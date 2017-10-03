@@ -172,9 +172,54 @@ OTHER_MODULES := \
 	Fw/Test \
 	$(FW_GTEST_MODULES)
 
+REF_MODULES := \
+	Ref/Top \
+	Ref/RecvBuffApp \
+	Ref/SendBuffApp \
+	Ref/SignalGen \
+	Ref/PingReceiver
+	
+Ref_MODULES := \
+	\
+	$(REF_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(DRV_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+  	\
+  	$(UTILS_MODULES)
+
+CTRL_DEPLOYMENT_MODULES := \
+	CTRL/Top
+	# CTRL/PwmDrv
+	# CTRL/GpioDrv
+
+CTRL_MODULES := \
+	\
+	$(CTRL_DEPLOYMENT_MODULES) \
+	\
+	Svc/PassiveRateGroup \
+	Svc/RateGroupDriver \
+	\
+	Fw/Cfg \
+	Fw/Obj \
+	Fw/Comp \
+	Fw/Port \
+	Fw/Types \
+	\
+	Svc/Sched \
+	Svc/PRUCycle \
+	Os
+
 # List deployments
 
-DEPLOYMENTS := Ref acdev
+DEPLOYMENTS := CTRL Ref acdev
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

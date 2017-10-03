@@ -1,4 +1,5 @@
 BUILDS := \
+	PRU \
 	DARWIN \
 	LINUX \
 	CYGWIN \
