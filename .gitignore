@@ -17,6 +17,7 @@ yacgen.log
 RemoteSystemsTempFiles
 *.py.bak
 ~*
+#*
 *.hash
 .DS_Store
 *.stackdump
