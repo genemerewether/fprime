@@ -7,7 +7,10 @@
 /*                 the resulting .out file on an AM335x device.             */
 /****************************************************************************/
 
--cr								/* Link using C conventions */
+-stack  0x100
+-heap   0x100
+
+/*-cr*/								/* Link using C conventions */
 
 /* Specify the System Memory Map */
 MEMORY
