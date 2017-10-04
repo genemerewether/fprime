@@ -1,5 +1,8 @@
 include $(BUILD_ROOT)/mk/configs/compiler/pru_cgt_common.mk
 
+PRU_AM335X_INCLUDES := -I $(BUILD_ROOT)/PRU/PruHal/am335x/ \
+		       -I $(BUILD_ROOT)/PRU/PruHal/
+
 CFLAGS := $(DEBUG) \
 	  \
 	  $(OPT_SIZE) \
@@ -12,6 +15,9 @@ CFLAGS := $(DEBUG) \
 	  $(PRU_CGT_INCLUDES_COMMON) \
 	  \
 	  $(PRU_INCLUDES_COMMON) \
+	  \
+	  $(PRU_AM335X_INCLUDES) \
+	  \
 	  --gen_func_subsections --printf_support=minimal --float_operations_allowed=none -k \
 	  --output_all_syms --embedded_cpp
 
@@ -27,6 +33,9 @@ CXXFLAGS := $(DEBUG) \
 	    $(PRU_CGT_INCLUDES_COMMON) \
 	    \
 	    $(PRU_INCLUDES_COMMON) \
+	    \
+	    $(PRU_AM335X_INCLUDES) \
+	    \
 	    --gen_func_subsections --printf_support=minimal --float_operations_allowed=none -k \
 	    --output_all_syms --embedded_cpp
 

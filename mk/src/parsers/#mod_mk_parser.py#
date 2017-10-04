@@ -1,4 +1,4 @@
-import os.path
+../mk/src/genmake.py../mk/src/genmake.pyimport os.path
 import parsers.variable_list_parser
 
 # A lookup dictionary for setting up code generation rules.
@@ -36,13 +36,6 @@ xml_gen_dictionary = {
                             ['AppAc.cpp',],
                             ['AppAc.hpp',],
                             '\tcd $(BUILD_ROOT)/<module_dir> && $(MKDIR) $(BUILD_ROOT)/<module_dir>/$(AC_DEP_DIR) && $(AC_TOPOLOGY_GEN) $(notdir $<) $(DEP_FILE_ARG) $(BUILD_ROOT)/<module_dir>/$(AC_DEP_DIR)/$(basename $(notdir $<)).dep'
-                            ],
-                        'C_App': 
-                            [
-                            'C_AppAi.xml',
-                            ['C_AppAc.c',],
-                            ['C_AppAc.h',],
-                            '\tcd $(BUILD_ROOT)/<module_dir> && $(MKDIR) $(BUILD_ROOT)/<module_dir>/$(AC_DEP_DIR) && $(AC_C_TOPOLOGY_GEN) $(notdir $<) $(DEP_FILE_ARG) $(BUILD_ROOT)/<module_dir>/$(AC_DEP_DIR)/$(basename $(notdir $<)).dep'
                             ],
                       }
 

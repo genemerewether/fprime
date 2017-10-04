@@ -188,6 +188,10 @@ def pinit():
 
     parser.add_option("-r", "--gen_report", dest="gen_report",
         help="Generate reports on component interfaces", action="store_true", default=False)
+
+    parser.add_option("-c", "--c_framework", dest="c_framework",
+        help="Create the C-code version of the topology; for highly constrained targets", action="store_true", default=False)
+
 #    author = os.environ['USER']
 #    parser.add_option("-a", "--author", dest="author", type="string",
 #        help="Specify the new FSW author (def: %s)." % author,
@@ -201,7 +205,7 @@ def pinit():
 
     return parser
 
-def generate_topology(the_parsed_topology_xml, xml_filename, opt):            
+def generate_topology(the_parsed_topology_xml, xml_filename, opt):
     DEBUG.debug("Topology xml type description file: %s" % xml_filename)
     generator = TopoFactory.TopoFactory.getInstance()
     if not(opt.default_topology_dict or opt.ampcs_topology_dict):
@@ -228,24 +232,28 @@ def generate_topology(the_parsed_topology_xml, xml_filename, opt):
     else:
         PRINT.info("Missing Ai at end of file name...")
         raise exceptions.IOError
-    
-    #Figures out what visitor to use
-    if opt.default_topology_dict:
-        generator.configureVisitor(h_instance_name, "InstanceTopologyHVisitor", True, True)  
-        generator.configureVisitor(cpp_instance_name, "InstanceTopologyCppVisitor", True, True)
+
+    # if not generating the C-code version of the framework for resource constrained targets
+    if not opt.c_framework:
+        #Figures out what visitor to use
+        if opt.default_topology_dict:
+            generator.configureVisitor(h_instance_name, "InstanceTopologyHVisitor", True, True)  
+            generator.configureVisitor(cpp_instance_name, "InstanceTopologyCppVisitor", True, True)
+        else:
+            generator.configureVisitor(h_instance_name, "TopologyHVisitor", True, True)  
+            generator.configureVisitor(cpp_instance_name, "TopologyCppVisitor", True, True)
+
+        #Used to generate base ID/base ID window CSV files
+        if True:
+            generator.configureVisitor(csv_instance_name , "TopologyIDVisitor" , True , True)
+
+        #Used to generate HTML tables of ID's etc.
+        if opt.default_topology_dict:
+            generator.configureVisitor(cmd_html_instance_name, "InstanceTopologyCmdHTMLVisitor", True, True)
+            generator.configureVisitor(channel_html_instance_name, "InstanceTopologyChannelsTMLVisitor", True, True)
+            generator.configureVisitor(event_html_instance_name, "InstanceTopologyEventsHTMLVisitor", True, True)
     else:
-        generator.configureVisitor(h_instance_name, "TopologyHVisitor", True, True)  
-        generator.configureVisitor(cpp_instance_name, "TopologyCppVisitor", True, True)
-        
-    #Used to generate base ID/base ID window CSV files
-    if True:
-        generator.configureVisitor(csv_instance_name , "TopologyIDVisitor" , True , True)
-    
-    #Used to generate HTML tables of ID's etc.
-    if opt.default_topology_dict:
-        generator.configureVisitor(cmd_html_instance_name, "InstanceTopologyCmdHTMLVisitor", True, True)
-        generator.configureVisitor(channel_html_instance_name, "InstanceTopologyChannelsTMLVisitor", True, True)
-        generator.configureVisitor(event_html_instance_name, "InstanceTopologyEventsHTMLVisitor", True, True)
+        PRINT.info("Generating resource-constrained version of framework")
     
     #uses the topology model to process the items        
     if opt.default_topology_dict or opt.ampcs_topology_dict:

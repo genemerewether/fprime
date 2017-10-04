@@ -202,20 +202,7 @@ CTRL_DEPLOYMENT_MODULES := \
 
 CTRL_MODULES := \
 	\
-	$(CTRL_DEPLOYMENT_MODULES) \
-	\
-	Svc/PassiveRateGroup \
-	Svc/RateGroupDriver \
-	\
-	Fw/Cfg \
-	Fw/Obj \
-	Fw/Comp \
-	Fw/Port \
-	Fw/Types \
-	\
-	Svc/Sched \
-	Svc/PRUCycle \
-	Os
+	$(CTRL_DEPLOYMENT_MODULES)
 
 # List deployments
 

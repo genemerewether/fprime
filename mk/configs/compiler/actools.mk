@@ -75,6 +75,8 @@ endif
 
 	AC_TOPOLOGY_GEN := $(CODE_GEN) --build_root --connect_only
 
+	AC_C_TOPOLOGY_GEN := $(CODE_GEN) --build_root --connect_only --c_framework
+
 endif
 	
 
