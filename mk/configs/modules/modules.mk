@@ -95,6 +95,25 @@ Ref_MODULES := \
 	$(CFDP_MODULES) \
   	\
   	$(UTILS_MODULES)
+
+SDREF_DEPLOYMENT_MODULES := \
+	SDREF/Top
+	
+SDREF_MODULES := \
+	\
+	$(SDREF_DEPLOYMENT_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(DRV_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+  	\
+  	$(UTILS_MODULES)
 		
 ACDEVTEST_MODULES := \
 	Autocoders/test/active_tester \
@@ -174,7 +193,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev
+DEPLOYMENTS := Ref acdev SDREF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

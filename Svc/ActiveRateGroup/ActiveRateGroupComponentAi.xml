@@ -45,6 +45,11 @@
             Cycle slips for rate group
             </comment>
         </channel>
+        <channel id="2" name="RgNumCycles" data_type="U32" abbrev="S001-002" update="on_change">
+            <comment>
+            Number of cycles
+            </comment>
+        </channel>
     </telemetry>
     <events event_base="$ActiveRateGroupEventsBase">
         <event id="0" name="RateGroupStarted" severity="DIAGNOSTIC" format_string = "Rate group started." >

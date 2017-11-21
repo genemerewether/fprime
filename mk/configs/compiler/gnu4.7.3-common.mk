@@ -12,26 +12,31 @@ GNU_CFLAGS_COMMON := $(GNU_COMMON) -std=c99 \
 				-Wstrict-prototypes
 
 GNU_CXXFLAGS_COMMON := $(GNU_COMMON)  -fcheck-new \
-				-Wnon-virtual-dtor 
+				-fno-rtti
+
+GNU_VERS := 4.7.3
+
+# Special compiler flags to get around known AC warnings
+
+AC_CC_FLAGS :=	-Wno-extra
+AC_CXX_FLAGS :=
+AC_HSM_FLAGS := -Wno-extra -Wno-parentheses
+AC_PARAMS_FLAGS := -fno-strict-aliasing	-Wno-extra	
 
 COMPILE_ONLY := -c
-SHARED_LIBRARY :=  -fPIC
 
 COMPILE_TO := -o
 LIBRARY_TO := -o
 LINK_BIN_PRE_TO := -o
 LINK_BIN_POST_TO := -o
-LINK_BIN_TO := -o
-
-POST_LINK_BIN := @echo
-
-LIBS_START := -Wl,--start-group
-LIBS_END := -Wl,--end-group
 
 INCLUDE_PATH := -I
 
+
 DEBUG := -g3
+
 OPT_SPEED := -Os
+
 OPT_NONE := -O0
 
-SYMBOL_CHECK := 
+SYMBOL_CHECK := /proj/msl/fsw/tools/bin/extract_symbols u

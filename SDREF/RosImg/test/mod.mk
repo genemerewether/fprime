@@ -11,28 +11,5 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-# This is a template for the mod.mk file that goes in each module
-# and each module's subdirectories.
-# With a fresh checkout, "make gen_make" should be invoked. It should also be
-# run if any of the variables are updated. Any unused variables can 
-# be deleted from the file.
 
-# There are some standard files that are included for reference
-SRC_LINUX = LinuxTimeImpl.cpp
-
-SRC_CYGWIN = LinuxTimeImpl.cpp
-
-SRC_DARWIN = DarwinTimeImpl.cpp
-
-SRC_BAERAD750 = VxWorksTimeImpl.cpp
-
-SRC_SPHINX = VxWorksTimeImpl.cpp
-
-SRC_SDFLIGHT = LinuxTimeImpl.cpp
-
-SRC_HEXAGON = DspalTimeImpl.cpp
-
-HDR = LinuxTimeImpl.hpp
-
-SUBDIRS = test
-
+SUBDIRS = ut 
