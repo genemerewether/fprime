@@ -290,6 +290,10 @@ void print_usage() {
 #include <signal.h>
 #include <stdio.h>
 
+extern "C" {
+    int main(int argc, char* argv[]);
+};
+
 volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {

@@ -40,3 +40,5 @@ SRC_WSTS = 			SvcSocketGndIfImpl.cpp
 SRC_CYGWIN =		SvcSocketGndIfImpl.cpp
 
 SRC_DARWIN =        SvcSocketGndIfImpl.cpp
+
+SRC_SDFLIGHT =        SvcSocketGndIfImpl.cpp

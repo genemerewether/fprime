@@ -12,4 +12,4 @@ CXXFLAGS := $(OPT_SPEED) \
 			$(LINUX_GNU_CXXFLAGS) \
 			$(LINUX_GNU_INCLUDES)
 
-COMPILER := linux-cross-arm-opt-gnu
+COMPILER := linaro-cross-arm-opt-gnu
