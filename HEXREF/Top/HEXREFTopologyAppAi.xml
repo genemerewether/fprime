@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<assembly name = "HEXREF">
+	<import_component_type>Svc/FatalHandler/FatalHandlerComponentAi.xml</import_component_type>
+	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
+	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
+	<import_component_type>Svc/Health/HealthComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
+	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PrmDb/PrmDbComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PassiveTextLogger/PassiveTextLoggerComponentAi.xml</import_component_type>
+
+   <instance namespace="Svc" name="fatalHandler" type="FatalHandler" base_id="1"  base_id_window="20" />
+
+   <instance namespace="Svc" name="fatalAdapter" type="AssertFatalAdapter" base_id="341"  base_id_window="20" />
+
+   <instance namespace="Svc" name="rgDrv" type="RateGroupDriver" base_id="461"  base_id_window="20" />
+
+   <instance namespace="Svc" name="health" type="Health" base_id="361"  base_id_window="20" />
+
+   <instance namespace="Svc" name="eventLogger" type="ActiveLogger" base_id="421"  base_id_window="20" />
+
+   <instance namespace="Svc" name="linuxTime" type="Time" base_id="441"  base_id_window="20" />
+
+   <instance namespace="Svc" name="rg" type="ActiveRateGroup" base_id="21"  base_id_window="20" />
+
+   <instance namespace="Svc" name="prmDb" type="PrmDb" base_id="141"  base_id_window="20" />
+
+   <instance namespace="Svc" name="textLogger" type="PassiveTextLogger" base_id="521"  base_id_window="20" />
+
+<connection name = "Connection2">
+	 <source component = "prmDb" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection3">
+	 <source component = "fatalAdapter" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection4">
+	 <source component = "rg" port = "PingOut" type = "Ping" num = "0"/>
+ 	 <target component = "health" port = "PingReturn" type = "Ping" num = "7"/>
+</connection>
+<connection name = "Connection7">
+	 <source component = "health" port = "PingSend" type = "Ping" num = "3"/>
+ 	 <target component = "eventLogger" port = "pingIn" type = "Ping" num = "0"/>
+</connection>
+<connection name = "Connection12">
+	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+ 	 <target component = "health" port = "Run" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection17">
+	 <source component = "eventLogger" port = "FatalAnnounce" type = "FatalEvent" num = "0"/>
+ 	 <target component = "fatalHandler" port = "FatalReceive" type = "FatalEvent" num = "0"/>
+</connection>
+<connection name = "Connection18">
+	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection22">
+	 <source component = "health" port = "PingSend" type = "Ping" num = "6"/>
+ 	 <target component = "prmDb" port = "pingIn" type = "Ping" num = "0"/>
+</connection>
+<connection name = "Connection24">
+	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection39">
+	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection41">
+	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "0"/>
+ 	 <target component = "rg" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection42">
+	 <source component = "eventLogger" port = "pingOut" type = "Ping" num = "0"/>
+ 	 <target component = "health" port = "PingReturn" type = "Ping" num = "3"/>
+</connection>
+<connection name = "Connection43">
+	 <source component = "rg" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection53">
+	 <source component = "prmDb" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection54">
+	 <source component = "prmDb" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection59">
+	 <source component = "health" port = "PingSend" type = "Ping" num = "7"/>
+ 	 <target component = "rg" port = "PingIn" type = "Ping" num = "0"/>
+</connection>
+<connection name = "Connection63">
+	 <source component = "eventLogger" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection64">
+	 <source component = "eventLogger" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection65">
+	 <source component = "rg" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection66">
+	 <source component = "rg" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection67">
+	 <source component = "health" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection71">
+	 <source component = "prmDb" port = "pingOut" type = "Ping" num = "0"/>
+ 	 <target component = "health" port = "PingReturn" type = "Ping" num = "6"/>
+</connection>
+<connection name = "Connection72">
+	 <source component = "health" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection74">
+	 <source component = "health" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+</assembly>
