@@ -77,7 +77,11 @@ namespace Svc {
       // Constants:
       // ----------------------------------------------------------------------
       // The maximum size of a filename
-      enum { 
+    enum {
+      /* TODO(mereweth) - these are not defined for DSPAL
+       * HEXAGON_Tools/7.2.12/Tools/target/hexagon/include/stdio.h does define
+       * FILENAME_MAX, which ends up being 260
+       */
         MAX_FILENAME_SIZE = NAME_MAX, // as defined in limits.h
         MAX_PATH_SIZE = PATH_MAX
       };

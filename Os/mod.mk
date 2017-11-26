@@ -34,7 +34,7 @@ HDR = 			Queue.hpp \
 				LocklessQueue.hpp
 
 SRC_LINUX=      Pthreads/Queue.cpp \
-               	Pthreads/BufferQueueCommon.cpp \
+		Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
 				Linux/File.cpp \
@@ -64,7 +64,7 @@ SRC_DARWIN =    Pthreads/Queue.cpp \
 				Posix/LocklessQueue.cpp
 
 SRC_CYGWIN =    Pthreads/Queue.cpp \
-               	Pthreads/BufferQueueCommon.cpp \
+		Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
 				Linux/File.cpp \
@@ -77,9 +77,9 @@ SRC_CYGWIN =    Pthreads/Queue.cpp \
 				Posix/Mutex.cpp \
 				Linux/FileSystem.cpp \
 				Posix/LocklessQueue.cpp
-				
+
 SRC_SDFLIGHT =  Pthreads/Queue.cpp \
-               	Pthreads/BufferQueueCommon.cpp \
+		Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
 				Linux/File.cpp \
@@ -93,6 +93,19 @@ SRC_SDFLIGHT =  Pthreads/Queue.cpp \
 				Posix/LocklessQueue.cpp \
 				Linux/FileSystem.cpp	
 
+SRC_DSPAL =  Pthreads/Queue.cpp \
+	 	Pthreads/BufferQueueCommon.cpp \
+                Pthreads/PriorityBufferQueue.cpp \
+                Pthreads/MaxHeap/MaxHeap.cpp \
+				Dspal/File.cpp \
+				Dspal/Task.cpp \
+				LogPrintf.cpp \
+				Linux/InterruptLock.cpp \
+				Linux/WatchdogTimer.cpp \
+				X86/IntervalTimer.cpp \
+				Dspal/IntervalTimer.cpp \
+				Posix/Mutex.cpp \
+				Posix/LocklessQueue.cpp
 
 SUBDIRS = test
 

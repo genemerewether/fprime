@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #endif
+// List of context IDs
 
 #if defined BUILD_DSPAL
 #define PRM_PATH "/dev/fs/PrmDb.dat"
@@ -19,13 +20,17 @@
 #define PRM_PATH "PrmDb.dat"
 #endif
 
-// List of context IDs
+enum {
+    DOWNLINK_PACKET_SIZE = 500,
+    DOWNLINK_BUFFER_STORE_SIZE = 2500,
+    DOWNLINK_BUFFER_QUEUE_SIZE = 5,
+    UPLINK_BUFFER_STORE_SIZE = 3000,
+    UPLINK_BUFFER_QUEUE_SIZE = 30
+};
+
 enum {
         ACTIVE_COMP_1HZ_RG,
-        ACTIVE_COMP_CMD_DISP,
-        ACTIVE_COMP_CMD_SEQ,
         ACTIVE_COMP_LOGGER,
-        ACTIVE_COMP_TLM,
         ACTIVE_COMP_PRMDB,
 
         CYCLER_TASK,
@@ -38,7 +43,7 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 // Component instance pointers
-static NATIVE_INT_TYPE rgDivs[] = {1,2,4};
+static NATIVE_INT_TYPE rgDivs[] = {1};
 Svc::RateGroupDriverImpl rgDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGDRV",
@@ -46,15 +51,12 @@ Svc::RateGroupDriverImpl rgDrv(
                     rgDivs,FW_NUM_ARRAY_ELEMENTS(rgDivs));
 
 static NATIVE_UINT_TYPE rgContext[] = {0,0,0,0,0,0,0,0,0,0};
-Svc::ActiveRateGroupImpl rg
+Svc::ActiveRateGroupImpl rg(
 #if FW_OBJECT_NAMES == 1
-                    ("RG",rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
-#else
-                    (rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
+                    "RG",
 #endif
+                    rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
 ;
-
-// HEXREF Implementation Components
 
 #if FW_ENABLE_TEXT_LOGGING
 Svc::ConsoleTextLoggerImpl textLogger
@@ -76,30 +78,11 @@ Svc::LinuxTimeImpl linuxTime
 #endif
 ;
 
-Svc::TlmChanImpl chanTlm
-#if FW_OBJECT_NAMES == 1
-                    ("TLM")
-#endif
-;
-
-Svc::CommandDispatcherImpl cmdDisp
-#if FW_OBJECT_NAMES == 1
-                    ("CMDDISP")
-#endif
-;
-
-Fw::MallocAllocator seqMallocator;
-Svc::CmdSequencerComponentImpl cmdSeq
-#if FW_OBJECT_NAMES == 1
-                    ("CMDSEQ")
-#endif
-;
-
 Svc::PrmDbImpl prmDb
 #if FW_OBJECT_NAMES == 1
-                    ("PRM","PrmDb.dat")
+                    ("PRM",PRM_PATH)
 #else
-                    ("PrmDb.dat")
+                    (PRM_PATH)
 #endif
 ;
 
@@ -132,7 +115,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void constructApp() {
+void constructApp(int port_number, char* hostname) {
 
     localTargetInit();
 
@@ -141,21 +124,10 @@ void constructApp() {
 #endif    
 
     // Initialize rate group driver
-    rateGroupDriverComp.init();
+    rgDrv.init();
 
     // Initialize the rate groups
-    rateGroup1Comp.init(10,0);
-    
-    rateGroup2Comp.init(10,1);
-    
-    rateGroup3Comp.init(10,2);
-
-    // Initialize block driver
-    blockDrv.init(10);
-
-    // Send/Receive example hardware components
-    recvBuffComp.init();
-    sendBuffComp.init(10);
+    rg.init(10,0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -165,83 +137,38 @@ void constructApp() {
 
     linuxTime.init(0);
 
-    chanTlm.init(10,0);
-
-    cmdDisp.init(20,0);
-
-    cmdSeq.init(10,0);
-    cmdSeq.allocateBuffer(0,seqMallocator,5*1024);
-
     prmDb.init(10,0);
 
-    sockGndIf.init(0);
+    fatalAdapter.init(0);
+    fatalHandler.init(0);
+    health.init(25,0);
 
-    fileUplink.init(30, 0);
-    fileDownlink.init(30, 0);
-    fileUplinkBufferManager.init(0);
-    fileDownlinkBufferManager.init(1);
-    SG1.init(10,0);
-	SG2.init(10,1);
-	SG3.init(10,2);
-	SG4.init(10,3);
-	SG5.init(10,4);
-	fatalAdapter.init(0);
-	fatalHandler.init(0);
-	health.init(25,0);
-	pingRcvr.init(10);
     // Connect rate groups to rate group driver
-    constructRefArchitecture();
+    constructHEXREFArchitecture();
 
     /* Register commands */
-    sendBuffComp.regCommands();
-    recvBuffComp.regCommands();
-    cmdSeq.regCommands();
-    cmdDisp.regCommands();
-    eventLogger.regCommands();
+    /*eventLogger.regCommands();
     prmDb.regCommands();
-    fileDownlink.regCommands();
-    SG1.regCommands();
-    SG2.regCommands();
-    SG3.regCommands();
-    SG4.regCommands();
-	SG5.regCommands();
-	health.regCommands();
-	pingRcvr.regCommands();
+    health.regCommands();*/
 
     // read parameters
     prmDb.readParamFile();
-    recvBuffComp.loadParameters();
-    sendBuffComp.loadParameters();
 
     // set health ping entries
 
     Svc::HealthImpl::PingEntry pingEntries[] = {
-        {3,5,rateGroup1Comp.getObjName()}, // 0
-        {3,5,rateGroup2Comp.getObjName()}, // 1
-        {3,5,rateGroup3Comp.getObjName()}, // 2
-        {3,5,cmdDisp.getObjName()}, // 3
-        {3,5,eventLogger.getObjName()}, // 4
-        {3,5,cmdSeq.getObjName()}, // 5
-        {3,5,chanTlm.getObjName()}, // 6
-        {3,5,fileUplink.getObjName()}, // 7
-        {3,5,blockDrv.getObjName()}, // 8
-        {3,5,fileDownlink.getObjName()}, // 9
-        {3,5,pingRcvr.getObjName()}, // 10
+        {3,5,rg.getObjName()}, // 0
+        {3,5,eventLogger.getObjName()}, // 1
     };
 
     // register ping table
-    health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
+    //health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
 
     // Active component startup
     // start rate groups
-    rateGroup1Comp.start(ACTIVE_COMP_1HZ_RG, 120,10 * 1024);
-    // start dispatcher
-    cmdDisp.start(ACTIVE_COMP_CMD_DISP,101,10*1024);
-    // start sequencer
-    cmdSeq.start(ACTIVE_COMP_CMD_SEQ,100,10*1024);
+    rg.start(ACTIVE_COMP_1HZ_RG, 120,10 * 1024);
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,98,10*1024);
-    chanTlm.start(ACTIVE_COMP_TLM,97,10*1024);
     prmDb.start(ACTIVE_COMP_PRMDB,96,10*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
@@ -262,8 +189,11 @@ void constructApp() {
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    blockDrv.callIsr();
-    Os::Task::delay(1000); //10Hz
+    Svc::InputCyclePort* port = rgDrv.get_CycleIn_InputPort(0);
+    Svc::TimerVal cycleStart;
+    cycleStart.take();
+    port->invoke(cycleStart);
+    Os::Task::delay(1000);
 }
 
 void runcycles(NATIVE_INT_TYPE cycles) {
@@ -280,21 +210,24 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 }
 
 void exitTasks(void) {
-    rateGroup1Comp.exit();
-    rateGroup2Comp.exit();
-    rateGroup3Comp.exit();
-    blockDrv.exit();
-    cmdDisp.exit();
+    rg.exit();
     eventLogger.exit();
-    chanTlm.exit();
     prmDb.exit();
-    fileUplink.exit();
-    fileDownlink.exit();
-    cmdSeq.exit();
+}
+
+// For testing; DSPAL binary is launched by FastRPC call
+#if !defined BUILD_DSPAL
+
+void print_usage() {
+	(void) printf("Usage: ./HEXREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
 }
 
 #include <signal.h>
 #include <stdio.h>
+
+extern "C" {
+    int main(int argc, char* argv[]);
+};
 
 volatile sig_atomic_t terminate = 0;
 
@@ -303,10 +236,37 @@ static void sighandler(int signum) {
 }
 
 int main(int argc, char* argv[]) {
+	U32 port_number = 0;
+	I32 option = 0;
+	char *hostname = NULL;
+        bool local_cycle = false;
 
-	(void) printf("Quit the Krait app to quit\n");
+	while ((option = getopt(argc, argv, "hlp:a:")) != -1){
+		switch(option) {
+			case 'h':
+				print_usage();
+				return 0;
+				break;
+                        case 'l':
+                          local_cycle = true;
+                          break;
+			case 'p':
+				port_number = atoi(optarg);
+				break;
+			case 'a':
+				hostname = optarg;
+				break;
+			case '?':
+				return 1;
+			default:
+				print_usage();
+				return 1;
+		}
+	}
 
-    constructApp();
+	(void) printf("Hit Ctrl-C to quit\n");
+
+    constructApp(port_number, hostname);
     //dumparch();
 
     signal(SIGINT,sighandler);
@@ -316,8 +276,12 @@ int main(int argc, char* argv[]) {
 
     while (!terminate) {
 //        (void) printf("Cycle %d\n",cycle);
+      if (local_cycle) {
         runcycles(1);
-        cycle++;
+      } else {
+        Os::Task::delay(1000);
+      }
+      cycle++;
     }
 
     // stop tasks
@@ -330,3 +294,5 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
+#endif //!defined BUILD_DSPAL

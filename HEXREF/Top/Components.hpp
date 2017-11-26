@@ -1,3 +1,5 @@
+#ifndef __LITS_COMPONENTS_HEADER__
+#define __LITS_COMPONENTS_HEADER__
 void constructHEXREFArchitecture(void);
 void exitTasks(void);
 
@@ -11,21 +13,15 @@ void exitTasks(void);
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 #include <Svc/Health/HealthComponentImpl.hpp>
 
-#include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
-
-#include <SDREF/Top/TargetInit.hpp>
+#include <HEXREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rg;
-extern Svc::CmdSequencerComponentImpl cmdSeq;
-extern Svc::SocketGndIfImpl sockGndIf;
 extern Svc::ConsoleTextLoggerImpl textLogger;
 extern Svc::ActiveLoggerImpl eventLogger;
 extern Svc::LinuxTimeImpl linuxTime;
-extern Svc::TlmChanImpl chanTlm;
-extern Svc::CommandDispatcherImpl cmdDisp;
 extern Svc::PrmDbImpl prmDb;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;

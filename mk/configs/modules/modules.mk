@@ -23,7 +23,7 @@ FW_GTEST_MODULES := \
 	Fw/SerializableFile/test/TestSerializable \
 	Fw/FilePacket/GTest \
 	Fw/Types/GTest
-	
+
 OS_MODULES := \
 	Os 
 
@@ -32,10 +32,10 @@ CFDP_MODULES := \
 
 CFDP_GTEST_MODULES := \
 	CFDP/Checksum/GTest
-	
+
 UTILS_MODULES := \
 	Utils/Hash
-        
+
 SVC_MODULES := \
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
@@ -71,7 +71,6 @@ SVC_MODULES := \
 DRV_MODULES := \
 	Drv/DataTypes \
 	Drv/BlockDriver
-	
 
 REF_MODULES := \
 	Ref/Top \
@@ -79,7 +78,7 @@ REF_MODULES := \
 	Ref/SendBuffApp \
 	Ref/SignalGen \
 	Ref/PingReceiver
-	
+
 Ref_MODULES := \
 	\
 	$(REF_MODULES) \
@@ -93,46 +92,65 @@ Ref_MODULES := \
 	$(OS_MODULES) \
 	\
 	$(CFDP_MODULES) \
-  	\
-  	$(UTILS_MODULES)
+	\
+	$(UTILS_MODULES)
 
 SDREF_DEPLOYMENT_MODULES := \
 	SDREF/Top
-	
+
 SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
 	$(SVC_MODULES) \
 	\
-	$(DRV_MODULES) \
-	\
 	$(FW_MODULES) \
 	\
 	$(OS_MODULES) \
 	\
 	$(CFDP_MODULES) \
-  	\
-  	$(UTILS_MODULES)
+	\
+	$(UTILS_MODULES)
 
 HEXREF_DEPLOYMENT_MODULES := \
 	HEXREF/Top
-	
+
 HEXREF_MODULES := \
 	\
 	$(HEXREF_DEPLOYMENT_MODULES) \
 	\
-	$(SVC_MODULES) \
-	\
-	$(DRV_MODULES) \
+	Svc/BufferManager \
+	Svc/CmdDispatcher \
+	Svc/CmdSequencer \
+	Svc/Seq \
+	Svc/ActiveRateGroup \
+	Svc/RateGroupDriver \
+	Svc/Sched \
+	Svc/PassiveTextLogger \
+	Svc/PassiveConsoleTextLogger \
+	Svc/Time \
+	Svc/Cycle \
+	Svc/LinuxTime \
+	Svc/ActiveLogger \
+	Svc/Fatal \
+	Svc/PolyIf \
+	Svc/PolyDb \
+	Svc/PrmDb \
+	Svc/Ping \
+	Svc/Health \
+	Svc/WatchDog \
+	Svc/AssertFatalAdapter \
+	Svc/FatalHandler \
+	Svc/FileManager \
 	\
 	$(FW_MODULES) \
 	\
 	$(OS_MODULES) \
 	\
 	$(CFDP_MODULES) \
-  	\
-  	$(UTILS_MODULES)
+	\
+	$(UTILS_MODULES)
+#Svc/ComLogger
 
 ACDEVTEST_MODULES := \
 	Autocoders/test/active_tester \
@@ -194,15 +212,15 @@ ACDEVTEST_MODULES := \
 	Autocoders/test/serial_passive \
     \
 	Autocoders/templates
-	
+
 acdev_MODULES := \
 	$(FW_MODULES) \
 	\
 	$(OS_MODULES) \
 	\
 	$(ACDEVTEST_MODULES)
-	
-	
+
+
 # Other modules to build, but not to link with deployment binaries
 OTHER_MODULES := \
 	gtest \
