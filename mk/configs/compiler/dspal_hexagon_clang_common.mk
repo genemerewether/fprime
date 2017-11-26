@@ -4,6 +4,7 @@ include $(BUILD_ROOT)/mk/configs/compiler/dspal_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_clang_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_sdk_common.mk
+include $(BUILD_ROOT)/mk/configs/compiler/hexagon_v55.mk
 
 CC := $(HEXAGON_BIN)/hexagon-clang
 CXX := $(HEXAGON_BIN)/hexagon-clang++
@@ -31,12 +32,17 @@ MUNCH := $(BUILD_ROOT)/mk/bin/empty.sh
 
 DSPAL_HEX_CLANG_CFLAGS := $(DSPAL_FLAGS_COMMON) \
 		    $(COMMON_DEFINES) \
-		    $(HEX_CLANG_CFLAGS_COMMON)
+		    $(HEX_CLANG_CFLAGS_COMMON) \
+		    $(HEXAGON_ARCH_CPU_FLAGS) \
+		    $(HEXAGON_ARCH_CFLAGS)
+
 #$(BUILD_32BIT) # Quantum framework won't build 32-bit
 
 DSPAL_HEX_CLANG_CXXFLAGS :=	$(DSPAL_FLAGS_COMMON) \
 				$(COMMON_DEFINES) \
-				$(HEX_CLANG_CXXFLAGS_COMMON)
+				$(HEX_CLANG_CXXFLAGS_COMMON) \
+				$(HEXAGON_ARCH_CPU_FLAGS) \
+				$(HEXAGON_ARCH_CXXFLAGS)
 #$(BUILD_32BIT)
 
 COVERAGE := -fprofile-arcs -ftest-coverage
@@ -45,13 +51,39 @@ COVERAGE := -fprofile-arcs -ftest-coverage
 
 DSPAL_HEX_CLANG_INCLUDES := 	$(DSPAL_INCLUDES_COMMON) \
 				$(COMMON_INCLUDES) \
-				-I $(HEXAGON_SDK_ROOT)/incs \
-				-I $(HEXAGON_SDK_ROOT)/incs/stddef #\
-#-I $(HEXAGON_SDK_ROOT)/libs/common/rpcmem/inc #\
-#-I $(HEXAGON_SDK_ROOT)/libs/common/qurt/ADSPv55MP/include #\
+				$(HEXAGON_SDK_INCLUDES) \
+				$(HEXAGON_ARCH_INCLUDES)
+
 #-I$(HEXAGON_TOOLS_ROOT)
 
 LINK_BIN := $(HEXAGON_BIN)/hexagon-link
-LINK_BIN_FLAGS := 
+LINK_BIN_FLAGS := $(HEXAGON_ARCH_LINK_FLAGS) \
+		  -shared \
+		  -call_shared \
+		  -G0 \
+		  $(HEXAGON_ARCH_LIB_DIR)/initS.o
 
 LINK_LIBS := 
+
+LIBS_START := -L$(HEXAGON_ARCH_LIB_DIR) \
+	-Bsymbolic \
+	$(HEXAGON_ARCH_LIB_DIR)/libgcc.a \
+	--wrap=malloc \
+	--wrap=calloc \
+	--wrap=free \
+	--wrap=realloc \
+	--wrap=memalign \
+	--wrap=__stack_chk_fail \
+	-lc \
+	\
+	--start-group --whole-archive
+
+LIBS_END := --no-whole-archive \
+	$(HEXAGON_ARCH_LIB_DIR)/libstdc++.a \
+	--end-group \
+	\
+	--start-group \
+	-lgcc \
+	--end-group \
+	$(HEXAGON_ARCH_LIB_DIR)/finiS.o
+
