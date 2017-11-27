@@ -30,11 +30,21 @@ DUMP = $(BUILD_ROOT)/mk/bin/empty.sh
 
 MUNCH := $(BUILD_ROOT)/mk/bin/empty.sh
 
+DSPAL_HEX_COMMON := -fPIC \
+	-D __QURT \
+	-D _PID_T \
+	-D _UID_T \
+	-D _TIMER_T \
+	-D _HAS_C9X \
+	-D restrict=__restrict__ \
+	-D noreturn_function= \
+	-D__CUSTOM_FILE_IO__
+
 DSPAL_HEX_CLANG_CFLAGS := $(DSPAL_FLAGS_COMMON) \
 		    $(COMMON_DEFINES) \
 		    $(HEX_CLANG_CFLAGS_COMMON) \
 		    $(HEXAGON_ARCH_CPU_FLAGS) \
-		    $(HEXAGON_ARCH_CFLAGS)
+		    $(DSPAL_HEX_COMMON)
 
 #$(BUILD_32BIT) # Quantum framework won't build 32-bit
 
@@ -42,12 +52,11 @@ DSPAL_HEX_CLANG_CXXFLAGS :=	$(DSPAL_FLAGS_COMMON) \
 				$(COMMON_DEFINES) \
 				$(HEX_CLANG_CXXFLAGS_COMMON) \
 				$(HEXAGON_ARCH_CPU_FLAGS) \
-				$(HEXAGON_ARCH_CXXFLAGS)
+				$(DSPAL_HEX_COMMON) \
+				-DCONFIG_WCHAR_BUILTIN
 #$(BUILD_32BIT)
 
 COVERAGE := -fprofile-arcs -ftest-coverage
-
-# TODO(mereweth)
 
 DSPAL_HEX_CLANG_INCLUDES := 	$(DSPAL_INCLUDES_COMMON) \
 				$(COMMON_INCLUDES) \
@@ -63,9 +72,9 @@ LINK_BIN_FLAGS := $(HEXAGON_ARCH_LINK_FLAGS) \
 		  -G0 \
 		  $(HEXAGON_ARCH_LIB_DIR)/initS.o
 
-LINK_LIBS := 
+LINK_LIBS :=
 
-LIBS_START := -L$(HEXAGON_ARCH_LIB_DIR) \
+LINK_BIN_PRE_LIB_FLAGS := -L$(HEXAGON_ARCH_LIB_DIR) \
 	-Bsymbolic \
 	$(HEXAGON_ARCH_LIB_DIR)/libgcc.a \
 	--wrap=malloc \
@@ -78,7 +87,7 @@ LIBS_START := -L$(HEXAGON_ARCH_LIB_DIR) \
 	\
 	--start-group --whole-archive
 
-LIBS_END := --no-whole-archive \
+LINK_BIN_POST_LIB_FLAGS := --no-whole-archive \
 	$(HEXAGON_ARCH_LIB_DIR)/libstdc++.a \
 	--end-group \
 	\
@@ -87,3 +96,6 @@ LIBS_END := --no-whole-archive \
 	--end-group \
 	$(HEXAGON_ARCH_LIB_DIR)/finiS.o
 
+# TODO(mereweth) - use prefix and suffix instead of renaming on adb push?
+BIN_PREFIX :=
+BIN_SUFFIX :=

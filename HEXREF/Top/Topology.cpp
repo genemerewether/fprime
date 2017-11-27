@@ -12,13 +12,22 @@
 #include <stdlib.h>
 #include <ctype.h>
 #endif
-// List of context IDs
 
-#if defined BUILD_DSPAL
+#ifdef BUILD_DSPAL
+#include <HEXREF/Rpc/hexref.h>
+#include <HAP_farf.h>
+#endif
+
+#ifdef BUILD_DSPAL
 #define PRM_PATH "/dev/fs/PrmDb.dat"
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
 #else
 #define PRM_PATH "PrmDb.dat"
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
+
+//#undef DEBUG_PRINT
+//#define DEBUG_PRINT(x,...)
 
 enum {
     DOWNLINK_PACKET_SIZE = 500,
@@ -28,6 +37,7 @@ enum {
     UPLINK_BUFFER_QUEUE_SIZE = 30
 };
 
+// List of context IDs
 enum {
         ACTIVE_COMP_1HZ_RG,
         ACTIVE_COMP_LOGGER,
@@ -115,7 +125,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void constructApp(int port_number, char* hostname) {
+void constructApp() {
 
     localTargetInit();
 
@@ -215,11 +225,44 @@ void exitTasks(void) {
     prmDb.exit();
 }
 
-// For testing; DSPAL binary is launched by FastRPC call
-#if !defined BUILD_DSPAL
+// DSPAL binary is launched by FastRPC call
+#ifdef BUILD_DSPAL
+int hexref_init(void) {
+  bool local_cycle = true;
+  
+  constructApp();
+  //dumparch();
+
+  //signal(SIGINT,sighandler);
+  //signal(SIGTERM,sighandler);
+
+  int cycle = 0;
+
+  while (true) { //!terminate) {
+    // DEBUG_PRINT("Cycle %d\n",cycle);
+    if (local_cycle) {
+      runcycles(1);
+    } else {
+      Os::Task::delay(1000);
+    }
+    cycle++;
+  }
+  
+  // stop tasks
+  exitTasks();
+  // Give time for threads to exit
+  DEBUG_PRINT("Waiting for threads...\n");
+  Os::Task::delay(1000);
+  
+  DEBUG_PRINT("Exiting...\n");
+  
+  return 0; 
+}
+
+#else // For testing
 
 void print_usage() {
-	(void) printf("Usage: ./HEXREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
+	(void) DEBUG_PRINT("Usage: ./HEXREF [options]\n-l\tFor time-based cycles\n");
 }
 
 #include <signal.h>
@@ -264,7 +307,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	(void) printf("Hit Ctrl-C to quit\n");
+	(void) DEBUG_PRINT("Hit Ctrl-C to quit\n");
 
     constructApp(port_number, hostname);
     //dumparch();
@@ -275,7 +318,7 @@ int main(int argc, char* argv[]) {
     int cycle = 0;
 
     while (!terminate) {
-//        (void) printf("Cycle %d\n",cycle);
+//        (void) DEBUG_PRINT("Cycle %d\n",cycle);
       if (local_cycle) {
         runcycles(1);
       } else {
@@ -287,12 +330,12 @@ int main(int argc, char* argv[]) {
     // stop tasks
     exitTasks();
     // Give time for threads to exit
-    (void) printf("Waiting for threads...\n");
+    (void) DEBUG_PRINT("Waiting for threads...\n");
     Os::Task::delay(1000);
 
-    (void) printf("Exiting...\n");
+    (void) DEBUG_PRINT("Exiting...\n");
 
     return 0;
 }
 
-#endif //!defined BUILD_DSPAL
+#endif //ifdef BUILD_DSPAL

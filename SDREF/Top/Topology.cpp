@@ -12,13 +12,16 @@
 #include <stdlib.h>
 #include <ctype.h>
 #endif
-// List of context IDs
 
-#if defined BUILD_SDFLIGHT
-#define PRM_PATH "/usr/share/data/adsp/PrmDb.dat"
-#else
-#define PRM_PATH "PrmDb.dat"
+#ifdef BUILD_SDFLIGHT
+#include <HEXREF/Rpc/hexref.h>
 #endif
+
+/*#ifdef BUILD_SDFLIGHT
+#define PRM_PATH "/usr/share/data/adsp/PrmDb.dat"
+#else*/
+#define PRM_PATH "PrmDb.dat"
+//#endif
 
 enum {
     DOWNLINK_PACKET_SIZE = 500,
@@ -28,6 +31,7 @@ enum {
     UPLINK_BUFFER_QUEUE_SIZE = 30
 };
 
+// List of context IDs
 enum {
         ACTIVE_COMP_1HZ_RG,
         ACTIVE_COMP_CMD_DISP,
@@ -238,6 +242,10 @@ void constructApp(int port_number, char* hostname) {
 
     // Initialize socket server
     sockGndIf.startSocketTask(100, port_number, hostname);
+
+#ifdef BUILD_SDFLIGHT
+    hexref_init();
+#endif
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();

@@ -5,19 +5,7 @@ HEXAGON_ARCH_LINK_FLAGS := -march=hexagon -mcpu=hexagon$(HEXAGON_V_ARCH)
 
 HEXAGON_ARCH_CPU_FLAGS := -m$(HEXAGON_V_ARCH) -G0 -DDSP_TYPE_$(HEXAGON_DSP_TYPE)
 
-HEXAGON_ARCH_COMMON := -D __QURT \
-	-D _PID_T \
-	-D _UID_T \
-	-D _TIMER_T \
-	-D _HAS_C9X \
-	-D restrict=__restrict__ \
-	-D noreturn_function= \
-	-D__CUSTOM_FILE_IO__
-
-HEXAGON_ARCH_CFLAGS := $(HEXAGON_ARCH_COMMON)
-HEXAGON_ARCH_CXXFLAGS := $(HEXAGON_ARCH_COMMON) \
-			 -DCONFIG_WCHAR_BUILTIN
-
-HEXAGON_ARCH_LIB_DIR := ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/$(HEXAGON_V_ARCH)/G0/pic
+HEXAGON_ARCH_LIB_DIR := $(HEXAGON_TOOLS_ROOT)/target/hexagon/lib/$(HEXAGON_V_ARCH)/G0/pic
+#$(HEXAGON_TOOLS_ROOT)/target/hexagon/lib/v5/G0/pic
 
 HEXAGON_ARCH_INCLUDES := -I $(HEXAGON_SDK_ROOT)/libs/common/qurt/ADSP$(HEXAGON_V_ARCH)MP/include #\

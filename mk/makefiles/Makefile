@@ -65,7 +65,9 @@ $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(BIN_SUFFIX
 	$(GEN_VERSION) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.c
 	$(CC) $(COMPILE_ONLY) $(COMPILE_TO) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.c
 	@echo Linking binary...
-	@$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o
+	#TODO(genemerewether@gmail.com) remove this debug
+	@echo $(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(LINK_BIN_POST_LIB_FLAGS)
+	@$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(LINK_BIN_POST_LIB_FLAGS)
 
 endif
 # Module-level code generator targets

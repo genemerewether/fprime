@@ -96,6 +96,7 @@ Ref_MODULES := \
 	$(UTILS_MODULES)
 
 SDREF_DEPLOYMENT_MODULES := \
+	HEXREF/Rpc \
 	SDREF/Top
 
 SDREF_MODULES := \
@@ -112,8 +113,13 @@ SDREF_MODULES := \
 	\
 	$(UTILS_MODULES)
 
+TESTRPC_MODULES := \
+	TESTRPC/Top \
+	HEXREF/Rpc
+
 HEXREF_DEPLOYMENT_MODULES := \
-	HEXREF/Top
+	HEXREF/Top \
+	HEXREF/Rpc
 
 HEXREF_MODULES := \
 	\
@@ -230,7 +236,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF HEXREF
+DEPLOYMENTS := Ref acdev SDREF HEXREF TESTRPC
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse
