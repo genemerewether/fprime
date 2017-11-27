@@ -19,6 +19,10 @@
 
 #include <Fw/Types/BasicTypes.hpp>
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#endif
+
 // VxWorks and DSPAL don't have strnlen
 #if defined __VXWORKS__ || defined BUILD_DSPAL
 NATIVE_INT_TYPE strnlen(const char *s, NATIVE_INT_TYPE maxlen) {
@@ -32,3 +36,16 @@ NATIVE_INT_TYPE strnlen(const char *s, NATIVE_INT_TYPE maxlen) {
 }
 #endif
 
+#ifdef BUILD_DSPAL
+int fputc(int c, FILE *stream)
+{
+  FARF(ALWAYS, "fputc called with %d", c);
+  return c;
+}
+
+int fprintf(FILE *stream, const char *format, ...)
+{
+  FARF(ALWAYS, "fprintf called with format string %s", format);
+  return 0;
+}
+#endif

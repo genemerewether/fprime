@@ -122,6 +122,7 @@ HEXREF_DEPLOYMENT_MODULES := \
 	HEXREF/Rpc
 
 HEXREF_MODULES := \
+	RpcCommon \
 	\
 	$(HEXREF_DEPLOYMENT_MODULES) \
 	\
@@ -147,7 +148,6 @@ HEXREF_MODULES := \
 	Svc/WatchDog \
 	Svc/AssertFatalAdapter \
 	Svc/FatalHandler \
-	Svc/FileManager \
 	\
 	$(FW_MODULES) \
 	\

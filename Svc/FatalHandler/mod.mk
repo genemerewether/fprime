@@ -24,6 +24,9 @@ SRC_DARWIN = FatalHandlerComponentLinuxImpl.cpp
 
 SRC_SDFLIGHT = FatalHandlerComponentLinuxImpl.cpp
 
+#TODO(mereweth) - how should we exit on DSPAL?
+SRC_DSPAL = FatalHandlerComponentLinuxImpl.cpp
+
 HDR = FatalHandlerComponentImpl.hpp	
 
 SUBDIRS = 

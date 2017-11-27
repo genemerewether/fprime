@@ -162,7 +162,8 @@ void constructApp() {
     health.regCommands();*/
 
     // read parameters
-    prmDb.readParamFile();
+
+    //prmDb.readParamFile();
 
     // set health ping entries
 
@@ -229,8 +230,13 @@ void exitTasks(void) {
 #ifdef BUILD_DSPAL
 int hexref_init(void) {
   bool local_cycle = true;
-  
+
+  DEBUG_PRINT("Before constructing app\n");
   constructApp();
+  DEBUG_PRINT("After constructing app\n");
+  
+  Os::Task::delay(1000);
+
   //dumparch();
 
   //signal(SIGINT,sighandler);
@@ -239,7 +245,7 @@ int hexref_init(void) {
   int cycle = 0;
 
   while (true) { //!terminate) {
-    // DEBUG_PRINT("Cycle %d\n",cycle);
+    DEBUG_PRINT("Cycle %d\n",cycle);
     if (local_cycle) {
       runcycles(1);
     } else {
@@ -279,12 +285,10 @@ static void sighandler(int signum) {
 }
 
 int main(int argc, char* argv[]) {
-	U32 port_number = 0;
 	I32 option = 0;
-	char *hostname = NULL;
         bool local_cycle = false;
 
-	while ((option = getopt(argc, argv, "hlp:a:")) != -1){
+	while ((option = getopt(argc, argv, "hl")) != -1){
 		switch(option) {
 			case 'h':
 				print_usage();
@@ -293,12 +297,6 @@ int main(int argc, char* argv[]) {
                         case 'l':
                           local_cycle = true;
                           break;
-			case 'p':
-				port_number = atoi(optarg);
-				break;
-			case 'a':
-				hostname = optarg;
-				break;
 			case '?':
 				return 1;
 			default:
@@ -309,7 +307,7 @@ int main(int argc, char* argv[]) {
 
 	(void) DEBUG_PRINT("Hit Ctrl-C to quit\n");
 
-    constructApp(port_number, hostname);
+    constructApp();
     //dumparch();
 
     signal(SIGINT,sighandler);
@@ -318,7 +316,7 @@ int main(int argc, char* argv[]) {
     int cycle = 0;
 
     while (!terminate) {
-//        (void) DEBUG_PRINT("Cycle %d\n",cycle);
+      (void) DEBUG_PRINT("Cycle %d\n",cycle);
       if (local_cycle) {
         runcycles(1);
       } else {

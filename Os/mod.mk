@@ -105,7 +105,8 @@ SRC_DSPAL =  Pthreads/Queue.cpp \
 				X86/IntervalTimer.cpp \
 				Dspal/IntervalTimer.cpp \
 				Posix/Mutex.cpp \
-				Posix/LocklessQueue.cpp
+				Posix/LocklessQueue.cpp \
+				Dspal/FileSystem.cpp
 
 SUBDIRS = test
 

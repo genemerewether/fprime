@@ -19,6 +19,8 @@ SUBDIRS = test
 
 SRC_SDFLIGHT = Stub/HealthComponentStubChecks.cpp
 
+SRC_DSPAL = Stub/HealthComponentStubChecks.cpp
+
 SRC_LINUX = Stub/HealthComponentStubChecks.cpp
 
 SRC_CYGWIN = Stub/HealthComponentStubChecks.cpp
