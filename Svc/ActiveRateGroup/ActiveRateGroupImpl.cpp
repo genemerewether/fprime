@@ -101,7 +101,7 @@ namespace Svc {
         }
 
         // increment cycle
-        this->m_cycles++;
+        this->tlmWrite_RgNumCycles(++this->m_cycles);
 
     }
 

@@ -1,0 +1,27 @@
+     INSTANCE NAME      | BASE ID (HEX) | REQUESTED WINDOW SIZE | DIFFERENCED ID WINDOW SIZE | LARGEST COMPONENT INTERNAL ID | MAX AMOUNT OF IDS
+     fatalHandler       |    1 (0x1)    |          20           |             20             |             None              |         0        
+          rg            |   21 (0x15)   |          20           |             40             |               3               |         3        
+        chanTlm         |   61 (0x3d)   |          20           |             60             |             None              |         0        
+        cmdDisp         |  121 (0x79)   |          20           |             20             |              10               |        10        
+         prmDb          |  141 (0x8d)   |          20           |            120             |               8               |         8        
+        fileUp          |  261 (0x105)  |          20           |             40             |               8               |         8        
+     fileUpBufMgr       |  301 (0x12d)  |          20           |             40             |               4               |         4        
+     fatalAdapter       |  341 (0x155)  |          20           |             20             |               8               |         8        
+        health          |  361 (0x169)  |          20           |             20             |               8               |         8        
+       sockGndIf        |  381 (0x17d)  |          20           |             20             |               3               |         3        
+    fileDownBufMgr      |  401 (0x191)  |          20           |             20             |               4               |         4        
+      eventLogger       |  421 (0x1a5)  |          20           |             20             |               7               |         7        
+       linuxTime        |  441 (0x1b9)  |          20           |             20             |             None              |         0        
+         rgDrv          |  461 (0x1cd)  |          20           |             40             |             None              |         0        
+       fileDown         |  501 (0x1f5)  |          20           |             20             |               4               |         4        
+      textLogger        |  521 (0x209)  |          20           |             20             |             None              |         0        
+        cmdSeq          |  541 (0x21d)  |          23           |            inf.            |              23               |        23        
+-------------------------------------------------------------------------------------------------------------------------------------
+| INSTANCE NAME                 - Name of the instance object.                                                                      |
+| BASE ID (HEX)                 - Base ID set for the instance.                                                                     |
+| REQUESTED WINDOW SIZE         - Specified by either the 'base_id_range' attribute in the instance tag or by finding the max of th |
+|                                 e 'base_id_range' attribute in the topology tag and the largest internal ID of the instance.      |
+| DIFFERENCED ID WINDOW SIZE    - Calculated by subtracting the current base ID from the next base ID.                              |
+| LARGEST COMPONENT INTERNAL ID - The largest ID found in the events, channels, and commands of the instance.                       |
+| MAX AMOUNT OF IDS             - The largest amount of items from either events, channels, or commands.                            |
+-------------------------------------------------------------------------------------------------------------------------------------

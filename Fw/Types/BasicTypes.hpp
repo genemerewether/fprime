@@ -30,6 +30,9 @@ extern "C" {
 #ifdef _WRS_KERNEL
 typedef int32_t NATIVE_INT_TYPE;
 typedef uint32_t NATIVE_UINT_TYPE;
+#elif defined BUILD_DSPAL
+typedef int32_t NATIVE_INT_TYPE;
+typedef uint32_t NATIVE_UINT_TYPE;
 #else
 typedef int NATIVE_INT_TYPE; //!< native integer type declaration
 typedef unsigned int NATIVE_UINT_TYPE; //!< native unsigned integer type declaration
@@ -120,8 +123,8 @@ typedef float   F32; //!< 32-bit floating point
 #define PRIVATE private //!< overridable private for unit testing
 #endif
 
-// Not ideal, but VxWorks doesn't have strnlen
-#ifdef __VXWORKS__
+// Not ideal, but VxWorks and DSPAL don't have strnlen
+#if defined __VXWORKS__ || defined BUILD_DSPAL
 NATIVE_INT_TYPE strnlen(const char *s, NATIVE_INT_TYPE maxlen);
 #endif
 

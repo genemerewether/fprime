@@ -17,9 +17,13 @@ HDR = HealthComponentImpl.hpp
 
 SUBDIRS = test
 
-SRC_LINUX = Stub/HealthComponentStubChecks.cpp	
+SRC_SDFLIGHT = Stub/HealthComponentStubChecks.cpp
 
-SRC_CYGWIN = Stub/HealthComponentStubChecks.cpp	
+SRC_DSPAL = Stub/HealthComponentStubChecks.cpp
+
+SRC_LINUX = Stub/HealthComponentStubChecks.cpp
+
+SRC_CYGWIN = Stub/HealthComponentStubChecks.cpp
 
 SRC_DARWIN = Stub/HealthComponentStubChecks.cpp
 

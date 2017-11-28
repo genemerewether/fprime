@@ -18,6 +18,10 @@ SRC_CYGWIN = Stub/PrintfLoggerImplStub.cpp
 
 SRC_LINUX = Stub/PrintfLoggerImplStub.cpp
 
+SRC_SDFLIGHT = Stub/PrintfLoggerImplStub.cpp
+
+SRC_DSPAL = Dspal/DspalLoggerImpl.cpp
+
 SRC_TIMSP430 = MSP/TextLoggerImplMsp.cpp
 
 SRC_DARWIN = Stub/PrintfLoggerImplStub.cpp

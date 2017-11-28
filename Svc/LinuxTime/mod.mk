@@ -28,6 +28,10 @@ SRC_BAERAD750 = VxWorksTimeImpl.cpp
 
 SRC_SPHINX = VxWorksTimeImpl.cpp
 
+SRC_SDFLIGHT = LinuxTimeImpl.cpp
+
+SRC_DSPAL = DspalTimeImpl.cpp
+
 HDR = LinuxTimeImpl.hpp
 
 SUBDIRS = test

@@ -8,6 +8,7 @@
 |---|---|---|---|
 |RgMaxTime|0 (0x0)|U32|Max execution time rate group|
 |RgCycleSlips|1 (0x1)|U32|Cycle slips for rate group|
+|RgNumCycles|2 (0x2)|U32|Number of cycles|
 
 ## Event List
 
