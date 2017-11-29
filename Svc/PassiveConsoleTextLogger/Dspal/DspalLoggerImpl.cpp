@@ -10,36 +10,37 @@ namespace Svc {
     }
     
     void ConsoleTextLoggerImpl::TextLogger_handler(NATIVE_INT_TYPE portNum, FwEventIdType id, Fw::Time &timeTag, Fw::TextLogSeverity severity, Fw::TextLogString &text) {
-        const char *severityString = "UNK";
+
+        const char *severityString = "UNKNOWN";
         switch (severity) {
             case Fw::TEXT_LOG_FATAL:
-                severityString = "FAT";
+                severityString = "FATAL";
                 break;
             case Fw::TEXT_LOG_WARNING_HI:
-                severityString = "WRNG_HI";
+                severityString = "WARNING_HI";
                 break;
             case Fw::TEXT_LOG_WARNING_LO:
-                severityString = "WRNG_LO";
+                severityString = "WARNING_LO";
                 break;
             case Fw::TEXT_LOG_COMMAND:
-                severityString = "CMD";
+                severityString = "COMMAND";
                 break;
             case Fw::TEXT_LOG_ACTIVITY_HI:
-                severityString = "ACT_HI";
+                severityString = "ACTIVITY_HI";
                 break;
             case Fw::TEXT_LOG_ACTIVITY_LO:
-                severityString = "ACT_LO";
+                severityString = "ACTIVITY_LO";
                 break;
             case Fw::TEXT_LOG_DIAGNOSTIC:
-                severityString = "DIAG";
+                severityString = "DIAGNOSTIC";
                 break;
             default:
-                severityString = "SVRTY ERR";
+                severityString = "SEVERITY ERROR";
                 break;
         }
 
-        FARF(ALWAYS, "EV: (%d) (%d,%d) %s: %s\n",
-            id,timeTag.getSeconds(),timeTag.getUSeconds(),severityString,text.toChar());
+        FARF(ALWAYS, "EVENT: (%d) (%d:%d,%d) %s: %s\n",
+             id,timeTag.getTimeBase(),timeTag.getSeconds(),timeTag.getUSeconds(),severityString,text.toChar());
     }
 
 }
