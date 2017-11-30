@@ -1,10 +1,7 @@
      INSTANCE NAME      | BASE ID (HEX) | REQUESTED WINDOW SIZE | DIFFERENCED ID WINDOW SIZE | LARGEST COMPONENT INTERNAL ID | MAX AMOUNT OF IDS
      fatalHandler       |    1 (0x1)    |          20           |             20             |             None              |         0        
-          rg            |   21 (0x15)   |          20           |            120             |               3               |         3        
-         prmDb          |  141 (0x8d)   |          20           |            200             |               8               |         8        
-     fatalAdapter       |  341 (0x155)  |          20           |             20             |               8               |         8        
-        health          |  361 (0x169)  |          20           |             60             |               8               |         8        
-      eventLogger       |  421 (0x1a5)  |          20           |             20             |               7               |         7        
+          rg            |   21 (0x15)   |          20           |            320             |               3               |         3        
+     fatalAdapter       |  341 (0x155)  |          20           |            100             |               8               |         8        
        linuxTime        |  441 (0x1b9)  |          20           |             20             |             None              |         0        
          rgDrv          |  461 (0x1cd)  |          20           |             60             |             None              |         0        
       textLogger        |  521 (0x209)  |          20           |            inf.            |             None              |         0        

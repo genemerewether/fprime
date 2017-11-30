@@ -19,10 +19,8 @@
 #endif
 
 #ifdef BUILD_DSPAL
-#define PRM_PATH "/dev/fs/PrmDb.dat"
 #define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
 #else
-#define PRM_PATH "PrmDb.dat"
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
@@ -40,8 +38,6 @@ enum {
 // List of context IDs
 enum {
         ACTIVE_COMP_1HZ_RG,
-        ACTIVE_COMP_LOGGER,
-        ACTIVE_COMP_PRMDB,
 
         CYCLER_TASK,
         NUM_ACTIVE_COMPS
@@ -76,27 +72,11 @@ Svc::ConsoleTextLoggerImpl textLogger
 ;
 #endif
 
-Svc::ActiveLoggerImpl eventLogger
-#if FW_OBJECT_NAMES == 1
-                    ("ELOG")
-#endif
-;
-
 Svc::LinuxTimeImpl linuxTime
 #if FW_OBJECT_NAMES == 1
                     ("LTIME")
 #endif
 ;
-
-Svc::PrmDbImpl prmDb
-#if FW_OBJECT_NAMES == 1
-                    ("PRM",PRM_PATH)
-#else
-                    (PRM_PATH)
-#endif
-;
-
-Svc::HealthImpl health("health");
 
 Svc::AssertFatalAdapterComponentImpl fatalAdapter
 #if FW_OBJECT_NAMES == 1
@@ -142,45 +122,18 @@ void constructApp() {
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
 #endif
-
-    eventLogger.init(10,0);
-
+    
     linuxTime.init(0);
-
-    prmDb.init(10,0);
 
     fatalAdapter.init(0);
     fatalHandler.init(0);
-    health.init(25,0);
-
+    
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
-
-    /* Register commands */
-    /*eventLogger.regCommands();
-    prmDb.regCommands();
-    health.regCommands();*/
-
-    // read parameters
-
-    //prmDb.readParamFile();
-
-    // set health ping entries
-
-    Svc::HealthImpl::PingEntry pingEntries[] = {
-        {3,5,rg.getObjName()}, // 0
-        {3,5,eventLogger.getObjName()}, // 1
-    };
-
-    // register ping table
-    //health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
 
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 120,10 * 1024);
-    // start telemetry
-    eventLogger.start(ACTIVE_COMP_LOGGER,98,10*1024);
-    prmDb.start(ACTIVE_COMP_PRMDB,96,10*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -222,8 +175,6 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     rg.exit();
-    eventLogger.exit();
-    prmDb.exit();
 }
 
 // DSPAL binary is launched by FastRPC call
