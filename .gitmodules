@@ -1,3 +1,6 @@
 [submodule "dspal"]
 	path = dspal
 	url = https://github.com/ATLFlight/dspal.git
+[submodule "Utils/nano-dm"]
+	path = Utils/nano-dm
+	url = https://github.com/kevinmehall/nano-dm.git
