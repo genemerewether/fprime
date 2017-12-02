@@ -39,7 +39,7 @@ namespace Svc {
                 break;
         }
 
-        FARF(ALWAYS, "EVENT: (%d) (%d:%d,%d) %s: %s\n",
+        FARF(ALWAYS, "EVENT: (%d) (%d:%d,%d) %s: \n%s\n",
              id,timeTag.getTimeBase(),timeTag.getSeconds(),timeTag.getUSeconds(),severityString,text.toChar());
     }
 

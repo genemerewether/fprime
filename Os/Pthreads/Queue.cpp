@@ -282,8 +282,17 @@ namespace Os {
 
       // If the queue is empty, wait until a message is put on the queue:
       while( queue->isEmpty() ) {
+#ifndef BUILD_DSPAL
         NATIVE_INT_TYPE ret = pthread_cond_wait(queueNotEmpty, queueLock);
         FW_ASSERT(ret == 0, errno);
+#else // TODO(mereweth)
+	timespec now, timeout;
+	clock_gettime(CLOCK_REALTIME, &now);
+	timeout.tv_sec = now.tv_sec + 3;
+	timeout.tv_nsec = now.tv_nsec;
+        NATIVE_INT_TYPE ret = pthread_cond_timedwait(queueNotEmpty, queueLock, &now);
+        //FW_ASSERT(ret == 0, errno);
+#endif
       }
       
       // Get an item off of the queue:

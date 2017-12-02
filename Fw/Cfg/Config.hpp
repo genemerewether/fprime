@@ -156,7 +156,7 @@
 #define FW_FILENAME_ASSERT                  3   //!< Uses the file name in the assert - image stores filenames
 
 #ifndef FW_ASSERT_LEVEL
-#define FW_ASSERT_LEVEL                     FW_FILENAME_ASSERT //!< Defines the type of assert used
+#define FW_ASSERT_LEVEL                     FW_FILEID_ASSERT //!< Defines the type of assert used
 #endif
 
 // Define max length of assert string
