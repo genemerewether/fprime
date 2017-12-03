@@ -1,6 +1,8 @@
      INSTANCE NAME      | BASE ID (HEX) | REQUESTED WINDOW SIZE | DIFFERENCED ID WINDOW SIZE | LARGEST COMPONENT INTERNAL ID | MAX AMOUNT OF IDS
      fatalHandler       |    1 (0x1)    |          20           |             20             |             None              |         0        
-          rg            |   21 (0x15)   |          20           |            120             |               3               |         3        
+          rg            |   21 (0x15)   |          20           |             20             |               3               |         3        
+         rgAtt          |   41 (0x29)   |          20           |             20             |               3               |         3        
+         rgPos          |   61 (0x3d)   |          20           |             80             |               3               |         3        
          prmDb          |  141 (0x8d)   |          20           |            200             |               8               |         8        
      fatalAdapter       |  341 (0x155)  |          20           |             20             |               8               |         8        
         health          |  361 (0x169)  |          20           |             60             |               8               |         8        

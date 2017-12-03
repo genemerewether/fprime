@@ -1,6 +1,8 @@
 component,instance,base_id,base_window_range
 FatalHandler,fatalHandler,1,20
 ActiveRateGroup,rg,21,20
+ActiveRateGroup,rgAtt,41,20
+ActiveRateGroup,rgPos,61,20
 PrmDb,prmDb,141,20
 AssertFatalAdapter,fatalAdapter,341,20
 Health,health,361,20

@@ -19,6 +19,8 @@ void exitTasks(void);
 
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rg;
+extern Svc::ActiveRateGroupImpl rgAtt;
+extern Svc::ActiveRateGroupImpl rgPos;
 extern Svc::ConsoleTextLoggerImpl textLogger;
 extern Svc::ActiveLoggerImpl eventLogger;
 extern Svc::LinuxTimeImpl linuxTime;

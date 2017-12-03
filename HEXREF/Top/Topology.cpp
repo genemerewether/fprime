@@ -40,6 +40,8 @@ enum {
 // List of context IDs
 enum {
         ACTIVE_COMP_1HZ_RG,
+        ACTIVE_COMP_ATT_RG,
+        ACTIVE_COMP_POS_RG,
         ACTIVE_COMP_LOGGER,
         ACTIVE_COMP_PRMDB,
 
@@ -53,7 +55,7 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 // Component instance pointers
-static NATIVE_INT_TYPE rgDivs[] = {1};
+static NATIVE_INT_TYPE rgDivs[] = {1000, 5, 1};
 Svc::RateGroupDriverImpl rgDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGDRV",
@@ -66,6 +68,22 @@ Svc::ActiveRateGroupImpl rg(
                     "RG",
 #endif
                     rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
+;
+
+static NATIVE_UINT_TYPE rgAttContext[] = {0,0,0,0,0,0,0,0,0,0};
+Svc::ActiveRateGroupImpl rgAtt(
+#if FW_OBJECT_NAMES == 1
+                    "RGATT",
+#endif
+                    rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
+;
+
+static NATIVE_UINT_TYPE rgPosContext[] = {0,0,0,0,0,0,0,0,0,0};
+Svc::ActiveRateGroupImpl rgPos(
+#if FW_OBJECT_NAMES == 1
+                    "RGPOS",
+#endif
+                    rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
 ;
 
 #if FW_ENABLE_TEXT_LOGGING
@@ -138,6 +156,8 @@ void constructApp() {
 
     // Initialize the rate groups
     rg.init(10,0);
+    rgAtt.init(10,0);
+    rgPos.init(10,0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -163,7 +183,7 @@ void constructApp() {
 
     // read parameters
 
-    //prmDb.readParamFile();
+    prmDb.readParamFile();
 
     // set health ping entries
 
@@ -178,6 +198,8 @@ void constructApp() {
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 120,10 * 1024);
+    rgAtt.start(ACTIVE_COMP_ATT_RG, 120,10 * 1024);
+    rgPos.start(ACTIVE_COMP_POS_RG, 120,10 * 1024);
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,98,10*1024);
     prmDb.start(ACTIVE_COMP_PRMDB,96,10*1024);
@@ -204,7 +226,7 @@ void run1cycle(void) {
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(1000);
+    Os::Task::delay(1);
 }
 
 void runcycles(NATIVE_INT_TYPE cycles) {
@@ -222,6 +244,8 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     rg.exit();
+    rgAtt.exit();
+    rgPos.exit();
     eventLogger.exit();
     prmDb.exit();
 }
@@ -232,20 +256,21 @@ void exitTasks(void) {
 volatile bool terminate = false;
 
 int hexref_init(void) {
+  //TODO(mereweth) - use singleton pattern to only allow one instance of the topology?
   bool local_cycle = true;
 
   DEBUG_PRINT("Before constructing app\n");
   constructApp();
   DEBUG_PRINT("After constructing app\n");
-  
+    
   Os::Task::delay(1000);
 
   //dumparch();
-
+  
   int cycle = 0;
 
-  while (terminate) {
-    DEBUG_PRINT("Cycle %d\n",cycle);
+  while (!terminate) {
+    //DEBUG_PRINT("Cycle %d\n",cycle);
     if (local_cycle) {
       runcycles(1);
     } else {

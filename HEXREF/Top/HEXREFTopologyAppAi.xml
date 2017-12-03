@@ -25,6 +25,10 @@
 
    <instance namespace="Svc" name="rg" type="ActiveRateGroup" base_id="21"  base_id_window="20" />
 
+   <instance namespace="Svc" name="rgAtt" type="ActiveRateGroup" base_id="41"  base_id_window="20" />
+   
+   <instance namespace="Svc" name="rgPos" type="ActiveRateGroup" base_id="61"  base_id_window="20" />
+
    <instance namespace="Svc" name="prmDb" type="PrmDb" base_id="141"  base_id_window="20" />
 
    <instance namespace="Svc" name="textLogger" type="PassiveTextLogger" base_id="521"  base_id_window="20" />
