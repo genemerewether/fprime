@@ -179,6 +179,9 @@ void exitTasks(void) {
 
 // DSPAL binary is launched by FastRPC call
 #ifdef BUILD_DSPAL
+
+volatile bool terminate = false;
+
 int hexref_init(void) {
   bool local_cycle = true;
 
@@ -190,12 +193,9 @@ int hexref_init(void) {
 
   //dumparch();
 
-  //signal(SIGINT,sighandler);
-  //signal(SIGTERM,sighandler);
-
   int cycle = 0;
 
-  while (true) { //!terminate) {
+  while (!terminate) {
     DEBUG_PRINT("Cycle %d\n",cycle);
     if (local_cycle) {
       runcycles(1);
@@ -216,6 +216,12 @@ int hexref_init(void) {
   return 0; 
 }
 
+int hexref_fini(void) {
+  DEBUG_PRINT("hexref_fini called...\n");
+  terminate = true;
+  return 0;
+}
+  
 #else // For testing
 
 void print_usage() {

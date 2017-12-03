@@ -419,11 +419,11 @@ struct Interface {
 #endif
 
 static const Method methods[1] = {{REMOTE_SCALARS_MAKEX(0,0,0x0,0x0,0x0,0x0),0x0,0x0,0,0,0,0x0,0x0}};
-static const Method* const methodArrays[1] = {&(methods[0])};
-static const char strings[5] = "init\0";
-static const uint16_t methodStrings[1] = {0};
-static const uint16_t methodStringsArrays[1] = {0};
-__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(hexref_slim) = {1,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
+static const Method* const methodArrays[2] = {&(methods[0]),&(methods[0])};
+static const char strings[10] = "fini\0init\0";
+static const uint16_t methodStrings[2] = {0,5};
+static const uint16_t methodStringsArrays[2] = {1,0};
+__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(hexref_slim) = {2,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
 #endif //_HEXREF_SLIM_H
 #ifdef __cplusplus
 extern "C" {
@@ -528,6 +528,10 @@ static __inline int _stub_method(remote_handle _handle, uint32_t _mid) {
 }
 __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_init)(void) __QAIC_STUB_ATTRIBUTE {
    uint32_t _mid = 0;
+   return _stub_method(_hexref_handle(), _mid);
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(hexref_fini)(void) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 1;
    return _stub_method(_hexref_handle(), _mid);
 }
 #ifdef __cplusplus
