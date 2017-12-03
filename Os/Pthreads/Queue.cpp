@@ -40,7 +40,17 @@ namespace Os {
       FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
       ret = pthread_cond_init(&this->queueNotFull, NULL);
       FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
+
+#ifdef BUILD_DSPAL
+      pthread_mutexattr_t attr;
+      ret = pthread_mutexattr_init(&attr);
+      FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
+      ret = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
+      FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
+      ret = pthread_mutex_init(&this->queueLock, &attr);
+#else
       ret = pthread_mutex_init(&this->queueLock, NULL);
+#endif // BUILD_DSPAL
       FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
     }
     ~QueueHandle() { 

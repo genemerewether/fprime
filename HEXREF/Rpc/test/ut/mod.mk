@@ -13,4 +13,4 @@
 
 TEST_SRC = main.cpp
 
-TEST_MODS = HEXREF/Rpc
+TEST_MODS = HEXREF/Rpc Os Fw/Types

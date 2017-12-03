@@ -419,11 +419,11 @@ struct Interface {
 #endif
 
 static const Method methods[1] = {{REMOTE_SCALARS_MAKEX(0,0,0x0,0x0,0x0,0x0),0x0,0x0,0,0,0,0x0,0x0}};
-static const Method* const methodArrays[1] = {&(methods[0])};
-static const char strings[5] = "init\0";
-static const uint16_t methodStrings[1] = {0};
-static const uint16_t methodStringsArrays[1] = {0};
-__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(hexref_slim) = {1,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
+static const Method* const methodArrays[2] = {&(methods[0]),&(methods[0])};
+static const char strings[10] = "fini\0init\0";
+static const uint16_t methodStrings[2] = {0,5};
+static const uint16_t methodStringsArrays[2] = {1,0};
+__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(hexref_slim) = {2,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
 #endif //_HEXREF_SLIM_H
 #ifdef __cplusplus
 extern "C" {
@@ -442,6 +442,8 @@ __QAIC_SKEL_EXPORT int __QAIC_SKEL(hexref_skel_invoke)(uint32_t _sc, remote_arg*
    {
       case 0:
       return _skel_method((void*)__QAIC_IMPL(hexref_init), _sc, _pra);
+      case 1:
+      return _skel_method((void*)__QAIC_IMPL(hexref_fini), _sc, _pra);
    }
    return AEE_EUNSUPPORTED;
 }

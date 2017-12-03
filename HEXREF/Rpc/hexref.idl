@@ -2,6 +2,7 @@
 
 interface hexref
 {
-   long init();  
+  long init();
+  long fini();
 };
 
