@@ -30,10 +30,10 @@ bin: bin_echo $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMEN
 
 clean: $(CLEAN_TARGETS) ampcs_clean
 	$(RM_DIR) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)
-	
+
 bin_clean: $(BIN_CLEAN_TARGETS) ampcs_clean
 	$(RM_DIR) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)
-	
+
 sloc: sloc_build $(SLOC_TARGETS) sloc_report
 
 sloc_report:
@@ -47,7 +47,7 @@ sloc_csv: sloc_build $(SLOC_TARGETS) sloc_csv_report
 sloc_csv_report:
 	@$(PYTHON_BIN) $(PROCESS_SLOC) -o csv_header 
 	@$(foreach module,$($(DEPLOYMENT)_MODULES),$(PYTHON_BIN) $(PROCESS_SLOC) -o csv -d $(module) $(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/written_sloc.txt $(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/ac_sloc.txt $(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/xml_sloc.txt;)
-	
+
 
 # build LARS SLOC tool for native platform
 sloc_build: $(BUILD_ROOT)/mk/bin/ncsl
@@ -64,10 +64,13 @@ $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(BIN_SUFFIX
 	@echo Generating version...
 	$(GEN_VERSION) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.c
 	$(CC) $(COMPILE_ONLY) $(COMPILE_TO) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.c
+ifdef CHECK_LINK_BIN
+	@echo Checking for missing symbols
+	$(CHECK_LINK_BIN) $(LINK_BIN_TO) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(CHECK_LINK_BIN_NAME)$(BIN_SUFFIX) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(CHECK_LINK_BIN_SRC)
+endif
 	@echo Linking binary...
-	#TODO(genemerewether@gmail.com) remove this debug
-	@echo $(CHECK_LINK_BIN) $(LINK_BIN_TO) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(CHECK_LINK_BIN_NAME)$(BIN_SUFFIX) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(CHECK_LINK_BIN_SRC)
-	@$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(LINK_BIN_POST_LIB_FLAGS)
+	@echo $(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(LINK_BIN_POST_LIB_FLAGS)
+	@$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
 
 endif
 # Module-level code generator targets
@@ -89,18 +92,18 @@ clean_dox:
 
 run: 
 	@cd $(BUILD_ROOT)/$(DEPLOYMENT_DIR) && $(shell $(RUN_TERMINAL) $(BUILD_ROOT)/$(DEPLOYMENT_DIR)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(BIN_SUFFIX))
-	
+
 run_ut:
 	@echo "Running test/ut/runtest_$(BUILD) with output dir $(OUTPUT_DIR)"
 	test/ut/runtest_$(BUILD) $(OUTPUT_DIR)
-	
+
 cov:
 	$(GCOV) -o $(OUTPUT_DIR) $(SRC_$(MOD_TARGET)) $(SRC_AC_$(MOD_TARGET)) > $(OUTPUT_DIR)/$(MOD_TARGET)_gcov.txt
 
 comp_report_gen:
 	@$(COMP_REPORT_GEN) $(foreach module,$($(DEPLOYMENT)_MODULES),$(wildcard $(BUILD_ROOT)/$(module)/*ComponentReport.txt))
 	@$(CAT) ComponentReport.txt
-	
+
 dict_clean:
 ifeq ($(DICT_GEN),"GLOBAL")
 	@echo "Cleaning dictionary in $(BUILD_ROOT)/$(GDS_MODULE)/generated/$(DEPLOYMENT)/serializable"
@@ -159,13 +162,13 @@ $(BUILD_ROOT)/$(DEPLOYMENT)/docs/sdd.html: $(BUILD_ROOT)/$(DEPLOYMENT)/docs/sdd.
 	@echo "Generating $@ from $<"
 	@$(CAT) $(BUILD_ROOT)/mk/docs/SDD.css > $@
 	-@$(MARKDOWN) $< >> $@
-	
+
 dep_sdd_clean:
 	@$(RM) $(BUILD_ROOT)/$(DEPLOYMENT)/docs/sdd.html
 
 gen_html_docs: gen_mod_sdds gen_dep_sdd
 	@$(PYTHON_BIN) $(BUILD_ROOT)/mk/bin/gen_deployment_doc.py $(DEPLOYMENT) $($(DEPLOYMENT)_MODULES)
-	
+
 ampcs_clean: ampcs_command_clean ampcs_event_clean ampcs_telemetry_clean
 
 ampcs_merge: ampcs_command_merge ampcs_event_merge ampcs_telemetry_merge
@@ -173,21 +176,21 @@ ampcs_merge: ampcs_command_merge ampcs_event_merge ampcs_telemetry_merge
 ampcs_command_merge:
 	@echo "Generating $(DEPLOYMENT) command dictionary"
 	$(AMPCS_COMMAND_MERGE) $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/command.xml $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/mission_header.xml $(foreach module,$($(DEPLOYMENT)_MODULES),$(wildcard $(BUILD_ROOT)/$(module)/$(AMPCS_DICT_MODULE_SUBDIR)/*CmdAc.xml))
-	
+
 ampcs_command_clean:
 	$(RM_DIR) $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/command.xml
-	
+
 ampcs_event_merge:
 	@echo "Generating $(DEPLOYMENT) event dictionary"
 	$(AMPCS_EVENT_MERGE) $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/evr.xml $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/mission_header.xml $(foreach module,$($(DEPLOYMENT)_MODULES),$(wildcard $(BUILD_ROOT)/$(module)/$(AMPCS_DICT_MODULE_SUBDIR)/*EvrAc.xml))
 
 ampcs_event_clean:
 	$(RM_DIR) $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/evr.xml
-	
+
 ampcs_telemetry_merge:
 	@echo "Generating $(DEPLOYMENT) telemetry dictionary"
 	$(AMPCS_TELEMETRY_MERGE) $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/channel.xml $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/mission_header.xml $(foreach module,$($(DEPLOYMENT)_MODULES),$(wildcard $(BUILD_ROOT)/$(module)/$(AMPCS_DICT_MODULE_SUBDIR)/*TlmAc.xml))
 
 ampcs_telemetry_clean:
 	$(RM_DIR) $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/channel.xml
-	
+

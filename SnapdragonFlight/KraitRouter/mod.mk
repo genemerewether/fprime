@@ -11,18 +11,18 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = hexref.idl
+SRC = 
 
-SRC_SDFLIGHT = hexref_stub.c
+# TODO stub to get it to compile?
+SRC_SDFLIGHT = 
 
-SRC_DSPAL = hexref_skel.c
+SRC_DSPAL = 
 
+# TODO alternate data flow for test
 SRC_DARWIN =  
-
-SRC_LINUX =  
-
+SRC_LINUX = 
 SRC_CYGWIN =  
 
-HDR = hexref.h
+HDR = 
 
-SUBDIRS = test
+#SUBDIRS = test

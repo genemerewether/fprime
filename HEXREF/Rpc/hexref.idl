@@ -4,5 +4,10 @@ interface hexref
 {
   long init();
   long fini();
+
+  typedef sequence<octet, 1024> dataBuffer;
+
+  long read(rout long port, rout dataBuffer buff, rout long bytes);
+  long write(in long port, in dataBuffer buff);
 };
 

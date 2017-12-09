@@ -72,6 +72,19 @@ DRV_MODULES := \
 	Drv/DataTypes \
 	Drv/BlockDriver
 
+HEXAGON_MODULES := \
+	SnapdragonFlight/KraitRouter
+
+SNAPDRAGON_MODULES := \
+	SnapdragonFlight/HexRouter #\
+	#SnapdragonFlight/DspRpcAllocator \
+	#SnapdragonFlight/SnapdragonHealth \
+	#SnapdragonFlight/SnapdragonGpioTester
+
+HEXAGON_MODULES := \
+	SnapdragonFlight/RpcCommon \
+	SnapdragonFlight/KraitRouter
+
 REF_MODULES := \
 	Ref/Top \
 	Ref/RecvBuffApp \
@@ -103,6 +116,8 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	$(SNAPDRAGON_MODULES) \
+	\
 	$(SVC_MODULES) \
 	\
 	$(FW_MODULES) \
@@ -122,7 +137,8 @@ HEXREF_DEPLOYMENT_MODULES := \
 	HEXREF/Rpc
 
 HEXREF_MODULES := \
-	RpcCommon \
+	\
+	$(HEXAGON_MODULES) \
 	\
 	$(HEXREF_DEPLOYMENT_MODULES) \
 	\

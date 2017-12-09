@@ -55,7 +55,9 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 // Component instance pointers
-static NATIVE_INT_TYPE rgDivs[] = {1000, 5, 1};
+
+// rg, rgAtt, rgPos
+static NATIVE_INT_TYPE rgDivs[] = {1000, 1, 5};
 Svc::RateGroupDriverImpl rgDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGDRV",
@@ -254,6 +256,12 @@ void exitTasks(void) {
 #ifdef BUILD_DSPAL
 
 volatile bool terminate = false;
+
+int hexref_read(int port, unsigned char* buff, int buffLen, int* bytes) {
+}
+
+int hexref_write(int port, const unsigned char* buff, int buffLen) {
+}
 
 int hexref_init(void) {
   //TODO(mereweth) - use singleton pattern to only allow one instance of the topology?

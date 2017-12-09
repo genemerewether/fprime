@@ -17,6 +17,9 @@
 #include <HEXREF/Rpc/hexref.h>
 #endif
 
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
+
 /*#ifdef BUILD_SDFLIGHT
 #define PRM_PATH "/usr/share/data/adsp/PrmDb.dat"
 #else*/
@@ -243,10 +246,6 @@ void constructApp(int port_number, char* hostname) {
     // Initialize socket server
     sockGndIf.startSocketTask(100, port_number, hostname);
 
-#ifdef BUILD_SDFLIGHT
-    hexref_init();
-#endif
-
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -352,7 +351,13 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM,sighandler);
 
     int cycle = 0;
-
+    
+#ifdef BUILD_SDFLIGHT
+    Os::Task task;
+    Os::TaskString task_name("HEXRPC");
+    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_init, NULL);
+#endif //BUILD_SDFLIGHT
+  
     while (!terminate) {
 //        (void) printf("Cycle %d\n",cycle);
       if (local_cycle) {
@@ -362,7 +367,12 @@ int main(int argc, char* argv[]) {
       }
       cycle++;
     }
-
+    
+#ifdef BUILD_SDFLIGHT
+    DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
+    hexref_fini();
+#endif //BUILD_SDFLIGHT
+  
     // stop tasks
     exitTasks();
     // Give time for threads to exit

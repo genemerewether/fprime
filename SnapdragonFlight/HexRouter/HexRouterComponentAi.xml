@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="HexRouter" kind="active" namespace="SnapdragonFlight">
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    
+    <comment>Forwards port calls over FastRPC to the DSP</comment>
+    <ports>
+        <port name="KraitPortsIn" data_type="Serial" kind="async_input" max_number="25">
+            <comment>
+            Input ports from other components
+            </comment>
+        </port>
+        <port name="HexPortsOut" data_type="Serial" kind="output" max_number="25">
+            <comment>
+            Output ports to other components
+            </comment>
+        </port>
+        <port name="Sched" data_type="Svc::Sched" kind="async_input" >
+            <comment>
+            Input port to get called each cycle by rate group
+            </comment>
+        </port>
+    </ports>
+    <events>
+        <event id="0" name="HR_DataReceiveError" severity="WARNING_HI" format_string = "Hexagon Router Receive data error %d" throttle = "5">
+            <comment>
+            FastRPC or memory error
+            </comment>
+            <args>
+                <arg name="error" type="ENUM">
+                    <enum name="HR_ReceiveError">
+                        <item name="HR_NO_BUFFERS" comment="Driver didn't have any buffers left"/>
+                        <item name="HR_BUFFER_TOO_SMALL" comment="Not enough room in buffer"/>
+                        <item name="HR_OTHER_ERR" comment="Other error"/>
+                    </enum>
+                    <comment>The receive error code</comment>
+                </arg>          
+            </args>
+        </event>
+        <event id="1" name="HR_InvalidPortNum" severity="WARNING_HI" format_string = "Hexagon Router invalid port number: %u." throttle = "5">
+            <comment>
+            Input data packet had a invalid port number, ie port number is not connected.
+            </comment>
+            <args>
+                <arg name="portNum" type="U8"/>
+            </args>
+        </event>
+        <event id="2" name="HR_BadSerialPortCall" severity="WARNING_HI" format_string = "Hexagon Router bad Serial port call with status %d and port number %d." throttle = "5">
+            <comment>
+            Bad status returned from output Serial port call, ie HexPortsOut() call had issues deserializing the buffer.
+            </comment>
+            <args>
+                <arg name="status" type="I32"/>
+                <arg name="portNum" type="U8"/>
+            </args>
+        </event>
+    </events>
+    <telemetry>
+        <channel id="0" name="HR_ResyncErrors" data_type="U32">
+            <comment>
+            Number of packet resync errors
+            </comment>
+        </channel>
+        <channel id="1" name="HR_NumPackets" data_type="U32">
+            <comment>
+            Number of packets from Hexagon
+            </comment>
+        </channel>
+        <channel id="2" name="HR_NumSerialErrors" data_type="U32">
+            <comment>
+            Number of serial read errors
+            </comment>
+        </channel>
+        <channel id="3" name="HR_NumInvalidPorts" data_type="U32">
+            <comment>
+            Number of packets with invalid ports
+            </comment>
+        </channel>
+        <channel id="4" name="HR_NumBadSerialPortCalls" data_type="U32">
+            <comment>
+            Number of bad Serial port calls, ie bad serialize status returned
+            </comment>
+        </channel>
+        <channel id="5" name="HR_NumOuputBufferOverflows" data_type="U32">
+            <comment>
+            Number of output buffer overflows
+            </comment>
+        </channel>
+        <channel id="6" name="HR_NumZeroPktSize" data_type="U32">
+            <comment>
+            Number of packets with zero size
+            </comment>
+        </channel>
+    </telemetry>
+</component>
+

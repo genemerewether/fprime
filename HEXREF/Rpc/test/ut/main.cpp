@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
   
 #ifdef BUILD_SDFLIGHT
   Os::TaskString task_name("HEXRPC");
-  task.start(task_name, 0, 70, 20*1024, (Os::Task::taskRoutine) hexref_init, NULL);
+  task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_init, NULL);
 #endif //BUILD_SDFLIGHT
 
   while (!terminate) {
