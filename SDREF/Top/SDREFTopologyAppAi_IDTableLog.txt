@@ -1,7 +1,8 @@
      INSTANCE NAME      | BASE ID (HEX) | REQUESTED WINDOW SIZE | DIFFERENCED ID WINDOW SIZE | LARGEST COMPONENT INTERNAL ID | MAX AMOUNT OF IDS
      fatalHandler       |    1 (0x1)    |          20           |             20             |             None              |         0        
           rg            |   21 (0x15)   |          20           |             40             |               3               |         3        
-        chanTlm         |   61 (0x3d)   |          20           |             60             |             None              |         0        
+        chanTlm         |   61 (0x3d)   |          20           |             20             |             None              |         0        
+       hexRouter        |   81 (0x51)   |          20           |             40             |               7               |         7        
         cmdDisp         |  121 (0x79)   |          20           |             20             |              10               |        10        
          prmDb          |  141 (0x8d)   |          20           |            120             |               8               |         8        
         fileUp          |  261 (0x105)  |          20           |             40             |               8               |         8        

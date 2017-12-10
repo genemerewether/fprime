@@ -11,7 +11,7 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = HexRouterComponentAi.xml
+SRC = HexRouterComponentAi.xml HexRouterComponentImpl.cpp
 
 SRC_SDFLIGHT = 
 
@@ -23,6 +23,6 @@ SRC_DARWIN =
 SRC_LINUX = 
 SRC_CYGWIN =  
 
-HDR = 
+HDR = HexRouterComponentImpl.hpp HexRouterComponentImplCfg.hpp
 
 #SUBDIRS = test

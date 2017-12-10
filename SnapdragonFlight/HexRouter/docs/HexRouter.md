@@ -29,5 +29,5 @@
 | | | |portNum|U8|||    
 |HR_MemoryError|3 (0x3)|Allocate or deallocate error| | | | |
 | | | |error|HR_MemoryError||Type of memory operation that failed|    
-|HR_WriteError|3 (0x3)|Send error in calling FastRPC write function| | | | |
+|HR_WriteError|4 (0x4)|Send error in calling FastRPC write function| | | | |
 | | | |error|I32||The error code|    

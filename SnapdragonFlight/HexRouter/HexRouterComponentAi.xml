@@ -86,7 +86,7 @@
                 </arg>          
             </args>
         </event>
-	<event id="3" name="HR_WriteError" severity="WARNING_HI" format_string = "Error sending to Hexagon %d"  throttle = "5">
+	<event id="4" name="HR_WriteError" severity="WARNING_HI" format_string = "Error sending to Hexagon %d"  throttle = "5">
           <comment>
 	    Send error in calling FastRPC write function
           </comment>

@@ -20,8 +20,12 @@
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
+#include "Fw/Types/EightyCharString.hpp"
 
 #include <SnapdragonFlight/RpcCommon/wrap_rpc.h>
+
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
@@ -69,7 +73,32 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
+    void HexRouterComponentImpl ::
+    readBufferRecv_handler(
+	const NATIVE_INT_TYPE portNum,
+	Fw::Buffer Buffer
+    )
+  {
+      this->m_readBuffMutex.lock();
+      bool found = false;
 
+      // search for open entry
+      for (NATIVE_UINT_TYPE entry = 0; entry < RECEIVE_BUFFER_POOL_SIZE; entry++) {
+	  // Look for slots to fill. "Available" is from
+	  // the perspective of the driver thread looking for
+	  // buffers to fill, so add the buffer and make it available.
+	  if (not this->m_buffSet[entry].available) {
+	      this->m_buffSet[entry].readBuffer = Buffer;
+	      this->m_buffSet[entry].available = true;
+	      found = true;
+	      break;
+	  }
+      }
+      this->m_readBuffMutex.unLock();
+      FW_ASSERT(found,Buffer.getbufferID(),Buffer.getmanagerID());
+
+  }
+  
   void HexRouterComponentImpl ::
     Sched_handler(
         const NATIVE_INT_TYPE portNum,
@@ -90,8 +119,8 @@ namespace SnapdragonFlight {
     )
   {   
         unsigned char* data =
-                reinterpret_cast<unsigned char*>(Buffer.getdata());
-        NATIVE_INT_TYPE xferSize = Buffer.getsize();
+                reinterpret_cast<unsigned char*>(Buffer.getBuffAddr());
+        NATIVE_INT_TYPE xferSize = Buffer.getBuffLength();
 
         for (NATIVE_INT_TYPE chunk = 0; chunk < xferSize; chunk +=
                 WRITE_BUFF_SIZE) {
@@ -125,7 +154,7 @@ namespace SnapdragonFlight {
         HexRouterComponentImpl* comp = static_cast<HexRouterComponentImpl*>(ptr);
 
 	uint8_t buff[READ_PORT_SIZE];
-	ExternalSerializeBuffer portBuff(buff, READ_PORT_SIZE);
+	Fw::ExternalSerializeBuffer portBuff(buff, READ_PORT_SIZE);
 	
 	int stat = rpc_relay_port_allocate(READ_PORT_SIZE);
         if (-1 == stat) {
@@ -136,19 +165,19 @@ namespace SnapdragonFlight {
         while (1) {
             // wait for data
             int sizeRead = 0;
-	    int portRead = 0;
+	    int portNum = 0;
 
 //          timespec stime;
 //          (void)clock_gettime(CLOCK_REALTIME,&stime);
-//          printf("<<< Calling rpc_relay_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
+//          printf("<<< Calling rpc_relay_port_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
 
             bool waiting = true;
             int stat = 0;
 	    
             while (waiting) {
-                stat = rpc_relay_read(&portRead,
-				      reinterpret_cast<unsigned char*>(buff),
-				      READ_PORT_SIZE, &sizeRead);
+                stat = rpc_relay_port_read(&portNum,
+					   reinterpret_cast<unsigned char*>(buff),
+					   READ_PORT_SIZE, &sizeRead);
 
                 // check for timeout
                 if (1 == stat) {
@@ -167,13 +196,13 @@ namespace SnapdragonFlight {
             if (stat != 0) {
 	        comp->log_WARNING_HI_HR_DataReceiveError(HR_RELAY_READ_ERR, stat);
             } else {
-		stat = buff.deserialize(portBuff.getBuffAddr(), sizeRead, true);
+	      /*stat = portBuff.deserialize(buff, sizeRead, true);
 		if (stat != Fw::FW_SERIALIZE_OK) {
 		    DEBUG_PRINT("Decode data error\n");
 		    comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
 		    return;
 		}
-		// set buffer to size of data
+		// set buffer to size of data*/
 		stat = portBuff.setBuffLen(sizeRead);
 		if (stat != Fw::FW_SERIALIZE_OK) {
 		    DEBUG_PRINT("Set setBuffLen error\n");
@@ -182,22 +211,22 @@ namespace SnapdragonFlight {
 		}
 
 //              (void)clock_gettime(CLOCK_REALTIME,&stime);
-//              printf("<!<! Sending data to port %u size %u at %d %d\n", portRead, buff.getsize(), stime.tv_sec, stime.tv_nsec);
+//              printf("<!<! Sending data to port %u size %u at %d %d\n", portNum, buff.getsize(), stime.tv_sec, stime.tv_nsec);
 		// call output port
-		DEBUG_PRINT("Calling port %d with %d bytes.\n", portRead, sizeRead);
-		if (comp->isConnected_HexPortsOut_OutputPort(portRead)) {
-		    Fw::SerializeStatus stat = comp->HexPortsOut_out(portRead, portBuff);
+		DEBUG_PRINT("Calling port %d with %d bytes.\n", portNum, sizeRead);
+		if (comp->isConnected_HexPortsOut_OutputPort(portNum)) {
+		    Fw::SerializeStatus stat = comp->HexPortsOut_out(portNum, portBuff);
 
 		    // If had issues deserializing the data, then report it:
 		    if (stat != Fw::FW_SERIALIZE_OK) {
-			DEBUG_PRINT("HexPortsOut_out() serialize status error\n");
-			comp->tlmWrite_HR_NumBadSerialPortCalls(++comp->m_numBadSerialPortCalls);
-			comp->log_WARNING_HI_HR_BadSerialPortCall(stat, portNum);
-			return;
+		      DEBUG_PRINT("HexPortsOut_out() serialize status error\n");
+		      comp->tlmWrite_HR_NumBadSerialPortCalls(++comp->m_numBadSerialPortCalls);
+		      comp->log_WARNING_HI_HR_BadSerialPortCall(stat, portNum);
+		      return;
 		    }
 		}
 		else {
-		    comp->log_WARNING_HI_HR_InvalidPortNum(HR_BUFF_SEND, portRead);
+		    comp->log_WARNING_HI_HR_InvalidPortNum(HR_BUFF_SEND, portNum);
 		}
             }
         }
@@ -218,7 +247,7 @@ namespace SnapdragonFlight {
 
 	int stat = rpc_relay_buff_allocate(READ_BUFF_SIZE);
         if (-1 == stat) {
-            comp->log_WARNING_HI_HR_MemoryError(HR_ReceiveError);
+            comp->log_WARNING_HI_HR_MemoryError(HR_HEX_ALLOC);
             return;
         }
 
@@ -227,7 +256,7 @@ namespace SnapdragonFlight {
         while (1) {
             // wait for data
             int sizeRead = 0;
-	    int portRead = 0;
+	    int portNum = 0;
 
             // find open buffer
 
@@ -236,7 +265,7 @@ namespace SnapdragonFlight {
             NATIVE_INT_TYPE entryFound = false;
 
 	    NATIVE_INT_TYPE entry = 0;
-            for (entry = 0; entry < MAX_NUM_BUFFERS; entry++) {
+            for (entry = 0; entry < RECEIVE_BUFFER_POOL_SIZE; entry++) {
                 if (comp->m_buffSet[entry].available) {
                     comp->m_buffSet[entry].available = false;
                     buff = comp->m_buffSet[entry].readBuffer;
@@ -255,7 +284,7 @@ namespace SnapdragonFlight {
 
 //          timespec stime;
 //          (void)clock_gettime(CLOCK_REALTIME,&stime);
-//          printf("<<< Calling rpc_relay_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
+//          printf("<<< Calling rpc_relay_buff_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
 
             bool waiting = true;
             int stat = 0;
@@ -263,9 +292,9 @@ namespace SnapdragonFlight {
 	    
             while (waiting) {
 
-                stat = rpc_relay_read(&portRead,
-				      reinterpret_cast<unsigned char*>(buff.getdata()),
-				      buff.getsize(), &sizeRead);
+                stat = rpc_relay_buff_read(&portNum,
+					   reinterpret_cast<unsigned char*>(buff.getdata()),
+					   buff.getsize(), &sizeRead);
 
                 // check for timeout
                 if (1 == stat) {
@@ -289,45 +318,19 @@ namespace SnapdragonFlight {
 		comp->m_readBuffMutex.unLock();
             } else {
 //              (void)clock_gettime(CLOCK_REALTIME,&stime);
-//              printf("<!<! Sending data to port %u size %u at %d %d\n", portRead, buff.getsize(), stime.tv_sec, stime.tv_nsec);
+//              printf("<!<! Sending data to port %u size %u at %d %d\n", portNum, buff.getsize(), stime.tv_sec, stime.tv_nsec);
                 buff.setsize(sizeRead);
-		if (comp->isConnected_readBufferSend_OutputPort(portRead)) {
-		    comp->readBufferSend_out(portRead, buff);
+		if (comp->isConnected_readBufferSend_OutputPort(portNum)) {
+		    comp->readBufferSend_out(portNum, buff);
 		}
 		else {
-		    comp->log_WARNING_HI_HR_InvalidPortNum(HR_BUFF_SEND, portRead);
+		    comp->log_WARNING_HI_HR_InvalidPortNum(HR_BUFF_SEND, portNum);
 		    comp->m_readBuffMutex.lock();
 		    comp->m_buffSet[entry].available = true;
 		    comp->m_readBuffMutex.unLock();
 		}
             }
         }
-    }
-
-    void HexRouterComponentImpl ::
-      readBufferRecv_handler(
-          const NATIVE_INT_TYPE portNum,
-          Fw::Buffer &Buffer
-      )
-    {
-        this->m_readBuffMutex.lock();
-        bool found = false;
-
-        // search for open entry
-        for (NATIVE_UINT_TYPE entry = 0; entry < MAX_NUM_BUFFERS; entry++) {
-            // Look for slots to fill. "Available" is from
-            // the perspective of the driver thread looking for
-            // buffers to fill, so add the buffer and make it available.
-            if (not this->m_buffSet[entry].available) {
-                this->m_buffSet[entry].readBuffer = Buffer;
-                this->m_buffSet[entry].available = true;
-                found = true;
-                break;
-            }
-        }
-        this->m_readBuffMutex.unLock();
-        FW_ASSERT(found,Buffer.getbufferID(),Buffer.getmanagerID());
-
     }
 
     void HexRouterComponentImpl::quitReadThread(void) {

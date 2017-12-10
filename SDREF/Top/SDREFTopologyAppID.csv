@@ -2,6 +2,7 @@ component,instance,base_id,base_window_range
 FatalHandler,fatalHandler,1,20
 ActiveRateGroup,rg,21,20
 TlmChan,chanTlm,61,20
+HexRouter,hexRouter,81,20
 CommandDispatcher,cmdDisp,121,20
 PrmDb,prmDb,141,20
 FileUplink,fileUp,261,20

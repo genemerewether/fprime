@@ -21,6 +21,7 @@
 #define HexRouter_HPP
 
 #include "SnapdragonFlight/HexRouter/HexRouterComponentAc.hpp"
+#include <SnapdragonFlight/HexRouter/HexRouterComponentImplCfg.hpp>
 #include <Os/Mutex.hpp>
 
 namespace SnapdragonFlight {
@@ -63,6 +64,13 @@ namespace SnapdragonFlight {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      //! Handler implementation for readBufferRecv
+      //!
+      void readBufferRecv_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer Buffer 
+      );
+    
       //! Handler implementation for Sched
       //!
       void Sched_handler(
@@ -86,17 +94,20 @@ namespace SnapdragonFlight {
     // ----------------------------------------------------------------------
     // Implementations of class methods
     // ----------------------------------------------------------------------
-    void HexRouterComponentImpl::startBuffReadThread(
+    void startBuffReadThread(
             NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
             NATIVE_INT_TYPE cpuAffinity);
 
-    void HexRouterComponentImpl::hexBuffReadTaskEntry(void * ptr);
+    void hexBuffReadTaskEntry(void * ptr);
     
-    void HexRouterComponentImpl::startPortReadThread(
+    void startPortReadThread(
             NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
             NATIVE_INT_TYPE cpuAffinity);
 
-    void HexRouterComponentImpl::hexBuffPortTaskEntry(void * ptr);
+    void hexPortReadTaskEntry(void * ptr);
+
+    
+    void quitReadThread(void);
 
     Os::Task m_portReadTask; //!< task instance for thread to read ports
     Os::Task m_buffReadTask; //!< task instance for thread to read generic buffers

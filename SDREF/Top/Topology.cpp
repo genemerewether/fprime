@@ -37,6 +37,7 @@ enum {
 // List of context IDs
 enum {
         ACTIVE_COMP_1HZ_RG,
+        ACTIVE_COMP_HEXROUTER,
         ACTIVE_COMP_CMD_DISP,
         ACTIVE_COMP_CMD_SEQ,
         ACTIVE_COMP_LOGGER,
@@ -124,6 +125,12 @@ Svc::PrmDbImpl prmDb
 #endif
 ;
 
+SnapdragonFlight::HexRouterComponentImpl hexRouter
+#if FW_OBJECT_NAMES == 1
+                    ("HEXRTR")
+#endif
+;
+
 Svc::FileUplink fileUp ("fileUp");
 Svc::FileDownlink fileDown ("fileDown", DOWNLINK_PACKET_SIZE);
 Svc::BufferManager fileDownBufMgr("fileDownBufMgr", DOWNLINK_BUFFER_STORE_SIZE, DOWNLINK_BUFFER_QUEUE_SIZE);
@@ -199,6 +206,8 @@ void constructApp(int port_number, char* hostname) {
     fatalHandler.init(0);
     health.init(25,0);
 
+    hexRouter.init(10, 0);
+
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
@@ -239,6 +248,8 @@ void constructApp(int port_number, char* hostname) {
     eventLogger.start(ACTIVE_COMP_LOGGER,50,10*1024);
     chanTlm.start(ACTIVE_COMP_TLM,60,10*1024);
     prmDb.start(ACTIVE_COMP_PRMDB,50,10*1024);
+
+    hexRouter.start(ACTIVE_COMP_HEXROUTER,90,20*1024);
 
     fileDown.start(ACTIVE_COMP_FILE_DOWNLINK, 40, 10*1024);
     fileUp.start(ACTIVE_COMP_FILE_UPLINK, 40, 10*1024);
