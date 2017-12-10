@@ -76,6 +76,7 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/KraitRouter
 
 SNAPDRAGON_MODULES := \
+	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter #\
 	#SnapdragonFlight/DspRpcAllocator \
 	#SnapdragonFlight/SnapdragonHealth \

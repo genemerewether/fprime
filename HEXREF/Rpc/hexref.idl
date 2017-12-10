@@ -7,7 +7,14 @@ interface hexref
 
   typedef sequence<octet, 1024> dataBuffer;
 
-  long read(rout long port, rout dataBuffer buff, rout long bytes);
-  long write(in long port, in dataBuffer buff);
+  long rpc_relay_port_allocate(in long size);
+  //long rpc_relay_port_deallocate(); //TODO(mereweth) - do this on close?
+  long rpc_relay_port_read(rout long port, rout dataBuffer buff, rout long bytes);
+
+  long rpc_relay_buff_allocate(in long size);
+  //long rpc_relay_buff_deallocate(); //TODO(mereweth) - do this on close?
+  long rpc_relay_buff_read(rout long port, rout dataBuffer buff, rout long bytes);
+  
+  long rpc_relay_write(in long port, in dataBuffer buff);
 };
 

@@ -11,11 +11,11 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = hexref.idl
+SRC = 
 
-SRC_SDFLIGHT = hexref_stub.c
+SRC_SDFLIGHT = hexref_stub.c krait_wrap_rpc.c
 
-SRC_DSPAL = hexref_skel.c
+SRC_DSPAL = hexref_skel.c hex_wrap_rpc.c
 
 SRC_DARWIN =  
 
@@ -23,6 +23,6 @@ SRC_LINUX =
 
 SRC_CYGWIN =  
 
-HDR = hexref.h
+HDR = hexref.h 
 
 SUBDIRS = test

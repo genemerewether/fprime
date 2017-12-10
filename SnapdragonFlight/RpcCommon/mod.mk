@@ -2,4 +2,4 @@ SRC =
 
 SRC_DSPAL = DspalStubs.cpp
 
-HDR = 
+HDR = wrap_rpc.h

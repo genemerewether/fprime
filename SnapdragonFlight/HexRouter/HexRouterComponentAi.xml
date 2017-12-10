@@ -3,18 +3,25 @@
 
 <component name="HexRouter" kind="active" namespace="SnapdragonFlight">
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
     
     <comment>Forwards port calls over FastRPC to the DSP</comment>
     <ports>
         <port name="KraitPortsIn" data_type="Serial" kind="async_input" max_number="25">
             <comment>
-            Input ports from other components
+            Input ports from other Krait components, destination is Hexagon
             </comment>
         </port>
         <port name="HexPortsOut" data_type="Serial" kind="output" max_number="25">
             <comment>
-            Output ports to other components
+            Output ports from Hexagon components, destination is Krait
             </comment>
+        </port>
+	<port name="readBufferSend" data_type="Fw::BufferSend"  kind="output" max_number="5">
+           <comment>Port to send buffers to components that do slow processing</comment>
+        </port>
+        <port name="readBufferRecv" data_type="Fw::BufferSend"  kind="sync_input" max_number="5">
+           <comment>Port to receive buffers back from components that do processing, like ActiveFileLogger</comment>
         </port>
         <port name="Sched" data_type="Svc::Sched" kind="async_input" >
             <comment>
@@ -23,7 +30,7 @@
         </port>
     </ports>
     <events>
-        <event id="0" name="HR_DataReceiveError" severity="WARNING_HI" format_string = "Hexagon Router Receive data error %d" throttle = "5">
+        <event id="0" name="HR_DataReceiveError" severity="WARNING_HI" format_string = "Hexagon Router Receive data error %d, stat %d" throttle = "5">
             <comment>
             FastRPC or memory error
             </comment>
@@ -32,18 +39,29 @@
                     <enum name="HR_ReceiveError">
                         <item name="HR_NO_BUFFERS" comment="Driver didn't have any buffers left"/>
                         <item name="HR_BUFFER_TOO_SMALL" comment="Not enough room in buffer"/>
+                        <item name="HR_RELAY_READ_ERR" comment="RPC relay read call failed"/>
                         <item name="HR_OTHER_ERR" comment="Other error"/>
                     </enum>
                     <comment>The receive error code</comment>
-                </arg>          
+                </arg>
+                <arg name="stat" type="I32">
+                    <comment>Status code - depends on error type</comment>
+                </arg>
             </args>
         </event>
-        <event id="1" name="HR_InvalidPortNum" severity="WARNING_HI" format_string = "Hexagon Router invalid port number: %u." throttle = "5">
+        <event id="1" name="HR_InvalidPortNum" severity="WARNING_HI" format_string = "Hexagon Router invalid port type: %d, number: %u." throttle = "5">
             <comment>
             Input data packet had a invalid port number, ie port number is not connected.
             </comment>
             <args>
-                <arg name="portNum" type="U8"/>
+              <arg name="PortType" type="ENUM">
+                <enum name="HR_PortType">
+                  <item name="HR_PORT_CALL" comment="Low-latency serialized port"/>
+                  <item name="HR_BUFF_SEND" comment="Higher-latency buffer that will be sent to other component for processing"/>
+                </enum>
+                <comment>Type of port that was not connected</comment>
+              </arg>
+              <arg name="portNum" type="U8"/>
             </args>
         </event>
         <event id="2" name="HR_BadSerialPortCall" severity="WARNING_HI" format_string = "Hexagon Router bad Serial port call with status %d and port number %d." throttle = "5">
@@ -55,6 +73,29 @@
                 <arg name="portNum" type="U8"/>
             </args>
         </event>
+	<event id="3" name="HR_MemoryError" severity="WARNING_HI" format_string = "Hexagon Router memory error %d" throttle = "5">
+            <comment>
+            Allocate or deallocate error
+            </comment>
+            <args>
+                <arg name="error" type="ENUM">
+                    <enum name="HR_MemoryError">
+                        <item name="HR_HEX_ALLOC" comment="Hexagon buffer allocate failed"/>
+                    </enum>
+                    <comment>Type of memory operation that failed</comment>
+                </arg>          
+            </args>
+        </event>
+	<event id="3" name="HR_WriteError" severity="WARNING_HI" format_string = "Error sending to Hexagon %d"  throttle = "5">
+          <comment>
+	    Send error in calling FastRPC write function
+          </comment>
+          <args>
+            <arg name="error" type="I32">
+              <comment>The error code</comment>
+            </arg>          
+          </args>
+	</event>
     </events>
     <telemetry>
         <channel id="0" name="HR_ResyncErrors" data_type="U32">
@@ -67,9 +108,9 @@
             Number of packets from Hexagon
             </comment>
         </channel>
-        <channel id="2" name="HR_NumSerialErrors" data_type="U32">
+        <channel id="2" name="HR_NumDecodeErrors" data_type="U32">
             <comment>
-            Number of serial read errors
+            Number of port decode errors
             </comment>
         </channel>
         <channel id="3" name="HR_NumInvalidPorts" data_type="U32">
@@ -82,7 +123,7 @@
             Number of bad Serial port calls, ie bad serialize status returned
             </comment>
         </channel>
-        <channel id="5" name="HR_NumOuputBufferOverflows" data_type="U32">
+        <channel id="5" name="HR_NumOutputBufferOverflows" data_type="U32">
             <comment>
             Number of output buffer overflows
             </comment>
