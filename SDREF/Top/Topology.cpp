@@ -230,21 +230,21 @@ void constructApp(int port_number, char* hostname) {
 
     // Active component startup
     // start rate groups
-    rg.start(ACTIVE_COMP_1HZ_RG, 120,10 * 1024);
+    rg.start(ACTIVE_COMP_1HZ_RG, 95,10 * 1024);
     // start dispatcher
-    cmdDisp.start(ACTIVE_COMP_CMD_DISP,101,10*1024);
+    cmdDisp.start(ACTIVE_COMP_CMD_DISP,60,10*1024);
     // start sequencer
-    cmdSeq.start(ACTIVE_COMP_CMD_SEQ,100,10*1024);
+    cmdSeq.start(ACTIVE_COMP_CMD_SEQ,50,10*1024);
     // start telemetry
-    eventLogger.start(ACTIVE_COMP_LOGGER,98,10*1024);
-    chanTlm.start(ACTIVE_COMP_TLM,97,10*1024);
-    prmDb.start(ACTIVE_COMP_PRMDB,96,10*1024);
+    eventLogger.start(ACTIVE_COMP_LOGGER,50,10*1024);
+    chanTlm.start(ACTIVE_COMP_TLM,60,10*1024);
+    prmDb.start(ACTIVE_COMP_PRMDB,50,10*1024);
 
-    fileDown.start(ACTIVE_COMP_FILE_DOWNLINK, 100, 10*1024);
-    fileUp.start(ACTIVE_COMP_FILE_UPLINK, 100, 10*1024);
+    fileDown.start(ACTIVE_COMP_FILE_DOWNLINK, 40, 10*1024);
+    fileUp.start(ACTIVE_COMP_FILE_UPLINK, 40, 10*1024);
 
     // Initialize socket server
-    sockGndIf.startSocketTask(100, port_number, hostname);
+    sockGndIf.startSocketTask(40, port_number, hostname);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
