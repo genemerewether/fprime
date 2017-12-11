@@ -17,11 +17,10 @@ SRC_SDFLIGHT = hexref_stub.c krait_wrap_rpc.c
 
 SRC_DSPAL = hexref_skel.c hex_wrap_rpc.c
 
-SRC_DARWIN =  
-
-SRC_LINUX =  
-
-SRC_CYGWIN =  
+# TODO (mereweth) - replace with some ipc bridge 
+SRC_DARWIN = wrap_rpc.c
+SRC_LINUX = wrap_rpc.c
+SRC_CYGWIN = wrap_rpc.c 
 
 HDR = hexref.h 
 

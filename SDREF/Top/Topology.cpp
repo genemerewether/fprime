@@ -1,5 +1,15 @@
 #include <Components.hpp>
 
+enum {
+    CORE_NONE = -1,
+    CORE_0 = 0,
+    CORE_1 = 1,
+    CORE_2 = 2,
+    CORE_3 = 3,
+
+    CORE_CDH = CORE_1,
+    CORE_RPC = CORE_2
+};
 
 #include <Fw/Types/Assert.hpp>
 #include <SDREF/Top/TargetInit.hpp>
@@ -249,7 +259,10 @@ void constructApp(int port_number, char* hostname) {
     chanTlm.start(ACTIVE_COMP_TLM,60,10*1024);
     prmDb.start(ACTIVE_COMP_PRMDB,50,10*1024);
 
-    hexRouter.start(ACTIVE_COMP_HEXROUTER,90,20*1024);
+    hexRouter.start(90, 20*1024, CORE_RPC);
+
+    hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
+    hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
     fileDown.start(ACTIVE_COMP_FILE_DOWNLINK, 40, 10*1024);
     fileUp.start(ACTIVE_COMP_FILE_UPLINK, 40, 10*1024);
@@ -296,6 +309,7 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 }
 
 void exitTasks(void) {
+    hexRouter.quitReadThreads();
     rg.exit();
     cmdDisp.exit();
     eventLogger.exit();
@@ -304,6 +318,7 @@ void exitTasks(void) {
     fileUp.exit();
     fileDown.exit();
     cmdSeq.exit();
+    hexRouter.exit();
 }
 
 void print_usage() {

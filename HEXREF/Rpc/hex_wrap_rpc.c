@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+  // call methods defined in HEXREF Topology that use the global instance of KraitRouter
+  
   int hexref_rpc_relay_buff_allocate(int size) {
     return 0;
     //return rpc_relay_buff_allocate(size);

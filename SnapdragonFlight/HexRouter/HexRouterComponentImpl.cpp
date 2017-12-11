@@ -181,7 +181,7 @@ namespace SnapdragonFlight {
 
                 // check for timeout
                 if (1 == stat) {
-                    if (comp->m_quitReadThread) {
+                    if (comp->m_quitReadThreads) {
                         return;
                     }
                 } else { // quit if other error or if data received
@@ -189,7 +189,7 @@ namespace SnapdragonFlight {
                 }
             }
 
-            if (comp->m_quitReadThread) {
+            if (comp->m_quitReadThreads) {
                 return;
             }
 
@@ -213,8 +213,8 @@ namespace SnapdragonFlight {
 //              (void)clock_gettime(CLOCK_REALTIME,&stime);
 //              printf("<!<! Sending data to port %u size %u at %d %d\n", portNum, buff.getsize(), stime.tv_sec, stime.tv_nsec);
 		// call output port
-		DEBUG_PRINT("Calling port %d with %d bytes.\n", portNum, sizeRead);
 		if (comp->isConnected_HexPortsOut_OutputPort(portNum)) {
+		  DEBUG_PRINT("Calling port %d with %d bytes.\n", portNum, sizeRead);
 		    Fw::SerializeStatus stat = comp->HexPortsOut_out(portNum, portBuff);
 
 		    // If had issues deserializing the data, then report it:
@@ -298,7 +298,7 @@ namespace SnapdragonFlight {
 
                 // check for timeout
                 if (1 == stat) {
-                    if (comp->m_quitReadThread) {
+                    if (comp->m_quitReadThreads) {
                         return;
                     }
                 } else { // quit if other error or if data received
@@ -306,7 +306,7 @@ namespace SnapdragonFlight {
                 }
             }
 
-            if (comp->m_quitReadThread) {
+            if (comp->m_quitReadThreads) {
                 return;
             }
 
@@ -333,8 +333,8 @@ namespace SnapdragonFlight {
         }
     }
 
-    void HexRouterComponentImpl::quitReadThread(void) {
-        this->m_quitReadThread = true;
+    void HexRouterComponentImpl::quitReadThreads(void) {
+        this->m_quitReadThreads = true;
         //rpc_relay_quit();
     }
 } // end namespace SnapdragonFlight

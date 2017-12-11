@@ -58,6 +58,16 @@ namespace SnapdragonFlight {
       //!
       ~HexRouterComponentImpl(void);
 
+    void startBuffReadThread(
+            NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
+            NATIVE_INT_TYPE cpuAffinity);
+    
+    void startPortReadThread(
+            NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
+            NATIVE_INT_TYPE cpuAffinity);
+        
+    void quitReadThreads(void);
+    
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -94,20 +104,10 @@ namespace SnapdragonFlight {
     // ----------------------------------------------------------------------
     // Implementations of class methods
     // ----------------------------------------------------------------------
-    void startBuffReadThread(
-            NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
-            NATIVE_INT_TYPE cpuAffinity);
 
     static void hexBuffReadTaskEntry(void * ptr);
     
-    void startPortReadThread(
-            NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
-            NATIVE_INT_TYPE cpuAffinity);
-
     static void hexPortReadTaskEntry(void * ptr);
-
-    
-    void quitReadThread(void);
 
     Os::Task m_portReadTask; //!< task instance for thread to read ports
     Os::Task m_buffReadTask; //!< task instance for thread to read generic buffers
@@ -123,7 +123,7 @@ namespace SnapdragonFlight {
 	
     Os::Mutex m_readBuffMutex;
 
-    bool m_quitReadThread; //!< flag to quit threads
+    bool m_quitReadThreads; //!< flag to quit threads
     
     U32 m_numDecodeErrors; //!< number of buffer decoder errors
     U32 m_numBadSerialPortCalls;  //<! number of bad Serial port calls, ie bad serialize status returned
