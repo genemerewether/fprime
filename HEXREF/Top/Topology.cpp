@@ -263,25 +263,6 @@ void exitTasks(void) {
 
 volatile bool terminate = false;
 
-// TODO(mereweth) - should we return here if not init-ed?
-int hexref_rpc_relay_buff_allocate(int size) {
-  return kraitRouter.buffAllocate(size);
-}
-int hexref_rpc_relay_buff_read(int* port, unsigned char* buff, int buffLen, int* bytes) {
-  return kraitRouter.buffRead(port, buff, buffLen, bytes);
-}
-
-int hexref_rpc_relay_port_allocate(int size) {
-  return kraitRouter.portAllocate(size);
-}
-int hexref_rpc_relay_port_read(int* port, unsigned char* buff, int buffLen, int* bytes) {
-  return kraitRouter.portRead(port, buff, buffLen, bytes);
-}
-
-int hexref_rpc_relay_write(int port, const unsigned char* buff, int buffLen) {
-  return kraitRouter.write(port, buff, buffLen);
-}
-
 /* TODO(mereweth)
  * use singleton pattern to only allow one instance of the topology?
  * return error if already initialized or if terminate is already true?
@@ -289,18 +270,18 @@ int hexref_rpc_relay_write(int port, const unsigned char* buff, int buffLen) {
  * split into init and run so SDREF can wait for init to be done? init would be called in
  * Topology (first thread) and would block. Then, hexref_run would be called in thread
  */
-int hexref_init(void) {
+int hexref_init() {
   DEBUG_PRINT("Before constructing app\n");
   constructApp();
   DEBUG_PRINT("After constructing app\n");
 
   //dumparch();
   
-  //Os::Task::delay(1000);
+  Os::Task::delay(1000);
   return 0;
 }
 
-int hexref_run(void) {
+int hexref_run() {
   bool local_cycle = true;  
   int cycle = 0;
 
@@ -325,10 +306,22 @@ int hexref_run(void) {
   return 0; 
 }
 
-int hexref_fini(void) {
+int hexref_fini() {
   DEBUG_PRINT("hexref_fini called...\n");
   terminate = true;
   return 0;
+}
+
+int hexref_rpc_relay_buff_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
+  return kraitRouter.buffRead(port, buff, buffLen, bytes);
+}
+
+int hexref_rpc_relay_port_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
+  return kraitRouter.portRead(port, buff, buffLen, bytes);
+}
+
+int hexref_rpc_relay_write(unsigned int port, const unsigned char* buff, int buffLen) {
+  return kraitRouter.write(port, buff, buffLen);
 }
 
 #ifndef BUILD_DSPAL

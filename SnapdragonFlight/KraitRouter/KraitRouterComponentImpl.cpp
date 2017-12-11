@@ -21,6 +21,11 @@
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <unistd.h>
+
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
+
 namespace SnapdragonFlight {
 
   // ----------------------------------------------------------------------
@@ -32,7 +37,8 @@ namespace SnapdragonFlight {
     KraitRouterComponentImpl(
         const char *const compName
     ) :
-      KraitRouterComponentBase(compName)
+      KraitRouterComponentBase(compName),
+      m_initialized(false)
 #else
     KraitRouterImpl(void)
 #endif
@@ -46,36 +52,41 @@ namespace SnapdragonFlight {
     ) 
   {
     KraitRouterComponentBase::init(instance);
+    m_initialized = true;
   }
 
   KraitRouterComponentImpl ::
     ~KraitRouterComponentImpl(void)
   {
-
-  }
-
-  int KraitRouterComponentImpl::buffAllocate(int size) {
-    return 0;
+    m_initialized = false;
   }
   
-  int KraitRouterComponentImpl::buffRead(int* port, unsigned char* buff, int buffLen, int* bytes) {
-    *port = -1;
+  int KraitRouterComponentImpl::buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
+    DEBUG_PRINT("buffRead called on object 0x%X, init %d\n", (unsigned long) this, this->m_initialized);
+    while (!this->m_initialized) {
+      usleep(1000);
+    }
+    *port = 0;
     *bytes = 0;
-    return 0;
+    return 1;
   }
   
-  int KraitRouterComponentImpl::portAllocate(int size) {
-    return 0;
-  }
-  
-  int KraitRouterComponentImpl::portRead(int* port, unsigned char* buff, int buffLen, int* bytes) {
-    *port = -1;
+  int KraitRouterComponentImpl::portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
+    DEBUG_PRINT("portRead called on object 0x%X, init %d\n", (unsigned long) this, this->m_initialized);
+    while (!this->m_initialized) {
+      usleep(1000);
+    }
+    *port = 0;
     *bytes = 0;
-    return 0;
+    return 1;
   }
   
-  int KraitRouterComponentImpl::write(int port, const unsigned char* buff, int buffLen) {
-    return 0;
+  int KraitRouterComponentImpl::write(unsigned int port, const unsigned char* buff, int buffLen) {
+    DEBUG_PRINT("write called on object 0x%X, port %d, init %d\n", (unsigned long) this, port, this->m_initialized);
+    while (!this->m_initialized) {
+      usleep(1000);
+    }
+    return 1;
   }
   
   // ----------------------------------------------------------------------

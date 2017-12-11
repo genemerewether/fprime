@@ -369,7 +369,14 @@ int main(int argc, char* argv[]) {
 	}
 
 	(void) printf("Hit Ctrl-C to quit\n");
-	
+
+#ifdef BUILD_SDFLIGHT
+    hexref_init();
+    Os::Task task;
+    Os::TaskString task_name("HEXRPC");
+    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+#endif //BUILD_SDFLIGHT
+    
     constructApp(port_number, hostname);
     //dumparch();
 
@@ -377,16 +384,9 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM,sighandler);
 
     int cycle = 0;
-    
-#ifdef BUILD_SDFLIGHT
-    hexref_init();
-    Os::Task task;
-    Os::TaskString task_name("HEXRPC");
-    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
-#endif //BUILD_SDFLIGHT
   
     while (!terminate) {
-//        (void) printf("Cycle %d\n",cycle);
+      DEBUG_PRINT("Cycle %d\n",cycle);
       if (local_cycle) {
         runcycles(1);
       } else {
@@ -394,14 +394,15 @@ int main(int argc, char* argv[]) {
       }
       cycle++;
     }
-    
+     
+    // stop tasks
+    exitTasks();
+
 #ifdef BUILD_SDFLIGHT
     DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
     hexref_fini();
 #endif //BUILD_SDFLIGHT
-  
-    // stop tasks
-    exitTasks();
+    
     // Give time for threads to exit
     (void) printf("Waiting for threads...\n");
     Os::Task::delay(1000);

@@ -1,5 +1,5 @@
 // ====================================================================== 
-// \title  HexRouterImpl.cpp
+// \Title  HexRouterImpl.cpp
 // \author mereweth
 // \brief  cpp file for HexRouter component implementation class
 //
@@ -23,6 +23,8 @@
 #include "Fw/Types/EightyCharString.hpp"
 
 #include <SnapdragonFlight/RpcCommon/wrap_rpc.h>
+
+#include <time.h>
 
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
@@ -127,7 +129,11 @@ namespace SnapdragonFlight {
 
             NATIVE_INT_TYPE thisSize = FW_MIN(WRITE_BUFF_SIZE,
                     xferSize - chunk);
+	    timespec stime;
+	    (void)clock_gettime(CLOCK_REALTIME,&stime);
+	    DEBUG_PRINT("<<< Calling rpc_relay_write() at %d %d\n", stime.tv_sec, stime.tv_nsec);
             NATIVE_INT_TYPE stat = rpc_relay_write(portNum, data + chunk, thisSize);
+	    // TODO(mereweth) - write error codes
             if (-1 == stat) {
                 this->log_WARNING_HI_HR_WriteError(stat);
                 return;
@@ -155,21 +161,15 @@ namespace SnapdragonFlight {
 
 	uint8_t buff[READ_PORT_SIZE];
 	Fw::ExternalSerializeBuffer portBuff(buff, READ_PORT_SIZE);
-	
-	int stat = rpc_relay_port_allocate(READ_PORT_SIZE);
-        if (-1 == stat) {
-            comp->log_WARNING_HI_HR_MemoryError(HR_HEX_ALLOC);
-            return;
-        }
 
         while (1) {
             // wait for data
             int sizeRead = 0;
-	    int portNum = 0;
+	    unsigned int portNum = 0;
 
-//          timespec stime;
-//          (void)clock_gettime(CLOCK_REALTIME,&stime);
-//          printf("<<< Calling rpc_relay_port_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
+	    timespec stime;
+	    (void)clock_gettime(CLOCK_REALTIME,&stime);
+	    DEBUG_PRINT("<<< Calling rpc_relay_port_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
 
             bool waiting = true;
             int stat = 0;
@@ -179,7 +179,7 @@ namespace SnapdragonFlight {
 					   reinterpret_cast<unsigned char*>(buff),
 					   READ_PORT_SIZE, &sizeRead);
 
-                // check for timeout
+                // TODO(mereweth) - add KraitRouter timeout return code and check for timeout
                 if (1 == stat) {
                     if (comp->m_quitReadThreads) {
                         return;
@@ -194,6 +194,9 @@ namespace SnapdragonFlight {
             }
 
             if (stat != 0) {
+	        timespec stime;
+		(void)clock_gettime(CLOCK_REALTIME,&stime);
+	        DEBUG_PRINT("rpc_relay_port_read error stat %d at %d:%d\n", stat, stime.tv_sec, stime.tv_nsec);
 	        comp->log_WARNING_HI_HR_DataReceiveError(HR_RELAY_READ_ERR, stat);
             } else {
 	      /*stat = portBuff.deserialize(buff, sizeRead, true);
@@ -245,18 +248,12 @@ namespace SnapdragonFlight {
     void HexRouterComponentImpl::hexBuffReadTaskEntry(void * ptr) {
         HexRouterComponentImpl* comp = static_cast<HexRouterComponentImpl*>(ptr);
 
-	int stat = rpc_relay_buff_allocate(READ_BUFF_SIZE);
-        if (-1 == stat) {
-            comp->log_WARNING_HI_HR_MemoryError(HR_HEX_ALLOC);
-            return;
-        }
-
         Fw::Buffer buff;
 
         while (1) {
             // wait for data
             int sizeRead = 0;
-	    int portNum = 0;
+	    unsigned int portNum = 0;
 
             // find open buffer
 
@@ -282,9 +279,9 @@ namespace SnapdragonFlight {
                 continue;
             }
 
-//          timespec stime;
-//          (void)clock_gettime(CLOCK_REALTIME,&stime);
-//          printf("<<< Calling rpc_relay_buff_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
+            timespec stime;
+            (void)clock_gettime(CLOCK_REALTIME,&stime);
+	    DEBUG_PRINT("<<< Calling rpc_relay_buff_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
 
             bool waiting = true;
             int stat = 0;
@@ -296,7 +293,7 @@ namespace SnapdragonFlight {
 					   reinterpret_cast<unsigned char*>(buff.getdata()),
 					   buff.getsize(), &sizeRead);
 
-                // check for timeout
+                // TODO(mereweth) - add KraitRouter timeout return code and check for timeout
                 if (1 == stat) {
                     if (comp->m_quitReadThreads) {
                         return;
@@ -311,7 +308,9 @@ namespace SnapdragonFlight {
             }
 
             if (stat != 0) {
-	        comp->log_WARNING_HI_HR_DataReceiveError(HR_RELAY_READ_ERR, stat);
+	        timespec stime;
+		(void)clock_gettime(CLOCK_REALTIME,&stime);
+	        DEBUG_PRINT("rpc_relay_buff_read error stat %d at %d:%d\n", stat, stime.tv_sec, stime.tv_nsec);
 		// TODO(mereweth) send buffer to destination with error flag instead of recycling
 		comp->m_readBuffMutex.lock();
 		comp->m_buffSet[entry].available = true;

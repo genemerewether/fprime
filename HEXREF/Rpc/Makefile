@@ -16,7 +16,9 @@ include $(BUILD_ROOT)/mk/makefiles/module_targets.mk
 idl:
 	$(HEXAGON_SDK_ROOT)/tools/qaic/Ubuntu14/qaic -mdll -I $(HEXAGON_SDK_ROOT)/incs/stddef hexref.idl
 
-load: idl ut_nocov_SDFLIGHT
+rebuild_nav: ut_nocov_clean_SDFLIGHT ut_nocov_SDFLIGHT
+
+load: ut_nocov_SDFLIGHT
 	adb push ./test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut /home/linaro/hexref_rpc_test_ut
 
 # Add module specific targets here

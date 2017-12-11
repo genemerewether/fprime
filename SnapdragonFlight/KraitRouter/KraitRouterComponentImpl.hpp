@@ -54,13 +54,11 @@ namespace SnapdragonFlight {
       //!
       ~KraitRouterComponentImpl(void);
 
-      int buffAllocate(int size);
-      int buffRead(int* port, unsigned char* buff, int buffLen, int* bytes);
+      int buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
     
-      int portAllocate(int size);
-      int portRead(int* port, unsigned char* buff, int buffLen, int* bytes);
+      int portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
 
-      int write(int port, const unsigned char* buff, int buffLen);
+      int write(unsigned int port, const unsigned char* buff, int buffLen);
     
     PRIVATE:
 
@@ -88,7 +86,7 @@ namespace SnapdragonFlight {
         Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
       );
 
-
+      bool m_initialized;
     };
 
 } // end namespace SnapdragonFlight
