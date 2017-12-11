@@ -259,7 +259,7 @@ void constructApp(int port_number, char* hostname) {
     chanTlm.start(ACTIVE_COMP_TLM,60,20*1024);
     prmDb.start(ACTIVE_COMP_PRMDB,50,20*1024);
 
-    hexRouter.start(90, 20*1024, CORE_RPC);
+    hexRouter.start(ACTIVE_COMP_HEXROUTER, 90, 20*1024);//, CORE_RPC);
 
     hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
     hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
@@ -369,7 +369,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	(void) printf("Hit Ctrl-C to quit\n");
-
+	
     constructApp(port_number, hostname);
     //dumparch();
 
@@ -379,9 +379,10 @@ int main(int argc, char* argv[]) {
     int cycle = 0;
     
 #ifdef BUILD_SDFLIGHT
+    hexref_init();
     Os::Task task;
     Os::TaskString task_name("HEXRPC");
-    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_init, NULL);
+    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
 #endif //BUILD_SDFLIGHT
   
     while (!terminate) {

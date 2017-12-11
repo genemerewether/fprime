@@ -54,6 +54,30 @@ namespace SnapdragonFlight {
 
   }
 
+  int KraitRouterComponentImpl::buffAllocate(int size) {
+    return 0;
+  }
+  
+  int KraitRouterComponentImpl::buffRead(int* port, unsigned char* buff, int buffLen, int* bytes) {
+    *port = -1;
+    *bytes = 0;
+    return 0;
+  }
+  
+  int KraitRouterComponentImpl::portAllocate(int size) {
+    return 0;
+  }
+  
+  int KraitRouterComponentImpl::portRead(int* port, unsigned char* buff, int buffLen, int* bytes) {
+    *port = -1;
+    *bytes = 0;
+    return 0;
+  }
+  
+  int KraitRouterComponentImpl::write(int port, const unsigned char* buff, int buffLen) {
+    return 0;
+  }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------

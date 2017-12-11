@@ -208,12 +208,12 @@ void constructApp() {
 
     // Active component startup
     // start rate groups
-    rg.start(ACTIVE_COMP_1HZ_RG, 120,10 * 1024);
-    rgAtt.start(ACTIVE_COMP_ATT_RG, 120,10 * 1024);
-    rgPos.start(ACTIVE_COMP_POS_RG, 120,10 * 1024);
+    rg.start(ACTIVE_COMP_1HZ_RG, 50,10 * 1024);
+    rgAtt.start(ACTIVE_COMP_ATT_RG, 90,10 * 1024);
+    rgPos.start(ACTIVE_COMP_POS_RG, 80,10 * 1024);
     // start telemetry
-    eventLogger.start(ACTIVE_COMP_LOGGER,98,10*1024);
-    prmDb.start(ACTIVE_COMP_PRMDB,96,10*1024);
+    eventLogger.start(ACTIVE_COMP_LOGGER,40,10*1024);
+    prmDb.start(ACTIVE_COMP_PRMDB,30,10*1024);
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -261,46 +261,47 @@ void exitTasks(void) {
     prmDb.exit();
 }
 
-// DSPAL binary is launched by FastRPC call
-#ifdef BUILD_DSPAL
-
 volatile bool terminate = false;
 
+// TODO(mereweth) - should we return here if not init-ed?
 int hexref_rpc_relay_buff_allocate(int size) {
-  return 0;
-  //return rpc_relay_buff_allocate(size);
+  return kraitRouter.buffAllocate(size);
 }
 int hexref_rpc_relay_buff_read(int* port, unsigned char* buff, int buffLen, int* bytes) {
-  return 0;
-  //return rpc_relay_buff_read(port, buff, buffLen, bytes);
+  return kraitRouter.buffRead(port, buff, buffLen, bytes);
 }
 
 int hexref_rpc_relay_port_allocate(int size) {
-  return 0;
-  //return rpc_relay_port_allocate(size);
+  return kraitRouter.portAllocate(size);
 }
 int hexref_rpc_relay_port_read(int* port, unsigned char* buff, int buffLen, int* bytes) {
-  return 0;
-  //return rpc_relay_port_read(port, buff, buffLen, bytes);
+  return kraitRouter.portRead(port, buff, buffLen, bytes);
 }
 
 int hexref_rpc_relay_write(int port, const unsigned char* buff, int buffLen) {
-  return 0;
-  //return rpc_relay_write(port, buff, buffLen);
+  return kraitRouter.write(port, buff, buffLen);
 }
 
+/* TODO(mereweth)
+ * use singleton pattern to only allow one instance of the topology?
+ * return error if already initialized or if terminate is already true?
+ *
+ * split into init and run so SDREF can wait for init to be done? init would be called in
+ * Topology (first thread) and would block. Then, hexref_run would be called in thread
+ */
 int hexref_init(void) {
-  //TODO(mereweth) - use singleton pattern to only allow one instance of the topology?
-  bool local_cycle = true;
-
   DEBUG_PRINT("Before constructing app\n");
   constructApp();
   DEBUG_PRINT("After constructing app\n");
-    
-  Os::Task::delay(1000);
 
   //dumparch();
   
+  //Os::Task::delay(1000);
+  return 0;
+}
+
+int hexref_run(void) {
+  bool local_cycle = true;  
   int cycle = 0;
 
   while (!terminate) {
@@ -330,75 +331,26 @@ int hexref_fini(void) {
   return 0;
 }
 
-#else // For testing
-
-void print_usage() {
-	(void) DEBUG_PRINT("Usage: ./HEXREF [options]\n-l\tFor time-based cycles\n");
-}
+#ifndef BUILD_DSPAL
 
 #include <signal.h>
 #include <stdio.h>
 
 extern "C" {
-    int main(int argc, char* argv[]);
+  int main(int argc, char* argv[]);
 };
 
-volatile sig_atomic_t terminate = 0;
-
 static void sighandler(int signum) {
-	terminate = 1;
+  terminate = 1;
 }
 
 int main(int argc, char* argv[]) {
-	I32 option = 0;
-        bool local_cycle = false;
-
-	while ((option = getopt(argc, argv, "hl")) != -1){
-		switch(option) {
-			case 'h':
-				print_usage();
-				return 0;
-				break;
-                        case 'l':
-                          local_cycle = true;
-                          break;
-			case '?':
-				return 1;
-			default:
-				print_usage();
-				return 1;
-		}
-	}
-
-	(void) DEBUG_PRINT("Hit Ctrl-C to quit\n");
-
-    constructApp();
-    //dumparch();
-
-    signal(SIGINT,sighandler);
-    signal(SIGTERM,sighandler);
-
-    int cycle = 0;
-
-    while (!terminate) {
-      (void) DEBUG_PRINT("Cycle %d\n",cycle);
-      if (local_cycle) {
-        runcycles(1);
-      } else {
-        Os::Task::delay(1000);
-      }
-      cycle++;
-    }
-
-    // stop tasks
-    exitTasks();
-    // Give time for threads to exit
-    (void) DEBUG_PRINT("Waiting for threads...\n");
-    Os::Task::delay(1000);
-
-    (void) DEBUG_PRINT("Exiting...\n");
-
-    return 0;
+  hexref_init();
+  
+  signal(SIGINT,sighandler);
+  signal(SIGTERM,sighandler);
+    
+  hexref_run();
 }
 
-#endif //ifdef BUILD_DSPAL
+#endif //ifndef BUILD_DSPAL

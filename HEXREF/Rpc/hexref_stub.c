@@ -423,11 +423,11 @@ static const Type types[1] = {{0x1,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,
 static const Parameter parameters[4] = {{0x4,{{(const uintptr_t)0,(const uintptr_t)1}}, 2,0x4,0,0},{0x4,{{(const uintptr_t)0,(const uintptr_t)1}}, 2,0x4,3,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),3,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),0,0}};
 static const Parameter* const parameterArrays[5] = {(&(parameters[1])),(&(parameters[2])),(&(parameters[1])),(&(parameters[0])),(&(parameters[3]))};
 static const Method methods[4] = {{REMOTE_SCALARS_MAKEX(0,0,0x0,0x0,0x0,0x0),0x0,0x0,0,0,0,0x0,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x4,0x0,1,1,(&(parameterArrays[3])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x2,0x0,0x0),0x4,0x8,5,3,(&(parameterArrays[0])),0x4,0x4},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x0,0x0,0x0),0x8,0x0,3,2,(&(parameterArrays[3])),0x4,0x0}};
-static const Method* const methodArrays[7] = {&(methods[0]),&(methods[0]),&(methods[1]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[3])};
-static const char strings[135] = "rpc_relay_buff_allocate\0rpc_relay_port_allocate\0rpc_relay_buff_read\0rpc_relay_port_read\0rpc_relay_write\0bytes\0buff\0port\0size\0fini\0init\0";
-static const uint16_t methodStrings[17] = {48,115,110,104,68,115,110,104,88,115,110,0,120,24,120,125,130};
-static const uint16_t methodStringsArrays[7] = {16,15,13,4,11,0,8};
-__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(hexref_slim) = {7,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
+static const Method* const methodArrays[8] = {&(methods[0]),&(methods[0]),&(methods[0]),&(methods[1]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[3])};
+static const char strings[139] = "rpc_relay_buff_allocate\0rpc_relay_port_allocate\0rpc_relay_buff_read\0rpc_relay_port_read\0rpc_relay_write\0bytes\0buff\0port\0size\0fini\0init\0run\0";
+static const uint16_t methodStrings[18] = {48,115,110,104,68,115,110,104,88,115,110,0,120,24,120,125,135,130};
+static const uint16_t methodStringsArrays[8] = {17,16,15,13,4,11,0,8};
+__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(hexref_slim) = {8,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
 #endif //_HEXREF_SLIM_H
 #ifdef __cplusplus
 extern "C" {
@@ -534,8 +534,12 @@ __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_init)(void) __QAIC_STUB_ATTRIBUTE {
    uint32_t _mid = 0;
    return _stub_method(_hexref_handle(), _mid);
 }
-__QAIC_STUB_EXPORT int __QAIC_STUB(hexref_fini)(void) __QAIC_STUB_ATTRIBUTE {
+__QAIC_STUB_EXPORT int __QAIC_STUB(hexref_run)(void) __QAIC_STUB_ATTRIBUTE {
    uint32_t _mid = 1;
+   return _stub_method(_hexref_handle(), _mid);
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(hexref_fini)(void) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 2;
    return _stub_method(_hexref_handle(), _mid);
 }
 static __inline int _stub_method_1(remote_handle _handle, uint32_t _mid, uint32_t _in0[1]) {
@@ -550,7 +554,7 @@ static __inline int _stub_method_1(remote_handle _handle, uint32_t _mid, uint32_
    return _nErr;
 }
 __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_rpc_relay_port_allocate)(int size) __QAIC_STUB_ATTRIBUTE {
-   uint32_t _mid = 2;
+   uint32_t _mid = 3;
    return _stub_method_1(_hexref_handle(), _mid, (uint32_t*)&size);
 }
 static __inline int _stub_method_2(remote_handle _handle, uint32_t _mid, uint32_t _rout0[1], char* _rout1[1], uint32_t _rout1Len[1], uint32_t _rout2[1]) {
@@ -578,15 +582,15 @@ static __inline int _stub_method_2(remote_handle _handle, uint32_t _mid, uint32_
    return _nErr;
 }
 __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_rpc_relay_port_read)(int* port, unsigned char* buff, int buffLen, int* bytes) __QAIC_STUB_ATTRIBUTE {
-   uint32_t _mid = 3;
+   uint32_t _mid = 4;
    return _stub_method_2(_hexref_handle(), _mid, (uint32_t*)port, (char**)&buff, (uint32_t*)&buffLen, (uint32_t*)bytes);
 }
 __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_rpc_relay_buff_allocate)(int size) __QAIC_STUB_ATTRIBUTE {
-   uint32_t _mid = 4;
+   uint32_t _mid = 5;
    return _stub_method_1(_hexref_handle(), _mid, (uint32_t*)&size);
 }
 __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_rpc_relay_buff_read)(int* port, unsigned char* buff, int buffLen, int* bytes) __QAIC_STUB_ATTRIBUTE {
-   uint32_t _mid = 5;
+   uint32_t _mid = 6;
    return _stub_method_2(_hexref_handle(), _mid, (uint32_t*)port, (char**)&buff, (uint32_t*)&buffLen, (uint32_t*)bytes);
 }
 static __inline int _stub_method_3(remote_handle _handle, uint32_t _mid, uint32_t _in0[1], char* _in1[1], uint32_t _in1Len[1]) {
@@ -606,7 +610,7 @@ static __inline int _stub_method_3(remote_handle _handle, uint32_t _mid, uint32_
    return _nErr;
 }
 __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_rpc_relay_write)(int port, const unsigned char* buff, int buffLen) __QAIC_STUB_ATTRIBUTE {
-   uint32_t _mid = 6;
+   uint32_t _mid = 7;
    return _stub_method_3(_hexref_handle(), _mid, (uint32_t*)&port, (char**)&buff, (uint32_t*)&buffLen);
 }
 #ifdef __cplusplus

@@ -52,7 +52,7 @@ namespace Fw {
     }
 #endif
     
-    void ActiveComponentBase::start(NATIVE_INT_TYPE identifier, NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize) {
+    void ActiveComponentBase::start(NATIVE_INT_TYPE identifier, NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize, NATIVE_INT_TYPE cpuAffinity) {
         
         Fw::EightyCharString taskName;
         
@@ -65,7 +65,7 @@ namespace Fw {
 #endif
         
     	Os::Task::TaskStatus status = this->m_task.start(taskName, identifier, priority, stackSize, this->s_baseTask,
-                        this);
+							 this, cpuAffinity);
     	FW_ASSERT(status == Os::Task::TASK_OK,(NATIVE_INT_TYPE)status);
     }
     

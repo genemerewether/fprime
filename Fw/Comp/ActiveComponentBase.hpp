@@ -19,7 +19,7 @@
 namespace Fw {
     class ActiveComponentBase : public QueuedComponentBase {
         public:
-            void start(NATIVE_INT_TYPE identifier, NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize); //!< called by instantiator when task is to be started
+            void start(NATIVE_INT_TYPE identifier, NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize, NATIVE_INT_TYPE cpuAffinity = -1); //!< called by instantiator when task is to be started
             void exit(void); //!< exit task in active component
 
             enum {

@@ -3,6 +3,7 @@
 interface hexref
 {
   long init();
+  long run();
   long fini();
 
   typedef sequence<octet, 1024> dataBuffer;

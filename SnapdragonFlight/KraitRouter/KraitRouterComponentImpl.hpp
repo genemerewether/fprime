@@ -54,6 +54,14 @@ namespace SnapdragonFlight {
       //!
       ~KraitRouterComponentImpl(void);
 
+      int buffAllocate(int size);
+      int buffRead(int* port, unsigned char* buff, int buffLen, int* bytes);
+    
+      int portAllocate(int size);
+      int portRead(int* port, unsigned char* buff, int buffLen, int* bytes);
+
+      int write(int port, const unsigned char* buff, int buffLen);
+    
     PRIVATE:
 
       // ----------------------------------------------------------------------
