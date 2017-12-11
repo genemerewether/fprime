@@ -98,13 +98,13 @@ namespace SnapdragonFlight {
             NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
             NATIVE_INT_TYPE cpuAffinity);
 
-    void hexBuffReadTaskEntry(void * ptr);
+    static void hexBuffReadTaskEntry(void * ptr);
     
     void startPortReadThread(
             NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize,
             NATIVE_INT_TYPE cpuAffinity);
 
-    void hexPortReadTaskEntry(void * ptr);
+    static void hexPortReadTaskEntry(void * ptr);
 
     
     void quitReadThread(void);
