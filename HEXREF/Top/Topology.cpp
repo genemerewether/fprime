@@ -116,6 +116,12 @@ Svc::PrmDbImpl prmDb
 #endif
 ;
 
+SnapdragonFlight::KraitRouterComponentImpl kraitRouter
+#if FW_OBJECT_NAMES == 1
+                    ("KRAITRTR")
+#endif
+;
+
 Svc::HealthImpl health("health");
 
 Svc::AssertFatalAdapterComponentImpl fatalAdapter
@@ -175,6 +181,9 @@ void constructApp() {
     fatalHandler.init(0);
     health.init(25,0);
 
+    // TODO(mereweth) - update if queued or active
+    kraitRouter.init(0);
+
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
 
@@ -205,7 +214,7 @@ void constructApp() {
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,98,10*1024);
     prmDb.start(ACTIVE_COMP_PRMDB,96,10*1024);
-
+    
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -257,10 +266,27 @@ void exitTasks(void) {
 
 volatile bool terminate = false;
 
-int hexref_read(int port, unsigned char* buff, int buffLen, int* bytes) {
+int hexref_rpc_relay_buff_allocate(int size) {
+  return 0;
+  //return rpc_relay_buff_allocate(size);
+}
+int hexref_rpc_relay_buff_read(int* port, unsigned char* buff, int buffLen, int* bytes) {
+  return 0;
+  //return rpc_relay_buff_read(port, buff, buffLen, bytes);
 }
 
-int hexref_write(int port, const unsigned char* buff, int buffLen) {
+int hexref_rpc_relay_port_allocate(int size) {
+  return 0;
+  //return rpc_relay_port_allocate(size);
+}
+int hexref_rpc_relay_port_read(int* port, unsigned char* buff, int buffLen, int* bytes) {
+  return 0;
+  //return rpc_relay_port_read(port, buff, buffLen, bytes);
+}
+
+int hexref_rpc_relay_write(int port, const unsigned char* buff, int buffLen) {
+  return 0;
+  //return rpc_relay_write(port, buff, buffLen);
 }
 
 int hexref_init(void) {

@@ -17,6 +17,8 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
+#include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
+
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rg;
 extern Svc::ActiveRateGroupImpl rgAtt;
@@ -28,5 +30,6 @@ extern Svc::PrmDbImpl prmDb;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern Svc::HealthImpl health;
+extern SnapdragonFlight::KraitRouterComponentImpl kraitRouter;
 
 #endif

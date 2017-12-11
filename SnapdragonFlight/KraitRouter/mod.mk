@@ -11,18 +11,14 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = 
+SRC = KraitRouterComponentAi.xml KraitRouterComponentImpl.cpp
 
-# TODO stub to get it to compile?
 SRC_SDFLIGHT = 
-
 SRC_DSPAL = 
-
-# TODO alternate data flow for test
 SRC_DARWIN =  
 SRC_LINUX = 
 SRC_CYGWIN =  
 
-HDR = 
+HDR = KraitRouterComponentImpl.hpp
 
 #SUBDIRS = test

@@ -15,7 +15,7 @@ SRC =
 
 SRC_SDFLIGHT = hexref_stub.c krait_wrap_rpc.c
 
-SRC_DSPAL = hexref_skel.c hex_wrap_rpc.c
+SRC_DSPAL = hexref_skel.c #hex_wrap_rpc.c
 
 # TODO (mereweth) - replace with some ipc bridge 
 SRC_DARWIN = wrap_rpc.c
