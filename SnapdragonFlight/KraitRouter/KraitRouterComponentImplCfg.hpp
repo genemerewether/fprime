@@ -17,11 +17,15 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
-#ifndef KraitRouter_HPP
-#define KraitRouter_HPP
+#ifndef KraitRouterCfg_HPP
+#define KraitRouterCfg_HPP
 
 namespace SnapdragonFlight {
-  
+  enum {
+    // TODO(mereweth) - must be manually synced with max port size
+    KR_RECV_PORT_BUFF_SIZE = 256,
+    KR_NUM_RECV_PORT_BUFFS = 5
+  };
 };
 
-#endif //ifndef KraitRouter_HPP
+#endif //ifndef KraitRouterCfg_HPP

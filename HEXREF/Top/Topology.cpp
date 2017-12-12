@@ -194,6 +194,7 @@ void constructApp() {
 
     // read parameters
 
+    //TODO (mereweth) - if the file read fails b/c file is absent, the fastRPC call segfaults
     prmDb.readParamFile();
 
     // set health ping entries

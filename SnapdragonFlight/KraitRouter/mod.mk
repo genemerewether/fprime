@@ -19,6 +19,6 @@ SRC_DARWIN =
 SRC_LINUX = 
 SRC_CYGWIN =  
 
-HDR = KraitRouterComponentImpl.hpp
+HDR = KraitRouterComponentImpl.hpp KraitRouterComponentImplCfg.hpp
 
 #SUBDIRS = test

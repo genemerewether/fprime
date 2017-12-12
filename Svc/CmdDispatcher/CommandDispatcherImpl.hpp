@@ -183,6 +183,10 @@ namespace Svc {
             U32 m_numCmdsDispatched; //!< number of commands dispatched
             U32 m_numCmdErrors; //!< number of commands with an error
 
+        public:
+
+            static const NATIVE_UINT_TYPE NUM_CMD_PORTS = NUM_COMPCMDSEND_OUTPUT_PORTS;
+
     };
 }
 

@@ -221,6 +221,13 @@ void constructApp(int port_number, char* hostname) {
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
+    // Manual connections
+    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
+    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
+
+    // Proxy registration
+    // hexCmdProxy.set_CmdReg_OutputPort(0,cmdDisp.get_compCmdReg_InputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1));
+
     /* Register commands */
     cmdSeq.regCommands();
     cmdDisp.regCommands();

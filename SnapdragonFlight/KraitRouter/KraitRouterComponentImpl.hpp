@@ -20,6 +20,8 @@
 #ifndef KraitRouter_HPP
 #define KraitRouter_HPP
 
+#include <SnapdragonFlight/KraitRouter/KraitRouterComponentImplCfg.hpp>
+
 #include "SnapdragonFlight/KraitRouter/KraitRouterComponentAc.hpp"
 
 namespace SnapdragonFlight {
@@ -86,6 +88,13 @@ namespace SnapdragonFlight {
         Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
       );
 
+      typedef struct RecvPortBufferEntry {
+	unsigned char portBuff[KR_RECV_PORT_BUFF_SIZE];
+	unsigned int portNum;
+      } m_recvPortBuffers[KR_NUM_RECV_PORT_BUFFS];
+    
+      unsigned int m_recvPortBuffIndex;
+    
       bool m_initialized;
     };
 

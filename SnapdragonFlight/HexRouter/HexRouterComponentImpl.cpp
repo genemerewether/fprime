@@ -17,6 +17,7 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
+#include <SnapdragonFlight/KraitRouter/KraitRouterComponentImplCfg.hpp>
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
@@ -124,10 +125,17 @@ namespace SnapdragonFlight {
                 reinterpret_cast<unsigned char*>(Buffer.getBuffAddr());
         NATIVE_INT_TYPE xferSize = Buffer.getBuffLength();
 
-        for (NATIVE_INT_TYPE chunk = 0; chunk < xferSize; chunk +=
-                WRITE_BUFF_SIZE) {
 
-            NATIVE_INT_TYPE thisSize = FW_MIN(WRITE_BUFF_SIZE,
+        NATIVE_INT_TYPE stat = rpc_relay_write(portNum, data, xferSize);
+	// TODO(mereweth) - write error codes
+	if (-1 == stat) {
+	  this->log_WARNING_HI_HR_WriteError(stat);
+	  return;
+	}
+	/*        for (NATIVE_INT_TYPE chunk = 0; chunk < xferSize; chunk +=
+                HR_WRITE_BUFF_SIZE) {
+
+            NATIVE_INT_TYPE thisSize = FW_MIN(HR_WRITE_BUFF_SIZE,
                     xferSize - chunk);
 	    timespec stime;
 	    (void)clock_gettime(CLOCK_REALTIME,&stime);
@@ -138,7 +146,7 @@ namespace SnapdragonFlight {
                 this->log_WARNING_HI_HR_WriteError(stat);
                 return;
             }
-        }
+	    }*/
   }
 
   // ----------------------------------------------------------------------

@@ -86,7 +86,19 @@ namespace SnapdragonFlight {
     while (!this->m_initialized) {
       usleep(1000);
     }
-    return 1;
+    // if connected, call output port
+    if (this->isConnected_KraitPortsOut_OutputPort(port)) {
+      Fw::ExternalSerializeBuffer portBuff((unsigned char*) buff, buffLen);
+
+      DEBUG_PRINT("Calling port %d with %d bytes.\n", port, buffLen);
+      Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
+      if (stat != Fw::FW_SERIALIZE_OK) {
+	DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
+	// TODO(mereweth) - status codes
+	return -1;
+      }
+    }
+    return 0;
   }
   
   // ----------------------------------------------------------------------
