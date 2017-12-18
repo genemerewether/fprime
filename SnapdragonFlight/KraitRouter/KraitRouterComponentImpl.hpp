@@ -61,6 +61,8 @@ namespace SnapdragonFlight {
       int portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
 
       int write(unsigned int port, const unsigned char* buff, int buffLen);
+
+      bool m_quit;
     
     PRIVATE:
 
@@ -88,12 +90,16 @@ namespace SnapdragonFlight {
         Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
       );
 
-      typedef struct RecvPortBufferEntry {
-	unsigned char portBuff[KR_RECV_PORT_BUFF_SIZE];
+      struct RecvPortBufferEntry {
+	unsigned char buff[KR_RECV_PORT_BUFF_SIZE];
+	//Fw::ExternalSerializeBuffer portBuffObj;
 	unsigned int portNum;
+	unsigned int buffLen;
+	bool available;
       } m_recvPortBuffers[KR_NUM_RECV_PORT_BUFFS];
     
-      unsigned int m_recvPortBuffIndex;
+      unsigned int m_recvPortBuffInsert;
+      unsigned int m_recvPortBuffRemove;
     
       bool m_initialized;
     };

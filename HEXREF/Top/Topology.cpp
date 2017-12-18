@@ -19,10 +19,8 @@
 #endif
 
 #ifdef BUILD_DSPAL
-#define PRM_PATH "/dev/fs/PrmDb.dat"
 #define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
 #else
-#define PRM_PATH "PrmDb.dat"
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
@@ -43,7 +41,6 @@ enum {
         ACTIVE_COMP_ATT_RG,
         ACTIVE_COMP_POS_RG,
         ACTIVE_COMP_LOGGER,
-        ACTIVE_COMP_PRMDB,
 
         CYCLER_TASK,
         NUM_ACTIVE_COMPS
@@ -108,14 +105,6 @@ Svc::LinuxTimeImpl linuxTime
 #endif
 ;
 
-Svc::PrmDbImpl prmDb
-#if FW_OBJECT_NAMES == 1
-                    ("PRM",PRM_PATH)
-#else
-                    (PRM_PATH)
-#endif
-;
-
 SnapdragonFlight::KraitRouterComponentImpl kraitRouter
 #if FW_OBJECT_NAMES == 1
                     ("KRAITRTR")
@@ -175,8 +164,6 @@ void constructApp() {
 
     linuxTime.init(0);
 
-    prmDb.init(10,0);
-
     fatalAdapter.init(0);
     fatalHandler.init(0);
     health.init(25,0);
@@ -187,15 +174,11 @@ void constructApp() {
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
 
+    // Manual connections
+
     /* Register commands */
     /*eventLogger.regCommands();
-    prmDb.regCommands();
     health.regCommands();*/
-
-    // read parameters
-
-    //TODO (mereweth) - if the file read fails b/c file is absent, the fastRPC call segfaults
-    prmDb.readParamFile();
 
     // set health ping entries
 
@@ -214,7 +197,6 @@ void constructApp() {
     rgPos.start(ACTIVE_COMP_POS_RG, 80,10 * 1024);
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,40,10*1024);
-    prmDb.start(ACTIVE_COMP_PRMDB,30,10*1024);
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -259,7 +241,6 @@ void exitTasks(void) {
     rgAtt.exit();
     rgPos.exit();
     eventLogger.exit();
-    prmDb.exit();
 }
 
 volatile bool terminate = false;
@@ -271,18 +252,18 @@ volatile bool terminate = false;
  * split into init and run so SDREF can wait for init to be done? init would be called in
  * Topology (first thread) and would block. Then, hexref_run would be called in thread
  */
-int hexref_init() {
+int hexref_init(void) {
   DEBUG_PRINT("Before constructing app\n");
   constructApp();
   DEBUG_PRINT("After constructing app\n");
 
   //dumparch();
   
-  Os::Task::delay(1000);
+  //Os::Task::delay(1000);
   return 0;
 }
 
-int hexref_run() {
+int hexref_run(void) {
   bool local_cycle = true;  
   int cycle = 0;
 
@@ -307,9 +288,10 @@ int hexref_run() {
   return 0; 
 }
 
-int hexref_fini() {
+int hexref_fini(void) {
   DEBUG_PRINT("hexref_fini called...\n");
   terminate = true;
+  kraitRouter.m_quit = true;
   return 0;
 }
 

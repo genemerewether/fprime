@@ -38,7 +38,11 @@ namespace SnapdragonFlight {
         const char *const compName
     ) :
       KraitRouterComponentBase(compName),
-      m_initialized(false)
+      m_recvPortBuffers(),
+      m_recvPortBuffInsert(0),
+      m_recvPortBuffRemove(0),
+      m_initialized(false),
+      m_quit(false)
 #else
     KraitRouterImpl(void)
 #endif
@@ -64,7 +68,11 @@ namespace SnapdragonFlight {
   int KraitRouterComponentImpl::buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
     DEBUG_PRINT("buffRead called on object 0x%X, init %d\n", (unsigned long) this, this->m_initialized);
     while (!this->m_initialized) {
-      usleep(1000);
+      if (this->m_quit) {
+	return -10;
+      }
+      
+      usleep(KR_PREINIT_SLEEP_US);
     }
     *port = 0;
     *bytes = 0;
@@ -74,17 +82,47 @@ namespace SnapdragonFlight {
   int KraitRouterComponentImpl::portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
     DEBUG_PRINT("portRead called on object 0x%X, init %d\n", (unsigned long) this, this->m_initialized);
     while (!this->m_initialized) {
-      usleep(1000);
+      if (this->m_quit) {
+	return -10;
+      }
+      
+      usleep(KR_PREINIT_SLEEP_US);
     }
-    *port = 0;
-    *bytes = 0;
-    return 1;
+
+    // TODO(mereweth) - lock a class member variable mutex here
+    
+    /* NOTE(mereweth) - if portBuffer entry is available, that means no data is stored there
+     * If m_recvPortBuffInsert and m_recvPortBuffRemove are equal, we are all caught up and waiting
+     * for a new input port call
+     */
+    while (this->m_recvPortBuffers[m_recvPortBuffRemove].available == true) {
+      DEBUG_PRINT("waiting for portBuff in object 0x%X\n", (unsigned long) this);
+      if (this->m_quit) {
+	return -10;
+      }
+      usleep(KR_NOPORT_SLEEP_US);
+    }
+
+    if (buffLen < m_recvPortBuffers[m_recvPortBuffRemove].buffLen) {
+      return -1;
+      //TODO(mereweth) - error - FastRPC call didn't provide enough space to copy in port
+    }
+    memcpy(buff, m_recvPortBuffers[m_recvPortBuffRemove].buff, m_recvPortBuffers[m_recvPortBuffRemove].buffLen);
+    *bytes = m_recvPortBuffers[m_recvPortBuffRemove].buffLen;
+        
+    // TODO(mereweth) - unlock class member variable mutex here
+    
+    return 0;
   }
   
   int KraitRouterComponentImpl::write(unsigned int port, const unsigned char* buff, int buffLen) {
     DEBUG_PRINT("write called on object 0x%X, port %d, init %d\n", (unsigned long) this, port, this->m_initialized);
     while (!this->m_initialized) {
-      usleep(1000);
+      if (this->m_quit) {
+	return -10;
+      }
+      
+      usleep(KR_PREINIT_SLEEP_US);
     }
     // if connected, call output port
     if (this->isConnected_KraitPortsOut_OutputPort(port)) {
@@ -94,6 +132,8 @@ namespace SnapdragonFlight {
       Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
       if (stat != Fw::FW_SERIALIZE_OK) {
 	DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
+	//this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+        //this->tlmWrite_HR_NumBadSerialPortCalls(++this->m_numBadSerialPortCalls);
 	// TODO(mereweth) - status codes
 	return -1;
       }
@@ -124,7 +164,28 @@ namespace SnapdragonFlight {
         Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
     )
   {
-    // TODO
+    DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n", portNum, Buffer.getBuffLength());
+    if (!this->m_recvPortBuffers[m_recvPortBuffInsert].available) {
+        DEBUG_PRINT("HexPortsIn_handler tried to overwrite a port buffer for port %d\n", portNum);
+	//this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+        //this->tlmWrite_KR_NumBadSerialPortCalls();
+	return;
+    }
+    
+    m_recvPortBuffers[m_recvPortBuffInsert].available = false;
+    m_recvPortBuffers[m_recvPortBuffInsert].portNum = portNum;
+
+    /* NOTE(mereweth) - this memory gets copied again into the buffer provided by FastRPC read call
+     * This should be sufficiently fast for these port calls
+     */
+    if (Buffer.getBuffLength() >= KR_RECV_PORT_BUFF_SIZE) {
+        DEBUG_PRINT("HexPortsIn_handler serialized port %d too big: actual %d, avail %d\n", portNum, Buffer.getBuffLength(), KR_RECV_PORT_BUFF_SIZE);
+	//this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+        //this->tlmWrite_KR_NumBadSerialPortCalls();
+	return;
+    }
+    memcpy(m_recvPortBuffers[m_recvPortBuffInsert].buff, Buffer.getBuffAddr(), Buffer.getBuffLength());
+    m_recvPortBuffers[m_recvPortBuffInsert].buffLen = Buffer.getBuffLength();
   }
 
 } // end namespace SnapdragonFlight

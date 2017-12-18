@@ -3,8 +3,7 @@
           rg            |   21 (0x15)   |          20           |             20             |               3               |         3        
          rgAtt          |   41 (0x29)   |          20           |             20             |               3               |         3        
          rgPos          |   61 (0x3d)   |          20           |             20             |               3               |         3        
-      kraitRouter       |   81 (0x51)   |          20           |             60             |               7               |         7        
-         prmDb          |  141 (0x8d)   |          20           |            200             |               8               |         8        
+      kraitRouter       |   81 (0x51)   |          20           |            260             |               7               |         7        
      fatalAdapter       |  341 (0x155)  |          20           |             20             |               8               |         8        
         health          |  361 (0x169)  |          20           |             60             |               8               |         8        
       eventLogger       |  421 (0x1a5)  |          20           |             20             |               7               |         7        

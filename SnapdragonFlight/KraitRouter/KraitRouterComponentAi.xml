@@ -5,7 +5,7 @@
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
     
-    <comment>Forwards port calls over FastRPC to the DSP</comment>
+    <comment>Forwards port calls over FastRPC to the Krait</comment>
     <ports>
         <port name="HexPortsIn" data_type="Serial" kind="sync_input" max_number="25">
             <comment>
@@ -120,6 +120,7 @@
             <comment>
             Number of output buffer overflows
             </comment>
+	    
         </channel>
         <channel id="6" name="KR_NumZeroPktSize" data_type="U32">
             <comment>

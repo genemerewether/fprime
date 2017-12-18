@@ -6,7 +6,6 @@
 	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
-	<import_component_type>Svc/PrmDb/PrmDbComponentAi.xml</import_component_type>
 	<import_component_type>Svc/Health/HealthComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
@@ -26,8 +25,6 @@
 
    <instance namespace="Svc" name="rg" type="ActiveRateGroup" base_id="21"  base_id_window="20" />
 
-   <instance namespace="Svc" name="prmDb" type="PrmDb" base_id="141"  base_id_window="20" />
-
    <instance namespace="Svc" name="health" type="Health" base_id="361"  base_id_window="20" />
 
    <instance namespace="Svc" name="rgPos" type="ActiveRateGroup" base_id="61"  base_id_window="20" />
@@ -43,10 +40,6 @@
 	 <source component = "rgPos" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection2">
-	 <source component = "prmDb" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
 <connection name = "Connection3">
 	 <source component = "health" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
@@ -58,10 +51,6 @@
 <connection name = "Connection5">
 	 <source component = "eventLogger" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection6">
-	 <source component = "health" port = "PingSend" type = "Ping" num = "6"/>
- 	 <target component = "prmDb" port = "pingIn" type = "Ping" num = "0"/>
 </connection>
 <connection name = "Connection7">
 	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
@@ -111,10 +100,6 @@
 	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "1"/>
  	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection19">
-	 <source component = "prmDb" port = "pingOut" type = "Ping" num = "0"/>
- 	 <target component = "health" port = "PingReturn" type = "Ping" num = "6"/>
-</connection>
 <connection name = "Connection20">
 	 <source component = "health" port = "PingSend" type = "Ping" num = "0"/>
  	 <target component = "rg" port = "PingIn" type = "Ping" num = "0"/>
@@ -138,10 +123,6 @@
 <connection name = "Connection25">
 	 <source component = "rgAtt" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection26">
-	 <source component = "prmDb" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection27">
 	 <source component = "health" port = "LogText" type = "LogText" num = "0"/>
@@ -178,9 +159,5 @@
 <connection name = "Connection35">
 	 <source component = "rgPos" port = "PingOut" type = "Ping" num = "0"/>
  	 <target component = "health" port = "PingReturn" type = "Ping" num = "2"/>
-</connection>
-<connection name = "Connection36">
-	 <source component = "prmDb" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 </assembly>

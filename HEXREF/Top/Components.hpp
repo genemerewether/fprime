@@ -9,7 +9,6 @@ void exitTasks(void);
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
-#include <Svc/PrmDb/PrmDbImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 #include <Svc/Health/HealthComponentImpl.hpp>
 
@@ -26,7 +25,6 @@ extern Svc::ActiveRateGroupImpl rgPos;
 extern Svc::ConsoleTextLoggerImpl textLogger;
 extern Svc::ActiveLoggerImpl eventLogger;
 extern Svc::LinuxTimeImpl linuxTime;
-extern Svc::PrmDbImpl prmDb;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern Svc::HealthImpl health;
