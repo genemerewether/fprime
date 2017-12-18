@@ -6,13 +6,14 @@ volatile bool terminate = false;
 
 int hexref_init() {
   FARF(ALWAYS, "hexref_init");
+  usleep(1000 * 1000);
   return 0;
 }
 
 int hexref_run() {
   FARF(ALWAYS, "hexref_run");
   while (!terminate) {
-    FARF(ALWAYS, "hexref_run loop");
+    FARF(ALWAYS, "hexref_run loop %d", terminate);
     usleep(10000);
   }
   return 0;

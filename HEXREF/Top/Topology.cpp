@@ -259,7 +259,8 @@ int hexref_init(void) {
 
   //dumparch();
   
-  //Os::Task::delay(1000);
+  Os::Task::delay(1000);
+  
   return 0;
 }
 

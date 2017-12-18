@@ -38,16 +38,18 @@ namespace SnapdragonFlight {
         const char *const compName
     ) :
       KraitRouterComponentBase(compName),
+      m_quit(false),
       m_recvPortBuffers(),
       m_recvPortBuffInsert(0),
       m_recvPortBuffRemove(0),
-      m_initialized(false),
-      m_quit(false)
+      m_initialized(false)
 #else
     KraitRouterImpl(void)
 #endif
   {
-
+      for (int i = 0; i < KR_NUM_RECV_PORT_BUFFS; i++) {
+  	  m_recvPortBuffers[i].available = true;
+      }
   }
 
   void KraitRouterComponentImpl ::
@@ -83,6 +85,7 @@ namespace SnapdragonFlight {
     DEBUG_PRINT("portRead called on object 0x%X, init %d\n", (unsigned long) this, this->m_initialized);
     while (!this->m_initialized) {
       if (this->m_quit) {
+	DEBUG_PRINT("quitting portRead preinit in object 0x%X\n", (unsigned long) this);
 	return -10;
       }
       
@@ -98,6 +101,7 @@ namespace SnapdragonFlight {
     while (this->m_recvPortBuffers[m_recvPortBuffRemove].available == true) {
       DEBUG_PRINT("waiting for portBuff in object 0x%X\n", (unsigned long) this);
       if (this->m_quit) {
+	DEBUG_PRINT("quitting portRead postinit in object 0x%X\n", (unsigned long) this);
 	return -10;
       }
       usleep(KR_NOPORT_SLEEP_US);
@@ -107,6 +111,8 @@ namespace SnapdragonFlight {
       return -1;
       //TODO(mereweth) - error - FastRPC call didn't provide enough space to copy in port
     }
+    *port = m_recvPortBuffers[m_recvPortBuffRemove].portNum;
+    DEBUG_PRINT("before memcpy in portRead in object 0x%X, port %d\n", (unsigned long) this, *port);
     memcpy(buff, m_recvPortBuffers[m_recvPortBuffRemove].buff, m_recvPortBuffers[m_recvPortBuffRemove].buffLen);
     *bytes = m_recvPortBuffers[m_recvPortBuffRemove].buffLen;
         
@@ -119,6 +125,7 @@ namespace SnapdragonFlight {
     DEBUG_PRINT("write called on object 0x%X, port %d, init %d\n", (unsigned long) this, port, this->m_initialized);
     while (!this->m_initialized) {
       if (this->m_quit) {
+	DEBUG_PRINT("quitting write preinit in object 0x%X\n", (unsigned long) this);
 	return -10;
       }
       
