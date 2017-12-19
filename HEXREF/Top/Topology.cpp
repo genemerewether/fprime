@@ -175,7 +175,13 @@ void constructApp() {
     constructHEXREFArchitecture();
 
     // Manual connections
+    // TODO(mereweth) - multiple DSPAL components with commands?
+    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
+    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
+    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
+    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
+    
     /* Register commands */
     /*eventLogger.regCommands();
     health.regCommands();*/

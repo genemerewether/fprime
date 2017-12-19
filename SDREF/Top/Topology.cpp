@@ -222,11 +222,17 @@ void constructApp(int port_number, char* hostname) {
     constructSDREFArchitecture();
 
     // Manual connections
+
+    //hexRouter.set_HexPortsOut_OutputPort(1, prmDb.get_
+    
     // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
     cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
+    hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
 
     // Proxy registration
-    // hexCmdProxy.set_CmdReg_OutputPort(0,cmdDisp.get_compCmdReg_InputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1));
+    // TODO(mereweth) - multiple DSPAL components with commands?
+    //hexCmdProxy.set_CmdReg_OutputPort(0,cmdDisp.get_compCmdReg_InputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1));
+    //hexCmdProxy.regCommands();
 
     /* Register commands */
     cmdSeq.regCommands();
