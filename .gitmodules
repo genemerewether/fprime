@@ -4,3 +4,9 @@
 [submodule "Utils/nano-dm"]
 	path = Utils/nano-dm
 	url = https://github.com/kevinmehall/nano-dm.git
+[submodule "ROS/fprime_ws/src/std_msgs"]
+	path = ROS/fprime_ws/src/std_msgs
+	url = https://github.com/ros/std_msgs.git
+[submodule "ROS/fprime_ws/src/common_msgs"]
+	path = ROS/fprime_ws/src/common_msgs
+	url = https://github.com/ros/common_msgs.git
