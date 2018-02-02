@@ -10,3 +10,6 @@
 [submodule "ROS/fprime_ws/src/common_msgs"]
 	path = ROS/fprime_ws/src/common_msgs
 	url = https://github.com/ros/common_msgs.git
+[submodule "ROS/fprime_ws/src/mav_comm"]
+	path = ROS/fprime_ws/src/mav_comm
+	url = https://github.com/ethz-asl/mav_comm.git

@@ -93,6 +93,19 @@ REF_MODULES := \
 	Ref/SignalGen \
 	Ref/PingReceiver
 
+ROS_MODULES := \
+	ROS/Gen/std_msgs/Types  \
+	ROS/Gen/actionlib_msgs/Types     \
+	ROS/Gen/diagnostic_msgs/Types    \
+	ROS/Gen/geometry_msgs/Types      \
+	ROS/Gen/nav_msgs/Types           \
+	ROS/Gen/sensor_msgs/Types        \
+	ROS/Gen/shape_msgs/Types         \
+	ROS/Gen/std_msgs/Types           \
+	ROS/Gen/stereo_msgs/Types        \
+	ROS/Gen/trajectory_msgs/Types    \
+	ROS/Gen/visualization_msgs/Types
+
 Ref_MODULES := \
 	\
 	$(REF_MODULES) \
@@ -120,6 +133,8 @@ SDREF_MODULES := \
 	$(SNAPDRAGON_MODULES) \
 	\
 	$(SVC_MODULES) \
+	\
+	$(ROS_MODULES) \
 	\
 	$(FW_MODULES) \
 	\
@@ -249,6 +264,7 @@ OTHER_MODULES := \
 	gtest \
 	Os/Stubs \
 	Fw/Test \
+	ROS/Gen \
 	$(FW_GTEST_MODULES)
 
 # List deployments

@@ -17,10 +17,10 @@
   - manually add serializable Ai.xml to port Ai.xml
   - dependency graph?
 - version-control - these types will be custom so should not have any dependencies on the user's ROS paths
-- put them in fprime/ROS/Types with *_msgs directory structure
+- put them in fprime/ROS/Types with msgs directory structure
 
 ### methods for converting to and from ROS message objects
-- 
+-
 
 ### Unit tests
 - headers
@@ -39,15 +39,10 @@
 ## misc notes
 - multiple components may need same (non-standard) messages
   - can't have duplicate defs in 2 catkin workspaces
-  - ROS/Types/*_msgs
-    - catkin build step should put SerializableAi.xml files here
-    - can check in to repo if desired
   - ROS/fprime_ws/src
     - can add custom msg packages here
     - also has genfprime
-      - Validate msg against Autocoders/schema/default/serializable_schema.rng
-      - Validate srv against Autocoders/schema/default/interface_schema.rng
-    - genfprime
-      - generate_messages(DEPENDENCIES deps [LANGS lang1 lang2...])
+      - Validate generated serializable XML against Autocoders/schema/default/serializable_schema.rng
+      - Validate generated port XML against Autocoders/schema/default/interface_schema.rng
 - generate port from msg/srv
   - msg port has no return value; srv port does

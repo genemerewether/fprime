@@ -13,6 +13,7 @@ from catkin_pkg import package, packages, workspaces, topological_order
 
 from genmsg import MsgGenerationException
 from . generate_modmk import write_modmk
+from . generator import generate
 
 def usage(progname):
     print("%(progname)s file(s)"%vars())
@@ -44,12 +45,7 @@ def genmain(argv, progname):
                     if not os.path.exists(options.outdir):
                         raise
             search_path = genmsg.command_line.includepath_to_dict(options.includepath)
-            filename = args[1]
-#             if filename.endswith('.msg'):
-#                 retcode = generate_msg(options.package, args[1:], options.outdir, search_path)
-#             else:
-#                 retcode = generate_srv(options.package, args[1:], options.outdir, search_path)
-            retcode = 0
+            retcode = generate(options.package, args[1], options.outdir, search_path)
     except genmsg.InvalidMsgSpec as e:
         print("ERROR: ", e, file=sys.stderr)
         retcode = 1
