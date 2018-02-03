@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(SDREF)
 
+#TODO(mereweth) - something is funky about the message dependencies
+
 find_package(catkin REQUIRED COMPONENTS
   genfprime message_generation fprime
   mav_msgs planning_msgs

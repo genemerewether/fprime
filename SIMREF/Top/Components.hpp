@@ -25,6 +25,8 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
+#include <ROS/RosCycle/RosCycleComponentImpl.hpp>
+
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rg;
 extern Svc::CmdSequencerComponentImpl cmdSeq;
@@ -42,5 +44,6 @@ extern Svc::BufferManager fileUpBufMgr;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern Svc::HealthImpl health;
+extern ROS::RosCycleComponentImpl rosCycle;
 
 #endif

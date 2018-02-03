@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<component name="RosCycle" kind="passive" namespace="" modeler="true">
+<component name="RosCycle" kind="passive" namespace="ROS" modeler="true">
 
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
@@ -11,7 +11,7 @@
     <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <ports>
-    
+
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>

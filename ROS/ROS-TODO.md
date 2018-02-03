@@ -12,6 +12,10 @@
 
 ## Build system
 
+### Requirements
+- RTTI??
+- how to disable RTTI everywhere with no ROS includes
+
 ### Serializable types and Ports
 - version-control?
 

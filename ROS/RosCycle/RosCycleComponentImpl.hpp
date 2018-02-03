@@ -21,11 +21,14 @@
 #define RosCycle_HPP
 
 #include "ros/ros.h"
+#include "rosgraph_msgs/Clock.h"
+
 #include <Os/Task.hpp>
+#include "Fw/Time/Time.hpp"
 
 #include "ROS/RosCycle/RosCycleComponentAc.hpp"
 
-namespace  {
+namespace ROS {
 
   class RosCycleComponentImpl :
     public RosCycleComponentBase
@@ -41,16 +44,14 @@ namespace  {
       //!
       RosCycleComponentImpl(
 #if FW_OBJECT_NAMES == 1
-          const char *const compName /*!< The component name*/
-#else
-          void
+          const char *const compName, /*!< The component name*/
 #endif
+          NATIVE_UINT_TYPE timeDivMS
       );
 
       //! Initialize object RosCycle
       //!
       void init(
-          const NATIVE_INT_TYPE queueDepth, /*!< The queue depth*/
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
@@ -82,7 +83,7 @@ namespace  {
           U32 key /*!< Value to return to pinger*/
       );
 
-      void chatterCallback(const std_msgs::String::ConstPtr& msg);
+      void clockCallback(const rosgraph_msgs::Clock::ConstPtr& msg);
 
       // ----------------------------------------------------------------------
       // Member variables
@@ -91,6 +92,14 @@ namespace  {
       //! Number of /clock callbacks received
       //!
       NATIVE_UINT_TYPE m_callbacks;
+
+      //! Time of last callback
+      //!
+      Fw::Time m_lastCallback;
+
+      //! Time divider; one tick per this amount of time
+      //!
+      Fw::Time m_timeDiv;
 
       //! Entry point for task waiting for interrupt
       static void intTaskEntry(void * ptr);

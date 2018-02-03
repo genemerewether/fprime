@@ -48,7 +48,9 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 // Component instance pointers
-static NATIVE_INT_TYPE rgDivs[] = {1};
+
+//NOTE(mereweth) - change this in sync with RosCycle timeDivMS
+static NATIVE_INT_TYPE rgDivs[] = {5};
 Svc::RateGroupDriverImpl rgDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGDRV",
@@ -88,6 +90,15 @@ Svc::LinuxTimeImpl linuxTime
 #if FW_OBJECT_NAMES == 1
                     ("LTIME")
 #endif
+;
+
+ROS::RosCycleComponentImpl rosCycle
+#if FW_OBJECT_NAMES == 1
+                    ("ROSCYCLE",
+#else
+                    (
+#endif
+                    200)
 ;
 
 Svc::TlmChanImpl chanTlm
@@ -243,7 +254,7 @@ void constructApp(int port_number, char* hostname) {
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
 
-    rosCycle.startIntTask(30, 20*1024);
+    rosCycle.startIntTask(90, 20*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -263,10 +274,10 @@ void constructApp(int port_number, char* hostname) {
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    Svc::InputCyclePort* port = rgDrv.get_CycleIn_InputPort(0);
+    Svc::InputCyclePort* port = rgDrv.get_CycleIn_InputPort(1);
     Svc::TimerVal cycleStart;
     cycleStart.take();
-    port->invoke(cycleStart);
+    //port->invoke(cycleStart);
     Os::Task::delay(1000);
 }
 
@@ -328,9 +339,9 @@ int main(int argc, char* argv[]) {
                 print_usage();
                 return 0;
                 break;
-                        case 'l':
-                          local_cycle = true;
-                          break;
+            case 'l':
+                local_cycle = true;
+                break;
             case 'p':
                 port_number = atoi(optarg);
                 break;
@@ -356,7 +367,7 @@ int main(int argc, char* argv[]) {
     int cycle = 0;
 
     while (!terminate) {
-      DEBUG_PRINT("Cycle %d\n",cycle);
+      //DEBUG_PRINT("Cycle %d\n",cycle);
       if (local_cycle) {
         runcycles(1);
       } else {

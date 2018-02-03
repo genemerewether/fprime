@@ -20,11 +20,12 @@
 
 #include <ROS/RosCycle/RosCycleComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
+#include "Svc/Cycle/TimerVal.hpp"
 
-//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-#define DEBUG_PRINT(x,...)
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
 
-namespace  {
+namespace ROS {
 
   // ----------------------------------------------------------------------
   // Construction, initialization, and destruction
@@ -33,23 +34,29 @@ namespace  {
   RosCycleComponentImpl ::
 #if FW_OBJECT_NAMES == 1
     RosCycleComponentImpl(
-        const char *const compName
+        const char *const compName,
+        NATIVE_UINT_TYPE timeDivMS
     ) :
-      RosCycleComponentBase(compName)
+      RosCycleComponentBase(compName),
 #else
-    RosCycleImpl(void)
+    RosCycleImpl(NATIVE_UINT_TYPE timeDivMS) :
 #endif
+      m_callbacks(0),
+      m_lastCallback(TB_ROS_TIME, 0, 0),
+      m_timeDiv(TB_ROS_TIME, 0, timeDivMS * 1000), // 10 ms default interval
+      m_quitThread(false)
   {
 
   }
 
   void RosCycleComponentImpl ::
     init(
-        const NATIVE_INT_TYPE queueDepth,
         const NATIVE_INT_TYPE instance
     )
   {
-    RosCycleComponentBase::init(queueDepth, instance);
+    RosCycleComponentBase::init(instance);
+
+    m_lastCallback.setTimeBase(TB_ROS_TIME);
   }
 
   RosCycleComponentImpl ::
@@ -83,7 +90,7 @@ namespace  {
         NATIVE_UINT_TYPE context
     )
   {
-    // TODO
+      //this->tlmWrite_ ... (m_callbacks);
   }
 
   void RosCycleComponentImpl ::
@@ -107,12 +114,47 @@ namespace  {
       RosCycleComponentImpl* compPtr = (RosCycleComponentImpl*) ptr;
 
       ros::NodeHandle n;
-      ros::Subscriber sub = n.subscribe("clock", 10, compPtr->clockCallback);
+      ros::Subscriber sub = n.subscribe("clock", 10,
+                                        &RosCycleComponentImpl::clockCallback,
+                                        compPtr);
+
+      ros::spin();
   }
 
-  void clockCallback(const std_msgs::String::ConstPtr& msg)
+  void RosCycleComponentImpl ::
+    clockCallback(const rosgraph_msgs::Clock::ConstPtr& msg)
   {
-      DEBUG_PRINT("Clock callback");//, msg->data.c_str());
+      if (this->m_callbacks%10 == 0)
+      {
+          DEBUG_PRINT("Clock callback %d, %f\n", this->m_callbacks,
+                                               msg->clock.toSec());
+      }
+      this->m_callbacks++;
+
+      // Make sure we were't at zero last time either
+      if ((!msg->clock.isZero()) &&
+          (m_lastCallback > Fw::Time::zero(TB_ROS_TIME))) {
+
+          Fw::Time now(TB_ROS_TIME, msg->clock.sec, msg->clock.nsec / 1000L);
+
+          //TODO(mereweth) - keep triggering cycle port and adding timeDiv to lastCallback
+
+          if (now >= Fw::Time::add(m_lastCallback, m_timeDiv)) {
+              DEBUG_PRINT("RosCycle enough time elapsed\n");
+              Svc::TimerVal cycleStart;
+              cycleStart.take();
+              if (this->isConnected_cycle_OutputPort(0)) {
+                  DEBUG_PRINT("RosCycle invoking cycle port\n");
+                  this->cycle_out(0, cycleStart);
+
+                  m_lastCallback.set(TB_ROS_TIME, msg->clock.sec, msg->clock.nsec / 1000);
+              }
+          }
+      }
+      else {
+          DEBUG_PRINT("RosCycle zero last time or clock msg is zero\n");
+          m_lastCallback.set(TB_ROS_TIME, msg->clock.sec, msg->clock.nsec / 1000);
+      }
   }
 
 } // end namespace
