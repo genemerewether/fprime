@@ -23,10 +23,10 @@ catkin_package(
 FILE(
     WRITE ${CMAKE_BINARY_DIR}/modmk.cmake
 "
-string (REPLACE \";\" \" \\\\ \\n\\t\" incs \"${catkin_INCLUDE_DIRS}\")
+string (REPLACE \";\" \" \\\\ \\n\\t-I \" incs \"${catkin_INCLUDE_DIRS}\")
 string (REPLACE \";\" \" \\\\ \\n\\t\" libs \"${catkin_LIBRARIES}\")
 
-FILE(APPEND \${MODMK} \"EXTRA_INCS = \")
+FILE(APPEND \${MODMK} \"EXTRA_INC_DIRS = -I \")
 FILE(APPEND \${MODMK} \${incs})
 
 FILE(APPEND \${MODMK} \"\\nEXTRA_LIBS = \")

@@ -153,6 +153,7 @@ class ModMkParser:
         self.defines_dictionary = {} # holds extra defines by target
         self.post_defines_dictionary = {} # holds extra defines by target
         self.extra_libs_dictionary = {} # holds extra libs by target
+        self.extra_inc_dirs_dictionary = {} # holds extra include directories by target
         self.test_mods_dictionary = {} # hold module libraries to link test binary to 
         self.test_libs_dictionary = {} # hold libraries to link test binary
         self.ac_extra_list = [] # holds extra AC files
@@ -181,6 +182,7 @@ class ModMkParser:
             self.defines_dictionary[target] = ""
             self.post_defines_dictionary[target] = ""
             self.extra_libs_dictionary[target] = ""
+            self.extra_inc_dirs_dictionary[target] = ""
 
         for xml_type in xml_gen_dictionary.keys():
             self.xml_dictionary[xml_type] = []
@@ -314,6 +316,9 @@ class ModMkParser:
                         
                 if var == "COMPARGS_POST" + starget:
                     self.post_defines_dictionary[target] = value
+
+                if var == "EXTRA_INC_DIRS" + starget:
+                    self.extra_inc_dirs_dictionary[target] = value
 
                 if var == "EXTRA_LIBS" + starget:
                     self.extra_libs_dictionary[target] = value
@@ -524,7 +529,13 @@ class ModMkParser:
             file_descriptor.write("\nEXTRA_LIBS_" + self.module_name + target + " := " + self.extra_libs_dictionary[target] + " \\\n")
             # add variable for common modules
             if target != "":
-                file_descriptor.write("\t\t$(EXTRA_LIBS_" + self.module_name + ")\n")    
+                file_descriptor.write("\t\t$(EXTRA_LIBS_" + self.module_name + ")\n")
+
+        for target in self.extra_inc_dirs_dictionary.keys():
+            file_descriptor.write("\nEXTRA_INC_DIRS_" + self.module_name + target + " := " + self.extra_inc_dirs_dictionary[target] + " \\\n")
+            # add variable for common modules
+            if target != "":
+                file_descriptor.write("\t\t$(EXTRA_INC_DIRS_" + self.module_name + ")\n")
 
         file_descriptor.write("\n-include $(BUILD_ROOT)/%s/extra_vars.mk\n\n" % self.directory)
 
@@ -571,9 +582,9 @@ class ModMkParser:
                         bin_file_descriptor.write("-include $(BUILD_ROOT)/" + self.directory + path + "/$(OUTPUT_DIR)/" + base + ".d\n")
                         bin_file_descriptor.write("$(BUILD_ROOT)/" + self.directory + path + "/$(OUTPUT_DIR)/$(OBJ_PREFIX)" + base + "$(OBJ_SUFFIX): $(BUILD_ROOT)/" + self.directory + "/" + source + "\n")
                         if (extension == ".c"):
-                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CC) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CFLAGS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
+                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CC) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CFLAGS) $(EXTRA_INC_DIRS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
                         elif ((extension == ".cpp") or (extension == ".cc") or (extension == ".asm")):
-                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CXX) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CXXFLAGS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
+                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CXX) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CXXFLAGS) $(EXTRA_INC_DIRS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
                         else:
                             raise CfgParseError,"Invalid Extension " + extension + " on file " + self.module_name + "/" + source
     
@@ -591,9 +602,9 @@ class ModMkParser:
                                 bin_file_descriptor.write("-include $(BUILD_ROOT)/" + self.directory + "/$(OUTPUT_DIR)/" + source_file + ".d\n")
                                 bin_file_descriptor.write("$(BUILD_ROOT)/" + self.directory + "/$(OUTPUT_DIR)/$(OBJ_PREFIX)" + source_file + "$(OBJ_SUFFIX): $(BUILD_ROOT)/" + self.directory + "/" + gen_file + "\n")
                                 if (extension == ".c"):
-                                    bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CC) $(INCLUDE_PATH)$(dir $<) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CFLAGS) $(AC_CC_FLAGS) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
+                                    bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CC) $(EXTRA_INC_DIRS) $(INCLUDE_PATH)$(dir $<) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CFLAGS) $(AC_CC_FLAGS) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
                                 elif ((extension == ".cpp") or (extension == ".cc")):
-                                    bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CXX) $(INCLUDE_PATH)$(dir $<) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CXXFLAGS) $(AC_CXX_FLAGS) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
+                                    bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CXX) $(EXTRA_INC_DIRS) $(INCLUDE_PATH)$(dir $<) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CXXFLAGS) $(AC_CXX_FLAGS) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
                                 else:
                                     raise CfgParseError,"Invalid Extension " + extension + " on file " + self.module_name + "/" + gen_file
                                 tgt_list += "$(BUILD_ROOT)/%s/%s " % (self.directory,gen_file),
@@ -650,9 +661,9 @@ class ModMkParser:
                         bin_file_descriptor.write("-include $(BUILD_ROOT)/" + self.directory + path + "/$(OUTPUT_DIR)/" + base + ".d\n")
                         bin_file_descriptor.write("$(BUILD_ROOT)/" + self.directory + path + "/$(OUTPUT_DIR)/$(OBJ_PREFIX)" + base + "$(OBJ_SUFFIX): $(BUILD_ROOT)/" + self.directory + "/" + source + "\n")
                         if (extension == ".c"):
-                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CC) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CFLAGS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
+                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CC) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CFLAGS) $(EXTRA_INC_DIRS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
                         elif ((extension == ".cpp") or (extension == ".cc")):
-                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CXX) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CXXFLAGS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
+                            bin_file_descriptor.write("\t$(MKDIR) $(@D)\n\t$(CXX) -DASSERT_FILE_ID=$(shell $(FILE_HASH) $(notdir $<)) $(DEFINES_" + self.directory_string + "_$(BUILD)) $(DEPEND_FILE)$(basename $@).d $(CXXFLAGS) $(EXTRA_INC_DIRS) $(INCLUDE_PATH)$(dir $<) $(POST_DEFINES_" + self.directory_string + "_$(BUILD)) $(COMPILE_ONLY) $(COMPILE_TO) $@ $<\n\n")
                         else:
                             raise CfgParseError,"Invalid Extension " + extension + " on file " + self.directory + "/" + source
                                     

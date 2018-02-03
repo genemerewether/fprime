@@ -1,3 +1,5 @@
+#include <ros/ros.h>
+
 #include <Components.hpp>
 
 enum {
@@ -358,6 +360,10 @@ int main(int argc, char* argv[]) {
 	char *hostname = NULL;
         bool local_cycle = false;
 
+        // Removes ROS cmdline args as a side-effect
+        ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
+        ros::start();
+
 	while ((option = getopt(argc, argv, "hlp:a:")) != -1){
 		switch(option) {
 			case 'h':
@@ -421,6 +427,8 @@ int main(int argc, char* argv[]) {
     Os::Task::delay(1000);
 
     (void) printf("Exiting...\n");
+
+    ros::shutdown();
 
     return 0;
 }
