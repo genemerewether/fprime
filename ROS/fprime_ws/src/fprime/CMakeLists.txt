@@ -11,4 +11,9 @@ generate_messages(
 
 catkin_package(
   CATKIN_DEPENDS message_runtime std_msgs geometry_msgs sensor_msgs roscpp
+  CFG_EXTRAS genmodmk.cmake
 )
+
+install(DIRECTORY cmake
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        PATTERN ".svn" EXCLUDE)

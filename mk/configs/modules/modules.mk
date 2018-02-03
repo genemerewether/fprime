@@ -94,6 +94,9 @@ REF_MODULES := \
 	Ref/PingReceiver
 
 ROS_MODULES := \
+	ROS/RosTime
+
+ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
 	ROS/Gen/actionlib_msgs/Types     \
 	ROS/Gen/diagnostic_msgs/Types    \
@@ -136,6 +139,32 @@ SDREF_MODULES := \
 	$(SVC_MODULES) \
 	\
 	$(ROS_MODULES) \
+	\
+	$(ROS_TYPE_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+SIMREF_DEPLOYMENT_MODULES := \
+	ROS/fprime_ws/src/SIMREF \
+	SIMREF/Top
+
+SIMREF_MODULES := \
+	\
+	$(SIMREF_DEPLOYMENT_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	ROS/RosCycle \
+	\
+	$(ROS_MODULES) \
+	\
+	$(ROS_TYPE_MODULES) \
 	\
 	$(FW_MODULES) \
 	\
@@ -270,7 +299,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF HEXREF TESTRPC
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse
