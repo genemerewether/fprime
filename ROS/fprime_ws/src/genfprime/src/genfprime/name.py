@@ -1,3 +1,8 @@
+import os
+
+BASE_NAMESPACE = "ROS"
+SEP = os.path.sep
+
 ## :param type_name str: Name of message type sans package,
 ## e.g. 'String'
 ## :returns str: name of Serializable
@@ -21,3 +26,10 @@ def _srv_serializable_xml_name(type_name, is_input):
         return type_name + "InSerializableAi.xml"
     else:
         return type_name + "OutSerializableAi.xml"
+
+def _type_to_namespace(type_):
+    if SEP in type_:
+        split = type_.split(SEP)
+        return "%s::%s::%s"%(BASE_NAMESPACE, split[0], split[1])
+    else:
+        return type_

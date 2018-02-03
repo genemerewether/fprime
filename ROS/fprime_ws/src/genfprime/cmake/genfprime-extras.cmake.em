@@ -17,6 +17,7 @@ set(GENFPRIME_SRC
   ${GENFPRIME_SRC_DIR}/generator.py
   ${GENFPRIME_SRC_DIR}/genfprime_main.py
   ${GENFPRIME_SRC_DIR}/name.py
+  ${GENFPRIME_SRC_DIR}/types.py
 )
 
 # Generate FPrime Serializable and Port xml from .msg or .srv
