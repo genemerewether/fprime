@@ -18,6 +18,8 @@ ALL_HDRS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(HDR_$(subst /,,$(module)
 
 # Global binary targets
 
+EXTRA_LIBS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(EXTRA_LIBS_$(subst /,,$(module))))
+
 TARGET_LIBS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/$(LIB_PREFIX)$(subst /,,$(module))$(LIB_SUFFIX))
 CLEAN_TARGETS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(subst /,,$(module))_clean)
 BIN_CLEAN_TARGETS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(subst /,,$(module))_bin_clean)
@@ -69,8 +71,8 @@ ifdef CHECK_LINK_BIN
 	$(CHECK_LINK_BIN) $(LINK_BIN_TO) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(CHECK_LINK_BIN_NAME)$(BIN_SUFFIX) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(CHECK_LINK_BIN_SRC)
 endif
 	@echo Linking binary...
-	@echo $(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(LINK_BIN_POST_LIB_FLAGS)
-	@$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
+	@echo $(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(EXTRA_LIBS) $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
+	@$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(EXTRA_LIBS) $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
 
 endif
 # Module-level code generator targets

@@ -152,6 +152,7 @@ class ModMkParser:
         self.xml_dictionary = {} # holds xml files  
         self.defines_dictionary = {} # holds extra defines by target
         self.post_defines_dictionary = {} # holds extra defines by target
+        self.extra_libs_dictionary = {} # holds extra libs by target
         self.test_mods_dictionary = {} # hold module libraries to link test binary to 
         self.test_libs_dictionary = {} # hold libraries to link test binary
         self.ac_extra_list = [] # holds extra AC files
@@ -179,6 +180,7 @@ class ModMkParser:
             self.test_mods_dictionary[target] = []
             self.defines_dictionary[target] = ""
             self.post_defines_dictionary[target] = ""
+            self.extra_libs_dictionary[target] = ""
 
         for xml_type in xml_gen_dictionary.keys():
             self.xml_dictionary[xml_type] = []
@@ -312,6 +314,9 @@ class ModMkParser:
                         
                 if var == "COMPARGS_POST" + starget:
                     self.post_defines_dictionary[target] = value
+
+                if var == "EXTRA_LIBS" + starget:
+                    self.extra_libs_dictionary[target] = value
                         
             #  extra AC files
             
@@ -513,6 +518,13 @@ class ModMkParser:
             # add variable for common modules
             if target != "":
                 file_descriptor.write("\t\t$(POST_DEFINES_" + self.directory_string + ")\n")    
+
+
+        for target in self.extra_libs_dictionary.keys():
+            file_descriptor.write("\nEXTRA_LIBS_" + self.module_name + target + " := " + self.extra_libs_dictionary[target] + " \\\n")
+            # add variable for common modules
+            if target != "":
+                file_descriptor.write("\t\t$(EXTRA_LIBS_" + self.module_name + ")\n")    
 
         file_descriptor.write("\n-include $(BUILD_ROOT)/%s/extra_vars.mk\n\n" % self.directory)
 

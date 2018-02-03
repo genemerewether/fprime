@@ -3,8 +3,8 @@ BUILD_ROOT ?= $(subst /$(MODULE_DIR),,$(CURDIR))
 export BUILD_ROOT
 include ../../mk/makefiles/module_targets.mk
 
-#SUBDIR := $(shell find . -type d -name '*_msgs')
-SUBDIR := std_msgs
+SUBDIR := $(shell find . -type d -name '*_msgs')
+#SUBDIR := std_msgs
 
 clean_msgs:
 	$(foreach dir, $(SUBDIR), rm $(dir)/Ports/* $(dir)/Types/*;)
