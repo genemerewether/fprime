@@ -19,4 +19,5 @@
   <depend>fprime</depend>
   <depend>mav_msgs</depend>
   <depend>planning_msgs</depend>
+  <depend>rosgraph_msgs</depend>
 </package>

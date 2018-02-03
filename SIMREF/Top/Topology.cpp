@@ -156,7 +156,7 @@ void constructApp(int port_number, char* hostname) {
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
-#endif    
+#endif
 
     // Initialize rate group driver
     rgDrv.init();
@@ -169,6 +169,8 @@ void constructApp(int port_number, char* hostname) {
 #endif
 
     eventLogger.init(10,0);
+
+    rosCycle.init(0);
 
     linuxTime.init(0);
 
@@ -241,6 +243,8 @@ void constructApp(int port_number, char* hostname) {
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
 
+    rosCycle.startIntTask(30, 20*1024);
+
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -291,7 +295,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-	(void) printf("Usage: ./SIMREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
+    (void) printf("Usage: ./SIMREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
 }
 
 
@@ -305,44 +309,44 @@ extern "C" {
 volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
-	terminate = 1;
+    terminate = 1;
 }
 
 int main(int argc, char* argv[]) {
-	U32 port_number = 0;
-	I32 option = 0;
-	char *hostname = NULL;
-        bool local_cycle = false;
+    U32 port_number = 0;
+    I32 option = 0;
+    char *hostname = NULL;
+    bool local_cycle = false;
 
-        // Removes ROS cmdline args as a side-effect
-        ros::init(argc,argv,"SIMREF", ros::init_options::NoSigintHandler);
-        ros::start();
+    // Removes ROS cmdline args as a side-effect
+    ros::init(argc,argv,"SIMREF", ros::init_options::NoSigintHandler);
+    ros::start();
 
-	while ((option = getopt(argc, argv, "hlp:a:")) != -1){
-		switch(option) {
-			case 'h':
-				print_usage();
-				return 0;
-				break;
+    while ((option = getopt(argc, argv, "hlp:a:")) != -1){
+        switch(option) {
+            case 'h':
+                print_usage();
+                return 0;
+                break;
                         case 'l':
                           local_cycle = true;
                           break;
-			case 'p':
-				port_number = atoi(optarg);
-				break;
-			case 'a':
-				hostname = optarg;
-				break;
-			case '?':
-				return 1;
-			default:
-				print_usage();
-				return 1;
-		}
-	}
+            case 'p':
+                port_number = atoi(optarg);
+                break;
+            case 'a':
+                hostname = optarg;
+                break;
+            case '?':
+                return 1;
+            default:
+                print_usage();
+                return 1;
+        }
+    }
 
-	(void) printf("Hit Ctrl-C to quit\n");
-    
+    (void) printf("Hit Ctrl-C to quit\n");
+
     constructApp(port_number, hostname);
     //dumparch();
 
@@ -350,7 +354,7 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM,sighandler);
 
     int cycle = 0;
-  
+
     while (!terminate) {
       DEBUG_PRINT("Cycle %d\n",cycle);
       if (local_cycle) {
@@ -360,10 +364,10 @@ int main(int argc, char* argv[]) {
       }
       cycle++;
     }
-     
+
     // stop tasks
     exitTasks();
-    
+
     // Give time for threads to exit
     (void) printf("Waiting for threads...\n");
     Os::Task::delay(1000);

@@ -3,7 +3,7 @@ project(SIMREF)
 
 find_package(catkin REQUIRED COMPONENTS
   genfprime message_generation fprime
-  mav_msgs planning_msgs
+  mav_msgs planning_msgs rosgraph_msgs
   # any new message packages here
 )
 
@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   CATKIN_DEPENDS
   message_runtime fprime
-  mav_msgs planning_msgs
+  mav_msgs planning_msgs rosgraph_msgs
   # any new message packages here
 )
 
