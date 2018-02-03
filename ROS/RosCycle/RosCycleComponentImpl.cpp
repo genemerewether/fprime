@@ -22,8 +22,8 @@
 #include "Fw/Types/BasicTypes.hpp"
 #include "Svc/Cycle/TimerVal.hpp"
 
-#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-//#define DEBUG_PRINT(x,...)
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
 
 namespace ROS {
 
@@ -114,7 +114,7 @@ namespace ROS {
       RosCycleComponentImpl* compPtr = (RosCycleComponentImpl*) ptr;
 
       ros::NodeHandle n;
-      ros::Subscriber sub = n.subscribe("clock", 10,
+      ros::Subscriber sub = n.subscribe("clock", 1000,
                                         &RosCycleComponentImpl::clockCallback,
                                         compPtr);
 
@@ -139,16 +139,16 @@ namespace ROS {
 
           //TODO(mereweth) - keep triggering cycle port and adding timeDiv to lastCallback
 
-          if (now >= Fw::Time::add(m_lastCallback, m_timeDiv)) {
+          while (now >= Fw::Time::add(m_lastCallback, m_timeDiv)) {
               DEBUG_PRINT("RosCycle enough time elapsed\n");
               Svc::TimerVal cycleStart;
               cycleStart.take();
               if (this->isConnected_cycle_OutputPort(0)) {
                   DEBUG_PRINT("RosCycle invoking cycle port\n");
                   this->cycle_out(0, cycleStart);
-
-                  m_lastCallback.set(TB_ROS_TIME, msg->clock.sec, msg->clock.nsec / 1000);
               }
+              m_lastCallback = Fw::Time::add(m_lastCallback, m_timeDiv);
+              //m_lastCallback.set(TB_ROS_TIME, msg->clock.sec, msg->clock.nsec / 1000);
           }
       }
       else {
