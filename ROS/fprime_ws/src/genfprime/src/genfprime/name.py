@@ -1,7 +1,13 @@
 import os
+#import genmsg.SEP
 
 BASE_NAMESPACE = "ROS"
 SEP = os.path.sep
+
+def _include_serializable_path(pkg, type_name):
+    return ['%s/Gen/%s/Types/%s'%(BASE_NAMESPACE,
+                                 pkg,
+                                 _msg_serializable_xml_name(type_name))]
 
 ## :param type_name str: Name of message type sans package,
 ## e.g. 'String'

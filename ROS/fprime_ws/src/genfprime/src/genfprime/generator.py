@@ -22,29 +22,8 @@ from . name import _port_xml_name, _type_to_namespace, BASE_NAMESPACE
 from . types import msg_field_to_fprime
 
 
-# import sys
-# sys.path.append('/Users/mereweth/quest/ROS/fprime_ws/devel/lib/python2.7/site-packages')
-# sys.path.append('/opt/ros/kinetic/lib/python2.7/site-packages')
-# sys.path.append('/Users/mereweth/quest/ROS/fprime_ws/src/genfprime/src/genfprime')
-# from name import _msg_serializable_xml_name, _srv_serializable_xml_name, _port_xml_name, _type_to_namespace, BASE_NAMESPACE
-# import genmsg.command_line
-# msg_context = MsgContext.create_default()
-# _file = '/Users/mereweth/quest/ROS/fprime_ws/src/common_msgs/geometry_msgs/msg/PoseStamped.msg'
-# generate('geometry_msgs',
-#          _file,
-#          '/Users/mereweth/quest/ROS/Gen/geometry_msgs',
-#          genmsg.command_line.includepath_to_dict(dict(std_msgs='/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg',
-#                                                       geometry_msgs='/Users/mereweth/quest/ROS/fprime_ws/src/common_msgs/geometry_msgs')))
-#
-# _file = '/Users/mereweth/quest/ROS/fprime_ws/src/common_msgs/diagnostic_msgs/srv/AddDiagnostics.srv'
-# generate('diagnostic_msgs',
-#          _file,
-#          '/Users/mereweth/quest/ROS/Gen/diagnostic_msgs',
-#          genmsg.command_line.includepath_to_dict(dict(std_msgs='/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg',
-#                                                       diagnostic_msgs='/Users/mereweth/quest/ROS/fprime_ws/src/common_msgs/diagnostic_msgs/srv')))
-
 def compute_type(pkg, field):
-    return msg_field_to_fprime(field)
+    return msg_field_to_fprime(pkg, field)
 
 def generate(pkg, _file, out_dir, search_path):
     msg_context = MsgContext.create_default()
@@ -88,22 +67,27 @@ def gen_serializable_xml(spec, pkg):
                          name=spec.full_name,
                          namespace="%s::%s"%(BASE_NAMESPACE, pkg))
 
-    import_header = etree.SubElement(root, "import_header")
-    import_header.text = 'Fw/Time/Time.hpp'
-    import_header = etree.SubElement(root, "import_header")
-    import_header.text = 'Fw/Types/EightyCharString.hpp'
-
-    # etree.SubElement(root, "import_serializable_type",
-    #                  'Fw/Time/TimeSerializableAi.xml')
-    # TODO(mereweth) - add imports for dependencies
-    #<import_serializable_type>Path/To/SerializableAi.xml</import_serializable_type>
-    #if msg_context.is_registered(type_):
     members = etree.SubElement(root, "members")
+
+    if len(spec.parsed_fields()) == 0:
+        # NOTE(mereweth) Empty.msg, possibly others
+        member = etree.SubElement(members,
+                                  "member",
+                                  name="unused",
+                                  type='U8')
 
     # TODO(mereweth) - what is field.type vs field.base_type?
     for field in spec.parsed_fields():
         # TODO(mereweth) - decide how to handle arrays besides just capping size
-        type_, size_, imports = compute_type(pkg, field)
+        type_, size_, header_includes, serial_imports = compute_type(pkg, field)
+
+        for header in header_includes:
+            include_header = etree.SubElement(root, "include_header")
+            include_header.text = header
+
+        for serial in serial_imports:
+            import_serial = etree.SubElement(root, "import_serializable_type")
+            import_serial.text = serial
 
         #TODO(mereweth) change to 'if size_ is not None' if we want to make some arrays into bigger, non-array data types
         if field.is_array and size_ is None:
@@ -148,45 +132,3 @@ def gen_serializable_xml(spec, pkg):
 #
 # >>> child2 = etree.SubElement(root, "child2")
 # >>> child3 = etree.SubElement(root, "child3")
-
-
-
-
-
-# def generate_msg(pkg, files, out_dir, search_path):
-#     """
-#     Generate F Prime XML for all messages in a package
-#     """
-#     msg_context = MsgContext.create_default()
-#     for f in files:
-#         f = os.path.abspath(f)
-#         infile = os.path.basename(f)
-#         full_type = genmsg.gentools.compute_full_type_name(pkg, infile)
-#         spec = genmsg.msg_loader.load_msg_from_file(msg_context, f, full_type)
-#         generate_msg_from_spec(msg_context, spec, search_path, out_dir, pkg)
-
-# def generate_srv(pkg, files, out_dir, search_path):
-#     """
-#     Generate F Prime XML for all services in a package
-#     """
-#     msg_context = MsgContext.create_default()
-#     for f in files:
-#         f = os.path.abspath(f)
-#         infile = os.path.basename(f)
-#         full_type = genmsg.gentools.compute_full_type_name(pkg, infile)
-#         spec = genmsg.msg_loader.load_srv_from_file(msg_context, f, full_type)
-#         generate_srv_from_spec(msg_context, spec, search_path, out_dir, pkg, f)
-
-# def generate_msg_from_spec(msg_context, spec, search_path, output_dir, package, msgs=None):
-#     """
-#     Generate a message
-
-#     @param msg_path: The path to the .msg file
-#     @type msg_path: str
-#     """
-#     genmsg.msg_loader.load_depends(msg_context, spec, search_path)
-#     spec.actual_name=spec.short_name
-#     spec.component_type='message'
-#     msgs = msg_list(package, search_path, '.msg')
-#     for m in msgs:
-#         genmsg.load_msg_by_type(msg_context, '%s/%s'%(package, m), search_path)

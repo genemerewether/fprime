@@ -1,4 +1,4 @@
-from . name import _type_to_namespace, BASE_NAMESPACE, SEP
+from . name import _type_to_namespace, BASE_NAMESPACE, SEP, _include_serializable_path
 
 MAX_ARRAY_LEN = 100
 
@@ -36,7 +36,11 @@ MSG_TYPE_TO_FPRIME = {'byte': 'I8',
                       'time': 'Fw::Time',
                       'duration': 'Fw::Time'}
 
-def msg_field_to_fprime(field):
+MSG_TYPE_TO_FPRIME_IMPORT = {'string': ['Fw/Types/EightyCharString.hpp'],
+                             'time': ['Fw/Time/Time.hpp'],
+                             'duration': ['Fw/Time/Time.hpp']}
+
+def msg_field_to_fprime(pkg, field):
     """
     Converts a message type (e.g. uint32, std_msgs/String, etc.) into the FPrime type
     for that type (e.g. uint32_t, Fw::EightyCharString)
@@ -47,7 +51,8 @@ def msg_field_to_fprime(field):
     @rtype: str
     """
     fprime_type = None
-    imports = None
+    header_includes = []
+    serial_imports = []
     array_len = None
 
     if field.is_header:
@@ -55,8 +60,15 @@ def msg_field_to_fprime(field):
 
     if (field.is_builtin):
         fprime_type = MSG_TYPE_TO_FPRIME[field.base_type]
+        if field.base_type in MSG_TYPE_TO_FPRIME_IMPORT.keys():
+            header_includes = MSG_TYPE_TO_FPRIME_IMPORT[field.base_type]
     else:
         fprime_type = _type_to_namespace(field.base_type)
+        if SEP in field.base_type:
+            splits = field.base_type.split(SEP)
+            serial_imports = _include_serializable_path(splits[0], splits[1])
+        else:
+            serial_imports = _include_serializable_path(pkg, field.base_type)
 
     if field.is_array:
         if field.array_len is None or field.array_len > MAX_ARRAY_LEN:
@@ -64,4 +76,4 @@ def msg_field_to_fprime(field):
         else:
             array_len = field.array_len
 
-    return (fprime_type, array_len, imports)
+    return (fprime_type, array_len, header_includes, serial_imports)
