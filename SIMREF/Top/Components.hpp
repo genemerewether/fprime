@@ -4,6 +4,7 @@ void constructSIMREFArchitecture(void);
 void exitTasks(void);
 
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
+#include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
@@ -27,8 +28,11 @@ void exitTasks(void);
 
 #include <ROS/RosCycle/RosCycleComponentImpl.hpp>
 
-extern Svc::RateGroupDriverImpl rgDrv;
+extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
+extern Svc::ActiveRateGroupImpl rgGnc;
+extern Svc::PassiveRateGroupImpl rgAtt;
+extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::CmdSequencerComponentImpl cmdSeq;
 extern Svc::SocketGndIfImpl sockGndIf;
 extern Svc::ConsoleTextLoggerImpl textLogger;

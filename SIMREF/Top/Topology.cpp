@@ -29,17 +29,18 @@ enum {
 
 // List of context IDs
 enum {
-        ACTIVE_COMP_1HZ_RG,
-        ACTIVE_COMP_CMD_DISP,
-        ACTIVE_COMP_CMD_SEQ,
-        ACTIVE_COMP_LOGGER,
-        ACTIVE_COMP_TLM,
-        ACTIVE_COMP_PRMDB,
-        ACTIVE_COMP_FILE_DOWNLINK,
-        ACTIVE_COMP_FILE_UPLINK,
+    ACTIVE_COMP_1HZ_RG,
+    ACTIVE_COMP_GNC_RG,
+    ACTIVE_COMP_CMD_DISP,
+    ACTIVE_COMP_CMD_SEQ,
+    ACTIVE_COMP_LOGGER,
+    ACTIVE_COMP_TLM,
+    ACTIVE_COMP_PRMDB,
+    ACTIVE_COMP_FILE_DOWNLINK,
+    ACTIVE_COMP_FILE_UPLINK,
 
-        CYCLER_TASK,
-        NUM_ACTIVE_COMPS
+    CYCLER_TASK,
+    NUM_ACTIVE_COMPS
 };
 
 // Registry
@@ -49,20 +50,49 @@ static Fw::SimpleObjRegistry simpleReg;
 
 // Component instance pointers
 
-//NOTE(mereweth) - change this in sync with RosCycle timeDivMS
-static NATIVE_INT_TYPE rgDivs[] = {5};
-Svc::RateGroupDriverImpl rgDrv(
-#if FW_OBJECT_NAMES == 1
-                    "RGDRV",
-#endif
-                    rgDivs,FW_NUM_ARRAY_ELEMENTS(rgDivs));
-
-static NATIVE_UINT_TYPE rgContext[] = {0,0,0,0,0,0,0,0,0,0};
+static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {0};
 Svc::ActiveRateGroupImpl rg(
 #if FW_OBJECT_NAMES == 1
                     "RG",
 #endif
                     rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
+;
+
+static NATIVE_UINT_TYPE rgGncContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {0};
+Svc::ActiveRateGroupImpl rgGnc(
+#if FW_OBJECT_NAMES == 1
+                    "RGGNC",
+#endif
+                    rgGncContext,FW_NUM_ARRAY_ELEMENTS(rgGncContext));
+;
+
+static NATIVE_INT_TYPE rgGncDivs[] = {1, 10, 1000};
+Svc::RateGroupDriverImpl rgGncDrv(
+#if FW_OBJECT_NAMES == 1
+                    "RGGNCDRV",
+#endif
+                    rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
+
+//NOTE(mereweth) - change this in sync with RosCycle timeDivMS
+
+// This table needs to be updated whenever
+// the connections in the topology are
+// updated.
+
+static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {0};
+Svc::PassiveRateGroupImpl rgAtt(
+#if FW_OBJECT_NAMES == 1
+                    "RGATT",
+#endif
+                    rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
+;
+
+static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {0};
+Svc::PassiveRateGroupImpl rgPos(
+#if FW_OBJECT_NAMES == 1
+                    "RGPOS",
+#endif
+                    rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
 ;
 
 // Command Components
@@ -98,7 +128,7 @@ ROS::RosCycleComponentImpl rosCycle
 #else
                     (
 #endif
-                    200)
+                    1)
 ;
 
 Svc::TlmChanImpl chanTlm
@@ -170,10 +200,13 @@ void constructApp(int port_number, char* hostname) {
 #endif
 
     // Initialize rate group driver
-    rgDrv.init();
+    rgGncDrv.init();
 
     // Initialize the rate groups
     rg.init(10,0);
+    rgGnc.init(10,0);
+    rgAtt.init(0);
+    rgPos.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -224,21 +257,23 @@ void constructApp(int port_number, char* hostname) {
     // set health ping entries
 
     Svc::HealthImpl::PingEntry pingEntries[] = {
-        {3,5,rg.getObjName()}, // 0
-        {3,5,cmdDisp.getObjName()}, // 1
-        {3,5,eventLogger.getObjName()}, // 2
-        {3,5,cmdSeq.getObjName()}, // 3
-        {3,5,chanTlm.getObjName()}, // 4
-        {3,5,fileUp.getObjName()}, // 5
-        {3,5,fileDown.getObjName()}, // 6
-    };
+        {5,10,chanTlm.getObjName()}, // 0
+        {5,10,cmdDisp.getObjName()}, // 1
+        {5,10,cmdSeq.getObjName()}, // 2
+        {5,10,eventLogger.getObjName()}, // 3
+        {5,10,fileDown.getObjName()}, // 4
+        {5,10,fileUp.getObjName()}, // 5
+        {5,10,prmDb.getObjName()}, // 6
 
-    // register ping table
-    health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
+        {5,10,rgGnc.getObjName()}, // 7
+        {5,10,rg.getObjName()}, // 8
+        {5,10,rosCycle.getObjName()}, // 9
+    };
 
     // Active component startup
     // start rate groups
-    rg.start(ACTIVE_COMP_1HZ_RG, 95, 20*1024);
+    rg.start(ACTIVE_COMP_1HZ_RG, 50, 20*1024);
+    rgGnc.start(ACTIVE_COMP_GNC_RG, 90, 20*1024);
     // start dispatcher
     cmdDisp.start(ACTIVE_COMP_CMD_DISP,60,20*1024);
     // start sequencer
@@ -254,7 +289,11 @@ void constructApp(int port_number, char* hostname) {
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
 
-    rosCycle.startIntTask(90, 20*1024);
+    Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+
+    // register ping table
+    //health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -262,22 +301,12 @@ void constructApp(int port_number, char* hostname) {
 
 }
 
-//void run1cycle(void) {
-//    // get timer to call rate group driver
-//    Svc::TimerVal timer;
-//    timer.take();
-//    rateGroupDriverComp.get_CycleIn_InputPort(0)->invoke(timer);
-//    Os::Task::TaskStatus delayStat = Os::Task::delay(1000);
-//    FW_ASSERT(Os::Task::TASK_OK == delayStat,delayStat);
-//}
-
-
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    Svc::InputCyclePort* port = rgDrv.get_CycleIn_InputPort(1);
+    Svc::InputCyclePort* port = rg.get_CycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
-    //port->invoke(cycleStart);
+    port->invoke(cycleStart);
     Os::Task::delay(1000);
 }
 
@@ -296,6 +325,7 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     rg.exit();
+    rgGnc.exit();
     cmdDisp.exit();
     eventLogger.exit();
     chanTlm.exit();
@@ -359,6 +389,10 @@ int main(int argc, char* argv[]) {
     (void) printf("Hit Ctrl-C to quit\n");
 
     constructApp(port_number, hostname);
+
+    if (!local_cycle) {
+        rgGncDrv.set_CycleOut_OutputPort(2, rg.get_CycleIn_InputPort(0));
+    }
     //dumparch();
 
     signal(SIGINT,sighandler);

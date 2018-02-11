@@ -1,3 +1,10 @@
+## ROS Components
+
+### RosCycle
+
+- provide reset command to set time back to zero?
+    - or should we just shutdown - there is accumulated state throughout the application
+
 ## Modifications to msg and srv
 
 ### No variable-size arrays

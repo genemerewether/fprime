@@ -43,6 +43,7 @@ SVC_MODULES := \
 	Svc/Seq \
 	Svc/GndIf \
 	Svc/ActiveRateGroup \
+	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
 	Svc/Sched \
 	Svc/ComLogger \

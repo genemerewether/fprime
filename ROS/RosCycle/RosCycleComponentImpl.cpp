@@ -116,7 +116,8 @@ namespace ROS {
       ros::NodeHandle n;
       ros::Subscriber sub = n.subscribe("clock", 1000,
                                         &RosCycleComponentImpl::clockCallback,
-                                        compPtr);
+                                        compPtr,
+                                        ros::TransportHints().tcpNoDelay());
 
       ros::spin();
   }
@@ -124,7 +125,7 @@ namespace ROS {
   void RosCycleComponentImpl ::
     clockCallback(const rosgraph_msgs::Clock::ConstPtr& msg)
   {
-      if (this->m_callbacks%10 == 0)
+      if (this->m_callbacks%100 == 0)
       {
           DEBUG_PRINT("Clock callback %d, %f\n", this->m_callbacks,
                                                msg->clock.toSec());
