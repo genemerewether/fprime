@@ -84,6 +84,14 @@ macro(_generate_module_fprime ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
     set(GEN_OUTPUT_DIR ${GEN_OUTPUT_BASE_DIR}/${ARG_PKG}/${type})
     set(GEN_OUTPUT_FILE ${GEN_OUTPUT_DIR}/mod.mk)
 
+    if(NOT EXISTS ${GEN_OUTPUT_DIR}/Makefile)
+      file(WRITE ${GEN_OUTPUT_DIR}/Makefile "MODULE_DIR = ROS/Gen/${ARG_PKG}/${type}\n")
+      file(APPEND ${GEN_OUTPUT_DIR}/Makefile "MODULE = $(subst /,,$(MODULE_DIR))\n")
+      file(APPEND ${GEN_OUTPUT_DIR}/Makefile "BUILD_ROOT ?= $(subst /$(MODULE_DIR),,$(CURDIR))\n")
+      file(APPEND ${GEN_OUTPUT_DIR}/Makefile "export BUILD_ROOT\n")
+      file(APPEND ${GEN_OUTPUT_DIR}/Makefile "include $(BUILD_ROOT)/mk/makefiles/module_targets.mk\n")
+    endif()
+
     if(IS_DIRECTORY ${GEN_OUTPUT_DIR})
       add_custom_command(OUTPUT ${GEN_OUTPUT_FILE}
         DEPENDS ${GENFPRIME_BIN} ${GENFPRIME_SRC} ${ARG_GENERATED_FILES}
@@ -91,7 +99,7 @@ macro(_generate_module_fprime ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
         -o ${GEN_OUTPUT_DIR}
         --modmk
         COMMENT "Generating Fprime ${type} mod.mk for ${ARG_PKG}")
-      list(APPEND ALL_GEN_OUTPUT_FILES_fprime ${GEN_OUTPUT_FILE})
+      list(APPEND ALL_GEN_OUTPUT_FILES_fprime ${GEN_OUTPUT_FILE} ${GEN_OUTPUT_DIR}/Makefile)
     endif()
 
   endforeach()

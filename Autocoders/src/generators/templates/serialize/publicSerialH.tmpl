@@ -40,8 +40,12 @@ public:
     
 #for name,type,size,format,comment,typeinfo in $members:
 #if $size == None:
+#if $typeinfo == 'extern':
+    const ${type}& get${name}(void); //!< get member $name
+#else
     ${type} get${name}(void); //!< get member $name
-#else if $typeinfo == 'string' or $typeinfo == 'extern':
+#end if
+#else if $typeinfo == 'string':
     const ${type}& get${name}(void); //!< get member $name
 #else
     const ${type}* get${name}(NATIVE_INT_TYPE& size); //!< get member $name
@@ -50,8 +54,12 @@ public:
 
 #for name,type,size,format,comment,typeinfo in $members:
 #if $size == None:
+#if $typeinfo == 'extern':
+    void set${name}(const ${type}& val); //!< set member $name
+#else
     void set${name}(${type} val); //!< set member $name
-#else if $typeinfo == 'string' or $typeinfo == 'extern':
+#end if
+#else if $typeinfo == 'string':
     void set${name}(const ${type}& val); //!< set member $name
 #else
     void set${name}(const ${type}* val, NATIVE_INT_TYPE size); //!< set member $name    

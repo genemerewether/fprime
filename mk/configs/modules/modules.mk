@@ -87,6 +87,14 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/KraitRouter
 
+# Multirotor low-level
+MROT_LL_MODULES := \
+	Gnc/Ctrl/LeeCtrl \
+	Gnc/Est/QuatFilt
+
+# Fixed-wing low-level
+#FIXED_WING_LL_MODULES := 
+
 REF_MODULES := \
 	Ref/Top \
 	Ref/RecvBuffApp \
@@ -94,8 +102,8 @@ REF_MODULES := \
 	Ref/SignalGen \
 	Ref/PingReceiver
 
-ROS_MODULES := \
-	ROS/RosTime
+ROS_PORT_MODULES := \
+	ROS/Gen/std_msgs/Ports
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
@@ -105,10 +113,20 @@ ROS_TYPE_MODULES := \
 	ROS/Gen/nav_msgs/Types           \
 	ROS/Gen/sensor_msgs/Types        \
 	ROS/Gen/shape_msgs/Types         \
-	ROS/Gen/std_msgs/Types           \
+	ROS/Gen/std_srvs/Types           \
 	ROS/Gen/stereo_msgs/Types        \
 	ROS/Gen/trajectory_msgs/Types    \
-	ROS/Gen/visualization_msgs/Types
+	ROS/Gen/visualization_msgs/Types \
+	ROS/Gen/planning_msgs/Types	 \
+	ROS/Gen/rosgraph_msgs/Types	 \
+	ROS/Gen/mav_msgs/Types
+
+ROS_MODULES := \
+	ROS/RosTime \
+	\
+	$(ROS_TYPE_MODULES) \
+	\
+	$(ROS_PORT_MODULES)
 
 Ref_MODULES := \
 	\
@@ -141,8 +159,6 @@ SDREF_MODULES := \
 	\
 	$(ROS_MODULES) \
 	\
-	$(ROS_TYPE_MODULES) \
-	\
 	$(FW_MODULES) \
 	\
 	$(OS_MODULES) \
@@ -164,8 +180,6 @@ SIMREF_MODULES := \
 	ROS/RosCycle \
 	\
 	$(ROS_MODULES) \
-	\
-	$(ROS_TYPE_MODULES) \
 	\
 	$(FW_MODULES) \
 	\

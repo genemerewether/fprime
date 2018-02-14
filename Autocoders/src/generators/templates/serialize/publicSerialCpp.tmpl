@@ -14,7 +14,7 @@ ${name}::${name}(const ${name}* src) : Serializable() {
 }
 
 ${name}::${name}(${args_proto_string}) : Serializable() {
-    this->set(${args_string});
+    this->set(${args_string_passthrough});
 }
 
 const ${name}& ${name}::operator=(const ${name}& src) {
@@ -44,35 +44,50 @@ void ${name}::set(${args_proto_string}) {
 
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $size == None:
+#if $typeinfo == 'extern':
+const ${type}& ${name}::get${member}(void) {
+    return this->m_${member};
+#else ## not external type
 ${type} ${name}::get${member}(void) {
     return this->m_${member};
-#else if $typeinfo == 'string' or $typeinfo == 'extern':
+#end if ## check whether external type
+#else ## multiple elements
+#if $typeinfo == 'string':
 const ${type}& ${name}::get${member}(void) {
     return this->m_${member};
 #else
 const ${type}* ${name}::get${member}(NATIVE_INT_TYPE& size) {
     size = ${size};
     return this->m_${member};
-#end if    
+#end if
+#end if
 }
 
 #end for
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $size == None:
+#if $typeinfo == 'extern':
+void ${name}::set${member}(const ${type}& val) {
+    this->m_${member} = val;
+}
+#else ## not external type
 void ${name}::set${member}(${type} val) {
     this->m_${member} = val;
 }
-#else if $typeinfo == 'string' or $typeinfo == 'extern':
+#end if ## check whether external type
+#else ## multiple elements
+#if $typeinfo == 'string':
 void ${name}::set${member}(const ${type}& val) {
     this->m_${member} = val;
 }
 #else
 void ${name}::set${member}(const ${type}* val, NATIVE_INT_TYPE size) {
-    for (NATIVE_INT_TYPE _mem = 0; _mem < (size < ${size})?size:${size}; _mem++) {
+    for (NATIVE_INT_TYPE _mem = 0; _mem < FW_MIN(size,${size}); _mem++) {
         this->m_${member}[_mem] = val[_mem];
     }
 }
-#end if
+#end if ## check if string
+#end if ## check for multiple elements
 #end for
 Fw::SerializeStatus ${name}::serialize(Fw::SerializeBufferBase& buffer) const {
     Fw::SerializeStatus stat;
@@ -176,9 +191,15 @@ void ${name}::toString(Fw::StringBase& text) const {
 
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $typeinfo == "extern":
-
+#if $size != None: ## is an array
+    Fw::EightyCharString ${member}Str[$size];
+#for $elem in range(0,int($size)):
+    this->m_${member}[$elem].toString(${member}Str[$elem]); 
+#end for ## for each element of the array
+#else ## not an array
     Fw::EightyCharString ${member}Str;
     this->m_${member}.toString(${member}Str); 
+#end if ## is an array
 #end if                   
 #end for
        
@@ -191,6 +212,8 @@ void ${name}::toString(Fw::StringBase& text) const {
        ,this->m_${member}[$elem]?"T":"F"
 #else if $type == "enum":
        ,(NATIVE_INT_TYPE)this->m_${member}[$elem]
+#else if $typeinfo == "extern":
+       ,${member}Str[$elem].toChar()
 #else:
        ,this->m_${member}[$elem]
 #end if

@@ -89,7 +89,7 @@ class SerialHVisitor(AbstractVisitor.AbstractVisitor):
                 arg_str += "%s %s, "%(mtype[0][1],name)
             elif mtype == "string":
                 arg_str += "const %s::%sString& %s, " % (obj.get_name(),name, name)
-            elif mtype not in typelist:
+            elif mtype not in typelist and size is None:
                 arg_str += "const %s& %s, " %(mtype,name)
             elif size != None:
                 arg_str += "const %s* %s, " % (mtype, name)

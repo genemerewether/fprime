@@ -89,15 +89,9 @@ def gen_serializable_xml(spec, pkg):
             import_serial = etree.SubElement(root, "import_serializable_type")
             import_serial.text = serial
 
-        #TODO(mereweth) change to 'if size_ is not None' if we want to make some arrays into bigger, non-array data types
-        if field.is_array and size_ is None:
-            array_len_spec = field.array_len
-            if array_len_spec is None:
+        if field.is_array:
+            if size_ is None:
                 raise MsgGenerationException("No calc size for array field: %s, msg: %s, pkg: %s"%(
-                                             field.name, spec.full_name, pkg))
-            else:
-                raise MsgGenerationException("No calc size for array len: %d, field: %s, msg: %s, pkg: %s"%(
-                                             array_len_spec,
                                              field.name, spec.full_name, pkg))
 
             member = etree.SubElement(members,
