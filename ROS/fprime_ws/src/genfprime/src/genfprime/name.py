@@ -4,10 +4,16 @@ import os
 BASE_NAMESPACE = "ROS"
 SEP = os.path.sep
 
-def _include_serializable_path(pkg, type_name):
-    return ['%s/Gen/%s/Types/%s'%(BASE_NAMESPACE,
+def _include_msg_serializable_path(pkg, type_name):
+    return '%s/Gen/%s/Types/%s'%(BASE_NAMESPACE,
                                  pkg,
-                                 _msg_serializable_xml_name(type_name))]
+                                 _msg_serializable_xml_name(type_name))
+
+def _include_srv_serializable_path(pkg, type_name, is_input):
+    return '%s/Gen/%s/Types/%s'%(BASE_NAMESPACE,
+                                 pkg,
+                                 _srv_serializable_xml_name(type_name,
+                                                            is_input))
 
 ## :param type_name str: Name of message type sans package,
 ## e.g. 'String'

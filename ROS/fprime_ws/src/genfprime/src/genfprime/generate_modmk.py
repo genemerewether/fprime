@@ -36,7 +36,8 @@ def _write_modmk(outdir, generated_xml):
     p = os.path.join(outdir, 'mod.mk')
     with open(p, 'w') as f:
         f.write('SRC = \\\n')
-        for xml in generated_xml[:-1]:
-            f.write('%s \\\n'%xml)
-        f.write('%s\n'%generated_xml[-1])
+        if len(generated_xml) != 0:
+            for xml in generated_xml[:-1]:
+                f.write('%s \\\n'%xml)
+            f.write('%s\n'%generated_xml[-1])
     return 0

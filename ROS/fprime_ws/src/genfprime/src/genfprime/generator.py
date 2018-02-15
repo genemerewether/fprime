@@ -17,6 +17,7 @@ from genmsg import InvalidMsgSpec, MsgContext, MsgSpec, MsgGenerationException
 from genmsg.base import log
 
 from . name import _msg_serializable_xml_name, _srv_serializable_xml_name
+from . name import _include_msg_serializable_path, _include_srv_serializable_path
 from . name import _port_xml_name, _type_to_namespace, BASE_NAMESPACE
 
 from . types import msg_field_to_fprime
@@ -55,7 +56,8 @@ def generate(pkg, _file, out_dir, search_path):
     with open(out_dir + os.path.sep + 'Ports' + os.path.sep
               + _port_xml_name(name), 'w') as f:
         f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
-        #gen_port_xml(spec, pkg, is_srv=(True if _file.endswith('.srv') else False))
+        tree = gen_port_xml(spec, pkg, is_srv=(True if _file.endswith('.srv') else False))
+        tree.write(f, pretty_print=True)
 
     return 0
 
@@ -108,21 +110,50 @@ def gen_serializable_xml(spec, pkg):
 
     return root.getroottree()
 
-# def gen_port_xml(spec, pkg, is_srv)
-#     root = etree.Element("interface", name="", namespace="ROS")
-#     <interface name="Ping" namespace="Svc">
-#     <import_serializable_type>Path/To/SerializableAi.xml</import_serializable_type>
-#         <args>
-#             <arg name="key" type="U32">
-#             type="Namespace::Type"
-# The XML tag name of elements is accessed through the tag property:
-#
-# >>> print(root.tag)
-# root
-# Elements are organised in an XML tree structure. To create child elements and add them to a parent element, you can use the append() method:
-#
-# >>> root.append( etree.Element("child1") )
-# However, this is so common that there is a shorter and much more efficient way to do this: the SubElement factory. It accepts the same arguments as the Element factory, but additionally requires the parent as first argument:
-#
-# >>> child2 = etree.SubElement(root, "child2")
-# >>> child3 = etree.SubElement(root, "child3")
+def gen_port_xml(spec, pkg, is_srv):
+    root = etree.Element("interface",
+                         name=spec.full_name,
+                         namespace="%s::%s"%(BASE_NAMESPACE, pkg))
+
+    args = etree.SubElement(root, "args")
+
+    if is_srv:
+        import_serial = etree.SubElement(root, "import_serializable_type")
+        import_serial.text = _include_srv_serializable_path(pkg,
+                                                            spec.full_name,
+                                                            is_input=True)
+
+        import_serial = etree.SubElement(root, "import_serializable_type")
+        import_serial.text = _include_srv_serializable_path(pkg,
+                                                            spec.full_name,
+                                                            is_input=False)
+
+        arg = etree.SubElement(args,
+                               "arg",
+                               name=spec.request.full_name,
+                               pass_by="reference",
+                               type="%s::%s::%s"%(BASE_NAMESPACE,
+                                                  pkg,
+                                                  spec.request.full_name))
+        ret = etree.SubElement(root,
+                               "return",
+                               name=spec.response.full_name,
+                               pass_by="reference",
+                               type="%s::%s::%s"%(BASE_NAMESPACE,
+                                                  pkg,
+                                                  spec.response.full_name))
+
+    else:
+        import_serial = etree.SubElement(root, "import_serializable_type")
+        import_serial.text = _include_msg_serializable_path(pkg,
+                                                            spec.full_name)
+
+        arg = etree.SubElement(args,
+                               "arg",
+                               name=spec.full_name,
+                               pass_by="reference",
+                               type="%s::%s::%s"%(BASE_NAMESPACE,
+                                                  pkg,
+                                                  spec.full_name))
+
+    return root.getroottree()

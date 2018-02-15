@@ -1,4 +1,4 @@
-from . name import _type_to_namespace, BASE_NAMESPACE, SEP, _include_serializable_path
+from . name import _type_to_namespace, BASE_NAMESPACE, SEP, _include_msg_serializable_path
 
 MAX_ARRAY_LEN = 100
 
@@ -66,9 +66,9 @@ def msg_field_to_fprime(pkg, field):
         fprime_type = _type_to_namespace(field.base_type)
         if SEP in field.base_type:
             splits = field.base_type.split(SEP)
-            serial_imports = _include_serializable_path(splits[0], splits[1])
+            serial_imports = [_include_msg_serializable_path(splits[0], splits[1])]
         else:
-            serial_imports = _include_serializable_path(pkg, field.base_type)
+            serial_imports = [_include_msg_serializable_path(pkg, field.base_type)]
 
     if field.is_array:
         if field.array_len is None or field.array_len > MAX_ARRAY_LEN:

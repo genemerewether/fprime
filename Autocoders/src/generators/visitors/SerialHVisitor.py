@@ -199,6 +199,10 @@ class SerialHVisitor(AbstractVisitor.AbstractVisitor):
         """
         c = startSerialH.startSerialH()
         c.name = obj.get_name()
+        if obj.get_namespace() == None:
+            c.namespace_list = None
+        else:
+            c.namespace_list = obj.get_namespace().split('::')
         d = datetime.datetime.now()
         c.date = d.strftime("%A, %d %B %Y")
         c.user = os.environ['USER']
