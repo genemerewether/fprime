@@ -22,6 +22,7 @@
 
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
+#include "std_msgs/Float32.h"
 
 #include "SIMREF/RotorSDrv/RotorSDrvComponentAc.hpp"
 
@@ -56,6 +57,10 @@ namespace SIMREF {
       //! Destroy object RotorSDrv
       //!
       ~RotorSDrvComponentImpl(void);
+
+      //! Initialize publishers
+      //!
+      void startPub(void);
 
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
@@ -111,11 +116,17 @@ namespace SIMREF {
       //! Entry point for task waiting for interrupt
       static void intTaskEntry(void * ptr);
 
-
       //! Task object for RTI task
       //!
       Os::Task m_intTask;
 
+      //! NodeHandle pointer for use in RateGroup context
+      //!
+      ros::NodeHandle* m_rgNH;
+
+      //! Publishers for motor speeds
+      //!
+      ros::Publisher m_motorPub[6];
     };
 
 } // end namespace SIMREF

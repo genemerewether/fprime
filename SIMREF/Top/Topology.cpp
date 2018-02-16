@@ -300,6 +300,7 @@ void constructApp(int port_number, char* hostname) {
     Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
+    rotorSDrv.startPub();
     stat = rotorSDrv.startIntTask(70, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
@@ -372,7 +373,6 @@ int main(int argc, char* argv[]) {
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SIMREF", ros::init_options::NoSigintHandler);
-    ros::start();
 
     while ((option = getopt(argc, argv, "hlp:a:")) != -1){
         switch(option) {
@@ -398,6 +398,8 @@ int main(int argc, char* argv[]) {
     }
 
     (void) printf("Hit Ctrl-C to quit\n");
+
+    ros::start();
 
     constructApp(port_number, hostname);
 

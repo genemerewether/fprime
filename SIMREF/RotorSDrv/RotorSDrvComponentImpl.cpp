@@ -21,6 +21,10 @@
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <stdio.h>
+
+#include <ros/callback_queue.h>
+
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
@@ -35,10 +39,11 @@ namespace SIMREF {
     RotorSDrvComponentImpl(
         const char *const compName
     ) :
-      RotorSDrvComponentBase(compName)
+      RotorSDrvComponentBase(compName),
 #else
-    RotorSDrvImpl(void)
+    RotorSDrvImpl(void),
 #endif
+    m_rgNH(NULL)
   {
 
   }
@@ -55,6 +60,18 @@ namespace SIMREF {
     ~RotorSDrvComponentImpl(void)
   {
 
+  }
+
+  void RotorSDrvComponentImpl ::
+    startPub() {
+      ros::NodeHandle n;
+      m_rgNH = &n;
+
+      char buf[32];
+      for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_motorPub); i++) {
+          snprintf(buf, 32, "motor_speed/%d", i);
+          m_motorPub[i] = m_rgNH->advertise<std_msgs::Float32>(buf, 5);
+      }
   }
 
   Os::Task::TaskStatus RotorSDrvComponentImpl ::
@@ -101,11 +118,14 @@ namespace SIMREF {
   //! Entry point for task waiting for messages
   void RotorSDrvComponentImpl ::
     intTaskEntry(void * ptr) {
+      DEBUG_PRINT("RotorSDrv task entry\n");
 
       FW_ASSERT(ptr);
       RotorSDrvComponentImpl* compPtr = (RotorSDrvComponentImpl*) ptr;
 
       ros::NodeHandle n;
+      ros::CallbackQueue localCallbacks;
+      n.setCallbackQueue(&localCallbacks);
 
       OdometryHandler gtHandler(compPtr, 0);
       OdometryHandler odomHandler(compPtr, 1);
@@ -115,12 +135,14 @@ namespace SIMREF {
                                           &gtHandler,
                                           ros::TransportHints().tcpNoDelay());
 
-      ros::Subscriber sub = n.subscribe("odometry_sensor1/odometry", 1000,
-                                        &OdometryHandler::odometryCallback,
-                                        &odomHandler,
-                                        ros::TransportHints().tcpNoDelay());
+      ros::Subscriber odomSub = n.subscribe("odometry_sensor1/odometry", 1000,
+                                            &OdometryHandler::odometryCallback,
+                                            &odomHandler,
+                                            ros::TransportHints().tcpNoDelay());
 
-      ros::spin();
+      while (1) {
+          localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
+      }
   }
 
   RotorSDrvComponentImpl :: OdometryHandler ::

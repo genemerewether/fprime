@@ -22,6 +22,8 @@
 #include "Fw/Types/BasicTypes.hpp"
 #include "Svc/Cycle/TimerVal.hpp"
 
+#include <ros/callback_queue.h>
+
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
@@ -114,12 +116,17 @@ namespace ROS {
       RosCycleComponentImpl* compPtr = (RosCycleComponentImpl*) ptr;
 
       ros::NodeHandle n;
-      ros::Subscriber sub = n.subscribe("clock", 1000,
+      ros::CallbackQueue localCallbacks;
+      n.setCallbackQueue(&localCallbacks);
+
+      ros::Subscriber sub = n.subscribe("/clock", 1000,
                                         &RosCycleComponentImpl::clockCallback,
                                         compPtr,
                                         ros::TransportHints().tcpNoDelay());
 
-      ros::spin();
+      while (1) {
+          localCallbacks.callAvailable(ros::WallDuration(0, 1000 * 1000));
+      }
   }
 
   void RosCycleComponentImpl ::
