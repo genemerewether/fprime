@@ -1,11 +1,10 @@
 MODULE_DIR = ROS/Gen
 BUILD_ROOT ?= $(subst /$(MODULE_DIR),,$(CURDIR))
 export BUILD_ROOT
-# include $(BUILD_ROOT)/mk/makefiles/module_targets.mk
 
 #SUBDIR := $(shell find . -type d -name '*_msgs')
 
-SUBDIRS := std_msgs/Types \
+TYPE_SUBDIRS := std_msgs/Types \
 	   actionlib_msgs/Types \
 	   diagnostic_msgs/Types \
 	   geometry_msgs/Types \
@@ -18,8 +17,9 @@ SUBDIRS := std_msgs/Types \
 	   trajectory_msgs/Types \
 	   visualization_msgs/Types \
 	   planning_msgs/Types \
-	   mav_msgs/Types \
-	   \
+	   mav_msgs/Types
+
+PORT_SUBDIRS := \
 	   std_msgs/Ports \
 	   actionlib_msgs/Ports \
 	   diagnostic_msgs/Ports \
@@ -35,16 +35,20 @@ SUBDIRS := std_msgs/Types \
 	   planning_msgs/Ports \
 	   mav_msgs/Ports
 
-all:
-	$(foreach dir, $(SUBDIRS), echo $(dir); cd $(dir); make -j 4; cd $(CURDIR))
+all: ports types
 
-clean:
-	$(foreach dir, $(SUBDIRS), echo $(dir); cd $(dir); $(MAKE) clean; cd $(CURDIR))
+types:
+	$(foreach dir, $(TYPE_SUBDIRS), echo $(dir); cd $(dir); make -j 4; cd $(CURDIR))
 
-#$(foreach dir, $(SUBDIRS), rm -r $(dir)/Ports/* $(dir)/Types/*;)
+ports:
+	$(foreach dir, $(PORT_SUBDIRS), echo $(dir); cd $(dir); make -j 4; cd $(CURDIR))
 
-#$(BUILDS):
-	#$(foreach dir, $(SUBDIRS), echo $(dir); cd $(dir); $(TIME) $(MAKE) -f $(BUILD_ROOT)/mk/makefiles/Makefile BUILD=$@ $(subst .,,$(subst /,,ROS/Gen/$(dir)/Types)); cd -)
-	#$(foreach dir, $(SUBDIRS), echo $(dir); cd $(dir); $(TIME) $(MAKE) -f $(BUILD_ROOT)/mk/makefiles/Makefile BUILD=$@ $(subst .,,$(subst /,,ROS/Gen/$(dir)/Ports)); cd -)
+clean: clean_ports clean_types
 
-.PHONY: clean all #$(BUILDS)
+clean_types:
+	$(foreach dir, $(TYPE_SUBDIRS), echo $(dir); cd $(dir); $(MAKE) clean; cd $(CURDIR))
+
+clean_ports:
+	$(foreach dir, $(PORT_SUBDIRS), echo $(dir); cd $(dir); $(MAKE) clean; cd $(CURDIR))
+
+.PHONY: clean all clean_ports clean_types ports types #$(BUILDS)

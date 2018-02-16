@@ -103,7 +103,20 @@ REF_MODULES := \
 	Ref/PingReceiver
 
 ROS_PORT_MODULES := \
-	ROS/Gen/std_msgs/Ports
+	ROS/Gen/std_msgs/Ports  \
+	ROS/Gen/actionlib_msgs/Ports     \
+	ROS/Gen/diagnostic_msgs/Ports    \
+	ROS/Gen/geometry_msgs/Ports      \
+	ROS/Gen/nav_msgs/Ports           \
+	ROS/Gen/sensor_msgs/Ports        \
+	ROS/Gen/shape_msgs/Ports         \
+	ROS/Gen/std_srvs/Ports           \
+	ROS/Gen/stereo_msgs/Ports        \
+	ROS/Gen/trajectory_msgs/Ports    \
+	ROS/Gen/visualization_msgs/Ports \
+	ROS/Gen/planning_msgs/Ports	 \
+	ROS/Gen/rosgraph_msgs/Ports	 \
+	ROS/Gen/mav_msgs/Ports
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
@@ -122,6 +135,8 @@ ROS_TYPE_MODULES := \
 	ROS/Gen/mav_msgs/Types
 
 ROS_MODULES := \
+	ROS/RosCycle \
+	\
 	ROS/RosTime \
 	\
 	$(ROS_TYPE_MODULES) \
@@ -169,6 +184,7 @@ SDREF_MODULES := \
 
 SIMREF_DEPLOYMENT_MODULES := \
 	ROS/fprime_ws/src/SIMREF \
+	SIMREF/RotorSDrv \
 	SIMREF/Top
 
 SIMREF_MODULES := \
@@ -176,8 +192,6 @@ SIMREF_MODULES := \
 	$(SIMREF_DEPLOYMENT_MODULES) \
 	\
 	$(SVC_MODULES) \
-	\
-	ROS/RosCycle \
 	\
 	$(ROS_MODULES) \
 	\
