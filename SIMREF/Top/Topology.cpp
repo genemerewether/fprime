@@ -131,6 +131,12 @@ ROS::RosCycleComponentImpl rosCycle
                     1)
 ;
 
+SIMREF::RotorSDrvComponentImpl rotorSDrv
+#if FW_OBJECT_NAMES == 1
+                    ("ROTORSDRV")
+#endif
+;
+
 Svc::TlmChanImpl chanTlm
 #if FW_OBJECT_NAMES == 1
                     ("TLM")
@@ -216,6 +222,8 @@ void constructApp(int port_number, char* hostname) {
 
     rosCycle.init(0);
 
+    rotorSDrv.init(0);
+
     linuxTime.init(0);
 
     chanTlm.init(10,0);
@@ -290,6 +298,9 @@ void constructApp(int port_number, char* hostname) {
     sockGndIf.startSocketTask(40, port_number, hostname);
 
     Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+
+    stat = rotorSDrv.startIntTask(70, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     // register ping table

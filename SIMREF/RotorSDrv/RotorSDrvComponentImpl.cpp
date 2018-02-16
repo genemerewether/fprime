@@ -21,6 +21,9 @@
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
+
 namespace SIMREF {
 
   // ----------------------------------------------------------------------
@@ -52,6 +55,21 @@ namespace SIMREF {
     ~RotorSDrvComponentImpl(void)
   {
 
+  }
+
+  Os::Task::TaskStatus RotorSDrvComponentImpl ::
+    startIntTask(NATIVE_INT_TYPE priority,
+                 NATIVE_INT_TYPE stackSize,
+                 NATIVE_INT_TYPE cpuAffinity) {
+      Os::TaskString name("ROTORSDRV");
+      Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
+        stackSize, RotorSDrvComponentImpl::intTaskEntry, this, cpuAffinity);
+
+      if (stat != Os::Task::TASK_OK) {
+          DEBUG_PRINT("Task start error: %d\n",stat);
+      }
+
+      return stat;
   }
 
   // ----------------------------------------------------------------------
@@ -88,24 +106,81 @@ namespace SIMREF {
       RotorSDrvComponentImpl* compPtr = (RotorSDrvComponentImpl*) ptr;
 
       ros::NodeHandle n;
-      ros::Subscriber sub = n.subscribe("clock", 1000,
-                                        &RotorSDrvComponentImpl::odometryCallback,
-                                        compPtr,
+
+      OdometryHandler gtHandler(compPtr, 0);
+      OdometryHandler odomHandler(compPtr, 1);
+
+      ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 1000,
+                                          &OdometryHandler::odometryCallback,
+                                          &gtHandler,
+                                          ros::TransportHints().tcpNoDelay());
+
+      ros::Subscriber sub = n.subscribe("odometry_sensor1/odometry", 1000,
+                                        &OdometryHandler::odometryCallback,
+                                        &odomHandler,
                                         ros::TransportHints().tcpNoDelay());
 
       ros::spin();
   }
 
-  void RotorSDrvComponentImpl ::
+  RotorSDrvComponentImpl :: OdometryHandler ::
+    OdometryHandler(RotorSDrvComponentImpl* compPtr,
+                    int portNum) :
+    compPtr(compPtr),
+    portNum(portNum)
+  {
+      FW_ASSERT(compPtr);
+      FW_ASSERT(portNum < compPtr->getNum_odometry_OutputPorts());
+  }
+
+  RotorSDrvComponentImpl :: OdometryHandler :: ~OdometryHandler()
+  {
+
+  }
+
+  void RotorSDrvComponentImpl :: OdometryHandler ::
     odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
   {
-      /*if (this->m_odometryCallbacks%100 == 0)
-      {
-          DEBUG_PRINT("Odometry callback %d, %f\n", this->m_callbacks,
-                      msg->header.stamp.toSec());
-      }
-      this->m_callbacks++;*/
+      FW_ASSERT(this->compPtr);
+      FW_ASSERT(this->portNum < this->compPtr->getNum_odometry_OutputPorts());
 
+      if (!this->compPtr->isConnected_odometry_OutputPort(this->portNum)) {
+          DEBUG_PRINT("Odom port %d not connected\n", this->portNum);
+          return;
+      }
+
+      DEBUG_PRINT("Odom port handler %d\n", this->portNum);
+
+      {
+          using namespace ROS::std_msgs;
+          using namespace ROS::nav_msgs;
+          using namespace ROS::geometry_msgs;
+          Odometry odom(
+            Header(msg->header.seq,
+                   Fw::Time(TB_ROS_TIME, 0,
+                            msg->header.stamp.sec,
+                            msg->header.stamp.nsec / 1000),
+                   Fw::EightyCharString(msg->header.frame_id.data())),
+            Fw::EightyCharString(msg->child_frame_id.data()),
+            PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
+                                          msg->pose.pose.position.y,
+                                          msg->pose.pose.position.z),
+                                    Quaternion(msg->pose.pose.orientation.x,
+                                               msg->pose.pose.orientation.y,
+                                               msg->pose.pose.orientation.z,
+                                               msg->pose.pose.orientation.w)),
+                               msg->pose.covariance.data(), 36),
+            TwistWithCovariance(Twist(Vector3(msg->twist.twist.linear.x,
+                                              msg->twist.twist.linear.y,
+                                              msg->twist.twist.linear.z),
+                                      Vector3(msg->twist.twist.linear.x,
+                                              msg->twist.twist.linear.y,
+                                              msg->twist.twist.linear.z)),
+                                msg->twist.covariance.data(), 36)
+          ); // end Odometry constructor
+
+          this->compPtr->odometry_out(this->portNum, odom);
+      }
   }
 
 } // end namespace SIMREF

@@ -27,6 +27,7 @@ void exitTasks(void);
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 #include <ROS/RosCycle/RosCycleComponentImpl.hpp>
+#include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
@@ -49,5 +50,6 @@ extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern Svc::HealthImpl health;
 extern ROS::RosCycleComponentImpl rosCycle;
+extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
 
 #endif

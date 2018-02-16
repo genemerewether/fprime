@@ -57,7 +57,10 @@ namespace SIMREF {
       //!
       ~RotorSDrvComponentImpl(void);
 
-    PRIVATE:
+      //! Start interrupt task
+      Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
+                                        NATIVE_INT_TYPE stackSize,
+                                        NATIVE_INT_TYPE cpuAffinity = -1);
 
       // ----------------------------------------------------------------------
       // Utility classes for enumerating callbacks
@@ -66,10 +69,22 @@ namespace SIMREF {
       class OdometryHandler
       {
         public:
+            OdometryHandler(RotorSDrvComponentImpl* compPtr,
+                            int portNum);
 
+            ~OdometryHandler();
 
+            void odometryCallback(const nav_msgs::Odometry::ConstPtr& msg);
+
+        PRIVATE:
+
+            RotorSDrvComponentImpl* compPtr;
+
+            const unsigned int portNum;
 
       }; // end class OdometryHandler
+
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -96,9 +111,10 @@ namespace SIMREF {
       //! Entry point for task waiting for interrupt
       static void intTaskEntry(void * ptr);
 
-      void odometryCallback(const nav_msgs::Odometry::ConstPtr& msg);
 
-      OdometryHandler m_odomHandlers[NUM_ODOMETRY_OUTPUT_PORTS];
+      //! Task object for RTI task
+      //!
+      Os::Task m_intTask;
 
     };
 
