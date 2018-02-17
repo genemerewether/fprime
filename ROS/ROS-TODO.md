@@ -1,3 +1,9 @@
+## Magic draw
+
+### types and Ports
+- create stubs for each catkin package
+- each type lives under its associated port
+
 ## ROS Components
 
 ### RosCycle
@@ -28,6 +34,7 @@
 
 ### methods for converting to and from ROS message objects
 - F Prime templates and visitors to create converter code to/from ROS message objects?
+- or python generate from msg spec
 
 ### Unit tests
 - headers

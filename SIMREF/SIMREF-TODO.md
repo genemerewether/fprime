@@ -14,6 +14,8 @@
 
 ## Drivers
 
+- MD model for RotorSDrv
+
 ### Actuators
 
 ### Ground truth
