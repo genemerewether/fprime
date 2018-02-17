@@ -11,10 +11,14 @@
     <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/std_msgs/Ports/Float32PortAi.xml</import_port_type>
     <ports>
 
 
         <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="output" max_number="2">
+        </port>
+
+        <port name="motor" data_type="ROS::std_msgs::Float32"  kind="sync_input" max_number="6">
         </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">

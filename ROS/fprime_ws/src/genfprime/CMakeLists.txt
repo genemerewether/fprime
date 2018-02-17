@@ -4,7 +4,7 @@ find_package(catkin REQUIRED COMPONENTS genmsg)
 
 catkin_package(
   CATKIN_DEPENDS genmsg
-  CFG_EXTRAS genfprime-extras.cmake
+  CFG_EXTRAS genfprime-extras.cmake genmodmk.cmake
 )
 
 add_subdirectory(scripts)
@@ -12,6 +12,9 @@ add_subdirectory(scripts)
 file(WRITE ${CATKIN_DEVEL_PREFIX}/${GENMSG_LANGS_DESTINATION}/genfprime "F Prime XML")
 install(FILES ${CATKIN_DEVEL_PREFIX}/${GENMSG_LANGS_DESTINATION}/genfprime
   DESTINATION ${GENMSG_LANGS_DESTINATION})
+
+install(FILES cmake/genmodmk.cmake
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 catkin_python_setup()
 

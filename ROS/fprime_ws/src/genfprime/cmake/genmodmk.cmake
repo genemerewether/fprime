@@ -4,8 +4,8 @@ macro(genmodmk)
 FILE(
     WRITE ${CMAKE_BINARY_DIR}/modmk.cmake
 "
-string (REPLACE \";\" \" \\\\ \\n\\t-I \" incs \"${catkin_INCLUDE_DIRS}\")
-string (REPLACE \";\" \" \\\\ \\n\\t\" libs \"${catkin_LIBRARIES}\")
+string (REPLACE \";\" \" -I \" incs \"${catkin_INCLUDE_DIRS}\")
+string (REPLACE \";\" \" \" libs \"${catkin_LIBRARIES}\")
 
 FILE(APPEND \${MODMK} \"EXTRA_INC_DIRS = -I \")
 FILE(APPEND \${MODMK} \${incs})

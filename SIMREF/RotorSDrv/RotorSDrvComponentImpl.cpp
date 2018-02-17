@@ -94,6 +94,17 @@ namespace SIMREF {
   // ----------------------------------------------------------------------
 
   void RotorSDrvComponentImpl ::
+    motor_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::std_msgs::Float32 &Float32
+    )
+  {
+      std_msgs::Float32 msg;
+      msg.data = Float32.getdata();
+      m_motorPub[portNum].publish(msg);
+  }
+
+  void RotorSDrvComponentImpl ::
     sched_handler(
         const NATIVE_INT_TYPE portNum,
         NATIVE_UINT_TYPE context

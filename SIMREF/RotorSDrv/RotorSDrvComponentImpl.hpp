@@ -95,6 +95,13 @@ namespace SIMREF {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      //! Handler implementation for motor
+      //!
+      void motor_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::std_msgs::Float32 &Float32
+      );
+
       //! Handler implementation for sched
       //!
       void sched_handler(
