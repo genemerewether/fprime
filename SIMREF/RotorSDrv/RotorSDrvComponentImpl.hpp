@@ -141,6 +141,7 @@ namespace SIMREF {
             Os::Mutex mutex; //! Mutex lock to guard odometry object
             ROS::nav_msgs::Odometry odom; //! odometry object
             bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_odomSet[NUM_ODOMETRY_OUTPUT_PORTS];
     };
 

@@ -23,8 +23,8 @@
 #include <Fw/Types/Assert.hpp>
 #include <Os/Log.hpp>
 
-#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-//#define DEBUG_PRINT(x,...)
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
 
 namespace Svc {
 

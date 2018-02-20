@@ -23,7 +23,14 @@
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
-namespace Svc {
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+
+namespace Svc
+{
 
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
@@ -31,13 +38,38 @@ namespace Svc {
 
     void FatalHandlerComponentImpl::FatalReceive_handler(
             const NATIVE_INT_TYPE portNum,
-            FwEventIdType Id) {
-        // for **nix, delay then exit with error code
-        Os::Log::logMsg("FATAL %d handled.\n",(U32)Id,0,0,0,0,0);
-        (void)Os::Task::delay(1000);
-        Os::Log::logMsg("Exiting.\n",0,0,0,0,0,0);
-        (void)raise( SIGSEGV );
-        exit(1);
+            FwEventIdType Id)
+    {
+
+        int j, nptrs;
+        void *buffer[100];
+        char **strings;
+        nptrs = backtrace(buffer, 100);
+        //printf("backtrace() returned %d addresses\n", nptrs);
+
+        /* The call backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO)
+         would produce similar output to the following: */
+
+        strings = backtrace_symbols(buffer, nptrs);
+        if (strings != NULL)
+        {
+            for (j = 0; j < nptrs; j++) {
+                printf("%s\n", strings[j]);
+            }
+            free(strings);
+        } else {
+            printf("No backtrace!\n");
+        }
+
+        if (not this->m_disableAssert) {
+            // for **nix, delay then exit with error code
+            Os::Log::logMsg("FATAL %d handled.\n", (U32) Id, 0, 0, 0, 0, 0);
+            (void) Os::Task::delay(1000);
+            //Os::Log::logMsg("Exiting.\n", 0, 0, 0, 0, 0, 0);
+            //assert(0);
+            (void) raise(SIGTERM);
+            pthread_exit(0);
+        }
     }
 
 } // end namespace Svc

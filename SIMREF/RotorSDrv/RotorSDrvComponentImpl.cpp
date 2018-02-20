@@ -25,8 +25,8 @@
 
 #include <ros/callback_queue.h>
 
-#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-//#define DEBUG_PRINT(x,...)
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
 
 namespace SIMREF {
 
@@ -46,6 +46,10 @@ namespace SIMREF {
       m_rgNH(NULL),
       m_odomSet() // zero-initialize instead of default-initializing
     {
+        for (int i = 0; i < NUM_ODOMETRY_OUTPUT_PORTS; i++) {
+            m_odomSet[i].fresh = false;
+            m_odomSet[i].overflows = 0u;
+        }
     }
 
     void RotorSDrvComponentImpl ::
@@ -68,7 +72,7 @@ namespace SIMREF {
         m_rgNH = &n;
 
         char buf[32];
-        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_motorPub); i++) {
+        for (int i = 0; i < NUM_MOTOR_INPUT_PORTS; i++) {
             snprintf(buf, 32, "motor_speed/%d", i);
             m_motorPub[i] = m_rgNH->advertise<std_msgs::Float32>(buf, 5);
         }
@@ -116,7 +120,7 @@ namespace SIMREF {
                 m_odomSet[i].mutex.lock();
                 if (m_odomSet[i].fresh) {
                     if (this->isConnected_odometry_OutputPort(i)) {
-                        // mimics call to driver to get and send sensor data
+                        // mimics driver hardware getting and sending sensor data
                         this->odometry_out(i, m_odomSet[i].odom);
                     }
                     else {
@@ -129,8 +133,10 @@ namespace SIMREF {
 
             // TODO(mereweth) check context == imu out context
         }
-        else if (portNum == 1){
-            //this->tlmWrite_
+        else if (portNum == 1) {
+            FW_ASSERT(NUM_ODOMETRY_OUTPUT_PORTS >= 2, NUM_ODOMETRY_OUTPUT_PORTS);
+            this->tlmWrite_RSDRV_Odometry1Overflows(m_odomSet[0].overflows);
+            this->tlmWrite_RSDRV_Odometry2Overflows(m_odomSet[1].overflows);
         }
     }
 
@@ -140,7 +146,7 @@ namespace SIMREF {
           U32 key
       )
     {
-      // TODO
+        this->pingOut_out(portNum, key);
     }
 
     // ----------------------------------------------------------------------
@@ -154,6 +160,7 @@ namespace SIMREF {
 
         FW_ASSERT(ptr);
         RotorSDrvComponentImpl* compPtr = (RotorSDrvComponentImpl*) ptr;
+        compPtr->log_ACTIVITY_LO_RSDRV_IntTaskStarted();
 
         ros::NodeHandle n;
         ros::CallbackQueue localCallbacks;
@@ -196,7 +203,7 @@ namespace SIMREF {
       odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
     {
         FW_ASSERT(this->compPtr);
-        FW_ASSERT(this->portNum < this->compPtr->getNum_odometry_OutputPorts());
+        FW_ASSERT(this->portNum < NUM_ODOMETRY_OUTPUT_PORTS);
 
         DEBUG_PRINT("Odom port handler %d\n", this->portNum);
 
@@ -230,6 +237,7 @@ namespace SIMREF {
 
             this->compPtr->m_odomSet[this->portNum].mutex.lock();
             if (this->compPtr->m_odomSet[this->portNum].fresh) {
+                this->compPtr->m_odomSet[this->portNum].overflows++;
                 DEBUG_PRINT("Overwriting odom port %d before Sched\n", this->portNum);
             }
             this->compPtr->m_odomSet[this->portNum].odom = odom;

@@ -251,6 +251,7 @@ void constructApp(int port_number, char* hostname) {
     prmDb.regCommands();
     fileDown.regCommands();
     health.regCommands();
+    fatalHandler.regCommands();
 
     // read parameters
     prmDb.readParamFile();
@@ -268,6 +269,7 @@ void constructApp(int port_number, char* hostname) {
 
         {5,10,rg.getObjName()}, // 8
         {5,10,rosCycle.getObjName()}, // 9
+        {5,10,rotorSDrv.getObjName()}, // 10
     };
 
     // Active component startup

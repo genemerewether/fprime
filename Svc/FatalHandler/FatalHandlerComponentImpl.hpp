@@ -67,6 +67,16 @@ namespace Svc {
           FwEventIdType Id /*!< The ID of the FATAL event*/
       );
 
+      //! Implementation for FH_ENABLE_ASSERT command handler
+      //! Enable/Disable asserts
+      void FH_ENABLE_ASSERT_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          AssertEnable enable /*!< Enable/Disable asserts*/
+      );
+
+      bool m_disableAssert; //!< flag to assert or not.
+
 
     };
 

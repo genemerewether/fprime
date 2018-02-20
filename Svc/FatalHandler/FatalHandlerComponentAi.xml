@@ -12,5 +12,32 @@
             </comment>
         </port>
     </ports>
+    <commands>    
+        <command kind="sync" opcode="0" mnemonic="FH_ENABLE_ASSERT" >
+            <comment>Enable/Disable asserts</comment>
+               <args>
+                    <arg name="enable" type="ENUM">
+                        <enum name="AssertEnable">
+                            <item name="ASSERT_ENABLE"/>
+                            <item name="ASSERT_DISABLE"/>
+                        </enum>
+                        <comment>Enable/Disable asserts</comment>
+                    </arg>   
+                </args>
+        </command>
+    </commands>
+    <events>
+        <event id="0" name="FH_AssertDisabled" severity="ACTIVITY_HI" format_string = "Fatal Handler Asserts Disabled" >
+            <comment>
+            Fatal Handler Asserts diabled
+            </comment>
+        </event>
+        <event id="1" name="FH_AssertEnabled" severity="ACTIVITY_HI" format_string = "Fatal Handler Asserts Enabled" >
+            <comment>
+            Fatal Handler Asserts diabled
+            </comment>
+        </event>
+    </events>        
+    
 </component>
 

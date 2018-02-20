@@ -36,6 +36,7 @@ namespace Svc {
 #else
     FatalHandlerImpl(void)
 #endif
+    ,m_disableAssert(false)
   {
 
   }
@@ -51,6 +52,30 @@ namespace Svc {
   FatalHandlerComponentImpl ::
     ~FatalHandlerComponentImpl(void)
   {
+
+  }
+
+  void FatalHandlerComponentImpl ::
+    FH_ENABLE_ASSERT_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        AssertEnable enable
+    )
+  {
+      switch (enable) {
+          case ASSERT_ENABLE:
+              this->m_disableAssert = false;
+              this->log_ACTIVITY_HI_FH_AssertEnabled();
+              break;
+          case ASSERT_DISABLE:
+              this->m_disableAssert = true;
+              this->log_ACTIVITY_HI_FH_AssertDisabled();
+              break;
+          default:
+              this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_VALIDATION_ERROR);
+              return;
+      }
+      this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
 
   }
 
