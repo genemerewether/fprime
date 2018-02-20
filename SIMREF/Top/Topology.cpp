@@ -30,7 +30,6 @@ enum {
 // List of context IDs
 enum {
     ACTIVE_COMP_1HZ_RG,
-    ACTIVE_COMP_GNC_RG,
     ACTIVE_COMP_CMD_DISP,
     ACTIVE_COMP_CMD_SEQ,
     ACTIVE_COMP_LOGGER,
@@ -58,14 +57,9 @@ Svc::ActiveRateGroupImpl rg(
                     rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
 ;
 
-static NATIVE_UINT_TYPE rgGncContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {0};
-Svc::ActiveRateGroupImpl rgGnc(
-#if FW_OBJECT_NAMES == 1
-                    "RGGNC",
-#endif
-                    rgGncContext,FW_NUM_ARRAY_ELEMENTS(rgGncContext));
-;
-
+/* TODO(mereweth) - we run the GNC rgAtt and rgPos in the rosCycle callback
+ * thread. If this needs to change -> create a new component ActiveRateGroupDriver
+ */
 static NATIVE_INT_TYPE rgGncDivs[] = {1, 10, 1000};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
@@ -210,7 +204,6 @@ void constructApp(int port_number, char* hostname) {
 
     // Initialize the rate groups
     rg.init(10,0);
-    rgGnc.init(10,0);
     rgAtt.init(0);
     rgPos.init(0);
 
@@ -273,7 +266,6 @@ void constructApp(int port_number, char* hostname) {
         {5,10,fileUp.getObjName()}, // 5
         {5,10,prmDb.getObjName()}, // 6
 
-        {5,10,rgGnc.getObjName()}, // 7
         {5,10,rg.getObjName()}, // 8
         {5,10,rosCycle.getObjName()}, // 9
     };
@@ -281,7 +273,6 @@ void constructApp(int port_number, char* hostname) {
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 50, 20*1024);
-    rgGnc.start(ACTIVE_COMP_GNC_RG, 90, 20*1024);
     // start dispatcher
     cmdDisp.start(ACTIVE_COMP_CMD_DISP,60,20*1024);
     // start sequencer
@@ -337,7 +328,6 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     rg.exit();
-    rgGnc.exit();
     cmdDisp.exit();
     eventLogger.exit();
     chanTlm.exit();

@@ -31,7 +31,6 @@ void exitTasks(void);
 
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
-extern Svc::ActiveRateGroupImpl rgGnc;
 extern Svc::PassiveRateGroupImpl rgAtt;
 extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::CmdSequencerComponentImpl cmdSeq;
