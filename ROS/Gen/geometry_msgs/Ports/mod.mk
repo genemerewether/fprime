@@ -1,0 +1,30 @@
+SRC = \
+AccelPortAi.xml \
+AccelStampedPortAi.xml \
+AccelWithCovariancePortAi.xml \
+AccelWithCovarianceStampedPortAi.xml \
+InertiaPortAi.xml \
+InertiaStampedPortAi.xml \
+Point32PortAi.xml \
+PointPortAi.xml \
+PointStampedPortAi.xml \
+PolygonPortAi.xml \
+PolygonStampedPortAi.xml \
+Pose2DPortAi.xml \
+PoseArrayPortAi.xml \
+PosePortAi.xml \
+PoseStampedPortAi.xml \
+PoseWithCovariancePortAi.xml \
+PoseWithCovarianceStampedPortAi.xml \
+QuaternionPortAi.xml \
+QuaternionStampedPortAi.xml \
+TransformPortAi.xml \
+TransformStampedPortAi.xml \
+TwistPortAi.xml \
+TwistStampedPortAi.xml \
+TwistWithCovariancePortAi.xml \
+TwistWithCovarianceStampedPortAi.xml \
+Vector3PortAi.xml \
+Vector3StampedPortAi.xml \
+WrenchPortAi.xml \
+WrenchStampedPortAi.xml

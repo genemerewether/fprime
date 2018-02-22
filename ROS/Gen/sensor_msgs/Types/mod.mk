@@ -1,0 +1,30 @@
+SRC = \
+BatteryStateSerializableAi.xml \
+CameraInfoSerializableAi.xml \
+ChannelFloat32SerializableAi.xml \
+CompressedImageSerializableAi.xml \
+FluidPressureSerializableAi.xml \
+IlluminanceSerializableAi.xml \
+ImageSerializableAi.xml \
+ImuSerializableAi.xml \
+JointStateSerializableAi.xml \
+JoyFeedbackArraySerializableAi.xml \
+JoyFeedbackSerializableAi.xml \
+JoySerializableAi.xml \
+LaserEchoSerializableAi.xml \
+LaserScanSerializableAi.xml \
+MagneticFieldSerializableAi.xml \
+MultiDOFJointStateSerializableAi.xml \
+MultiEchoLaserScanSerializableAi.xml \
+NavSatFixSerializableAi.xml \
+NavSatStatusSerializableAi.xml \
+PointCloud2SerializableAi.xml \
+PointCloudSerializableAi.xml \
+PointFieldSerializableAi.xml \
+RangeSerializableAi.xml \
+RegionOfInterestSerializableAi.xml \
+RelativeHumiditySerializableAi.xml \
+SetCameraInfoInSerializableAi.xml \
+SetCameraInfoOutSerializableAi.xml \
+TemperatureSerializableAi.xml \
+TimeReferenceSerializableAi.xml

@@ -18,8 +18,7 @@ ALL_HDRS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(HDR_$(subst /,,$(module)
 
 # Global binary targets
 
-EXTRA_INC_DIRS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(EXTRA_INC_DIRS_$(subst /,,$(module))))
-EXTRA_LIBS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(EXTRA_LIBS_$(subst /,,$(module))))
+#EXTRA_INC_DIRS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(EXTRA_INC_DIRS_$(subst /,,$(module))))
 
 TARGET_LIBS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/$(LIB_PREFIX)$(subst /,,$(module))$(LIB_SUFFIX))
 CLEAN_TARGETS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(subst /,,$(module))_clean)
@@ -61,6 +60,8 @@ $(BUILD_ROOT)/mk/bin/ncsl: $(BUILD_ROOT)/mk/tools/ncsl/ncsl.c
 # define binary target
 
 ifneq ("$(BUILD)","") # only define if building binary targets
+
+EXTRA_LIBS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(EXTRA_LIBS_$(subst /,,$(module))_$(BUILD)))
 
 $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(BIN_SUFFIX): $(TARGET_LIBS)
 	$(MKDIR) $(@D)

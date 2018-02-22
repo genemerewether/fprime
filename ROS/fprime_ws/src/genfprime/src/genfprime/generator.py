@@ -34,7 +34,7 @@ def generate(pkg, _file, out_dir, search_path):
         spec = genmsg.msg_loader.load_msg_from_file(msg_context, _file, name)
         with open(out_dir + os.path.sep + 'Types' + os.path.sep
                   + _msg_serializable_xml_name(name), 'w') as f:
-            f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
+            #f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
             tree = gen_serializable_xml(spec, pkg)
             tree.write(f, pretty_print=True)
 
@@ -43,19 +43,19 @@ def generate(pkg, _file, out_dir, search_path):
 
         with open(out_dir + os.path.sep + 'Types' + os.path.sep
                   + _srv_serializable_xml_name(name, is_input=True), 'w') as f:
-            f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
+            #f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
             tree = gen_serializable_xml(spec.request, pkg)
             tree.write(f, pretty_print=True)
 
         with open(out_dir + os.path.sep + 'Types' + os.path.sep
                   + _srv_serializable_xml_name(name, is_input=False), 'w') as f:
-            f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
+            #f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
             tree = gen_serializable_xml(spec.response, pkg)
             tree.write(f, pretty_print=True)
 
     with open(out_dir + os.path.sep + 'Ports' + os.path.sep
               + _port_xml_name(name), 'w') as f:
-        f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
+        #f.write("<!--\n%s\n%s\n%s\n-->\n"%(pkg,_file,search_path))
         tree = gen_port_xml(spec, pkg, is_srv=(True if _file.endswith('.srv') else False))
         tree.write(f, pretty_print=True)
 

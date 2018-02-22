@@ -1,0 +1,29 @@
+SRC = \
+BatteryStatePortAi.xml \
+CameraInfoPortAi.xml \
+ChannelFloat32PortAi.xml \
+CompressedImagePortAi.xml \
+FluidPressurePortAi.xml \
+IlluminancePortAi.xml \
+ImagePortAi.xml \
+ImuPortAi.xml \
+JointStatePortAi.xml \
+JoyFeedbackArrayPortAi.xml \
+JoyFeedbackPortAi.xml \
+JoyPortAi.xml \
+LaserEchoPortAi.xml \
+LaserScanPortAi.xml \
+MagneticFieldPortAi.xml \
+MultiDOFJointStatePortAi.xml \
+MultiEchoLaserScanPortAi.xml \
+NavSatFixPortAi.xml \
+NavSatStatusPortAi.xml \
+PointCloud2PortAi.xml \
+PointCloudPortAi.xml \
+PointFieldPortAi.xml \
+RangePortAi.xml \
+RegionOfInterestPortAi.xml \
+RelativeHumidityPortAi.xml \
+SetCameraInfoPortAi.xml \
+TemperaturePortAi.xml \
+TimeReferencePortAi.xml

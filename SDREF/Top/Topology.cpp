@@ -362,7 +362,6 @@ int main(int argc, char* argv[]) {
 
         // Removes ROS cmdline args as a side-effect
         ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
-        ros::start();
 
 	while ((option = getopt(argc, argv, "hlp:a:")) != -1){
 		switch(option) {
@@ -388,6 +387,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	(void) printf("Hit Ctrl-C to quit\n");
+
+        ros::start();
 
 #ifdef BUILD_SDFLIGHT
     hexref_init();
