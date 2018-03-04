@@ -73,7 +73,7 @@ namespace SIMREF {
 
         char buf[32];
         for (int i = 0; i < NUM_MOTOR_INPUT_PORTS; i++) {
-            snprintf(buf, 32, "motor_speed/%d", i);
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "motor_speed/%d", i);
             m_motorPub[i] = m_rgNH->advertise<std_msgs::Float32>(buf, 5);
         }
     }

@@ -30,6 +30,8 @@
 - how to disable RTTI everywhere with no ROS includes
 
 ### Serializable types and Ports
+- what about msg packages in another workspace?
+    - pass in BUILD_ROOT?
 - version-control?
 
 ### methods for converting to and from ROS message objects
