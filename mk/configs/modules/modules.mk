@@ -87,13 +87,10 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/KraitRouter
 
-# Multirotor low-level
-MROT_LL_MODULES := \
-	Gnc/Ctrl/LeeCtrl \
-	Gnc/Est/QuatFilt
-
-# Fixed-wing low-level
-#FIXED_WING_LL_MODULES := 
+QUEST_GNC_MODULES := \
+	Gnc/quest_gnc/src/diffeo \
+	Gnc/quest_gnc/src/traj \
+	Gnc/quest_gnc/src/ctrl
 
 REF_MODULES := \
 	Ref/Top \
@@ -188,6 +185,8 @@ SIMREF_DEPLOYMENT_MODULES := \
 	SIMREF/Top
 
 SIMREF_MODULES := \
+	\
+	$(QUEST_GNC_MODULES) \
 	\
 	$(SIMREF_DEPLOYMENT_MODULES) \
 	\

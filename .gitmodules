@@ -16,3 +16,12 @@
 [submodule "ROS/fprime_ws/src/ros_comm_msgs"]
 	path = ROS/fprime_ws/src/ros_comm_msgs
 	url = https://github.com/ros/ros_comm_msgs.git
+[submodule "quest_gnc"]
+	path = Gnc/quest_gnc
+	url = /Users/mereweth/quest_gnc/.git
+[submodule "Gnc/eigen"]
+	path = Gnc/eigen
+	url = https://github.com/eigenteam/eigen-git-mirror
+[submodule "Gnc/linter"]
+	path = Gnc/linter
+	url = git@github.com:genemerewether/linter.git
