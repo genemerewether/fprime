@@ -110,10 +110,11 @@ ROS_PORT_MODULES := \
 	ROS/Gen/std_srvs/Ports           \
 	ROS/Gen/stereo_msgs/Ports        \
 	ROS/Gen/trajectory_msgs/Ports    \
-	ROS/Gen/visualization_msgs/Ports \
 	ROS/Gen/planning_msgs/Ports	 \
 	ROS/Gen/rosgraph_msgs/Ports	 \
 	ROS/Gen/mav_msgs/Ports
+
+#	ROS/Gen/visualization_msgs/Ports \
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
@@ -126,10 +127,11 @@ ROS_TYPE_MODULES := \
 	ROS/Gen/std_srvs/Types           \
 	ROS/Gen/stereo_msgs/Types        \
 	ROS/Gen/trajectory_msgs/Types    \
-	ROS/Gen/visualization_msgs/Types \
 	ROS/Gen/planning_msgs/Types	 \
 	ROS/Gen/rosgraph_msgs/Types	 \
 	ROS/Gen/mav_msgs/Types
+
+#	ROS/Gen/visualization_msgs/Types \
 
 ROS_MODULES := \
 	ROS/RosCycle \
@@ -211,6 +213,8 @@ HEXREF_DEPLOYMENT_MODULES := \
 	HEXREF/Rpc
 
 HEXREF_MODULES := \
+	\
+	$(QUEST_GNC_MODULES) \
 	\
 	$(HEXAGON_MODULES) \
 	\

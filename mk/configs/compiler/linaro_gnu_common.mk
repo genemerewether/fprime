@@ -48,8 +48,8 @@ LINK_LIBS += 	-L$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
 				-lgsl \
 				-lsc-a3xx \
 				$(HEXAGON_ARM_SYSROOT)/lib/libcrypto.so.1.0.0 \
-				$(HEXAGON_ARM_SYSROOT)/lib/libstdc++.so.6 \
-				-lmv1 # Machine Vision SDK, depends on libraries above
+				$(HEXAGON_ARM_SYSROOT)/lib/libstdc++.so.6
+				#-lmv1 # Machine Vision SDK, depends on libraries above
 				#$(HEXAGON_ARM_SYSROOT)/usr/lib/arm-linux-gnueabihf/libstdc++.so.6
 				# not necessary if libraries above are specified explicitly
 				#-Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/usr/lib \

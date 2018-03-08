@@ -23,7 +23,9 @@
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifndef BUILD_DSPAL
 #include <execinfo.h>
+#endif // BUILD_DSPAL
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -44,6 +46,7 @@ namespace Svc
         int j, nptrs;
         void *buffer[100];
         char **strings;
+#ifndef BUILD_DSPAL
         nptrs = backtrace(buffer, 100);
         //printf("backtrace() returned %d addresses\n", nptrs);
 
@@ -60,6 +63,7 @@ namespace Svc
         } else {
             printf("No backtrace!\n");
         }
+#endif // BUILD_DSPAL
 
         if (not this->m_disableAssert) {
             // for **nix, delay then exit with error code
