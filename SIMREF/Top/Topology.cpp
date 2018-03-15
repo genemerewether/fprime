@@ -131,6 +131,12 @@ SIMREF::RotorSDrvComponentImpl rotorSDrv
 #endif
 ;
 
+Gnc::LeeCtrlComponentImpl leeCtrl
+#if FW_OBJECT_NAMES == 1
+                    ("LEECTRL")
+#endif
+;
+
 Svc::TlmChanImpl chanTlm
 #if FW_OBJECT_NAMES == 1
                     ("TLM")

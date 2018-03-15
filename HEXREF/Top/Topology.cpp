@@ -125,6 +125,11 @@ Svc::FatalHandlerComponentImpl fatalHandler
 #endif
 ;
 
+Gnc::LeeCtrlComponentImpl leeCtrl
+#if FW_OBJECT_NAMES == 1
+                    ("LEECTRL")
+#endif
+;
 
 #if FW_OBJECT_REGISTRATION == 1
 
@@ -146,7 +151,7 @@ void constructApp() {
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
-#endif    
+#endif
 
     // Initialize rate group driver
     rgDrv.init();
@@ -181,7 +186,7 @@ void constructApp() {
 
     //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
     //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
-    
+
     /* Register commands */
     /*eventLogger.regCommands();
     health.regCommands();*/
@@ -203,7 +208,7 @@ void constructApp() {
     rgPos.start(ACTIVE_COMP_POS_RG, 80,10 * 1024);
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,40,10*1024);
-    
+
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -264,14 +269,14 @@ int hexref_init(void) {
   DEBUG_PRINT("After constructing app\n");
 
   //dumparch();
-  
+
   Os::Task::delay(1000);
-  
+
   return 0;
 }
 
 int hexref_run(void) {
-  bool local_cycle = true;  
+  bool local_cycle = true;
   int cycle = 0;
 
   while (!terminate) {
@@ -283,16 +288,16 @@ int hexref_run(void) {
     }
     cycle++;
   }
-  
+
   // stop tasks
   exitTasks();
   // Give time for threads to exit
   DEBUG_PRINT("Waiting for threads...\n");
   Os::Task::delay(1000);
-  
+
   DEBUG_PRINT("Exiting...\n");
-  
-  return 0; 
+
+  return 0;
 }
 
 int hexref_fini(void) {
@@ -329,10 +334,10 @@ static void sighandler(int signum) {
 
 int main(int argc, char* argv[]) {
   hexref_init();
-  
+
   signal(SIGINT,sighandler);
   signal(SIGTERM,sighandler);
-    
+
   hexref_run();
 }
 

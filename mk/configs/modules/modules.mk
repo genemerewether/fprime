@@ -88,6 +88,7 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/KraitRouter
 
 QUEST_GNC_MODULES := \
+	Gnc/quest_gnc/src/comp/LeeCtrl \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl
@@ -213,6 +214,16 @@ HEXREF_DEPLOYMENT_MODULES := \
 	HEXREF/Rpc
 
 HEXREF_MODULES := \
+	ROS/Gen/std_msgs/Types  \
+	ROS/Gen/geometry_msgs/Types \
+	ROS/Gen/std_srvs/Types \
+	ROS/Gen/mav_msgs/Types \
+	ROS/Gen/nav_msgs/Types \
+	ROS/Gen/std_msgs/Ports  \
+	ROS/Gen/geometry_msgs/Ports \
+	ROS/Gen/std_srvs/Ports \
+	ROS/Gen/mav_msgs/Ports \
+	ROS/Gen/nav_msgs/Ports \
 	\
 	$(QUEST_GNC_MODULES) \
 	\

@@ -28,6 +28,7 @@ void exitTasks(void);
 
 #include <ROS/RosCycle/RosCycleComponentImpl.hpp>
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
+#include <Gnc/quest_gnc/src/comp/LeeCtrl/LeeCtrlComponentImpl.hpp>
 
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
@@ -50,5 +51,6 @@ extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern Svc::HealthImpl health;
 extern ROS::RosCycleComponentImpl rosCycle;
 extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
+extern Gnc::LeeCtrlComponentImpl leeCtrl;
 
 #endif
