@@ -88,7 +88,7 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/KraitRouter
 
 QUEST_GNC_MODULES := \
-	Gnc/quest_gnc/src/comp/LeeCtrl \
+	Gnc/Ctrl/LeeCtrl \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl
@@ -102,37 +102,37 @@ REF_MODULES := \
 
 ROS_PORT_MODULES := \
 	ROS/Gen/std_msgs/Ports  \
-	ROS/Gen/actionlib_msgs/Ports     \
 	ROS/Gen/diagnostic_msgs/Ports    \
 	ROS/Gen/geometry_msgs/Ports      \
 	ROS/Gen/nav_msgs/Ports           \
-	ROS/Gen/sensor_msgs/Ports        \
-	ROS/Gen/shape_msgs/Ports         \
 	ROS/Gen/std_srvs/Ports           \
-	ROS/Gen/stereo_msgs/Ports        \
-	ROS/Gen/trajectory_msgs/Ports    \
-	ROS/Gen/planning_msgs/Ports	 \
 	ROS/Gen/rosgraph_msgs/Ports	 \
 	ROS/Gen/mav_msgs/Ports
 
 #	ROS/Gen/visualization_msgs/Ports \
+#	ROS/Gen/stereo_msgs/Ports        \
+#	ROS/Gen/trajectory_msgs/Ports    \
+#	ROS/Gen/planning_msgs/Ports	 \
+#	ROS/Gen/actionlib_msgs/Ports     \
+#	ROS/Gen/shape_msgs/Ports         \
+#	ROS/Gen/sensor_msgs/Ports        \
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
-	ROS/Gen/actionlib_msgs/Types     \
 	ROS/Gen/diagnostic_msgs/Types    \
 	ROS/Gen/geometry_msgs/Types      \
 	ROS/Gen/nav_msgs/Types           \
-	ROS/Gen/sensor_msgs/Types        \
-	ROS/Gen/shape_msgs/Types         \
 	ROS/Gen/std_srvs/Types           \
-	ROS/Gen/stereo_msgs/Types        \
-	ROS/Gen/trajectory_msgs/Types    \
-	ROS/Gen/planning_msgs/Types	 \
 	ROS/Gen/rosgraph_msgs/Types	 \
 	ROS/Gen/mav_msgs/Types
 
 #	ROS/Gen/visualization_msgs/Types \
+#	ROS/Gen/stereo_msgs/Types        \
+#	ROS/Gen/trajectory_msgs/Types    \
+#	ROS/Gen/planning_msgs/Types	 \
+#	ROS/Gen/actionlib_msgs/Types     \
+#	ROS/Gen/shape_msgs/Types         \
+#	ROS/Gen/sensor_msgs/Types        \
 
 ROS_MODULES := \
 	ROS/RosCycle \

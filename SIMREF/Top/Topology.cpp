@@ -49,7 +49,9 @@ static Fw::SimpleObjRegistry simpleReg;
 
 // Component instance pointers
 
-static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {0};
+static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
+    0 // TODO(mereweth) - add sched contexts here - keep in sync with MD model
+};
 Svc::ActiveRateGroupImpl rg(
 #if FW_OBJECT_NAMES == 1
                     "RG",
@@ -60,7 +62,7 @@ Svc::ActiveRateGroupImpl rg(
 /* TODO(mereweth) - we run the GNC rgAtt and rgPos in the rosCycle callback
  * thread. If this needs to change -> create a new component ActiveRateGroupDriver
  */
-static NATIVE_INT_TYPE rgGncDivs[] = {1, 10, 1000};
+static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGGNCDRV",

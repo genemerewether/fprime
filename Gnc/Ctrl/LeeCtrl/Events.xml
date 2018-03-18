@@ -1,0 +1,7 @@
+<events>
+    <event id="0" name="LCTRL_Dummy" severity="ACTIVITY_LO" format_string = "Lee Control dummy event" >
+        <comment>
+            Lee Control dummy event
+        </comment>
+    </event>
+</events>

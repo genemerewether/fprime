@@ -114,7 +114,9 @@ namespace SIMREF {
           NATIVE_UINT_TYPE context
       )
     {
-        if (portNum == 0) {
+        // TODO(mereweth) - use context instead? only if in same rategroup
+
+        if ((portNum == 0) || (portNum == 1)) {
             // TODO(mereweth) check context == odometry out context
             for (int i = 0; i < NUM_ODOMETRY_OUTPUT_PORTS; i++) {
                 m_odomSet[i].mutex.lock();
@@ -133,8 +135,9 @@ namespace SIMREF {
 
             // TODO(mereweth) check context == imu out context
         }
-        else if (portNum == 1) {
-            FW_ASSERT(NUM_ODOMETRY_OUTPUT_PORTS >= 2, NUM_ODOMETRY_OUTPUT_PORTS);
+        else if (portNum == 2) {
+            FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(m_odomSet) >= 2,
+                      FW_NUM_ARRAY_ELEMENTS(m_odomSet));
             this->tlmWrite_RSDRV_Odometry1Overflows(m_odomSet[0].overflows);
             this->tlmWrite_RSDRV_Odometry2Overflows(m_odomSet[1].overflows);
         }
@@ -229,9 +232,9 @@ namespace SIMREF {
               TwistWithCovariance(Twist(Vector3(msg->twist.twist.linear.x,
                                                 msg->twist.twist.linear.y,
                                                 msg->twist.twist.linear.z),
-                                        Vector3(msg->twist.twist.linear.x,
-                                                msg->twist.twist.linear.y,
-                                                msg->twist.twist.linear.z)),
+                                        Vector3(msg->twist.twist.angular.x,
+                                                msg->twist.twist.angular.y,
+                                                msg->twist.twist.angular.z)),
                                   msg->twist.covariance.data(), 36)
             ); // end Odometry constructor
 

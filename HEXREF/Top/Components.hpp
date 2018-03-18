@@ -18,7 +18,7 @@ void exitTasks(void);
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 
-#include <Gnc/quest_gnc/src/comp/LeeCtrl/LeeCtrlComponentImpl.hpp>
+#include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rg;

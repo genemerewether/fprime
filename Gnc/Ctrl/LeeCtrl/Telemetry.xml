@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="LCTRL_Dummy" data_type="U32" update="on_change">
+        <comment>
+            Lee Control dummy channel
+        </comment>
+    </channel>
+</telemetry>

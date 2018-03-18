@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<component name="RotorSDrv" kind="passive" namespace="SIMREF">
+<component name="LeeCtrl" kind="passive" namespace="Gnc">
 
 
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
@@ -11,19 +11,19 @@
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/std_msgs/Ports/Float32PortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
 
-    <import_dictionary>SIMREF/RotorSDrv/Telemetry.xml</import_dictionary>
-    <import_dictionary>SIMREF/RotorSDrv/Events.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/LeeCtrl/Telemetry.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/LeeCtrl/Events.xml</import_dictionary>
 
     <ports>
-        <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="output" max_number="2">
+        <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="sync_input" max_number="1">
         </port>
 
-        <port name="motor" data_type="ROS::std_msgs::Float32"  kind="sync_input" max_number="6">
+        <port name="controls" data_type="ROS::mav_msgs::TorqueThrust"  kind="output" max_number="1">
         </port>
 
-        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="2">
         </port>
 
         <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
