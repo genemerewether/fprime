@@ -161,6 +161,9 @@ void constructApp() {
     rgAtt.init(10,0);
     rgPos.init(10,0);
 
+    // Initialize the GNC components
+    leeCtrl.init(0);
+
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
 #endif

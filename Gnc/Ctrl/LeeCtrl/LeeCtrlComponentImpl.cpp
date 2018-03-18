@@ -38,10 +38,34 @@ namespace Gnc {
       LeeCtrlComponentImpl(void),
 #endif
       seq(0u),
+      u_tlm(),
+      x_w(0.0f, 0.0f, 0.0f),
       w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
+      v_b(0.0f, 0.0f, 0.0f),
+      omega_b(0.0f, 0.0f, 0.0f),
+      a_w__comm(0.0f, 0.0f, 0.0f),
       leeControl()
   {
+      for (NATIVE_UINT_TYPE i = 0; i < FW_NUM_ARRAY_ELEMENTS(this->u_tlm); i++) {
+          this->u_tlm[i] = 0.0f;
+      }
 
+      (void) leeControl.SetGains(Eigen::Vector3d(1.0f, 1.0f, 1.0f),
+                                 Eigen::Vector3d(1.0f, 1.0f, 1.0f),
+                                 Eigen::Vector3d(1.0f, 1.0f, 1.0f),
+                                 Eigen::Vector3d(1.0f, 1.0f, 1.0f));
+
+      quest_gnc::multirotor::MultirotorModel mrModel = {1.0f,
+                                                        1.0f, 1.0f, 1.0f,
+                                                        0.0f, 0.0f, 0.0f};
+      quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
+      (void) leeControl.SetWorldParams(wParams);
+      (void) leeControl.SetModel(mrModel);
+
+      //TODO(mereweth) - remove this
+      (void) leeControl.SetPositionDes(Eigen::Vector3d(0.0f, 0.0f, 1.5f),
+                                       Eigen::Vector3d(0.0f, 0.0f, 0.0f),
+                                       Eigen::Vector3d(0.0f, 0.0f, 0.0f));
   }
 
   void LeeCtrlComponentImpl ::
@@ -120,19 +144,42 @@ namespace Gnc {
           Eigen::Vector3d a_w__comm(this->a_w__comm.getx(),
                                     this->a_w__comm.gety(),
                                     this->a_w__comm.getz());
-          Eigen::Vector3d a_b__comm = w_q_b.inverse() * a_w__comm;
+          double mass = 1.0f; // TODO(mereweth) - replace with parm
+          Eigen::Vector3d thrust_b__comm = mass * (w_q_b.inverse() * a_w__comm);
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
           this->leeControl.GetAngAccelCommand(&alpha_b__comm);
 
+          // TODO(mereweth) - replace with parm
+          Eigen::Matrix3d J_b;
+          J_b << 1.0f, 0.0f, 0.0f,
+                 0.0f, 1.0f, 0.0f,
+                 0.0f, 0.0f, 1.0f;
+          Eigen::Vector3d moment_b__comm = J_b * alpha_b__comm;
+
           ROS::std_msgs::Header h(this->seq, this->getTime(), "body");
           ROS::mav_msgs::TorqueThrust u_b__comm(h,
-            Vector3(a_b__comm(0), a_b__comm(1), a_b__comm(2)),
-            Vector3(alpha_b__comm(0), alpha_b__comm(1), alpha_b__comm(2)));
-          this->controls_out(0, u_b__comm);
+            Vector3(thrust_b__comm(0), thrust_b__comm(1), thrust_b__comm(2)),
+            Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2)));
+          if (this->isConnected_controls_OutputPort(0)) {
+              this->controls_out(0, u_b__comm);
+          }
+
+          this->u_tlm[0] = thrust_b__comm(2); // z-axis only
+          this->u_tlm[1] = moment_b__comm(0);
+          this->u_tlm[2] = moment_b__comm(1);
+          this->u_tlm[3] = moment_b__comm(2);
       }
       else if (portNum == 2) {
-          //this->tlmWrite_
+          #pragma GCC diagnostic push
+          #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+          COMPILE_TIME_ASSERT(FW_NUM_ARRAY_ELEMENTS(this->u_tlm) == 4,
+                              LCTRL_THRUST_MOMENT_TLM_SIZE);
+          #pragma GCC diagnostic pop
+          this->tlmWrite_LCTRL_ThrustComm(this->u_tlm[0]);
+          this->tlmWrite_LCTRL_MomentCommX(this->u_tlm[1]);
+          this->tlmWrite_LCTRL_MomentCommY(this->u_tlm[2]);
+          this->tlmWrite_LCTRL_MomentCommZ(this->u_tlm[3]);
       }
       else {
           // TODO(mereweth) - assert invalid port
@@ -145,7 +192,7 @@ namespace Gnc {
         U32 key
     )
   {
-    // TODO
+      this->pingOut_out(portNum, key);
   }
 
 } // end namespace Gnc

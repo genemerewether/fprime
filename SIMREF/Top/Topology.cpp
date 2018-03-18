@@ -215,6 +215,9 @@ void constructApp(int port_number, char* hostname) {
     rgAtt.init(0);
     rgPos.init(0);
 
+    // Initialize the GNC components
+    leeCtrl.init(0);
+
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
 #endif
@@ -278,6 +281,7 @@ void constructApp(int port_number, char* hostname) {
         {5,10,rg.getObjName()}, // 8
         {5,10,rosCycle.getObjName()}, // 9
         {5,10,rotorSDrv.getObjName()}, // 10
+        {5,10,leeCtrl.getObjName()}, // 11
     };
 
     // Active component startup

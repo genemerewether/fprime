@@ -549,4 +549,8 @@
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "6"/>
  	 <target component = "eventLogger" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
+<connection name = "Connection121">
+    <source component="rotorSDrv" port="odometry" type="Odometry" num="0"></source>
+    <target component="leeCtrl" port="odometry" type="Odometry" num="0"></target>
+</connection>
 </assembly>

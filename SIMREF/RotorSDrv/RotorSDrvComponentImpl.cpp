@@ -130,6 +130,7 @@ namespace SIMREF {
                     }
                     m_odomSet[i].fresh = false;
                 }
+                // TODO(mereweth) - notify that no new odometry received?
                 m_odomSet[i].mutex.unLock();
             }
 

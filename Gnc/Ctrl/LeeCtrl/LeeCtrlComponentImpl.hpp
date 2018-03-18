@@ -91,6 +91,8 @@ namespace Gnc {
 
       U32 seq;
 
+      F32 u_tlm[4];
+
       ROS::geometry_msgs::Point x_w;
 
       ROS::geometry_msgs::Quaternion w_q_b;
