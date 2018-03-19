@@ -4,7 +4,7 @@ BUILD_ROOT ?= $(subst /$(DEPLOYMENT),,$(CURDIR))
 
 export BUILD_ROOT
 
-default_build: DSPAL #DSPAL_opt
+default_build: DSPAL_opt
 
 COV_BUILD: DSPAL_bin_clean DSPAL
 
@@ -14,4 +14,4 @@ load: default_build
 	adb push ./dspal-hex-clang-cross-debug-dspal-bin/HEXREF /usr/share/data/adsp/libhexref_skel.so
 
 rebuild_hex:
-	make gen_make DSPAL_clean DSPAL #DSPAL_opt_clean DSPAL_opt
+	make gen_make DSPAL_opt_clean DSPAL_opt

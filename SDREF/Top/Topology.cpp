@@ -182,7 +182,7 @@ void constructApp(int port_number, char* hostname) {
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
-#endif    
+#endif
 
     // Initialize rate group driver
     rgDrv.init();
@@ -226,7 +226,7 @@ void constructApp(int port_number, char* hostname) {
     // Manual connections
 
     //hexRouter.set_HexPortsOut_OutputPort(1, prmDb.get_
-    
+
     // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
     cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
     hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
@@ -337,7 +337,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-	(void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n");
 }
 
 
@@ -351,52 +351,73 @@ extern "C" {
 volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
-	terminate = 1;
+    terminate = 1;
+}
+
+void dummy() {
+  while(!terminate) {
+    Os::Task::delay(1000);
+  }
 }
 
 int main(int argc, char* argv[]) {
-	U32 port_number = 0;
-	I32 option = 0;
-	char *hostname = NULL;
-        bool local_cycle = false;
+    bool noInit = false;
+    bool noFini = false;
+    U32 port_number = 0;
+    I32 option = 0;
+    char *hostname = NULL;
+    bool local_cycle = false;
 
-        // Removes ROS cmdline args as a side-effect
-        ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
+    // Removes ROS cmdline args as a side-effect
+    ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-	while ((option = getopt(argc, argv, "hlp:a:")) != -1){
-		switch(option) {
-			case 'h':
-				print_usage();
-				return 0;
-				break;
+    while ((option = getopt(argc, argv, "ifhlp:a:")) != -1){
+        switch(option) {
+            case 'h':
+                print_usage();
+                return 0;
+                break;
                         case 'l':
                           local_cycle = true;
                           break;
-			case 'p':
-				port_number = atoi(optarg);
-				break;
-			case 'a':
-				hostname = optarg;
-				break;
-			case '?':
-				return 1;
-			default:
-				print_usage();
-				return 1;
-		}
-	}
+            case 'p':
+                port_number = atoi(optarg);
+                break;
+            case 'a':
+                hostname = optarg;
+                break;
+            case 'i':
+                noInit = true;
+                break;
+            case 'f':
+                noFini = true;
+                break;
+            case '?':
+                return 1;
+            default:
+                print_usage();
+                return 1;
+        }
+    }
 
-	(void) printf("Hit Ctrl-C to quit\n");
+    (void) printf("Hit Ctrl-C to quit\n");
 
-        ros::start();
+    ros::start();
 
-#ifdef BUILD_SDFLIGHT
-    hexref_init();
     Os::Task task;
-    Os::TaskString task_name("HEXRPC");
-    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+#ifdef BUILD_SDFLIGHT
+    if (!noInit) {
+        hexref_init();
+        Os::TaskString task_name("HEXRPC");
+        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+    }
+#else //BUILD_SDFLIGHT
+    if (!noInit) {
+        Os::TaskString task_name("DUMMY");
+        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+    }
 #endif //BUILD_SDFLIGHT
-    
+
     constructApp(port_number, hostname);
     //dumparch();
 
@@ -404,7 +425,7 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM,sighandler);
 
     int cycle = 0;
-  
+
     while (!terminate) {
       DEBUG_PRINT("Cycle %d\n",cycle);
       if (local_cycle) {
@@ -414,15 +435,22 @@ int main(int argc, char* argv[]) {
       }
       cycle++;
     }
-     
+
     // stop tasks
     exitTasks();
 
 #ifdef BUILD_SDFLIGHT
-    DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
-    hexref_fini();
+    if (!noFini) {
+        DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
+        hexref_fini();
+    }
 #endif //BUILD_SDFLIGHT
-    
+
+    if (!noInit) {
+        DEBUG_PRINT("Waiting for the runner to return\n");
+        FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+    }
+
     // Give time for threads to exit
     (void) printf("Waiting for threads...\n");
     Os::Task::delay(1000);

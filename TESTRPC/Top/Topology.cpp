@@ -13,7 +13,7 @@ int hexref_init() {
 int hexref_run() {
   FARF(ALWAYS, "hexref_run");
   while (!terminate) {
-    FARF(ALWAYS, "hexref_run loop %d", terminate);
+    FARF(ALWAYS, "hexref_run loop; terminate: %d", terminate);
     usleep(10000);
   }
   return 0;
