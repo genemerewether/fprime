@@ -15,10 +15,6 @@ void exitTasks(void);
 #include <Svc/TlmChan/TlmChanImpl.hpp>
 #include <Svc/PrmDb/PrmDbImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
-#include <Svc/FileUplink/FileUplink.hpp>
-#include <Svc/FileDownlink/FileDownlink.hpp>
-#include <Svc/BufferManager/BufferManager.hpp>
-#include <Svc/Health/HealthComponentImpl.hpp>
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 
@@ -42,13 +38,8 @@ extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::TlmChanImpl chanTlm;
 extern Svc::CommandDispatcherImpl cmdDisp;
 extern Svc::PrmDbImpl prmDb;
-extern Svc::FileUplink fileUp;
-extern Svc::FileDownlink fileDown;
-extern Svc::BufferManager fileDownBufMgr;
-extern Svc::BufferManager fileUpBufMgr;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
-extern Svc::HealthImpl health;
 extern ROS::RosCycleComponentImpl rosCycle;
 extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;

@@ -112,7 +112,7 @@ namespace Gnc {
   {
       // TODO(mereweth) - use context instead? only if in same rategroup
 
-      if (portNum == 0) {
+      if (context == LCTRL_SCHED_CONTEXT_POS) {
           using ROS::geometry_msgs::Vector3;
 
           // set position feedback
@@ -127,7 +127,7 @@ namespace Gnc {
           this->leeControl.GetAccelCommand(&a_w__comm);
           this->a_w__comm = Vector3(a_w__comm(0), a_w__comm(1), a_w__comm(2));
       }
-      else if (portNum == 1) {
+      else if (context == LCTRL_SCHED_CONTEXT_ATT) {
           using ROS::geometry_msgs::Vector3;
 
           // set angular feedback
@@ -170,7 +170,7 @@ namespace Gnc {
           this->u_tlm[2] = moment_b__comm(1);
           this->u_tlm[3] = moment_b__comm(2);
       }
-      else if (portNum == 2) {
+      else if (context == LCTRL_SCHED_CONTEXT_TLM) {
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
           COMPILE_TIME_ASSERT(FW_NUM_ARRAY_ELEMENTS(this->u_tlm) == 4,

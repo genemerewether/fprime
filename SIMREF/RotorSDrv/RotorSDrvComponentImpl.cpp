@@ -114,9 +114,8 @@ namespace SIMREF {
           NATIVE_UINT_TYPE context
       )
     {
-        // TODO(mereweth) - use context instead? only if in same rategroup
-
-        if ((portNum == 0) || (portNum == 1)) {
+        if ((context == RSDRV_SCHED_CONTEXT_ATT) ||
+            (context == RSDRV_SCHED_CONTEXT_POS)) {
             // TODO(mereweth) check context == odometry out context
             for (int i = 0; i < NUM_ODOMETRY_OUTPUT_PORTS; i++) {
                 m_odomSet[i].mutex.lock();
@@ -136,7 +135,7 @@ namespace SIMREF {
 
             // TODO(mereweth) check context == imu out context
         }
-        else if (portNum == 2) {
+        else if (context == RSDRV_SCHED_CONTEXT_TLM) {
             FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(m_odomSet) >= 2,
                       FW_NUM_ARRAY_ELEMENTS(m_odomSet));
             this->tlmWrite_RSDRV_Odometry1Overflows(m_odomSet[0].overflows);

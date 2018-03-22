@@ -19,14 +19,6 @@
 
 #define PRM_PATH "PrmDb.dat"
 
-enum {
-    DOWNLINK_PACKET_SIZE = 500,
-    DOWNLINK_BUFFER_STORE_SIZE = 2500,
-    DOWNLINK_BUFFER_QUEUE_SIZE = 5,
-    UPLINK_BUFFER_STORE_SIZE = 3000,
-    UPLINK_BUFFER_QUEUE_SIZE = 30
-};
-
 // List of context IDs
 enum {
     ACTIVE_COMP_1HZ_RG,
@@ -35,8 +27,6 @@ enum {
     ACTIVE_COMP_LOGGER,
     ACTIVE_COMP_TLM,
     ACTIVE_COMP_PRMDB,
-    ACTIVE_COMP_FILE_DOWNLINK,
-    ACTIVE_COMP_FILE_UPLINK,
 
     CYCLER_TASK,
     NUM_ACTIVE_COMPS
@@ -50,7 +40,12 @@ static Fw::SimpleObjRegistry simpleReg;
 // Component instance pointers
 
 static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
-    0 // TODO(mereweth) - add sched contexts here - keep in sync with MD model
+    // TODO(mereweth) - add sched contexts here - keep in sync with MD model
+    0, // cmdSeq
+    0, // chanTlm
+    0, // rosCycle
+    SIMREF::RSDRV_SCHED_CONTEXT_TLM, // rotorSDrv
+    Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
 };
 Svc::ActiveRateGroupImpl rg(
 #if FW_OBJECT_NAMES == 1
@@ -71,11 +66,11 @@ Svc::RateGroupDriverImpl rgGncDrv(
 
 //NOTE(mereweth) - change this in sync with RosCycle timeDivMS
 
-// This table needs to be updated whenever
-// the connections in the topology are
-// updated.
-
-static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {0};
+static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    // TODO(mereweth) - add sched contexts here - keep in sync with MD model
+    SIMREF::RSDRV_SCHED_CONTEXT_ATT,
+    Gnc::LCTRL_SCHED_CONTEXT_ATT,
+};
 Svc::PassiveRateGroupImpl rgAtt(
 #if FW_OBJECT_NAMES == 1
                     "RGATT",
@@ -83,7 +78,11 @@ Svc::PassiveRateGroupImpl rgAtt(
                     rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
 ;
 
-static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {0};
+static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    // TODO(mereweth) - add sched contexts here - keep in sync with MD model
+    SIMREF::RSDRV_SCHED_CONTEXT_POS,
+    Gnc::LCTRL_SCHED_CONTEXT_POS,
+};
 Svc::PassiveRateGroupImpl rgPos(
 #if FW_OBJECT_NAMES == 1
                     "RGPOS",
@@ -166,12 +165,6 @@ Svc::PrmDbImpl prmDb
 #endif
 ;
 
-Svc::FileUplink fileUp ("fileUp");
-Svc::FileDownlink fileDown ("fileDown", DOWNLINK_PACKET_SIZE);
-Svc::BufferManager fileDownBufMgr("fileDownBufMgr", DOWNLINK_BUFFER_STORE_SIZE, DOWNLINK_BUFFER_QUEUE_SIZE);
-Svc::BufferManager fileUpBufMgr("fileUpBufMgr", UPLINK_BUFFER_STORE_SIZE, UPLINK_BUFFER_QUEUE_SIZE);
-Svc::HealthImpl health("health");
-
 Svc::AssertFatalAdapterComponentImpl fatalAdapter
 #if FW_OBJECT_NAMES == 1
 ("fatalAdapter")
@@ -241,14 +234,8 @@ void constructApp(int port_number, char* hostname) {
 
     sockGndIf.init(0);
 
-    fileUp.init(30, 0);
-    fileDown.init(30, 0);
-    fileUpBufMgr.init(0);
-    fileDownBufMgr.init(1);
-
     fatalAdapter.init(0);
     fatalHandler.init(0);
-    health.init(25,0);
 
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
@@ -260,29 +247,10 @@ void constructApp(int port_number, char* hostname) {
     cmdDisp.regCommands();
     eventLogger.regCommands();
     prmDb.regCommands();
-    fileDown.regCommands();
-    health.regCommands();
     fatalHandler.regCommands();
 
     // read parameters
     prmDb.readParamFile();
-
-    // set health ping entries
-
-    Svc::HealthImpl::PingEntry pingEntries[] = {
-        {5,10,chanTlm.getObjName()}, // 0
-        {5,10,cmdDisp.getObjName()}, // 1
-        {5,10,cmdSeq.getObjName()}, // 2
-        {5,10,eventLogger.getObjName()}, // 3
-        {5,10,fileDown.getObjName()}, // 4
-        {5,10,fileUp.getObjName()}, // 5
-        {5,10,prmDb.getObjName()}, // 6
-
-        {5,10,rg.getObjName()}, // 8
-        {5,10,rosCycle.getObjName()}, // 9
-        {5,10,rotorSDrv.getObjName()}, // 10
-        {5,10,leeCtrl.getObjName()}, // 11
-    };
 
     // Active component startup
     // start rate groups
@@ -296,9 +264,6 @@ void constructApp(int port_number, char* hostname) {
     chanTlm.start(ACTIVE_COMP_TLM,60,20*1024);
     prmDb.start(ACTIVE_COMP_PRMDB,50,20*1024);
 
-    fileDown.start(ACTIVE_COMP_FILE_DOWNLINK, 40, 20*1024);
-    fileUp.start(ACTIVE_COMP_FILE_UPLINK, 40, 20*1024);
-
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
 
@@ -308,9 +273,6 @@ void constructApp(int port_number, char* hostname) {
     rotorSDrv.startPub();
     stat = rotorSDrv.startIntTask(70, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
-
-    // register ping table
-    //health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -346,8 +308,6 @@ void exitTasks(void) {
     eventLogger.exit();
     chanTlm.exit();
     prmDb.exit();
-    fileUp.exit();
-    fileDown.exit();
     cmdSeq.exit();
 }
 

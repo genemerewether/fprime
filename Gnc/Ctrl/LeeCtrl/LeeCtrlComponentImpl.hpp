@@ -21,6 +21,7 @@
 #define LeeCtrl_HPP
 
 #include "Gnc/Ctrl/LeeCtrl/LeeCtrlComponentAc.hpp"
+#include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImplCfg.hpp>
 
 #include "quest_gnc/ctrl/lee_control.h"
 #include "quest_gnc/utils/multirotor_model.h"

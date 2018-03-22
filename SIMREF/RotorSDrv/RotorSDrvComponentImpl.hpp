@@ -27,6 +27,7 @@
 #include "Os/Mutex.hpp"
 
 #include "SIMREF/RotorSDrv/RotorSDrvComponentAc.hpp"
+#include "SIMREF/RotorSDrv/RotorSDrvComponentImplCfg.hpp"
 
 namespace SIMREF {
 

@@ -1,3 +1,3 @@
 SRC = RotorSDrvComponentAi.xml RotorSDrvComponentImpl.cpp
 
-HDR = RotorSDrvComponentImpl.hpp
+HDR = RotorSDrvComponentImpl.hpp RotorSDrvComponentImplCfg.hpp
