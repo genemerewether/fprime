@@ -145,6 +145,10 @@ void dumpobj(const char* objName) {
 
 #endif
 
+void manualConstruct(void) {
+
+}
+
 void constructApp() {
 
     localTargetInit();
@@ -304,22 +308,22 @@ int hexref_run(void) {
 }
 
 int hexref_fini(void) {
-  DEBUG_PRINT("hexref_fini called...\n");
-  terminate = true;
-  kraitRouter.m_quit = true;
-  return 0;
+    DEBUG_PRINT("hexref_fini called...\n");
+    terminate = true;
+    kraitRouter.m_quit = true;
+    return 0;
 }
 
 int hexref_rpc_relay_buff_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-  return kraitRouter.buffRead(port, buff, buffLen, bytes);
+    return kraitRouter.buffRead(port, buff, buffLen, bytes);
 }
 
 int hexref_rpc_relay_port_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-  return kraitRouter.portRead(port, buff, buffLen, bytes);
+    return kraitRouter.portRead(port, buff, buffLen, bytes);
 }
 
 int hexref_rpc_relay_write(unsigned int port, const unsigned char* buff, int buffLen) {
-  return kraitRouter.write(port, buff, buffLen);
+    return kraitRouter.write(port, buff, buffLen);
 }
 
 #ifndef BUILD_DSPAL
@@ -328,20 +332,20 @@ int hexref_rpc_relay_write(unsigned int port, const unsigned char* buff, int buf
 #include <stdio.h>
 
 extern "C" {
-  int main(int argc, char* argv[]);
+    int main(int argc, char* argv[]);
 };
 
 static void sighandler(int signum) {
-  terminate = 1;
+    terminate = 1;
 }
 
 int main(int argc, char* argv[]) {
-  hexref_init();
+    hexref_init();
 
-  signal(SIGINT,sighandler);
-  signal(SIGTERM,sighandler);
+    signal(SIGINT,sighandler);
+    signal(SIGTERM,sighandler);
 
-  hexref_run();
+    hexref_run();
 }
 
 #endif //ifndef BUILD_DSPAL

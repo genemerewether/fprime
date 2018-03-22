@@ -4,7 +4,7 @@
 <component name="KraitRouter" kind="passive" namespace="SnapdragonFlight">
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
-    
+
     <comment>Forwards port calls over FastRPC to the Krait</comment>
     <ports>
         <port name="HexPortsIn" data_type="Serial" kind="sync_input" max_number="25">
@@ -66,7 +66,7 @@
                 <arg name="portNum" type="U8"/>
             </args>
         </event>
-	<event id="3" name="KR_MemoryError" severity="WARNING_HI" format_string = "Krait Router memory error %d" throttle = "5">
+    <event id="3" name="KR_MemoryError" severity="WARNING_HI" format_string = "Krait Router memory error %d" throttle = "5">
             <comment>
             Allocate or deallocate error
             </comment>
@@ -76,19 +76,19 @@
                         <item name="KR_HEX_ALLOC" comment="Krait buffer allocate failed"/>
                     </enum>
                     <comment>Type of memory operation that failed</comment>
-                </arg>          
+                </arg>
             </args>
         </event>
-	<event id="4" name="KR_WriteError" severity="WARNING_HI" format_string = "Error sending to Krait %d"  throttle = "5">
+    <event id="4" name="KR_WriteError" severity="WARNING_HI" format_string = "Error sending to Krait %d"  throttle = "5">
           <comment>
-	    Send error in calling FastRPC write function
+        Send error in calling FastRPC write function
           </comment>
           <args>
             <arg name="error" type="I32">
               <comment>The error code</comment>
-            </arg>          
+            </arg>
           </args>
-	</event>
+    </event>
     </events>
     <telemetry>
         <channel id="0" name="KR_ResyncErrors" data_type="U32">
@@ -120,7 +120,6 @@
             <comment>
             Number of output buffer overflows
             </comment>
-	    
         </channel>
         <channel id="6" name="KR_NumZeroPktSize" data_type="U32">
             <comment>
@@ -129,4 +128,3 @@
         </channel>
     </telemetry>
 </component>
-
