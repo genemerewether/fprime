@@ -107,7 +107,9 @@ namespace SnapdragonFlight {
             usleep(KR_PREINIT_SLEEP_US);
         }
 
-        // TODO(mereweth) - lock a class member variable mutex here
+        /* TODO(mereweth) - handle concurrency issue here if we ever invoke
+         * this from multiple contexts
+         */
 
         /* NOTE(mereweth) - if portBuffer entry is available, that means no data
          * is stored there. If m_recvPortBuffInsert and m_recvPortBuffRemove are
@@ -137,7 +139,9 @@ namespace SnapdragonFlight {
                m_recvPortBuffers[m_recvPortBuffRemove].buffLen);
         *bytes = m_recvPortBuffers[m_recvPortBuffRemove].buffLen;
 
-        // TODO(mereweth) - unlock class member variable mutex here
+        /* TODO(mereweth) - handle concurrency issue here if we ever invoke
+         * this from multiple contexts
+         */
 
         return 0;
     }
@@ -156,20 +160,37 @@ namespace SnapdragonFlight {
 
             usleep(KR_PREINIT_SLEEP_US);
         }
-        // if connected, call output port
-        if (this->isConnected_KraitPortsOut_OutputPort(port)) {
-            Fw::ExternalSerializeBuffer portBuff((unsigned char*) buff, buffLen);
 
-            DEBUG_PRINT("Calling port %d with %d bytes.\n", port, buffLen);
-            Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
-            if (stat != Fw::FW_SERIALIZE_OK) {
-                DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
-                //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
-                //this->tlmWrite_HR_NumBadSerialPortCalls(++this->m_numBadSerialPortCalls);
-                // TODO(mereweth) - status codes
-                return -1;
-            }
+        if (!this->m_sendPortBuffers[m_sendPortBuffInsert].available) {
+            DEBUG_PRINT("FastRPC write tried to overwrite a port buffer for port %d\n",
+                        port);
+            //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+            //this->tlmWrite_KR_NumBadSerialPortCalls();
+            return -5;
         }
+
+        m_sendPortBuffers[m_sendPortBuffInsert].available = false;
+        m_sendPortBuffers[m_sendPortBuffInsert].portNum = port;
+
+        /* NOTE(mereweth) - this memory will be copied again in the Sched call
+         * for the output port invocation. This should be sufficiently fast for
+         * these port calls.
+         */
+        unsigned int sendBuffSize =
+           FW_NUM_ARRAY_ELEMENTS(m_sendPortBuffers[m_sendPortBuffInsert].buff);
+        if (buffLen >= sendBuffSize) {
+            DEBUG_PRINT("FastRPC write data %d too big: actual %d, avail %d\n",
+                        port, buffLen, sendBuffSize);
+            //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+            //this->tlmWrite_KR_NumBadSerialPortCalls();
+            return -3;
+        }
+        memcpy(m_sendPortBuffers[m_sendPortBuffInsert].buff,
+               buff, buffLen);
+        m_sendPortBuffers[m_sendPortBuffInsert].buffLen = buffLen;
+
+        m_sendPortBuffInsert++;
+
         return 0;
     }
 
@@ -183,7 +204,27 @@ namespace SnapdragonFlight {
           NATIVE_UINT_TYPE context
       )
     {
-      // TODO
+        // until writeRemove catches up to writeInsert
+        while (!this->m_sendPortBuffers[m_sendPortBuffRemove].available) {
+            unsigned int port = m_sendPortBuffers[m_sendPortBuffRemove].portNum;
+            unsigned char* buff = m_sendPortBuffers[m_sendPortBuffRemove].buff;
+            unsigned int buffLen = m_sendPortBuffers[m_sendPortBuffRemove].buffLen;
+            // if connected, call output port
+            if (this->isConnected_KraitPortsOut_OutputPort(port)) {
+                Fw::ExternalSerializeBuffer portBuff(buff, buffLen);
+
+                DEBUG_PRINT("Calling port %d with %d bytes.\n", port, buffLen);
+                Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
+                if (stat != Fw::FW_SERIALIZE_OK) {
+                    DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
+                    //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+                    //this->tlmWrite_HR_NumBadSerialPortCalls(++this->m_numBadSerialPortCalls);
+                    // TODO(mereweth) - status codes
+                }
+            }
+
+            m_sendPortBuffRemove++;
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -196,6 +237,10 @@ namespace SnapdragonFlight {
           Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
       )
     {
+        /* NOTE(mereweth) - single (thread of) producer, so we don't lock here
+         * All the Hexagon QUEST code runs in a single QuRT thread, using PassiveRateGroup
+         */
+
         DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n",
                     portNum, Buffer.getBuffLength());
         if (!this->m_recvPortBuffers[m_recvPortBuffInsert].available) {
@@ -213,9 +258,11 @@ namespace SnapdragonFlight {
          * provided by FastRPC read call. This should be sufficiently fast for
          * these port calls
          */
-        if (Buffer.getBuffLength() >= KR_RECV_PORT_BUFF_SIZE) {
+        unsigned int recvBuffSize =
+            FW_NUM_ARRAY_ELEMENTS(m_recvPortBuffers[m_recvPortBuffInsert].buff);
+        if (Buffer.getBuffLength() >= recvBuffSize) {
             DEBUG_PRINT("HexPortsIn_handler serialized port %d too big: actual %d, avail %d\n",
-                        portNum, Buffer.getBuffLength(), KR_RECV_PORT_BUFF_SIZE);
+                        portNum, Buffer.getBuffLength(), recvBuffSize);
             //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
             //this->tlmWrite_KR_NumBadSerialPortCalls();
             return;
@@ -223,6 +270,8 @@ namespace SnapdragonFlight {
         memcpy(m_recvPortBuffers[m_recvPortBuffInsert].buff,
                Buffer.getBuffAddr(), Buffer.getBuffLength());
         m_recvPortBuffers[m_recvPortBuffInsert].buffLen = Buffer.getBuffLength();
+
+        m_recvPortBuffInsert++;
     }
 
 } // end namespace SnapdragonFlight

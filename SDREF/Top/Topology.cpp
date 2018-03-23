@@ -377,9 +377,9 @@ int main(int argc, char* argv[]) {
                 print_usage();
                 return 0;
                 break;
-                        case 'l':
-                          local_cycle = true;
-                          break;
+            case 'l':
+              local_cycle = true;
+              break;
             case 'p':
                 port_number = atoi(optarg);
                 break;

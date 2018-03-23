@@ -156,8 +156,10 @@ namespace SnapdragonFlight {
             NATIVE_INT_TYPE cpuAffinity) {
 
         Fw::EightyCharString task("HexPortReader");
-        // TODO(mereweth) - may want to start multiple read threads
-        // depending on FastRPC call latency
+        /* TODO(mereweth) - may want to start multiple read threads
+         * depending on FastRPC call latency - have to handle the concurrency
+         * issue in KraitRouter then
+         */
         Os::Task::TaskStatus stat =
                     this->m_portReadTask.start(task, 0,
                                                priority, stackSize,

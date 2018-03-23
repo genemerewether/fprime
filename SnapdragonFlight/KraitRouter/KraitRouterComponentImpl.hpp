@@ -60,6 +60,7 @@ namespace SnapdragonFlight {
 
         int portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
 
+        // TODO(mereweth) - split into portWrite and buffWrite (with return port)?
         int write(unsigned int port, const unsigned char* buff, int buffLen);
 
         bool m_quit;
@@ -91,8 +92,9 @@ namespace SnapdragonFlight {
         );
 
         // TODO(mereweth) - alloc on heap to allow setting size from Krait?
+        // and/or allow setting size in Topology based on serialized size of each port?
         struct PortBufferEntry {
-            unsigned char buff[KR_RECV_PORT_BUFF_SIZE];
+            unsigned char buff[KR_PORT_BUFF_SIZE];
             //Fw::ExternalSerializeBuffer portBuffObj;
             unsigned int portNum;
             unsigned int buffLen;
@@ -102,7 +104,7 @@ namespace SnapdragonFlight {
         unsigned int m_recvPortBuffInsert;
         unsigned int m_recvPortBuffRemove;
 
-        struct PortBufferEntry m_sendPortBuffers[KR_NUM_SEND_PORT_BUFFS];
+        PortBufferEntry m_sendPortBuffers[KR_NUM_SEND_PORT_BUFFS];
 
         unsigned int m_sendPortBuffInsert;
         unsigned int m_sendPortBuffRemove;

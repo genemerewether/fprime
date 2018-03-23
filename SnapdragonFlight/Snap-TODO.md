@@ -1,3 +1,8 @@
+## IPC communication (stuff with other build systems)
+- use 0MQ?
+- C structs for message defs? can just copy the header
+- checksum?
+
 ## MV lib wrappers
 
 ### VISLAM
@@ -16,7 +21,7 @@
 - separate time context for DSP side
 - can we convert on the DSP?
 - how to translate headers/stamps in structures?
-    - this may need to be hardcoded
+    - this may need to be hand-coded
 
 ###
 
