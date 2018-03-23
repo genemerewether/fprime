@@ -320,7 +320,6 @@ void runcycles(NATIVE_INT_TYPE cycles) {
     for (NATIVE_INT_TYPE cycle = 0; cycle < cycles; cycle++) {
         run1cycle();
     }
-
 }
 
 void exitTasks(void) {
@@ -355,9 +354,9 @@ static void sighandler(int signum) {
 }
 
 void dummy() {
-  while(!terminate) {
-    Os::Task::delay(1000);
-  }
+    while(!terminate) {
+        Os::Task::delay(1000);
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -405,17 +404,22 @@ int main(int argc, char* argv[]) {
     ros::start();
 
     Os::Task task;
+    Os::Task waiter;
+    Os::TaskString waiter_task_name("WAITER");
 #ifdef BUILD_SDFLIGHT
+    // TODO(mereweth) - test that calling other functions before init has no effect
+    //hexref_rpc_relay_buff_allocate(10);
     if (!noInit) {
         hexref_init();
-        Os::TaskString task_name("HEXRPC");
-        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
     }
-#else //BUILD_SDFLIGHT
-    if (!noInit) {
-        Os::TaskString task_name("DUMMY");
-        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
-    }
+    Os::TaskString task_name("HEXRPC");
+    DEBUG_PRINT("Starting cycler on hexagon\n");
+    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+    waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
+#else
+    Os::TaskString task_name("DUMMY");
+    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+    waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
 #endif //BUILD_SDFLIGHT
 
     constructApp(port_number, hostname);
@@ -446,10 +450,11 @@ int main(int argc, char* argv[]) {
     }
 #endif //BUILD_SDFLIGHT
 
-    if (!noInit) {
-        DEBUG_PRINT("Waiting for the runner to return\n");
-        FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
-    }
+    DEBUG_PRINT("Waiting for the runner to return\n");
+    FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+
+    DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
+    FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
 
     // Give time for threads to exit
     (void) printf("Waiting for threads...\n");

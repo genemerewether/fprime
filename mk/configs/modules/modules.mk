@@ -211,19 +211,19 @@ SIMREF_MODULES := \
 	$(UTILS_MODULES)
 
 TESTRPC_MODULES := \
-	Svc/Sched \
-	Svc/Time \
-	Svc/Ping \
-	$(QUEST_GNC_MODULES) \
-	$(HEXAGON_MODULES) \
-	$(FW_MODULES) \
-	$(UTILS_MODULES) \
-	$(OS_MODULES) \
-	$(CFDP_MODULES) \
-	$(ROS_MODULES_ALL) \
-	\
 	TESTRPC/Top \
 	HEXREF/Rpc
+
+# 	Svc/Sched \
+# 	Svc/Time \
+# 	Svc/Ping \
+# 	$(QUEST_GNC_MODULES) \
+# 	$(HEXAGON_MODULES) \
+# 	$(FW_MODULES) \
+# 	$(UTILS_MODULES) \
+# 	$(OS_MODULES) \
+# 	$(CFDP_MODULES) \
+# 	$(ROS_MODULES_ALL) \
 	#SnapdragonFlight/RpcCommon \
 
 HEXREF_DEPLOYMENT_MODULES := \

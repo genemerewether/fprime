@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_init)(void) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_cycle)(unsigned int cycles) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_wait)(void) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_run)(void) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_fini)(void) __QAIC_HEADER_ATTRIBUTE;
 typedef struct _hexref_dataBuffer__seq_octet _hexref_dataBuffer__seq_octet;

@@ -238,20 +238,6 @@ void run1cycle(void) {
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(1);
-}
-
-void runcycles(NATIVE_INT_TYPE cycles) {
-    if (cycles == -1) {
-        while (true) {
-            run1cycle();
-        }
-    }
-
-    for (NATIVE_INT_TYPE cycle = 0; cycle < cycles; cycle++) {
-        run1cycle();
-    }
-
 }
 
 void exitTasks(void) {
@@ -262,6 +248,7 @@ void exitTasks(void) {
 }
 
 volatile bool terminate = false;
+volatile bool preinit = true;
 
 /* TODO(mereweth)
  * use singleton pattern to only allow one instance of the topology?
@@ -271,40 +258,71 @@ volatile bool terminate = false;
  * Topology (first thread) and would block. Then, hexref_run would be called in thread
  */
 int hexref_init(void) {
-  DEBUG_PRINT("Before constructing app\n");
-  constructApp();
-  DEBUG_PRINT("After constructing app\n");
+    DEBUG_PRINT("Before constructing app\n");
+    constructApp();
+    DEBUG_PRINT("After constructing app\n");
 
-  //dumparch();
+    //dumparch();
 
-  Os::Task::delay(1000);
+    Os::Task::delay(1000);
+    preinit = false;
 
-  return 0;
+    return 0;
 }
 
 int hexref_run(void) {
-  bool local_cycle = true;
-  int cycle = 0;
-
-  while (!terminate) {
-    //DEBUG_PRINT("Cycle %d\n",cycle);
-    if (local_cycle) {
-      runcycles(1);
-    } else {
-      Os::Task::delay(1000);
+    DEBUG_PRINT("hexref_run");
+    if (preinit) {
+        DEBUG_PRINT("hexref_run preinit - returning");
+        return -1;
     }
-    cycle++;
-  }
 
-  // stop tasks
-  exitTasks();
-  // Give time for threads to exit
-  DEBUG_PRINT("Waiting for threads...\n");
-  Os::Task::delay(1000);
+    bool local_cycle = true;
+    int cycle = 0;
 
-  DEBUG_PRINT("Exiting...\n");
+    while (!terminate) {
+        //DEBUG_PRINT("Cycle %d\n",cycle);
+        if (local_cycle) {
+            run1cycle();
+        }
+        Os::Task::delay(1);
+        cycle++;
+    }
 
-  return 0;
+    // stop tasks
+    exitTasks();
+    // Give time for threads to exit
+    DEBUG_PRINT("Waiting for threads...\n");
+    Os::Task::delay(1000);
+
+    DEBUG_PRINT("Exiting...\n");
+
+    return 0;
+}
+
+int hexref_cycle(unsigned int cycles) {
+    DEBUG_PRINT("hexref_cycle");
+    if (preinit) {
+        DEBUG_PRINT("hexref_cycle preinit - returning");
+        return -1;
+    }
+
+    for (unsigned int i = 0; i < cycles; i++) {
+        //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
+        if (terminate) return -1;
+        run1cycle();
+        Os::Task::delay(1);
+    }
+    return 0;
+}
+
+int hexref_wait() {
+    DEBUG_PRINT("hexref_wait\n");
+    while (!terminate) {
+        DEBUG_PRINT("hexref_wait loop; terminate: %d", terminate);
+        Os::Task::delay(1000);
+    }
+    return 0;
 }
 
 int hexref_fini(void) {
