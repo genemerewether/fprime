@@ -26,6 +26,7 @@ enum {
     // TODO(mereweth) - must be manually synced with max port size
     KR_RECV_PORT_BUFF_SIZE = 256,
     KR_NUM_RECV_PORT_BUFFS = 5,
+    KR_NUM_SEND_PORT_BUFFS = 5,
     KR_PREINIT_SLEEP_US = 1000,
     KR_NOPORT_SLEEP_US = 1000
 };

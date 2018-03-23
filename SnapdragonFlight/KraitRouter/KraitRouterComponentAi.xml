@@ -9,24 +9,24 @@
     <ports>
         <port name="HexPortsIn" data_type="Serial" kind="sync_input" max_number="25">
             <comment>
-            Input ports from other Hexagon components, destination is Krait
+                Input ports from other Hexagon components, destination is Krait
             </comment>
         </port>
         <port name="KraitPortsOut" data_type="Serial" kind="output" max_number="25">
             <comment>
-            Output ports from Krait components, destination is Hexagon
+                Output ports from Krait components, destination is Hexagon
             </comment>
         </port>
         <port name="Sched" data_type="Svc::Sched" kind="sync_input" >
             <comment>
-            Input port to get called each cycle by rate group
+                Input port to get called each cycle by rate group
             </comment>
         </port>
     </ports>
     <events>
         <event id="0" name="KR_DataReceiveError" severity="WARNING_HI" format_string = "Krait Router Receive data error %d, stat %d" throttle = "5">
             <comment>
-            FastRPC or memory error
+                FastRPC or memory error
             </comment>
             <args>
                 <arg name="error" type="ENUM">
@@ -44,31 +44,31 @@
         </event>
         <event id="1" name="KR_InvalidPortNum" severity="WARNING_HI" format_string = "Krait Router invalid port type: %d, number: %u." throttle = "5">
             <comment>
-            Input data packet had a invalid port number, ie port number is not connected.
+                Input data packet had a invalid port number, ie port number is not connected.
             </comment>
             <args>
-              <arg name="PortType" type="ENUM">
-                <enum name="KR_PortType">
-                  <item name="KR_PORT_CALL" comment="Low-latency serialized port"/>
-                  <item name="KR_BUFF_SEND" comment="Higher-latency buffer that will be sent to other component for processing"/>
-                </enum>
-                <comment>Type of port that was not connected</comment>
-              </arg>
-              <arg name="portNum" type="U8"/>
+                <arg name="PortType" type="ENUM">
+                    <enum name="KR_PortType">
+                        <item name="KR_PORT_CALL" comment="Low-latency serialized port"/>
+                        <item name="KR_BUFF_SEND" comment="Higher-latency buffer that will be sent to other component for processing"/>
+                    </enum>
+                    <comment>Type of port that was not connected</comment>
+                </arg>
+                <arg name="portNum" type="U8"/>
             </args>
         </event>
         <event id="2" name="KR_BadSerialPortCall" severity="WARNING_HI" format_string = "Krait Router bad Serial port call with status %d and port number %d." throttle = "5">
             <comment>
-            Bad status returned from output Serial port call, ie HexPortsOut() call had issues deserializing the buffer.
+                Bad status returned from output Serial port call, ie HexPortsOut() call had issues deserializing the buffer.
             </comment>
             <args>
                 <arg name="status" type="I32"/>
                 <arg name="portNum" type="U8"/>
             </args>
         </event>
-    <event id="3" name="KR_MemoryError" severity="WARNING_HI" format_string = "Krait Router memory error %d" throttle = "5">
+        <event id="3" name="KR_MemoryError" severity="WARNING_HI" format_string = "Krait Router memory error %d" throttle = "5">
             <comment>
-            Allocate or deallocate error
+                Allocate or deallocate error
             </comment>
             <args>
                 <arg name="error" type="ENUM">
@@ -79,51 +79,51 @@
                 </arg>
             </args>
         </event>
-    <event id="4" name="KR_WriteError" severity="WARNING_HI" format_string = "Error sending to Krait %d"  throttle = "5">
-          <comment>
-        Send error in calling FastRPC write function
-          </comment>
-          <args>
-            <arg name="error" type="I32">
-              <comment>The error code</comment>
-            </arg>
-          </args>
-    </event>
+        <event id="4" name="KR_WriteError" severity="WARNING_HI" format_string = "Error sending to Krait %d"  throttle = "5">
+            <comment>
+                Send error in calling FastRPC write function
+            </comment>
+            <args>
+                <arg name="error" type="I32">
+                    <comment>The error code</comment>
+                </arg>
+            </args>
+        </event>
     </events>
     <telemetry>
         <channel id="0" name="KR_ResyncErrors" data_type="U32">
             <comment>
-            Number of packet resync errors
+                Number of packet resync errors
             </comment>
         </channel>
         <channel id="1" name="KR_NumPackets" data_type="U32">
             <comment>
-            Number of packets from Krait
+                Number of packets from Krait
             </comment>
         </channel>
         <channel id="2" name="KR_NumDecodeErrors" data_type="U32">
             <comment>
-            Number of port decode errors
+                Number of port decode errors
             </comment>
         </channel>
         <channel id="3" name="KR_NumInvalidPorts" data_type="U32">
             <comment>
-            Number of packets with invalid ports
+                Number of packets with invalid ports
             </comment>
         </channel>
         <channel id="4" name="KR_NumBadSerialPortCalls" data_type="U32">
             <comment>
-            Number of bad Serial port calls, ie bad serialize status returned
+                Number of bad Serial port calls, ie bad serialize status returned
             </comment>
         </channel>
         <channel id="5" name="KR_NumOutputBufferOverflows" data_type="U32">
             <comment>
-            Number of output buffer overflows
+                Number of output buffer overflows
             </comment>
         </channel>
         <channel id="6" name="KR_NumZeroPktSize" data_type="U32">
             <comment>
-            Number of packets with zero size
+                Number of packets with zero size
             </comment>
         </channel>
     </telemetry>

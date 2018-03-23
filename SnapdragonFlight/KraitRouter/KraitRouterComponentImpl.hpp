@@ -26,82 +26,88 @@
 
 namespace SnapdragonFlight {
 
-  class KraitRouterComponentImpl :
-    public KraitRouterComponentBase
-  {
+    class KraitRouterComponentImpl :
+      public KraitRouterComponentBase
+    {
 
-    public:
+      public:
 
-      // ----------------------------------------------------------------------
-      // Construction, initialization, and destruction
-      // ----------------------------------------------------------------------
+        // ----------------------------------------------------------------------
+        // Construction, initialization, and destruction
+        // ----------------------------------------------------------------------
 
-      //! Construct object KraitRouter
-      //!
-      KraitRouterComponentImpl(
-#if FW_OBJECT_NAMES == 1
-          const char *const compName /*!< The component name*/
-#else
-          void
-#endif
-      );
+        //! Construct object KraitRouter
+        //!
+        KraitRouterComponentImpl(
+  #if FW_OBJECT_NAMES == 1
+            const char *const compName /*!< The component name*/
+  #else
+            void
+  #endif
+        );
 
-      //! Initialize object KraitRouter
-      //!
-      void init(
-          const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-      );
+        //! Initialize object KraitRouter
+        //!
+        void init(
+            const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
+        );
 
-      //! Destroy object KraitRouter
-      //!
-      ~KraitRouterComponentImpl(void);
+        //! Destroy object KraitRouter
+        //!
+        ~KraitRouterComponentImpl(void);
 
-      int buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
+        int buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
 
-      int portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
+        int portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
 
-      int write(unsigned int port, const unsigned char* buff, int buffLen);
+        int write(unsigned int port, const unsigned char* buff, int buffLen);
 
-      bool m_quit;
+        bool m_quit;
 
-    PRIVATE:
+      PRIVATE:
 
-      // ----------------------------------------------------------------------
-      // Handler implementations for user-defined typed input ports
-      // ----------------------------------------------------------------------
+        // ----------------------------------------------------------------------
+        // Handler implementations for user-defined typed input ports
+        // ----------------------------------------------------------------------
 
-      //! Handler implementation for Sched
-      //!
-      void Sched_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          NATIVE_UINT_TYPE context /*!< The call order*/
-      );
+        //! Handler implementation for Sched
+        //!
+        void Sched_handler(
+            const NATIVE_INT_TYPE portNum, /*!< The port number*/
+            NATIVE_UINT_TYPE context /*!< The call order*/
+        );
 
-    PRIVATE:
+      PRIVATE:
 
-      // ----------------------------------------------------------------------
-      // Handler implementations for user-defined serial input ports
-      // ----------------------------------------------------------------------
+        // ----------------------------------------------------------------------
+        // Handler implementations for user-defined serial input ports
+        // ----------------------------------------------------------------------
 
-      //! Handler implementation for HexPortsIn
-      //!
-      void HexPortsIn_handler(
-        NATIVE_INT_TYPE portNum, /*!< The port number*/
-        Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
-      );
+        //! Handler implementation for HexPortsIn
+        //!
+        void HexPortsIn_handler(
+          NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
+        );
 
-      struct RecvPortBufferEntry {
-          unsigned char buff[KR_RECV_PORT_BUFF_SIZE];
-          //Fw::ExternalSerializeBuffer portBuffObj;
-          unsigned int portNum;
-          unsigned int buffLen;
-          bool available;
-      } m_recvPortBuffers[KR_NUM_RECV_PORT_BUFFS];
+        // TODO(mereweth) - alloc on heap to allow setting size from Krait?
+        struct PortBufferEntry {
+            unsigned char buff[KR_RECV_PORT_BUFF_SIZE];
+            //Fw::ExternalSerializeBuffer portBuffObj;
+            unsigned int portNum;
+            unsigned int buffLen;
+            bool available;
+        } m_recvPortBuffers[KR_NUM_RECV_PORT_BUFFS];
 
-      unsigned int m_recvPortBuffInsert;
-      unsigned int m_recvPortBuffRemove;
+        unsigned int m_recvPortBuffInsert;
+        unsigned int m_recvPortBuffRemove;
 
-      bool m_initialized;
+        struct PortBufferEntry m_sendPortBuffers[KR_NUM_SEND_PORT_BUFFS];
+
+        unsigned int m_sendPortBuffInsert;
+        unsigned int m_sendPortBuffRemove;
+
+        bool m_initialized;
     };
 
 } // end namespace SnapdragonFlight
