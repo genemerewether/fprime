@@ -11,14 +11,19 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = KraitRouterComponentAi.xml KraitRouterComponentImpl.cpp
+TEST_SRC = main.cpp TesterBase.cpp GTestBase.cpp Tester.cpp
 
-SRC_SDFLIGHT =
-SRC_DSPAL =
-SRC_DARWIN =
-SRC_LINUX =
-SRC_CYGWIN =
-
-HDR = KraitRouterComponentImpl.hpp KraitRouterComponentImplCfg.hpp
-
-SUBDIRS = test
+TEST_MODS = SnapdragonFlight/KraitRouter \
+	Svc/Sched \
+	Fw/Cmd \
+	Fw/Tlm \
+	Fw/Comp \
+	Fw/Log \
+	Fw/Obj \
+	Fw/Port \
+	Fw/Time \
+	Fw/Buffer \
+	Fw/Types \
+	Utils/Hash \
+	Os \
+	gtest

@@ -2,6 +2,7 @@ include $(BUILD_ROOT)/mk/configs/compiler/include_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/defines_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/dspal_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_clang_common.mk
+include $(BUILD_ROOT)/mk/configs/compiler/dspal_ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_sdk_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_v55.mk

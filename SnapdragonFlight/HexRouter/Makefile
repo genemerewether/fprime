@@ -12,7 +12,8 @@ export BUILD_ROOT
 
 include $(BUILD_ROOT)/mk/makefiles/module_targets.mk
 
-load: ut_nocov_SDFLIGHT
+load: ut_nocov_SDFLIGHT ut_nocov_DSPAL
 	adb push ./test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut /home/linaro/hexrouter_test_ut
+	adb push ./test/ut/dspal-hex-clang-cross-ut-nocov-dspal-bin/test_ut /usr/share/data/adsp/libut_hexrtr_skel.so
 
 # Add module specific targets here

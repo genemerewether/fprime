@@ -1,7 +1,5 @@
 ## Unit tests
 
-### IDL function to run one cycle for testing
-
 ### KraitRouter
 - Make a fake Topology.cpp as the unit test
 - Manually loop back ports of different sizes

@@ -1,0 +1,14 @@
+#include "AEEStdDef.idl"
+
+interface ut_hexrtr
+{
+    long run();
+
+    typedef sequence<octet, 1024> dataBuffer;
+
+    long rpc_relay_port_read(rout unsigned long port, rout dataBuffer buff, rout long bytes);
+
+    long rpc_relay_buff_read(rout unsigned long port, rout dataBuffer buff, rout long bytes);
+
+    long rpc_relay_write(in unsigned long port, in dataBuffer buff);
+};
