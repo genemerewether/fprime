@@ -1,6 +1,7 @@
 ## Unit tests
 
 ### KraitRouter
+- Exit after some number of cycles in port/buffRead wait loop
 - Make a fake Topology.cpp as the unit test
 - Manually loop back ports of different sizes
     - Push data in

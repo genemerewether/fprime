@@ -5,6 +5,12 @@
 #include <Fw/Test/UnitTest.hpp>
 #include <SnapdragonFlight/RpcCommon/wrap_rpc.h>
 
+#if defined TGT_OS_TYPE_LINUX || TGT_OS_TYPE_DARWIN
+#include <getopt.h>
+#include <stdlib.h>
+#include <ctype.h>
+#endif
+
 #ifdef BUILD_SDFLIGHT
     #include <ut_hexrtr.h>
 #endif
@@ -66,11 +72,45 @@ extern "C" {
     int main(int argc, char* argv[]);
 };
 
-int main(int argc, char* argv[]) {
+void print_usage() {
+    (void) printf("Pass -k to kill hung unit test\n");
+}
 
 #ifdef BUILD_SDFLIGHT
-    ut_hexrtr_run();
-#endif // BUILD_SDFLIGHT
+static void sighandler(int signum) {
+    // TODO(mereweth) - is there something that can help with SIGKILL?
+    DEBUG_PRINT("Signal %d caught - exiting\n", signum);
+    ut_hexrtr_fini();
+}
+#endif //BUILD_SDFLIGHT
+
+int main(int argc, char* argv[]) {
+    I32 option = 0;
+    while ((option = getopt(argc, argv, "hk")) != -1){
+        switch(option) {
+            case 'h':
+                print_usage();
+                return 0;
+                break;
+            case 'k':
+#ifdef BUILD_SDFLIGHT
+                ut_hexrtr_fini();
+#endif //BUILD_SDFLIGHT
+                return 0;
+                break;
+            case '?':
+                return 1;
+            default:
+                print_usage();
+                return 1;
+        }
+    }
+
+#ifdef BUILD_SDFLIGHT
+    signal(SIGINT,sighandler);
+    signal(SIGTERM,sighandler);
+    signal(SIGABRT,sighandler);
+#endif //BUILD_SDFLIGHT
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

@@ -2,7 +2,11 @@
 
 interface ut_hexrtr
 {
-    long run();
+    long init();
+
+    long fini();
+
+    long sched();
 
     typedef sequence<octet, 1024> dataBuffer;
 

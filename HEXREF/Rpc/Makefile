@@ -15,7 +15,7 @@ include $(BUILD_ROOT)/mk/makefiles/module_targets.mk
 # TODO(mereweth) - replace this with cleaner dependencies
 idl: hexref_skel.c hexref_stub.c hexref.h
 
-hexref_skel.c hexref_stub.c hexref.h:
+hexref_skel.c hexref_stub.c hexref.h: hexref.idl
 	$(HEXAGON_SDK_ROOT)/tools/qaic/Ubuntu14/qaic -mdll -I $(HEXAGON_SDK_ROOT)/incs/stddef hexref.idl
 
 rebuild_nav: ut_nocov_clean_SDFLIGHT ut_nocov_SDFLIGHT

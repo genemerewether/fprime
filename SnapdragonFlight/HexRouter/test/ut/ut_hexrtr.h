@@ -27,7 +27,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-__QAIC_HEADER_EXPORT int __QAIC_HEADER(ut_hexrtr_run)(void) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(ut_hexrtr_init)(void) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(ut_hexrtr_fini)(void) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(ut_hexrtr_sched)(void) __QAIC_HEADER_ATTRIBUTE;
 typedef struct _ut_hexrtr_dataBuffer__seq_octet _ut_hexrtr_dataBuffer__seq_octet;
 typedef _ut_hexrtr_dataBuffer__seq_octet ut_hexrtr_dataBuffer;
 struct _ut_hexrtr_dataBuffer__seq_octet {

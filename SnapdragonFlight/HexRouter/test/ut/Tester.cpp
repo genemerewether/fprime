@@ -18,6 +18,11 @@
 // ======================================================================
 
 #include "Tester.hpp"
+#include "Fw/Types/SerialBuffer.hpp"
+
+#ifdef BUILD_SDFLIGHT
+    #include <ut_hexrtr.h>
+#endif
 
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 10
@@ -41,12 +46,15 @@ namespace SnapdragonFlight {
   {
     this->initComponents();
     this->connectPorts();
+
+    this->component.startBuffReadThread(90,20*1024,-1);
+    this->component.startPortReadThread(90,20*1024,-1);
   }
 
   Tester ::
     ~Tester(void)
   {
-
+    this->component.quitReadThreads();
   }
 
   // ----------------------------------------------------------------------
@@ -54,9 +62,29 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
 
   void Tester ::
-    run_port_read_write_test(void) 
+    run_port_read_write_test(void)
   {
-    // TODO
+#ifdef BUILD_SDFLIGHT
+    ut_hexrtr_init();
+#endif // BUILD_SDFLIGHT
+
+    Fw::ExternalSerializeBuffer bufObj;
+    char* buf[200] = {"hi"};
+    bufObj.setExtBuffer((U8*) buf, 200);
+
+    bufObj.setBuffLen(2);
+    this->invoke_to_KraitPortsIn(0, bufObj);
+    this->dispatchAll();
+
+#ifdef BUILD_SDFLIGHT
+    Os::Task::delay(1000);
+    ut_hexrtr_sched();
+#endif // BUILD_SDFLIGHT
+
+#ifdef BUILD_SDFLIGHT
+    Os::Task::delay(1000);
+    ut_hexrtr_fini();
+#endif // BUILD_SDFLIGHT
   }
 
   // ----------------------------------------------------------------------
@@ -163,6 +191,19 @@ namespace SnapdragonFlight {
     }
 
 
+  }
+
+  void Tester ::
+    dispatchOne(void)
+  {
+      this->component.doDispatch();
+  }
+
+  void Tester ::
+    dispatchAll(void)
+  {
+      while(this->component.m_queue.getNumMsgs() > 0)
+      this->dispatchOne();
   }
 
   void Tester ::

@@ -18,9 +18,6 @@
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
-volatile bool terminate = false;
-volatile bool preinit = true;
-
 TEST(PortReadWrite,Nominal) {
 
     TEST_CASE(1, "Read and write single port without sched");

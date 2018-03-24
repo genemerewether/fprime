@@ -23,7 +23,14 @@
 
 #include <unistd.h>
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+//#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
@@ -116,8 +123,8 @@ namespace SnapdragonFlight {
          * equal, we are all caught up and waiting for a new input port call.
          */
         while (this->m_recvPortBuffers[m_recvPortBuffRemove].available == true) {
-            DEBUG_PRINT("waiting for portBuff in object 0x%X\n",
-                        (unsigned long) this);
+            /*DEBUG_PRINT("waiting for portBuff in object 0x%X\n",
+                        (unsigned long) this);*/
             if (this->m_quit) {
                 DEBUG_PRINT("quitting portRead postinit in object 0x%X\n",
                             (unsigned long) this);

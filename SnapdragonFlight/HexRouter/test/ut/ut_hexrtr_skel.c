@@ -423,11 +423,11 @@ static const Type types[1] = {{0x1,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,
 static const Parameter parameters[5] = {{0x4,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x4,3,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),3,0},{0x4,{{(const uintptr_t)0,(const uintptr_t)1}}, 2,0x4,3,0},{0x4,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x4,0,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),0,0}};
 static const Parameter* const parameterArrays[5] = {(&(parameters[0])),(&(parameters[1])),(&(parameters[2])),(&(parameters[3])),(&(parameters[4]))};
 static const Method methods[3] = {{REMOTE_SCALARS_MAKEX(0,0,0x0,0x0,0x0,0x0),0x0,0x0,0,0,0,0x0,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x2,0x0,0x0),0x4,0x8,5,3,(&(parameterArrays[0])),0x4,0x4},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x0,0x0,0x0),0x8,0x0,3,2,(&(parameterArrays[3])),0x4,0x0}};
-static const Method* const methodArrays[4] = {&(methods[0]),&(methods[1]),&(methods[1]),&(methods[2])};
-static const char strings[76] = "rpc_relay_buff_read\0rpc_relay_port_read\0rpc_relay_write\0bytes\0buff\0port\0run\0";
-static const uint16_t methodStrings[12] = {0,67,62,56,20,67,62,56,40,67,62,72};
-static const uint16_t methodStringsArrays[4] = {11,4,0,8};
-__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(ut_hexrtr_slim) = {4,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
+static const Method* const methodArrays[6] = {&(methods[0]),&(methods[0]),&(methods[0]),&(methods[1]),&(methods[1]),&(methods[2])};
+static const char strings[88] = "rpc_relay_buff_read\0rpc_relay_port_read\0rpc_relay_write\0bytes\0sched\0buff\0port\0fini\0init\0";
+static const uint16_t methodStrings[14] = {0,73,68,56,20,73,68,56,40,73,68,62,78,83};
+static const uint16_t methodStringsArrays[6] = {13,12,11,4,0,8};
+__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(ut_hexrtr_slim) = {6,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
 #endif //_UT_HEXRTR_SLIM_H
 #ifdef __cplusplus
 extern "C" {
@@ -496,12 +496,16 @@ __QAIC_SKEL_EXPORT int __QAIC_SKEL(ut_hexrtr_skel_invoke)(uint32_t _sc, remote_a
    switch(REMOTE_SCALARS_METHOD(_sc))
    {
       case 0:
-      return _skel_method_2((void*)__QAIC_IMPL(ut_hexrtr_run), _sc, _pra);
+      return _skel_method_2((void*)__QAIC_IMPL(ut_hexrtr_init), _sc, _pra);
       case 1:
-      return _skel_method_1((void*)__QAIC_IMPL(ut_hexrtr_rpc_relay_port_read), _sc, _pra);
+      return _skel_method_2((void*)__QAIC_IMPL(ut_hexrtr_fini), _sc, _pra);
       case 2:
-      return _skel_method_1((void*)__QAIC_IMPL(ut_hexrtr_rpc_relay_buff_read), _sc, _pra);
+      return _skel_method_2((void*)__QAIC_IMPL(ut_hexrtr_sched), _sc, _pra);
       case 3:
+      return _skel_method_1((void*)__QAIC_IMPL(ut_hexrtr_rpc_relay_port_read), _sc, _pra);
+      case 4:
+      return _skel_method_1((void*)__QAIC_IMPL(ut_hexrtr_rpc_relay_buff_read), _sc, _pra);
+      case 5:
       return _skel_method((void*)__QAIC_IMPL(ut_hexrtr_rpc_relay_write), _sc, _pra);
    }
    return AEE_EUNSUPPORTED;

@@ -17,16 +17,22 @@ SnapdragonFlight::KraitRouterComponentImpl kraitRouter
 extern "C" {
 #endif
 
-int ut_hexrtr_run() {
-    DEBUG_PRINT("ut_hexrtr_run");
-    Os::Task::delay(1000);
+int ut_hexrtr_init() {
+    DEBUG_PRINT("ut_hexrtr_init");
     kraitRouter.init(0);
     kraitRouter.set_KraitPortsOut_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0));
+    return 0;
+}
 
-    // invoke Sched port
+int ut_hexrtr_sched() {
+    DEBUG_PRINT("ut_hexrtr_sched");
+    kraitRouter.get_Sched_InputPort(0)->invoke(0);
+    return 0;
+}
 
+int ut_hexrtr_fini() {
+    DEBUG_PRINT("ut_hexrtr_fini");
     kraitRouter.m_quit = true;
-    DEBUG_PRINT("ut_hexrtr_run done");
     return 0;
 }
 

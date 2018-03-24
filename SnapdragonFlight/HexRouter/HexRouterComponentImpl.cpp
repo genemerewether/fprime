@@ -123,6 +123,8 @@ namespace SnapdragonFlight {
                       reinterpret_cast<unsigned char*>(Buffer.getBuffAddr());
         NATIVE_INT_TYPE xferSize = Buffer.getBuffLength();
 
+        DEBUG_PRINT("KraitPortsIn_handler for port %d with %d bytes\n",
+                    portNum, Buffer.getBuffLength());
 
         NATIVE_INT_TYPE stat = rpc_relay_write(portNum, data, xferSize);
         // TODO(mereweth) - write error codes
@@ -361,6 +363,8 @@ namespace SnapdragonFlight {
 
     void HexRouterComponentImpl::quitReadThreads(void) {
         this->m_quitReadThreads = true;
+        this->m_portReadTask.join(NULL);
+        this->m_buffReadTask.join(NULL);
         //rpc_relay_quit();
     }
 } // end namespace SnapdragonFlight

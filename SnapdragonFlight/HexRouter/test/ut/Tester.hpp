@@ -53,6 +53,13 @@ namespace SnapdragonFlight {
       //!
       void run_port_read_write_test(void);
 
+    protected:
+      //! Dispatch one message on the queue
+      void dispatchOne(void);
+
+      //! Dispatch all messages on the queue
+      void dispatchAll(void);
+
     private:
 
       // ----------------------------------------------------------------------
