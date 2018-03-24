@@ -22,6 +22,16 @@
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 10
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+//#undef DEBUG_PRINT
+//#define DEBUG_PRINT(x,...)
+
 namespace SnapdragonFlight {
 
   // ----------------------------------------------------------------------
@@ -55,8 +65,17 @@ namespace SnapdragonFlight {
   void Tester ::
     run_port_read_write_test(void)
   {
-    // TODO
-    // this-portRead
+      this->component.write(0, (const unsigned char *)"hi", 3);
+      this->invoke_to_Sched(0, 0);
+      unsigned int port = 0;
+      unsigned char buff[512];
+      int bytes = -1;
+      this->component.portRead(&port,
+                               (unsigned char *)buff,
+                               FW_NUM_ARRAY_ELEMENTS(buff),
+                               &bytes);
+      DEBUG_PRINT("Round trip for port %d with %d bytes.\n",
+                  port, bytes);
   }
 
   // ----------------------------------------------------------------------
@@ -69,7 +88,9 @@ namespace SnapdragonFlight {
         Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
     )
   {
-    // TODO
+      DEBUG_PRINT("KRAITRTR called port %d with %d bytes.\n",
+                  portNum, Buffer.getBuffLength());
+      this->invoke_to_HexPortsIn(portNum, Buffer);
   }
 
   // ----------------------------------------------------------------------

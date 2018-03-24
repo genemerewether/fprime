@@ -20,7 +20,7 @@
 
 TEST(PortReadWrite,Nominal) {
 
-    TEST_CASE(1, "Read and write single port without sched");
+    TEST_CASE(1, "Read and write single port");
 
     SnapdragonFlight::Tester tester;
 

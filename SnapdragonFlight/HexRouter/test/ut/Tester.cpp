@@ -27,8 +27,16 @@
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 10
 #define QUEUE_DEPTH 10
+#define MSG_SIZE 2*READ_PORT_SIZE // TODO(mereweth) - increase this for off-nominal testing?
+
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
+
+char gBuff[KR_PORT_BUFF_SIZE];
+unsigned int gLen;
+unsigned int gPortNum;
 
   // ----------------------------------------------------------------------
   // Construction and destruction
@@ -69,10 +77,19 @@ namespace SnapdragonFlight {
 #endif // BUILD_SDFLIGHT
 
     Fw::ExternalSerializeBuffer bufObj;
-    char* buf[200] = {"hi"};
+    char buf[200] = {"hi"};
+    DEBUG_PRINT("Contents of buf: %s\n", buf);
     bufObj.setExtBuffer((U8*) buf, 200);
 
-    bufObj.setBuffLen(2);
+    bufObj.setBuffLen(3);
+    this->invoke_to_KraitPortsIn(0, bufObj);
+    this->dispatchAll();
+
+#ifndef BUILD_SDFLIGHT
+    DEBUG_PRINT("Port %d, Len %d, Contents of gBuff: %s\n",
+                gPortNum, gLen, gBuff);
+#endif
+
     this->invoke_to_KraitPortsIn(0, bufObj);
     this->dispatchAll();
 
@@ -211,7 +228,7 @@ namespace SnapdragonFlight {
   {
     this->init();
     this->component.init(
-        QUEUE_DEPTH, INSTANCE
+        QUEUE_DEPTH, MSG_SIZE, INSTANCE
     );
   }
 

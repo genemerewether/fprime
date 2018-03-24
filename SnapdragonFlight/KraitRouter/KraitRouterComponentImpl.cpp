@@ -219,6 +219,7 @@ namespace SnapdragonFlight {
             // if connected, call output port
             if (this->isConnected_KraitPortsOut_OutputPort(port)) {
                 Fw::ExternalSerializeBuffer portBuff(buff, buffLen);
+                portBuff.setBuffLen(buffLen);
 
                 DEBUG_PRINT("Calling port %d with %d bytes.\n", port, buffLen);
                 Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
@@ -250,6 +251,15 @@ namespace SnapdragonFlight {
 
         DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n",
                     portNum, Buffer.getBuffLength());
+
+        if (Buffer.getBuffLength() == 0) {
+            DEBUG_PRINT("HexPortsIn_handler serialized port %d empty\n",
+                        portNum);
+            //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+            //this->tlmWrite_KR_NumBadSerialPortCalls();
+            return;
+        }
+
         if (!this->m_recvPortBuffers[m_recvPortBuffInsert].available) {
             DEBUG_PRINT("HexPortsIn_handler tried to overwrite a port buffer for port %d\n",
                         portNum);
@@ -272,6 +282,7 @@ namespace SnapdragonFlight {
                         portNum, Buffer.getBuffLength(), recvBuffSize);
             //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
             //this->tlmWrite_KR_NumBadSerialPortCalls();
+            m_recvPortBuffers[m_recvPortBuffInsert].available = true;
             return;
         }
         memcpy(m_recvPortBuffers[m_recvPortBuffInsert].buff,

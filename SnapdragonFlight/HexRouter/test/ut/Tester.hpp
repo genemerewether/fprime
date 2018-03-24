@@ -22,8 +22,13 @@
 
 #include "GTestBase.hpp"
 #include "SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp"
+#include <SnapdragonFlight/KraitRouter/KraitRouterComponentImplCfg.hpp>
 
 namespace SnapdragonFlight {
+
+extern char gBuff[KR_PORT_BUFF_SIZE];
+extern unsigned int gLen;
+extern unsigned int gPortNum;
 
   class Tester :
     public HexRouterGTestBase

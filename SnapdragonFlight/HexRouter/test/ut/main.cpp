@@ -1,5 +1,6 @@
 #include <SnapdragonFlight/HexRouter/test/ut/Tester.hpp>
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
+#include <SnapdragonFlight/KraitRouter/KraitRouterComponentImplCfg.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 #include <gtest/gtest.h>
 #include <Fw/Test/UnitTest.hpp>
@@ -10,6 +11,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #endif
+
+#include <string.h>
 
 #ifdef BUILD_SDFLIGHT
     #include <ut_hexrtr.h>
@@ -42,14 +45,22 @@ int rpc_relay_port_read(unsigned int* port, unsigned char* buff, int buffLen, in
 }
 
 int rpc_relay_write(unsigned int port, const unsigned char* buff, int buffLen) {
-    // TODO(mereweth) - return something useful for testing
-    return 10;
+    DEBUG_PRINT("write called on port %d, size %d\n",
+                port, buffLen);
+    if (buffLen > FW_NUM_ARRAY_ELEMENTS(SnapdragonFlight::gBuff)) {
+        return -3; // TODO(mereweth) - error codes from KraitRouter
+    }
+    memcpy(SnapdragonFlight::gBuff, buff, buffLen);
+    SnapdragonFlight::gLen = buffLen;
+    SnapdragonFlight::gPortNum = port;
+
+    return 0;
 }
 #endif // BUILD_SDFLIGHT
 
 TEST(PortReadWrite,Nominal) {
 
-    TEST_CASE(1, "Read and write single port without sched");
+    TEST_CASE(1, "Read and write single port");
 
     SnapdragonFlight::Tester tester;
 
@@ -111,6 +122,10 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM,sighandler);
     signal(SIGABRT,sighandler);
 #endif //BUILD_SDFLIGHT
+
+    memset(SnapdragonFlight::gBuff, 0, FW_NUM_ARRAY_ELEMENTS(SnapdragonFlight::gBuff));
+    SnapdragonFlight::gLen = 0;
+    SnapdragonFlight::gPortNum = 0;
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
