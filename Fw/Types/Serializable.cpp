@@ -5,7 +5,9 @@
 #include <stdio.h>
 
 #ifdef BUILD_UT
+#ifndef BUILD_DSPAL
 #include <iomanip>
+#endif
 #endif
 
 // Some macros/functions to optimize for architectures
@@ -644,6 +646,7 @@ namespace Fw {
     }
 
 #ifdef BUILD_UT
+#ifndef BUILD_DSPAL
     bool SerializeBufferBase::operator==(const SerializeBufferBase& other) const {
         if (this->getBuffLength() != other.getBuffLength()) {
             return false;
@@ -676,6 +679,7 @@ namespace Fw {
 
         return os;
     }
+#endif
 #endif
 
     ExternalSerializeBuffer::ExternalSerializeBuffer(U8* buffPtr, NATIVE_UINT_TYPE size) {

@@ -5,7 +5,7 @@ include $(BUILD_ROOT)/mk/makefiles/vars.mk
 include $(BUILD_ROOT)/mk/makefiles/ac_targets.mk
 ifneq ("$(BUILD)","") # only include if building binary targets
    include $(BUILD_ROOT)/mk/makefiles/bin_targets.mk
-endif   
+endif
 
 
 # Global code generator targets
@@ -14,7 +14,7 @@ AC_LVL1  : $(foreach module,$($(DEPLOYMENT)_MODULES),$(SRC_AC_SERIALIZABLE_$(sub
 AC_LVL2  : $(foreach module,$($(DEPLOYMENT)_MODULES),$(SRC_AC_PORT_$(subst /,,$(module))))
 AC_LVL3  : $(foreach module,$($(DEPLOYMENT)_MODULES),$(SRC_AC_COMPONENT_$(subst /,,$(module))))
 AC_LVL4  : $(foreach module,$($(DEPLOYMENT)_MODULES),$(SRC_AC_APP_$(subst /,,$(module))))
-ALL_HDRS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(HDR_$(subst /,,$(module))) $(HDR_AC_$(subst /,,$(module))))   
+ALL_HDRS := $(foreach module,$($(DEPLOYMENT)_MODULES),$(HDR_$(subst /,,$(module))) $(HDR_AC_$(subst /,,$(module))))
 
 # Global binary targets
 
@@ -47,7 +47,7 @@ sloc_report:
 sloc_csv: sloc_build $(SLOC_TARGETS) sloc_csv_report
 
 sloc_csv_report:
-	@$(PYTHON_BIN) $(PROCESS_SLOC) -o csv_header 
+	@$(PYTHON_BIN) $(PROCESS_SLOC) -o csv_header
 	@$(foreach module,$($(DEPLOYMENT)_MODULES),$(PYTHON_BIN) $(PROCESS_SLOC) -o csv -d $(module) $(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/written_sloc.txt $(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/ac_sloc.txt $(BUILD_ROOT)/$(module)/$(OUTPUT_DIR)/xml_sloc.txt;)
 
 
@@ -70,7 +70,7 @@ $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(BIN_SUFFIX
 	$(CC) $(COMPILE_ONLY) $(COMPILE_TO) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.c
 ifdef CHECK_LINK_BIN
 	@echo Checking for missing symbols
-	$(CHECK_LINK_BIN) $(LINK_BIN_TO) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(CHECK_LINK_BIN_NAME)$(BIN_SUFFIX) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(CHECK_LINK_BIN_SRC)
+	$(CHECK_LINK_BIN) $(LINK_BIN_TO) $@$(CHECK_LINK_BIN_NAME) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(CHECK_LINK_BIN_SRC)
 endif
 	@echo Linking binary...
 	@echo $(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(EXTRA_LIBS) $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
@@ -94,7 +94,7 @@ gen_dox:
 clean_dox:
 	rm -rf $(BUILD_ROOT)/$(DEPLOYMENT)/doxygen
 
-run: 
+run:
 	@cd $(BUILD_ROOT)/$(DEPLOYMENT_DIR) && $(shell $(RUN_TERMINAL) $(BUILD_ROOT)/$(DEPLOYMENT_DIR)/$(DEPLOYMENT)/$(OUTPUT_DIR)/$(BIN_PREFIX)$(DEPLOYMENT)$(BIN_SUFFIX))
 
 run_ut:
@@ -117,7 +117,7 @@ else
 	@$(RM_DIR) $(BUILD_ROOT)/$(GDS_MODULE)/generated/$(DEPLOYMENT)
 endif
 
-dict_install: 
+dict_install:
 ifeq ($(DICT_GEN),"GLOBAL")
 	@echo "Installing instance dictionaries into $(BUILD_ROOT)/$(GDS_MODULE)/generated/$(DEPLOYMENT)"
 	@$(MKDIR) $(BUILD_ROOT)/$(GDS_MODULE)/generated/$(DEPLOYMENT)/serializable
@@ -197,4 +197,3 @@ ampcs_telemetry_merge:
 
 ampcs_telemetry_clean:
 	$(RM_DIR) $(BUILD_ROOT)/$(DEPLOYMENT)/$(AMPCS_DICT_DEPLOYMENT_SUBDIR)/channel.xml
-

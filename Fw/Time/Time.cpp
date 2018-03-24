@@ -254,11 +254,13 @@ namespace Fw {
     }
 
 #ifdef BUILD_UT
+#ifndef BUILD_DSPAL
     std::ostream& operator<<(std::ostream& os, const Time& val) {
 
         os << "(" << val.getTimeBase() << "," << val.getUSeconds() << "," << val.getSeconds() << ")";
         return os;
     }
+#endif
 #endif
 
 }
