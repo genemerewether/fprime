@@ -4,13 +4,13 @@ void constructHEXREFArchitecture(void);
 void exitTasks(void);
 
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
+#include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
-#include <Svc/Health/HealthComponentImpl.hpp>
 
 #include <HEXREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
@@ -20,16 +20,15 @@ void exitTasks(void);
 
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 
-extern Svc::RateGroupDriverImpl rgDrv;
+extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
-extern Svc::ActiveRateGroupImpl rgAtt;
-extern Svc::ActiveRateGroupImpl rgPos;
+extern Svc::PassiveRateGroupImpl rgAtt;
+extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::ConsoleTextLoggerImpl textLogger;
 extern Svc::ActiveLoggerImpl eventLogger;
 extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
-extern Svc::HealthImpl health;
 extern SnapdragonFlight::KraitRouterComponentImpl kraitRouter;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 

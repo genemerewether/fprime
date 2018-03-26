@@ -27,19 +27,9 @@
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
-enum {
-    DOWNLINK_PACKET_SIZE = 500,
-    DOWNLINK_BUFFER_STORE_SIZE = 2500,
-    DOWNLINK_BUFFER_QUEUE_SIZE = 5,
-    UPLINK_BUFFER_STORE_SIZE = 3000,
-    UPLINK_BUFFER_QUEUE_SIZE = 30
-};
-
 // List of context IDs
 enum {
         ACTIVE_COMP_1HZ_RG,
-        ACTIVE_COMP_ATT_RG,
-        ACTIVE_COMP_POS_RG,
         ACTIVE_COMP_LOGGER,
 
         CYCLER_TASK,
@@ -53,15 +43,12 @@ static Fw::SimpleObjRegistry simpleReg;
 
 // Component instance pointers
 
-// rg, rgAtt, rgPos
-static NATIVE_INT_TYPE rgDivs[] = {1000, 1, 5};
-Svc::RateGroupDriverImpl rgDrv(
-#if FW_OBJECT_NAMES == 1
-                    "RGDRV",
-#endif
-                    rgDivs,FW_NUM_ARRAY_ELEMENTS(rgDivs));
-
-static NATIVE_UINT_TYPE rgContext[] = {0,0,0,0,0,0,0,0,0,0};
+static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
+    0,
+    0,
+    0,
+    Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
+};
 Svc::ActiveRateGroupImpl rg(
 #if FW_OBJECT_NAMES == 1
                     "RG",
@@ -69,16 +56,30 @@ Svc::ActiveRateGroupImpl rg(
                     rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
 ;
 
-static NATIVE_UINT_TYPE rgAttContext[] = {0,0,0,0,0,0,0,0,0,0};
-Svc::ActiveRateGroupImpl rgAtt(
+/* TODO(mereweth) - we run the GNC rgAtt and rgPos in the main
+ * thread. If this needs to change -> create a new component ActiveRateGroupDriver
+ */
+static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+Svc::RateGroupDriverImpl rgGncDrv(
+#if FW_OBJECT_NAMES == 1
+                    "RGDRV",
+#endif
+                    rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
+
+static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    Gnc::LCTRL_SCHED_CONTEXT_ATT,
+};
+Svc::PassiveRateGroupImpl rgAtt(
 #if FW_OBJECT_NAMES == 1
                     "RGATT",
 #endif
                     rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
 ;
 
-static NATIVE_UINT_TYPE rgPosContext[] = {0,0,0,0,0,0,0,0,0,0};
-Svc::ActiveRateGroupImpl rgPos(
+static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    Gnc::LCTRL_SCHED_CONTEXT_POS,
+};
+Svc::PassiveRateGroupImpl rgPos(
 #if FW_OBJECT_NAMES == 1
                     "RGPOS",
 #endif
@@ -110,8 +111,6 @@ SnapdragonFlight::KraitRouterComponentImpl kraitRouter
                     ("KRAITRTR")
 #endif
 ;
-
-Svc::HealthImpl health("health");
 
 Svc::AssertFatalAdapterComponentImpl fatalAdapter
 #if FW_OBJECT_NAMES == 1
@@ -146,7 +145,13 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct(void) {
+    // Manual connections
+    // TODO(mereweth) - multiple DSPAL components with commands?
+    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
+    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
+    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
+    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 }
 
 void constructApp() {
@@ -158,12 +163,12 @@ void constructApp() {
 #endif
 
     // Initialize rate group driver
-    rgDrv.init();
+    rgGncDrv.init();
 
     // Initialize the rate groups
     rg.init(10,0);
-    rgAtt.init(10,0);
-    rgPos.init(10,0);
+    rgAtt.init(0);
+    rgPos.init(0);
 
     // Initialize the GNC components
     leeCtrl.init(0);
@@ -178,7 +183,6 @@ void constructApp() {
 
     fatalAdapter.init(0);
     fatalHandler.init(0);
-    health.init(25,0);
 
     // TODO(mereweth) - update if queued or active
     kraitRouter.init(0);
@@ -186,33 +190,14 @@ void constructApp() {
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
 
-    // Manual connections
-    // TODO(mereweth) - multiple DSPAL components with commands?
-    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
-    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
-
-    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
-    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
+    manualConstruct();
 
     /* Register commands */
-    /*eventLogger.regCommands();
-    health.regCommands();*/
-
-    // set health ping entries
-
-    Svc::HealthImpl::PingEntry pingEntries[] = {
-        {3,5,rg.getObjName()}, // 0
-        {3,5,eventLogger.getObjName()}, // 1
-    };
-
-    // register ping table
-    //health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
+    /*eventLogger.regCommands();*/
 
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 50,10 * 1024);
-    rgAtt.start(ACTIVE_COMP_ATT_RG, 90,10 * 1024);
-    rgPos.start(ACTIVE_COMP_POS_RG, 80,10 * 1024);
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,40,10*1024);
 
@@ -234,7 +219,7 @@ void constructApp() {
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    Svc::InputCyclePort* port = rgDrv.get_CycleIn_InputPort(0);
+    Svc::InputCyclePort* port = rgGncDrv.get_CycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
@@ -242,8 +227,6 @@ void run1cycle(void) {
 
 void exitTasks(void) {
     rg.exit();
-    rgAtt.exit();
-    rgPos.exit();
     eventLogger.exit();
 }
 

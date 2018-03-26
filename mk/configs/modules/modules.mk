@@ -245,6 +245,7 @@ HEXREF_MODULES := \
 	Svc/CmdSequencer \
 	Svc/Seq \
 	Svc/ActiveRateGroup \
+	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
 	Svc/Sched \
 	Svc/PassiveTextLogger \
