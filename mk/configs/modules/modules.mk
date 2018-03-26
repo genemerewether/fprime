@@ -71,7 +71,13 @@ SVC_MODULES := \
 
 DRV_MODULES := \
 	Drv/DataTypes \
-	Drv/BlockDriver
+	Drv/BlockDriver \
+	Drv/GpioDriverPorts \
+	Drv/LinuxGpioDriver \
+	Drv/LinuxSerialDriver \
+	Drv/LinuxSpiDriver \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts
 
 HEXAGON_MODULES := \
 	SnapdragonFlight/KraitRouter
