@@ -133,10 +133,11 @@ Gnc::LeeCtrlComponentImpl leeCtrl
 #endif
 ;
 
-Drv::MPU9250ComponentImpl mpu9250
+Drv::MPU9250ComponentImpl mpu9250(
 #if FW_OBJECT_NAMES == 1
-                    ("MPU9250")
+                    "MPU9250",
 #endif
+                     false) // don't use magnetometer for now
 ;
 
 Drv::LinuxSpiDriverComponentImpl spiDrv
@@ -188,6 +189,8 @@ void constructApp() {
     // Initialize the GNC components
     leeCtrl.init(0);
     mpu9250.init(0);
+
+    spiDrv.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();

@@ -1,3 +1,6 @@
+## SPI Driver
+- add port for setting SPI bus speed
+
 ## Unit tests
 
 ### KraitRouter

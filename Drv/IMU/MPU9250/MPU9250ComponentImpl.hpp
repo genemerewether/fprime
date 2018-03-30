@@ -39,10 +39,9 @@ namespace Drv {
       //!
       MPU9250ComponentImpl(
 #if FW_OBJECT_NAMES == 1
-          const char *const compName /*!< The component name*/
-#else
-          void
+          const char *const compName, /*!< The component name*/
 #endif
+          bool useMagnetometer
       );
 
       //! Initialize object MPU9250
@@ -65,9 +64,10 @@ namespace Drv {
      *
      */
     enum InitState {
-        INIT_WAITING,
+        INIT_RESET,
         INIT_COMPLETE,
-    } initState;
+        INIT_ERROR,
+    } m_initState;
 
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
@@ -87,6 +87,11 @@ namespace Drv {
         U32 key /*!< Value to return to pinger*/
     );
 
+    // ----------------------------------------------------------------------
+    // Member variables
+    // ----------------------------------------------------------------------
+
+    bool m_useMagnetometer;
 
   };
 

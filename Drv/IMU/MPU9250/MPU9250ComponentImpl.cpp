@@ -19,6 +19,7 @@
 
 
 #include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
+#include <Drv/IMU/MPU9250/MPU9250Reg.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
 #ifdef BUILD_DSPAL
@@ -40,12 +41,14 @@ namespace Drv {
     MPU9250ComponentImpl ::
   #if FW_OBJECT_NAMES == 1
       MPU9250ComponentImpl(
-          const char *const compName
+          const char *const compName,
+          bool useMagnetometer
       ) :
-        MPU9250ComponentBase(compName)
+        MPU9250ComponentBase(compName),
   #else
-      MPU9250Impl(void)
+        MPU9250ComponentBase(void),
   #endif
+        m_useMagnetometer(useMagnetometer)
     {
 
     }
@@ -74,7 +77,23 @@ namespace Drv {
           NATIVE_UINT_TYPE context
       )
     {
-        // TODO
+        if (context == MPU9250_SCHED_CONTEXT_OPERATE) {
+            switch(m_initState) {
+                case INIT_RESET:
+                    // this->set SPI clock to 1 MHZ
+                    //this->SpiReadWrite_out()
+                    break;
+                case INIT_COMPLETE:
+                    break;
+                case INIT_ERROR:
+                    break;
+                default:
+                    FW_ASSERT(0, m_initState);
+            }
+        }
+        else if (context == MPU9250_SCHED_CONTEXT_TLM) {
+
+        }
     }
 
     void MPU9250ComponentImpl ::
