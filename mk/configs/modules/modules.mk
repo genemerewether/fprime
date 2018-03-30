@@ -25,7 +25,7 @@ FW_GTEST_MODULES := \
 	Fw/Types/GTest
 
 OS_MODULES := \
-	Os 
+	Os
 
 CFDP_MODULES := \
 	CFDP/Checksum
@@ -245,6 +245,12 @@ HEXREF_MODULES := \
 	$(HEXAGON_MODULES) \
 	\
 	$(HEXREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	Drv/GpioDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/LinuxSpiDriver \
 	\
 	Svc/BufferManager \
 	Svc/CmdDispatcher \

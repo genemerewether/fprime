@@ -45,8 +45,7 @@ static Fw::SimpleObjRegistry simpleReg;
 
 static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     0,
-    0,
-    0,
+    0, // TODO(mereweth) - estimator
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
 };
 Svc::ActiveRateGroupImpl rg(
@@ -67,6 +66,8 @@ Svc::RateGroupDriverImpl rgGncDrv(
                     rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    Drv::MPU9250_SCHED_CONTEXT_OPERATE,
+    0, //TODO(mereweth) - estimator
     Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
 Svc::PassiveRateGroupImpl rgAtt(
@@ -77,6 +78,8 @@ Svc::PassiveRateGroupImpl rgAtt(
 ;
 
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    0, //TODO(mereweth) - IMU?
+    0, //TODO(mereweth) - estimator?
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
 Svc::PassiveRateGroupImpl rgPos(
@@ -130,6 +133,18 @@ Gnc::LeeCtrlComponentImpl leeCtrl
 #endif
 ;
 
+Drv::MPU9250ComponentImpl mpu9250
+#if FW_OBJECT_NAMES == 1
+                    ("MPU9250")
+#endif
+;
+
+Drv::LinuxSpiDriverComponentImpl spiDrv
+#if FW_OBJECT_NAMES == 1
+                    ("SPIDRV")
+#endif
+;
+
 #if FW_OBJECT_REGISTRATION == 1
 
 void dumparch(void) {
@@ -172,6 +187,7 @@ void constructApp() {
 
     // Initialize the GNC components
     leeCtrl.init(0);
+    mpu9250.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();

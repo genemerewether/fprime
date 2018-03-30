@@ -18,6 +18,8 @@ void exitTasks(void);
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 
+#include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
+#include <Drv/LinuxSpiDriver/LinuxSpiDriverComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 
 extern Svc::RateGroupDriverImpl rgGncDrv;
@@ -31,5 +33,7 @@ extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern SnapdragonFlight::KraitRouterComponentImpl kraitRouter;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
+extern Drv::MPU9250ComponentImpl mpu9250;
+extern Drv::LinuxSpiDriverComponentImpl spiDrv;
 
 #endif

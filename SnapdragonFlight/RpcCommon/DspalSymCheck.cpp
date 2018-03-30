@@ -14,6 +14,8 @@ extern "C" {
 extern "C" {
 #endif
 
+int ioctl(int fd, int request, void *argp) {  return 0;  }
+
 void HAP_debug(const char *msg, int level, const char *filename, int line) { }
 void HAP_power_request(int a, int b, int c) { }
 
