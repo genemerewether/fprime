@@ -87,6 +87,43 @@ namespace Drv {
             BYTE writeBuf[2] = {0};
             Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, 2);
             Fw::Buffer dummyReadBufObj(0, 0, 0, 0);
+            BYTE readBuf[MPU9250_FIFO_LEN + 1] = {0}; // biggest read
+            Fw::Buffer readBufObj(0, 0, (U64) readBuf, 2); // most reads are a single byte
+
+            // outside of switch statement for clarity
+            if (m_initState == INIT_COMPLETE) {
+                // TODO(mereweth) - check that value is read into 2nd byte
+                // this->set SPI clock to 1 MHZ
+                writeBuf[0] = MPU9250_REG_INT_STATUS | SPI_BITS_READ;
+                writeBuf[1] = 0; // TODO(mereweth) - needed?
+                this->SpiReadWrite_out(0, writeBufObj, readBufObj);
+                if (readBuf[1] & MPU9250_BITS_INT_STATUS_FIFO_OVERFLOW) {
+                    FARF(ALWAYS,/*DEBUG_PRINT(*/"FIFO overflow\n");
+                    m_initState = INIT_FIFO_RESET;
+                    return;
+                }
+                // TODO(mereweth) - check that value is read starting at 2nd byte
+                writeBuf[0] = MPU9250_REG_FIFO_COUNTH | SPI_BITS_READ;
+                writeBuf[1] = 0; // TODO(mereweth) - needed?
+                readBufObj.setsize(3);
+                this->SpiReadWrite_out(0, writeBufObj, readBufObj);
+                readBufObj.setsize(2); // reset for everyone else
+                // TODO(mereweth) - add endianness check to Fw
+                DEBUG_PRINT("FIFO count %u; low 0x%x, high 0x%x\n",
+                            (((uint16_t) readBuf[1]) << 8 | (uint16_t) readBuf[2]),
+                            readBuf[1], readBuf[2]);
+
+                writeBuf[0] = MPU9250_REG_FIFO_R_W | SPI_BITS_READ;
+                writeBuf[1] = 0; // TODO(mereweth) - needed?
+                readBufObj.setsize(500);
+                this->SpiReadWrite_out(0, writeBufObj, readBufObj);
+                // TODO(mereweth) - parse data
+
+                // this->set SPI clock to 20 MHZ
+                return;
+            }
+
+            // handle init/error
             switch(m_initState) {
                 case INIT_RESET:
                     if (!m_cycleCount) { // first time in state
@@ -111,7 +148,7 @@ namespace Drv {
                     writeBuf[0] = MPU9250_REG_PWR_MGMT_1 | SPI_BITS_WRITE;
                     writeBuf[1] = 0;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
-                    m_initState = INIT_POWER_ON_1;
+                    m_initState = INIT_POWER_ON_2;
                     break;
                 case INIT_POWER_ON_2:
                     DEBUG_PRINT("MPU9250 enter INIT_POWER_ON_2\n");
@@ -128,17 +165,17 @@ namespace Drv {
                     writeBuf[1] = MPU9250_BITS_USER_CTRL_I2C_MST_RST |
                                   MPU9250_BITS_USER_CTRL_I2C_IF_DIS;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
-                    m_initState = INIT_FIFO_RESET;
-                    break;
-                case INIT_FIFO_RESET:
-                    DEBUG_PRINT("MPU9250 enter INIT_FIFO_RESET\n");
-                    // this->set SPI clock to 1 MHZ
-                    writeBuf[0] = MPU9250_REG_USER_CTRL | SPI_BITS_WRITE;
-                    writeBuf[1] = MPU9250_BITS_USER_CTRL_FIFO_RST |
-                                  MPU9250_BITS_USER_CTRL_FIFO_EN;
-                    this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
                     m_initState = INIT_FIFO_CONFIG;
                     break;
+                // case INIT_FIFO_RESET:
+                //     DEBUG_PRINT("MPU9250 enter INIT_FIFO_RESET\n");
+                //     // this->set SPI clock to 1 MHZ
+                //     writeBuf[0] = MPU9250_REG_USER_CTRL | SPI_BITS_WRITE;
+                //     writeBuf[1] = MPU9250_BITS_USER_CTRL_FIFO_RST |
+                //                   MPU9250_BITS_USER_CTRL_FIFO_EN;
+                //     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                //     m_initState = INIT_FIFO_CONFIG;
+                //     break;
                 case INIT_FIFO_CONFIG:
                     DEBUG_PRINT("MPU9250 enter INIT_FIFO_CONFIG\n");
                     // this->set SPI clock to 1 MHZ
@@ -154,11 +191,75 @@ namespace Drv {
                         writeBuf[1] |= MPU9250_BITS_FIFO_ENABLE_SLV0;
                     }
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    m_initState = INIT_GEN_CONFIG; // TODO next state
+                    break;
+                case INIT_GEN_CONFIG:
+                    DEBUG_PRINT("MPU9250 enter INIT_GEN_CONFIG\n");
+                    // this->set SPI clock to 1 MHZ
+                    writeBuf[0] = MPU9250_REG_CONFIG | SPI_BITS_WRITE;
+                    // temperature & gyro DLPF, FIFO mode
+                    writeBuf[1] = MPU9250_BITS_DLPF_CFG_250HZ |
+                                  MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
+                    this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    m_initState = INIT_GYRO_CONFIG; // TODO next state
+                    break;
+                case INIT_GYRO_CONFIG:
+                    DEBUG_PRINT("MPU9250 enter INIT_GYRO_CONFIG\n");
+                    // this->set SPI clock to 1 MHZ
+                    writeBuf[0] = MPU9250_REG_GYRO_CONFIG | SPI_BITS_WRITE;
+                    // TODO(mereweth) - test gyro at MPU9250_BITS_BW_8800HZ - no DLPF control
+                    writeBuf[1] = MPU9250_BITS_FS_2000DPS |
+                                  MPU9250_BITS_BW_LTE3600HZ;
+                    this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    m_initState = INIT_ACCEL_CONFIG_1; // TODO next state
+                    break;
+                case INIT_ACCEL_CONFIG_1:
+                    DEBUG_PRINT("MPU9250 enter INIT_ACCEL_CONFIG_1\n");
+                    // this->set SPI clock to 1 MHZ
+                    writeBuf[0] = MPU9250_REG_ACCEL_CONFIG | SPI_BITS_WRITE;
+                    writeBuf[1] = MPU9250_BITS_ACCEL_CONFIG_16G;
+                    this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    m_initState = INIT_ACCEL_CONFIG_2; // TODO next state
+                    break;
+                case INIT_ACCEL_CONFIG_2:
+                    DEBUG_PRINT("MPU9250 enter INIT_ACCEL_CONFIG_2\n");
+                    // this->set SPI clock to 1 MHZ
+                    writeBuf[0] = MPU9250_REG_ACCEL_CONFIG2 | SPI_BITS_WRITE;
+                    // TODO(mereweth) - better performance with DLPF?
+                    writeBuf[1] = MPU9250_BITS_ACCEL_CONFIG2_BW_1130HZ;
+                    this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    m_initState = INIT_MAG_CONFIG; // TODO next state
+                    break;
+                case INIT_MAG_CONFIG:
+                    DEBUG_PRINT("MPU9250 enter INIT_MAG_CONFIG\n");
+                    if (m_useMagnetometer) {
+                        DEBUG_PRINT("MPU9250 config mag\n");
+                        // this->set SPI clock to 1 MHZ
+                        this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    }
+                    else {
+                        m_initState = INIT_FIFO_RESET;
+                        break;
+                    }
+                    break;
+                case INIT_FIFO_RESET:
+                    DEBUG_PRINT("MPU9250 enter INIT_FIFO_RESET\n");
+                    // this->set SPI clock to 1 MHZ
+                    writeBuf[0] = MPU9250_REG_USER_CTRL | SPI_BITS_READ;
+                    writeBuf[1] = 0; // TODO(mereweth) - needed?
+                    this->SpiReadWrite_out(0, writeBufObj, readBufObj);
+                    // TODO(mereweth) - check that value is read into 2nd byte
+
+                    writeBuf[0] = MPU9250_REG_USER_CTRL | SPI_BITS_WRITE;
+                    writeBuf[1] = readBuf[1]                      |
+                                  MPU9250_BITS_USER_CTRL_FIFO_RST |
+                                  MPU9250_BITS_USER_CTRL_FIFO_EN;
+                    this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+
                     m_initState = INIT_COMPLETE; // TODO next state
                     break;
-                case INIT_COMPLETE:
-                    break;
                 case INIT_ERROR:
+                    m_initState = INIT_RESET; // TODO(mereweth) - smarter recovery?
                     break;
                 default:
                     FW_ASSERT(0, m_initState);

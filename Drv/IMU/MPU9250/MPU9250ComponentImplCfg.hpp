@@ -9,7 +9,7 @@ enum {
 };
 
 enum {
-    MPU9250_RESET_WAIT_CYCLES = 1000,
+    MPU9250_RESET_WAIT_CYCLES = 1000, // TODO(mereweth) - reduce
 };
 
 } // namespace Drv

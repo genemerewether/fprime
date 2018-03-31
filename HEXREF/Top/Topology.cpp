@@ -283,6 +283,7 @@ int hexref_run(void) {
         return -1;
     }
 
+    // TODO(mereweth) - interrupt for cycling - local_cycle as argument
     bool local_cycle = true;
     int cycle = 0;
 

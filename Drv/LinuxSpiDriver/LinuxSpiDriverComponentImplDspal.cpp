@@ -31,8 +31,8 @@
 #include <errno.h>
 
 #include <HAP_farf.h>
-#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
-//#define DEBUG_PRINT(x,...)
+//#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#define DEBUG_PRINT(x,...)
 
 namespace Drv {
 
@@ -48,8 +48,6 @@ namespace Drv {
             DEBUG_PRINT("Forgot to open SPI fd\n");
             return;
         }
-
-        DEBUG_PRINT("Writing %d bytes to SPI\n",writeBuffer.getsize());
 
         struct dspal_spi_ioctl_read_write read_write;
 

@@ -70,6 +70,11 @@ namespace Drv {
         INIT_I2C_RESET,
         INIT_FIFO_RESET,
         INIT_FIFO_CONFIG,
+        INIT_GEN_CONFIG,
+        INIT_GYRO_CONFIG,
+        INIT_ACCEL_CONFIG_1,
+        INIT_ACCEL_CONFIG_2,
+        INIT_MAG_CONFIG,
         INIT_COMPLETE,
         INIT_ERROR,
     } m_initState;

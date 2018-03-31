@@ -19,6 +19,10 @@
 
 namespace Drv {
 
+enum {
+    MPU9250_FIFO_LEN = 512,
+};
+
 enum MPU9250Reg {
     MPU9250_REG_WHOAMI = 0x75,
     MPU9250_REG_SMPLRT_DIV = 0x19,
@@ -103,9 +107,11 @@ enum MPU9250Bits {
     MPU9250_BITS_FS_2000DPS = 0x18,
     MPU9250_BITS_FS_MASK = 0x18,
 // This is FCHOICE_B which is the inverse of FCHOICE
+    MPU9250_BITS_BW_8800HZ = 0x01, // 0x03 also works per datasheet
+// This is FCHOICE_B which is the inverse of FCHOICE
     MPU9250_BITS_BW_3600HZ = 0x02,
-// The FCHOICE bits are the same for all Bandwidths below 3600 Hz.
-    MPU9250_BITS_BW_LT3600HZ = 0x00,
+// The FCHOICE bits are the same for all bandwidths <= 3600 Hz (DLPF active)
+    MPU9250_BITS_BW_LTE3600HZ = 0x00,
 
     MPU9250_BITS_DLPF_CFG_250HZ = 0x00,
     MPU9250_BITS_DLPF_CFG_184HZ = 0x01,
