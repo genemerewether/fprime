@@ -45,6 +45,7 @@ namespace Drv {
             Fw::Buffer &readBuffer) {
 
         if (this->m_fd == -1) {
+            DEBUG_PRINT("Forgot to open SPI fd\n");
             return;
         }
 

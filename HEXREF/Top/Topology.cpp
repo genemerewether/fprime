@@ -214,6 +214,10 @@ void constructApp() {
     /* Register commands */
     /*eventLogger.regCommands();*/
 
+    // Open devices
+    // /dev/spi-1 on QuRT
+    spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
+
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 50,10 * 1024);
@@ -310,7 +314,7 @@ int hexref_cycle(unsigned int cycles) {
     }
 
     for (unsigned int i = 0; i < cycles; i++) {
-        //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
+        DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
         run1cycle();
         Os::Task::delay(1);

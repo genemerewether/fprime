@@ -65,6 +65,11 @@ namespace Drv {
      */
     enum InitState {
         INIT_RESET,
+        INIT_POWER_ON_1,
+        INIT_POWER_ON_2,
+        INIT_I2C_RESET,
+        INIT_FIFO_RESET,
+        INIT_FIFO_CONFIG,
         INIT_COMPLETE,
         INIT_ERROR,
     } m_initState;
@@ -92,6 +97,8 @@ namespace Drv {
     // ----------------------------------------------------------------------
 
     bool m_useMagnetometer;
+
+    NATIVE_UINT_TYPE m_cycleCount;
 
   };
 

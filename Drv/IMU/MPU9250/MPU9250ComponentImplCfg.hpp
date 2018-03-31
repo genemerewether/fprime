@@ -8,6 +8,10 @@ enum {
     MPU9250_SCHED_CONTEXT_TLM
 };
 
+enum {
+    MPU9250_RESET_WAIT_CYCLES = 1000,
+};
+
 } // namespace Drv
 
 #endif // Drv_IMU_MPU9250Cfg_HPP
