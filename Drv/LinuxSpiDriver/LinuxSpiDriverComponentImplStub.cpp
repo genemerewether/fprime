@@ -32,6 +32,15 @@ namespace Drv {
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
+    void LinuxSpiDriverComponentImpl ::
+      SpiConfig_handler(
+          const NATIVE_INT_TYPE portNum,
+          U32 busSpeed
+      )
+    {
+      // TODO
+    }
+
     void LinuxSpiDriverComponentImpl::SpiReadWrite_handler(
             const NATIVE_INT_TYPE portNum, Fw::Buffer &WriteBuffer,
             Fw::Buffer &readBuffer) {

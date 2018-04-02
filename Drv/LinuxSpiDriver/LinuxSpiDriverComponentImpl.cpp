@@ -40,6 +40,27 @@ namespace Drv {
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
+    void LinuxSpiDriverComponentImpl ::
+      SpiConfig_handler(
+          const NATIVE_INT_TYPE portNum,
+          U32 busSpeed
+      )
+    {
+        if (this->m_fd == -1) {
+            return;
+        }
+        /*
+         * Max speed in Hz
+         */
+        int ret = ioctl(this->m_fd, SPI_IOC_WR_MAX_SPEED_HZ, &busSpeed);
+        if (ret == -1) {
+            DEBUG_PRINT("ioctl SPI_IOC_WR_MAX_SPEED_HZ fd %d failed. %d\n",this->m_fd,errno);
+            this->log_WARNING_HI_SPI_ConfigError(this->m_device,this->m_select,ret);
+        } else {
+            DEBUG_PRINT("SPI fd %d WR freq successfully configured to %d\n",this->m_fd,busSpeed);
+        }
+    }
+
     void LinuxSpiDriverComponentImpl::SpiReadWrite_handler(
             const NATIVE_INT_TYPE portNum, Fw::Buffer &writeBuffer,
             Fw::Buffer &readBuffer) {

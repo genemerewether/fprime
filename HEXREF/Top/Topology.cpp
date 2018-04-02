@@ -18,6 +18,8 @@
 #include <HAP_farf.h>
 #endif
 
+#include <unistd.h>
+
 #ifdef BUILD_DSPAL
 #define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
 #else
@@ -292,6 +294,7 @@ int hexref_run(void) {
         if (local_cycle) {
             run1cycle();
         }
+        //usleep(100);
         Os::Task::delay(1);
         cycle++;
     }
@@ -315,7 +318,7 @@ int hexref_cycle(unsigned int cycles) {
     }
 
     for (unsigned int i = 0; i < cycles; i++) {
-        DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
+        //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
         run1cycle();
         Os::Task::delay(1);

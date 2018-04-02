@@ -7,13 +7,14 @@
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Drv/SpiDriverPorts/SpiReadWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/SpiDriverPorts/SpiConfigPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <!--import_dictionary>Drv/IMU/MPU9250/Telemetry.xml</import_dictionary-->
     <!--import_dictionary>Drv/IMU/MPU9250/Events.xml</import_dictionary-->
     <ports>
-    
+
 
         <port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
         </port>
@@ -25,6 +26,9 @@
         </port>
 
         <port name="SpiReadWrite" data_type="Drv::SpiReadWrite"  kind="output"    max_number="1">
+        </port>
+
+        <port name="SpiConfig" data_type="Drv::SpiConfig"  kind="output"    max_number="1">
         </port>
 
         <port name="LogText" data_type="Fw::LogText"  kind="output"    max_number="1">

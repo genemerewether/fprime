@@ -2,7 +2,10 @@
 - factory init - globals but only init once
 
 ## SPI Driver
-- add port for setting SPI bus speed
+- add port for setting SPI bus speed to MD model
+
+## MPU9250 driver
+- add port for setting SPI bus speed to MD model
 
 ## Unit tests
 

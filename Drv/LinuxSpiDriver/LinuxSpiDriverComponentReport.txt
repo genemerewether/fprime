@@ -1,4 +1,4 @@
-Input Ports: 1
+Input Ports: 2
 Output Ports: 4
 Channels: 1
  ChanIds: 0

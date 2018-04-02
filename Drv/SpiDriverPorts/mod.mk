@@ -11,4 +11,4 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = SpiReadWritePortAi.xml
+SRC = SpiReadWritePortAi.xml SpiConfigPortAi.xml

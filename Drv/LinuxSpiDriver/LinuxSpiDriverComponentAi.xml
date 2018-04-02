@@ -6,12 +6,13 @@
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Drv/SpiDriverPorts/SpiReadWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/SpiDriverPorts/SpiConfigPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_dictionary>Drv/LinuxSpiDriver/Events.xml</import_dictionary>
     <import_dictionary>Drv/LinuxSpiDriver/Telemetry.xml</import_dictionary>
     <ports>
-    
+
 
         <port name="Tlm" data_type="Fw::Tlm"  kind="output" role="Telemetry"    max_number="1">
         </port>
@@ -20,6 +21,9 @@
         </port>
 
         <port name="SpiReadWrite" data_type="Drv::SpiReadWrite"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="SpiConfig" data_type="Drv::SpiConfig"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="LogText" data_type="Fw::LogText"  kind="output" role="LogTextEvent"    max_number="1">

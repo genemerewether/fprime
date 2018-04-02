@@ -81,7 +81,13 @@ namespace Drv {
             //! Handler implementation for SpiReadWrite
             //!
             void SpiReadWrite_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
-            Fw::Buffer &WriteBuffer, Fw::Buffer &readBuffer);
+                                      Fw::Buffer &WriteBuffer,
+                                      Fw::Buffer &readBuffer);
+
+            //! Handler implementation for SpiConfig
+            //!
+            void SpiConfig_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                   U32 busSpeed);
 
             NATIVE_INT_TYPE m_fd;
             NATIVE_INT_TYPE m_device;
