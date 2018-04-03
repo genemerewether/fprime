@@ -17,7 +17,7 @@
                 Output ports from Krait components, destination is Hexagon
             </comment>
         </port>
-        <port name="Sched" data_type="Svc::Sched" kind="sync_input" >
+        <port name="Sched" data_type="Svc::Sched" kind="sync_input" max_number="3">
             <comment>
                 Input port to get called each cycle by rate group
             </comment>

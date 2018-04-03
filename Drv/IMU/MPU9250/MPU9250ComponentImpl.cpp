@@ -109,17 +109,17 @@ namespace Drv {
                 this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                 readBufObj.setsize(2); // reset for everyone else
                 // TODO(mereweth) - add endianness check to Fw
+                uint16_t fifoLen = ((uint16_t) readBuf[1]) << 8 | (uint16_t) readBuf[2];
                 DEBUG_PRINT("FIFO count %u; low 0x%x, high 0x%x\n",
-                            (((uint16_t) readBuf[1]) << 8 | (uint16_t) readBuf[2]),
-                            readBuf[1], readBuf[2]);
+                            fifoLen, readBuf[1], readBuf[2]);
 
+                this->SpiConfig_out(0, MPU9250_SPI_FIFO_HZ);
                 writeBuf[0] = MPU9250_REG_FIFO_R_W | SPI_BITS_READ;
                 writeBuf[1] = 0; // TODO(mereweth) - needed?
-                readBufObj.setsize(500);
+                readBufObj.setsize(fifoLen);
                 this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                 // TODO(mereweth) - parse data
 
-                this->SpiConfig_out(0, MPU9250_SPI_FIFO_HZ);
                 return;
             }
 
