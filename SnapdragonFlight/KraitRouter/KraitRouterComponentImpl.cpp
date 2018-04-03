@@ -40,11 +40,16 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
 
     KraitRouterComponentImpl ::
-  #if FW_OBJECT_NAMES == 1
       KraitRouterComponentImpl(
+    #if FW_OBJECT_NAMES == 1
           const char *const compName
+    #endif
       ) :
-        KraitRouterComponentBase(compName),
+        KraitRouterComponentBase(
+    #if FW_OBJECT_NAMES == 1
+                                 compName
+    #endif
+                                 ),
         m_quit(false),
         m_recvPortBuffers(),
         m_recvPortBuffInsert(0),
@@ -53,9 +58,6 @@ namespace SnapdragonFlight {
         m_sendPortBuffInsert(0),
         m_sendPortBuffRemove(0),
         m_initialized(false)
-  #else
-      KraitRouterImpl(void)
-  #endif
     {
         for (int i = 0; i < KR_NUM_RECV_PORT_BUFFS; i++) {
             m_recvPortBuffers[i].available = true;
@@ -122,9 +124,10 @@ namespace SnapdragonFlight {
          * is stored there. If m_recvPortBuffInsert and m_recvPortBuffRemove are
          * equal, we are all caught up and waiting for a new input port call.
          */
-        while (this->m_recvPortBuffers[m_recvPortBuffRemove].available == true) {
-            /*DEBUG_PRINT("waiting for portBuff in object 0x%X\n",
-                        (unsigned long) this);*/
+        while (this->m_recvPortBuffers[m_recvPortBuffRemove].available == true ||
+               m_recvPortBuffInsert == m_recvPortBuffRemove) {
+            DEBUG_PRINT("waiting for portBuff at %d in object 0x%X\n",
+                        m_recvPortBuffRemove, (unsigned long) this);
             if (this->m_quit) {
                 DEBUG_PRINT("quitting portRead postinit in object 0x%X\n",
                             (unsigned long) this);
@@ -140,11 +143,19 @@ namespace SnapdragonFlight {
              */
         }
         *port = m_recvPortBuffers[m_recvPortBuffRemove].portNum;
-        DEBUG_PRINT("before memcpy in portRead in object 0x%X, port %d\n",
-                    (unsigned long) this, *port);
+        DEBUG_PRINT("before memcpy of buff idx %d in portRead in object 0x%X, port %d\n",
+                    m_recvPortBuffRemove, (unsigned long) this, *port);
         memcpy(buff, m_recvPortBuffers[m_recvPortBuffRemove].buff,
                m_recvPortBuffers[m_recvPortBuffRemove].buffLen);
         *bytes = m_recvPortBuffers[m_recvPortBuffRemove].buffLen;
+
+        // was false, meaning had data. set to available so it can be filled again
+        m_recvPortBuffers[m_recvPortBuffRemove].available = true;
+
+        m_recvPortBuffRemove++;
+        if (m_recvPortBuffRemove >= FW_NUM_ARRAY_ELEMENTS(m_recvPortBuffers)) {
+            m_recvPortBuffRemove = 0;
+        }
 
         /* TODO(mereweth) - handle concurrency issue here if we ever invoke
          * this from multiple contexts
@@ -169,22 +180,24 @@ namespace SnapdragonFlight {
         }
 
         if (!this->m_sendPortBuffers[m_sendPortBuffInsert].available) {
-            DEBUG_PRINT("FastRPC write tried to overwrite a port buffer for port %d\n",
-                        port);
+            DEBUG_PRINT("FastRPC write tried to overwrite a port buffer at %d for port %d\n",
+                        m_sendPortBuffInsert, port);
             //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
             //this->tlmWrite_KR_NumBadSerialPortCalls();
             return -5;
         }
 
-        m_sendPortBuffers[m_sendPortBuffInsert].available = false;
-        m_sendPortBuffers[m_sendPortBuffInsert].portNum = port;
+        NATIVE_UINT_TYPE sendPortBuffInsert = m_sendPortBuffInsert;
+
+        m_sendPortBuffers[sendPortBuffInsert].available = false;
+        m_sendPortBuffers[sendPortBuffInsert].portNum = port;
 
         /* NOTE(mereweth) - this memory will be copied again in the Sched call
          * for the output port invocation. This should be sufficiently fast for
          * these port calls.
          */
         unsigned int sendBuffSize =
-           FW_NUM_ARRAY_ELEMENTS(m_sendPortBuffers[m_sendPortBuffInsert].buff);
+           FW_NUM_ARRAY_ELEMENTS(m_sendPortBuffers[sendPortBuffInsert].buff);
         if (buffLen >= sendBuffSize) {
             DEBUG_PRINT("FastRPC write data %d too big: actual %d, avail %d\n",
                         port, buffLen, sendBuffSize);
@@ -192,11 +205,14 @@ namespace SnapdragonFlight {
             //this->tlmWrite_KR_NumBadSerialPortCalls();
             return -3;
         }
-        memcpy(m_sendPortBuffers[m_sendPortBuffInsert].buff,
+        memcpy(m_sendPortBuffers[sendPortBuffInsert].buff,
                buff, buffLen);
-        m_sendPortBuffers[m_sendPortBuffInsert].buffLen = buffLen;
+        m_sendPortBuffers[sendPortBuffInsert].buffLen = buffLen;
 
         m_sendPortBuffInsert++;
+        if (m_sendPortBuffInsert >= FW_NUM_ARRAY_ELEMENTS(m_sendPortBuffers)) {
+            m_sendPortBuffInsert = 0;
+        }
 
         return 0;
     }
@@ -212,7 +228,8 @@ namespace SnapdragonFlight {
       )
     {
         // until writeRemove catches up to writeInsert
-        while (!this->m_sendPortBuffers[m_sendPortBuffRemove].available) {
+        while (!this->m_sendPortBuffers[m_sendPortBuffRemove].available &&
+               m_sendPortBuffRemove != m_sendPortBuffInsert) {
             unsigned int port = m_sendPortBuffers[m_sendPortBuffRemove].portNum;
             unsigned char* buff = m_sendPortBuffers[m_sendPortBuffRemove].buff;
             unsigned int buffLen = m_sendPortBuffers[m_sendPortBuffRemove].buffLen;
@@ -221,7 +238,8 @@ namespace SnapdragonFlight {
                 Fw::ExternalSerializeBuffer portBuff(buff, buffLen);
                 portBuff.setBuffLen(buffLen);
 
-                DEBUG_PRINT("Calling port %d with %d bytes.\n", port, buffLen);
+                DEBUG_PRINT("Calling port %d from buf %d with %d bytes.\n",
+                            port, m_sendPortBuffRemove, buffLen);
                 Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
                 if (stat != Fw::FW_SERIALIZE_OK) {
                     DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
@@ -231,7 +249,12 @@ namespace SnapdragonFlight {
                 }
             }
 
+            m_sendPortBuffers[m_sendPortBuffRemove].available = true;
+
             m_sendPortBuffRemove++;
+            if (m_sendPortBuffRemove >= FW_NUM_ARRAY_ELEMENTS(m_sendPortBuffers)) {
+                m_sendPortBuffRemove = 0;
+            }
         }
     }
 
@@ -261,8 +284,8 @@ namespace SnapdragonFlight {
         }
 
         if (!this->m_recvPortBuffers[m_recvPortBuffInsert].available) {
-            DEBUG_PRINT("HexPortsIn_handler tried to overwrite a port buffer for port %d\n",
-                        portNum);
+            DEBUG_PRINT("HexPortsIn_handler tried to overwrite a port buffer at %d for port %d\n",
+                        m_recvPortBuffInsert, portNum);
             //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
             //this->tlmWrite_KR_NumBadSerialPortCalls();
             return;
@@ -290,6 +313,9 @@ namespace SnapdragonFlight {
         m_recvPortBuffers[m_recvPortBuffInsert].buffLen = Buffer.getBuffLength();
 
         m_recvPortBuffInsert++;
+        if (m_recvPortBuffInsert >= FW_NUM_ARRAY_ELEMENTS(m_recvPortBuffers)) {
+            m_recvPortBuffInsert = 0;
+        }
     }
 
 } // end namespace SnapdragonFlight

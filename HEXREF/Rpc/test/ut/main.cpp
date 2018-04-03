@@ -1,5 +1,6 @@
 #ifdef BUILD_SDFLIGHT
 #include <HEXREF/Rpc/hexref.h>
+#include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #endif //BUILD_SDFLIGHT
 
 #if defined TGT_OS_TYPE_LINUX || TGT_OS_TYPE_DARWIN
@@ -34,7 +35,7 @@ void dummy() {
 }
 
 void print_usage() {
-    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run 1 cycle; -c to run continuously\n");
+    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run 1 cycle; -c to run continuously\n-r to use HexRouter");
 }
 
 int main(int argc, char* argv[]) {
@@ -42,9 +43,10 @@ int main(int argc, char* argv[]) {
     bool noFini = false;
     bool kraitCycle = false;
     bool hexCycle = false;
+    bool hexRtr = false;
     int numKraitCycles = 0;
     int option = 0;
-    while ((option = getopt(argc, argv, "ifho:c")) != -1) {
+    while ((option = getopt(argc, argv, "rifho:c")) != -1) {
         switch(option) {
             case 'h':
                 print_usage();
@@ -63,7 +65,11 @@ int main(int argc, char* argv[]) {
             case 'c':
                 hexCycle = true;
                 break;
+            case 'r':
+                hexRtr = true;
+                break;
             case '?':
+                print_usage();
                 return 1;
             default:
                 print_usage();
@@ -80,10 +86,16 @@ int main(int argc, char* argv[]) {
     Os::Task waiter;
     Os::TaskString waiter_task_name("WAITER");
 #ifdef BUILD_SDFLIGHT
+    SnapdragonFlight::HexRouterComponentImpl hexRouter("HEXRTR");
     // TODO(mereweth) - test that calling other functions before init has no effect
     //hexref_rpc_relay_buff_allocate(10);
     if (!noInit) {
         hexref_init();
+    }
+    if (hexRtr) {
+        DEBUG_PRINT("Starting HexRouter\n");
+        hexRouter.init(10, 0);
+        hexRouter.startPortReadThread(90, 20*1024, 0);
     }
     if (hexCycle) {
         Os::TaskString task_name("HEXRPC");
@@ -126,6 +138,11 @@ int main(int argc, char* argv[]) {
     if (hexCycle) {
         DEBUG_PRINT("Waiting for the runner to return\n");
         FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+    }
+
+    if (hexRtr) {
+        hexRouter.quitReadThreads();
+        //hexRouter.exit();
     }
 
     DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");

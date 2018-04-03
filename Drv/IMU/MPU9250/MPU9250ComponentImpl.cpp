@@ -42,15 +42,15 @@ namespace Drv {
 
     MPU9250ComponentImpl ::
       MPU9250ComponentImpl(
-    #if FW_OBJECT_NAMES == 1
+#if FW_OBJECT_NAMES == 1
           const char *const compName,
-    #endif
+#endif
           bool useMagnetometer
       ) :
         MPU9250ComponentBase(
-    #if FW_OBJECT_NAMES == 1
+#if FW_OBJECT_NAMES == 1
                              compName
-    #endif
+#endif
                              ),
         m_initState(INIT_RESET),
         m_useMagnetometer(useMagnetometer),
@@ -119,6 +119,16 @@ namespace Drv {
                 readBufObj.setsize(fifoLen);
                 this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                 // TODO(mereweth) - parse data
+
+                if (this->isConnected_FIFORaw_OutputPort(0)) {
+                    Fw::ExternalSerializeBuffer portBuff(readBuf, fifoLen);
+                    portBuff.setBuffLen(fifoLen);
+
+                    Fw::SerializeStatus stat = this->FIFORaw_out(0, portBuff);
+                    if (stat != Fw::FW_SERIALIZE_OK) {
+                        DEBUG_PRINT("FIFORaw_out() serialize status error\n");
+                    }
+                }
 
                 return;
             }
@@ -191,7 +201,7 @@ namespace Drv {
                         writeBuf[1] |= MPU9250_BITS_FIFO_ENABLE_SLV0;
                     }
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
-                    m_initState = INIT_GEN_CONFIG; // TODO next state
+                    m_initState = INIT_GEN_CONFIG;
                     break;
                 case INIT_GEN_CONFIG:
                     DEBUG_PRINT("MPU9250 enter INIT_GEN_CONFIG\n");
@@ -201,7 +211,7 @@ namespace Drv {
                     writeBuf[1] = MPU9250_BITS_DLPF_CFG_250HZ |
                                   MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
-                    m_initState = INIT_GYRO_CONFIG; // TODO next state
+                    m_initState = INIT_GYRO_CONFIG;
                     break;
                 case INIT_GYRO_CONFIG:
                     DEBUG_PRINT("MPU9250 enter INIT_GYRO_CONFIG\n");
@@ -209,9 +219,10 @@ namespace Drv {
                     writeBuf[0] = MPU9250_REG_GYRO_CONFIG | SPI_BITS_WRITE;
                     // TODO(mereweth) - test gyro at MPU9250_BITS_BW_8800HZ - no DLPF control
                     writeBuf[1] = MPU9250_BITS_FS_2000DPS |
+                                  //MPU9250_BITS_BW_8800HZ;
                                   MPU9250_BITS_BW_LTE3600HZ;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
-                    m_initState = INIT_ACCEL_CONFIG_1; // TODO next state
+                    m_initState = INIT_ACCEL_CONFIG_1;
                     break;
                 case INIT_ACCEL_CONFIG_1:
                     DEBUG_PRINT("MPU9250 enter INIT_ACCEL_CONFIG_1\n");
@@ -219,7 +230,7 @@ namespace Drv {
                     writeBuf[0] = MPU9250_REG_ACCEL_CONFIG | SPI_BITS_WRITE;
                     writeBuf[1] = MPU9250_BITS_ACCEL_CONFIG_16G;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
-                    m_initState = INIT_ACCEL_CONFIG_2; // TODO next state
+                    m_initState = INIT_ACCEL_CONFIG_2;
                     break;
                 case INIT_ACCEL_CONFIG_2:
                     DEBUG_PRINT("MPU9250 enter INIT_ACCEL_CONFIG_2\n");
@@ -228,7 +239,7 @@ namespace Drv {
                     // TODO(mereweth) - better performance with DLPF?
                     writeBuf[1] = MPU9250_BITS_ACCEL_CONFIG2_BW_1130HZ;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
-                    m_initState = INIT_MAG_CONFIG; // TODO next state
+                    m_initState = INIT_MAG_CONFIG;
                     break;
                 case INIT_MAG_CONFIG:
                     DEBUG_PRINT("MPU9250 enter INIT_MAG_CONFIG\n");
@@ -256,7 +267,7 @@ namespace Drv {
                                   MPU9250_BITS_USER_CTRL_FIFO_EN;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
 
-                    m_initState = INIT_COMPLETE; // TODO next state
+                    m_initState = INIT_COMPLETE;
                     break;
                 case INIT_ERROR:
                     m_initState = INIT_RESET; // TODO(mereweth) - smarter recovery?

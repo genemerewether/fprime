@@ -37,14 +37,27 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
 
     HexRouterComponentImpl ::
-  #if FW_OBJECT_NAMES == 1
       HexRouterComponentImpl(
+#if FW_OBJECT_NAMES == 1
           const char *const compName
+#endif
       ) :
-        HexRouterComponentBase(compName)
-  #else
-      HexRouterImpl(void)
-  #endif
+        HexRouterComponentBase(
+#if FW_OBJECT_NAMES == 1
+                               compName
+#endif
+                               ),
+        m_portReadTask(),
+        m_buffReadTask(),
+        m_buffSet(),
+        m_inputBuff(),
+        m_inputBuffObj(),
+        m_readBuffMutex(),
+        m_quitReadThreads(false),
+        m_numDecodeErrors(0u),
+        m_numBadSerialPortCalls(0u),
+        m_numPackets(0u),
+        m_numInvalidPorts(0u)
     {
         // Initialize memory buffer objects
         for (NATIVE_UINT_TYPE buff = 0; buff < RECEIVE_BUFFER_POOL_SIZE; buff++) {
@@ -184,7 +197,7 @@ namespace SnapdragonFlight {
 
             timespec stime;
             (void)clock_gettime(CLOCK_REALTIME,&stime);
-            DEBUG_PRINT("<<< Calling rpc_relay_port_read() at %d %d\n",
+            DEBUG_PRINT("Calling rpc_relay_port_read() at %d %d\n",
                         stime.tv_sec, stime.tv_nsec);
 
             bool waiting = true;
@@ -194,6 +207,11 @@ namespace SnapdragonFlight {
                 stat = rpc_relay_port_read(&portNum,
                        reinterpret_cast<unsigned char*>(buff),
                        READ_PORT_SIZE, &sizeRead);
+
+                timespec stime;
+                (void)clock_gettime(CLOCK_REALTIME,&stime);
+                DEBUG_PRINT("After rpc_relay_port_read() at %d %d; quit? %d\n",
+                            stime.tv_sec, stime.tv_nsec, comp->m_quitReadThreads);
 
                 // TODO(mereweth) - add KraitRouter timeout return code and
                 // check for timeout
@@ -256,6 +274,10 @@ namespace SnapdragonFlight {
                 }
             }
         }
+        timespec stime;
+        (void)clock_gettime(CLOCK_REALTIME,&stime);
+        DEBUG_PRINT("Done with hexPortReadTaskEntry at %d %d\n",
+                    stime.tv_sec, stime.tv_nsec);
     }
 
     void HexRouterComponentImpl::startBuffReadThread(
