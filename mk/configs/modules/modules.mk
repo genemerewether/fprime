@@ -51,6 +51,8 @@ SVC_MODULES := \
 	Svc/SocketGndIf \
 	Svc/BuffGndSockIf \
 	Svc/TlmChan \
+	Svc/SerLogger \
+	Svc/ActiveFileLogger \
 	Svc/PassiveTextLogger \
 	Svc/PassiveConsoleTextLogger \
 	Svc/Time \
