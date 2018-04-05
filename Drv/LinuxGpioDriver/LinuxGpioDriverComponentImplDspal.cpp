@@ -22,49 +22,27 @@
 #include <Fw/Types/BasicTypes.hpp>
 #include <Os/TaskString.hpp>
 
-// TODO make proper static constants for these
-#define SYSFS_GPIO_DIR "/sys/class/gpio"
-#define MAX_BUF 64
-
+#include <dev_fs_lib_gpio.h>
+#include <stdint.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include <poll.h>
+#include <sys/ioctl.h>
+#include <errno.h>
 
-//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-#define DEBUG_PRINT(x,...)
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+//#define DEBUG_PRINT(x,...)
 
 namespace Drv {
 
 
-// Code modified from https://developer.ridgerun.com/wiki/index.php?title=Gpio-int-test.c
     /****************************************************************
     * gpio_export
     ****************************************************************/
     int gpio_export(unsigned int gpio)
     {
-        int fd, len;
-        char buf[MAX_BUF];
-
-        fd = open(SYSFS_GPIO_DIR "/export", O_WRONLY);
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/export error!\n");
-            return -1;
-        }
-
-        // TODO check value of len
-        len = snprintf(buf, sizeof(buf), "%d", gpio);
-        (void) write(fd, buf, len); // TODO check return value
-        (void) close(fd);
-
-        /* NOTE(mereweth) - this is to allow systemd udev to make
-         * necessary filesystem changes after exporting
-         */
-        usleep(100 * 1000);
-
         return 0;
     }
 
@@ -73,25 +51,6 @@ namespace Drv {
      ****************************************************************/
     int gpio_unexport(unsigned int gpio)
     {
-        int fd, len;
-        char buf[MAX_BUF];
-
-        fd = open(SYSFS_GPIO_DIR "/unexport", O_WRONLY);
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/unexport error!\n");
-            return -1;
-        }
-
-        // TODO check value of len
-        len = snprintf(buf, sizeof(buf), "%d", gpio);
-        (void) write(fd, buf, len); // TODO check return value
-        (void) close(fd);
-
-        /* NOTE(mereweth) - this is to allow systemd udev to make
-         * necessary filesystem changes after unexporting
-         */
-        usleep(100 * 1000);
-
         return 0;
     }
 
@@ -100,27 +59,6 @@ namespace Drv {
      ****************************************************************/
     int gpio_set_dir(unsigned int gpio, unsigned int out_flag)
     {
-        int fd, len;
-        char buf[MAX_BUF];
-
-        len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d/direction", gpio);
-        FW_ASSERT(len > 0, len);
-
-        fd = open(buf, O_WRONLY);
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/direction error!\n");
-            return -1;
-        }
-
-        // TODO check return value
-        if (out_flag) {
-            (void) write(fd, "out", 4);
-        }
-        else {
-            (void) write(fd, "in", 3);
-        }
-
-        (void) close(fd);
         return 0;
     }
 
@@ -129,21 +67,6 @@ namespace Drv {
      ****************************************************************/
     int gpio_set_value(int fd, unsigned int value)
     {
-
-        FW_ASSERT(fd != -1);
-
-        // TODO make value a enum or check its value
-
-        // TODO check return value
-        if (value) {
-            (void) write(fd, "1", 1);
-        }
-        else {
-            (void) write(fd, "0", 1);
-        }
-
-        DEBUG_PRINT("GPIO fd %d value %d written\n",fd,value);
-
         return 0;
     }
 
@@ -152,27 +75,6 @@ namespace Drv {
      ****************************************************************/
     int gpio_get_value(int fd, unsigned int *value)
     {
-        char ch = '0';
-
-        FW_ASSERT(fd != -1);
-
-        NATIVE_INT_TYPE stat1 = lseek(fd, 0, SEEK_SET); // Must seek back to the starting
-        NATIVE_INT_TYPE stat2 = read(fd, &ch, 1);
-
-        if (stat1 == -1 || stat2 != 1) {
-            DEBUG_PRINT("GPIO read failure: %d %d!\n",stat1,stat2);
-            return -1;
-        }
-
-        // TODO could use atoi instead to get the value
-        if (ch != '0') {
-            *value = 1;
-        } else {
-            *value = 0;
-        }
-
-        DEBUG_PRINT("GPIO fd %d value %c read\n",fd,ch);
-
         return 0;
     }
 
@@ -183,24 +85,6 @@ namespace Drv {
 
     int gpio_set_edge(unsigned int gpio, char *edge)
     {
-        int fd, len;
-        char buf[MAX_BUF];
-
-        FW_ASSERT(edge != NULL);
-        // TODO check that edge has correct values of "none", "rising", or "falling"
-
-        len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/edge", gpio);
-        FW_ASSERT(len > 0, len);
-
-        fd = open(buf, O_WRONLY);
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/set-edge error!\n");
-            return -1;
-        }
-
-        // TODO check return value of write and strlen()
-        (void) write(fd, edge, strlen(edge) + 1);
-        (void) close(fd);
         return 0;
     }
 
@@ -210,18 +94,7 @@ namespace Drv {
 
     int gpio_fd_open(unsigned int gpio)
     {
-        int fd, len;
-        char buf[MAX_BUF];
-
-        len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
-        FW_ASSERT(len > 0, len);
-
-        fd = open(buf, O_RDWR | O_NONBLOCK );
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/fd_open error!\n");
-            return -1;
-        }
-        return fd;
+        return 0;
     }
 
     /****************************************************************
@@ -234,7 +107,7 @@ namespace Drv {
         // previous settings.
         (void) gpio_unexport(gpio); // TODO check return value
 
-        return close(fd);
+        return 0;
     }
 
 
@@ -250,7 +123,7 @@ namespace Drv {
   {
       FW_ASSERT(this->m_fd != -1);
 
-      NATIVE_UINT_TYPE val;
+      unsigned int val;
       NATIVE_INT_TYPE stat = gpio_get_value(this->m_fd, &val);
       if (-1 == stat) {
           this->log_WARNING_HI_GP_ReadError(this->m_gpio,stat);
@@ -258,7 +131,6 @@ namespace Drv {
       } else {
           state = val?true:false;
       }
-
   }
 
   void LinuxGpioDriverComponentImpl ::
@@ -305,7 +177,6 @@ namespace Drv {
           this->m_gpio = gpio;
       }
 
-
       return true;
   }
 
@@ -328,59 +199,17 @@ namespace Drv {
 
       // spin waiting for interrupt
       while(not compPtr->m_quitThread) {
-          pollfd fdset[1];
-          NATIVE_INT_TYPE nfds = 1;
-          NATIVE_INT_TYPE timeout = 10000; // Timeout of 10 seconds
+          usleep(1000 * 1000);
 
-          memset((void*)fdset, 0, sizeof(fdset));
+          // call interrupt ports
+          Svc::TimerVal timerVal;
+          timerVal.take();
 
-          fdset[0].fd = compPtr->m_fd;
-          fdset[0].events = POLLPRI;
-
-          stat = poll(fdset, nfds, timeout);
-
-          /*
-           * According to this link, poll will always have POLLERR set for the sys/class/gpio subsystem
-           * so cant check for it to look for error:
-           * http://stackoverflow.com/questions/27411013/poll-returns-both-pollpri-pollerr
-           */
-          if (stat < 0) {
-              DEBUG_PRINT("stat: %d, revents: 0x%x, POLLERR: 0x%x, POLLIN: 0x%x, POLLPRI: 0x%x\n",
-                     stat, fdset[0].revents, POLLERR, POLLIN, POLLPRI); // TODO remove
-              compPtr->log_WARNING_HI_GP_IntWaitError(compPtr->m_gpio);
-              return;
+          for (NATIVE_INT_TYPE port = 0; port < compPtr->getNum_intOut_OutputPorts(); port++) {
+              if (compPtr->isConnected_intOut_OutputPort(port)) {
+                  compPtr->intOut_out(port,timerVal);
+              }
           }
-
-          if (stat == 0) {
-              // continue to poll
-	          DEBUG_PRINT("Krait timed out waiting for GPIO interrupt\n");
-              continue;
-          }
-
-          // Asserting that number of fds w/ revents is 1:
-          FW_ASSERT(stat == 1, stat);  // TODO should i bother w/ this assert?
-
-          // TODO what to do if POLLPRI not set?
-
-          // TODO: if I take out the read then the poll just continually interrupts
-          // Read is only taking 22 usecs each time, so it is not blocking for long
-          if (fdset[0].revents & POLLPRI) {
-
-              char *buf[MAX_BUF];
-              (void) lseek(fdset[0].fd, 0, SEEK_SET); // Must seek back to the starting
-              (void) read(fdset[0].fd, buf, MAX_BUF);
-              DEBUG_PRINT("\npoll() GPIO interrupt occurred w/ value: %c\n", buf[0]);
-          }
-
-        // call interrupt ports
-        Svc::TimerVal timerVal;
-        timerVal.take();
-
-        for (NATIVE_INT_TYPE port = 0; port < compPtr->getNum_intOut_OutputPorts(); port++) {
-            if (compPtr->isConnected_intOut_OutputPort(port)) {
-                compPtr->intOut_out(port,timerVal);
-            }
-        }
 
       }
 

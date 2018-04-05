@@ -57,29 +57,6 @@ namespace Drv {
     PRIVATE:
 
     // ----------------------------------------------------------------------
-    // Constants/Types
-    // ----------------------------------------------------------------------
-
-    /*! \brief MPU9250 Initialization State
-     *
-     */
-    enum InitState {
-        INIT_RESET,
-        INIT_POWER_ON_1,
-        INIT_POWER_ON_2,
-        INIT_I2C_RESET,
-        INIT_FIFO_RESET,
-        INIT_FIFO_CONFIG,
-        INIT_GEN_CONFIG,
-        INIT_GYRO_CONFIG,
-        INIT_ACCEL_CONFIG_1,
-        INIT_ACCEL_CONFIG_2,
-        INIT_MAG_CONFIG,
-        INIT_COMPLETE,
-        INIT_ERROR,
-    } m_initState;
-
-    // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
@@ -96,6 +73,35 @@ namespace Drv {
         const NATIVE_INT_TYPE portNum, /*!< The port number*/
         U32 key /*!< Value to return to pinger*/
     );
+
+    // ----------------------------------------------------------------------
+    // Constants/Types
+    // ----------------------------------------------------------------------
+
+    /*! \brief MPU9250 Initialization State
+     *
+     */
+    enum InitState {
+        INIT_RESET,
+        INIT_POWER_ON_1,
+        INIT_POWER_ON_2,
+        INIT_I2C_RESET,
+        INIT_FIFO_RESET,
+        INIT_FIFO_CONFIG,
+        INIT_INT_CONFIG,
+        INIT_GEN_CONFIG,
+        INIT_GYRO_CONFIG,
+        INIT_ACCEL_CONFIG_1,
+        INIT_ACCEL_CONFIG_2,
+        INIT_MAG_CONFIG,
+        INIT_COMPLETE,
+        INIT_ERROR,
+    } m_initState;
+
+    enum OperationMode {
+        OPMODE_INTERRUPT,
+        OPMODE_FIFO,
+    } m_opMode;
 
     // ----------------------------------------------------------------------
     // Member variables

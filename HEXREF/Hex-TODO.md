@@ -5,7 +5,7 @@
 - add port for setting SPI bus speed to MD model
 
 ## MPU9250 driver
-- add port for setting SPI bus speed to MD model
+- GPIO 65 is interrupt pin - make this cycle the passive rate groups
 
 ## Unit tests
 

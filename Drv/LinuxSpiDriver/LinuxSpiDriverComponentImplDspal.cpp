@@ -69,6 +69,7 @@ namespace Drv {
             return;
         }
 
+        int result = 0;
         struct dspal_spi_ioctl_read_write read_write;
 
         read_write.read_buffer = (void*) readBuffer.getdata();
@@ -91,7 +92,7 @@ namespace Drv {
             .rx_data_callback = 0,
         };
 
-        int result = ioctl(this->m_fd, SPI_IOCTL_SET_OPTIONS, &options);
+        result = ioctl(this->m_fd, SPI_IOCTL_SET_OPTIONS, &options);
 
         if (result < 0) {
             DEBUG_PRINT("SPI %d slave set 1 error! %d: %s",this->m_fd,errno,strerror(errno));

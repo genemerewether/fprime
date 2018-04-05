@@ -195,7 +195,7 @@ void constructApp() {
     // Initialize the rate groups
     rg.init(10,0);
     rgDecouple.init(10,0);
-    rgAtt.init(0);
+    rgAtt.init(1);
     rgPos.init(0);
 
     // Initialize the GNC components
@@ -242,16 +242,6 @@ void constructApp() {
 #endif
 
 }
-
-//void run1cycle(void) {
-//    // get timer to call rate group driver
-//    Svc::TimerVal timer;
-//    timer.take();
-//    rateGroupDriverComp.get_CycleIn_InputPort(0)->invoke(timer);
-//    Os::Task::TaskStatus delayStat = Os::Task::delay(1000);
-//    FW_ASSERT(Os::Task::TASK_OK == delayStat,delayStat);
-//}
-
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
@@ -306,7 +296,6 @@ int hexref_run(void) {
         if (local_cycle) {
             run1cycle();
         }
-        //usleep(100);
         Os::Task::delay(1);
         cycle++;
     }
@@ -333,7 +322,8 @@ int hexref_cycle(unsigned int cycles) {
         //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
         run1cycle();
-        //Os::Task::delay(1);
+        //usleep(800);
+        Os::Task::delay(1);
     }
     return 0;
 }

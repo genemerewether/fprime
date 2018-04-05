@@ -21,6 +21,8 @@ SRC_CYGWIN = LinuxGpioDriverComponentImpl.cpp
 
 SRC_DARWIN = LinuxGpioDriverComponentImplStub.cpp
 
+SRC_DSPAL = LinuxGpioDriverComponentImplDspal.cpp
+
 HDR = LinuxGpioDriverComponentImpl.hpp
 
 SUBDIRS = test
