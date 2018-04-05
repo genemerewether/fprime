@@ -22,6 +22,7 @@
 // List of context IDs
 enum {
     ACTIVE_COMP_1HZ_RG,
+    ACTIVE_COMP_RG_DECOUPLE,
     ACTIVE_COMP_CMD_DISP,
     ACTIVE_COMP_CMD_SEQ,
     ACTIVE_COMP_LOGGER,
@@ -54,9 +55,12 @@ Svc::ActiveRateGroupImpl rg(
                     rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
 ;
 
-/* TODO(mereweth) - we run the GNC rgAtt and rgPos in the rosCycle callback
- * thread. If this needs to change -> create a new component ActiveRateGroupDriver
- */
+Svc::RateGroupDecouplerComponentImpl rgDecouple
+#if FW_OBJECT_NAMES == 1
+                    ("RGDECOUPLE")
+#endif
+;
+
 static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
@@ -205,6 +209,7 @@ void constructApp(int port_number, char* hostname) {
 
     // Initialize the rate groups
     rg.init(10,0);
+    rgDecouple.init(10,0);
     rgAtt.init(0);
     rgPos.init(0);
 
@@ -255,6 +260,7 @@ void constructApp(int port_number, char* hostname) {
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 50, 20*1024);
+    rgDecouple.start(ACTIVE_COMP_RG_DECOUPLE, 90, 20*1024);
     // start dispatcher
     cmdDisp.start(ACTIVE_COMP_CMD_DISP,60,20*1024);
     // start sequencer
@@ -304,6 +310,7 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     rg.exit();
+    rgDecouple.exit();
     cmdDisp.exit();
     eventLogger.exit();
     chanTlm.exit();

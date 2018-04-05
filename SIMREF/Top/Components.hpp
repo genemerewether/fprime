@@ -6,6 +6,7 @@ void exitTasks(void);
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
+#include <Svc/RateGroupDecoupler/RateGroupDecouplerComponentImpl.hpp>
 
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
@@ -26,6 +27,7 @@ void exitTasks(void);
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 
+extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
 extern Svc::PassiveRateGroupImpl rgAtt;

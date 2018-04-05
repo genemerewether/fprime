@@ -31,11 +31,12 @@
 
 // List of context IDs
 enum {
-        ACTIVE_COMP_1HZ_RG,
-        ACTIVE_COMP_LOGGER,
+    ACTIVE_COMP_1HZ_RG,
+    ACTIVE_COMP_RG_DECOUPLE,
+    ACTIVE_COMP_LOGGER,
 
-        CYCLER_TASK,
-        NUM_ACTIVE_COMPS
+    CYCLER_TASK,
+    NUM_ACTIVE_COMPS
 };
 
 // Registry
@@ -44,6 +45,12 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 // Component instance pointers
+
+Svc::RateGroupDecouplerComponentImpl rgDecouple
+#if FW_OBJECT_NAMES == 1
+                    ("RGDECOUPLE")
+#endif
+;
 
 static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     0,
@@ -187,6 +194,7 @@ void constructApp() {
 
     // Initialize the rate groups
     rg.init(10,0);
+    rgDecouple.init(10,0);
     rgAtt.init(0);
     rgPos.init(0);
 
@@ -225,6 +233,7 @@ void constructApp() {
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 50,10 * 1024);
+    rgDecouple.start(ACTIVE_COMP_RG_DECOUPLE, 90, 20*1024);
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,40,10*1024);
 
@@ -246,7 +255,7 @@ void constructApp() {
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    Svc::InputCyclePort* port = rgGncDrv.get_CycleIn_InputPort(0);
+    Svc::InputCyclePort* port = rgDecouple.get_CycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
@@ -254,6 +263,7 @@ void run1cycle(void) {
 
 void exitTasks(void) {
     rg.exit();
+    rgDecouple.exit();
     eventLogger.exit();
 }
 
@@ -323,7 +333,7 @@ int hexref_cycle(unsigned int cycles) {
         //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
         run1cycle();
-        Os::Task::delay(1);
+        //Os::Task::delay(1);
     }
     return 0;
 }

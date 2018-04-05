@@ -45,6 +45,7 @@ SVC_MODULES := \
 	Svc/ActiveRateGroup \
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
+	Svc/RateGroupDecoupler \
 	Svc/Sched \
 	Svc/ComLogger \
 	Svc/SocketGndIf \
@@ -259,6 +260,7 @@ HEXREF_MODULES := \
 	Svc/ActiveRateGroup \
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
+	Svc/RateGroupDecoupler \
 	Svc/Sched \
 	Svc/PassiveTextLogger \
 	Svc/PassiveConsoleTextLogger \

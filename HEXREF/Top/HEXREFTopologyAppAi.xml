@@ -9,6 +9,7 @@
 	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
+	<import_component_type>Svc/RateGroupDecoupler/RateGroupDecouplerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
@@ -30,6 +31,8 @@
    <instance namespace="Svc" name="eventLogger" type="ActiveLogger" base_id="421"  base_id_window="20" />
 
    <instance namespace="Svc" name="linuxTime" type="Time" base_id="441"  base_id_window="20" />
+
+   <instance namespace="Svc" name="rgDecouple" type="RateGroupDecoupler"/>
 
    <instance namespace="Svc" name="rg" type="ActiveRateGroup" base_id="21"  base_id_window="20" />
 
@@ -95,66 +98,70 @@
  	 <target component = "spiDrv" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
 </connection>
 <connection name = "Connection14">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+	 <source component = "rgDecouple" port = "CycleOut" type = "Cycle" num = "0"/>
+ 	 <target component = "rgGncDrv" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection15">
 	 <source component = "spiDrv" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection16">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+ 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection17">
 	 <source component = "spiDrv" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection17">
+<connection name = "Connection18">
 	 <source component = "mpu9250" port = "SpiConfig" type = "SpiConfig" num = "0"/>
  	 <target component = "spiDrv" port = "SpiConfig" type = "SpiConfig" num = "0"/>
 </connection>
-<connection name = "Connection18">
+<connection name = "Connection19">
 	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection19">
+<connection name = "Connection20">
 	 <source component = "mpu9250" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection20">
+<connection name = "Connection21">
 	 <source component = "rg" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection21">
+<connection name = "Connection22">
 	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection22">
+<connection name = "Connection23">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "2"/>
  	 <target component = "rg" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection23">
+<connection name = "Connection24">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection24">
+<connection name = "Connection25">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "mpu9250" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection25">
+<connection name = "Connection26">
 	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection26">
+<connection name = "Connection27">
 	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection27">
+<connection name = "Connection28">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "1"/>
 </connection>
-<connection name = "Connection28">
+<connection name = "Connection29">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
  	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection29">
+<connection name = "Connection30">
 	 <source component = "leeCtrl" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
