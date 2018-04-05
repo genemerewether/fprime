@@ -29,9 +29,15 @@
 #ifdef BUILD_DSPAL
 #include <HAP_farf.h>
 #define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
-#else
+#else // BUILD_DSPAL
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-#endif
+#endif // BUILD_DSPAL
+
+#if defined BUILD_SDFLIGHT || defined BUILD_DSPAL
+#define BIG_ENDIAN
+#else // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
+#define LITTLE_ENDIAN
+#endif // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
 
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
@@ -56,6 +62,8 @@ namespace Drv {
                              ),
         m_initState(INIT_RESET),
         m_opMode(OPMODE_INTERRUPT),
+        m_gyroRawToRadS(0.0f),
+        m_accelRawToMS2(0.0f),
         m_useMagnetometer(useMagnetometer),
         m_cycleCount(0u)
     {
@@ -105,11 +113,64 @@ namespace Drv {
                     readBufObj.setsize(1 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
-                    // TODO(mereweth) - parse data
                     timer.stop();
+                    /*DEBUG_PRINT("reg read %d bytes in %u usec\n",
+                                readBufObj.getsize(), timer.getDiffUsec());*/
 
-                    DEBUG_PRINT("reg read %d bytes in %u usec\n",
-                                readBufObj.getsize(), timer.getDiffUsec());
+                    // raw register contents
+                    /*if (this->isConnected_FIFORaw_OutputPort(0)) {
+                        Fw::ExternalSerializeBuffer portBuff(readBuf,
+                                                             readBufObj.getsize());
+                        portBuff.setBuffLen(readBufObj.getsize());
+
+                        Fw::SerializeStatus stat = this->FIFORaw_out(0, portBuff);
+                        if (stat != Fw::FW_SERIALIZE_OK) {
+                            DEBUG_PRINT("FIFORaw_out() serialize status error\n");
+                        }
+                    }*/
+
+                    int16_t accel[3];
+                    int16_t gyro[3];
+                    int16_t temp;
+                    NATIVE_UINT_TYPE sIdx;
+                    NATIVE_UINT_TYPE sBase = 1;
+                    // read starts at index 1 in read buffer
+#ifdef LITTLE_ENDIAN // little-endian - x86
+                    for (sIdx = 0; sIdx < 3; sIdx++) {
+                        accel[sIdx] = ((int16_t) readBuf[2*sIdx+1+sBase]) << 8 |
+                                        (int16_t) readBuf[2*sIdx+sBase];
+                    }
+                    sBase += 6;
+                    temp = ((int16_t) readBuf[1+sBase]) << 8 |
+                           (int16_t) readBuf[sBase];
+                    sBase += 2;
+                    for (sIdx = 0; sIdx < 3; sIdx++) {
+                        gyro[sIdx] = ((int16_t) readBuf[2*sIdx+1+sBase]) << 8 |
+                                        (int16_t) readBuf[2*sIdx+sBase];
+                    }
+#else // big endian - ARM & Hexagon
+                    for (sIdx = 0; sIdx < 3; sIdx++) {
+                        accel[sIdx] = ((int16_t) readBuf[2*sIdx+sBase]) << 8 |
+                                        (int16_t) readBuf[1+2*sIdx+sBase];
+                    }
+                    sBase += 6;
+                    temp = ((int16_t) readBuf[sBase]) << 8 |
+                           (int16_t) readBuf[1+sBase];
+                    sBase += 2;
+                    for (sIdx = 0; sIdx < 3; sIdx++) {
+                        gyro[sIdx] = ((int16_t) readBuf[2*sIdx+sBase]) << 8 |
+                                        (int16_t) readBuf[1+2*sIdx+sBase];
+                    }
+#endif
+                    // TODO(mereweth) - convert temperature; check for saturation
+                    DEBUG_PRINT("Accel [ % 2.3f, % 2.3f, % 2.3f]; Gyro [% 2.3f, % 2.3f, % 2.3f]; Temp % 2.3f\n",
+                                m_accelRawToMS2 * (float) accel[0],
+                                m_accelRawToMS2 * (float) accel[1],
+                                m_accelRawToMS2 * (float) accel[2],
+                                m_gyroRawToRadS * (float) gyro[0],
+                                m_gyroRawToRadS * (float) gyro[1],
+                                m_gyroRawToRadS * (float) gyro[2],
+                                float(temp) / 361.0f + 35.0f);
                 }
                 else if (m_opMode == OPMODE_FIFO) {
                     timer.start();
@@ -131,8 +192,12 @@ namespace Drv {
                     readBufObj.setsize(3);
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     readBufObj.setsize(2); // reset for everyone else
-                    // TODO(mereweth) - add endianness check to Fw
+                    // TODO(mereweth) - add endianness check to Fw - FIFO_COUNT_H first
+#ifdef LITTLE_ENDIAN // little-endian - x86
+                    uint16_t fifoLen = ((uint16_t) readBuf[2]) << 8 | (uint16_t) readBuf[1];
+#else // big endian - ARM & Hexagon
                     uint16_t fifoLen = ((uint16_t) readBuf[1]) << 8 | (uint16_t) readBuf[2];
+#endif
                     // get config execution time
                     timer.stop();
                     DEBUG_PRINT("FIFO count %u; low 0x%x, high 0x%x; calc in %u usec\n",
@@ -142,6 +207,7 @@ namespace Drv {
                     this->SpiConfig_out(0, MPU9250_SPI_DATA_HZ);
                     writeBuf[0] = MPU9250_REG_FIFO_R_W | SPI_BITS_READ;
                     writeBuf[1] = 0; // TODO(mereweth) - needed?
+                    // TODO(mereweth) - DSP can read max of 512 bytes at once - check for full FIFO -> 513 bytes
                     readBufObj.setsize(fifoLen);
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     // TODO(mereweth) - parse data
@@ -149,7 +215,8 @@ namespace Drv {
 
                     DEBUG_PRINT("FIFO read in %u usec\n", timer.getDiffUsec());
                     if (this->isConnected_FIFORaw_OutputPort(0)) {
-                        Fw::ExternalSerializeBuffer portBuff(readBuf, fifoLen);
+                        // read data starts at index 1
+                        Fw::ExternalSerializeBuffer portBuff(readBuf + 1, fifoLen);
                         portBuff.setBuffLen(fifoLen);
 
                         Fw::SerializeStatus stat = this->FIFORaw_out(0, portBuff);
@@ -171,8 +238,10 @@ namespace Drv {
                         writeBuf[0] = MPU9250_REG_PWR_MGMT_1 | SPI_BITS_WRITE;
                         writeBuf[1] = MPU9250_BITS_H_RESET;
                         this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                        DEBUG_PRINT("MPU9250 done in INIT_RESET\n");
                     }
                     else {
+                        //DEBUG_PRINT("MPU9250 INIT_RESET cycle %d\n", m_cycleCount);
                         if (m_cycleCount > MPU9250_RESET_WAIT_CYCLES) {
                             m_cycleCount = 0;
                             m_initState = INIT_POWER_ON_1;
@@ -241,6 +310,7 @@ namespace Drv {
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_GYRO_CONFIG | SPI_BITS_WRITE;
                     // TODO(mereweth) - test gyro at MPU9250_BITS_BW_8800HZ - no DLPF control
+                    m_gyroRawToRadS = 2000.0f / 32768.0f * MPU9250_PI / 180.0f;
                     writeBuf[1] = MPU9250_BITS_FS_2000DPS |
                                   //MPU9250_BITS_GYRO_BW_8800HZ;
                                   MPU9250_BITS_GYRO_BW_LTE3600HZ;
@@ -251,6 +321,7 @@ namespace Drv {
                     DEBUG_PRINT("MPU9250 enter INIT_ACCEL_CONFIG_1\n");
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_ACCEL_CONFIG | SPI_BITS_WRITE;
+                    m_accelRawToMS2 = MPU9250_ONE_G / 2048.0f;
                     writeBuf[1] = MPU9250_BITS_ACCEL_CONFIG_16G;
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
                     m_initState = INIT_ACCEL_CONFIG_2;

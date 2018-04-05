@@ -21,6 +21,7 @@ void exitTasks(void);
 
 #include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
 #include <Drv/LinuxSpiDriver/LinuxSpiDriverComponentImpl.hpp>
+#include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;

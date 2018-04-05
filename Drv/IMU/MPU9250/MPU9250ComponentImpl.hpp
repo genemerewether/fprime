@@ -107,6 +107,9 @@ namespace Drv {
     // Member variables
     // ----------------------------------------------------------------------
 
+    float m_gyroRawToRadS;
+    float m_accelRawToMS2;
+
     bool m_useMagnetometer;
 
     NATIVE_UINT_TYPE m_cycleCount;

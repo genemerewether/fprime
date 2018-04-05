@@ -16,6 +16,9 @@
 #ifdef BUILD_DSPAL
 #include <HEXREF/Rpc/hexref.h>
 #include <HAP_farf.h>
+
+//TODO(mereweth) - move to HexPower component
+#include <dspal_platform.h>
 #endif
 
 #include <unistd.h>
@@ -272,6 +275,9 @@ int hexref_init(void) {
     constructApp();
     DEBUG_PRINT("After constructing app\n");
 
+    //TODO(mereweth) - move to HexPower component
+    HAP_power_request(100, 100, 1);
+
     //dumparch();
 
     Os::Task::delay(1000);
@@ -374,6 +380,7 @@ int main(int argc, char* argv[]) {
 
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);
+    signal(SIGHUP,sighandler);
 
     hexref_run();
 }

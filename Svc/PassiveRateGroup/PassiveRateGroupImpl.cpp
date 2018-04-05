@@ -81,8 +81,8 @@ namespace Svc {
         this->m_cycles++;
         // TODO(mereweth) - telemeter this->m_cycles and cycle_time
 
-        DEBUG_PRINT("PRG max time: %d; time %d; # cycles: %d\n",
-                    this->m_maxTime, cycle_time, this->m_cycles);
+        DEBUG_PRINT("PRG instance %d max time: %d; time %d; # cycles: %d\n",
+                    this->getInstance(), this->m_maxTime, cycle_time, this->m_cycles);
     }
 
 }

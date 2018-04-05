@@ -23,9 +23,13 @@ extern "C" {
 };
 
 volatile sig_atomic_t terminate = 0;
+volatile sig_atomic_t fini = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
+    if (signum == SIGHUP) {
+        fini = 1;
+    }
 }
 
 void dummy() {
@@ -40,7 +44,6 @@ void print_usage() {
 
 int main(int argc, char* argv[]) {
     bool noInit = false;
-    bool noFini = false;
     bool kraitCycle = false;
     bool hexCycle = false;
     bool hexRtr = false;
@@ -56,7 +59,7 @@ int main(int argc, char* argv[]) {
                 noInit = true;
                 break;
             case 'f':
-                noFini = true;
+                fini = false; // overridden in case of SIGHUP
                 break;
             case 'o':
                 numKraitCycles = atoi(optarg);
@@ -81,6 +84,10 @@ int main(int argc, char* argv[]) {
         printf("o and c both specified - use one only\n");
         return 1;
     }
+
+    signal(SIGINT,sighandler);
+    signal(SIGTERM,sighandler);
+    signal(SIGHUP,sighandler);
 
     Os::Task task;
     Os::Task waiter;
@@ -112,37 +119,37 @@ int main(int argc, char* argv[]) {
     waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
 #endif //BUILD_SDFLIGHT
 
-    signal(SIGINT,sighandler);
-    signal(SIGTERM,sighandler);
-
-
 #ifdef BUILD_SDFLIGHT
     if (kraitCycle) {
+        DEBUG_PRINT("Cycling from Krait\n");
         hexref_cycle(numKraitCycles);
     }
 #endif //BUILD_SDFLIGHT
 
     if (hexCycle) {
         while (!terminate) {
+            DEBUG_PRINT("Waiting on Krait\n");
             Os::Task::delay(1000);
         }
+        DEBUG_PRINT("Terminate is true\n");
     }
 
 #ifdef BUILD_SDFLIGHT
-    if (!noFini) {
+    if (fini) {
         DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
         hexref_fini();
     }
 #endif //BUILD_SDFLIGHT
 
+    if (hexRtr) {
+        DEBUG_PRINT("Quitting hexrouter read threads\n");
+        hexRouter.quitReadThreads();
+        //hexRouter.exit();
+    }
+
     if (hexCycle) {
         DEBUG_PRINT("Waiting for the runner to return\n");
         FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
-    }
-
-    if (hexRtr) {
-        hexRouter.quitReadThreads();
-        //hexRouter.exit();
     }
 
     DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
