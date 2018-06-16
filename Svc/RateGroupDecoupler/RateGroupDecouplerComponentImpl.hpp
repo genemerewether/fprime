@@ -38,10 +38,9 @@ namespace Svc {
       //!
       RateGroupDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
-          const char *const compName /*!< The component name*/
-#else
-          void
+          const char *const compName, /*!< The component name*/
 #endif
+          U32 droppedCyclesError /*!< Number of backup cycles before error */
       );
 
       //! Initialize object RateGroupDecoupler
@@ -63,6 +62,13 @@ namespace Svc {
 
       //! Handler implementation for CycleIn
       //!
+      void BackupCycleIn_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Svc::TimerVal &cycleStart /*!< Cycle start timer value*/
+      );
+
+      //! Handler implementation for CycleIn
+      //!
       void CycleIn_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           Svc::TimerVal &cycleStart /*!< Cycle start timer value*/
@@ -77,12 +83,15 @@ namespace Svc {
       //!  \param cycleStart value stored by the cycle driver, used to compute execution time.
 
       void CycleIn_preMsgHook(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart); //!< CycleIn pre-message hook
+      void BackupCycleIn_preMsgHook(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart); //!< BackupCycleIn pre-message hook
 
       U32 m_cycles; //!< cycles executed
       U32 m_maxTime; //!< maximum execution time in microseconds
       volatile bool m_cycleStarted; //!< indicate that cycle has started. Used to detect overruns.
       NATIVE_INT_TYPE m_overrunThrottle; //!< throttle value for overrun events
       U32 m_cycleSlips; //!< tracks number of cycle slips
+      U32 m_backupCycles; //!< tracks number of missing regular cycles
+      U32 m_droppedCyclesError; //!< Number of missing regular cycles before error
   };
 
 } // end namespace Svc

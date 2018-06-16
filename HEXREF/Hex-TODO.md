@@ -1,6 +1,10 @@
 ## topology
 - factory init - globals but only init once
 
+## Utils
+- test HAP process list
+    - Qualcomm/Hexagon_SDK/3.0/incs/HAP_ps.h
+
 ## SPI Driver
 - add port for setting SPI bus speed to MD model
 

@@ -82,9 +82,6 @@ DRV_MODULES := \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts
 
-HEXAGON_MODULES := \
-	SnapdragonFlight/KraitRouter
-
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter #\
@@ -253,6 +250,7 @@ HEXREF_MODULES := \
 	Drv/GpioDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
+	Drv/LinuxGpioDriver \
 	Drv/LinuxSpiDriver \
 	\
 	Svc/BufferManager \

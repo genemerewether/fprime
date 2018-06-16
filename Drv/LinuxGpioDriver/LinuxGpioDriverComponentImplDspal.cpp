@@ -180,61 +180,61 @@ namespace Drv {
       return true;
   }
 
-  //! Entry point for task waiting for RTI
+  void *gpio_int_isr(DSPAL_GPIO_INT_ISR_CTX context)
+  {
+      void * val = (void *)context;
+
+      LinuxGpioDriverComponentImpl::intTaskEntry(val);
+
+      return NULL;
+  }
+
+  //! Reuse interrupt task from Linux - but this gets called from DSPAL interrupt
   void LinuxGpioDriverComponentImpl ::
     intTaskEntry(void * ptr) {
 
       FW_ASSERT(ptr);
       LinuxGpioDriverComponentImpl* compPtr = (LinuxGpioDriverComponentImpl*) ptr;
 
-      FW_ASSERT(compPtr->m_fd != -1);
-
-      // start GPIO interrupt
-      NATIVE_INT_TYPE stat;
-      stat = gpio_set_edge(compPtr->m_gpio, "rising");
-      if (-1 == stat) {
-          compPtr->log_WARNING_HI_GP_IntStartError(compPtr->m_gpio);
+      if (compPtr->m_quitThread) {
           return;
       }
 
-      // spin waiting for interrupt
-      while(not compPtr->m_quitThread) {
-          usleep(1000 * 1000);
+      // call interrupt ports
+      Svc::TimerVal timerVal;
+      timerVal.take();
 
-          // call interrupt ports
-          Svc::TimerVal timerVal;
-          timerVal.take();
-
-          for (NATIVE_INT_TYPE port = 0; port < compPtr->getNum_intOut_OutputPorts(); port++) {
-              if (compPtr->isConnected_intOut_OutputPort(port)) {
-                  compPtr->intOut_out(port,timerVal);
-              }
+      for (NATIVE_INT_TYPE port = 0; port < compPtr->getNum_intOut_OutputPorts(); port++) {
+          if (compPtr->isConnected_intOut_OutputPort(port)) {
+              compPtr->intOut_out(port,timerVal);
           }
-
       }
-
   }
 
   Os::Task::TaskStatus LinuxGpioDriverComponentImpl ::
   startIntTask(NATIVE_INT_TYPE priority, NATIVE_INT_TYPE cpuAffinity) {
-      Os::TaskString name;
-      name.format("GPINT_%s",this->getObjName()); // The task name can only be 16 chars including null
-      Os::Task::TaskStatus stat = this->m_intTask.start(name,0,priority,20*1024,LinuxGpioDriverComponentImpl::intTaskEntry,this,cpuAffinity);
+      // NOTE(mereweth) - no task needed on DSPAL; instead use this to turn on/off
+      this->m_quitThread = false;
 
-      if (stat != Os::Task::TASK_OK) {
-          DEBUG_PRINT("Task start error: %d\n",stat);
+      // Configure this GPIO device as interrupt source
+      struct dspal_gpio_ioctl_reg_int int_config = {
+        .trigger = DSPAL_GPIOINT_TRIGGER_RISING,
+        .isr = (DSPAL_GPIO_INT_ISR) &gpio_int_isr,
+        .isr_ctx = (DSPAL_GPIO_INT_ISR_CTX) this,
+      };
+
+      if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_REG_INT, (void *)&int_config) != 0) {
+          DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_REG_INT failed\n");
+          return Os::Task::TASK_UNKNOWN_ERROR;
       }
 
-      return stat;
-
+      return Os::Task::TASK_OK;
   }
 
   void LinuxGpioDriverComponentImpl ::
     exitThread(void) {
       this->m_quitThread = true;
   }
-
-
 
   LinuxGpioDriverComponentImpl ::
     ~LinuxGpioDriverComponentImpl(void)

@@ -38,5 +38,6 @@ extern SnapdragonFlight::KraitRouterComponentImpl kraitRouter;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Drv::MPU9250ComponentImpl mpu9250;
 extern Drv::LinuxSpiDriverComponentImpl spiDrv;
+extern Drv::LinuxGpioDriverComponentImpl imuDRInt;
 
 #endif

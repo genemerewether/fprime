@@ -23,7 +23,7 @@ extern "C" {
 };
 
 volatile sig_atomic_t terminate = 0;
-volatile sig_atomic_t fini = 0;
+volatile sig_atomic_t fini = 1;
 
 static void sighandler(int signum) {
     terminate = 1;
@@ -39,7 +39,7 @@ void dummy() {
 }
 
 void print_usage() {
-    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run 1 cycle; -c to run continuously\n-r to use HexRouter");
+    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run 1 cycle; -c to run continuously\n-r to use HexRouter\n");
 }
 
 int main(int argc, char* argv[]) {

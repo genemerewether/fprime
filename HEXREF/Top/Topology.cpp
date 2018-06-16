@@ -49,10 +49,11 @@ static Fw::SimpleObjRegistry simpleReg;
 
 // Component instance pointers
 
-Svc::RateGroupDecouplerComponentImpl rgDecouple
+Svc::RateGroupDecouplerComponentImpl rgDecouple(
 #if FW_OBJECT_NAMES == 1
-                    ("RGDECOUPLE")
+                    "RGDECOUPLE",
 #endif
+                    10) // 10 dropped hardware cycles before an error
 ;
 
 static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
@@ -67,9 +68,6 @@ Svc::ActiveRateGroupImpl rg(
                     rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
 ;
 
-/* TODO(mereweth) - we run the GNC rgAtt and rgPos in the main
- * thread. If this needs to change -> create a new component ActiveRateGroupDriver
- */
 static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
@@ -158,6 +156,12 @@ Drv::LinuxSpiDriverComponentImpl spiDrv
 #endif
 ;
 
+Drv::LinuxGpioDriverComponentImpl imuDRInt
+#if FW_OBJECT_NAMES == 1
+                    ("IMUDRINT")
+#endif
+;
+
 #if FW_OBJECT_REGISTRATION == 1
 
 void dumparch(void) {
@@ -206,6 +210,7 @@ void constructApp() {
     mpu9250.init(0);
 
     spiDrv.init(0);
+    imuDRInt.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -232,10 +237,12 @@ void constructApp() {
     // Open devices
     // /dev/spi-1 on QuRT
     spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
+    imuDRInt.open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
 
     // Active component startup
     // start rate groups
     rg.start(ACTIVE_COMP_1HZ_RG, 50,10 * 1024);
+    // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple.start(ACTIVE_COMP_RG_DECOUPLE, 90, 20*1024);
     // start telemetry
     eventLogger.start(ACTIVE_COMP_LOGGER,40,10*1024);
@@ -248,7 +255,7 @@ void constructApp() {
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    Svc::InputCyclePort* port = rgDecouple.get_CycleIn_InputPort(0);
+    Svc::InputCyclePort* port = rgDecouple.get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
@@ -276,7 +283,9 @@ int hexref_init(void) {
     DEBUG_PRINT("After constructing app\n");
 
     //TODO(mereweth) - move to HexPower component
+#ifdef BUILD_DSPAL
     HAP_power_request(100, 100, 1);
+#endif // BUILD_DSPAL
 
     //dumparch();
 
@@ -296,6 +305,7 @@ int hexref_run(void) {
     // TODO(mereweth) - interrupt for cycling - local_cycle as argument
     bool local_cycle = true;
     int cycle = 0;
+    // imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 
     while (!terminate) {
         //DEBUG_PRINT("Cycle %d\n",cycle);
@@ -307,6 +317,7 @@ int hexref_run(void) {
     }
 
     // stop tasks
+    //imuDRInt.exitThread();
     exitTasks();
     // Give time for threads to exit
     DEBUG_PRINT("Waiting for threads...\n");
@@ -324,6 +335,7 @@ int hexref_cycle(unsigned int cycles) {
         return -1;
     }
 
+    // imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
     for (unsigned int i = 0; i < cycles; i++) {
         //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
@@ -331,6 +343,8 @@ int hexref_cycle(unsigned int cycles) {
         //usleep(800);
         Os::Task::delay(1);
     }
+    //imuDRInt.exitThread();
+
     return 0;
 }
 

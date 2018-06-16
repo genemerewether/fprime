@@ -5,6 +5,11 @@
     <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
     <comment>A rate group decoupler component with input and output cycle ports</comment>
     <ports>
+        <port name="BackupCycleIn" data_type="Cycle" kind="async_input" max_number="1" full="drop">
+            <comment>
+            Backup cycle in, usually timer based
+            </comment>
+        </port>
         <port name="CycleIn" data_type="Cycle" kind="async_input" max_number="1" full="drop">
             <comment>
             Cycle input to the rate group decoupler

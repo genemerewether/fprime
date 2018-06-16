@@ -58,6 +58,10 @@ namespace Drv {
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority, NATIVE_INT_TYPE cpuAffinity = -1);
 
+      //! Entry point for task waiting for interrupt
+      //! Public so can be called from outside class - like in interrupt handler
+      static void intTaskEntry(void * ptr);
+
       //! configure GPIO
       enum GpioDirection {
           GPIO_IN, //!< input
@@ -96,9 +100,6 @@ namespace Drv {
 
       //! device direction
       GpioDirection m_direction;
-
-      //! Entry point for task waiting for interrupt
-      static void intTaskEntry(void * ptr);
 
       //! Task object for RTI task
       Os::Task m_intTask;
