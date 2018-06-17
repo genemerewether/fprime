@@ -1,15 +1,6 @@
 #ifndef RotorSDrvCfg_HPP
 #define RotorSDrvCfg_HPP
 
-#include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
-#include "std_msgs/Float32.h"
-
-#include "Os/Mutex.hpp"
-
-#include "SIMREF/RotorSDrv/RotorSDrvComponentAc.hpp"
-#include "SIMREF/RotorSDrv/RotorSDrvComponentImplCfg.hpp"
-
 namespace SIMREF {
 
 enum {

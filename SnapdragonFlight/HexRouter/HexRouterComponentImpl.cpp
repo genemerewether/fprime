@@ -27,8 +27,8 @@
 
 #include <time.h>
 
-#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-//#define DEBUG_PRINT(x,...)
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
@@ -386,7 +386,9 @@ namespace SnapdragonFlight {
     void HexRouterComponentImpl::quitReadThreads(void) {
         this->m_quitReadThreads = true;
         this->m_portReadTask.join(NULL);
+        DEBUG_PRINT("HexRouter quitReadThreads after portRead join\n");
         this->m_buffReadTask.join(NULL);
+        DEBUG_PRINT("HexRouter quitReadThreads after buffRead join\n");
         //rpc_relay_quit();
     }
 } // end namespace SnapdragonFlight

@@ -46,22 +46,6 @@ enum {
     UPLINK_BUFFER_QUEUE_SIZE = 30
 };
 
-// List of context IDs
-enum {
-    ACTIVE_COMP_1HZ_RG,
-    ACTIVE_COMP_HEXROUTER,
-    ACTIVE_COMP_CMD_DISP,
-    ACTIVE_COMP_CMD_SEQ,
-    ACTIVE_COMP_LOGGER,
-    ACTIVE_COMP_TLM,
-    ACTIVE_COMP_PRMDB,
-    ACTIVE_COMP_FILE_DOWNLINK,
-    ACTIVE_COMP_FILE_UPLINK,
-
-    CYCLER_TASK,
-    NUM_ACTIVE_COMPS
-};
-
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
 static Fw::SimpleObjRegistry simpleReg;
@@ -143,6 +127,12 @@ SnapdragonFlight::HexRouterComponentImpl hexRouter
 #endif
 ;
 
+SDREF::SDRosIfaceComponentImpl sdRosIface
+#if FW_OBJECT_NAMES == 1
+                    ("SDROSIFACE")
+#endif
+;
+
 Svc::FileUplink fileUp ("fileUp");
 Svc::FileDownlink fileDown ("fileDown", DOWNLINK_PACKET_SIZE);
 Svc::BufferManager fileDownBufMgr("fileDownBufMgr", DOWNLINK_BUFFER_STORE_SIZE, DOWNLINK_BUFFER_QUEUE_SIZE);
@@ -219,6 +209,7 @@ void constructApp(int port_number, char* hostname) {
     health.init(25,0);
 
     hexRouter.init(10, 0);
+    sdRosIface.init(10);
 
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
@@ -230,6 +221,8 @@ void constructApp(int port_number, char* hostname) {
     // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
     cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
     hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
+
+    hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?
@@ -264,41 +257,34 @@ void constructApp(int port_number, char* hostname) {
 
     // Active component startup
     // start rate groups
-    rg.start(ACTIVE_COMP_1HZ_RG, 95, 20*1024);
+    rg.start(0, 95, 20*1024);
     // start dispatcher
-    cmdDisp.start(ACTIVE_COMP_CMD_DISP,60,20*1024);
+    cmdDisp.start(0,60,20*1024);
     // start sequencer
-    cmdSeq.start(ACTIVE_COMP_CMD_SEQ,50,20*1024);
+    cmdSeq.start(0,50,20*1024);
     // start telemetry
-    eventLogger.start(ACTIVE_COMP_LOGGER,50,20*1024);
-    chanTlm.start(ACTIVE_COMP_TLM,60,20*1024);
-    prmDb.start(ACTIVE_COMP_PRMDB,50,20*1024);
+    eventLogger.start(0,50,20*1024);
+    chanTlm.start(0,60,20*1024);
+    prmDb.start(0,50,20*1024);
 
-    hexRouter.start(ACTIVE_COMP_HEXROUTER, 90, 20*1024);//, CORE_RPC);
+    hexRouter.start(0, 90, 20*1024);//, CORE_RPC);
 
     hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
-    fileDown.start(ACTIVE_COMP_FILE_DOWNLINK, 40, 20*1024);
-    fileUp.start(ACTIVE_COMP_FILE_UPLINK, 40, 20*1024);
+    fileDown.start(0, 40, 20*1024);
+    fileUp.start(0, 40, 20*1024);
 
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
+
+    sdRosIface.startPub();
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
 
 }
-
-//void run1cycle(void) {
-//    // get timer to call rate group driver
-//    Svc::TimerVal timer;
-//    timer.take();
-//    rateGroupDriverComp.get_CycleIn_InputPort(0)->invoke(timer);
-//    Os::Task::TaskStatus delayStat = Os::Task::delay(1000);
-//    FW_ASSERT(Os::Task::TASK_OK == delayStat,delayStat);
-//}
 
 
 void run1cycle(void) {
@@ -324,6 +310,7 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     hexRouter.quitReadThreads();
+    DEBUG_PRINT("After HexRouter read thread quit\n");
     rg.exit();
     cmdDisp.exit();
     eventLogger.exit();
@@ -333,10 +320,11 @@ void exitTasks(void) {
     fileDown.exit();
     cmdSeq.exit();
     hexRouter.exit();
+    DEBUG_PRINT("After HexRouter quit\n");
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles; -c to run continuously\n");
 }
 
 
@@ -351,6 +339,7 @@ volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
+    ros::shutdown();
 }
 
 void dummy() {
@@ -362,6 +351,9 @@ void dummy() {
 int main(int argc, char* argv[]) {
     bool noInit = false;
     bool noFini = false;
+    bool kraitCycle = false;
+    bool hexCycle = false;
+    int numKraitCycles = 0;
     U32 port_number = 0;
     I32 option = 0;
     char *hostname = NULL;
@@ -370,7 +362,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:a:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlp:a:o:c")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -391,6 +383,13 @@ int main(int argc, char* argv[]) {
             case 'f':
                 noFini = true;
                 break;
+            case 'o':
+                numKraitCycles = atoi(optarg);
+                kraitCycle = true;
+                break;
+            case 'c':
+                hexCycle = true;
+                break;
             case '?':
                 return 1;
             default:
@@ -399,7 +398,19 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    if (kraitCycle && hexCycle) {
+        printf("o and c both specified - use one only\n");
+        return 1;
+    }
+
+    signal(SIGINT,sighandler);
+    signal(SIGTERM,sighandler);
+    signal(SIGKILL,sighandler);
+
     (void) printf("Hit Ctrl-C to quit\n");
+
+    constructApp(port_number, hostname);
+    //dumparch();
 
     ros::start();
 
@@ -412,21 +423,26 @@ int main(int argc, char* argv[]) {
     if (!noInit) {
         hexref_init();
     }
-    Os::TaskString task_name("HEXRPC");
-    DEBUG_PRINT("Starting cycler on hexagon\n");
-    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+    if (hexCycle) {
+        Os::TaskString task_name("HEXRPC");
+        DEBUG_PRINT("Starting cycler on hexagon\n");
+        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+    }
     waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
 #else
-    Os::TaskString task_name("DUMMY");
-    task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+    if (hexCycle) {
+        Os::TaskString task_name("DUMMY");
+        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+    }
     waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
 #endif //BUILD_SDFLIGHT
 
-    constructApp(port_number, hostname);
-    //dumparch();
-
-    signal(SIGINT,sighandler);
-    signal(SIGTERM,sighandler);
+#ifdef BUILD_SDFLIGHT
+    if (kraitCycle) {
+        DEBUG_PRINT("Cycling from Krait\n");
+        hexref_cycle(numKraitCycles);
+    }
+#endif //BUILD_SDFLIGHT
 
     int cycle = 0;
 
@@ -440,9 +456,6 @@ int main(int argc, char* argv[]) {
       cycle++;
     }
 
-    // stop tasks
-    exitTasks();
-
 #ifdef BUILD_SDFLIGHT
     if (!noFini) {
         DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
@@ -450,8 +463,15 @@ int main(int argc, char* argv[]) {
     }
 #endif //BUILD_SDFLIGHT
 
-    DEBUG_PRINT("Waiting for the runner to return\n");
-    FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+    // stop tasks
+    DEBUG_PRINT("Stopping tasks\n");
+    ros::shutdown();
+    exitTasks();
+
+    if (hexCycle) {
+        DEBUG_PRINT("Waiting for the runner to return\n");
+        FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+    }
 
     DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
     FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
@@ -461,8 +481,6 @@ int main(int argc, char* argv[]) {
     Os::Task::delay(1000);
 
     (void) printf("Exiting...\n");
-
-    ros::shutdown();
 
     return 0;
 }

@@ -73,7 +73,7 @@ namespace SIMREF {
 
         char buf[32];
         for (int i = 0; i < NUM_MOTOR_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "motor_speed/%d", i);
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "motor_speed_%d", i);
             m_motorPub[i] = m_rgNH->advertise<std_msgs::Float32>(buf, 5);
         }
     }
@@ -149,6 +149,7 @@ namespace SIMREF {
           U32 key
       )
     {
+        // TODO(mereweth) - check that message-wait task is OK
         this->pingOut_out(portNum, key);
     }
 
@@ -183,6 +184,7 @@ namespace SIMREF {
                                               ros::TransportHints().tcpNoDelay());
 
         while (1) {
+            // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
     }

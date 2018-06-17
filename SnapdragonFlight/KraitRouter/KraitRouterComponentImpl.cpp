@@ -30,8 +30,8 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
-//#undef DEBUG_PRINT
-//#define DEBUG_PRINT(x,...)
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
@@ -126,8 +126,8 @@ namespace SnapdragonFlight {
          */
         while (this->m_recvPortBuffers[m_recvPortBuffRemove].available == true ||
                m_recvPortBuffInsert == m_recvPortBuffRemove) {
-            DEBUG_PRINT("waiting for portBuff at %d in object 0x%X\n",
-                        m_recvPortBuffRemove, (unsigned long) this);
+            /*DEBUG_PRINT("waiting for portBuff at %d in object 0x%X\n",
+                        m_recvPortBuffRemove, (unsigned long) this);*/
             if (this->m_quit) {
                 DEBUG_PRINT("quitting portRead postinit in object 0x%X\n",
                             (unsigned long) this);

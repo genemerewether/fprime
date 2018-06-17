@@ -21,8 +21,8 @@
 #include <Svc/RateGroupDecoupler/RateGroupDecouplerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
-//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-#define DEBUG_PRINT(x,...)
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
 
 namespace Svc {
 
@@ -84,6 +84,8 @@ namespace Svc {
          */
 
         if (this->m_backupCycles > m_droppedCyclesError) {
+            DEBUG_PRINT("Backup cycle %u gt than error threshold %u\n",
+                        this->m_backupCycles, m_droppedCyclesError);
             this->CycleIn_handler(portNum, cycleStart);
         }
     }
@@ -153,7 +155,7 @@ namespace Svc {
         // set flag to indicate cycle has started. Check in thread for overflow.
         this->m_cycleStarted = true;
 
-        if (this->m_backupCycles) {
+        if (this->m_backupCycles > m_droppedCyclesError) {
             DEBUG_PRINT("Got a real cycle after %u backup; switching\n",
                         this->m_backupCycles);
         }

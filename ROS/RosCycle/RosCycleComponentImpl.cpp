@@ -101,6 +101,7 @@ namespace ROS {
         U32 key
     )
   {
+      // TODO(mereweth) - check that message-wait task is OK
       this->pingOut_out(portNum, key);
   }
 
@@ -125,6 +126,7 @@ namespace ROS {
                                         ros::TransportHints().tcpNoDelay());
 
       while (1) {
+          // TODO(mereweth) - check for and respond to ping
           localCallbacks.callAvailable(ros::WallDuration(0, 1000 * 1000));
       }
   }

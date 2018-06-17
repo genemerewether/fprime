@@ -175,6 +175,7 @@ Ref_MODULES := \
 SDREF_DEPLOYMENT_MODULES := \
 	ROS/fprime_ws/src/SDREF \
 	HEXREF/Rpc \
+	SDREF/SDRosIface \
 	SDREF/Top
 
 SDREF_MODULES := \

@@ -39,7 +39,7 @@ void dummy() {
 }
 
 void print_usage() {
-    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run 1 cycle; -c to run continuously\n-r to use HexRouter\n");
+    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run # cycles; -c to run continuously\n-r to use HexRouter\n");
 }
 
 int main(int argc, char* argv[]) {

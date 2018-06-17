@@ -345,6 +345,7 @@ int hexref_cycle(unsigned int cycles) {
         Os::Task::delay(1);
     }
     imuDRInt.exitThread();
+    DEBUG_PRINT("hexref_cycle returning");
 
     return 0;
 }
