@@ -202,9 +202,10 @@ namespace Drv {
                           Vector3(accelX, accelY, accelZ),
                           imu_covar, FW_NUM_ARRAY_ELEMENTS(imu_covar)
                         ); // end Imu constructor
-
-                        if (this->isConnected_Imu_OutputPort(0)) {
-                            this->Imu_out(0, imu);
+                        for (int i = 0; i < NUM_IMU_OUTPUT_PORTS; i++) {
+                            if (this->isConnected_Imu_OutputPort(i)) {
+                                this->Imu_out(i, imu);
+                            }
                         }
                     }
                 }
@@ -411,6 +412,7 @@ namespace Drv {
                         this->SpiConfig_out(0, MPU9250_SPI_DATA_HZ);
                     }
                     m_initState = INIT_COMPLETE;
+                    this->log_ACTIVITY_HI_MPU9250_ImuInit();
                     break;
                 case INIT_ERROR:
                     m_initState = INIT_RESET; // TODO(mereweth) - smarter recovery?
