@@ -308,6 +308,7 @@ enum TimeBase {
     TB_PROC_TIME, //!< Indicates time is processor cycle time. Not tied to external time
     TB_WORKSTATION_TIME, //!< Time as reported on workstation where software is running. For testing.
     TB_ROS_TIME, //!< Indicates time is ROS time, either real or sim.
+    TB_HEXAGON_DSP_TIME, //!< Time on Hexagon DSP
     TB_DONT_CARE = 0xFFFF //!< Don't care value for sequences. If FwTimeBaseStoreType is changed, value should be changed
 };
 

@@ -1,9 +1,3 @@
-## Magic draw
-
-### types and Ports
-- create stubs for each catkin package
-- each type lives under its associated port
-
 ## ROS Components
 
 ### RosCycle
@@ -16,23 +10,11 @@
 ### No variable-size arrays
 - all array storage (greater than max size) separate from serializable type
 
-### ROS time & duration
-- Fw::Time with specific timebase/context
-
-### string
-
-### Header
-
 ## Build system
 
 ### Requirements
 - RTTI??
 - how to disable RTTI everywhere with no ROS includes
-
-### Serializable types and Ports
-- what about msg packages in another workspace?
-    - pass in BUILD_ROOT?
-- version-control?
 
 ### methods for converting to and from ROS message objects
 - F Prime templates and visitors to create converter code to/from ROS message objects?

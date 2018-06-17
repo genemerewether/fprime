@@ -14,12 +14,6 @@
 
 ## Drivers
 
-- MD model for RotorSDrv
-
-### Actuators
-
-### Ground truth
-
 ### IMU
 
 ### Cameras

@@ -84,8 +84,6 @@ namespace Svc {
          */
 
         if (this->m_backupCycles > m_droppedCyclesError) {
-            DEBUG_PRINT("Backup cycle %u gt than error threshold %u\n",
-                        this->m_backupCycles, m_droppedCyclesError);
             this->CycleIn_handler(portNum, cycleStart);
         }
     }
@@ -97,6 +95,8 @@ namespace Svc {
         // we are using backup cycler, so allow for checking for cycle slip
         // TODO(mereweth) - might see a fake slip when backup cycler starts/stops
         if (this->m_backupCycles > m_droppedCyclesError) {
+            DEBUG_PRINT("Backup cycle %u gt than error threshold %u; cycle %u\n",
+                        this->m_backupCycles, m_droppedCyclesError, this->m_cycles);
             this->m_cycleStarted = true;
         }
     }
