@@ -105,6 +105,8 @@ namespace Drv {
             if (m_initState == INIT_COMPLETE) {
                 Os::IntervalTimer timer;
                 if (m_opMode == OPMODE_INTERRUPT) {
+                    // TODO(mereweth) - add port call with exact interrupt time
+                    Fw::Time ImuNow = this->getTime();
                     timer.start();
                     // this is done when leaving last INIT phase
                     //this->SpiConfig_out(0, MPU9250_SPI_DATA_HZ);
@@ -162,15 +164,49 @@ namespace Drv {
                                         (int16_t) readBuf[1+2*sIdx+sBase];
                     }
 #endif
+
+                    F64 accelX = m_accelRawToMS2 * (float) accel[0];
+                    F64 accelY = m_accelRawToMS2 * (float) accel[1];
+                    F64 accelZ = m_accelRawToMS2 * (float) accel[2];
+
+                    F64 gyroX = m_gyroRawToRadS * (float) gyro[0];
+                    F64 gyroY = m_gyroRawToRadS * (float) gyro[1];
+                    F64 gyroZ = m_gyroRawToRadS * (float) gyro[2];
+
                     // TODO(mereweth) - convert temperature; check for saturation
                     DEBUG_PRINT("Accel [ % 2.3f, % 2.3f, % 2.3f]; Gyro [% 2.3f, % 2.3f, % 2.3f]; Temp % 2.3f\n",
-                                m_accelRawToMS2 * (float) accel[0],
-                                m_accelRawToMS2 * (float) accel[1],
-                                m_accelRawToMS2 * (float) accel[2],
-                                m_gyroRawToRadS * (float) gyro[0],
-                                m_gyroRawToRadS * (float) gyro[1],
-                                m_gyroRawToRadS * (float) gyro[2],
+                                accelX, accelY, accelZ, gyroX, gyroY, gyroZ,
                                 float(temp) / 361.0f + 35.0f);
+
+                    {
+                        using namespace ROS::std_msgs;
+                        using namespace ROS::geometry_msgs;
+                        using namespace ROS::sensor_msgs;
+
+                        /* TODO(mereweth) - magnetometer; from ROS docs:
+                         * If you have no estimate for one of the data elements
+                         * (e.g. your IMU doesn't produce an orientation
+                         * estimate), please set element 0 of the associated
+                         * covariance matrix to -1
+                         */
+                        F64 mag_covar[9] = {-1.0L, 0.0L}; // mark as invalid measurement
+                        F64 imu_covar[9] = {0.0L}; // unknown covariance
+
+                        Imu imu(
+                          // TODO(mereweth) - add/use time port from GPIO interrupt
+                          Header(m_cycleCount, ImuNow, Fw::EightyCharString("mpu9250")),
+                          Quaternion(0, 0, 0, 1), // TODO(mereweth) - mag goes here
+                          mag_covar, FW_NUM_ARRAY_ELEMENTS(mag_covar),
+                          Vector3(gyroX, gyroY, gyroZ),
+                          imu_covar, FW_NUM_ARRAY_ELEMENTS(imu_covar),
+                          Vector3(accelX, accelY, accelZ),
+                          imu_covar, FW_NUM_ARRAY_ELEMENTS(imu_covar)
+                        ); // end Imu constructor
+
+                        if (this->isConnected_Imu_OutputPort(0)) {
+                            this->Imu_out(0, imu);
+                        }
+                    }
                 }
                 else if (m_opMode == OPMODE_FIFO) {
                     timer.start();

@@ -31,61 +31,23 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
+// TODO make proper static constants for these
+#define DSPAL_GPIO_PATH "/dev/gpio-"
+#define MAX_BUF 64
+
 #include <HAP_farf.h>
-#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
-//#define DEBUG_PRINT(x,...)
+//#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#define DEBUG_PRINT(x,...)
 
 namespace Drv {
 
-
-    /****************************************************************
-    * gpio_export
-    ****************************************************************/
-    int gpio_export(unsigned int gpio)
+    void *gpio_int_isr(DSPAL_GPIO_INT_ISR_CTX context)
     {
-        return 0;
-    }
+        void * val = (void *)context;
 
-    /****************************************************************
-     * gpio_unexport
-     ****************************************************************/
-    int gpio_unexport(unsigned int gpio)
-    {
-        return 0;
-    }
+        LinuxGpioDriverComponentImpl::intTaskEntry(val);
 
-    /****************************************************************
-     * gpio_set_dir
-     ****************************************************************/
-    int gpio_set_dir(unsigned int gpio, unsigned int out_flag)
-    {
-        return 0;
-    }
-
-    /****************************************************************
-     * gpio_set_value
-     ****************************************************************/
-    int gpio_set_value(int fd, unsigned int value)
-    {
-        return 0;
-    }
-
-    /****************************************************************
-     * gpio_get_value
-     ****************************************************************/
-    int gpio_get_value(int fd, unsigned int *value)
-    {
-        return 0;
-    }
-
-
-    /****************************************************************
-     * gpio_set_edge
-     ****************************************************************/
-
-    int gpio_set_edge(unsigned int gpio, char *edge)
-    {
-        return 0;
+        return NULL;
     }
 
     /****************************************************************
@@ -94,7 +56,18 @@ namespace Drv {
 
     int gpio_fd_open(unsigned int gpio)
     {
-        return 0;
+        int fd, len;
+        char buf[MAX_BUF];
+
+        len = snprintf(buf, sizeof(buf), DSPAL_GPIO_PATH "%d", gpio);
+        FW_ASSERT(len > 0, len);
+
+        fd = open(buf, 0);
+        if (fd < 0) {
+            DEBUG_PRINT("gpio/fd_open error!\n");
+            return -1;
+        }
+        return fd;
     }
 
     /****************************************************************
@@ -103,10 +76,6 @@ namespace Drv {
 
     int gpio_fd_close(int fd, unsigned int gpio)
     {
-        // TODO is this needed? w/o this the edge file and others can retain the state from
-        // previous settings.
-        (void) gpio_unexport(gpio); // TODO check return value
-
         return 0;
     }
 
@@ -123,13 +92,13 @@ namespace Drv {
   {
       FW_ASSERT(this->m_fd != -1);
 
-      unsigned int val;
-      NATIVE_INT_TYPE stat = gpio_get_value(this->m_fd, &val);
-      if (-1 == stat) {
-          this->log_WARNING_HI_GP_ReadError(this->m_gpio,stat);
+      enum DSPAL_GPIO_VALUE_TYPE val;
+      int bytes = read(this->m_fd, &val, 1);
+      if (bytes != 1) {
+          this->log_WARNING_HI_GP_WriteError(this->m_gpio,bytes);
           return;
       } else {
-          state = val?true:false;
+          state = (val == DSPAL_GPIO_HIGH_VALUE)?true:false;
       }
   }
 
@@ -141,52 +110,61 @@ namespace Drv {
   {
       FW_ASSERT(this->m_fd != -1);
 
-      NATIVE_INT_TYPE stat;
+      enum DSPAL_GPIO_VALUE_TYPE val = state ? DSPAL_GPIO_HIGH_VALUE : DSPAL_GPIO_LOW_VALUE;
+      int bytes = write(this->m_fd, &val, 1);
 
-      stat = gpio_set_value(this->m_fd,state?1:0);
-
-      if (0 != stat) {
-          this->log_WARNING_HI_GP_WriteError(this->m_gpio,stat);
+      if (bytes != 1) {
+          this->log_WARNING_HI_GP_WriteError(this->m_gpio,bytes);
           return;
       }
   }
 
   bool LinuxGpioDriverComponentImpl ::
     open(NATIVE_INT_TYPE gpio, GpioDirection direction) {
-
       // TODO check for invalid gpio?
-      NATIVE_INT_TYPE stat;
 
       // Configure:
-      stat = gpio_export(gpio);
-      if (-1 == stat) {
-          this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-      }
-      stat = gpio_set_dir(gpio, direction == GPIO_OUT ? 1 : 0);
-      if (-1 == stat) {
-          this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-      }
-
-      // If needed, set edge to rising in intTaskEntry()
-
-      // Open:
       this->m_fd = gpio_fd_open(gpio);
-      if (-1 == this->m_fd) {
-          this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-      } else {
-          this->m_gpio = gpio;
+
+      struct dspal_gpio_ioctl_config_io config;
+      config.direction = DSPAL_GPIO_DIRECTION_INPUT;
+      config.pull = DSPAL_GPIO_NO_PULL;
+      config.drive = DSPAL_GPIO_2MA;
+
+      switch (direction) {
+          case GPIO_INT:
+          {
+              // Configure this GPIO device as interrupt source
+              struct dspal_gpio_ioctl_reg_int int_config = {
+                .trigger = DSPAL_GPIOINT_TRIGGER_RISING,
+                .isr = (DSPAL_GPIO_INT_ISR) &gpio_int_isr,
+                .isr_ctx = (DSPAL_GPIO_INT_ISR_CTX) this,
+              };
+
+              if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_REG_INT, (void *)&int_config) != 0) {
+                  this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+                  DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_REG_INT failed\n");
+              }
+          }
+              break;
+          case GPIO_OUT:
+              config.direction = DSPAL_GPIO_DIRECTION_OUTPUT;
+              // NOTE(mereweth) - direction set to input above; fall through to finish handling
+          case GPIO_IN:
+              if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_IO, (void *)&config) != 0) {
+                  this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+                  DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_IO failed\n");
+              }
+              break;
+          default:
+              DEBUG_PRINT("Unhandled direction %d in LinuxGpioDriver open\n", direction);
+              FW_ASSERT(0, direction);
+              break;
       }
+
+      this->m_gpio = gpio;
 
       return true;
-  }
-
-  void *gpio_int_isr(DSPAL_GPIO_INT_ISR_CTX context)
-  {
-      void * val = (void *)context;
-
-      LinuxGpioDriverComponentImpl::intTaskEntry(val);
-
-      return NULL;
   }
 
   //! Reuse interrupt task from Linux - but this gets called from DSPAL interrupt
@@ -215,18 +193,6 @@ namespace Drv {
   startIntTask(NATIVE_INT_TYPE priority, NATIVE_INT_TYPE cpuAffinity) {
       // NOTE(mereweth) - no task needed on DSPAL; instead use this to turn on/off
       this->m_quitThread = false;
-
-      // Configure this GPIO device as interrupt source
-      struct dspal_gpio_ioctl_reg_int int_config = {
-        .trigger = DSPAL_GPIOINT_TRIGGER_RISING,
-        .isr = (DSPAL_GPIO_INT_ISR) &gpio_int_isr,
-        .isr_ctx = (DSPAL_GPIO_INT_ISR_CTX) this,
-      };
-
-      if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_REG_INT, (void *)&int_config) != 0) {
-          DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_REG_INT failed\n");
-          return Os::Task::TASK_UNKNOWN_ERROR;
-      }
 
       return Os::Task::TASK_OK;
   }

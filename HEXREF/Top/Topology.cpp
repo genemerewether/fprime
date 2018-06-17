@@ -185,7 +185,8 @@ void manualConstruct(void) {
     //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
     //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
-    mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(1));
+    mpu9250.set_Imu_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(1));
+    //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
 }
 
 void constructApp() {
@@ -305,7 +306,7 @@ int hexref_run(void) {
     // TODO(mereweth) - interrupt for cycling - local_cycle as argument
     bool local_cycle = true;
     int cycle = 0;
-    // imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+    imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 
     while (!terminate) {
         //DEBUG_PRINT("Cycle %d\n",cycle);
@@ -317,7 +318,7 @@ int hexref_run(void) {
     }
 
     // stop tasks
-    //imuDRInt.exitThread();
+    imuDRInt.exitThread();
     exitTasks();
     // Give time for threads to exit
     DEBUG_PRINT("Waiting for threads...\n");
@@ -335,7 +336,7 @@ int hexref_cycle(unsigned int cycles) {
         return -1;
     }
 
-    // imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+    imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
     for (unsigned int i = 0; i < cycles; i++) {
         //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
@@ -343,7 +344,7 @@ int hexref_cycle(unsigned int cycles) {
         //usleep(800);
         Os::Task::delay(1);
     }
-    //imuDRInt.exitThread();
+    imuDRInt.exitThread();
 
     return 0;
 }
