@@ -27,8 +27,8 @@ namespace SnapdragonFlight {
 enum {
     // TODO(mereweth) - must be manually synced with max port size
     KR_PORT_BUFF_SIZE = 512,
-    KR_NUM_RECV_PORT_BUFFS = 5,
-    KR_NUM_SEND_PORT_BUFFS = 5,
+    KR_NUM_RECV_PORT_BUFFS = 10,
+    KR_NUM_SEND_PORT_BUFFS = 10,
     KR_PREINIT_SLEEP_US = 1000,
     KR_NOPORT_SLEEP_US = 1000
 };

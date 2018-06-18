@@ -222,7 +222,7 @@ void constructApp(int port_number, char* hostname) {
     cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
     hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
 
-    hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
+    //hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?
@@ -269,7 +269,7 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter.start(0, 90, 20*1024);//, CORE_RPC);
 
-    hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
+    hexRouter.startPortReadThread(90,20*1024);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
     fileDown.start(0, 40, 20*1024);

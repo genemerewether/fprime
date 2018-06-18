@@ -39,8 +39,8 @@
 #define LITTLE_ENDIAN
 #endif // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
 
-#undef DEBUG_PRINT
-#define DEBUG_PRINT(x,...)
+//#undef DEBUG_PRINT
+//#define DEBUG_PRINT(x,...)
 
 namespace Drv {
 
@@ -114,10 +114,11 @@ namespace Drv {
                     writeBuf[1] = 0; // TODO(mereweth) - needed?
                     readBufObj.setsize(1 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
+                    DEBUG_PRINT("MPU9250 before read\n");
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     timer.stop();
-                    /*DEBUG_PRINT("reg read %d bytes in %u usec\n",
-                                readBufObj.getsize(), timer.getDiffUsec());*/
+                    DEBUG_PRINT("reg read %d bytes in %u usec\n",
+                                readBufObj.getsize(), timer.getDiffUsec());
 
                     // raw register contents
                     /*if (this->isConnected_FIFORaw_OutputPort(0)) {

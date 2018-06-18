@@ -26,6 +26,7 @@
 #include <SnapdragonFlight/RpcCommon/wrap_rpc.h>
 
 #include <time.h>
+#include <unistd.h>
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -60,9 +61,9 @@ namespace SnapdragonFlight {
         m_numInvalidPorts(0u)
     {
         // Initialize memory buffer objects
-        for (NATIVE_UINT_TYPE buff = 0; buff < RECEIVE_BUFFER_POOL_SIZE; buff++) {
+        for (NATIVE_UINT_TYPE buff = 0; buff < HR_RECEIVE_BUFFER_POOL_SIZE; buff++) {
             this->m_inputBuffObj[buff].setdata((U64)this->m_inputBuff[buff]);
-            this->m_inputBuffObj[buff].setsize(RECEIVE_BUFFER_SIZE);
+            this->m_inputBuffObj[buff].setsize(HR_RECEIVE_BUFFER_SIZE);
 
             // After creation, buffer set ordering can change as some consumers are slower to process and return
             this->m_buffSet[buff].readBuffer = this->m_inputBuffObj[buff];
@@ -97,7 +98,7 @@ namespace SnapdragonFlight {
         bool found = false;
 
         // search for open entry
-        for (NATIVE_UINT_TYPE entry = 0; entry < RECEIVE_BUFFER_POOL_SIZE; entry++) {
+        for (NATIVE_UINT_TYPE entry = 0; entry < HR_RECEIVE_BUFFER_POOL_SIZE; entry++) {
             // Look for slots to fill. "Available" is from
             // the perspective of the driver thread looking for
             // buffers to fill, so add the buffer and make it available.
@@ -187,8 +188,8 @@ namespace SnapdragonFlight {
         HexRouterComponentImpl* comp =
                   static_cast<HexRouterComponentImpl*>(ptr);
 
-        uint8_t buff[READ_PORT_SIZE];
-        Fw::ExternalSerializeBuffer portBuff(buff, READ_PORT_SIZE);
+        uint8_t buff[HR_READ_PORT_SIZE];
+        Fw::ExternalSerializeBuffer portBuff(buff, HR_READ_PORT_SIZE);
 
         while (1) {
             // wait for data
@@ -206,7 +207,7 @@ namespace SnapdragonFlight {
             while (waiting) {
                 stat = rpc_relay_port_read(&portNum,
                        reinterpret_cast<unsigned char*>(buff),
-                       READ_PORT_SIZE, &sizeRead);
+                       HR_READ_PORT_SIZE, &sizeRead);
 
                 timespec stime;
                 (void)clock_gettime(CLOCK_REALTIME,&stime);
@@ -307,7 +308,7 @@ namespace SnapdragonFlight {
             NATIVE_INT_TYPE entryFound = false;
 
             NATIVE_INT_TYPE entry = 0;
-            for (entry = 0; entry < RECEIVE_BUFFER_POOL_SIZE; entry++) {
+            for (entry = 0; entry < HR_RECEIVE_BUFFER_POOL_SIZE; entry++) {
                 if (comp->m_buffSet[entry].available) {
                     comp->m_buffSet[entry].available = false;
                     buff = comp->m_buffSet[entry].readBuffer;

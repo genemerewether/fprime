@@ -32,16 +32,6 @@
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
-// List of context IDs
-enum {
-    ACTIVE_COMP_1HZ_RG,
-    ACTIVE_COMP_RG_DECOUPLE,
-    ACTIVE_COMP_LOGGER,
-
-    CYCLER_TASK,
-    NUM_ACTIVE_COMPS
-};
-
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
 static Fw::SimpleObjRegistry simpleReg;
@@ -53,7 +43,7 @@ Svc::RateGroupDecouplerComponentImpl rgDecouple(
 #if FW_OBJECT_NAMES == 1
                     "RGDECOUPLE",
 #endif
-                    10) // 10 dropped hardware cycles before an error
+                    5) // 50 dropped hardware cycles before an error
 ;
 
 static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
@@ -185,7 +175,7 @@ void manualConstruct(void) {
     //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
     //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
-    mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
+    //mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
     //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
 }
 
@@ -202,7 +192,7 @@ void constructApp() {
 
     // Initialize the rate groups
     rg.init(10,0);
-    rgDecouple.init(10,0);
+    rgDecouple.init(10, 0);
     rgAtt.init(1);
     rgPos.init(0);
 
@@ -242,11 +232,11 @@ void constructApp() {
 
     // Active component startup
     // start rate groups
-    rg.start(ACTIVE_COMP_1HZ_RG, 50,10 * 1024);
+    rg.start(0, 50, 2 * 1024);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
-    rgDecouple.start(ACTIVE_COMP_RG_DECOUPLE, 90, 20*1024);
+    rgDecouple.start(0, 90, 5*1024);
     // start telemetry
-    eventLogger.start(ACTIVE_COMP_LOGGER,40,10*1024);
+    eventLogger.start(0, 40, 2*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -260,12 +250,22 @@ void run1cycle(void) {
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
+
+#if 1 // stress test, small amount of data
+    Fw::ExternalSerializeBuffer bufObj;
+    char buf[200] = {"hi"};
+    bufObj.setExtBuffer((U8*) buf, 200);
+    bufObj.setBuffLen(199);
+    Fw::InputSerializePort* serPort = kraitRouter.get_HexPortsIn_InputPort(1);
+    serPort->invokeSerial(bufObj);
+#endif
 }
 
 void exitTasks(void) {
     rg.exit();
     rgDecouple.exit();
     eventLogger.exit();
+    imuDRInt.exitThread();
 }
 
 volatile bool terminate = false;
@@ -313,7 +313,7 @@ int hexref_run(void) {
         if (local_cycle) {
             run1cycle();
         }
-        Os::Task::delay(1);
+        Os::Task::delay(10);
         cycle++;
     }
 
@@ -341,8 +341,7 @@ int hexref_cycle(unsigned int cycles) {
         //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
         run1cycle();
-        //usleep(800);
-        Os::Task::delay(1);
+        Os::Task::delay(10);
     }
     imuDRInt.exitThread();
     DEBUG_PRINT("hexref_cycle returning");
@@ -362,6 +361,7 @@ int hexref_wait() {
 int hexref_fini(void) {
     DEBUG_PRINT("hexref_fini called...\n");
     terminate = true;
+    imuDRInt.exitThread();
     kraitRouter.m_quit = true;
     return 0;
 }

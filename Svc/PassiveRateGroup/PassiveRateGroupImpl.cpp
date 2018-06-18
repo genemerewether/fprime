@@ -23,8 +23,8 @@
 #include <Fw/Types/Assert.hpp>
 #include <Os/Log.hpp>
 
-//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-#define DEBUG_PRINT(x,...)
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
 
 namespace Svc {
 
@@ -63,6 +63,8 @@ namespace Svc {
         for (NATIVE_INT_TYPE port = 0; port < this->getNum_RateGroupMemberOut_OutputPorts(); port++) {
             if (this->isConnected_RateGroupMemberOut_OutputPort(port)) {
                 this->RateGroupMemberOut_out(port,this->m_contexts[port]);
+                DEBUG_PRINT("PRG instance %d done with port %d\n",
+                            this->getInstance(), port);
             }
         }
 

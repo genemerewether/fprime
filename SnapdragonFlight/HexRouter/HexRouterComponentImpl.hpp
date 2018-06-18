@@ -60,11 +60,11 @@ namespace SnapdragonFlight {
 
     void startBuffReadThread(NATIVE_INT_TYPE priority,
                              NATIVE_INT_TYPE stackSize,
-                             NATIVE_INT_TYPE cpuAffinity);
+                             NATIVE_INT_TYPE cpuAffinity = -1);
 
     void startPortReadThread(NATIVE_INT_TYPE priority,
                              NATIVE_INT_TYPE stackSize,
-                             NATIVE_INT_TYPE cpuAffinity);
+                             NATIVE_INT_TYPE cpuAffinity = -1);
 
     void quitReadThreads(void);
 
@@ -117,11 +117,11 @@ namespace SnapdragonFlight {
       struct BufferSet {
           Fw::Buffer readBuffer; //!< buffers for port reads
           bool available; //!< is buffer available?
-      } m_buffSet[RECEIVE_BUFFER_POOL_SIZE];
+      } m_buffSet[HR_RECEIVE_BUFFER_POOL_SIZE];
 
       // input buffers
-      BYTE m_inputBuff[RECEIVE_BUFFER_POOL_SIZE][RECEIVE_BUFFER_SIZE]; //!< locally allocated buffer
-      Fw::Buffer m_inputBuffObj[RECEIVE_BUFFER_POOL_SIZE]; //!< input buffer objects
+      BYTE m_inputBuff[HR_RECEIVE_BUFFER_POOL_SIZE][HR_RECEIVE_BUFFER_SIZE]; //!< locally allocated buffer
+      Fw::Buffer m_inputBuffObj[HR_RECEIVE_BUFFER_POOL_SIZE]; //!< input buffer objects
 
       Os::Mutex m_readBuffMutex;
 

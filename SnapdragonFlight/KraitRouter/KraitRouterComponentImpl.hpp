@@ -24,6 +24,8 @@
 
 #include "SnapdragonFlight/KraitRouter/KraitRouterComponentAc.hpp"
 
+#include "Os/Mutex.hpp"
+
 namespace SnapdragonFlight {
 
     class KraitRouterComponentImpl :
@@ -98,18 +100,18 @@ namespace SnapdragonFlight {
             //Fw::ExternalSerializeBuffer portBuffObj;
             unsigned int portNum;
             unsigned int buffLen;
-            bool available;
+            volatile bool available;
         } m_recvPortBuffers[KR_NUM_RECV_PORT_BUFFS];
 
-        unsigned int m_recvPortBuffInsert;
-        unsigned int m_recvPortBuffRemove;
+        volatile unsigned int m_recvPortBuffInsert;
+        volatile unsigned int m_recvPortBuffRemove;
 
         PortBufferEntry m_sendPortBuffers[KR_NUM_SEND_PORT_BUFFS];
 
-        unsigned int m_sendPortBuffInsert;
-        unsigned int m_sendPortBuffRemove;
+        volatile unsigned int m_sendPortBuffInsert;
+        volatile unsigned int m_sendPortBuffRemove;
 
-        bool m_initialized;
+        volatile bool m_initialized;
     };
 
 } // end namespace SnapdragonFlight

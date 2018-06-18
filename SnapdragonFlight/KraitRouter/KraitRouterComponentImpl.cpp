@@ -30,8 +30,8 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
-#undef DEBUG_PRINT
-#define DEBUG_PRINT(x,...)
+//#undef DEBUG_PRINT
+//#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
@@ -142,12 +142,15 @@ namespace SnapdragonFlight {
              * to copy in port
              */
         }
+
         *port = m_recvPortBuffers[m_recvPortBuffRemove].portNum;
         DEBUG_PRINT("before memcpy of buff idx %d in portRead in object 0x%X, port %d\n",
                     m_recvPortBuffRemove, (unsigned long) this, *port);
         memcpy(buff, m_recvPortBuffers[m_recvPortBuffRemove].buff,
                m_recvPortBuffers[m_recvPortBuffRemove].buffLen);
         *bytes = m_recvPortBuffers[m_recvPortBuffRemove].buffLen;
+        DEBUG_PRINT("after memcpy of buff idx %d in portRead in object 0x%X, port %d\n",
+                    m_recvPortBuffRemove, (unsigned long) this, *port);
 
         // was false, meaning had data. set to available so it can be filled again
         m_recvPortBuffers[m_recvPortBuffRemove].available = true;
@@ -272,8 +275,8 @@ namespace SnapdragonFlight {
          * All the Hexagon QUEST code runs in a single QuRT thread, using PassiveRateGroup
          */
 
-        DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n",
-                    portNum, Buffer.getBuffLength());
+        DEBUG_PRINT("HexPortsIn_handler for port %d, insert idx %u, with %d bytes\n",
+                    portNum, m_recvPortBuffInsert, Buffer.getBuffLength());
 
         if (Buffer.getBuffLength() == 0) {
             DEBUG_PRINT("HexPortsIn_handler serialized port %d empty\n",
@@ -308,14 +311,19 @@ namespace SnapdragonFlight {
             m_recvPortBuffers[m_recvPortBuffInsert].available = true;
             return;
         }
+        DEBUG_PRINT("HexPortsIn_handler before memcpy\n");
         memcpy(m_recvPortBuffers[m_recvPortBuffInsert].buff,
                Buffer.getBuffAddr(), Buffer.getBuffLength());
+        DEBUG_PRINT("HexPortsIn_handler after memcpy\n");
         m_recvPortBuffers[m_recvPortBuffInsert].buffLen = Buffer.getBuffLength();
 
         m_recvPortBuffInsert++;
         if (m_recvPortBuffInsert >= FW_NUM_ARRAY_ELEMENTS(m_recvPortBuffers)) {
             m_recvPortBuffInsert = 0;
         }
+
+        DEBUG_PRINT("HexPortsIn_handler done port %d, insert idx %u, with %d bytes\n",
+                    portNum, m_recvPortBuffInsert, Buffer.getBuffLength());
     }
 
 } // end namespace SnapdragonFlight

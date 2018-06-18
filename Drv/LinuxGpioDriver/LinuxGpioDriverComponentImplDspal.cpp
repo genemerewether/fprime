@@ -44,6 +44,7 @@ namespace Drv {
     void *gpio_int_isr(DSPAL_GPIO_INT_ISR_CTX context)
     {
         void * val = (void *)context;
+        DEBUG_PRINT("gpio interrupt\n");
 
         LinuxGpioDriverComponentImpl::intTaskEntry(val);
 
@@ -68,15 +69,6 @@ namespace Drv {
             return -1;
         }
         return fd;
-    }
-
-    /****************************************************************
-     * gpio_fd_close
-     ****************************************************************/
-
-    int gpio_fd_close(int fd, unsigned int gpio)
-    {
-        return 0;
     }
 
 
@@ -170,6 +162,7 @@ namespace Drv {
   //! Reuse interrupt task from Linux - but this gets called from DSPAL interrupt
   void LinuxGpioDriverComponentImpl ::
     intTaskEntry(void * ptr) {
+      DEBUG_PRINT("LinuxGpioDriver intTaskEntry\n");
 
       FW_ASSERT(ptr);
       LinuxGpioDriverComponentImpl* compPtr = (LinuxGpioDriverComponentImpl*) ptr;
@@ -200,6 +193,11 @@ namespace Drv {
   void LinuxGpioDriverComponentImpl ::
     exitThread(void) {
       this->m_quitThread = true;
+
+      if (this->m_fd != -1) {
+          close(this->m_fd);
+          this->m_fd = -1;
+      }
   }
 
   LinuxGpioDriverComponentImpl ::
@@ -207,7 +205,7 @@ namespace Drv {
   {
       if (this->m_fd != -1) {
           DEBUG_PRINT("Closing GPIO %d fd %d\n",this->m_gpio, this->m_fd);
-          (void) gpio_fd_close(this->m_fd, this->m_gpio);
+          close(this->m_fd);
       }
 
   }
