@@ -67,8 +67,7 @@ namespace SnapdragonFlight {
 
         int buffWrite(unsigned int port, const unsigned char* buff, int buffLen);
 
-        // multiple serialized port calls
-        int portWrite(const unsigned char* buff, int buffLen);
+        int portWrite(unsigned int port, const unsigned char* buff, int buffLen);
 
       PRIVATE:
 

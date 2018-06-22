@@ -84,8 +84,8 @@ DRV_MODULES := \
 
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
-	SnapdragonFlight/HexRouter #\
-	#SnapdragonFlight/DspRpcAllocator \
+	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/DspRpcAllocator
 	#SnapdragonFlight/SnapdragonHealth \
 	#SnapdragonFlight/SnapdragonGpioTester
 

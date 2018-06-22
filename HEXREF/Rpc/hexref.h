@@ -40,7 +40,7 @@ struct _hexref_dataBuffer__seq_octet {
 };
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_rpc_relay_port_read)(unsigned char* buff, int buffLen, int* bytes) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_rpc_relay_buff_read)(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) __QAIC_HEADER_ATTRIBUTE;
-__QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_rpc_relay_port_write)(const unsigned char* buff, int buffLen) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_rpc_relay_port_write)(unsigned int port, const unsigned char* buff, int buffLen) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(hexref_rpc_relay_buff_write)(unsigned int port, const unsigned char* buff, int buffLen) __QAIC_HEADER_ATTRIBUTE;
 #ifdef __cplusplus
 }

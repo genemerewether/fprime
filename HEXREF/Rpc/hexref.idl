@@ -14,7 +14,7 @@ interface hexref
 
     long rpc_relay_buff_read(rout unsigned long port, rout dataBuffer buff, rout long bytes);
 
-    long rpc_relay_port_write(in dataBuffer buff);
+    long rpc_relay_port_write(in unsigned long port, in dataBuffer buff);
 
     long rpc_relay_buff_write(in unsigned long port, in dataBuffer buff);
 };

@@ -23,6 +23,7 @@
 #include "SnapdragonFlight/HexRouter/HexRouterComponentAc.hpp"
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImplCfg.hpp>
 #include <Os/Mutex.hpp>
+#include <Fw/Types/MemAllocator.hpp>
 
 namespace SnapdragonFlight {
 
@@ -57,6 +58,12 @@ namespace SnapdragonFlight {
       //! Destroy object HexRouter
       //!
       ~HexRouterComponentImpl(void);
+
+    //! Give the class a memory buffer. Should be called after constructor and init, but before task is spawned.
+    void allocateBuffer(NATIVE_INT_TYPE identifier, Fw::MemAllocator& allocator, NATIVE_UINT_TYPE bytes);
+
+    //! Return allocated buffer. Should be done during shutdown
+    void deallocateBuffer(Fw::MemAllocator& allocator);
 
     void startBuffReadThread(NATIVE_INT_TYPE priority,
                              NATIVE_INT_TYPE stackSize,
@@ -125,7 +132,7 @@ namespace SnapdragonFlight {
 
       Os::Mutex m_readBuffMutex;
 
-      bool m_quitReadThreads; //!< flag to quit threads
+      volatile bool m_quitReadThreads; //!< flag to quit threads
 
       U32 m_numDecodeErrors; //!< number of buffer decoder errors
       U32 m_numBadSerialPortCalls;  //<! number of bad Serial port calls, ie bad serialize status returned
@@ -133,6 +140,8 @@ namespace SnapdragonFlight {
       U32 m_numPackets; //!< number of received packets
       U32 m_numInvalidPorts; //!< number of invalid ports
 
+      //! The allocator ID
+      NATIVE_INT_TYPE m_allocatorId;
   };
 
 } // end namespace SnapdragonFlight

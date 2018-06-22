@@ -22,14 +22,20 @@
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 #include "Fw/Types/EightyCharString.hpp"
+#include "Fw/Types/SerialBuffer.hpp"
 
 #include <SnapdragonFlight/RpcCommon/wrap_rpc.h>
 
+#ifdef BUILD_SDFLIGHT
+#include <rpcmem.h>
+#endif // BUILD_SDFLIGHT
+
 #include <time.h>
 #include <unistd.h>
+#include <stdlib.h>
 
-//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-#define DEBUG_PRINT(x,...)
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
@@ -58,9 +64,11 @@ namespace SnapdragonFlight {
         m_numDecodeErrors(0u),
         m_numBadSerialPortCalls(0u),
         m_numPackets(0u),
-        m_numInvalidPorts(0u)
+        m_numInvalidPorts(0u),
+        m_allocatorId(0)
     {
         // Initialize memory buffer objects
+        // TODO(mereweth) switch to rpcmem_alloc if actually using these
         for (NATIVE_UINT_TYPE buff = 0; buff < HR_RECEIVE_BUFFER_POOL_SIZE; buff++) {
             this->m_inputBuffObj[buff].setdata((U64)this->m_inputBuff[buff]);
             this->m_inputBuffObj[buff].setsize(HR_RECEIVE_BUFFER_SIZE);
@@ -85,6 +93,18 @@ namespace SnapdragonFlight {
       ~HexRouterComponentImpl(void)
     {
 
+    }
+
+    // TODO(mereweth) - allocate buffer pools - change name to allocateBuffers
+    void HexRouterComponentImpl ::
+      allocateBuffer(NATIVE_INT_TYPE identifier, Fw::MemAllocator& allocator, NATIVE_UINT_TYPE bytes) {
+        this->m_allocatorId = identifier;
+        //static_cast<U8*>(allocator.allocate(identifier,bytes))
+    }
+
+    void HexRouterComponentImpl ::
+      deallocateBuffer(Fw::MemAllocator& allocator) {
+        //allocator.deallocate(this->m_allocatorId,this->m_seqBuffer.getBuffAddr());
     }
 
   // ----------------------------------------------------------------------
@@ -140,7 +160,7 @@ namespace SnapdragonFlight {
         DEBUG_PRINT("KraitPortsIn_handler for port %d with %d bytes\n",
                     portNum, Buffer.getBuffLength());
 
-        NATIVE_INT_TYPE stat = rpc_relay_write(portNum, data, xferSize);
+        NATIVE_INT_TYPE stat = rpc_relay_port_write(portNum, data, xferSize);
         // TODO(mereweth) - write error codes
         if (-1 == stat) {
             this->log_WARNING_HI_HR_WriteError(stat);
@@ -188,97 +208,149 @@ namespace SnapdragonFlight {
         HexRouterComponentImpl* comp =
                   static_cast<HexRouterComponentImpl*>(ptr);
 
-        uint8_t buff[HR_READ_PORT_SIZE];
-        Fw::ExternalSerializeBuffer portBuff(buff, HR_READ_PORT_SIZE);
+#ifdef BUILD_SDFLIGHT
+        // TODO(mereweth) - switch to DspRpcAllocator?
+        rpcmem_init();
+        uint8_t* buff = (uint8_t*)rpcmem_alloc(22, 0, HR_RPC_READ_SIZE);
+#else
+        uint8_t* buff = (uint8_t*)malloc(HR_RPC_READ_SIZE);
+#endif
+        FW_ASSERT(buff != NULL, 0);
+        Fw::SerialBuffer rpcCallBuff(buff, HR_RPC_READ_SIZE);
 
-        while (1) {
+        while (!comp->m_quitReadThreads) {
             // wait for data
             int sizeRead = 0;
             unsigned int portNum = 0;
+            bool waiting = true;
 
             timespec stime;
             (void)clock_gettime(CLOCK_REALTIME,&stime);
             DEBUG_PRINT("Calling rpc_relay_port_read() at %d %d\n",
                         stime.tv_sec, stime.tv_nsec);
 
-            bool waiting = true;
             int stat = 0;
 
             while (waiting) {
-                stat = rpc_relay_port_read(&portNum,
-                       reinterpret_cast<unsigned char*>(buff),
-                       HR_READ_PORT_SIZE, &sizeRead);
+                stat = rpc_relay_port_read(reinterpret_cast<unsigned char*>(buff),
+                                           HR_RPC_READ_SIZE, &sizeRead);
+                // setBuffLen to sizeRead called below
 
                 timespec stime;
                 (void)clock_gettime(CLOCK_REALTIME,&stime);
                 DEBUG_PRINT("After rpc_relay_port_read() at %d %d; quit? %d\n",
                             stime.tv_sec, stime.tv_nsec, comp->m_quitReadThreads);
 
-                // TODO(mereweth) - add KraitRouter timeout return code and
+                // TODO(mereweth) - is this the best strategy for performance? Favor the DSP
                 // check for timeout
-                if (1 == stat) {
+                if ((stat == KR_RTN_OK) &&
+                    (sizeRead == 0))     {
                     if (comp->m_quitReadThreads) {
-                        return;
+                        waiting = false;
+                        break;
                     }
+                    usleep(HR_NO_MSG_SLEEP_US);
                 } else { // quit if other error or if data received
                     waiting = false;
                 }
             }
 
             if (comp->m_quitReadThreads) {
+#ifdef BUILD_SDFLIGHT
+                rpcmem_free(buff);
+#else
+                free(buff);
+#endif
                 return;
             }
 
-            if (stat != 0) {
-                timespec stime;
-                (void)clock_gettime(CLOCK_REALTIME,&stime);
-                DEBUG_PRINT("rpc_relay_port_read error stat %d at %d:%d\n",
-                            stat, stime.tv_sec, stime.tv_nsec);
-                comp->log_WARNING_HI_HR_DataReceiveError(HR_RELAY_READ_ERR,
-                                                         stat);
-            } else {
-                  /*stat = portBuff.deserialize(buff, sizeRead, true);
-                if (stat != Fw::FW_SERIALIZE_OK) {
-                    DEBUG_PRINT("Decode data error\n");
-                    comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
-                    return;
-                }
-                // set buffer to size of data*/
-                stat = portBuff.setBuffLen(sizeRead);
-                if (stat != Fw::FW_SERIALIZE_OK) {
-                    DEBUG_PRINT("Set setBuffLen error\n");
-                    comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
-                    return;
-                }
+            // TODO(mereweth) - make EVRs for exit
+            switch (stat) {
+                case KR_RTN_QUIT_PREINIT:
+                case KR_RTN_QUIT:
+                    comp->m_quitReadThreads = true;
+                    break;
+                case KR_RTN_OK:
+                {
+                    Fw::SerializeStatus serStat = Fw::FW_SERIALIZE_OK;
+                    // set buffer to total size of data*/
+                    serStat = rpcCallBuff.setBuffLen(sizeRead);
+                    if (serStat != Fw::FW_SERIALIZE_OK) {
+                        DEBUG_PRINT("Set setBuffLen error\n");
+                        comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
+                        break;
+                    }
+                    while (serStat == Fw::FW_SERIALIZE_OK) {
+                        serStat = rpcCallBuff.deserialize(portNum);
+                        if (serStat != Fw::FW_SERIALIZE_OK) {
+                            DEBUG_PRINT("deserialize portNum error\n");
+                            comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
+                            break;
+                        }
 
-                // (void)clock_gettime(CLOCK_REALTIME,&stime);
-                // printf("<!<! Sending data to port %u size %u at %d %d\n", portNum, buff.getsize(), stime.tv_sec, stime.tv_nsec);
+                        // pull out one port call's worth
+                        Fw::ExternalSerializeBuffer portBuff;
+                        serStat = rpcCallBuff.deserializeNoCopy(portBuff);
+                        if (serStat != Fw::FW_SERIALIZE_OK) {
+                            DEBUG_PRINT("deserialize portNum error\n");
+                            comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
+                            break;
+                        }
 
-                // call output port
-                if (comp->isConnected_HexPortsOut_OutputPort(portNum)) {
-                    DEBUG_PRINT("Calling port %d with %d bytes.\n",
-                                portNum, sizeRead);
-                    Fw::SerializeStatus stat = comp->HexPortsOut_out(portNum,
-                                                                     portBuff);
+                        // (void)clock_gettime(CLOCK_REALTIME,&stime);
+                        // printf("<!<! Sending data to port %u size %u at %d %d\n", portNum, buff.getsize(), stime.tv_sec, stime.tv_nsec);
 
-                    // If had issues deserializing the data, then report it:
-                    if (stat != Fw::FW_SERIALIZE_OK) {
-                        DEBUG_PRINT("HexPortsOut_out() serialize status error\n");
-                        comp->tlmWrite_HR_NumBadSerialPortCalls(++comp->m_numBadSerialPortCalls);
-                        comp->log_WARNING_HI_HR_BadSerialPortCall(stat,
-                                                                  portNum);
-                        return;
+                        // call output port
+                        if (comp->isConnected_HexPortsOut_OutputPort(portNum)) {
+                            DEBUG_PRINT("Calling port %d with %d bytes.\n",
+                                        portNum, portBuff.getBuffLength());
+                            Fw::SerializeStatus serStat = comp->HexPortsOut_out(portNum,
+                                                                                portBuff);
+
+                            // If had issues deserializing the data, then report it:
+                            if (serStat != Fw::FW_SERIALIZE_OK) {
+                                DEBUG_PRINT("HexPortsOut_out() serialize status error\n");
+                                comp->tlmWrite_HR_NumBadSerialPortCalls(++comp->m_numBadSerialPortCalls);
+                                comp->log_WARNING_HI_HR_BadSerialPortCall(serStat,
+                                                                          portNum);
+                                break;
+                            }
+                        }
+                        else {
+                            comp->log_WARNING_HI_HR_InvalidPortNum(HR_BUFF_SEND, portNum);
+                        }
+                    }
+                    //TODO(mereweth) - EVR that bytes remain
+                    if (serStat != Fw::FW_DESERIALIZE_BUFFER_EMPTY) {
+                        comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
+                        DEBUG_PRINT("%d bytes remain\n", rpcCallBuff.getBuffLeft());
                     }
                 }
-                else {
-                    comp->log_WARNING_HI_HR_InvalidPortNum(HR_BUFF_SEND, portNum);
-                }
+                    break;
+                case KR_RTN_FASTRPC_FAIL:
+                default:
+                    timespec stime;
+                    (void)clock_gettime(CLOCK_REALTIME,&stime);
+                    DEBUG_PRINT("rpc_relay_port_read error stat %d at %d:%d\n",
+                                stat, stime.tv_sec, stime.tv_nsec);
+                    comp->log_WARNING_HI_HR_DataReceiveError(HR_RELAY_READ_ERR,
+                                                             stat);
+                    break;
             }
+
+            (void)clock_gettime(CLOCK_REALTIME,&stime);
+            DEBUG_PRINT("Done with hexPortReadTaskEntry loop at %d %d\n",
+                        stime.tv_sec, stime.tv_nsec);
+        } // end of outer while loop
+
+        if (comp->m_quitReadThreads) {
+#ifdef BUILD_SDFLIGHT
+            rpcmem_free(buff);
+#else
+            free(buff);
+#endif
+            return;
         }
-        timespec stime;
-        (void)clock_gettime(CLOCK_REALTIME,&stime);
-        DEBUG_PRINT("Done with hexPortReadTaskEntry at %d %d\n",
-                    stime.tv_sec, stime.tv_nsec);
     }
 
     void HexRouterComponentImpl::startBuffReadThread(
@@ -292,6 +364,8 @@ namespace SnapdragonFlight {
     }
 
     void HexRouterComponentImpl::hexBuffReadTaskEntry(void * ptr) {
+        FW_ASSERT(0); // NOTE(mereweth) - not fully implemented yet
+
         HexRouterComponentImpl* comp = static_cast<HexRouterComponentImpl*>(ptr);
 
         Fw::Buffer buff;

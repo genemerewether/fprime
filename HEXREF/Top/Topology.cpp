@@ -377,8 +377,8 @@ int hexref_rpc_relay_buff_write(unsigned int port, const unsigned char* buff, in
     return kraitRouter.buffWrite(port, buff, buffLen);
 }
 
-int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
-    return kraitRouter.portWrite(buff, buffLen);
+int hexref_rpc_relay_port_write(unsigned int port, const unsigned char* buff, int buffLen) {
+    return kraitRouter.portWrite(port, buff, buffLen);
 }
 
 #ifndef BUILD_DSPAL

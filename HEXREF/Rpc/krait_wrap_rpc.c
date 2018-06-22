@@ -20,9 +20,9 @@ extern "C" {
     return hexref_rpc_relay_buff_write(port, buff, buffLen);
   }
 
-  int rpc_relay_port_write(const unsigned char* buff, int buffLen) {
+  int rpc_relay_port_write(unsigned int port, const unsigned char* buff, int buffLen) {
     //return 1;
-    return hexref_rpc_relay_port_write(buff, buffLen);
+    return hexref_rpc_relay_port_write(port, buff, buffLen);
   }
 
 /*#ifdef __cplusplus

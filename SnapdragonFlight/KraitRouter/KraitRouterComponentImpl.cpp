@@ -139,10 +139,11 @@ namespace SnapdragonFlight {
         return 0;
     }
 
-    int KraitRouterComponentImpl::portWrite(const unsigned char* buff,
+    int KraitRouterComponentImpl::portWrite(unsigned int port,
+                                            const unsigned char* buff,
                                             int buffLen) {
-        DEBUG_PRINT("write called on object 0x%X, init %d\n",
-                    (unsigned long) this, this->m_initialized);
+        DEBUG_PRINT("write called on object 0x%X, port %d, init %d\n",
+                    (unsigned long) this, port, this->m_initialized);
         FW_ASSERT(0); // TODO(mereweth) - fill write queue
         /*while (!this->m_initialized) {
             if (this->m_quit) {
