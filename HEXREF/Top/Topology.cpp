@@ -207,15 +207,14 @@ void constructApp() {
     textLogger.init();
 #endif
 
-    eventLogger.init(10,0);
+    eventLogger.init(10, 0);
 
     linuxTime.init(0);
 
     fatalAdapter.init(0);
     fatalHandler.init(0);
 
-    // TODO(mereweth) - update if queued or active
-    kraitRouter.init(0);
+    kraitRouter.init(10, 512);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -251,11 +250,11 @@ void run1cycle(void) {
     cycleStart.take();
     port->invoke(cycleStart);
 
-#if 1 // stress test, small amount of data
+#if 0 // stress test, small amount of data
     Fw::ExternalSerializeBuffer bufObj;
     char buf[200] = {"hi"};
     bufObj.setExtBuffer((U8*) buf, 200);
-    bufObj.setBuffLen(199);
+    bufObj.setBuffLen(12);
     Fw::InputSerializePort* serPort = kraitRouter.get_HexPortsIn_InputPort(1);
     serPort->invokeSerial(bufObj);
 #endif
@@ -362,7 +361,7 @@ int hexref_fini(void) {
     DEBUG_PRINT("hexref_fini called...\n");
     terminate = true;
     imuDRInt.exitThread();
-    kraitRouter.m_quit = true;
+    kraitRouter.exit();
     return 0;
 }
 
@@ -370,12 +369,16 @@ int hexref_rpc_relay_buff_read(unsigned int* port, unsigned char* buff, int buff
     return kraitRouter.buffRead(port, buff, buffLen, bytes);
 }
 
-int hexref_rpc_relay_port_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-    return kraitRouter.portRead(port, buff, buffLen, bytes);
+int hexref_rpc_relay_port_read(unsigned char* buff, int buffLen, int* bytes) {
+    return kraitRouter.portRead(buff, buffLen, bytes);
 }
 
-int hexref_rpc_relay_write(unsigned int port, const unsigned char* buff, int buffLen) {
-    return kraitRouter.write(port, buff, buffLen);
+int hexref_rpc_relay_buff_write(unsigned int port, const unsigned char* buff, int buffLen) {
+    return kraitRouter.buffWrite(port, buff, buffLen);
+}
+
+int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
+    return kraitRouter.portWrite(buff, buffLen);
 }
 
 #ifndef BUILD_DSPAL

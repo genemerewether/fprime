@@ -20,14 +20,19 @@
 namespace Fw {
     class QueuedComponentBase : public PassiveComponentBase {
         public:
+            void exit(void); //!< exit task in active/queued component
 
-    		// FIXME: Had to make MsgDispatchStatus public for LLVM. Think LLVM is wrong.
-    		typedef enum {
-				MSG_DISPATCH_OK, //!< Dispatch was normal
-				MSG_DISPATCH_EMPTY, //!< No more messages in the queue
-				MSG_DISPATCH_ERROR, //!< Errors dispatching messages
-				MSG_DISPATCH_EXIT //!< A message was sent requesting an exit of the loop
-			} MsgDispatchStatus;
+            enum {
+                QUEUED_COMPONENT_EXIT //!< message to exit queued component loop
+            };
+
+            // FIXME: Had to make MsgDispatchStatus public for LLVM. Think LLVM is wrong.
+            typedef enum {
+                MSG_DISPATCH_OK, //!< Dispatch was normal
+                MSG_DISPATCH_EMPTY, //!< No more messages in the queue
+                MSG_DISPATCH_ERROR, //!< Errors dispatching messages
+                MSG_DISPATCH_EXIT //!< A message was sent requesting an exit of the loop
+            } MsgDispatchStatus;
 
         PROTECTED:
 

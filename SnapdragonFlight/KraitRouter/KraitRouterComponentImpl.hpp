@@ -24,7 +24,7 @@
 
 #include "SnapdragonFlight/KraitRouter/KraitRouterComponentAc.hpp"
 
-#include "Os/Mutex.hpp"
+#include <Fw/Types/SerialBuffer.hpp>
 
 namespace SnapdragonFlight {
 
@@ -51,6 +51,8 @@ namespace SnapdragonFlight {
         //! Initialize object KraitRouter
         //!
         void init(
+            const NATIVE_INT_TYPE queueDepth, /*!< The queue depth*/
+            const NATIVE_INT_TYPE msgSize, /*!< The message size*/
             const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
         );
 
@@ -60,12 +62,13 @@ namespace SnapdragonFlight {
 
         int buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
 
-        int portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
+        // multiple serialized port calls
+        int portRead(unsigned char* buff, int buffLen, int* bytes);
 
-        // TODO(mereweth) - split into portWrite and buffWrite (with return port)?
-        int write(unsigned int port, const unsigned char* buff, int buffLen);
+        int buffWrite(unsigned int port, const unsigned char* buff, int buffLen);
 
-        bool m_quit;
+        // multiple serialized port calls
+        int portWrite(const unsigned char* buff, int buffLen);
 
       PRIVATE:
 
@@ -93,25 +96,17 @@ namespace SnapdragonFlight {
           Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
         );
 
-        // TODO(mereweth) - alloc on heap to allow setting size from Krait?
-        // and/or allow setting size in Topology based on serialized size of each port?
-        struct PortBufferEntry {
-            unsigned char buff[KR_PORT_BUFF_SIZE];
-            //Fw::ExternalSerializeBuffer portBuffObj;
-            unsigned int portNum;
-            unsigned int buffLen;
-            volatile bool available;
-        } m_recvPortBuffers[KR_NUM_RECV_PORT_BUFFS];
+        // temporary buffer to get data out of handler
+        Fw::ExternalSerializeBuffer m_tempBuff;
 
-        volatile unsigned int m_recvPortBuffInsert;
-        volatile unsigned int m_recvPortBuffRemove;
+        U32 m_maxReadPerDispatch;
 
-        PortBufferEntry m_sendPortBuffers[KR_NUM_SEND_PORT_BUFFS];
-
-        volatile unsigned int m_sendPortBuffInsert;
-        volatile unsigned int m_sendPortBuffRemove;
-
-        volatile bool m_initialized;
+        volatile enum InitState {
+            KR_STATE_PREINIT,
+            KR_STATE_INIT,
+            KR_STATE_QUIT_PREINIT,
+            KR_STATE_QUIT
+        } m_initialized;
     };
 
 } // end namespace SnapdragonFlight

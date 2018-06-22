@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
 
-<component name="KraitRouter" kind="passive" namespace="SnapdragonFlight">
+<component name="KraitRouter" kind="queued" namespace="SnapdragonFlight">
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
 
     <comment>Forwards port calls over FastRPC to the Krait</comment>
     <ports>
-        <port name="HexPortsIn" data_type="Serial" kind="sync_input" max_number="25">
+        <port name="HexPortsIn" data_type="Serial" kind="async_input" max_number="25">
             <comment>
                 Input ports from other Hexagon components, destination is Krait
             </comment>

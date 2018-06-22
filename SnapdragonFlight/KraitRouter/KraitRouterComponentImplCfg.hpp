@@ -25,12 +25,17 @@ namespace SnapdragonFlight {
 // TODO(mereweth) - add error status codes
 
 enum {
-    // TODO(mereweth) - must be manually synced with max port size
-    KR_PORT_BUFF_SIZE = 512,
-    KR_NUM_RECV_PORT_BUFFS = 10,
-    KR_NUM_SEND_PORT_BUFFS = 10,
-    KR_PREINIT_SLEEP_US = 1000,
-    KR_NOPORT_SLEEP_US = 1000
+    KR_PREINIT_SLEEP_US = 1000
+};
+
+enum KraitRouterReturnCode {
+    KR_RTN_QUIT_PREINIT = -10,
+    KR_RTN_QUIT = -2,
+
+    //NOTE(mereweth) - don't return this value - just a placeholder for when FastRPC returns it
+    KR_RTN_FASTRPC_FAIL = -1,
+
+    KR_RTN_OK = 0
 };
 
 }; // namespace SnapdragonFlight
