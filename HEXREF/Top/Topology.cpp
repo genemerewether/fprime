@@ -175,7 +175,7 @@ void manualConstruct(void) {
     //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
     //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
-    //mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
+    mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
     //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
 }
 
@@ -214,7 +214,7 @@ void constructApp() {
     fatalAdapter.init(0);
     fatalHandler.init(0);
 
-    kraitRouter.init(10, 512);
+    kraitRouter.init(20, 512);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -265,6 +265,7 @@ void exitTasks(void) {
     rgDecouple.exit();
     eventLogger.exit();
     imuDRInt.exitThread();
+    kraitRouter.exit();
 }
 
 volatile bool terminate = false;
@@ -360,8 +361,7 @@ int hexref_wait() {
 int hexref_fini(void) {
     DEBUG_PRINT("hexref_fini called...\n");
     terminate = true;
-    imuDRInt.exitThread();
-    kraitRouter.exit();
+    DEBUG_PRINT("hexref_fini done...\n");
     return 0;
 }
 

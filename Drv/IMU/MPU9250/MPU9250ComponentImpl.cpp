@@ -39,8 +39,8 @@
 #define LITTLE_ENDIAN
 #endif // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
 
-//#undef DEBUG_PRINT
-//#define DEBUG_PRINT(x,...)
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
 
 namespace Drv {
 

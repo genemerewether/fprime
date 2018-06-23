@@ -649,6 +649,7 @@ namespace Fw {
 
         // getBuffAddrLeft now points to beginning of buffer data
         val.setExtBuffer(&this->getBuffAddr()[this->m_deserLoc], storedLength);
+        val.setBuffLen(storedLength); // fill with data that was just added
 
         this->m_deserLoc += storedLength;
 

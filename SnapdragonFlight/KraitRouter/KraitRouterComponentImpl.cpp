@@ -29,8 +29,8 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
-//#undef DEBUG_PRINT
-//#define DEBUG_PRINT(x,...)
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
@@ -98,8 +98,6 @@ namespace SnapdragonFlight {
     int KraitRouterComponentImpl::portRead(unsigned char* buff,
                                            int buffLen,
                                            int* bytes) {
-        DEBUG_PRINT("portRead called on object 0x%X, init %d\n",
-                    (unsigned long) this, this->m_initialized);
         while (this->m_initialized == KR_STATE_PREINIT) {
             // queue isn't initialized yet so we have no choice but to sleep.
             usleep(KR_PREINIT_SLEEP_US);
@@ -118,8 +116,15 @@ namespace SnapdragonFlight {
 
         Fw::QueuedComponentBase::MsgDispatchStatus msgStat = Fw::QueuedComponentBase::MSG_DISPATCH_OK;
         // dequeue any pending messages
+        DEBUG_PRINT("portRead object 0x%X, init %d, pre-loop buffLeft %d, msgStat %d\n",
+                    (unsigned long) this, this->m_initialized,
+                    this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength(), msgStat);
         while ((msgStat != Fw::QueuedComponentBase::MSG_DISPATCH_EMPTY) &&
-               this->m_tempBuff.getBuffLeft() >= this->m_maxReadPerDispatch) {
+               ((this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength())
+                >= this->m_maxReadPerDispatch)) {
+            DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d, msgStat %d\n",
+                        (unsigned long) this, this->m_initialized,
+                        this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength(), msgStat);
             msgStat = this->doDispatch();
             if (msgStat == Fw::QueuedComponentBase::MSG_DISPATCH_EXIT) {
                 return KR_RTN_QUIT;
@@ -127,6 +132,11 @@ namespace SnapdragonFlight {
         }
 
         *bytes = this->m_tempBuff.getBuffLength();
+
+        DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d, msgStat %d, returning %d bytes\n",
+                    (unsigned long) this, this->m_initialized,
+                    this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength(), msgStat,
+                    *bytes);
 
         return KR_RTN_OK;
     }
@@ -237,10 +247,10 @@ namespace SnapdragonFlight {
         DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n",
                     portNum, Buffer.getBuffLength());
 
-        Fw::SerializeStatus stat = Buffer.serialize(portNum);
+        Fw::SerializeStatus stat = this->m_tempBuff.serialize(portNum);
         FW_ASSERT(stat == Fw::FW_SERIALIZE_OK);
         // serializes length and copies contents
-        stat = Buffer.serialize(this->m_tempBuff);
+        stat = this->m_tempBuff.serialize(Buffer);
         FW_ASSERT(stat == Fw::FW_SERIALIZE_OK);
 
         DEBUG_PRINT("HexPortsIn_handler done port %d with %d bytes\n",

@@ -11,7 +11,7 @@ enum {
 enum {
     MPU9250_RESET_WAIT_CYCLES = 20,
     MPU9250_SPI_CONFIG_HZ = 1000 * 1000, // 1 MHz for config registers
-    MPU9250_SPI_DATA_HZ = 20 * 1000 * 1000, // 20 MHz for data registers
+    MPU9250_SPI_DATA_HZ = 10 * 1000 * 1000, // 20 MHz for data registers
 };
 
 static const float MPU9250_PI = 3.14159265358979323846f;

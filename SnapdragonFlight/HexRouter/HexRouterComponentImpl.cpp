@@ -34,8 +34,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-//#define DEBUG_PRINT(x,...)
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
@@ -282,7 +282,9 @@ namespace SnapdragonFlight {
                     }
                     while (serStat == Fw::FW_SERIALIZE_OK) {
                         serStat = rpcCallBuff.deserialize(portNum);
-                        if (serStat != Fw::FW_SERIALIZE_OK) {
+                        // first read into loop; could be empty here
+                        if ((serStat != Fw::FW_SERIALIZE_OK)              &&
+                            (serStat != Fw::FW_DESERIALIZE_BUFFER_EMPTY)) {
                             DEBUG_PRINT("deserialize portNum error\n");
                             comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
                             break;
@@ -301,6 +303,12 @@ namespace SnapdragonFlight {
                         // printf("<!<! Sending data to port %u size %u at %d %d\n", portNum, buff.getsize(), stime.tv_sec, stime.tv_nsec);
 
                         // call output port
+                        if (portNum >= comp->getNum_HexPortsOut_OutputPorts()) {
+                            DEBUG_PRINT("portNum %d too big\n", portNum, comp->getNum_HexPortsOut_OutputPorts());
+                            comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
+                            break;
+                        }
+
                         if (comp->isConnected_HexPortsOut_OutputPort(portNum)) {
                             DEBUG_PRINT("Calling port %d with %d bytes.\n",
                                         portNum, portBuff.getBuffLength());
@@ -309,7 +317,7 @@ namespace SnapdragonFlight {
 
                             // If had issues deserializing the data, then report it:
                             if (serStat != Fw::FW_SERIALIZE_OK) {
-                                DEBUG_PRINT("HexPortsOut_out() serialize status error\n");
+                                DEBUG_PRINT("HexPortsOut_out() serialize status error %d\n", serStat);
                                 comp->tlmWrite_HR_NumBadSerialPortCalls(++comp->m_numBadSerialPortCalls);
                                 comp->log_WARNING_HI_HR_BadSerialPortCall(serStat,
                                                                           portNum);

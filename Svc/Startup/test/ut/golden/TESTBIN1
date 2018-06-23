@@ -1,0 +1,6 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+FILENAME=`basename "$0"`
+
+echo "I AM ${DIR}/$FILENAME, ARGS $@"
+sleep 1

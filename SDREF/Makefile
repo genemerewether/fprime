@@ -10,8 +10,7 @@ COV_BUILD: SDFLIGHT_bin_clean SDFLIGHT
 
 include $(BUILD_ROOT)/mk/makefiles/deployment_makefile.mk
 
-load: default_build
-	adb push ./linux-linaro-cross-arm-opt-gnu-bin/SDREF /home/linaro
+include $(BUILD_ROOT)/Svc/Startup/patch/patch.mk
 
 rebuild_sd:
 	make gen_make SDFLIGHT_opt_clean SDFLIGHT_opt dict_install

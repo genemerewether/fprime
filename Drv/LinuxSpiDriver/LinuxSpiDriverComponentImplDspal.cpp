@@ -82,7 +82,7 @@ namespace Drv {
         for (byte = 0; byte < read_write.read_buffer_length; byte++) {
             read_data[byte] = 0xA5;
         }
-
+/*
         // We must update the slave address before/after writing to get the chip
         // select behavior desired:
         struct dspal_spi_ioctl_set_options options = {
@@ -113,17 +113,19 @@ namespace Drv {
             this->log_WARNING_HI_SPI_WriteError(this->m_device,this->m_select,errno);
             return;
         }
-
+*/
         // Finally, we can write:
         DEBUG_PRINT("Writing %d bytes to SPI",read_write.write_buffer_length);
 
         result = ioctl(this->m_fd, SPI_IOCTL_RDWR, &read_write);
-        if (result < 0) {
-            DEBUG_PRINT("SPI %d read/write error! %d: %s",this->m_fd,errno,strerror(errno));
+        if (result != read_write.read_buffer_length) {
+            DEBUG_PRINT("SPI %d read/write error %d vs %d actual! %d: %s",
+                        this->m_fd, read_write.read_buffer_length, result,
+                        errno,strerror(errno));
             this->log_WARNING_HI_SPI_WriteError(this->m_device,this->m_select,errno);
             return;
         }
-
+/*
         // Once again to get the desired chip select behavior after writing:
         options.slave_address = 1;
 
@@ -140,7 +142,7 @@ namespace Drv {
             this->log_WARNING_HI_SPI_WriteError(this->m_device,this->m_select,errno);
             return;
         }
-
+*/
         this->m_bytes += readBuffer.getsize();
         this->tlmWrite_SPI_Bytes(this->m_bytes);
     }
@@ -171,7 +173,7 @@ namespace Drv {
         }
 
         this->m_fd = fd;
-
+/*
         struct dspal_spi_ioctl_set_bus_frequency rate = {
             .bus_frequency_in_hz = clock
         };
@@ -228,6 +230,7 @@ namespace Drv {
             this->log_WARNING_HI_SPI_ConfigError(device,select,errno);
             return;
         }
+*/
     }
 
     LinuxSpiDriverComponentImpl::~LinuxSpiDriverComponentImpl(void) {

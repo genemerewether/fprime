@@ -17,7 +17,7 @@ namespace SnapdragonFlight {
 
       HR_RPC_READ_SIZE = 1024,
 
-      HR_NO_MSG_SLEEP_US = 1000
+      HR_NO_MSG_SLEEP_US = 10000
   };
 
 };
