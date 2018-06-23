@@ -70,7 +70,7 @@ namespace SDREF {
       //!
       void Imu_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::sensor_msgs::Imu &Imu
+          ROS::sensor_msgs::ImuNoCov &Imu
       );
 
       //! Handler implementation for sched

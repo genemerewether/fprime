@@ -269,7 +269,7 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter.start(0, 90, 20*1024);//, CORE_RPC);
 
-    hexRouter.startPortReadThread(90,20*1024);
+    hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
     fileDown.start(0, 40, 20*1024);

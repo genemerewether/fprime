@@ -79,7 +79,7 @@ namespace SDREF {
     void SDRosIfaceComponentImpl ::
       Imu_handler(
           const NATIVE_INT_TYPE portNum,
-          ROS::sensor_msgs::Imu &Imu
+          ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
         sensor_msgs::Imu msg;

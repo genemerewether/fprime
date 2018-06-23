@@ -15,7 +15,7 @@ namespace SnapdragonFlight {
       HR_RECEIVE_BUFFER_POOL_SIZE = 4,
       HR_RECEIVE_BUFFER_SIZE = 1024,
 
-      HR_RPC_READ_SIZE = 1024,
+      HR_RPC_READ_SIZE = 4096,
 
       HR_NO_MSG_SLEEP_US = 10000
   };

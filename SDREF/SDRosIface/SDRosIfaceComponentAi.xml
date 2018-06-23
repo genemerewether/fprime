@@ -3,7 +3,7 @@
 
 <component name="SDRosIface" kind="passive" namespace="SDREF" modeler="true">
 
-    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
@@ -14,7 +14,7 @@
     <ports>
 
 
-        <port name="Imu" data_type="ROS::sensor_msgs::Imu"  kind="sync_input"    max_number="1">
+        <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

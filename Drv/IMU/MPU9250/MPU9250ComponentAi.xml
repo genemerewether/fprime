@@ -8,7 +8,7 @@
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Drv/SpiDriverPorts/SpiReadWritePortAi.xml</import_port_type>
     <import_port_type>Drv/SpiDriverPorts/SpiConfigPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
@@ -22,7 +22,7 @@
             </comment>
         </port>
 
-        <port name="Imu" data_type="ROS::sensor_msgs::Imu"  kind="output" max_number="2">
+        <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output" max_number="2">
         </port>
 
         <port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

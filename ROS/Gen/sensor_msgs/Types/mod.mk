@@ -7,6 +7,7 @@ FluidPressureSerializableAi.xml \
 IlluminanceSerializableAi.xml \
 ImageSerializableAi.xml \
 ImuSerializableAi.xml \
+ImuNoCovSerializableAi.xml \
 JointStateSerializableAi.xml \
 JoyFeedbackArraySerializableAi.xml \
 JoyFeedbackSerializableAi.xml \

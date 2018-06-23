@@ -23,7 +23,8 @@
 - how to translate headers/stamps in structures?
     - this may need to be hand-coded
 
-###
+### Routers
+- add second set of HexRouter ports for RingBufferQueue
 
 ## Build system
 

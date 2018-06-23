@@ -116,15 +116,9 @@ namespace SnapdragonFlight {
 
         Fw::QueuedComponentBase::MsgDispatchStatus msgStat = Fw::QueuedComponentBase::MSG_DISPATCH_OK;
         // dequeue any pending messages
-        DEBUG_PRINT("portRead object 0x%X, init %d, pre-loop buffLeft %d, msgStat %d\n",
-                    (unsigned long) this, this->m_initialized,
-                    this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength(), msgStat);
         while ((msgStat != Fw::QueuedComponentBase::MSG_DISPATCH_EMPTY) &&
                ((this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength())
                 >= this->m_maxReadPerDispatch)) {
-            DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d, msgStat %d\n",
-                        (unsigned long) this, this->m_initialized,
-                        this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength(), msgStat);
             msgStat = this->doDispatch();
             if (msgStat == Fw::QueuedComponentBase::MSG_DISPATCH_EXIT) {
                 return KR_RTN_QUIT;
