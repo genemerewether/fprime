@@ -30,6 +30,7 @@ enum {
 
 enum KraitRouterReturnCode {
     KR_RTN_QUIT_PREINIT = -10,
+    KR_RTN_SEND_TOO_BIG = -3,
     KR_RTN_QUIT = -2,
 
     //NOTE(mereweth) - don't return this value - just a placeholder for when FastRPC returns it

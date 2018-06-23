@@ -65,6 +65,8 @@ namespace SnapdragonFlight {
         m_numBadSerialPortCalls(0u),
         m_numPackets(0u),
         m_numInvalidPorts(0u),
+        m_rpcPortWriteBuff(NULL),
+        m_localMsgSize(0u),
         m_allocatorId(0)
     {
         // Initialize memory buffer objects
@@ -87,12 +89,29 @@ namespace SnapdragonFlight {
       )
     {
         HexRouterComponentBase::init(queueDepth, msgSize, instance);
+
+        m_localMsgSize = msgSize + 2 * sizeof(U32);
+#ifdef BUILD_SDFLIGHT
+        // TODO(mereweth) - switch to DspRpcAllocator?
+        rpcmem_init();
+        uint8_t* m_rpcPortWriteBuff = (uint8_t*)rpcmem_alloc(22, 0, m_localMsgSize);
+#else
+        uint8_t* m_rpcPortWriteBuff = (uint8_t*)malloc(m_localMsgSize);
+#endif
     }
 
     HexRouterComponentImpl ::
       ~HexRouterComponentImpl(void)
     {
-
+        if (m_rpcPortWriteBuff) {
+#ifdef BUILD_SDFLIGHT
+            rpcmem_free(m_rpcPortWriteBuff);
+#else
+            free(m_rpcPortWriteBuff);
+#endif
+        }
+        m_rpcPortWriteBuff = NULL;
+        m_localMsgSize = 0;
     }
 
     // TODO(mereweth) - allocate buffer pools - change name to allocateBuffers
@@ -153,34 +172,22 @@ namespace SnapdragonFlight {
           Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
       )
     {
-        unsigned char* data =
-                      reinterpret_cast<unsigned char*>(Buffer.getBuffAddr());
-        NATIVE_INT_TYPE xferSize = Buffer.getBuffLength();
-
         DEBUG_PRINT("KraitPortsIn_handler for port %d with %d bytes\n",
                     portNum, Buffer.getBuffLength());
 
-        NATIVE_INT_TYPE stat = rpc_relay_port_write(portNum, data, xferSize);
+        Fw::SerialBuffer sendBuff(m_rpcPortWriteBuff, m_localMsgSize);
+        Fw::SerializeStatus serStat = sendBuff.serialize(portNum);
+        FW_ASSERT(serStat == Fw::FW_SERIALIZE_OK, serStat);
+        serStat = sendBuff.serialize(Buffer);
+        FW_ASSERT(serStat == Fw::FW_SERIALIZE_OK, serStat);
+
+        NATIVE_INT_TYPE stat = rpc_relay_port_write(m_rpcPortWriteBuff,
+                                                    sendBuff.getBuffLength());
         // TODO(mereweth) - write error codes
-        if (-1 == stat) {
+        if (KR_RTN_OK != stat) {
             this->log_WARNING_HI_HR_WriteError(stat);
             return;
         }
-      /*        for (NATIVE_INT_TYPE chunk = 0; chunk < xferSize; chunk +=
-                  HR_WRITE_BUFF_SIZE) {
-
-              NATIVE_INT_TYPE thisSize = FW_MIN(HR_WRITE_BUFF_SIZE,
-                      xferSize - chunk);
-          timespec stime;
-          (void)clock_gettime(CLOCK_REALTIME,&stime);
-          DEBUG_PRINT("<<< Calling rpc_relay_write() at %d %d\n", stime.tv_sec, stime.tv_nsec);
-              NATIVE_INT_TYPE stat = rpc_relay_write(portNum, data + chunk, thisSize);
-          // TODO(mereweth) - write error codes
-              if (-1 == stat) {
-                  this->log_WARNING_HI_HR_WriteError(stat);
-                  return;
-              }
-          }*/
     }
 
   // ----------------------------------------------------------------------

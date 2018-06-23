@@ -140,6 +140,9 @@ namespace SnapdragonFlight {
       U32 m_numPackets; //!< number of received packets
       U32 m_numInvalidPorts; //!< number of invalid ports
 
+      U8* m_rpcPortWriteBuff;
+      U32 m_localMsgSize; //!< size of rpc_alloc'd buffer for port write
+
       //! The allocator ID
       NATIVE_INT_TYPE m_allocatorId;
   };

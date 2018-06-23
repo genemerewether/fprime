@@ -39,17 +39,16 @@ void dummy() {
 }
 
 void print_usage() {
-    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run # cycles; -c to run continuously\n-r to use HexRouter\n");
+    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run # cycles; -c to run continuously\n");
 }
 
 int main(int argc, char* argv[]) {
     bool noInit = false;
     bool kraitCycle = false;
     bool hexCycle = false;
-    bool hexRtr = false;
     int numKraitCycles = 0;
     int option = 0;
-    while ((option = getopt(argc, argv, "rifho:c")) != -1) {
+    while ((option = getopt(argc, argv, "ifho:c")) != -1) {
         switch(option) {
             case 'h':
                 print_usage();
@@ -67,9 +66,6 @@ int main(int argc, char* argv[]) {
                 break;
             case 'c':
                 hexCycle = true;
-                break;
-            case 'r':
-                hexRtr = true;
                 break;
             case '?':
                 print_usage();
@@ -99,11 +95,9 @@ int main(int argc, char* argv[]) {
     if (!noInit) {
         hexref_init();
     }
-    if (hexRtr) {
-        DEBUG_PRINT("Starting HexRouter\n");
-        hexRouter.init(10, 0);
-        hexRouter.startPortReadThread(90, 20*1024, 0);
-    }
+    DEBUG_PRINT("Starting HexRouter\n");
+    hexRouter.init(10, 0);
+    hexRouter.startPortReadThread(90, 20*1024, 0);
     if (hexCycle) {
         Os::TaskString task_name("HEXRPC");
         DEBUG_PRINT("Starting cycler on hexagon\n");
@@ -141,11 +135,9 @@ int main(int argc, char* argv[]) {
     }
 #endif //BUILD_SDFLIGHT
 
-    if (hexRtr) {
-        DEBUG_PRINT("Quitting hexrouter read threads\n");
-        hexRouter.quitReadThreads();
-        //hexRouter.exit();
-    }
+    DEBUG_PRINT("Quitting hexrouter read threads\n");
+    hexRouter.quitReadThreads();
+    //hexRouter.exit();
 
     if (hexCycle) {
         DEBUG_PRINT("Waiting for the runner to return\n");

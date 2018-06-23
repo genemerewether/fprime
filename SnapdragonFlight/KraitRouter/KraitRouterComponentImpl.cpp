@@ -20,6 +20,7 @@
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
+#include "Fw/Types/SerialBuffer.hpp"
 #include <unistd.h>
 
 #ifdef BUILD_DSPAL
@@ -50,8 +51,9 @@ namespace SnapdragonFlight {
     #endif
                                  ),
         m_tempBuff(),
-        m_maxReadPerDispatch(0u),
-        m_initialized(KR_STATE_PREINIT)
+        m_localMsgSize(0u),
+        m_initialized(KR_STATE_PREINIT),
+        m_sendQueue()
     {
 
     }
@@ -65,7 +67,18 @@ namespace SnapdragonFlight {
     {
         KraitRouterComponentBase::init(queueDepth, msgSize, instance);
 
-        m_maxReadPerDispatch = msgSize + 2 * sizeof(U32);
+        m_localMsgSize = msgSize + 2 * sizeof(U32);
+
+        Fw::EightyCharString queueName;
+#if FW_OBJECT_NAMES == 1
+        queueName = this->m_objName;
+#else
+        char queueNameChar[FW_QUEUE_NAME_MAX_SIZE];
+        (void)snprintf(queueNameChar,sizeof(queueNameChar),"CompQ_%d",Os::Queue::getNumQueues());
+        queueName = queueNameChar;
+#endif
+        m_sendQueue.create(queueName, queueDepth, m_localMsgSize);
+
         m_initialized = KR_STATE_INIT;
     }
 
@@ -118,7 +131,7 @@ namespace SnapdragonFlight {
         // dequeue any pending messages
         while ((msgStat != Fw::QueuedComponentBase::MSG_DISPATCH_EMPTY) &&
                ((this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength())
-                >= this->m_maxReadPerDispatch)) {
+                >= this->m_localMsgSize)) {
             msgStat = this->doDispatch();
             if (msgStat == Fw::QueuedComponentBase::MSG_DISPATCH_EXIT) {
                 return KR_RTN_QUIT;
@@ -143,58 +156,24 @@ namespace SnapdragonFlight {
         return 0;
     }
 
-    int KraitRouterComponentImpl::portWrite(unsigned int port,
-                                            const unsigned char* buff,
+    int KraitRouterComponentImpl::portWrite(const unsigned char* buff,
                                             int buffLen) {
-        DEBUG_PRINT("write called on object 0x%X, port %d, init %d\n",
-                    (unsigned long) this, port, this->m_initialized);
-        FW_ASSERT(0); // TODO(mereweth) - fill write queue
-        /*while (!this->m_initialized) {
-            if (this->m_quit) {
-                DEBUG_PRINT("quitting write preinit in object 0x%X\n",
-                            (unsigned long) this);
-                return -10;
-            }
+        DEBUG_PRINT("write called on object 0x%X, init %d\n",
+                    (unsigned long) this, this->m_initialized);
 
-            usleep(KR_PREINIT_SLEEP_US);
+        if (buffLen > this->m_localMsgSize) {
+            return KR_RTN_SEND_TOO_BIG;
         }
+        FW_ASSERT(buffLen <= this->m_localMsgSize, buffLen, this->m_localMsgSize);
 
-        if (!this->m_sendPortBuffers[m_sendPortBuffInsert].available) {
-            DEBUG_PRINT("FastRPC write tried to overwrite a port buffer at %d for port %d\n",
-                        m_sendPortBuffInsert, port);
-            //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
-            //this->tlmWrite_KR_NumBadSerialPortCalls();
-            return -5;
-        }
+        Os::Queue::QueueStatus qStatus =
+          this->m_sendQueue.send(buff, buffLen, 0, Os::Queue::QUEUE_NONBLOCKING);
+        FW_ASSERT(
+            qStatus == Os::Queue::QUEUE_OK,
+            static_cast<AssertArg>(qStatus)
+        );
 
-        NATIVE_UINT_TYPE sendPortBuffInsert = m_sendPortBuffInsert;
-
-        m_sendPortBuffers[sendPortBuffInsert].available = false;
-        m_sendPortBuffers[sendPortBuffInsert].portNum = port;
-*/
-        /* NOTE(mereweth) - this memory will be copied again in the Sched call
-         * for the output port invocation. This should be sufficiently fast for
-         * these port calls.
-         */
-        /*unsigned int sendBuffSize =
-           FW_NUM_ARRAY_ELEMENTS(m_sendPortBuffers[sendPortBuffInsert].buff);
-        if (buffLen >= sendBuffSize) {
-            DEBUG_PRINT("FastRPC write data %d too big: actual %d, avail %d\n",
-                        port, buffLen, sendBuffSize);
-            //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
-            //this->tlmWrite_KR_NumBadSerialPortCalls();
-            return -3;
-        }
-        memcpy(m_sendPortBuffers[sendPortBuffInsert].buff,
-               buff, buffLen);
-        m_sendPortBuffers[sendPortBuffInsert].buffLen = buffLen;
-
-        m_sendPortBuffInsert++;
-        if (m_sendPortBuffInsert >= FW_NUM_ARRAY_ELEMENTS(m_sendPortBuffers)) {
-            m_sendPortBuffInsert = 0;
-        }*/
-
-        return 0;
+        return KR_RTN_OK;
     }
 
     // ----------------------------------------------------------------------
@@ -207,16 +186,53 @@ namespace SnapdragonFlight {
           NATIVE_UINT_TYPE context
       )
     {
-        return; // TODO(mereweth) - fill write queue
-        /*
-            // if connected, call output port
-            if (this->isConnected_KraitPortsOut_OutputPort(port)) {
-                Fw::ExternalSerializeBuffer portBuff(buff, buffLen);
-                portBuff.setBuffLen(buffLen);
+        // TODO(mereweth) - max loop iterations
 
-                DEBUG_PRINT("Calling port %d from buf %d with %d bytes.\n",
-                            port, m_sendPortBuffRemove, buffLen);
-                Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
+        while (1) {
+            U8 msgBuff[this->m_localMsgSize];
+            Fw::ExternalSerializeBuffer msg(msgBuff,this->m_localMsgSize);
+            NATIVE_INT_TYPE priority;
+
+            Os::Queue::QueueStatus msgStatus = this->m_sendQueue.receive(msg,
+                                            priority, Os::Queue::QUEUE_NONBLOCKING);
+            if (Os::Queue::QUEUE_NO_MORE_MSGS == msgStatus) {
+              return;
+            } else {
+              FW_ASSERT(
+                  msgStatus == Os::Queue::QUEUE_OK,
+                  static_cast<AssertArg>(msgStatus)
+              );
+            }
+
+            // Reset to beginning of buffer
+            msg.resetDeser();
+
+            NATIVE_INT_TYPE outPortNum;
+            Fw::SerializeStatus deserStatus = msg.deserialize(outPortNum);
+            FW_ASSERT(
+                deserStatus == Fw::FW_SERIALIZE_OK,
+                static_cast<AssertArg>(deserStatus)
+            );
+            // at this point, msg deserialization pointer points at length & buffer
+
+            if (outPortNum >= this->getNum_KraitPortsOut_OutputPorts()) {
+                DEBUG_PRINT("portNum %d too big\n", outPortNum, this->getNum_KraitPortsOut_OutputPorts());
+                //this->tlmWrite_HR_NumDecodeErrors(++this->m_numDecodeErrors);
+                break;
+            }
+
+            // if connected, call output port
+            if (this->isConnected_KraitPortsOut_OutputPort(outPortNum)) {
+                // Deserialize serialized buffer into new buffer
+                Fw::ExternalSerializeBuffer serHandBuff;
+                deserStatus = msg.deserializeNoCopy(serHandBuff);
+                FW_ASSERT(
+                    deserStatus == Fw::FW_SERIALIZE_OK,
+                    static_cast<AssertArg>(deserStatus)
+                );
+
+                DEBUG_PRINT("Calling port %d from KR sched\n", outPortNum);
+                Fw::SerializeStatus stat = this->KraitPortsOut_out(outPortNum, serHandBuff);
                 if (stat != Fw::FW_SERIALIZE_OK) {
                     DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
                     //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
@@ -224,7 +240,7 @@ namespace SnapdragonFlight {
                     // TODO(mereweth) - status codes
                 }
             }
-        }*/
+        }
     }
 
     // ----------------------------------------------------------------------

@@ -24,6 +24,7 @@
     - this may need to be hand-coded
 
 ### Routers
+- fix unit tests
 - add second set of HexRouter ports for RingBufferQueue
 
 ## Build system

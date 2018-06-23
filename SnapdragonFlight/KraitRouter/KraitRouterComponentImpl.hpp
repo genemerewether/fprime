@@ -24,7 +24,8 @@
 
 #include "SnapdragonFlight/KraitRouter/KraitRouterComponentAc.hpp"
 
-#include <Fw/Types/SerialBuffer.hpp>
+#include <Fw/Types/EightyCharString.hpp>
+#include <Os/Queue.hpp>
 
 namespace SnapdragonFlight {
 
@@ -67,7 +68,7 @@ namespace SnapdragonFlight {
 
         int buffWrite(unsigned int port, const unsigned char* buff, int buffLen);
 
-        int portWrite(unsigned int port, const unsigned char* buff, int buffLen);
+        int portWrite(const unsigned char* buff, int buffLen);
 
       PRIVATE:
 
@@ -98,7 +99,7 @@ namespace SnapdragonFlight {
         // temporary buffer to get data out of handler
         Fw::ExternalSerializeBuffer m_tempBuff;
 
-        U32 m_maxReadPerDispatch;
+        U32 m_localMsgSize;
 
         volatile enum InitState {
             KR_STATE_PREINIT,
@@ -106,6 +107,8 @@ namespace SnapdragonFlight {
             KR_STATE_QUIT_PREINIT,
             KR_STATE_QUIT
         } m_initialized;
+
+        Os::Queue m_sendQueue;
     };
 
 } // end namespace SnapdragonFlight

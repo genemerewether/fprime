@@ -22,7 +22,7 @@ int rpc_relay_buff_write(unsigned int port, const unsigned char* buff, int buffL
   return 0;
 }
 
-int rpc_relay_port_write(unsigned int port, const unsigned char* buff, int buffLen)
+int rpc_relay_port_write(const unsigned char* buff, int buffLen)
 {
   usleep(10000);
   return 0;

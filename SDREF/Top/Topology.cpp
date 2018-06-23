@@ -324,7 +324,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles; -c to run continuously\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
 }
 
 
@@ -352,7 +352,7 @@ int main(int argc, char* argv[]) {
     bool noInit = false;
     bool noFini = false;
     bool kraitCycle = false;
-    bool hexCycle = false;
+    bool hexCycle = true;
     int numKraitCycles = 0;
     U32 port_number = 0;
     I32 option = 0;
@@ -362,7 +362,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:a:o:c")) != -1){
+    while ((option = getopt(argc, argv, "ifhlp:a:o:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -386,9 +386,7 @@ int main(int argc, char* argv[]) {
             case 'o':
                 numKraitCycles = atoi(optarg);
                 kraitCycle = true;
-                break;
-            case 'c':
-                hexCycle = true;
+                hexCycle = false;
                 break;
             case '?':
                 return 1;
