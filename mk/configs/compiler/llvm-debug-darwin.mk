@@ -7,7 +7,7 @@ CFLAGS := 	$(DEBUG) \
 
 CXXFLAGS := $(DEBUG) \
 			$(DARWIN_LLVM_CXXFLAGS) \
-			$(DARWIN_LLVM_INCLUDES) \
-			-fno-rtti
+			$(DARWIN_LLVM_INCLUDES)
+			# -fno-rtti # needed for ROS
 
 COMPILER := darwin-x86-debug-llvm

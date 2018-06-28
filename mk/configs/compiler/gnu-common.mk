@@ -1,5 +1,5 @@
 GNU_COMMON := -Wall -Wextra \
-               -fno-builtin -fno-asm \
+               -fno-builtin \
                -fstrength-reduce \
                -Wno-unused-parameter \
                -Wno-long-long

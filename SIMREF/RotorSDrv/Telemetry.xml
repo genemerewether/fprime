@@ -1,0 +1,12 @@
+<telemetry>
+    <channel id="0" name="RSDRV_Odometry1Overflows" data_type="U32" update="on_change">
+        <comment>
+            Number of times that ROS odometry message was not sent on a port (by Sched call)
+        </comment>
+    </channel>
+    <channel id="1" name="RSDRV_Odometry2Overflows" data_type="U32" update="on_change">
+        <comment>
+            Number of times that ROS odometry message was not sent on a port (by Sched call)
+        </comment>
+    </channel>
+</telemetry>

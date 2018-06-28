@@ -1,0 +1,12 @@
+test/ut/*.bash
+!test/ut/deployment.bash
+
+test/ut/eng/*
+test/ut/seq/*
+test/ut/fsw/*
+test/ut/STARTUP_FAIL
+test/ut/STARTUP_UP
+test/ut/STARTUP_BIN_UP
+!README.md
+
+log.txt

@@ -4,3 +4,24 @@
 [submodule "Utils/nano-dm"]
 	path = Utils/nano-dm
 	url = https://github.com/kevinmehall/nano-dm.git
+[submodule "ROS/fprime_ws/src/std_msgs"]
+	path = ROS/fprime_ws/src/std_msgs
+	url = https://github.com/ros/std_msgs.git
+[submodule "ROS/fprime_ws/src/common_msgs"]
+	path = ROS/fprime_ws/src/common_msgs
+	url = https://github.com/ros/common_msgs.git
+[submodule "ROS/fprime_ws/src/mav_comm"]
+	path = ROS/fprime_ws/src/mav_comm
+	url = https://github.com/ethz-asl/mav_comm.git
+[submodule "ROS/fprime_ws/src/ros_comm_msgs"]
+	path = ROS/fprime_ws/src/ros_comm_msgs
+	url = https://github.com/ros/ros_comm_msgs.git
+[submodule "quest_gnc"]
+	path = Gnc/quest_gnc
+	url = /Users/mereweth/quest_gnc/.git
+[submodule "Gnc/eigen"]
+	path = Gnc/eigen
+	url = https://github.com/eigenteam/eigen-git-mirror
+[submodule "Gnc/linter"]
+	path = Gnc/linter
+	url = git@github.com:genemerewether/linter.git

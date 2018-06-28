@@ -1,0 +1,33 @@
+SRC = \
+BoolPortAi.xml \
+ByteMultiArrayPortAi.xml \
+BytePortAi.xml \
+CharPortAi.xml \
+ColorRGBAPortAi.xml \
+DurationPortAi.xml \
+EmptyPortAi.xml \
+Float32MultiArrayPortAi.xml \
+Float32PortAi.xml \
+Float64MultiArrayPortAi.xml \
+Float64PortAi.xml \
+HeaderPortAi.xml \
+Int16MultiArrayPortAi.xml \
+Int16PortAi.xml \
+Int32MultiArrayPortAi.xml \
+Int32PortAi.xml \
+Int64MultiArrayPortAi.xml \
+Int64PortAi.xml \
+Int8MultiArrayPortAi.xml \
+Int8PortAi.xml \
+MultiArrayDimensionPortAi.xml \
+MultiArrayLayoutPortAi.xml \
+StringPortAi.xml \
+TimePortAi.xml \
+UInt16MultiArrayPortAi.xml \
+UInt16PortAi.xml \
+UInt32MultiArrayPortAi.xml \
+UInt32PortAi.xml \
+UInt64MultiArrayPortAi.xml \
+UInt64PortAi.xml \
+UInt8MultiArrayPortAi.xml \
+UInt8PortAi.xml

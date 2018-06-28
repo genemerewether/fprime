@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>fprime</name>
+  <version>0.0.1</version>
+  <description>FPrime base ROS package.</description>
+  <maintainer email="mereweth@jpl.nasa.gov">Gene Merewether</maintainer>
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/nasa/fprime/issues</url>
+  <url type="repository">https://github.com/nasa/fprime</url>
+
+  <buildtool_depend version_gte="0.5.78">catkin</buildtool_depend>
+
+  <build_depend>genfprime</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_export_depend>message_runtime</build_export_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>roscpp</depend>
+</package>

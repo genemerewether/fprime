@@ -2,6 +2,7 @@ include $(BUILD_ROOT)/mk/configs/compiler/include_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/defines_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/dspal_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_clang_common.mk
+include $(BUILD_ROOT)/mk/configs/compiler/dspal_ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_sdk_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_v55.mk
@@ -65,7 +66,7 @@ DSPAL_HEX_CLANG_INCLUDES := 	$(DSPAL_INCLUDES_COMMON) \
 
 #-I$(HEXAGON_TOOLS_ROOT)
 
-CHECK_LINK_BIN = $(CXX) $(DSPAL_HEX_CLANG_CXXFLAGS) $(DSPAL_HEX_CLANG_INCLUDES)
+CHECK_LINK_BIN = $(CXX) $(DSPAL_HEX_CLANG_CXXFLAGS) $(DSPAL_HEX_CLANG_INCLUDES) -Wl,-whole-archive
 CHECK_LINK_BIN_NAME := _CHECK_LINK
 CHECK_LINK_BIN_SRC := $(BUILD_ROOT)/SnapdragonFlight/RpcCommon/DspalSymCheck.cpp
 

@@ -1,0 +1,7 @@
+<events>
+    <event id="0" name="MPU9250_ImuInit" severity="ACTIVITY_HI" format_string = "MPU9250 passed init" >
+        <comment>
+            MPU9250 passed init
+        </comment>
+    </event>
+</events>

@@ -14,7 +14,11 @@
 #if $namespace_list != None
  #for $namespace in $namespace_list
 } // end namespace $namespace
- #end for    
+ #end for
+
+\#endif /* #for $namespace in $namespace_list#${namespace.upper()}_#end for#${name.upper()}_PORT_HPP_ */
+#else
+\#endif /* ${name.upper()}_PORT_HPP_ */
 #end if
-\#endif /* ${name_space.upper()}_${name.upper()}_PORT_HPP_ */
+
 

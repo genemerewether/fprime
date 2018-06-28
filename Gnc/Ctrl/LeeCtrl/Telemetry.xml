@@ -1,0 +1,42 @@
+<telemetry>
+    <channel id="0" name="LCTRL_ThrustComm" data_type="F32" update="on_change" format_string="%.3fN">
+        <comment>
+            Lee Control commanded thrust
+        </comment>
+    </channel>
+    <channel id="1" name="LCTRL_MomentCommX" data_type="F32" update="on_change" format_string="%.6fNm">
+        <comment>
+            Lee Control commanded moment in x
+        </comment>
+    </channel>
+    <channel id="2" name="LCTRL_MomentCommY" data_type="F32" update="on_change" format_string="%.6fNm">
+        <comment>
+            Lee Control commanded moment in y
+        </comment>
+    </channel>
+    <channel id="3" name="LCTRL_MomentCommZ" data_type="F32" update="on_change" format_string="%.6fNm">
+        <comment>
+            Lee Control commanded moment in z
+        </comment>
+    </channel>
+    <channel id="4" name="LCTRL_Error_x_w" data_type="F32" update="on_change" format_string="%.3fm">
+        <comment>
+            Lee Control x error
+        </comment>
+    </channel>
+    <channel id="5" name="LCTRL_Error_y_w" data_type="F32" update="on_change" format_string="%.3fm">
+        <comment>
+            Lee Control y error
+        </comment>
+    </channel>
+    <channel id="6" name="LCTRL_Error_z_w" data_type="F32" update="on_change" format_string="%.3fm">
+        <comment>
+            Lee Control z error
+        </comment>
+    </channel>
+    <channel id="7" name="LCTRL_Error_yaw" data_type="F32" update="on_change" format_string="%.3fdeg">
+        <comment>
+            Lee Control yaw error
+        </comment>
+    </channel>
+</telemetry>

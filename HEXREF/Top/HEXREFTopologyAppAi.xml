@@ -1,163 +1,199 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <assembly name = "HEXREF">
-	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
 	<import_component_type>Svc/FatalHandler/FatalHandlerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
-	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
-	<import_component_type>Svc/Health/HealthComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
-	<import_component_type>Svc/PassiveTextLogger/PassiveTextLoggerComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
+	<import_component_type>Drv/LinuxSpiDriver/LinuxSpiDriverComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>SnapdragonFlight/KraitRouter/KraitRouterComponentAi.xml</import_component_type>
-
-   <instance namespace="SnapdragonFlight" name="kraitRouter" type="KraitRouter" base_id="81"  base_id_window="20" />
-	
-   <instance namespace="Svc" name="linuxTime" type="Time" base_id="441"  base_id_window="20" />
+	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
+	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
+	<import_component_type>Svc/RateGroupDecoupler/RateGroupDecouplerComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PassiveTextLogger/PassiveTextLoggerComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Ctrl/LeeCtrl/LeeCtrlComponentAi.xml</import_component_type>
+	<import_component_type>Drv/LinuxGpioDriver/LinuxGpioDriverComponentAi.xml</import_component_type>
 
    <instance namespace="Svc" name="fatalHandler" type="FatalHandler" base_id="1"  base_id_window="20" />
 
    <instance namespace="Svc" name="fatalAdapter" type="AssertFatalAdapter" base_id="341"  base_id_window="20" />
 
-   <instance namespace="Svc" name="rgDrv" type="RateGroupDriver" base_id="461"  base_id_window="20" />
+   <instance namespace="Drv" name="spiDrv" type="LinuxSpiDriver"/>
 
-   <instance namespace="Svc" name="rg" type="ActiveRateGroup" base_id="21"  base_id_window="20" />
+   <instance namespace="Svc" name="rgPos" type="PassiveRateGroup" base_id="61"  base_id_window="20" />
 
-   <instance namespace="Svc" name="health" type="Health" base_id="361"  base_id_window="20" />
+   <instance namespace="SnapdragonFlight" name="kraitRouter" type="KraitRouter"/>
 
-   <instance namespace="Svc" name="rgPos" type="ActiveRateGroup" base_id="61"  base_id_window="20" />
-
-   <instance namespace="Svc" name="rgAtt" type="ActiveRateGroup" base_id="41"  base_id_window="20" />
-
-   <instance namespace="Svc" name="textLogger" type="PassiveTextLogger" base_id="521"  base_id_window="20" />
+   <instance namespace="Svc" name="rgGncDrv" type="RateGroupDriver" base_id="461"  base_id_window="20" />
 
    <instance namespace="Svc" name="eventLogger" type="ActiveLogger" base_id="421"  base_id_window="20" />
 
+   <instance namespace="Svc" name="linuxTime" type="Time" base_id="441"  base_id_window="20" />
+
+   <instance namespace="Svc" name="rgDecouple" type="RateGroupDecoupler"/>
+
+   <instance namespace="Svc" name="rg" type="ActiveRateGroup" base_id="21"  base_id_window="20" />
+
+   <instance namespace="Drv" name="mpu9250" type="MPU9250"/>
+
+   <instance namespace="Svc" name="rgAtt" type="PassiveRateGroup" base_id="41"  base_id_window="20" />
+
+   <instance namespace="Svc" name="textLogger" type="PassiveTextLogger" base_id="521"  base_id_window="20" />
+
+   <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl"/>
+
+   <instance namespace="Drv" name="imuDRInt" type="LinuxGpioDriver"/>
+
 
 <connection name = "Connection1">
-	 <source component = "rgPos" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
+ 	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection2">
+	 <source component = "kraitRouter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection3">
-	 <source component = "health" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection4">
 	 <source component = "eventLogger" port = "FatalAnnounce" type = "FatalEvent" num = "0"/>
  	 <target component = "fatalHandler" port = "FatalReceive" type = "FatalEvent" num = "0"/>
 </connection>
-<connection name = "Connection5">
+<connection name = "Connection4">
 	 <source component = "eventLogger" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection7">
+<connection name = "Connection5">
 	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection8">
-	 <source component = "rgAtt" port = "LogText" type = "LogText" num = "0"/>
+<connection name = "Connection6">
+	 <source component = "mpu9250" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection9">
-	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "2"/>
- 	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
+<connection name = "Connection7">
+	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+ 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "1"/>
 </connection>
-<connection name = "Connection10">
+<connection name = "Connection8">
 	 <source component = "eventLogger" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection11">
-	 <source component = "health" port = "PingSend" type = "Ping" num = "3"/>
- 	 <target component = "eventLogger" port = "pingIn" type = "Ping" num = "0"/>
+<connection name = "Connection9">
+	 <source component = "imuDRInt" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection12">
+<connection name = "Connection10">
 	 <source component = "rg" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection13">
+<connection name = "Connection11">
+	 <source component = "imuDRInt" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection12">
 	 <source component = "rg" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection13">
+	 <source component = "spiDrv" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection14">
 	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection15">
-	 <source component = "rgAtt" port = "PingOut" type = "Ping" num = "0"/>
- 	 <target component = "health" port = "PingReturn" type = "Ping" num = "1"/>
+	 <source component = "imuDRInt" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection16">
-	 <source component = "health" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+	 <source component = "kraitRouter" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection17">
 	 <source component = "fatalAdapter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection18">
-	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "1"/>
- 	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
-</connection>
-<connection name = "Connection20">
-	 <source component = "health" port = "PingSend" type = "Ping" num = "0"/>
- 	 <target component = "rg" port = "PingIn" type = "Ping" num = "0"/>
-</connection>
-<connection name = "Connection21">
-	 <source component = "rg" port = "PingOut" type = "Ping" num = "0"/>
- 	 <target component = "health" port = "PingReturn" type = "Ping" num = "0"/>
-</connection>
-<connection name = "Connection22">
-	 <source component = "rgPos" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection23">
-	 <source component = "rgPos" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection24">
-	 <source component = "rgAtt" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection25">
-	 <source component = "rgAtt" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection27">
-	 <source component = "health" port = "LogText" type = "LogText" num = "0"/>
+	 <source component = "kraitRouter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection28">
-	 <source component = "health" port = "PingSend" type = "Ping" num = "1"/>
- 	 <target component = "rgAtt" port = "PingIn" type = "Ping" num = "0"/>
+<connection name = "Connection19">
+	 <source component = "mpu9250" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
+ 	 <target component = "spiDrv" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
 </connection>
-<connection name = "Connection29">
+<connection name = "Connection20">
+	 <source component = "rgDecouple" port = "CycleOut" type = "Cycle" num = "0"/>
+ 	 <target component = "rgGncDrv" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection21">
+	 <source component = "spiDrv" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection22">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+ 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection23">
+	 <source component = "spiDrv" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection24">
+	 <source component = "mpu9250" port = "SpiConfig" type = "SpiConfig" num = "0"/>
+ 	 <target component = "spiDrv" port = "SpiConfig" type = "SpiConfig" num = "0"/>
+</connection>
+<connection name = "Connection25">
 	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection30">
-	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "0"/>
- 	 <target component = "rg" port = "CycleIn" type = "Cycle" num = "0"/>
+<connection name = "Connection26">
+	 <source component = "imuDRInt" port = "intOut" type = "Cycle" num = "0"/>
+ 	 <target component = "rgDecouple" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection31">
+<connection name = "Connection27">
+	 <source component = "mpu9250" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection28">
 	 <source component = "rg" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
+<connection name = "Connection29">
+	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection30">
+	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "2"/>
+ 	 <target component = "rg" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection31">
+	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
+ 	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
 <connection name = "Connection32">
-	 <source component = "eventLogger" port = "pingOut" type = "Ping" num = "0"/>
- 	 <target component = "health" port = "PingReturn" type = "Ping" num = "3"/>
+	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
+ 	 <target component = "mpu9250" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection33">
-	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "health" port = "Run" type = "Sched" num = "0"/>
+	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection34">
-	 <source component = "health" port = "PingSend" type = "Ping" num = "2"/>
- 	 <target component = "rgPos" port = "PingIn" type = "Ping" num = "0"/>
+	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection35">
-	 <source component = "rgPos" port = "PingOut" type = "Ping" num = "0"/>
- 	 <target component = "health" port = "PingReturn" type = "Ping" num = "2"/>
+	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
+ 	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "1"/>
+</connection>
+<connection name = "Connection36">
+	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
+ 	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection37">
+	 <source component = "leeCtrl" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 </assembly>

@@ -22,6 +22,9 @@ RemoteSystemsTempFiles
 *.stackdump
 Dict
 *.core
+*_IDTableLog.txt
+*TopologyAppID.csv
+
 
 *.gcov
 !**/test/ut/output/*.gcov

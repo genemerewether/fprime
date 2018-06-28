@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="SerLogger" kind="passive" namespace="Svc">
+    <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
+    <comment>A component that logs the output of a Serialize port</comment>
+    <ports>
+        <!-- Input data port -->
+        <port name="SerPortIn" data_type="Serial" kind="sync_input">
+            <comment>
+            The rate group scheduler input
+            </comment>
+        </port>
+
+        <!-- Output log port -->
+        <port name="LogOut" data_type="Svc::ActiveFileLogPort" kind="output">
+            <comment>
+            Port to write log data
+            </comment>
+        </port>
+    </ports>
+</component>
+

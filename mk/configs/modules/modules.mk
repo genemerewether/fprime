@@ -25,7 +25,7 @@ FW_GTEST_MODULES := \
 	Fw/Types/GTest
 
 OS_MODULES := \
-	Os 
+	Os
 
 CFDP_MODULES := \
 	CFDP/Checksum
@@ -43,12 +43,16 @@ SVC_MODULES := \
 	Svc/Seq \
 	Svc/GndIf \
 	Svc/ActiveRateGroup \
+	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
+	Svc/RateGroupDecoupler \
 	Svc/Sched \
 	Svc/ComLogger \
 	Svc/SocketGndIf \
 	Svc/BuffGndSockIf \
 	Svc/TlmChan \
+	Svc/SerLogger \
+	Svc/ActiveFileLogger \
 	Svc/PassiveTextLogger \
 	Svc/PassiveConsoleTextLogger \
 	Svc/Time \
@@ -70,15 +74,18 @@ SVC_MODULES := \
 
 DRV_MODULES := \
 	Drv/DataTypes \
-	Drv/BlockDriver
-
-HEXAGON_MODULES := \
-	SnapdragonFlight/KraitRouter
+	Drv/BlockDriver \
+	Drv/GpioDriverPorts \
+	Drv/LinuxGpioDriver \
+	Drv/LinuxSerialDriver \
+	Drv/LinuxSpiDriver \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts
 
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
-	SnapdragonFlight/HexRouter #\
-	#SnapdragonFlight/DspRpcAllocator \
+	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/DspRpcAllocator
 	#SnapdragonFlight/SnapdragonHealth \
 	#SnapdragonFlight/SnapdragonGpioTester
 
@@ -86,12 +93,68 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/KraitRouter
 
+QUEST_GNC_MODULES := \
+	Gnc/Ctrl/LeeCtrl \
+	Gnc/quest_gnc/src/diffeo \
+	Gnc/quest_gnc/src/traj \
+	Gnc/quest_gnc/src/ctrl
+
 REF_MODULES := \
 	Ref/Top \
 	Ref/RecvBuffApp \
 	Ref/SendBuffApp \
 	Ref/SignalGen \
 	Ref/PingReceiver
+
+ROS_PORT_MODULES := \
+	ROS/Gen/std_msgs/Ports  \
+	ROS/Gen/diagnostic_msgs/Ports    \
+	ROS/Gen/geometry_msgs/Ports      \
+	ROS/Gen/nav_msgs/Ports           \
+	ROS/Gen/std_srvs/Ports           \
+	ROS/Gen/rosgraph_msgs/Ports	 \
+	ROS/Gen/actionlib_msgs/Ports     \
+	ROS/Gen/mav_msgs/Ports		 \
+	ROS/Gen/sensor_msgs/Ports
+
+ROS_TYPE_MODULES := \
+	ROS/Gen/std_msgs/Types  \
+	ROS/Gen/diagnostic_msgs/Types    \
+	ROS/Gen/geometry_msgs/Types      \
+	ROS/Gen/nav_msgs/Types           \
+	ROS/Gen/std_srvs/Types           \
+	ROS/Gen/rosgraph_msgs/Types	 \
+	ROS/Gen/actionlib_msgs/Types     \
+	ROS/Gen/mav_msgs/Types		 \
+	ROS/Gen/sensor_msgs/Types
+
+ROS_MODULES_ALL := \
+	$(ROS_TYPE_MODULES) \
+	$(ROS_PORT_MODULES) \
+	\
+	ROS/Gen/stereo_msgs/Types        \
+	ROS/Gen/trajectory_msgs/Types    \
+	ROS/Gen/planning_msgs/Types	 \
+	ROS/Gen/shape_msgs/Types         \
+	ROS/Gen/sensor_msgs/Types        \
+	\
+	ROS/Gen/stereo_msgs/Ports        \
+	ROS/Gen/trajectory_msgs/Ports    \
+	ROS/Gen/planning_msgs/Ports	 \
+	ROS/Gen/shape_msgs/Ports         \
+	ROS/Gen/sensor_msgs/Ports
+#	ROS/Gen/visualization_msgs/Types \
+#	ROS/Gen/visualization_msgs/Ports \
+
+
+ROS_MODULES := \
+	ROS/RosCycle \
+	\
+	ROS/RosTime \
+	\
+	$(ROS_TYPE_MODULES) \
+	\
+	$(ROS_PORT_MODULES)
 
 Ref_MODULES := \
 	\
@@ -110,7 +173,9 @@ Ref_MODULES := \
 	$(UTILS_MODULES)
 
 SDREF_DEPLOYMENT_MODULES := \
+	ROS/fprime_ws/src/SDREF \
 	HEXREF/Rpc \
+	SDREF/SDRosIface \
 	SDREF/Top
 
 SDREF_MODULES := \
@@ -120,6 +185,31 @@ SDREF_MODULES := \
 	$(SNAPDRAGON_MODULES) \
 	\
 	$(SVC_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+SIMREF_DEPLOYMENT_MODULES := \
+	ROS/fprime_ws/src/SIMREF \
+	SIMREF/RotorSDrv \
+	SIMREF/Top
+
+SIMREF_MODULES := \
+	\
+	$(QUEST_GNC_MODULES) \
+	\
+	$(SIMREF_DEPLOYMENT_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(ROS_MODULES) \
 	\
 	$(FW_MODULES) \
 	\
@@ -133,22 +223,47 @@ TESTRPC_MODULES := \
 	TESTRPC/Top \
 	HEXREF/Rpc
 
+# 	Svc/Sched \
+# 	Svc/Time \
+# 	Svc/Ping \
+# 	$(QUEST_GNC_MODULES) \
+# 	$(HEXAGON_MODULES) \
+# 	$(FW_MODULES) \
+# 	$(UTILS_MODULES) \
+# 	$(OS_MODULES) \
+# 	$(CFDP_MODULES) \
+# 	$(ROS_MODULES_ALL) \
+	#SnapdragonFlight/RpcCommon \
+
 HEXREF_DEPLOYMENT_MODULES := \
 	HEXREF/Top \
 	HEXREF/Rpc
 
 HEXREF_MODULES := \
+	$(ROS_TYPE_MODULES) \
+	$(ROS_PORT_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
 	\
 	$(HEXAGON_MODULES) \
 	\
 	$(HEXREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	Drv/GpioDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/LinuxGpioDriver \
+	Drv/LinuxSpiDriver \
 	\
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
 	Svc/CmdSequencer \
 	Svc/Seq \
 	Svc/ActiveRateGroup \
+	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
+	Svc/RateGroupDecoupler \
 	Svc/Sched \
 	Svc/PassiveTextLogger \
 	Svc/PassiveConsoleTextLogger \
@@ -167,6 +282,8 @@ HEXREF_MODULES := \
 	Svc/FatalHandler \
 	\
 	$(FW_MODULES) \
+	\
+	$(UTILS_MODULES) \
 	\
 	$(OS_MODULES) \
 	\
@@ -249,11 +366,12 @@ OTHER_MODULES := \
 	gtest \
 	Os/Stubs \
 	Fw/Test \
+	ROS/Gen \
 	$(FW_GTEST_MODULES)
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF HEXREF TESTRPC
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

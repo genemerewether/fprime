@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="ActiveFileLogger" kind="active" namespace="Svc">
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Com/ComPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
+    
+    <comment>A component that logs messages to a file</comment>
+    <ports>
+        <!-- Input scheduler port -->
+        <port name="SchedIn" data_type="Sched" kind="async_input" max_number="1">
+            <comment>
+            The rate group scheduler input
+            </comment>
+        </port>
+
+        <port name="LogQueue" data_type="Svc::ActiveFileLogPort" kind="sync_input" max_number="1">
+            <comment>
+	      Log binary output port
+            </comment>
+        </port>
+    </ports>
+        
+    <commands>
+        <command kind="async" opcode="0x0" mnemonic="FLOG_RESET_LOG">
+            <comment>
+            Restart the file logs with a new time/date stamp 
+            </comment>
+        </command>
+        <command kind="async" opcode="0x1" mnemonic="FLOG_ACTIVATE">
+            <comment>
+            Activate logging 
+            </comment>
+            <args>
+                <arg name="activate" type="bool">
+                    <comment>Activate/deactivate the logger</comment>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="0x2" mnemonic="FLOG_RESET_LOG_DIR">
+            <comment>
+            Restart the file logs with a new time/date stamp in the specified base directory
+            </comment>
+            <args>
+                <arg name="dir_name" type="string" size="80">
+                    <comment>Base directory to start putting time stamped directories in for file logs.</comment>
+                </arg>
+            </args>
+        </command>
+   </commands>
+   
+   <events>
+    
+        <event id="0" name="AFL_ResetLogCmd" severity="ACTIVITY_HI" format_string = "FLOG_RESET_LOG command sent.  Directory created: %s." >
+            <comment>
+            FLOG_RESET_LOG or FLOG_RESET_LOG_DIR command was sent
+            </comment>
+            <args>
+                <arg name="dir" type="string" size="80">
+                    <comment>New time stamped directory for storing file logs.</comment>
+                </arg>
+            </args> 
+        </event>
+        
+        <event id="1" name="AFL_ActivateCmd" severity="ACTIVITY_HI" format_string = "FLOG_ACTIVATE command sent with arg: %d" >
+            <comment>
+            FLOG_ACTIVATE command was sent
+            </comment>
+            <args>
+                <arg name="activate" type="bool">
+                    <comment>Activate/deactivate the logger</comment>
+                </arg>
+            </args> 
+        </event>
+                                
+    </events>     
+</component>
+

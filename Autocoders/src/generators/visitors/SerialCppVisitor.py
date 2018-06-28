@@ -86,7 +86,7 @@ class SerialCppVisitor(AbstractVisitor.AbstractVisitor):
                 arg_str += "%s %s, "%(mtype[0][1],name)
             elif mtype == "string":
                 arg_str += "const %s::%sString& %s, " % (obj.get_name(),name, name)
-            elif mtype not in typelist:
+            elif mtype not in typelist and size is None:
                 arg_str += "const %s& %s, " %(mtype,name)
             elif size != None:
                 arg_str += "const %s* %s, " % (mtype, name)
@@ -94,6 +94,22 @@ class SerialCppVisitor(AbstractVisitor.AbstractVisitor):
             else:
                 arg_str += "%s %s" % (mtype, name)
                 arg_str += ", "
+            
+        arg_str = arg_str.strip(', ')
+        return arg_str
+
+    def _get_args_string_passthrough(self, obj):
+        """
+        Return a string of (type, name) args, comma seperated
+        for use in templates that generate method or function calls.
+        Passes through the parameters from the prototype.
+        """
+        arg_str = ""
+        for (name,mtype,size,format,comment) in obj.get_members():
+            if size == None or mtype == "string":
+                arg_str += "%s, " % (name)
+            else:
+                arg_str += "%s, %sSize, " % (name, name)
             
         arg_str = arg_str.strip(', ')
         return arg_str
@@ -265,7 +281,7 @@ class SerialCppVisitor(AbstractVisitor.AbstractVisitor):
         c = publicSerialCpp.publicSerialCpp()
         c.name = obj.get_name()
         c.args_proto_string = self._get_args_proto_string(obj)
-        c.args_string = self._get_args_string(obj)
+        c.args_string_passthrough = self._get_args_string_passthrough(obj)
         c.args_mstring = self._get_args_string(obj, "src.m_")
         c.args_mstring_ptr = self._get_args_string(obj, "src->m_")
         c.members = self._get_conv_mem_list(obj) 

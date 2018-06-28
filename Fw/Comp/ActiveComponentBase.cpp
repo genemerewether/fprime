@@ -6,28 +6,7 @@
 
 
 namespace Fw {
-    
-    class ActiveComponentExitSerializableBuffer : public Fw::SerializeBufferBase {
-        
-        public:
-            NATIVE_UINT_TYPE getBuffCapacity(void) const {
-                return sizeof(m_buff);
-            }
-        
-            U8* getBuffAddr(void) {
-                return m_buff;
-            }
-        
-            const U8* getBuffAddr(void) const {
-                return m_buff;
-            }
 
-        private:
-            
-            U8 m_buff[sizeof(ActiveComponentBase::ACTIVE_COMPONENT_EXIT)];
-            
-    };
-    
 #if FW_OBJECT_NAMES == 1
     ActiveComponentBase::ActiveComponentBase(const char* name) : QueuedComponentBase(name) {
 
@@ -40,7 +19,7 @@ namespace Fw {
     ActiveComponentBase::~ActiveComponentBase() {
 
     }
-    
+
     void ActiveComponentBase::init(NATIVE_INT_TYPE instance) {
         QueuedComponentBase::init(instance);
     }
@@ -51,11 +30,11 @@ namespace Fw {
         buffer[size-1] = 0;
     }
 #endif
-    
+
     void ActiveComponentBase::start(NATIVE_INT_TYPE identifier, NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize, NATIVE_INT_TYPE cpuAffinity) {
-        
+
         Fw::EightyCharString taskName;
-        
+
 #if FW_OBJECT_NAMES == 1
         taskName = this->getObjName();
 #else
@@ -63,18 +42,10 @@ namespace Fw {
         (void)snprintf(taskNameChar,sizeof(taskNameChar),"ActComp_%d",Os::Task::getNumTasks());
         taskName = taskNameChar;
 #endif
-        
+
     	Os::Task::TaskStatus status = this->m_task.start(taskName, identifier, priority, stackSize, this->s_baseTask,
 							 this, cpuAffinity);
     	FW_ASSERT(status == Os::Task::TASK_OK,(NATIVE_INT_TYPE)status);
-    }
-    
-    void ActiveComponentBase::exit(void) {
-        ActiveComponentExitSerializableBuffer exitBuff;
-        SerializeStatus stat = exitBuff.serialize((I32)ACTIVE_COMPONENT_EXIT);
-        FW_ASSERT(FW_SERIALIZE_OK == stat,static_cast<NATIVE_INT_TYPE>(stat));
-        Os::Queue::QueueStatus qStat = this->m_queue.send(exitBuff,0,Os::Queue::QUEUE_NONBLOCKING);
-        FW_ASSERT(Os::Queue::QUEUE_OK == qStat,static_cast<NATIVE_INT_TYPE>(qStat));
     }
 
     void ActiveComponentBase::s_baseTask(void* ptr) {
@@ -107,9 +78,9 @@ namespace Fw {
                     FW_ASSERT(0,(NATIVE_INT_TYPE)loopStatus);
             }
         }
-        
+
     }
-    
+
     void ActiveComponentBase::preamble(void) {
     }
 

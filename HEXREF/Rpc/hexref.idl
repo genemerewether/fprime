@@ -2,16 +2,19 @@
 
 interface hexref
 {
-  long init();
-  long run();
-  long fini();
+    long init();
+    long cycle(in unsigned long cycles);
+    long wait();
+    long run();
+    long fini();
 
-  typedef sequence<octet, 1024> dataBuffer;
+    typedef sequence<octet, 1024> dataBuffer;
 
-  long rpc_relay_port_read(rout unsigned long port, rout dataBuffer buff, rout long bytes);
+    long rpc_relay_port_read(rout dataBuffer buff, rout long bytes);
 
-  long rpc_relay_buff_read(rout unsigned long port, rout dataBuffer buff, rout long bytes);
-  
-  long rpc_relay_write(in unsigned long port, in dataBuffer buff);
+    long rpc_relay_buff_read(rout unsigned long port, rout dataBuffer buff, rout long bytes);
+
+    long rpc_relay_port_write(in dataBuffer buff);
+
+    long rpc_relay_buff_write(in unsigned long port, in dataBuffer buff);
 };
-

@@ -4,12 +4,13 @@ include $(BUILD_ROOT)/mk/configs/compiler/include_common.mk
 CFLAGS := 	$(DEBUG) \
 			$(DSPAL_HEX_CLANG_CFLAGS) \
 			$(DSPAL_HEX_CLANG_INCLUDES) \
-			$(UT_FLAGS)
-			
+			$(UT_FLAGS) \
+			$(DSPAL_UT_FLAGS)
 
 CXXFLAGS := $(DEBUG) \
 			$(DSPAL_HEX_CLANG_CXXFLAGS) \
 			$(DSPAL_HEX_CLANG_INCLUDES) \
-			$(UT_FLAGS)
+			$(UT_FLAGS) \
+			$(DSPAL_UT_FLAGS)
 
 COMPILER := hex-clang-cross-ut-nocov-dspal

@@ -5,7 +5,9 @@
 #include <stdio.h>
 
 #ifdef BUILD_UT
+#ifndef BUILD_DSPAL
 #include <iomanip>
+#endif
 #endif
 
 // Some macros/functions to optimize for architectures
@@ -77,7 +79,7 @@ namespace Fw {
         return FW_SERIALIZE_OK;
     }
 
-#if FW_HAS_16_BIT==1        
+#if FW_HAS_16_BIT==1
     SerializeStatus SerializeBufferBase::serialize(U16 val) {
         if (this->m_serLoc + (NATIVE_UINT_TYPE) sizeof(val) - 1 >= this->getBuffCapacity()) {
             return FW_SERIALIZE_NO_ROOM_LEFT;
@@ -104,7 +106,7 @@ namespace Fw {
         return FW_SERIALIZE_OK;
     }
 #endif
-#if FW_HAS_32_BIT==1        
+#if FW_HAS_32_BIT==1
     SerializeStatus SerializeBufferBase::serialize(U32 val) {
         if (this->m_serLoc + (NATIVE_UINT_TYPE) sizeof(val) - 1 >= this->getBuffCapacity()) {
             return FW_SERIALIZE_NO_ROOM_LEFT;
@@ -144,7 +146,7 @@ namespace Fw {
     }
 #endif
 
-#if FW_HAS_64_BIT==1	
+#if FW_HAS_64_BIT==1
     SerializeStatus SerializeBufferBase::serialize(U64 val) {
         if (this->m_serLoc + (NATIVE_UINT_TYPE) sizeof(val) - 1 >= this->getBuffCapacity()) {
             return FW_SERIALIZE_NO_ROOM_LEFT;
@@ -200,7 +202,7 @@ namespace Fw {
         this->m_deserLoc = 0;
         return FW_SERIALIZE_OK;
     }
-#endif  
+#endif
 
 #if FW_HAS_F64
 
@@ -331,7 +333,7 @@ namespace Fw {
         return FW_SERIALIZE_OK;
     }
 
-#if FW_HAS_16_BIT==1        
+#if FW_HAS_16_BIT==1
     SerializeStatus SerializeBufferBase::deserialize(U16 &val) {
         // check for room
         if (this->getBuffLength() == this->m_deserLoc) {
@@ -364,7 +366,7 @@ namespace Fw {
         return FW_SERIALIZE_OK;
     }
 #endif
-#if FW_HAS_32_BIT==1        
+#if FW_HAS_32_BIT==1
     SerializeStatus SerializeBufferBase::deserialize(U32 &val) {
         // check for room
         if (this->getBuffLength() == this->m_deserLoc) {
@@ -400,9 +402,9 @@ namespace Fw {
         this->m_deserLoc += sizeof(val);
         return FW_SERIALIZE_OK;
     }
-#endif	
+#endif
 
-#if FW_HAS_64_BIT==1     
+#if FW_HAS_64_BIT==1
 
     SerializeStatus SerializeBufferBase::deserialize(U64 &val) {
         // check for room
@@ -632,6 +634,28 @@ namespace Fw {
 
     }
 
+    SerializeStatus SerializeBufferBase::deserializeNoCopy(ExternalSerializeBuffer& val) {
+        SerializeStatus stat = FW_SERIALIZE_OK;
+
+        FwBuffSizeType storedLength;
+        stat = this->deserialize(storedLength);
+        if (stat != FW_SERIALIZE_OK) {
+            return stat;
+        }
+        // make sure source has enough
+        if (storedLength > this->getBuffLeft()) {
+            return FW_DESERIALIZE_SIZE_MISMATCH;
+        }
+
+        // getBuffAddrLeft now points to beginning of buffer data
+        val.setExtBuffer(&this->getBuffAddr()[this->m_deserLoc], storedLength);
+        val.setBuffLen(storedLength); // fill with data that was just added
+
+        this->m_deserLoc += storedLength;
+
+        return FW_SERIALIZE_OK;
+    }
+
     // return address of buffer not yet deserialized. This is used
     // to copy the remainder of a buffer.
     const U8* SerializeBufferBase::getBuffAddrLeft(void) const {
@@ -644,6 +668,7 @@ namespace Fw {
     }
 
 #ifdef BUILD_UT
+#ifndef BUILD_DSPAL
     bool SerializeBufferBase::operator==(const SerializeBufferBase& other) const {
         if (this->getBuffLength() != other.getBuffLength()) {
             return false;
@@ -676,6 +701,7 @@ namespace Fw {
 
         return os;
     }
+#endif
 #endif
 
     ExternalSerializeBuffer::ExternalSerializeBuffer(U8* buffPtr, NATIVE_UINT_TYPE size) {
@@ -710,4 +736,3 @@ namespace Fw {
     }
 
 }
-

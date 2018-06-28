@@ -35,6 +35,8 @@ namespace Fw {
             virtual ~Serializable(); //!< destructor
     };
 
+    class ExternalSerializeBuffer; //!< forward declaration
+
     class SerializeBufferBase {
         public:
 
@@ -47,15 +49,15 @@ namespace Fw {
             SerializeStatus serialize(U8 val); //!< serialize 8-bit unsigned int
             SerializeStatus serialize(I8 val); //!< serialize 8-bit signed int
 
-#if FW_HAS_16_BIT==1        
+#if FW_HAS_16_BIT==1
             SerializeStatus serialize(U16 val); //!< serialize 16-bit unsigned int
             SerializeStatus serialize(I16 val); //!< serialize 16-bit signed int
 #endif
-#if FW_HAS_32_BIT==1        
+#if FW_HAS_32_BIT==1
             SerializeStatus serialize(U32 val); //!< serialize 32-bit unsigned int
             SerializeStatus serialize(I32 val); //!< serialize 32-bit signed int
 #endif
-#if FW_HAS_64_BIT==1		
+#if FW_HAS_64_BIT==1
             SerializeStatus serialize(U64 val); //!< serialize 64-bit unsigned int
             SerializeStatus serialize(I64 val); //!< serialize 64-bit signed int
 #endif
@@ -78,16 +80,16 @@ namespace Fw {
             SerializeStatus deserialize(U8 &val); //!< deserialize 8-bit unsigned int
             SerializeStatus deserialize(I8 &val); //!< deserialize 8-bit signed int
 
-#if FW_HAS_16_BIT==1        
+#if FW_HAS_16_BIT==1
             SerializeStatus deserialize(U16 &val); //!< deserialize 16-bit unsigned int
             SerializeStatus deserialize(I16 &val); //!< deserialize 16-bit signed int
 #endif
 
-#if FW_HAS_32_BIT==1        
+#if FW_HAS_32_BIT==1
             SerializeStatus deserialize(U32 &val); //!< deserialize 32-bit unsigned int
             SerializeStatus deserialize(I32 &val); //!< deserialize 32-bit signed int
 #endif
-#if FW_HAS_64_BIT==1        
+#if FW_HAS_64_BIT==1
             SerializeStatus deserialize(U64 &val); //!< deserialize 64-bit unsigned int
             SerializeStatus deserialize(I64 &val); //!< deserialize 64-bit signed int
 #endif
@@ -123,6 +125,9 @@ namespace Fw {
             SerializeStatus setBuffLen(NATIVE_UINT_TYPE length); //!< sets buffer length manually after filling with data
             SerializeStatus copyRaw(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
                                                                                       // Will increment deserialization pointer
+
+            //!< Dangerous - setup a temporary buffer with a piece of ourselves and shift deserialization pointer
+            SerializeStatus deserializeNoCopy(ExternalSerializeBuffer& val);
 
 #ifdef BUILD_UT
             bool operator==(const SerializeBufferBase& other) const;

@@ -1,0 +1,19 @@
+/*
+ * ActiveFileLoggerImplCfg.hpp
+ *
+ *  Created on: Jul 24, 2017
+ *      Author: tcanham
+ */
+
+#ifndef ACTIVEFILELOGGER_ACTIVEFILELOGGERIMPLCFG_HPP_
+#define ACTIVEFILELOGGER_ACTIVEFILELOGGERIMPLCFG_HPP_
+
+namespace Svc {
+
+    static const NATIVE_UINT_TYPE ACTIVE_FILE_LOGGER_MAX_BASE_DIR = 128;
+
+}
+
+
+
+#endif /* ACTIVEFILELOGGER_ACTIVEFILELOGGERIMPLCFG_HPP_ */

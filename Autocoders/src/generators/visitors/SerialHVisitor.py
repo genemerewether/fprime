@@ -89,7 +89,7 @@ class SerialHVisitor(AbstractVisitor.AbstractVisitor):
                 arg_str += "%s %s, "%(mtype[0][1],name)
             elif mtype == "string":
                 arg_str += "const %s::%sString& %s, " % (obj.get_name(),name, name)
-            elif mtype not in typelist:
+            elif mtype not in typelist and size is None:
                 arg_str += "const %s& %s, " %(mtype,name)
             elif size != None:
                 arg_str += "const %s* %s, " % (mtype, name)
@@ -199,6 +199,10 @@ class SerialHVisitor(AbstractVisitor.AbstractVisitor):
         """
         c = startSerialH.startSerialH()
         c.name = obj.get_name()
+        if obj.get_namespace() == None:
+            c.namespace_list = None
+        else:
+            c.namespace_list = obj.get_namespace().split('::')
         d = datetime.datetime.now()
         c.date = d.strftime("%A, %d %B %Y")
         c.user = os.environ['USER']

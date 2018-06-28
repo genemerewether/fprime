@@ -1,4 +1,4 @@
-// ====================================================================== 
+// ======================================================================
 // \title  KraitRouterImpl.cpp
 // \author vagrant
 // \brief  cpp file for KraitRouter component implementation class
@@ -8,191 +8,263 @@
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
 // acknowledged. Any commercial use must be negotiated with the Office
 // of Technology Transfer at the California Institute of Technology.
-// 
+//
 // This software may be subject to U.S. export control laws and
 // regulations.  By accepting this document, the user agrees to comply
 // with all U.S. export laws and regulations.  User has the
 // responsibility to obtain export licenses, or other export authority
 // as may be required before exporting such information to foreign
 // countries or providing access to foreign persons.
-// ====================================================================== 
+// ======================================================================
 
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
-
+#include "Fw/Types/SerialBuffer.hpp"
 #include <unistd.h>
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-//#define DEBUG_PRINT(x,...)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
 
 namespace SnapdragonFlight {
 
   // ----------------------------------------------------------------------
-  // Construction, initialization, and destruction 
+  // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
-  KraitRouterComponentImpl ::
+    KraitRouterComponentImpl ::
+      KraitRouterComponentImpl(
+    #if FW_OBJECT_NAMES == 1
+          const char *const compName
+    #endif
+      ) :
+        KraitRouterComponentBase(
+    #if FW_OBJECT_NAMES == 1
+                                 compName
+    #endif
+                                 ),
+        m_tempBuff(),
+        m_localMsgSize(0u),
+        m_initialized(KR_STATE_PREINIT),
+        m_sendQueue()
+    {
+
+    }
+
+    void KraitRouterComponentImpl ::
+      init(
+          const NATIVE_INT_TYPE queueDepth,
+          const NATIVE_INT_TYPE msgSize,
+          const NATIVE_INT_TYPE instance
+      )
+    {
+        KraitRouterComponentBase::init(queueDepth, msgSize, instance);
+
+        m_localMsgSize = msgSize + 2 * sizeof(U32);
+
+        Fw::EightyCharString queueName;
 #if FW_OBJECT_NAMES == 1
-    KraitRouterComponentImpl(
-        const char *const compName
-    ) :
-      KraitRouterComponentBase(compName),
-      m_quit(false),
-      m_recvPortBuffers(),
-      m_recvPortBuffInsert(0),
-      m_recvPortBuffRemove(0),
-      m_initialized(false)
+        queueName = this->m_objName;
 #else
-    KraitRouterImpl(void)
+        char queueNameChar[FW_QUEUE_NAME_MAX_SIZE];
+        (void)snprintf(queueNameChar,sizeof(queueNameChar),"CompQ_%d",Os::Queue::getNumQueues());
+        queueName = queueNameChar;
 #endif
-  {
-      for (int i = 0; i < KR_NUM_RECV_PORT_BUFFS; i++) {
-  	  m_recvPortBuffers[i].available = true;
-      }
-  }
+        m_sendQueue.create(queueName, queueDepth, m_localMsgSize);
 
-  void KraitRouterComponentImpl ::
-    init(
-        const NATIVE_INT_TYPE instance
-    ) 
-  {
-    KraitRouterComponentBase::init(instance);
-    m_initialized = true;
-  }
-
-  KraitRouterComponentImpl ::
-    ~KraitRouterComponentImpl(void)
-  {
-    m_initialized = false;
-  }
-  
-  int KraitRouterComponentImpl::buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-    DEBUG_PRINT("buffRead called on object 0x%X, init %d\n", (unsigned long) this, this->m_initialized);
-    while (!this->m_initialized) {
-      if (this->m_quit) {
-	return -10;
-      }
-      
-      usleep(KR_PREINIT_SLEEP_US);
-    }
-    *port = 0;
-    *bytes = 0;
-    return 1;
-  }
-  
-  int KraitRouterComponentImpl::portRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-    DEBUG_PRINT("portRead called on object 0x%X, init %d\n", (unsigned long) this, this->m_initialized);
-    while (!this->m_initialized) {
-      if (this->m_quit) {
-	DEBUG_PRINT("quitting portRead preinit in object 0x%X\n", (unsigned long) this);
-	return -10;
-      }
-      
-      usleep(KR_PREINIT_SLEEP_US);
+        m_initialized = KR_STATE_INIT;
     }
 
-    // TODO(mereweth) - lock a class member variable mutex here
-    
-    /* NOTE(mereweth) - if portBuffer entry is available, that means no data is stored there
-     * If m_recvPortBuffInsert and m_recvPortBuffRemove are equal, we are all caught up and waiting
-     * for a new input port call
-     */
-    while (this->m_recvPortBuffers[m_recvPortBuffRemove].available == true) {
-      DEBUG_PRINT("waiting for portBuff in object 0x%X\n", (unsigned long) this);
-      if (this->m_quit) {
-	DEBUG_PRINT("quitting portRead postinit in object 0x%X\n", (unsigned long) this);
-	return -10;
-      }
-      usleep(KR_NOPORT_SLEEP_US);
+    KraitRouterComponentImpl ::
+      ~KraitRouterComponentImpl(void)
+    {
+        m_initialized = KR_STATE_QUIT;
     }
 
-    if (buffLen < m_recvPortBuffers[m_recvPortBuffRemove].buffLen) {
-      return -1;
-      //TODO(mereweth) - error - FastRPC call didn't provide enough space to copy in port
+    int KraitRouterComponentImpl::buffRead(unsigned int* port,
+                                           unsigned char* buff,
+                                           int buffLen,
+                                           int* bytes) {
+        FW_ASSERT(0); // TODO(mereweth)
+        DEBUG_PRINT("buffRead called on object 0x%X, init %d\n",
+                    (unsigned long) this, this->m_initialized);
+        while (this->m_initialized == KR_STATE_PREINIT) {
+            // queue isn't initialized yet so we have no choice but to sleep.
+            usleep(KR_PREINIT_SLEEP_US);
+        }
+        // TODO(mereweth) - add mechanism for force quit
+        if (this->m_initialized == KR_STATE_QUIT_PREINIT) {
+            return KR_RTN_QUIT_PREINIT;
+        }
+        *port = 0;
+        *bytes = 0;
+        return 1;
     }
-    *port = m_recvPortBuffers[m_recvPortBuffRemove].portNum;
-    DEBUG_PRINT("before memcpy in portRead in object 0x%X, port %d\n", (unsigned long) this, *port);
-    memcpy(buff, m_recvPortBuffers[m_recvPortBuffRemove].buff, m_recvPortBuffers[m_recvPortBuffRemove].buffLen);
-    *bytes = m_recvPortBuffers[m_recvPortBuffRemove].buffLen;
-        
-    // TODO(mereweth) - unlock class member variable mutex here
-    
-    return 0;
-  }
-  
-  int KraitRouterComponentImpl::write(unsigned int port, const unsigned char* buff, int buffLen) {
-    DEBUG_PRINT("write called on object 0x%X, port %d, init %d\n", (unsigned long) this, port, this->m_initialized);
-    while (!this->m_initialized) {
-      if (this->m_quit) {
-	DEBUG_PRINT("quitting write preinit in object 0x%X\n", (unsigned long) this);
-	return -10;
-      }
-      
-      usleep(KR_PREINIT_SLEEP_US);
+
+    int KraitRouterComponentImpl::portRead(unsigned char* buff,
+                                           int buffLen,
+                                           int* bytes) {
+        while (this->m_initialized == KR_STATE_PREINIT) {
+            // queue isn't initialized yet so we have no choice but to sleep.
+            usleep(KR_PREINIT_SLEEP_US);
+        }
+        // TODO(mereweth) - add mechanism for force quit
+        if (this->m_initialized == KR_STATE_QUIT_PREINIT) {
+            return KR_RTN_QUIT_PREINIT;
+        }
+
+        if (buffLen < 0) {
+            return KR_RTN_FASTRPC_FAIL;
+        }
+        this->m_tempBuff.setExtBuffer(buff,
+                                      static_cast<unsigned int>(buffLen));
+        this->m_tempBuff.resetSer();
+
+        Fw::QueuedComponentBase::MsgDispatchStatus msgStat = Fw::QueuedComponentBase::MSG_DISPATCH_OK;
+        // dequeue any pending messages
+        while ((msgStat != Fw::QueuedComponentBase::MSG_DISPATCH_EMPTY) &&
+               ((this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength())
+                >= this->m_localMsgSize)) {
+            msgStat = this->doDispatch();
+            if (msgStat == Fw::QueuedComponentBase::MSG_DISPATCH_EXIT) {
+                return KR_RTN_QUIT;
+            }
+        }
+
+        *bytes = this->m_tempBuff.getBuffLength();
+
+        DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d, msgStat %d, returning %d bytes\n",
+                    (unsigned long) this, this->m_initialized,
+                    this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength(), msgStat,
+                    *bytes);
+
+        return KR_RTN_OK;
     }
-    // if connected, call output port
-    if (this->isConnected_KraitPortsOut_OutputPort(port)) {
-      Fw::ExternalSerializeBuffer portBuff((unsigned char*) buff, buffLen);
 
-      DEBUG_PRINT("Calling port %d with %d bytes.\n", port, buffLen);
-      Fw::SerializeStatus stat = this->KraitPortsOut_out(port, portBuff);
-      if (stat != Fw::FW_SERIALIZE_OK) {
-	DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
-	//this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
-        //this->tlmWrite_HR_NumBadSerialPortCalls(++this->m_numBadSerialPortCalls);
-	// TODO(mereweth) - status codes
-	return -1;
-      }
+
+    int KraitRouterComponentImpl::buffWrite(unsigned int port,
+                                            const unsigned char* buff,
+                                            int buffLen) {
+        FW_ASSERT(0); // TODO(mereweth)
+        return 0;
     }
-    return 0;
-  }
-  
-  // ----------------------------------------------------------------------
-  // Handler implementations for user-defined typed input ports
-  // ----------------------------------------------------------------------
 
-  void KraitRouterComponentImpl ::
-    Sched_handler(
-        const NATIVE_INT_TYPE portNum,
-        NATIVE_UINT_TYPE context
-    )
-  {
-    // TODO
-  }
+    int KraitRouterComponentImpl::portWrite(const unsigned char* buff,
+                                            int buffLen) {
+        DEBUG_PRINT("write called on object 0x%X, init %d\n",
+                    (unsigned long) this, this->m_initialized);
 
-  // ----------------------------------------------------------------------
-  // Handler implementations for user-defined serial input ports
-  // ----------------------------------------------------------------------
+        if (buffLen > this->m_localMsgSize) {
+            return KR_RTN_SEND_TOO_BIG;
+        }
+        FW_ASSERT(buffLen <= this->m_localMsgSize, buffLen, this->m_localMsgSize);
 
-  void KraitRouterComponentImpl ::
-    HexPortsIn_handler(
-        NATIVE_INT_TYPE portNum, /*!< The port number*/
-        Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
-    )
-  {
-    DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n", portNum, Buffer.getBuffLength());
-    if (!this->m_recvPortBuffers[m_recvPortBuffInsert].available) {
-        DEBUG_PRINT("HexPortsIn_handler tried to overwrite a port buffer for port %d\n", portNum);
-	//this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
-        //this->tlmWrite_KR_NumBadSerialPortCalls();
-	return;
+        Os::Queue::QueueStatus qStatus =
+          this->m_sendQueue.send(buff, buffLen, 0, Os::Queue::QUEUE_NONBLOCKING);
+        FW_ASSERT(
+            qStatus == Os::Queue::QUEUE_OK,
+            static_cast<AssertArg>(qStatus)
+        );
+
+        return KR_RTN_OK;
     }
-    
-    m_recvPortBuffers[m_recvPortBuffInsert].available = false;
-    m_recvPortBuffers[m_recvPortBuffInsert].portNum = portNum;
 
-    /* NOTE(mereweth) - this memory gets copied again into the buffer provided by FastRPC read call
-     * This should be sufficiently fast for these port calls
-     */
-    if (Buffer.getBuffLength() >= KR_RECV_PORT_BUFF_SIZE) {
-        DEBUG_PRINT("HexPortsIn_handler serialized port %d too big: actual %d, avail %d\n", portNum, Buffer.getBuffLength(), KR_RECV_PORT_BUFF_SIZE);
-	//this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
-        //this->tlmWrite_KR_NumBadSerialPortCalls();
-	return;
+    // ----------------------------------------------------------------------
+    // Handler implementations for user-defined typed input ports
+    // ----------------------------------------------------------------------
+
+    void KraitRouterComponentImpl ::
+      Sched_handler(
+          const NATIVE_INT_TYPE portNum,
+          NATIVE_UINT_TYPE context
+      )
+    {
+        // TODO(mereweth) - max loop iterations
+
+        while (1) {
+            U8 msgBuff[this->m_localMsgSize];
+            Fw::ExternalSerializeBuffer msg(msgBuff,this->m_localMsgSize);
+            NATIVE_INT_TYPE priority;
+
+            Os::Queue::QueueStatus msgStatus = this->m_sendQueue.receive(msg,
+                                            priority, Os::Queue::QUEUE_NONBLOCKING);
+            if (Os::Queue::QUEUE_NO_MORE_MSGS == msgStatus) {
+              return;
+            } else {
+              FW_ASSERT(
+                  msgStatus == Os::Queue::QUEUE_OK,
+                  static_cast<AssertArg>(msgStatus)
+              );
+            }
+
+            // Reset to beginning of buffer
+            msg.resetDeser();
+
+            NATIVE_INT_TYPE outPortNum;
+            Fw::SerializeStatus deserStatus = msg.deserialize(outPortNum);
+            FW_ASSERT(
+                deserStatus == Fw::FW_SERIALIZE_OK,
+                static_cast<AssertArg>(deserStatus)
+            );
+            // at this point, msg deserialization pointer points at length & buffer
+
+            if (outPortNum >= this->getNum_KraitPortsOut_OutputPorts()) {
+                DEBUG_PRINT("portNum %d too big\n", outPortNum, this->getNum_KraitPortsOut_OutputPorts());
+                //this->tlmWrite_HR_NumDecodeErrors(++this->m_numDecodeErrors);
+                break;
+            }
+
+            // if connected, call output port
+            if (this->isConnected_KraitPortsOut_OutputPort(outPortNum)) {
+                // Deserialize serialized buffer into new buffer
+                Fw::ExternalSerializeBuffer serHandBuff;
+                deserStatus = msg.deserializeNoCopy(serHandBuff);
+                FW_ASSERT(
+                    deserStatus == Fw::FW_SERIALIZE_OK,
+                    static_cast<AssertArg>(deserStatus)
+                );
+
+                DEBUG_PRINT("Calling port %d from KR sched\n", outPortNum);
+                Fw::SerializeStatus stat = this->KraitPortsOut_out(outPortNum, serHandBuff);
+                if (stat != Fw::FW_SERIALIZE_OK) {
+                    DEBUG_PRINT("KraitPortsOut_out() serialize status error\n");
+                    //this->log_WARNING_HI_KR_BadSerialPortCall(stat, port);
+                    //this->tlmWrite_HR_NumBadSerialPortCalls(++this->m_numBadSerialPortCalls);
+                    // TODO(mereweth) - status codes
+                }
+            }
+        }
     }
-    memcpy(m_recvPortBuffers[m_recvPortBuffInsert].buff, Buffer.getBuffAddr(), Buffer.getBuffLength());
-    m_recvPortBuffers[m_recvPortBuffInsert].buffLen = Buffer.getBuffLength();
-  }
+
+    // ----------------------------------------------------------------------
+    // Handler implementations for user-defined serial input ports
+    // ----------------------------------------------------------------------
+
+    void KraitRouterComponentImpl ::
+      HexPortsIn_handler(
+          NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
+      )
+    {
+        // NOTE(mereweth) - called from FastRPC portRead thread
+        DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n",
+                    portNum, Buffer.getBuffLength());
+
+        Fw::SerializeStatus stat = this->m_tempBuff.serialize(portNum);
+        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK);
+        // serializes length and copies contents
+        stat = this->m_tempBuff.serialize(Buffer);
+        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK);
+
+        DEBUG_PRINT("HexPortsIn_handler done port %d with %d bytes\n",
+                    portNum, Buffer.getBuffLength());
+    }
 
 } // end namespace SnapdragonFlight

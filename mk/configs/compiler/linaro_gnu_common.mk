@@ -33,23 +33,23 @@ LOAD_SIZE := $(SIZE)
 LINK_LIBS := -ldl -lpthread -lm -lrt -lutil
 LINK_LIBS += 	-L$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
 				-ladsprpc \
-				$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/UbuntuARM_Debug/rpcmem.a \
-				-L $(HEXAGON_ARM_SYSROOT)/usr/lib/ \
-				-lcamera \
-				-lcamparams \
-				-lz \
-				-lCB \
-				-lssl \
-				-lOpenCL \
-				-lglib-2.0 \
-				-lEGL_adreno \
-				-lGLESv2_adreno \
-				-ladreno_utils \
-				-lgsl \
-				-lsc-a3xx \
-				$(HEXAGON_ARM_SYSROOT)/lib/libcrypto.so.1.0.0 \
-				$(HEXAGON_ARM_SYSROOT)/lib/libstdc++.so.6 \
-				-lmv1 # Machine Vision SDK, depends on libraries above
+				$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/UbuntuARM_Debug/rpcmem.a
+				# -L $(HEXAGON_ARM_SYSROOT)/usr/lib/ \
+				# -lcamera \
+				# -lcamparams \
+				# -lz \
+				# -lCB \
+				# -lssl \
+				# -lOpenCL \
+				# -lglib-2.0 \
+				# -lEGL_adreno \
+				# -lGLESv2_adreno \
+				# -ladreno_utils \
+				# -lgsl \
+				# -lsc-a3xx \
+				# $(HEXAGON_ARM_SYSROOT)/lib/libcrypto.so.1.0.0 \
+				# $(HEXAGON_ARM_SYSROOT)/lib/libstdc++.so.6
+				#-lmv1 # Machine Vision SDK, depends on libraries above
 				#$(HEXAGON_ARM_SYSROOT)/usr/lib/arm-linux-gnueabihf/libstdc++.so.6
 				# not necessary if libraries above are specified explicitly
 				#-Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/usr/lib \
@@ -61,7 +61,7 @@ DEBUG := -g3
 LINUX_GNU_CFLAGS := $(LINUX_FLAGS_COMMON) \
 					$(COMMON_DEFINES) \
 					$(GNU_CFLAGS_COMMON)
-					
+
 					#$(BUILD_32BIT) # Quantum framework won't build 32-bit
 
 LINUX_GNU_CXXFLAGS :=	$(LINUX_FLAGS_COMMON) \

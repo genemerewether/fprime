@@ -1,0 +1,17 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+FILENAME=`basename "$0"`
+
+cleanup ()
+{
+    kill -9 $!
+    exit 0
+}
+
+trap cleanup SIGINT SIGTERM
+
+while [ 1 ]; do
+    echo "I AM ${DIR}/$FILENAME, ARGS $@"
+    sleep 1 &
+    wait $!
+done

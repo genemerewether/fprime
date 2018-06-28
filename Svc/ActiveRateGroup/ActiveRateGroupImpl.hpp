@@ -48,12 +48,12 @@ namespace Svc {
             //!         output port number.
             //!  \param numContexts The number of elements in the context array.
 
-#if FW_OBJECT_NAMES == 1        
+#if FW_OBJECT_NAMES == 1
             ActiveRateGroupImpl(const char* compName, NATIVE_UINT_TYPE contexts[], NATIVE_UINT_TYPE numContexts);
 #else
             ActiveRateGroupImpl(NATIVE_UINT_TYPE contexts[], NATIVE_UINT_TYPE numContexts);
 #endif
-      
+
             //!  \brief ActiveRateGroupImpl initialization function
             //!
             //!  The initialization function of the class initializes the member
@@ -116,6 +116,10 @@ namespace Svc {
             NATIVE_UINT_TYPE m_contexts[NUM_RATEGROUPMEMBEROUT_OUTPUT_PORTS]; //!< Must match number of output ports
             NATIVE_INT_TYPE m_overrunThrottle; //!< throttle value for overrun events
             U32 m_cycleSlips; //!< tracks number of cycle slips
+        public:
+
+            // put this constant here for sizing the context table
+            static const NATIVE_UINT_TYPE CONTEXT_SIZE =  NUM_RATEGROUPMEMBEROUT_OUTPUT_PORTS;
     };
 
 }

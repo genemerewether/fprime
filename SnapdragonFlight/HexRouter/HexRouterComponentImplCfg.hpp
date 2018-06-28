@@ -11,14 +11,13 @@
 namespace SnapdragonFlight {
 
   enum {
-      READ_BUFF_SIZE = 4*1024,		// This is large enough for the circular buffer
-
       // specifically for async processed cycling buffers
-      RECEIVE_BUFFER_POOL_SIZE = 4,
-      RECEIVE_BUFFER_SIZE = 1024,
+      HR_RECEIVE_BUFFER_POOL_SIZE = 4,
+      HR_RECEIVE_BUFFER_SIZE = 1024,
 
-      // TODO (mereweth) - set as max of serialized port sizes
-      READ_PORT_SIZE = 512
+      HR_RPC_READ_SIZE = 4096,
+
+      HR_NO_MSG_SLEEP_US = 10000
   };
 
 };

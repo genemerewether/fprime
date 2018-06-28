@@ -4,14 +4,19 @@ BUILD_ROOT ?= $(subst /$(DEPLOYMENT),,$(CURDIR))
 
 export BUILD_ROOT
 
-default_build: DSPAL #DSPAL_opt
+__DEFAULT_BUILD = DSPAL_opt
+__DEFAULT_BUILD_OUT = dspal-hex-clang-cross-opt-dspal-bin
+
+default_build: $(__DEFAULT_BUILD)
 
 COV_BUILD: DSPAL_bin_clean DSPAL
 
 include $(BUILD_ROOT)/mk/makefiles/deployment_makefile.mk
 
-load: default_build
-	adb push ./dspal-hex-clang-cross-debug-dspal-bin/HEXREF /usr/share/data/adsp/libhexref_skel.so
+include $(BUILD_ROOT)/Svc/Startup/patch/patch.mk
+
+load_dsp: default_build
+	adb push ./$(__DEFAULT_BUILD_OUT)/HEXREF /usr/share/data/adsp/libhexref_skel.so
 
 rebuild_hex:
-	make gen_make DSPAL_clean DSPAL #DSPAL_opt_clean DSPAL_opt
+	make gen_make DSPAL_opt_clean DSPAL_opt

@@ -14,7 +14,7 @@ ${name}::${name}(const ${name}* src) : Serializable() {
 }
 
 ${name}::${name}(${args_proto_string}) : Serializable() {
-    this->set(${args_string});
+    this->set(${args_string_passthrough});
 }
 
 const ${name}& ${name}::operator=(const ${name}& src) {
@@ -38,49 +38,64 @@ void ${name}::set(${args_proto_string}) {
     for (NATIVE_INT_TYPE _mem = 0; _mem < FW_MIN(${member}Size,${size}); _mem++) {
         this->m_${member}[_mem] = ${member}[_mem];
     }
-#end if    
+#end if
 #end for
 }
 
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $size == None:
-${type} ${name}::get${member}(void) {
+#if $typeinfo == 'extern':
+const ${type}& ${name}::get${member}(void) const {
     return this->m_${member};
-#else if $typeinfo == 'string' or $typeinfo == 'extern':
-const ${type}& ${name}::get${member}(void) {
+#else ## not external type
+${type} ${name}::get${member}(void) const {
+    return this->m_${member};
+#end if ## check whether external type
+#else ## multiple elements
+#if $typeinfo == 'string':
+const ${type}& ${name}::get${member}(void) const {
     return this->m_${member};
 #else
-const ${type}* ${name}::get${member}(NATIVE_INT_TYPE& size) {
+const ${type}* ${name}::get${member}(NATIVE_INT_TYPE& size) const {
     size = ${size};
     return this->m_${member};
-#end if    
+#end if
+#end if
 }
 
 #end for
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $size == None:
+#if $typeinfo == 'extern':
+void ${name}::set${member}(const ${type}& val) {
+    this->m_${member} = val;
+}
+#else ## not external type
 void ${name}::set${member}(${type} val) {
     this->m_${member} = val;
 }
-#else if $typeinfo == 'string' or $typeinfo == 'extern':
+#end if ## check whether external type
+#else ## multiple elements
+#if $typeinfo == 'string':
 void ${name}::set${member}(const ${type}& val) {
     this->m_${member} = val;
 }
 #else
 void ${name}::set${member}(const ${type}* val, NATIVE_INT_TYPE size) {
-    for (NATIVE_INT_TYPE _mem = 0; _mem < (size < ${size})?size:${size}; _mem++) {
+    for (NATIVE_INT_TYPE _mem = 0; _mem < FW_MIN(size,${size}); _mem++) {
         this->m_${member}[_mem] = val[_mem];
     }
 }
-#end if
+#end if ## check if string
+#end if ## check for multiple elements
 #end for
 Fw::SerializeStatus ${name}::serialize(Fw::SerializeBufferBase& buffer) const {
     Fw::SerializeStatus stat;
 
-\#if FW_SERIALIZATION_TYPE_ID    
+\#if FW_SERIALIZATION_TYPE_ID
     // serialize type ID
     stat = buffer.serialize((U32)${name}::TYPE_ID);
-\#endif    
+\#endif
 
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $size == None or $typeinfo == "string":
@@ -88,7 +103,7 @@ Fw::SerializeStatus ${name}::serialize(Fw::SerializeBufferBase& buffer) const {
     stat = buffer.serialize((FwEnumStoreType)this->m_${member});
 #else
     stat = buffer.serialize(this->m_${member});
-#end if    
+#end if
     if (stat != Fw::FW_SERIALIZE_OK) {
         return stat;
     }
@@ -98,7 +113,7 @@ Fw::SerializeStatus ${name}::serialize(Fw::SerializeBufferBase& buffer) const {
         if (stat != Fw::FW_SERIALIZE_OK) {
             return stat;
         }
-    }   
+    }
 #end if
 #end for
     return stat;
@@ -107,7 +122,7 @@ Fw::SerializeStatus ${name}::serialize(Fw::SerializeBufferBase& buffer) const {
 Fw::SerializeStatus ${name}::deserialize(Fw::SerializeBufferBase& buffer) {
     Fw::SerializeStatus stat;
 
-\#if FW_SERIALIZATION_TYPE_ID    
+\#if FW_SERIALIZATION_TYPE_ID
     U32 typeId;
 
     stat = buffer.deserialize(typeId);
@@ -118,7 +133,7 @@ Fw::SerializeStatus ${name}::deserialize(Fw::SerializeBufferBase& buffer) {
     if (typeId != ${name}::TYPE_ID) {
         return Fw::FW_DESERIALIZE_TYPE_MISMATCH;
     }
-\#endif    
+\#endif
 
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $size == None or $typeinfo == "string":
@@ -138,7 +153,7 @@ Fw::SerializeStatus ${name}::deserialize(Fw::SerializeBufferBase& buffer) {
         if (stat != Fw::FW_SERIALIZE_OK) {
             return stat;
         }
-    }   
+    }
 #end if
 #end for
     return stat;
@@ -147,8 +162,8 @@ Fw::SerializeStatus ${name}::deserialize(Fw::SerializeBufferBase& buffer) {
 \#if FW_SERIALIZABLE_TO_STRING  || BUILD_UT
 
 void ${name}::toString(Fw::StringBase& text) const {
-    
-    static const char * formatString = 
+
+    static const char * formatString =
        "("
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members[0:-1]:
 #if $size != None and typeinfo != "string":
@@ -159,7 +174,7 @@ void ${name}::toString(Fw::StringBase& text) const {
        "[$format] "
 #else
        "$member = $format, "
-#end if       
+#end if
 #end for
 #if $members[-1][2] != None and $members[-1][5] != "string":
        "$members[-1][0] = "
@@ -169,19 +184,25 @@ void ${name}::toString(Fw::StringBase& text) const {
        "[$members[-1][3]] "
 #else
        "$members[-1][0] = $members[-1][3]"
-#end if        
+#end if
        ")";
-       
+
     // declare strings to hold any serializable toString() arguments
 
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
 #if $typeinfo == "extern":
-
+#if $size != None: ## is an array
+    Fw::EightyCharString ${member}Str[$size];
+#for $elem in range(0,int($size)):
+    this->m_${member}[$elem].toString(${member}Str[$elem]);
+#end for ## for each element of the array
+#else ## not an array
     Fw::EightyCharString ${member}Str;
-    this->m_${member}.toString(${member}Str); 
-#end if                   
+    this->m_${member}.toString(${member}Str);
+#end if ## is an array
+#end if
 #end for
-       
+
     char outputString[FW_SERIALIZABLE_TO_STRING_BUFFER_SIZE];
     (void)snprintf(outputString,FW_SERIALIZABLE_TO_STRING_BUFFER_SIZE,formatString
 #for ($member,$type,$size,$format,$comment,$typeinfo) in $members:
@@ -191,6 +212,8 @@ void ${name}::toString(Fw::StringBase& text) const {
        ,this->m_${member}[$elem]?"T":"F"
 #else if $type == "enum":
        ,(NATIVE_INT_TYPE)this->m_${member}[$elem]
+#else if $typeinfo == "extern":
+       ,${member}Str[$elem].toChar()
 #else:
        ,this->m_${member}[$elem]
 #end if
@@ -200,7 +223,7 @@ void ${name}::toString(Fw::StringBase& text) const {
        ,this->m_${member}?"T":"F"
 #else if $type == "enum":
        ,(NATIVE_INT_TYPE)this->m_${member}
-#else if $typeinfo == "string":    
+#else if $typeinfo == "string":
        ,this->m_${member}.toChar()
 #else if $typeinfo == "extern":
        ,${member}Str.toChar()
@@ -211,8 +234,8 @@ void ${name}::toString(Fw::StringBase& text) const {
 #end for ## each member
     );
     outputString[FW_SERIALIZABLE_TO_STRING_BUFFER_SIZE-1] = 0; // NULL terminate
-    
-    text = outputString;           
+
+    text = outputString;
 }
 
 \#endif

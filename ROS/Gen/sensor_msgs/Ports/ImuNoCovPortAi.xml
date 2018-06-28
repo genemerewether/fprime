@@ -1,0 +1,6 @@
+<interface name="ImuNoCov" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="ImuNoCov" pass_by="reference" type="ROS::sensor_msgs::ImuNoCov"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/ImuNoCovSerializableAi.xml</import_serializable_type>
+</interface>
