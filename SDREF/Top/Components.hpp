@@ -38,13 +38,8 @@ extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::TlmChanImpl chanTlm;
 extern Svc::CommandDispatcherImpl cmdDisp;
 extern Svc::PrmDbImpl prmDb;
-extern Svc::FileUplink fileUp;
-extern Svc::FileDownlink fileDown;
-extern Svc::BufferManager fileDownBufMgr;
-extern Svc::BufferManager fileUpBufMgr;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
-extern Svc::HealthImpl health;
 extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
 extern SDREF::SDRosIfaceComponentImpl sdRosIface;
 

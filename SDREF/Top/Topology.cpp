@@ -133,12 +133,6 @@ SDREF::SDRosIfaceComponentImpl sdRosIface
 #endif
 ;
 
-Svc::FileUplink fileUp ("fileUp");
-Svc::FileDownlink fileDown ("fileDown", DOWNLINK_PACKET_SIZE);
-Svc::BufferManager fileDownBufMgr("fileDownBufMgr", DOWNLINK_BUFFER_STORE_SIZE, DOWNLINK_BUFFER_QUEUE_SIZE);
-Svc::BufferManager fileUpBufMgr("fileUpBufMgr", UPLINK_BUFFER_STORE_SIZE, UPLINK_BUFFER_QUEUE_SIZE);
-Svc::HealthImpl health("health");
-
 Svc::AssertFatalAdapterComponentImpl fatalAdapter
 #if FW_OBJECT_NAMES == 1
 ("fatalAdapter")
@@ -199,14 +193,8 @@ void constructApp(int port_number, char* hostname) {
 
     sockGndIf.init(0);
 
-    fileUp.init(30, 0);
-    fileDown.init(30, 0);
-    fileUpBufMgr.init(0);
-    fileDownBufMgr.init(1);
-
     fatalAdapter.init(0);
     fatalHandler.init(0);
-    health.init(25,0);
 
     hexRouter.init(10, 0);
     sdRosIface.init(10);
@@ -234,26 +222,9 @@ void constructApp(int port_number, char* hostname) {
     cmdDisp.regCommands();
     eventLogger.regCommands();
     prmDb.regCommands();
-    fileDown.regCommands();
-    health.regCommands();
 
     // read parameters
     prmDb.readParamFile();
-
-    // set health ping entries
-
-    Svc::HealthImpl::PingEntry pingEntries[] = {
-        {3,5,rg.getObjName()}, // 0
-        {3,5,cmdDisp.getObjName()}, // 1
-        {3,5,eventLogger.getObjName()}, // 2
-        {3,5,cmdSeq.getObjName()}, // 3
-        {3,5,chanTlm.getObjName()}, // 4
-        {3,5,fileUp.getObjName()}, // 5
-        {3,5,fileDown.getObjName()}, // 6
-    };
-
-    // register ping table
-    health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
 
     // Active component startup
     // start rate groups
@@ -271,9 +242,6 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
-
-    fileDown.start(0, 40, 20*1024);
-    fileUp.start(0, 40, 20*1024);
 
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
@@ -316,8 +284,6 @@ void exitTasks(void) {
     eventLogger.exit();
     chanTlm.exit();
     prmDb.exit();
-    fileUp.exit();
-    fileDown.exit();
     cmdSeq.exit();
     hexRouter.exit();
     DEBUG_PRINT("After HexRouter quit\n");

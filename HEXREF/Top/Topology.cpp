@@ -47,8 +47,8 @@ Svc::RateGroupDecouplerComponentImpl rgDecouple(
 ;
 
 static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
-    0,
-    0, // TODO(mereweth) - estimator
+    0, // unused
+    Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
 };
 Svc::ActiveRateGroupImpl rg(
@@ -67,8 +67,8 @@ Svc::RateGroupDriverImpl rgGncDrv(
 
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-    0, //TODO(mereweth) - estimator
-    Gnc::LCTRL_SCHED_CONTEXT_ATT,
+    Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+    Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
 };
 Svc::PassiveRateGroupImpl rgAtt(
 #if FW_OBJECT_NAMES == 1
@@ -79,8 +79,8 @@ Svc::PassiveRateGroupImpl rgAtt(
 
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     0, //TODO(mereweth) - IMU?
-    0, //TODO(mereweth) - estimator?
-    Gnc::LCTRL_SCHED_CONTEXT_POS,
+    Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+    Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
 };
 Svc::PassiveRateGroupImpl rgPos(
 #if FW_OBJECT_NAMES == 1
@@ -130,6 +130,12 @@ Svc::FatalHandlerComponentImpl fatalHandler
 Gnc::LeeCtrlComponentImpl leeCtrl
 #if FW_OBJECT_NAMES == 1
                     ("LEECTRL")
+#endif
+;
+
+Gnc::ImuIntegComponentImpl imuInteg
+#if FW_OBJECT_NAMES == 1
+                    ("IMUINTEG")
 #endif
 ;
 
@@ -198,6 +204,7 @@ void constructApp() {
 
     // Initialize the GNC components
     leeCtrl.init(0);
+    imuInteg.init(0);
     mpu9250.init(0);
 
     spiDrv.init(0);
