@@ -14,7 +14,7 @@
     <!--import_dictionary>Gnc/Ctrl/LeeCtrl/Telemetry.xml</import_dictionary -->
     <!--import_dictionary>Gnc/Ctrl/LeeCtrl/Events.xml</import_dictionary -->
     <ports>
-    
+
 
         <port name="Imu" data_type="ImuNoCov"  kind="sync_input"    max_number="1">
         </port>
@@ -25,7 +25,7 @@
         <port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
         </port>
 
-        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">
         </port>
 
         <port name="Log" data_type="Fw::Log"  kind="output"    max_number="1">

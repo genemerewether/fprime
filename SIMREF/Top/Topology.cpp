@@ -32,6 +32,7 @@ static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     0, // chanTlm
     0, // rosCycle
     SIMREF::RSDRV_SCHED_CONTEXT_TLM, // rotorSDrv
+    Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
 };
 Svc::ActiveRateGroupImpl rg(
@@ -73,7 +74,7 @@ Svc::PassiveRateGroupImpl rgAtt(
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_POS,
-    Gnc::IMUINTEG_SCHED_CONTEXT_ATT,
+    Gnc::IMUINTEG_SCHED_CONTEXT_POS,
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
 Svc::PassiveRateGroupImpl rgPos(
