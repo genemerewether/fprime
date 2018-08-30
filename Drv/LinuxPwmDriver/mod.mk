@@ -11,21 +11,21 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = LinuxPwmDriverComponentAi.xml LinuxPwmDriverComponentImplCommon.cpp
+SRC = LinuxPwmDriverComponentAi.xml #LinuxPwmDriverComponentImplCommon.cpp
 
-SRC_SDFLIGHT = LinuxPwmDriverComponentImpl.cpp
+#SRC_SDFLIGHT = LinuxPwmDriverComponentImpl.cpp
 
-SRC_LINUX = LinuxPwmDriverComponentImpl.cpp
+#SRC_LINUX = LinuxPwmDriverComponentImpl.cpp
 
-SRC_CYGWIN = LinuxPwmDriverComponentImpl.cpp
+#SRC_CYGWIN = LinuxPwmDriverComponentImpl.cpp
 
-SRC_DARWIN = LinuxPwmDriverComponentImplStub.cpp
+#SRC_DARWIN = LinuxPwmDriverComponentImplStub.cpp
 
-SRC_DSPAL = LinuxPwmDriverComponentImplDspal.cpp
+#SRC_DSPAL = LinuxPwmDriverComponentImplDspal.cpp
 
-HDR = LinuxPwmDriverComponentImpl.hpp
+#HDR = LinuxPwmDriverComponentImpl.hpp
 
 #SUBDIRS = test
 
 
-SRC_LINUXRT = LinuxPwmDriverComponentImpl.cpp
+#SRC_LINUXRT = LinuxPwmDriverComponentImpl.cpp

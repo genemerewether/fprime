@@ -13,8 +13,8 @@ GetPlanOutSerializableAi.xml \
 GridCellsSerializableAi.xml \
 MapMetaDataSerializableAi.xml \
 OccupancyGridSerializableAi.xml \
-OdometrySerializableAi.xml \
 OdometryNoCovSerializableAi.xml \
+OdometrySerializableAi.xml \
 PathSerializableAi.xml \
 SetMapInSerializableAi.xml \
 SetMapOutSerializableAi.xml

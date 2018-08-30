@@ -136,8 +136,10 @@ int main(int argc, char* argv[]) {
 #endif //BUILD_SDFLIGHT
 
     DEBUG_PRINT("Quitting hexrouter read threads\n");
+#ifdef BUILD_SDFLIGHT
     hexRouter.quitReadThreads();
     //hexRouter.exit();
+#endif //BUILD_SDFLIGHT
 
     if (hexCycle) {
         DEBUG_PRINT("Waiting for the runner to return\n");
