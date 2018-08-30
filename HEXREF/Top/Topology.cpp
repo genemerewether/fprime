@@ -185,7 +185,7 @@ void manualConstruct(void) {
     //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
 
     //kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_fullStateUpdate_InputPort(0));
-    imuInteg.set_odomNoCov_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(2));
+    imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
 }
 
 void constructApp() {
@@ -224,7 +224,7 @@ void constructApp() {
     fatalAdapter.init(0);
     fatalHandler.init(0);
 
-    kraitRouter.init(20, 512);
+    kraitRouter.init(50, 512);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -235,9 +235,11 @@ void constructApp() {
     /*eventLogger.regCommands();*/
 
     // Open devices
+#ifdef BUILD_DSPAL
     // /dev/spi-1 on QuRT
     spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt.open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+#endif
 
     // Active component startup
     // start rate groups
@@ -316,7 +318,9 @@ int hexref_run(void) {
     // TODO(mereweth) - interrupt for cycling - local_cycle as argument
     bool local_cycle = true;
     int cycle = 0;
+#ifdef BUILD_DSPAL
     imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+#endif
 
     while (!terminate) {
         //DEBUG_PRINT("Cycle %d\n",cycle);
@@ -328,7 +332,9 @@ int hexref_run(void) {
     }
 
     // stop tasks
+#ifdef BUILD_DSPAL
     imuDRInt.exitThread();
+#endif
     exitTasks();
     // Give time for threads to exit
     DEBUG_PRINT("Waiting for threads...\n");
