@@ -98,7 +98,8 @@ QUEST_GNC_MODULES := \
 	Gnc/Est/ImuInteg \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
-	Gnc/quest_gnc/src/ctrl
+	Gnc/quest_gnc/src/ctrl \
+	Gnc/quest_gnc/src/est
 
 REF_MODULES := \
 	Ref/Top \

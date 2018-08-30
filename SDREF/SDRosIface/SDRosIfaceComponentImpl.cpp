@@ -149,10 +149,43 @@ namespace SDREF {
     void SDRosIfaceComponentImpl ::
       Odometry_handler(
           const NATIVE_INT_TYPE portNum,
-          ROS::nav_msgs::Odometry &Odometry
+          ROS::nav_msgs::OdometryNoCov &Odometry
       )
     {
-      // TODO
+        nav_msgs::Odometry msg;
+
+        ROS::std_msgs::Header header = Odometry.getheader();
+        // TODO(mereweth) - time-translate from DSP & use message there
+        Fw::Time stamp = header.getstamp();
+        msg.header.stamp = ros::Time::now();
+
+        msg.header.seq = header.getseq();
+
+        // TODO(mereweth) - convert frame ID
+        Fw::EightyCharString frame_id = header.getframe_id();
+        msg.header.frame_id = "odom";
+
+        msg.child_frame_id = "body";
+
+        ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
+        msg.pose.pose.position.x = p.getx();
+        msg.pose.pose.position.y = p.gety();
+        msg.pose.pose.position.z = p.getz();
+        ROS::geometry_msgs::Quaternion q = Odometry.getpose().getorientation();
+        msg.pose.pose.orientation.w = q.getw();
+        msg.pose.pose.orientation.x = q.getx();
+        msg.pose.pose.orientation.y = q.gety();
+        msg.pose.pose.orientation.z = q.getz();
+        ROS::geometry_msgs::Vector3 vec = Odometry.gettwist().getlinear();
+        msg.twist.twist.linear.x = vec.getx();
+        msg.twist.twist.linear.y = vec.gety();
+        msg.twist.twist.linear.z = vec.getz();
+        vec = Odometry.gettwist().getangular();
+        msg.twist.twist.angular.x = vec.getx();
+        msg.twist.twist.angular.y = vec.gety();
+        msg.twist.twist.angular.z = vec.getz();
+
+        m_odomPub[portNum].publish(msg);
     }
 
     void SDRosIfaceComponentImpl ::

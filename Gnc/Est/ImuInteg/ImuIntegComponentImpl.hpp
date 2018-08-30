@@ -23,7 +23,7 @@
 #include "Gnc/Est/ImuInteg/ImuIntegComponentAc.hpp"
 #include "Gnc/Est/ImuInteg/ImuIntegComponentImplCfg.hpp"
 
-#include "quest_gnc/ctrl/lee_control.h"
+#include "quest_gnc/est/imu_integ.h"
 #include "quest_gnc/utils/world_params.h"
 
 namespace Gnc {
@@ -78,6 +78,19 @@ namespace Gnc {
           NATIVE_UINT_TYPE context /*!< The call order*/
       );
 
+      U32 seq;
+
+      // IMU sample in
+      ROS::geometry_msgs::Vector3 omega_b;
+
+      ROS::geometry_msgs::Vector3 a_b;
+
+      // Odometry out
+      ROS::geometry_msgs::Point x_w;
+
+      ROS::geometry_msgs::Quaternion w_q_b;
+
+      ROS::geometry_msgs::Vector3 v_b;
 
       quest_gnc::estimation::ImuInteg imuInteg;
 

@@ -37,6 +37,12 @@ namespace Gnc {
     ImuIntegComponentImpl(void) :
       ImuIntegComponentImpl(void),
 #endif
+      seq(0u),
+      omega_b(0.0f, 0.0f, 0.0f),
+      a_b(0.0f, 0.0f, 0.0f),
+      x_w(0.0f, 0.0f, 0.0f),
+      w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
+      v_b(0.0f, 0.0f, 0.0f),
       imuInteg()
   {
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
@@ -68,7 +74,19 @@ namespace Gnc {
         ROS::sensor_msgs::ImuNoCov &ImuNoCov
     )
   {
-      // fill imuInteg IMU setter
+      ROS::std_msgs::Header h = ImuNoCov.getheader();
+      this->seq = h.getseq();
+      // TODO(mereweth) check h.getstamp()
+
+      this->omega_b = ImuNoCov.getangular_velocity();
+      this->a_b = ImuNoCov.getlinear_acceleration();
+
+      this->imuInteg.AddImu(Eigen::Vector3d(this->omega_b.getx(),
+                                            this->omega_b.gety(),
+                                            this->omega_b.getz()),
+                            Eigen::Vector3d(this->a_b.getx(),
+                                            this->a_b.gety(),
+                                            this->a_b.getz()));
   }
 
   void ImuIntegComponentImpl ::
@@ -77,10 +95,43 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-      if (context == IMUINTEG_SCHED_CONTEXT_POS) {
-      }
-      else if (context == IMUINTEG_SCHED_CONTEXT_ATT) {
+      if ((context == IMUINTEG_SCHED_CONTEXT_POS) ||
+          (context == IMUINTEG_SCHED_CONTEXT_ATT)) {
+          using namespace ROS::geometry_msgs;
+          this->imuInteg.PropagateState();
+          Eigen::Vector3d x_w(0, 0, 0);
+          Eigen::Quaterniond w_q_b(1, 0, 0, 0);
+          Eigen::Vector3d v_b(0, 0, 0);
+          Eigen::Vector3d omega_b(0, 0, 0);
+          this->imuInteg.GetState(&x_w,
+                                  &w_q_b,
+                                  &v_b,
+                                  &omega_b);
 
+          ROS::std_msgs::Header h(this->seq, this->getTime(), "odom");
+          ROS::nav_msgs::Odometry odom(h, "body",
+              PoseWithCovariance(Pose(Point(x_w(0), x_w(1), x_w(2)),
+                                      Quaternion(w_q_b.x(), w_q_b.y(),
+                                                 w_q_b.z(), w_q_b.w())),
+                                 NULL, 0), // don't use covariance estimates
+              TwistWithCovariance(Twist(Vector3(v_b(0), v_b(1), v_b(2)),
+                                        Vector3(omega_b(0), omega_b(1), omega_b(2))),
+                                  NULL, 0) // don't use covariance estimates
+              );
+          if (this->isConnected_odometry_OutputPort(0)) {
+              this->odometry_out(0, odom);
+          }
+
+          ROS::nav_msgs::OdometryNoCov odomNoCov(h, "body",
+                                 Pose(Point(x_w(0), x_w(1), x_w(2)),
+                                      Quaternion(w_q_b.x(), w_q_b.y(),
+                                                 w_q_b.z(), w_q_b.w())),
+                                 Twist(Vector3(v_b(0), v_b(1), v_b(2)),
+                                        Vector3(omega_b(0), omega_b(1), omega_b(2)))
+              );
+          if (this->isConnected_odomNoCov_OutputPort(0)) {
+              this->odomNoCov_out(0, odomNoCov);
+          }
       }
       else if (context == IMUINTEG_SCHED_CONTEXT_TLM) {
 

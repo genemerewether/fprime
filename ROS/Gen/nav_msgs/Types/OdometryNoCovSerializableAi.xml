@@ -1,0 +1,12 @@
+<serializable name="OdometryNoCov" namespace="ROS::nav_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="child_frame_id" type="Fw::EightyCharString"/>
+    <member name="pose" type="ROS::geometry_msgs::Pose"/>
+    <member name="twist" type="ROS::geometry_msgs::Twist"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/TwistSerializableAi.xml</import_serializable_type>
+</serializable>

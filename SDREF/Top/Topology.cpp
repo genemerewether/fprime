@@ -211,6 +211,7 @@ void constructApp(int port_number, char* hostname) {
     hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
 
     hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
+    hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?

@@ -183,6 +183,9 @@ void manualConstruct(void) {
 
     mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
     //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+
+    //kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_fullStateUpdate_InputPort(0));
+    imuInteg.set_odomNoCov_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(2));
 }
 
 void constructApp() {
