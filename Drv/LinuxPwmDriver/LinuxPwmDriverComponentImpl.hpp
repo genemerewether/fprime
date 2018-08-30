@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  ImuIntegImpl.hpp
-// \author mereweth
-// \brief  hpp file for ImuInteg component implementation class
+// \title  LinuxGpioDriverImpl.hpp
+// \author tcanham
+// \brief  hpp file for LinuxGpioDriver component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,19 +17,16 @@
 // countries or providing access to foreign persons.
 // ======================================================================
 
-#ifndef ImuInteg_HPP
-#define ImuInteg_HPP
+#ifndef LinuxGpioDriver_HPP
+#define LinuxGpioDriver_HPP
 
-#include "Gnc/Est/ImuInteg/ImuIntegComponentAc.hpp"
-#include "Gnc/Est/ImuInteg/ImuIntegComponentImplCfg.hpp"
+#include "Drv/LinuxGpioDriver/LinuxGpioDriverComponentAc.hpp"
+#include <Os/Task.hpp>
 
-#include "quest_gnc/ctrl/lee_control.h"
-#include "quest_gnc/utils/world_params.h"
+namespace Drv {
 
-namespace Gnc {
-
-  class ImuIntegComponentImpl :
-    public ImuIntegComponentBase
+  class LinuxGpioDriverComponentImpl :
+    public LinuxGpioDriverComponentBase
   {
 
     public:
@@ -38,9 +35,9 @@ namespace Gnc {
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
 
-      //! Construct object ImuInteg
+      //! Construct object LinuxGpioDriver
       //!
-      ImuIntegComponentImpl(
+      LinuxGpioDriverComponentImpl(
 #if FW_OBJECT_NAMES == 1
           const char *const compName /*!< The component name*/
 #else
@@ -48,15 +45,35 @@ namespace Gnc {
 #endif
       );
 
-      //! Initialize object ImuInteg
+      //! Initialize object LinuxGpioDriver
       //!
       void init(
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
-      //! Destroy object ImuInteg
+      //! Destroy object LinuxGpioDriver
       //!
-      ~ImuIntegComponentImpl(void);
+      ~LinuxGpioDriverComponentImpl(void);
+
+      //! Start interrupt task
+      Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority, NATIVE_INT_TYPE cpuAffinity = -1);
+
+      //! Entry point for task waiting for interrupt
+      //! Public so can be called from outside class - like in interrupt handler
+      static void intTaskEntry(void * ptr);
+
+      //! configure GPIO
+      enum GpioDirection {
+          GPIO_IN, //!< input
+          GPIO_OUT, //!< output
+          GPIO_INT //!< interrupt
+      };
+
+      //! open GPIO
+      bool open(NATIVE_INT_TYPE gpio, GpioDirection direction);
+
+      //! exit thread
+      void exitThread(void);
 
     PRIVATE:
 
@@ -64,25 +81,35 @@ namespace Gnc {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
-      //! Handler implementation for Imu
+      //! Handler implementation for gpioRead
       //!
-      void Imu_handler(
+      void gpioRead_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::sensor_msgs::ImuNoCov &ImuNoCov
+          bool &state
       );
 
-      //! Handler implementation for sched
+      //! Handler implementation for gpioWrite
       //!
-      void sched_handler(
+      void gpioWrite_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          NATIVE_UINT_TYPE context /*!< The call order*/
+          bool state
       );
 
+      //! keep GPIO ID
+      NATIVE_INT_TYPE m_gpio;
 
-      quest_gnc::estimation::ImuInteg imuInteg;
+      //! device direction
+      GpioDirection m_direction;
+
+      //! Task object for RTI task
+      Os::Task m_intTask;
+      //! file descriptor for GPIO
+      NATIVE_INT_TYPE m_fd;
+      //! flag to quit thread
+      bool m_quitThread;
 
     };
 
-} // end namespace Gnc
+} // end namespace Drv
 
 #endif

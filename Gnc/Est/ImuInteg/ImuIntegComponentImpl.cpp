@@ -1,4 +1,4 @@
-// ====================================================================== 
+// ======================================================================
 // \title  ImuIntegImpl.cpp
 // \author mereweth
 // \brief  cpp file for ImuInteg component implementation class
@@ -8,14 +8,14 @@
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
 // acknowledged. Any commercial use must be negotiated with the Office
 // of Technology Transfer at the California Institute of Technology.
-// 
+//
 // This software may be subject to U.S. export control laws and
 // regulations.  By accepting this document, the user agrees to comply
 // with all U.S. export laws and regulations.  User has the
 // responsibility to obtain export licenses, or other export authority
 // as may be required before exporting such information to foreign
 // countries or providing access to foreign persons.
-// ====================================================================== 
+// ======================================================================
 
 
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
@@ -24,7 +24,7 @@
 namespace Gnc {
 
   // ----------------------------------------------------------------------
-  // Construction, initialization, and destruction 
+  // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
   ImuIntegComponentImpl ::
@@ -32,18 +32,22 @@ namespace Gnc {
     ImuIntegComponentImpl(
         const char *const compName
     ) :
-      ImuIntegComponentBase(compName)
+      ImuIntegComponentBase(compName),
 #else
-    ImuIntegImpl(void)
+    ImuIntegComponentImpl(void) :
+      ImuIntegComponentImpl(void),
 #endif
+      imuInteg()
   {
+      quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
+      (void) imuInteg.SetWorldParams(wParams);
 
   }
 
   void ImuIntegComponentImpl ::
     init(
         const NATIVE_INT_TYPE instance
-    ) 
+    )
   {
     ImuIntegComponentBase::init(instance);
   }
@@ -64,7 +68,7 @@ namespace Gnc {
         ROS::sensor_msgs::ImuNoCov &ImuNoCov
     )
   {
-    // TODO
+      // fill imuInteg IMU setter
   }
 
   void ImuIntegComponentImpl ::
@@ -73,16 +77,17 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-    // TODO
-  }
+      if (context == IMUINTEG_SCHED_CONTEXT_POS) {
+      }
+      else if (context == IMUINTEG_SCHED_CONTEXT_ATT) {
 
-  void ImuIntegComponentImpl ::
-    pingIn_handler(
-        const NATIVE_INT_TYPE portNum,
-        U32 key
-    )
-  {
-    // TODO
+      }
+      else if (context == IMUINTEG_SCHED_CONTEXT_TLM) {
+
+      }
+      else {
+          // TODO(mereweth) - assert invalid context
+      }
   }
 
 } // end namespace Gnc

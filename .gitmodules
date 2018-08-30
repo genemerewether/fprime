@@ -25,3 +25,6 @@
 [submodule "Gnc/linter"]
 	path = Gnc/linter
 	url = git@github.com:genemerewether/linter.git
+[submodule "Gnc/tools/pybind11"]
+	path = Gnc/tools/pybind11
+	url = https://github.com/wjakob/pybind11.git

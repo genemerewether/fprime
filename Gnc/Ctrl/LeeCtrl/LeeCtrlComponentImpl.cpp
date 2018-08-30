@@ -186,13 +186,4 @@ namespace Gnc {
       }
   }
 
-  void LeeCtrlComponentImpl ::
-    pingIn_handler(
-        const NATIVE_INT_TYPE portNum,
-        U32 key
-    )
-  {
-      this->pingOut_out(portNum, key);
-  }
-
 } // end namespace Gnc

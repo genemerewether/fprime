@@ -251,11 +251,13 @@ HEXREF_MODULES := \
 	$(HEXREF_DEPLOYMENT_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/PwmDriverPorts \
 	Drv/GpioDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
 	Drv/LinuxGpioDriver \
 	Drv/LinuxSpiDriver \
+	Drv/LinuxPwmDriver \
 	\
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
