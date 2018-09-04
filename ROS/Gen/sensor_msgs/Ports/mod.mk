@@ -8,6 +8,7 @@ IlluminancePortAi.xml \
 ImagePortAi.xml \
 ImuNoCovPortAi.xml \
 ImuPortAi.xml \
+ImuStateUpdatePortAi.xml \
 JointStatePortAi.xml \
 JoyFeedbackArrayPortAi.xml \
 JoyFeedbackPortAi.xml \

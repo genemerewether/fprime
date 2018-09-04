@@ -89,6 +89,48 @@ namespace Gnc {
                                             this->a_b.getz()));
   }
 
+
+  void ImuIntegComponentImpl ::
+    ImuStateUpdate_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::sensor_msgs::ImuStateUpdate &ImuStateUpdate
+    )
+  {
+      ROS::std_msgs::Header h = ImuStateUpdate.getheader();
+      //this->seq = h.getseq();
+      // TODO(mereweth) convert h.getstamp()
+
+      this->x_w = ImuStateUpdate.getpose().getpose().getposition();
+      this->w_q_b = ImuStateUpdate.getpose().getpose().getorientation();
+
+      ROS::geometry_msgs::Vector3 v_w = ImuStateUpdate.gettwist().gettwist().getlinear();
+      this->omega_b = ImuStateUpdate.gettwist().gettwist().getangular();
+
+      this->wBias = ImuStateUpdate.getangular_velocity_bias();
+      this->aBias = ImuStateUpdate.getlinear_acceleration_bias();
+
+      Eigen::Quaterniond w_q_b = Eigen::Quaterniond(this->w_q_b.getw(),
+                                                    this->w_q_b.getx(),
+                                                    this->w_q_b.gety(),
+                                                    this->w_q_b.getz());
+
+      this->imuInteg.SetUpdate(h.getstamp().getSeconds()
+                               + h.getstamp().getUSeconds() / 1000.0 / 1000.0,
+                               Eigen::Vector3d(this->x_w.getx(),
+                                               this->x_w.gety(),
+                                               this->x_w.getz()),
+                               w_q_b,
+                               Eigen::Vector3d(v_w.getx(),
+                                               v_w.gety(),
+                                               v_w.getz()),
+                               Eigen::Vector3d(this->wBias.getx(),
+                                               this->wBias.gety(),
+                                               this->wBias.getz()),
+                               Eigen::Vector3d(this->aBias.getx(),
+                                               this->aBias.gety(),
+                                               this->aBias.getz()));
+  }
+
   void ImuIntegComponentImpl ::
     sched_handler(
         const NATIVE_INT_TYPE portNum,

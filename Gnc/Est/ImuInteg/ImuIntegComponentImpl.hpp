@@ -71,6 +71,13 @@ namespace Gnc {
           ROS::sensor_msgs::ImuNoCov &ImuNoCov
       );
 
+      //! Handler implementation for ImuStateUpdate
+      //!
+      void ImuStateUpdate_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::sensor_msgs::ImuStateUpdate &ImuStateUpdate
+      );
+
       //! Handler implementation for sched
       //!
       void sched_handler(
@@ -79,6 +86,11 @@ namespace Gnc {
       );
 
       U32 seq;
+
+      // State update in
+      ROS::geometry_msgs::Vector3 wBias;
+
+      ROS::geometry_msgs::Vector3 aBias;
 
       // IMU sample in
       ROS::geometry_msgs::Vector3 omega_b;

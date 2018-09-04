@@ -8,6 +8,7 @@ IlluminanceSerializableAi.xml \
 ImageSerializableAi.xml \
 ImuNoCovSerializableAi.xml \
 ImuSerializableAi.xml \
+ImuStateUpdateSerializableAi.xml \
 JointStateSerializableAi.xml \
 JoyFeedbackArraySerializableAi.xml \
 JoyFeedbackSerializableAi.xml \
