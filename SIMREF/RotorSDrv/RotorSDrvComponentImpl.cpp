@@ -46,7 +46,7 @@ namespace SIMREF {
       m_rgNH(NULL),
       m_odomSet() // zero-initialize instead of default-initializing
     {
-        for (int i = 0; i < NUM_ODOMETRY_OUTPUT_PORTS; i++) {
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
             m_odomSet[i].fresh = false;
             m_odomSet[i].overflows = 0u;
         }
@@ -117,7 +117,7 @@ namespace SIMREF {
         if ((context == RSDRV_SCHED_CONTEXT_ATT) ||
             (context == RSDRV_SCHED_CONTEXT_POS)) {
             // TODO(mereweth) check context == odometry out context
-            for (int i = 0; i < NUM_ODOMETRY_OUTPUT_PORTS; i++) {
+            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
                 m_odomSet[i].mutex.lock();
                 if (m_odomSet[i].fresh) {
                     if (this->isConnected_odometry_OutputPort(i)) {

@@ -26,6 +26,10 @@
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
 
+// TODO - ImuStateUpdate.h
+
+#include "Os/Mutex.hpp"
+
 namespace SDREF {
 
   class SDRosIfaceComponentImpl :
@@ -62,6 +66,33 @@ namespace SDREF {
 
     PRIVATE:
 
+        //! Start interrupt task
+        Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
+                                          NATIVE_INT_TYPE stackSize,
+                                          NATIVE_INT_TYPE cpuAffinity = -1);
+
+      // ----------------------------------------------------------------------
+      // Utility classes for enumerating callbacks
+      // ----------------------------------------------------------------------
+
+        class ImuStateUpdateHandler
+        {
+          public:
+              ImuStateUpdateHandler(SDRosIfaceComponentImpl* compPtr,
+                              int portNum);
+
+              ~ImuStateUpdateHandler();
+
+              //void imuStateUpdateCallback(const sensor_msgs::ImuStateUpdate::ConstPtr& msg);
+
+          PRIVATE:
+
+              SDRosIfaceComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class ImuStateUpdateHandler
+
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
@@ -94,6 +125,10 @@ namespace SDREF {
           U32 key /*!< Value to return to pinger*/
       );
 
+      // ----------------------------------------------------------------------
+      // Member variables
+      // ----------------------------------------------------------------------
+
         //! NodeHandle pointer for use in RateGroup context
         //!
         ros::NodeHandle* m_rgNH;
@@ -105,6 +140,20 @@ namespace SDREF {
         //! Publishers for Odometry data
         //!
         ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
+
+        //! Entry point for task waiting for interrupt
+        static void intTaskEntry(void * ptr);
+
+        //! Task object for RTI task
+        //!
+        Os::Task m_intTask;
+
+        struct ImuStateUpdateSet {
+            Os::Mutex mutex; //! Mutex lock to guard odometry object
+            ROS::sensor_msgs::ImuStateUpdate imuStateUpdate; //! message object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
     };
 
 } // end namespace
