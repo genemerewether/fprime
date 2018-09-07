@@ -1,0 +1,10 @@
+<!--
+std_srvs
+/Users/mereweth/quest/ROS/fprime_ws/src/ros_comm_msgs/std_srvs/srv/SetBool.srv
+{}
+-->
+<serializable name="SetBoolRequest" namespace="ROS::std_srvs">
+  <members>
+    <member name="data" type="U8"/>
+  </members>
+</serializable>

@@ -1,0 +1,5 @@
+<serializable name="LaserEcho" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="echoes" size="100" type="F32"/>
+  </members>
+</serializable>

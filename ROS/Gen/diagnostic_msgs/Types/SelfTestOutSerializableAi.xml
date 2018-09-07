@@ -1,0 +1,9 @@
+<serializable name="SelfTestResponse" namespace="ROS::diagnostic_msgs">
+  <members>
+    <member name="id" type="Fw::EightyCharString"/>
+    <member name="passed" type="I8"/>
+    <member name="status" size="100" type="DiagnosticStatus"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/DiagnosticStatusSerializableAi.xml</import_serializable_type>
+</serializable>

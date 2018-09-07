@@ -1,0 +1,8 @@
+<interface name="SetMap" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="SetMapRequest" pass_by="reference" type="ROS::nav_msgs::SetMapRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/SetMapInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/SetMapOutSerializableAi.xml</import_serializable_type>
+  <return name="SetMapResponse" pass_by="reference" type="ROS::nav_msgs::SetMapResponse"/>
+</interface>

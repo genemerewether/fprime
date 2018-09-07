@@ -1,0 +1,7 @@
+<serializable name="JoyFeedback" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="type" type="U8"/>
+    <member name="id" type="U8"/>
+    <member name="intensity" type="F32"/>
+  </members>
+</serializable>

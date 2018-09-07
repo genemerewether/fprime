@@ -1,0 +1,11 @@
+<serializable name="MenuEntry" namespace="ROS::visualization_msgs">
+  <members>
+    <member name="id" type="U32"/>
+    <member name="parent_id" type="U32"/>
+    <member name="title" type="Fw::EightyCharString"/>
+    <member name="command" type="Fw::EightyCharString"/>
+    <member name="command_type" type="U8"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

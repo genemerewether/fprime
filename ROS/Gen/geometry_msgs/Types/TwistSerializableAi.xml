@@ -1,0 +1,8 @@
+<serializable name="Twist" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="linear" type="Vector3"/>
+    <member name="angular" type="Vector3"/>
+  </members>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+</serializable>

@@ -1,0 +1,8 @@
+<interface name="AddDiagnostics" namespace="ROS::diagnostic_msgs">
+  <args>
+    <arg name="AddDiagnosticsRequest" pass_by="reference" type="ROS::diagnostic_msgs::AddDiagnosticsRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/AddDiagnosticsInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/AddDiagnosticsOutSerializableAi.xml</import_serializable_type>
+  <return name="AddDiagnosticsResponse" pass_by="reference" type="ROS::diagnostic_msgs::AddDiagnosticsResponse"/>
+</interface>

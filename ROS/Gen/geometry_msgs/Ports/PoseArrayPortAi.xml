@@ -1,0 +1,6 @@
+<interface name="PoseArray" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="PoseArray" pass_by="reference" type="ROS::geometry_msgs::PoseArray"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseArraySerializableAi.xml</import_serializable_type>
+</interface>

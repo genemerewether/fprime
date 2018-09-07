@@ -1,0 +1,6 @@
+<interface name="Plane" namespace="ROS::shape_msgs">
+  <args>
+    <arg name="Plane" pass_by="reference" type="ROS::shape_msgs::Plane"/>
+  </args>
+  <import_serializable_type>ROS/Gen/shape_msgs/Types/PlaneSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,13 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/MultiArrayDimension.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="MultiArrayDimension" namespace="ROS::std_msgs">
+  <members>
+    <member name="label" type="Fw::EightyCharString"/>
+    <member name="size" type="U32"/>
+    <member name="stride" type="U32"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

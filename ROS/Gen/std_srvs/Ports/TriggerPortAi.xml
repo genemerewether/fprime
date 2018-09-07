@@ -1,0 +1,13 @@
+<!--
+std_srvs
+/Users/mereweth/quest/ROS/fprime_ws/src/ros_comm_msgs/std_srvs/srv/Trigger.srv
+{}
+-->
+<interface name="Trigger" namespace="ROS::std_srvs">
+  <args>
+    <arg name="TriggerRequest" pass_by="reference" type="ROS::std_srvs::TriggerRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_srvs/Types/TriggerInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/std_srvs/Types/TriggerOutSerializableAi.xml</import_serializable_type>
+  <return name="TriggerResponse" pass_by="reference" type="ROS::std_srvs::TriggerResponse"/>
+</interface>

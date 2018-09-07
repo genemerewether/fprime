@@ -1,0 +1,18 @@
+<serializable name="Log" namespace="ROS::rosgraph_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="level" type="I8"/>
+    <member name="name" type="Fw::EightyCharString"/>
+    <member name="msg" type="Fw::EightyCharString"/>
+    <member name="file" type="Fw::EightyCharString"/>
+    <member name="function" type="Fw::EightyCharString"/>
+    <member name="line" type="U32"/>
+    <member name="topics" size="100" type="Fw::EightyCharString"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

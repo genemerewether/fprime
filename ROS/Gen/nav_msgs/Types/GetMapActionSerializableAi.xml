@@ -1,0 +1,10 @@
+<serializable name="GetMapAction" namespace="ROS::nav_msgs">
+  <members>
+    <member name="action_goal" type="GetMapActionGoal"/>
+    <member name="action_result" type="GetMapActionResult"/>
+    <member name="action_feedback" type="GetMapActionFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetMapActionGoalSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetMapActionResultSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetMapActionFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

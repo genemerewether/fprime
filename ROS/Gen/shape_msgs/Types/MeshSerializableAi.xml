@@ -1,0 +1,8 @@
+<serializable name="Mesh" namespace="ROS::shape_msgs">
+  <members>
+    <member name="triangles" size="100" type="MeshTriangle"/>
+    <member name="vertices" size="100" type="ROS::geometry_msgs::Point"/>
+  </members>
+  <import_serializable_type>ROS/Gen/shape_msgs/Types/MeshTriangleSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>
+</serializable>

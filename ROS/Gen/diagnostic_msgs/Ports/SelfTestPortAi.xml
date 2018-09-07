@@ -1,0 +1,8 @@
+<interface name="SelfTest" namespace="ROS::diagnostic_msgs">
+  <args>
+    <arg name="SelfTestRequest" pass_by="reference" type="ROS::diagnostic_msgs::SelfTestRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/SelfTestInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/SelfTestOutSerializableAi.xml</import_serializable_type>
+  <return name="SelfTestResponse" pass_by="reference" type="ROS::diagnostic_msgs::SelfTestResponse"/>
+</interface>

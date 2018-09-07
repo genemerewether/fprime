@@ -1,0 +1,11 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Duration.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<interface name="Duration" namespace="ROS::std_msgs">
+  <args>
+    <arg name="Duration" pass_by="reference" type="ROS::std_msgs::Duration"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/DurationSerializableAi.xml</import_serializable_type>
+</interface>

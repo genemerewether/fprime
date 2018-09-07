@@ -1,0 +1,5 @@
+<serializable name="Plane" namespace="ROS::shape_msgs">
+  <members>
+    <member name="coef" size="4" type="F64"/>
+  </members>
+</serializable>

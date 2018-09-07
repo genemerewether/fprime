@@ -1,0 +1,8 @@
+<serializable name="GoalID" namespace="ROS::actionlib_msgs">
+  <members>
+    <member name="stamp" type="Fw::Time"/>
+    <member name="id" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

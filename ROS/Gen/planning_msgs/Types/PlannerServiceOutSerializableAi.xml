@@ -1,0 +1,9 @@
+<serializable name="PlannerServiceResponse" namespace="ROS::planning_msgs">
+  <members>
+    <member name="success" type="U8"/>
+    <member name="polynomial_plan" type="ROS::planning_msgs::PolynomialTrajectory4D"/>
+    <member name="sampled_plan" type="ROS::trajectory_msgs::MultiDOFJointTrajectory"/>
+  </members>
+  <import_serializable_type>ROS/Gen/planning_msgs/Types/PolynomialTrajectory4DSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/MultiDOFJointTrajectorySerializableAi.xml</import_serializable_type>
+</serializable>

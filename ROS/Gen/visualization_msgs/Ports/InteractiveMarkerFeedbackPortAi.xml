@@ -1,0 +1,6 @@
+<interface name="InteractiveMarkerFeedback" namespace="ROS::visualization_msgs">
+  <args>
+    <arg name="InteractiveMarkerFeedback" pass_by="reference" type="ROS::visualization_msgs::InteractiveMarkerFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/InteractiveMarkerFeedbackSerializableAi.xml</import_serializable_type>
+</interface>

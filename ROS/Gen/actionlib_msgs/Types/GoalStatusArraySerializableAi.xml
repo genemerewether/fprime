@@ -1,0 +1,8 @@
+<serializable name="GoalStatusArray" namespace="ROS::actionlib_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="status_list" size="100" type="GoalStatus"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/actionlib_msgs/Types/GoalStatusSerializableAi.xml</import_serializable_type>
+</serializable>

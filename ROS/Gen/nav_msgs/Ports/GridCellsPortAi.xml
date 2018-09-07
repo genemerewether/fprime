@@ -1,0 +1,6 @@
+<interface name="GridCells" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="GridCells" pass_by="reference" type="ROS::nav_msgs::GridCells"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GridCellsSerializableAi.xml</import_serializable_type>
+</interface>

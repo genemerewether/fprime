@@ -1,0 +1,6 @@
+<interface name="MapMetaData" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="MapMetaData" pass_by="reference" type="ROS::nav_msgs::MapMetaData"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/MapMetaDataSerializableAi.xml</import_serializable_type>
+</interface>

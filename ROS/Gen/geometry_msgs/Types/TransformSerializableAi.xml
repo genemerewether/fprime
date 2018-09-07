@@ -1,0 +1,8 @@
+<serializable name="Transform" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="translation" type="Vector3"/>
+    <member name="rotation" type="Quaternion"/>
+  </members>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionSerializableAi.xml</import_serializable_type>
+</serializable>

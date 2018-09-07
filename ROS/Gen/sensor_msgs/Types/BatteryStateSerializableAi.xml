@@ -1,0 +1,21 @@
+<serializable name="BatteryState" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="voltage" type="F32"/>
+    <member name="current" type="F32"/>
+    <member name="charge" type="F32"/>
+    <member name="capacity" type="F32"/>
+    <member name="design_capacity" type="F32"/>
+    <member name="percentage" type="F32"/>
+    <member name="power_supply_status" type="U8"/>
+    <member name="power_supply_health" type="U8"/>
+    <member name="power_supply_technology" type="U8"/>
+    <member name="present" type="U8"/>
+    <member name="cell_voltage" size="100" type="F32"/>
+    <member name="location" type="Fw::EightyCharString"/>
+    <member name="serial_number" type="Fw::EightyCharString"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

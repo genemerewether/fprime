@@ -1,0 +1,6 @@
+<interface name="PoseWithCovariance" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="PoseWithCovariance" pass_by="reference" type="ROS::geometry_msgs::PoseWithCovariance"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseWithCovarianceSerializableAi.xml</import_serializable_type>
+</interface>

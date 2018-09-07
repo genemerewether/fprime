@@ -1,0 +1,9 @@
+<serializable name="CompressedImage" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="format" type="Fw::EightyCharString"/>
+    <member name="data" size="100" type="U8"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

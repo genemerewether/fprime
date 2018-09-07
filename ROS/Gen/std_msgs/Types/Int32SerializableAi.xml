@@ -1,0 +1,10 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Int32.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="Int32" namespace="ROS::std_msgs">
+  <members>
+    <member name="data" type="I32"/>
+  </members>
+</serializable>

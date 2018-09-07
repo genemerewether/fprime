@@ -1,0 +1,6 @@
+<interface name="Status" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="Status" pass_by="reference" type="ROS::mav_msgs::Status"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/StatusSerializableAi.xml</import_serializable_type>
+</interface>

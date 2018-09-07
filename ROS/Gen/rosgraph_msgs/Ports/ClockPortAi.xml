@@ -1,0 +1,6 @@
+<interface name="Clock" namespace="ROS::rosgraph_msgs">
+  <args>
+    <arg name="Clock" pass_by="reference" type="ROS::rosgraph_msgs::Clock"/>
+  </args>
+  <import_serializable_type>ROS/Gen/rosgraph_msgs/Types/ClockSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,6 @@
+<interface name="KeyValue" namespace="ROS::diagnostic_msgs">
+  <args>
+    <arg name="KeyValue" pass_by="reference" type="ROS::diagnostic_msgs::KeyValue"/>
+  </args>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/KeyValueSerializableAi.xml</import_serializable_type>
+</interface>

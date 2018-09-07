@@ -1,0 +1,6 @@
+<interface name="PointCloud2" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="PointCloud2" pass_by="reference" type="ROS::sensor_msgs::PointCloud2"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/PointCloud2SerializableAi.xml</import_serializable_type>
+</interface>

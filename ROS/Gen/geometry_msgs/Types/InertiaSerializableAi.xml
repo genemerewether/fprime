@@ -1,0 +1,13 @@
+<serializable name="Inertia" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="m" type="F64"/>
+    <member name="com" type="ROS::geometry_msgs::Vector3"/>
+    <member name="ixx" type="F64"/>
+    <member name="ixy" type="F64"/>
+    <member name="ixz" type="F64"/>
+    <member name="iyy" type="F64"/>
+    <member name="iyz" type="F64"/>
+    <member name="izz" type="F64"/>
+  </members>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+</serializable>

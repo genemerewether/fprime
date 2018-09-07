@@ -1,0 +1,6 @@
+<serializable name="SolidPrimitive" namespace="ROS::shape_msgs">
+  <members>
+    <member name="type" type="U8"/>
+    <member name="dimensions" size="100" type="F64"/>
+  </members>
+</serializable>

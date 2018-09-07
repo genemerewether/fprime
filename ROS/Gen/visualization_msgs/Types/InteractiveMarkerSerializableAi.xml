@@ -1,0 +1,17 @@
+<serializable name="InteractiveMarker" namespace="ROS::visualization_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="pose" type="ROS::geometry_msgs::Pose"/>
+    <member name="name" type="Fw::EightyCharString"/>
+    <member name="description" type="Fw::EightyCharString"/>
+    <member name="scale" type="F32"/>
+    <member name="menu_entries" size="100" type="MenuEntry"/>
+    <member name="controls" size="100" type="InteractiveMarkerControl"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/MenuEntrySerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/InteractiveMarkerControlSerializableAi.xml</import_serializable_type>
+</serializable>

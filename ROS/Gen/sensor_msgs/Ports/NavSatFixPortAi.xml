@@ -1,0 +1,6 @@
+<interface name="NavSatFix" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="NavSatFix" pass_by="reference" type="ROS::sensor_msgs::NavSatFix"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/NavSatFixSerializableAi.xml</import_serializable_type>
+</interface>

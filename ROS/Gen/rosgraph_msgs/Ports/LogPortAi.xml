@@ -1,0 +1,6 @@
+<interface name="Log" namespace="ROS::rosgraph_msgs">
+  <args>
+    <arg name="Log" pass_by="reference" type="ROS::rosgraph_msgs::Log"/>
+  </args>
+  <import_serializable_type>ROS/Gen/rosgraph_msgs/Types/LogSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,16 @@
+<serializable name="InteractiveMarkerControl" namespace="ROS::visualization_msgs">
+  <members>
+    <member name="name" type="Fw::EightyCharString"/>
+    <member name="orientation" type="ROS::geometry_msgs::Quaternion"/>
+    <member name="orientation_mode" type="U8"/>
+    <member name="interaction_mode" type="U8"/>
+    <member name="always_visible" type="U8"/>
+    <member name="markers" size="100" type="Marker"/>
+    <member name="independent_marker_orientation" type="U8"/>
+    <member name="description" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/MarkerSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

@@ -1,0 +1,13 @@
+<!--
+std_srvs
+/Users/mereweth/quest/ROS/fprime_ws/src/ros_comm_msgs/std_srvs/srv/Empty.srv
+{}
+-->
+<interface name="Empty" namespace="ROS::std_srvs">
+  <args>
+    <arg name="EmptyRequest" pass_by="reference" type="ROS::std_srvs::EmptyRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_srvs/Types/EmptyInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/std_srvs/Types/EmptyOutSerializableAi.xml</import_serializable_type>
+  <return name="EmptyResponse" pass_by="reference" type="ROS::std_srvs::EmptyResponse"/>
+</interface>

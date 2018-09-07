@@ -1,0 +1,6 @@
+<interface name="JointTrajectory" namespace="ROS::trajectory_msgs">
+  <args>
+    <arg name="JointTrajectory" pass_by="reference" type="ROS::trajectory_msgs::JointTrajectory"/>
+  </args>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/JointTrajectorySerializableAi.xml</import_serializable_type>
+</interface>

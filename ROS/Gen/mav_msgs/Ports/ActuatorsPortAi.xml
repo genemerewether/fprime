@@ -1,0 +1,6 @@
+<interface name="Actuators" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="Actuators" pass_by="reference" type="ROS::mav_msgs::Actuators"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/ActuatorsSerializableAi.xml</import_serializable_type>
+</interface>

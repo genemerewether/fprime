@@ -1,0 +1,8 @@
+<serializable name="Vector3Stamped" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="vector" type="Vector3"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+</serializable>

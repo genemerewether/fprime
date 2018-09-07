@@ -1,0 +1,6 @@
+<interface name="MarkerArray" namespace="ROS::visualization_msgs">
+  <args>
+    <arg name="MarkerArray" pass_by="reference" type="ROS::visualization_msgs::MarkerArray"/>
+  </args>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/MarkerArraySerializableAi.xml</import_serializable_type>
+</interface>

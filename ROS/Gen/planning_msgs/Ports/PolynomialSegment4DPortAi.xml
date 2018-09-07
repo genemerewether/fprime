@@ -1,0 +1,6 @@
+<interface name="PolynomialSegment4D" namespace="ROS::planning_msgs">
+  <args>
+    <arg name="PolynomialSegment4D" pass_by="reference" type="ROS::planning_msgs::PolynomialSegment4D"/>
+  </args>
+  <import_serializable_type>ROS/Gen/planning_msgs/Types/PolynomialSegment4DSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,8 @@
+<interface name="GetMap" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="GetMapRequest" pass_by="reference" type="ROS::nav_msgs::GetMapRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetMapInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetMapOutSerializableAi.xml</import_serializable_type>
+  <return name="GetMapResponse" pass_by="reference" type="ROS::nav_msgs::GetMapResponse"/>
+</interface>

@@ -1,0 +1,7 @@
+<serializable name="TwistWithCovariance" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="twist" type="Twist"/>
+    <member name="covariance" size="36" type="F64"/>
+  </members>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/TwistSerializableAi.xml</import_serializable_type>
+</serializable>

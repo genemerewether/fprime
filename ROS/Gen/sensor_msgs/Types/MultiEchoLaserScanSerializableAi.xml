@@ -1,0 +1,17 @@
+<serializable name="MultiEchoLaserScan" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="angle_min" type="F32"/>
+    <member name="angle_max" type="F32"/>
+    <member name="angle_increment" type="F32"/>
+    <member name="time_increment" type="F32"/>
+    <member name="scan_time" type="F32"/>
+    <member name="range_min" type="F32"/>
+    <member name="range_max" type="F32"/>
+    <member name="ranges" size="100" type="LaserEcho"/>
+    <member name="intensities" size="100" type="LaserEcho"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/LaserEchoSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/LaserEchoSerializableAi.xml</import_serializable_type>
+</serializable>

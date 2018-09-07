@@ -1,0 +1,29 @@
+<serializable name="TopicStatistics" namespace="ROS::rosgraph_msgs">
+  <members>
+    <member name="topic" type="Fw::EightyCharString"/>
+    <member name="node_pub" type="Fw::EightyCharString"/>
+    <member name="node_sub" type="Fw::EightyCharString"/>
+    <member name="window_start" type="Fw::Time"/>
+    <member name="window_stop" type="Fw::Time"/>
+    <member name="delivered_msgs" type="I32"/>
+    <member name="dropped_msgs" type="I32"/>
+    <member name="traffic" type="I32"/>
+    <member name="period_mean" type="Fw::Time"/>
+    <member name="period_stddev" type="Fw::Time"/>
+    <member name="period_max" type="Fw::Time"/>
+    <member name="stamp_age_mean" type="Fw::Time"/>
+    <member name="stamp_age_stddev" type="Fw::Time"/>
+    <member name="stamp_age_max" type="Fw::Time"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

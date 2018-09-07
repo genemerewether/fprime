@@ -1,0 +1,12 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/MultiArrayLayout.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="MultiArrayLayout" namespace="ROS::std_msgs">
+  <members>
+    <member name="dim" size="100" type="MultiArrayDimension"/>
+    <member name="data_offset" type="U32"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/MultiArrayDimensionSerializableAi.xml</import_serializable_type>
+</serializable>

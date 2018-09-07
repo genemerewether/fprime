@@ -1,0 +1,5 @@
+<serializable name="SetMapResponse" namespace="ROS::nav_msgs">
+  <members>
+    <member name="success" type="U8"/>
+  </members>
+</serializable>

@@ -1,0 +1,11 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Float64.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<interface name="Float64" namespace="ROS::std_msgs">
+  <args>
+    <arg name="Float64" pass_by="reference" type="ROS::std_msgs::Float64"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/Float64SerializableAi.xml</import_serializable_type>
+</interface>

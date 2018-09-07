@@ -1,0 +1,6 @@
+<serializable name="JoyFeedbackArray" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="array" size="100" type="JoyFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/JoyFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

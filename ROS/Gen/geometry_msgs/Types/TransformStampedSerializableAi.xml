@@ -1,0 +1,10 @@
+<serializable name="TransformStamped" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="child_frame_id" type="Fw::EightyCharString"/>
+    <member name="transform" type="Transform"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/TransformSerializableAi.xml</import_serializable_type>
+</serializable>

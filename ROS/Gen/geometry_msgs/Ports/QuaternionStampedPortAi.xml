@@ -1,0 +1,6 @@
+<interface name="QuaternionStamped" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="QuaternionStamped" pass_by="reference" type="ROS::geometry_msgs::QuaternionStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionStampedSerializableAi.xml</import_serializable_type>
+</interface>

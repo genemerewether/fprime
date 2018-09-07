@@ -1,0 +1,6 @@
+<interface name="JoyFeedback" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="JoyFeedback" pass_by="reference" type="ROS::sensor_msgs::JoyFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/JoyFeedbackSerializableAi.xml</import_serializable_type>
+</interface>

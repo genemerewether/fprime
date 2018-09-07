@@ -1,0 +1,7 @@
+<serializable name="Pose2D" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="x" type="F64"/>
+    <member name="y" type="F64"/>
+    <member name="theta" type="F64"/>
+  </members>
+</serializable>

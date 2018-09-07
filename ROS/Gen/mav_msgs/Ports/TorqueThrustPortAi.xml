@@ -1,0 +1,6 @@
+<interface name="TorqueThrust" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="TorqueThrust" pass_by="reference" type="ROS::mav_msgs::TorqueThrust"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/TorqueThrustSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,18 @@
+<serializable name="CameraInfo" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="height" type="U32"/>
+    <member name="width" type="U32"/>
+    <member name="distortion_model" type="Fw::EightyCharString"/>
+    <member name="D" size="100" type="F64"/>
+    <member name="K" size="9" type="F64"/>
+    <member name="R" size="9" type="F64"/>
+    <member name="P" size="12" type="F64"/>
+    <member name="binning_x" type="U32"/>
+    <member name="binning_y" type="U32"/>
+    <member name="roi" type="RegionOfInterest"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/RegionOfInterestSerializableAi.xml</import_serializable_type>
+</serializable>

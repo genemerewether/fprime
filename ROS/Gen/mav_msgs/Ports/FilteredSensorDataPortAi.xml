@@ -1,0 +1,6 @@
+<interface name="FilteredSensorData" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="FilteredSensorData" pass_by="reference" type="ROS::mav_msgs::FilteredSensorData"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/FilteredSensorDataSerializableAi.xml</import_serializable_type>
+</interface>

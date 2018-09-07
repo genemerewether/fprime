@@ -1,0 +1,9 @@
+<serializable name="RegionOfInterest" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="x_offset" type="U32"/>
+    <member name="y_offset" type="U32"/>
+    <member name="height" type="U32"/>
+    <member name="width" type="U32"/>
+    <member name="do_rectify" type="U8"/>
+  </members>
+</serializable>

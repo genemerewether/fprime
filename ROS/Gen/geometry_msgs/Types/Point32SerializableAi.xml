@@ -1,0 +1,7 @@
+<serializable name="Point32" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="x" type="F32"/>
+    <member name="y" type="F32"/>
+    <member name="z" type="F32"/>
+  </members>
+</serializable>

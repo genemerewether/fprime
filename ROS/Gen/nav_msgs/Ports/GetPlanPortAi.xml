@@ -1,0 +1,8 @@
+<interface name="GetPlan" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="GetPlanRequest" pass_by="reference" type="ROS::nav_msgs::GetPlanRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetPlanInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetPlanOutSerializableAi.xml</import_serializable_type>
+  <return name="GetPlanResponse" pass_by="reference" type="ROS::nav_msgs::GetPlanResponse"/>
+</interface>

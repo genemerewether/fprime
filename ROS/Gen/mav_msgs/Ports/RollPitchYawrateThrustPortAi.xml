@@ -1,0 +1,6 @@
+<interface name="RollPitchYawrateThrust" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="RollPitchYawrateThrust" pass_by="reference" type="ROS::mav_msgs::RollPitchYawrateThrust"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/RollPitchYawrateThrustSerializableAi.xml</import_serializable_type>
+</interface>

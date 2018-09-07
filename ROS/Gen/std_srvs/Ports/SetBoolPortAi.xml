@@ -1,0 +1,13 @@
+<!--
+std_srvs
+/Users/mereweth/quest/ROS/fprime_ws/src/ros_comm_msgs/std_srvs/srv/SetBool.srv
+{}
+-->
+<interface name="SetBool" namespace="ROS::std_srvs">
+  <args>
+    <arg name="SetBoolRequest" pass_by="reference" type="ROS::std_srvs::SetBoolRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_srvs/Types/SetBoolInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/std_srvs/Types/SetBoolOutSerializableAi.xml</import_serializable_type>
+  <return name="SetBoolResponse" pass_by="reference" type="ROS::std_srvs::SetBoolResponse"/>
+</interface>
