@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  LinuxGpioDriverImpl.cpp
+// \title  LinuxPwmDriverImpl.cpp
 // \author tcanham
-// \brief  cpp file for LinuxGpioDriver component implementation class
+// \brief  cpp file for LinuxPwmDriver component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -18,7 +18,7 @@
 // ======================================================================
 
 
-#include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
+#include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Fw/Types/BasicTypes.hpp>
 
 namespace Drv {
@@ -27,29 +27,27 @@ namespace Drv {
   // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
-  LinuxGpioDriverComponentImpl ::
+  LinuxPwmDriverComponentImpl ::
 #if FW_OBJECT_NAMES == 1
-    LinuxGpioDriverComponentImpl(
+    LinuxPwmDriverComponentImpl(
         const char *const compName
     ) :
-      LinuxGpioDriverComponentBase(compName)
+      LinuxPwmDriverComponentBase(compName)
 #else
-    LinuxGpioDriverImpl(void)
+    LinuxPwmDriverImpl(void)
 #endif
-    ,m_gpio(-1)
-    ,m_direction(GPIO_IN)
+    ,m_pwmchip(-1)
     ,m_fd(-1)
-    ,m_quitThread(false)
   {
 
   }
 
-  void LinuxGpioDriverComponentImpl ::
+  void LinuxPwmDriverComponentImpl ::
     init(
         const NATIVE_INT_TYPE instance
     )
   {
-    LinuxGpioDriverComponentBase::init(instance);
+    LinuxPwmDriverComponentBase::init(instance);
   }
 
 } // end namespace Drv

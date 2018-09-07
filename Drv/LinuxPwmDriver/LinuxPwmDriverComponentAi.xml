@@ -7,12 +7,17 @@
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
+    <import_port_type>Drv/PwmDriverPorts/PwmConfigPortAi.xml</import_port_type>
+    <import_port_type>Drv/PwmDriverPorts/PwmSetDutyCyclePortAi.xml</import_port_type>
     <import_dictionary>Drv/LinuxPwmDriver/Events.xml</import_dictionary>
     <ports>
-    
 
-        <!--port name="pwmSetDuty" data_type="Drv::PwmDutyCycle"  kind="sync_input"    max_number="1">
-        </port-->
+
+        <port name="pwmConfig" data_type="Drv::PwmConfig"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycle"  kind="sync_input"    max_number="1">
+        </port>
 
         <port name="Log" data_type="Fw::Log"  kind="output" role="LogEvent"    max_number="1">
         </port>

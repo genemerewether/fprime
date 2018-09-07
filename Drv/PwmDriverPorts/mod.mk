@@ -11,4 +11,4 @@
 #   or an ITAR exemption prior to the export or transfer.
 #
 
-SRC = #PwmReadPortAi.xml PwmWritePortAi.xml
+SRC = PwmConfigPortAi.xml PwmSetDutyCyclePortAi.xml

@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  LinuxGpioDriverImpl.cpp
+// \title  LinuxPwmDriverImpl.cpp
 // \author tcanham
-// \brief  cpp file for LinuxGpioDriver component implementation class
+// \brief  cpp file for LinuxPwmDriver component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -18,7 +18,7 @@
 // ======================================================================
 
 
-#include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
+#include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Fw/Types/BasicTypes.hpp>
 #include <Os/TaskString.hpp>
 
@@ -242,7 +242,7 @@ namespace Drv {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void LinuxGpioDriverComponentImpl ::
+  void LinuxPwmDriverComponentImpl ::
     gpioRead_handler(
         const NATIVE_INT_TYPE portNum,
         bool &state
@@ -261,7 +261,7 @@ namespace Drv {
 
   }
 
-  void LinuxGpioDriverComponentImpl ::
+  void LinuxPwmDriverComponentImpl ::
     gpioWrite_handler(
         const NATIVE_INT_TYPE portNum,
         bool state
@@ -279,7 +279,7 @@ namespace Drv {
       }
   }
 
-  bool LinuxGpioDriverComponentImpl ::
+  bool LinuxPwmDriverComponentImpl ::
     open(NATIVE_INT_TYPE gpio, GpioDirection direction) {
 
       // TODO check for invalid gpio?
@@ -310,11 +310,11 @@ namespace Drv {
   }
 
   //! Entry point for task waiting for RTI
-  void LinuxGpioDriverComponentImpl ::
+  void LinuxPwmDriverComponentImpl ::
     intTaskEntry(void * ptr) {
 
       FW_ASSERT(ptr);
-      LinuxGpioDriverComponentImpl* compPtr = (LinuxGpioDriverComponentImpl*) ptr;
+      LinuxPwmDriverComponentImpl* compPtr = (LinuxPwmDriverComponentImpl*) ptr;
 
       FW_ASSERT(compPtr->m_fd != -1);
 
@@ -386,11 +386,11 @@ namespace Drv {
 
   }
 
-  Os::Task::TaskStatus LinuxGpioDriverComponentImpl ::
+  Os::Task::TaskStatus LinuxPwmDriverComponentImpl ::
   startIntTask(NATIVE_INT_TYPE priority, NATIVE_INT_TYPE cpuAffinity) {
       Os::TaskString name;
       name.format("GPINT_%s",this->getObjName()); // The task name can only be 16 chars including null
-      Os::Task::TaskStatus stat = this->m_intTask.start(name,0,priority,20*1024,LinuxGpioDriverComponentImpl::intTaskEntry,this,cpuAffinity);
+      Os::Task::TaskStatus stat = this->m_intTask.start(name,0,priority,20*1024,LinuxPwmDriverComponentImpl::intTaskEntry,this,cpuAffinity);
 
       if (stat != Os::Task::TASK_OK) {
           DEBUG_PRINT("Task start error: %d\n",stat);
@@ -400,15 +400,15 @@ namespace Drv {
 
   }
 
-  void LinuxGpioDriverComponentImpl ::
+  void LinuxPwmDriverComponentImpl ::
     exitThread(void) {
       this->m_quitThread = true;
   }
 
 
 
-  LinuxGpioDriverComponentImpl ::
-    ~LinuxGpioDriverComponentImpl(void)
+  LinuxPwmDriverComponentImpl ::
+    ~LinuxPwmDriverComponentImpl(void)
   {
       if (this->m_fd != -1) {
           DEBUG_PRINT("Closing GPIO %d fd %d\n",this->m_gpio, this->m_fd);
