@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/serializable_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<serializable name="PwmSetDutyCycle" namespace="Drv">
+  <members>
+      <!-- size is max number of PWM lines per PWM chip -->
+      <member name="dutyCycle" type="F32" size="8">
+      </member>
+      <member name="bitmask" type="U32">
+      </member>
+  </members>
+</serializable>

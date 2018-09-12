@@ -56,7 +56,10 @@ namespace Drv {
 
       //! Open PWM chip
       //!
-      bool open(NATIVE_INT_TYPE pwmchip);
+      bool open(NATIVE_UINT_TYPE pwmchip,
+                NATIVE_UINT_TYPE * channel,
+                NATIVE_UINT_TYPE channelSize,
+                NATIVE_UINT_TYPE period_in_usecs);
 
     PRIVATE:
 
@@ -68,21 +71,23 @@ namespace Drv {
       //!
       void pwmConfig_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          U32 period
+          PwmConfig pwmConfig
       );
 
       //! Handler implementation for pwmSetDuty
       //!
       void pwmSetDuty_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          F32 dutyCycle,
-          U32 bitmask
+          PwmSetDutyCycle pwmSetDutyCycle
       );
 
       //! store pwmchip ID
       NATIVE_INT_TYPE m_pwmchip;
       //! file descriptor for GPIO
       NATIVE_INT_TYPE m_fd;
+
+      //! Implementation-specific handle
+      void * m_handle;
 
     };
 

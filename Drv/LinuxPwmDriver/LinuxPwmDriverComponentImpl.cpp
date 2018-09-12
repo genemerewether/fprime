@@ -23,7 +23,7 @@
 #include <Os/TaskString.hpp>
 
 // TODO make proper static constants for these
-#define SYSFS_GPIO_DIR "/sys/class/gpio"
+#define SYSFS_PWM_DIR "/sys/class/pwm"
 #define MAX_BUF 64
 
 #include <stdio.h>
@@ -42,21 +42,28 @@ namespace Drv {
 
 // Code modified from https://developer.ridgerun.com/wiki/index.php?title=Gpio-int-test.c
     /****************************************************************
-    * gpio_export
+    * pwm_export
     ****************************************************************/
-    int gpio_export(unsigned int gpio)
+    int pwm_export(unsigned int pwmchip, unsigned int channel)
     {
         int fd, len;
         char buf[MAX_BUF];
 
-        fd = open(SYSFS_GPIO_DIR "/export", O_WRONLY);
+        // TODO(mereweth) - check npwm
+
+        len = snprintf(buf, sizeof(buf),
+                       SYSFS_PWM_DIR  "/pwmchip%d/export",
+                       pwmchip);
+        FW_ASSERT(len > 0, len);
+
+        fd = open(buf, O_WRONLY);
         if (fd < 0) {
-            DEBUG_PRINT("gpio/export error!\n");
+            DEBUG_PRINT("pwm/export error!\n");
             return -1;
         }
 
         // TODO check value of len
-        len = snprintf(buf, sizeof(buf), "%d", gpio);
+        len = snprintf(buf, sizeof(buf), "%d", channel);
         (void) write(fd, buf, len); // TODO check return value
         (void) close(fd);
 
@@ -69,21 +76,28 @@ namespace Drv {
     }
 
     /****************************************************************
-     * gpio_unexport
+     * pwm_unexport
      ****************************************************************/
-    int gpio_unexport(unsigned int gpio)
+    int pwm_unexport(unsigned int pwmchip, unsigned int channel)
     {
         int fd, len;
         char buf[MAX_BUF];
 
-        fd = open(SYSFS_GPIO_DIR "/unexport", O_WRONLY);
+        // TODO(mereweth) - check npwm
+
+        len = snprintf(buf, sizeof(buf),
+                       SYSFS_PWM_DIR  "/pwmchip%d/unexport",
+                       pwmchip);
+        FW_ASSERT(len > 0, len);
+
+        fd = open(buf, O_WRONLY);
         if (fd < 0) {
-            DEBUG_PRINT("gpio/unexport error!\n");
+            DEBUG_PRINT("pwm/unexport error!\n");
             return -1;
         }
 
         // TODO check value of len
-        len = snprintf(buf, sizeof(buf), "%d", gpio);
+        len = snprintf(buf, sizeof(buf), "%d", channel);
         (void) write(fd, buf, len); // TODO check return value
         (void) close(fd);
 
@@ -95,327 +109,85 @@ namespace Drv {
         return 0;
     }
 
-    /****************************************************************
-     * gpio_set_dir
-     ****************************************************************/
-    int gpio_set_dir(unsigned int gpio, unsigned int out_flag)
-    {
-        int fd, len;
-        char buf[MAX_BUF];
+/*
+TODO(mereweth)
 
-        len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d/direction", gpio);
-        FW_ASSERT(len > 0, len);
+When a PWM channel is exported a pwmX directory will be created in the
+pwmchipN directory it is associated with, where X is the number of the
+channel that was exported. The following properties will then be available:
 
-        fd = open(buf, O_WRONLY);
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/direction error!\n");
-            return -1;
-        }
+  period
+    The total period of the PWM signal (read/write).
+    Value is in nanoseconds and is the sum of the active and inactive
+    time of the PWM.
 
-        // TODO check return value
-        if (out_flag) {
-            (void) write(fd, "out", 4);
-        }
-        else {
-            (void) write(fd, "in", 3);
-        }
+  duty_cycle
+    The active time of the PWM signal (read/write).
+    Value is in nanoseconds and must be less than the period.
 
-        (void) close(fd);
-        return 0;
-    }
+  polarity
+    Changes the polarity of the PWM signal (read/write).
+    Writes to this property only work if the PWM chip supports changing
+    the polarity. The polarity can only be changed if the PWM is not
+    enabled. Value is the string "normal" or "inversed".
 
-    /****************************************************************
-     * gpio_set_value
-     ****************************************************************/
-    int gpio_set_value(int fd, unsigned int value)
-    {
+  enable
+    Enable/disable the PWM signal (read/write).
 
-        FW_ASSERT(fd != -1);
-
-        // TODO make value a enum or check its value
-
-        // TODO check return value
-        if (value) {
-            (void) write(fd, "1", 1);
-        }
-        else {
-            (void) write(fd, "0", 1);
-        }
-
-        DEBUG_PRINT("GPIO fd %d value %d written\n",fd,value);
-
-        return 0;
-    }
-
-    /****************************************************************
-     * gpio_get_value
-     ****************************************************************/
-    int gpio_get_value(int fd, unsigned int *value)
-    {
-        char ch = '0';
-
-        FW_ASSERT(fd != -1);
-
-        NATIVE_INT_TYPE stat1 = lseek(fd, 0, SEEK_SET); // Must seek back to the starting
-        NATIVE_INT_TYPE stat2 = read(fd, &ch, 1);
-
-        if (stat1 == -1 || stat2 != 1) {
-            DEBUG_PRINT("GPIO read failure: %d %d!\n",stat1,stat2);
-            return -1;
-        }
-
-        // TODO could use atoi instead to get the value
-        if (ch != '0') {
-            *value = 1;
-        } else {
-            *value = 0;
-        }
-
-        DEBUG_PRINT("GPIO fd %d value %c read\n",fd,ch);
-
-        return 0;
-    }
-
-
-    /****************************************************************
-     * gpio_set_edge
-     ****************************************************************/
-
-    int gpio_set_edge(unsigned int gpio, char *edge)
-    {
-        int fd, len;
-        char buf[MAX_BUF];
-
-        FW_ASSERT(edge != NULL);
-        // TODO check that edge has correct values of "none", "rising", or "falling"
-
-        len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/edge", gpio);
-        FW_ASSERT(len > 0, len);
-
-        fd = open(buf, O_WRONLY);
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/set-edge error!\n");
-            return -1;
-        }
-
-        // TODO check return value of write and strlen()
-        (void) write(fd, edge, strlen(edge) + 1);
-        (void) close(fd);
-        return 0;
-    }
-
-    /****************************************************************
-     * gpio_fd_open
-     ****************************************************************/
-
-    int gpio_fd_open(unsigned int gpio)
-    {
-        int fd, len;
-        char buf[MAX_BUF];
-
-        len = snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR "/gpio%d/value", gpio);
-        FW_ASSERT(len > 0, len);
-
-        fd = open(buf, O_RDWR | O_NONBLOCK );
-        if (fd < 0) {
-            DEBUG_PRINT("gpio/fd_open error!\n");
-            return -1;
-        }
-        return fd;
-    }
-
-    /****************************************************************
-     * gpio_fd_close
-     ****************************************************************/
-
-    int gpio_fd_close(int fd, unsigned int gpio)
-    {
-        // TODO is this needed? w/o this the edge file and others can retain the state from
-        // previous settings.
-        (void) gpio_unexport(gpio); // TODO check return value
-
-        return close(fd);
-    }
-
+	- 0 - disabled
+	- 1 - enabled
+*/
 
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void LinuxPwmDriverComponentImpl ::
-    gpioRead_handler(
-        const NATIVE_INT_TYPE portNum,
-        bool &state
-    )
-  {
-      FW_ASSERT(this->m_fd != -1);
+    void LinuxPwmDriverComponentImpl ::
+      pwmConfig_handler(
+          const NATIVE_INT_TYPE portNum,
+          PwmConfig pwmConfig
+      )
+    {
+      // TODO
+    }
 
-      NATIVE_UINT_TYPE val;
-      NATIVE_INT_TYPE stat = gpio_get_value(this->m_fd, &val);
-      if (-1 == stat) {
-          this->log_WARNING_HI_GP_ReadError(this->m_gpio,stat);
-          return;
-      } else {
-          state = val?true:false;
-      }
+    void LinuxPwmDriverComponentImpl ::
+      pwmSetDuty_handler(
+          const NATIVE_INT_TYPE portNum,
+          PwmSetDutyCycle pwmSetDutyCycle
+      )
+    {
+      // TODO
+    }
 
-  }
+    bool LinuxPwmDriverComponentImpl ::
+      open(NATIVE_UINT_TYPE pwmchip,
+           NATIVE_UINT_TYPE * channel,
+           NATIVE_UINT_TYPE channelSize,
+           NATIVE_UINT_TYPE period_in_usecs) {
+        // TODO check for invalid pwm device?
 
-  void LinuxPwmDriverComponentImpl ::
-    gpioWrite_handler(
-        const NATIVE_INT_TYPE portNum,
-        bool state
-    )
-  {
-      FW_ASSERT(this->m_fd != -1);
+        // Configure:
+        //this->m_fd = pwm_fd_open(pwmchip);
 
-      NATIVE_INT_TYPE stat;
-
-      stat = gpio_set_value(this->m_fd,state?1:0);
-
-      if (0 != stat) {
-          this->log_WARNING_HI_GP_WriteError(this->m_gpio,stat);
-          return;
-      }
-  }
-
-  bool LinuxPwmDriverComponentImpl ::
-    open(NATIVE_INT_TYPE gpio, GpioDirection direction) {
-
-      // TODO check for invalid gpio?
-      NATIVE_INT_TYPE stat;
-
-      // Configure:
-      stat = gpio_export(gpio);
-      if (-1 == stat) {
-          this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-      }
-      stat = gpio_set_dir(gpio, direction == GPIO_OUT ? 1 : 0);
-      if (-1 == stat) {
-          this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-      }
-
-      // If needed, set edge to rising in intTaskEntry()
-
-      // Open:
-      this->m_fd = gpio_fd_open(gpio);
-      if (-1 == this->m_fd) {
-          this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-      } else {
-          this->m_gpio = gpio;
-      }
-
-
-      return true;
-  }
-
-  //! Entry point for task waiting for RTI
-  void LinuxPwmDriverComponentImpl ::
-    intTaskEntry(void * ptr) {
-
-      FW_ASSERT(ptr);
-      LinuxPwmDriverComponentImpl* compPtr = (LinuxPwmDriverComponentImpl*) ptr;
-
-      FW_ASSERT(compPtr->m_fd != -1);
-
-      // start GPIO interrupt
-      NATIVE_INT_TYPE stat;
-      stat = gpio_set_edge(compPtr->m_gpio, "rising");
-      if (-1 == stat) {
-          compPtr->log_WARNING_HI_GP_IntStartError(compPtr->m_gpio);
-          return;
-      }
-
-      // spin waiting for interrupt
-      while(not compPtr->m_quitThread) {
-          pollfd fdset[1];
-          NATIVE_INT_TYPE nfds = 1;
-          NATIVE_INT_TYPE timeout = 10000; // Timeout of 10 seconds
-
-          memset((void*)fdset, 0, sizeof(fdset));
-
-          fdset[0].fd = compPtr->m_fd;
-          fdset[0].events = POLLPRI;
-
-          stat = poll(fdset, nfds, timeout);
-
-          /*
-           * According to this link, poll will always have POLLERR set for the sys/class/gpio subsystem
-           * so cant check for it to look for error:
-           * http://stackoverflow.com/questions/27411013/poll-returns-both-pollpri-pollerr
-           */
-          if (stat < 0) {
-              DEBUG_PRINT("stat: %d, revents: 0x%x, POLLERR: 0x%x, POLLIN: 0x%x, POLLPRI: 0x%x\n",
-                     stat, fdset[0].revents, POLLERR, POLLIN, POLLPRI); // TODO remove
-              compPtr->log_WARNING_HI_GP_IntWaitError(compPtr->m_gpio);
-              return;
-          }
-
-          if (stat == 0) {
-              // continue to poll
-	          DEBUG_PRINT("Krait timed out waiting for GPIO interrupt\n");
-              continue;
-          }
-
-          // Asserting that number of fds w/ revents is 1:
-          FW_ASSERT(stat == 1, stat);  // TODO should i bother w/ this assert?
-
-          // TODO what to do if POLLPRI not set?
-
-          // TODO: if I take out the read then the poll just continually interrupts
-          // Read is only taking 22 usecs each time, so it is not blocking for long
-          if (fdset[0].revents & POLLPRI) {
-
-              char *buf[MAX_BUF];
-              (void) lseek(fdset[0].fd, 0, SEEK_SET); // Must seek back to the starting
-              (void) read(fdset[0].fd, buf, MAX_BUF);
-              DEBUG_PRINT("\npoll() GPIO interrupt occurred w/ value: %c\n", buf[0]);
-          }
-
-        // call interrupt ports
-        Svc::TimerVal timerVal;
-        timerVal.take();
-
-        for (NATIVE_INT_TYPE port = 0; port < compPtr->getNum_intOut_OutputPorts(); port++) {
-            if (compPtr->isConnected_intOut_OutputPort(port)) {
-                compPtr->intOut_out(port,timerVal);
-            }
+        if (-1 == this->m_fd) {
+            //this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+            return false;
         }
 
-      }
+        this->m_pwmchip = pwmchip;
 
-  }
+        return true;
+    }
 
-  Os::Task::TaskStatus LinuxPwmDriverComponentImpl ::
-  startIntTask(NATIVE_INT_TYPE priority, NATIVE_INT_TYPE cpuAffinity) {
-      Os::TaskString name;
-      name.format("GPINT_%s",this->getObjName()); // The task name can only be 16 chars including null
-      Os::Task::TaskStatus stat = this->m_intTask.start(name,0,priority,20*1024,LinuxPwmDriverComponentImpl::intTaskEntry,this,cpuAffinity);
+    LinuxPwmDriverComponentImpl ::
+      ~LinuxPwmDriverComponentImpl(void)
+    {
+        if (this->m_fd != -1) {
+            DEBUG_PRINT("Closing PWM %d fd %d\n",this->m_pwmchip, this->m_fd);
+            close(this->m_fd);
+        }
 
-      if (stat != Os::Task::TASK_OK) {
-          DEBUG_PRINT("Task start error: %d\n",stat);
-      }
-
-      return stat;
-
-  }
-
-  void LinuxPwmDriverComponentImpl ::
-    exitThread(void) {
-      this->m_quitThread = true;
-  }
-
-
-
-  LinuxPwmDriverComponentImpl ::
-    ~LinuxPwmDriverComponentImpl(void)
-  {
-      if (this->m_fd != -1) {
-          DEBUG_PRINT("Closing GPIO %d fd %d\n",this->m_gpio, this->m_fd);
-          (void) gpio_fd_close(this->m_fd, this->m_gpio);
-      }
-
-  }
-
+    }
 
 } // end namespace Drv

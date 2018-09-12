@@ -38,6 +38,7 @@ namespace Drv {
 #endif
     ,m_pwmchip(-1)
     ,m_fd(-1)
+    ,m_handle(NULL)
   {
 
   }

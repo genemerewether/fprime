@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/interface_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<interface name="PwmConfig" namespace="Drv">
+<interface name="PwmConfigData" namespace="Drv">
+    <import_serializable_type>Drv/PwmDriverPorts/PwmConfigSerializableAi.xml</import_serializable_type>
     <comment>
     Port Type interface arguments.
     </comment>
     <args>
-        <arg name="period" type="U32" pass_by="value">
+        <arg name="pwmConfig" type="PwmConfig" pass_by="value">
         </arg>
     </args>
 </interface>

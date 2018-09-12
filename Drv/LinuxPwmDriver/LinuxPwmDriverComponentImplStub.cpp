@@ -28,7 +28,10 @@ namespace Drv {
   // ----------------------------------------------------------------------
 
   bool LinuxPwmDriverComponentImpl ::
-    open(NATIVE_INT_TYPE pwmchip) {
+    open(NATIVE_UINT_TYPE pwmchip,
+         NATIVE_UINT_TYPE * channel,
+         NATIVE_UINT_TYPE channelSize,
+         NATIVE_UINT_TYPE period_in_usecs) {
       return false;
   }
 

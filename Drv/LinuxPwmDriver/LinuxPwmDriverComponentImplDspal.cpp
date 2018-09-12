@@ -1,5 +1,5 @@
 // ======================================================================
-// \title  LinuxPwmDriverImpl.cpp
+// \title  LinuxPwmDriverImplDspal.cpp
 // \author tcanham
 // \brief  cpp file for LinuxPwmDriver component implementation class
 //
@@ -35,81 +35,105 @@
 #define DSPAL_PWM_PATH "/dev/pwm-"
 #define MAX_BUF 64
 
+#define MAX_NUM_CHANNELS 8
+
 #include <HAP_farf.h>
 //#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
 #define DEBUG_PRINT(x,...)
 
 namespace Drv {
 
-  /****************************************************************
-   * pwm_fd_open
-   ****************************************************************/
-
-  int pwm_fd_open(unsigned int pwmchip)
-  {
-      int fd, len;
-      char buf[MAX_BUF];
-
-      len = snprintf(buf, sizeof(buf), DSPAL_PWM_PATH "%d", pwmchip);
-      FW_ASSERT(len > 0, len);
-
-      fd = open(buf, 0);
-      if (fd < 0) {
-          DEBUG_PRINT("pwm/fd_open error!\n");
-          return -1;
-      }
-      return fd;
-  }
-
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void LinuxPwmDriverComponentImpl ::
-    pwmConfig_handler(
-        const NATIVE_INT_TYPE portNum,
-        U32 period
-    )
-  {
-    // TODO
-  }
+    void LinuxPwmDriverComponentImpl ::
+      pwmConfig_handler(
+          const NATIVE_INT_TYPE portNum,
+          PwmConfig pwmConfig
+      )
+    {
+      // TODO
+    }
 
-  void LinuxPwmDriverComponentImpl ::
-    pwmSetDuty_handler(
-        const NATIVE_INT_TYPE portNum,
-        F32 dutyCycle,
-        U32 bitmask
-    )
-  {
-    // TODO
-  }
+    void LinuxPwmDriverComponentImpl ::
+      pwmSetDuty_handler(
+          const NATIVE_INT_TYPE portNum,
+          PwmSetDutyCycle pwmSetDutyCycle
+      )
+    {
+      // TODO
+    }
 
-  bool LinuxPwmDriverComponentImpl ::
-    open(NATIVE_INT_TYPE pwmchip) {
-      // TODO check for invalid pwm device?
+    bool LinuxPwmDriverComponentImpl ::
+      open(NATIVE_UINT_TYPE pwmchip,
+           NATIVE_UINT_TYPE * channel,
+           NATIVE_UINT_TYPE channelSize,
+           NATIVE_UINT_TYPE period_in_usecs) {
+        // TODO check for invalid pwm device?
 
-      // Configure:
-      this->m_fd = pwm_fd_open(pwmchip);
+        // Configure:
+        int fd, len;
+        char buf[MAX_BUF];
 
-      if (-1 == this->m_fd) {
-          //this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-          return false;
-      }
+        if (channelSize > MAX_NUM_CHANNELS) {
+            DEBUG_PRINT("not enough channel slots: %d < %d!\n",
+                        channelSize, MAX_NUM_CHANNELS);
+            return false;
+        }
 
-      this->m_pwmchip = pwmchip;
+        len = snprintf(buf, sizeof(buf), DSPAL_PWM_PATH "%d", pwmchip);
+        FW_ASSERT(len > 0, len);
 
-      return true;
-  }
+        fd = ::open(buf, 0);
+        if (fd < 0) {
+            //this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+            DEBUG_PRINT("pwm/fd_open error!\n");
+            return false;
+        }
+        this->m_fd = fd;
 
-  LinuxPwmDriverComponentImpl ::
-    ~LinuxPwmDriverComponentImpl(void)
-  {
-      if (this->m_fd != -1) {
-          DEBUG_PRINT("Closing PWM %d fd %d\n",this->m_pwmchip, this->m_fd);
-          close(this->m_fd);
-      }
+        struct dspal_pwm pwm_gpio[MAX_NUM_CHANNELS];
+        struct dspal_pwm_ioctl_signal_definition signal_definition;
+        struct dspal_pwm_ioctl_update_buffer *update_buffer;
 
-  }
+        this->m_pwmchip = pwmchip;
+
+        for (int i = 0; i < channelSize; i++) {
+            pwm_gpio[i].gpio_id = channel[i];
+            pwm_gpio[i].pulse_width_in_usecs = 0;
+        }
+
+        // Describe the overall signal and reference the above array.
+        signal_definition.num_gpios = channelSize;
+        signal_definition.period_in_usecs = 2000;
+        signal_definition.pwm_signal = &pwm_gpio[0];
+
+        // Send the signal definition to the DSP.
+        if (ioctl(fd, PWM_IOCTL_SIGNAL_DEFINITION, &signal_definition) != 0) {
+            return false;
+        }
+
+        // Retrieve the shared buffer which will be used below to update the desired
+        // pulse width.
+        if (ioctl(fd, PWM_IOCTL_GET_UPDATE_BUFFER, &update_buffer) != 0)
+        {
+            return false;
+        }
+        this->m_handle = (void *) &update_buffer->pwm_signal[0];
+
+        return true;
+    }
+
+    LinuxPwmDriverComponentImpl ::
+      ~LinuxPwmDriverComponentImpl(void)
+    {
+        if (this->m_fd != -1) {
+            DEBUG_PRINT("Closing PWM %d fd %d\n",this->m_pwmchip, this->m_fd);
+            close(this->m_fd);
+        }
+
+    }
 
 
 } // end namespace Drv

@@ -13,10 +13,10 @@
     <ports>
 
 
-        <port name="pwmConfig" data_type="Drv::PwmConfig"  kind="sync_input"    max_number="1">
+        <port name="pwmConfig" data_type="Drv::PwmConfigData"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycle"  kind="sync_input"    max_number="1">
+        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycleData"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="Log" data_type="Fw::Log"  kind="output" role="LogEvent"    max_number="1">
