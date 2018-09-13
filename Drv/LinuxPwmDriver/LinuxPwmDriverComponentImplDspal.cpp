@@ -66,15 +66,18 @@ namespace Drv {
             //TODO(mereweth) - issue EVR
             return;
         }
-        struct dspal_pwm *pwm = (dspal_pwm *) this->m_handle;
+
+        struct dspal_pwm_ioctl_update_buffer * updateBuf =
+            (struct dspal_pwm_ioctl_update_buffer *) this->m_handle;
+        FW_ASSERT(updateBuf->num_gpios == this->m_numGpios);
         U32 bitmask = pwmSetDutyCycle.getbitmask();
 
         NATIVE_INT_TYPE dutySize = 0;
-        F32* duty = pwmSetDutyCycle.getdutyCycle(dutySize);
+        const F32* duty = pwmSetDutyCycle.getdutyCycle(dutySize);
 
         for (int i = 0; i < FW_MIN(dutySize, m_numGpios); i++) {
             if (bitmask & (1 << i)) {
-                pwm[i].pulse_width_in_usecs =
+                 updateBuf->pwm_signal[i].pulse_width_in_usecs =
                       (U32) (m_periodInUsecs * duty[i]);
             }
         }
@@ -137,8 +140,8 @@ namespace Drv {
         {
             return false;
         }
-        FW_ASSERT(update_buffer.num_gpios == m_numGpios);
-        this->m_handle = (void *) &update_buffer->pwm_signal[0];
+        FW_ASSERT(update_buffer->num_gpios == m_numGpios);
+        this->m_handle = (void *) update_buffer;
 
         return true;
     }
