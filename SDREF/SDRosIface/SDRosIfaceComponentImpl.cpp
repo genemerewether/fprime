@@ -159,6 +159,22 @@ namespace SDREF {
                 m_imuStateUpdateSet[i].mutex.unLock();
             }
 
+            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_float32Set); i++) {
+                m_float32Set[i].mutex.lock();
+                if (m_float32Set[i].fresh) {
+                    if (this->isConnected_Float32Data_OutputPort(i)) {
+                        // mimics driver hardware getting and sending sensor data
+                        this->Float32Data_out(i, m_float32Set[i].float32);
+                    }
+                    else {
+                        DEBUG_PRINT("Float32 port %d not connected\n", i);
+                    }
+                    m_float32Set[i].fresh = false;
+                }
+                // TODO(mereweth) - notify that no new odometry received?
+                m_float32Set[i].mutex.unLock();
+            }
+
             // TODO(mereweth) check context == imu out context
         }
         else if (context == SDROSIFACE_SCHED_CONTEXT_TLM) {
@@ -245,10 +261,64 @@ namespace SDREF {
                                             &gtHandler,
                                             ros::TransportHints().tcpNoDelay());
 */
+
+        Float32Handler float32Handler0(compPtr, 0);
+        Float32Handler float32Handler1(compPtr, 1);
+        Float32Handler float32Handler2(compPtr, 2);
+        Float32Handler float32Handler3(compPtr, 3);
+        Float32Handler float32Handler4(compPtr, 4);
+        Float32Handler float32Handler5(compPtr, 5);
+
+        ros::Subscriber float32Sub0 = n.subscribe("float0", 1000,
+                                            &Float32Handler::float32Callback,
+                                            &float32Handler0,
+                                            ros::TransportHints().tcpNoDelay());
+        ros::Subscriber float32Sub1 = n.subscribe("float1", 1000,
+                                            &Float32Handler::float32Callback,
+                                            &float32Handler1,
+                                            ros::TransportHints().tcpNoDelay());
+        ros::Subscriber float32Sub2 = n.subscribe("float2", 1000,
+                                            &Float32Handler::float32Callback,
+                                            &float32Handler2,
+                                            ros::TransportHints().tcpNoDelay());
+        ros::Subscriber float32Sub3 = n.subscribe("float3", 1000,
+                                            &Float32Handler::float32Callback,
+                                            &float32Handler3,
+                                            ros::TransportHints().tcpNoDelay());
+        ros::Subscriber float32Sub4 = n.subscribe("float4", 1000,
+                                            &Float32Handler::float32Callback,
+                                            &float32Handler4,
+                                            ros::TransportHints().tcpNoDelay());
+        ros::Subscriber float32Sub5 = n.subscribe("float5", 1000,
+                                            &Float32Handler::float32Callback,
+                                            &float32Handler5,
+                                            ros::TransportHints().tcpNoDelay());
+
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
+    }
+
+    SDRosIfaceComponentImpl :: Float32Handler ::
+      Float32Handler(SDRosIfaceComponentImpl* compPtr,
+                      int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_FLOAT32DATA_OUTPUT_PORTS); //compPtr->getNum_ImuStateUpdate_OutputPorts());
+    }
+
+    SDRosIfaceComponentImpl :: Float32Handler :: ~Float32Handler()
+    {
+
+    }
+
+    void SDRosIfaceComponentImpl :: Float32Handler ::
+      float32Callback(const std_msgs::Float32::ConstPtr& msg)
+    {
+        //TODO(mereweth)
     }
 
     SDRosIfaceComponentImpl :: ImuStateUpdateHandler ::

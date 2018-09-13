@@ -25,6 +25,7 @@
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
+#include "std_msgs/Float32.h"
 
 // TODO - ImuStateUpdate.h
 
@@ -74,6 +75,24 @@ namespace SDREF {
       // ----------------------------------------------------------------------
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
+
+        class Float32Handler
+        {
+          public:
+              Float32Handler(SDRosIfaceComponentImpl* compPtr,
+                             int portNum);
+
+              ~Float32Handler();
+
+              void float32Callback(const std_msgs::Float32::ConstPtr& msg);
+
+          PRIVATE:
+
+              SDRosIfaceComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class Float32Handler
 
         class ImuStateUpdateHandler
         {
@@ -154,6 +173,13 @@ namespace SDREF {
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
+
+        struct Float32Set {
+            Os::Mutex mutex; //! Mutex lock to guard odometry object
+            ROS::std_msgs::Float32 float32; //! message object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_float32Set[NUM_FLOAT32DATA_OUTPUT_PORTS];
     };
 
 } // end namespace

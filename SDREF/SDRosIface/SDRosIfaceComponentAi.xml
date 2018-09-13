@@ -12,6 +12,7 @@
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/std_msgs/Ports/Float32PortAi.xml</import_port_type>
     <ports>
 
 
@@ -40,6 +41,9 @@
         </port>
 
         <port name="ImuStateUpdate" data_type="ROS::sensor_msgs::ImuStateUpdate"  kind="output"  max_number="1">
+        </port>
+
+        <port name="Float32Data" data_type="ROS::std_msgs::Float32"  kind="output" max_number="6">
         </port>
 
         <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">
