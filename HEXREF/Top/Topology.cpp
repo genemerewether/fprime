@@ -158,6 +158,12 @@ Drv::LinuxGpioDriverComponentImpl imuDRInt
 #endif
 ;
 
+Drv::LinuxPwmDriverComponentImpl escPwm
+#if FW_OBJECT_NAMES == 1
+                    ("ESCPWM")
+#endif
+;
+
 #if FW_OBJECT_REGISTRATION == 1
 
 void dumparch(void) {
@@ -183,9 +189,12 @@ void manualConstruct(void) {
 
     mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
     //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+    imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
 
     kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
-    imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+    for (int i = 0; i < 6; i++) {
+        //kraitRouter.set_KraitPortsOut_OutputPort(2 + i, pwm adapter);
+    }
 }
 
 void constructApp() {

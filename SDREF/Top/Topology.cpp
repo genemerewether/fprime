@@ -207,6 +207,7 @@ void constructApp(int port_number, char* hostname) {
 
     sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
     for (int i = 0; i < 6; i++) {
+        // NOTE(mereweth) - could connect mixer in topology and connect only one PwmSetDutyCycle port here
         sdRosIface.set_Float32Data_OutputPort(i, hexRouter.get_KraitPortsIn_InputPort(2 + i));
     }
 
