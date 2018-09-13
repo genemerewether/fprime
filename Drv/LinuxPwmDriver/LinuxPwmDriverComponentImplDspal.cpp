@@ -53,7 +53,7 @@ namespace Drv {
           PwmConfig pwmConfig
       )
     {
-      // TODO
+        // TODO(mereweth) - can't do this on DSPAL without reissuing ioctls
     }
 
     void LinuxPwmDriverComponentImpl ::
@@ -62,7 +62,22 @@ namespace Drv {
           PwmSetDutyCycle pwmSetDutyCycle
       )
     {
-      // TODO
+        if (!this->m_handle) {
+            //TODO(mereweth) - issue EVR
+            return;
+        }
+        struct dspal_pwm *pwm = (dspal_pwm *) this->m_handle;
+        U32 bitmask = pwmSetDutyCycle.getbitmask();
+
+        NATIVE_INT_TYPE dutySize = 0;
+        F32* duty = pwmSetDutyCycle.getdutyCycle(dutySize);
+
+        for (int i = 0; i < FW_MIN(dutySize, m_numGpios); i++) {
+            if (bitmask & (1 << i)) {
+                pwm[i].pulse_width_in_usecs =
+                      (U32) (m_periodInUsecs * duty[i]);
+            }
+        }
     }
 
     bool LinuxPwmDriverComponentImpl ::
@@ -106,7 +121,9 @@ namespace Drv {
 
         // Describe the overall signal and reference the above array.
         signal_definition.num_gpios = channelSize;
-        signal_definition.period_in_usecs = 2000;
+        m_numGpios = channelSize;
+        signal_definition.period_in_usecs = period_in_usecs;
+        this->m_periodInUsecs = period_in_usecs;
         signal_definition.pwm_signal = &pwm_gpio[0];
 
         // Send the signal definition to the DSP.
@@ -120,6 +137,7 @@ namespace Drv {
         {
             return false;
         }
+        FW_ASSERT(update_buffer.num_gpios == m_numGpios);
         this->m_handle = (void *) &update_buffer->pwm_signal[0];
 
         return true;

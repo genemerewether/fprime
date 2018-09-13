@@ -38,7 +38,9 @@ namespace Drv {
 #endif
     ,m_pwmchip(-1)
     ,m_fd(-1)
+    ,m_periodInUsecs(0u)
     ,m_handle(NULL)
+    ,m_numGpios(0u)
   {
 
   }

@@ -86,8 +86,12 @@ namespace Drv {
       //! file descriptor for GPIO
       NATIVE_INT_TYPE m_fd;
 
+      NATIVE_UINT_TYPE m_periodInUsecs;
+
       //! Implementation-specific handle
       void * m_handle;
+
+      U32 m_numGpios;
 
     };
 
