@@ -95,6 +95,7 @@ HEXAGON_MODULES := \
 
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
+	Gnc/Ctrl/BasicMixer \
 	Gnc/Est/ImuInteg \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \

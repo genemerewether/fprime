@@ -147,10 +147,9 @@ namespace ROS {
 
           Fw::Time now(TB_ROS_TIME, msg->clock.sec, msg->clock.nsec / 1000L);
 
-          //TODO(mereweth) - keep triggering cycle port and adding timeDiv to lastCallback
-
           while (now >= Fw::Time::add(m_lastCallback, m_timeDiv)) {
               DEBUG_PRINT("RosCycle enough time elapsed\n");
+              // TODO(mereweth) - should we use the message time instead?
               Svc::TimerVal cycleStart;
               cycleStart.take();
               if (this->isConnected_cycle_OutputPort(0)) {

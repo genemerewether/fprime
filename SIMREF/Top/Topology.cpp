@@ -49,14 +49,13 @@ Svc::RateGroupDecouplerComponentImpl rgDecouple
 #endif
 ;
 
-static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+//NOTE(mereweth) - change this in sync with RosCycle timeDivMS
+static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 100};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGGNCDRV",
 #endif
                     rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
-
-//NOTE(mereweth) - change this in sync with RosCycle timeDivMS
 
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
@@ -117,7 +116,7 @@ ROS::RosCycleComponentImpl rosCycle
 #else
                     (
 #endif
-                    1)
+                    10) // 10 milliseconds per division
 ;
 
 SIMREF::RotorSDrvComponentImpl rotorSDrv

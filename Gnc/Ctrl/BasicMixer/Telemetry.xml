@@ -1,0 +1,6 @@
+<telemetry>
+    <channel id="0" name="BMIX_Dummy" data_type="F32" update="on_change" format_string="%.3fN">
+        <comment>
+        </comment>
+    </channel>
+</telemetry>
