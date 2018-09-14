@@ -35,6 +35,24 @@ namespace Drv {
       return false;
   }
 
+  void LinuxPwmDriverComponentImpl ::
+    pwmConfig_handler(
+        const NATIVE_INT_TYPE portNum,
+        PwmConfig pwmConfig
+    )
+  {
+    // TODO
+  }
+
+  void LinuxPwmDriverComponentImpl ::
+    pwmSetDuty_handler(
+        const NATIVE_INT_TYPE portNum,
+        PwmSetDutyCycle pwmSetDutyCycle
+    )
+  {
+    // TODO
+  }
+
   LinuxPwmDriverComponentImpl ::
     ~LinuxPwmDriverComponentImpl(void)
   {

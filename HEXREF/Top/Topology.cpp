@@ -133,6 +133,12 @@ Gnc::LeeCtrlComponentImpl leeCtrl
 #endif
 ;
 
+Gnc::BasicMixerComponentImpl mixer
+#if FW_OBJECT_NAMES == 1
+                    ("MIXER")
+#endif
+;
+
 Gnc::ImuIntegComponentImpl imuInteg
 #if FW_OBJECT_NAMES == 1
                     ("IMUINTEG")
@@ -216,11 +222,13 @@ void constructApp() {
 
     // Initialize the GNC components
     leeCtrl.init(0);
+    mixer.init(0);
     imuInteg.init(0);
     mpu9250.init(0);
 
     spiDrv.init(0);
     imuDRInt.init(0);
+    escPwm.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -245,9 +253,16 @@ void constructApp() {
 
     // Open devices
 #ifdef BUILD_DSPAL
-    // /dev/spi-1 on QuRT
+    // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt.open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+
+    // J13 is already at 5V, so use for 4 of the ESCs
+    NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
+    // /dev/pwm-1 on QuRT
+    escPwm.open(1, pwmPins, 4, 20 * 1000);
+
+    // reserve J15, bam-9, for Spektrum radio receiver
 #endif
 
     // Active component startup
@@ -379,6 +394,19 @@ int hexref_wait() {
     while (!terminate) {
         DEBUG_PRINT("hexref_wait loop; terminate: %d", terminate);
         Os::Task::delay(1000);
+
+        // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
+        // Drv::InputPwmSetDutyCycleDataPort * port = escPwm.get_pwmSetDuty_InputPort(0);
+        // static F32 d1 = 0.05;
+        // static F32 d2 = 0.1;
+        // F32 duty[4] = {d1, d2, d1, d2};
+        // Drv::PwmSetDutyCycle config(duty, 4, 0x0f);
+        // port->invoke(config);
+        // d1 += 0.005;
+        // if (d1 > 0.1) {  d1 = 0.05;  }
+        // d2 -= 0.005;
+        // if (d2 < 0.05) {  d2 = 0.1;  }
+
     }
     return 0;
 }
@@ -426,7 +454,9 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM,sighandler);
     signal(SIGHUP,sighandler);
 
-    hexref_run();
+    preinit=false;
+
+    hexref_cycle(10);
 }
 
 #endif //ifndef BUILD_DSPAL
