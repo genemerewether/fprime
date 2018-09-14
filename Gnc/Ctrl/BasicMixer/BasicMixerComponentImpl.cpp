@@ -77,6 +77,21 @@ namespace Gnc {
                                moment_b.getz(),
                                thrust_b.getz());
 
+      Eigen::MatrixXd mixer;
+      mixer.resize(4, 6);
+      mixer <<
+       9.18972e-07,  1.83794e-06,  9.18972e-07, -9.18972e-07, -1.83794e-06, -9.18972e-07,
+      -1.59171e-06, -8.99966e-18,  1.59171e-06,  1.59171e-06, -8.99966e-18, -1.59171e-06,
+      -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07,
+       8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06;
+
+       // TODO(mereweth) - calculate pseudoinverse in init
+
+       Eigen::MatrixXd mixerPinv = mixer.transpose() * (mixer * mixer.transpose()).inverse();
+
+       Eigen::VectorXd rotorVel = mixerPinv * controls;
+
+       // TODO(mereweth) - call motor output ports;
   }
 
   void BasicMixerComponentImpl ::
