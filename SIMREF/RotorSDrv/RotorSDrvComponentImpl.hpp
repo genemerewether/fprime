@@ -22,7 +22,7 @@
 
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
-#include "std_msgs/Float32.h"
+#include "mav_msgs/Actuators.h"
 
 #include "Os/Mutex.hpp"
 
@@ -102,7 +102,7 @@ namespace SIMREF {
         //!
         void motor_handler(
             const NATIVE_INT_TYPE portNum, /*!< The port number*/
-            ROS::std_msgs::Float32 &Float32
+            ROS::mav_msgs::Actuators &actuator
         );
 
         //! Handler implementation for sched
@@ -134,9 +134,9 @@ namespace SIMREF {
         //!
         ros::NodeHandle* m_rgNH;
 
-        //! Publishers for motor speeds
+        //! Publisher for motor speeds
         //!
-        ros::Publisher m_motorPub[NUM_MOTOR_INPUT_PORTS];
+        ros::Publisher m_motorPub;
 
         struct OdomSet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object

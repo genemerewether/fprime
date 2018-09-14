@@ -12,7 +12,7 @@
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/std_msgs/Ports/Float32PortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
 
     <import_dictionary>SIMREF/RotorSDrv/Telemetry.xml</import_dictionary>
     <import_dictionary>SIMREF/RotorSDrv/Events.xml</import_dictionary>
@@ -24,7 +24,7 @@
         <port name="SimImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output" max_number="1">
         </port>
 
-        <port name="motor" data_type="ROS::std_msgs::Float32"  kind="sync_input" max_number="6">
+        <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="1">
         </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">

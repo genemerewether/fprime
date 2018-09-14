@@ -91,7 +91,7 @@ namespace Gnc {
 
        Eigen::VectorXd rotorVel = mixerPinv * controls;
 
-       // TODO(mereweth) - call motor output ports;
+       // TODO(mereweth) - store actuator values
   }
 
   void BasicMixerComponentImpl ::
@@ -100,7 +100,7 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-    // TODO(mereweth) - push telemetry
+    // TODO(mereweth) - call Actuators output port
   }
 
 } // end namespace Gnc

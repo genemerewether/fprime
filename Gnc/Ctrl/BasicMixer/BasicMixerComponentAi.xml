@@ -10,7 +10,7 @@
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/std_msgs/Ports/Float32PortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
 
     <import_dictionary>Gnc/Ctrl/BasicMixer/Telemetry.xml</import_dictionary>
     <import_dictionary>Gnc/Ctrl/BasicMixer/Events.xml</import_dictionary>
@@ -19,7 +19,7 @@
         <port name="controls" data_type="ROS::mav_msgs::TorqueThrust"  kind="sync_input" max_number="1">
         </port>
 
-        <port name="motor" data_type="ROS::std_msgs::Float32"  kind="output" max_number="6">
+        <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="1">
         </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">

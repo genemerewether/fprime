@@ -72,10 +72,7 @@ namespace SIMREF {
         m_rgNH = &n;
 
         char buf[32];
-        for (int i = 0; i < NUM_MOTOR_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "motor_speed_%d", i);
-            m_motorPub[i] = m_rgNH->advertise<std_msgs::Float32>(buf, 5);
-        }
+        m_motorPub = m_rgNH->advertise<mav_msgs::Actuators>("command/motor_speed", 5);
     }
 
     Os::Task::TaskStatus RotorSDrvComponentImpl ::
@@ -100,12 +97,17 @@ namespace SIMREF {
     void RotorSDrvComponentImpl ::
       motor_handler(
           const NATIVE_INT_TYPE portNum,
-          ROS::std_msgs::Float32 &Float32
+          ROS::mav_msgs::Actuators &actuator
       )
     {
-        std_msgs::Float32 msg;
-        msg.data = Float32.getdata();
-        m_motorPub[portNum].publish(msg);
+        mav_msgs::Actuators msg;
+        int size = 0;
+        const F64 *angVel = actuator.getangular_velocities(size);
+        msg.angular_velocities.resize(size);
+        for (int i = 0; i < size; i++) {
+            msg.angular_velocities[i] = angVel[i];
+        }
+        m_motorPub.publish(msg);
     }
 
     void RotorSDrvComponentImpl ::

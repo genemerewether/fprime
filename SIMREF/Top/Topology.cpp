@@ -131,6 +131,12 @@ Gnc::LeeCtrlComponentImpl leeCtrl
 #endif
 ;
 
+Gnc::BasicMixerComponentImpl mixer
+#if FW_OBJECT_NAMES == 1
+                    ("MIXER")
+#endif
+;
+
 Gnc::ImuIntegComponentImpl imuInteg
 #if FW_OBJECT_NAMES == 1
                     ("IMUINTEG")
@@ -210,6 +216,7 @@ void constructApp(int port_number, char* hostname) {
 
     // Initialize the GNC components
     leeCtrl.init(0);
+    mixer.init(0);
     imuInteg.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
