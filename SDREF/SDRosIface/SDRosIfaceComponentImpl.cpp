@@ -140,48 +140,36 @@ namespace SDREF {
           NATIVE_UINT_TYPE context
       )
     {
-        if ((context == SDROSIFACE_SCHED_CONTEXT_ATT) ||
-            (context == SDROSIFACE_SCHED_CONTEXT_POS)) {
-            // TODO(mereweth) check context == odometry out context
-            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
-                m_imuStateUpdateSet[i].mutex.lock();
-                if (m_imuStateUpdateSet[i].fresh) {
-                    if (this->isConnected_ImuStateUpdate_OutputPort(i)) {
-                        // mimics driver hardware getting and sending sensor data
-                        this->ImuStateUpdate_out(i, m_imuStateUpdateSet[i].imuStateUpdate);
-                    }
-                    else {
-                        DEBUG_PRINT("IMU state update port %d not connected\n", i);
-                    }
-                    m_imuStateUpdateSet[i].fresh = false;
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
+            m_imuStateUpdateSet[i].mutex.lock();
+            if (m_imuStateUpdateSet[i].fresh) {
+                if (this->isConnected_ImuStateUpdate_OutputPort(i)) {
+                    // mimics driver hardware getting and sending sensor data
+                    this->ImuStateUpdate_out(i, m_imuStateUpdateSet[i].imuStateUpdate);
                 }
-                // TODO(mereweth) - notify that no new odometry received?
-                m_imuStateUpdateSet[i].mutex.unLock();
-            }
-
-            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_float32Set); i++) {
-                m_float32Set[i].mutex.lock();
-                if (m_float32Set[i].fresh) {
-                    if (this->isConnected_Float32Data_OutputPort(i)) {
-                        // mimics driver hardware getting and sending sensor data
-                        this->Float32Data_out(i, m_float32Set[i].float32);
-                    }
-                    else {
-                        DEBUG_PRINT("Float32 port %d not connected\n", i);
-                    }
-                    m_float32Set[i].fresh = false;
+                else {
+                    DEBUG_PRINT("IMU state update port %d not connected\n", i);
                 }
-                // TODO(mereweth) - notify that no new odometry received?
-                m_float32Set[i].mutex.unLock();
+                m_imuStateUpdateSet[i].fresh = false;
             }
-
-            // TODO(mereweth) check context == imu out context
+            // TODO(mereweth) - notify that no new odometry received?
+            m_imuStateUpdateSet[i].mutex.unLock();
         }
-        else if (context == SDROSIFACE_SCHED_CONTEXT_TLM) {
-            /*FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet) >= 2,
-                      FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet));
-            this->tlmWrite_SDROSIFACE_ImuStateUpdate1Overflows(m_imuStateUpdateSet[0].overflows);
-            this->tlmWrite_SDROSIFACE_ImuStateUpdate2Overflows(m_imuStateUpdateSet[1].overflows);*/
+
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_actuatorsSet); i++) {
+            m_actuatorsSet[i].mutex.lock();
+            if (m_actuatorsSet[i].fresh) {
+                if (this->isConnected_ActuatorsData_OutputPort(i)) {
+                    // mimics driver hardware getting and sending sensor data
+                    this->ActuatorsData_out(i, m_actuatorsSet[i].actuators);
+                }
+                else {
+                    DEBUG_PRINT("Actuators port %d not connected\n", i);
+                }
+                m_actuatorsSet[i].fresh = false;
+            }
+            // TODO(mereweth) - notify that no new actuators received?
+            m_actuatorsSet[i].mutex.unLock();
         }
     }
 
@@ -262,36 +250,11 @@ namespace SDREF {
                                             ros::TransportHints().tcpNoDelay());
 */
 
-        Float32Handler float32Handler0(compPtr, 0);
-        Float32Handler float32Handler1(compPtr, 1);
-        Float32Handler float32Handler2(compPtr, 2);
-        Float32Handler float32Handler3(compPtr, 3);
-        Float32Handler float32Handler4(compPtr, 4);
-        Float32Handler float32Handler5(compPtr, 5);
+        ActuatorsHandler actuatorsHandler(compPtr, 0);
 
-        ros::Subscriber float32Sub0 = n.subscribe("float0", 1000,
-                                            &Float32Handler::float32Callback,
-                                            &float32Handler0,
-                                            ros::TransportHints().tcpNoDelay());
-        ros::Subscriber float32Sub1 = n.subscribe("float1", 1000,
-                                            &Float32Handler::float32Callback,
-                                            &float32Handler1,
-                                            ros::TransportHints().tcpNoDelay());
-        ros::Subscriber float32Sub2 = n.subscribe("float2", 1000,
-                                            &Float32Handler::float32Callback,
-                                            &float32Handler2,
-                                            ros::TransportHints().tcpNoDelay());
-        ros::Subscriber float32Sub3 = n.subscribe("float3", 1000,
-                                            &Float32Handler::float32Callback,
-                                            &float32Handler3,
-                                            ros::TransportHints().tcpNoDelay());
-        ros::Subscriber float32Sub4 = n.subscribe("float4", 1000,
-                                            &Float32Handler::float32Callback,
-                                            &float32Handler4,
-                                            ros::TransportHints().tcpNoDelay());
-        ros::Subscriber float32Sub5 = n.subscribe("float5", 1000,
-                                            &Float32Handler::float32Callback,
-                                            &float32Handler5,
+        ros::Subscriber actuatorsSub0 = n.subscribe("command", 1000,
+                                            &ActuatorsHandler::actuatorsCallback,
+                                            &actuatorsHandler,
                                             ros::TransportHints().tcpNoDelay());
 
         while (1) {
@@ -300,23 +263,23 @@ namespace SDREF {
         }
     }
 
-    SDRosIfaceComponentImpl :: Float32Handler ::
-      Float32Handler(SDRosIfaceComponentImpl* compPtr,
+    SDRosIfaceComponentImpl :: ActuatorsHandler ::
+      ActuatorsHandler(SDRosIfaceComponentImpl* compPtr,
                       int portNum) :
       compPtr(compPtr),
       portNum(portNum)
     {
         FW_ASSERT(compPtr);
-        FW_ASSERT(portNum < NUM_FLOAT32DATA_OUTPUT_PORTS); //compPtr->getNum_ImuStateUpdate_OutputPorts());
+        FW_ASSERT(portNum < NUM_ACTUATORSDATA_OUTPUT_PORTS); //compPtr->getNum_ImuStateUpdate_OutputPorts());
     }
 
-    SDRosIfaceComponentImpl :: Float32Handler :: ~Float32Handler()
+    SDRosIfaceComponentImpl :: ActuatorsHandler :: ~ActuatorsHandler()
     {
 
     }
 
-    void SDRosIfaceComponentImpl :: Float32Handler ::
-      float32Callback(const std_msgs::Float32::ConstPtr& msg)
+    void SDRosIfaceComponentImpl :: ActuatorsHandler ::
+      actuatorsCallback(const mav_msgs::Actuators::ConstPtr& msg)
     {
         //TODO(mereweth)
     }

@@ -29,7 +29,8 @@ void exitTasks(void);
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 extern Svc::RateGroupDriverImpl rgDrv;
-extern Svc::ActiveRateGroupImpl rg;
+extern Svc::ActiveRateGroupImpl rgTlm;
+extern Svc::ActiveRateGroupImpl rgXfer;
 extern Svc::CmdSequencerComponentImpl cmdSeq;
 extern Svc::SocketGndIfImpl sockGndIf;
 extern Svc::ConsoleTextLoggerImpl textLogger;

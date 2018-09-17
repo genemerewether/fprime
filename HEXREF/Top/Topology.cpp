@@ -198,9 +198,7 @@ void manualConstruct(void) {
     imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
 
     kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
-    for (int i = 0; i < 6; i++) {
-        //kraitRouter.set_KraitPortsOut_OutputPort(2 + i, pwm adapter);
-    }
+    kraitRouter.set_KraitPortsOut_OutputPort(2, escPwm.get_pwmSetDuty_InputPort(1));
 }
 
 void constructApp() {

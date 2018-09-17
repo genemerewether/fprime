@@ -44,19 +44,27 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 // Component instance pointers
-static NATIVE_INT_TYPE rgDivs[] = {1};
+static NATIVE_INT_TYPE rgDivs[] = {100, 1};
 Svc::RateGroupDriverImpl rgDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGDRV",
 #endif
                     rgDivs,FW_NUM_ARRAY_ELEMENTS(rgDivs));
 
-static NATIVE_UINT_TYPE rgContext[] = {0,0,0,0,0,0,0,0,0,0};
-Svc::ActiveRateGroupImpl rg(
+static NATIVE_UINT_TYPE rgTlmContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
+Svc::ActiveRateGroupImpl rgTlm(
 #if FW_OBJECT_NAMES == 1
-                    "RG",
+                    "RGTLM",
 #endif
-                    rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
+                    rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
+;
+
+static NATIVE_UINT_TYPE rgXferContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
+Svc::ActiveRateGroupImpl rgXfer(
+#if FW_OBJECT_NAMES == 1
+                    "RGXFER",
+#endif
+                    rgXferContext,FW_NUM_ARRAY_ELEMENTS(rgXferContext));
 ;
 
 // Command Components
@@ -164,7 +172,8 @@ void constructApp(int port_number, char* hostname) {
     rgDrv.init();
 
     // Initialize the rate groups
-    rg.init(10,0);
+    rgTlm.init(10,0);
+    rgXfer.init(10,0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -206,10 +215,7 @@ void constructApp(int port_number, char* hostname) {
     hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
 
     sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
-    for (int i = 0; i < 6; i++) {
-        // NOTE(mereweth) - could connect mixer in topology and connect only one PwmSetDutyCycle port here
-        sdRosIface.set_Float32Data_OutputPort(i, hexRouter.get_KraitPortsIn_InputPort(2 + i));
-    }
+    //pwmAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?
@@ -227,7 +233,8 @@ void constructApp(int port_number, char* hostname) {
 
     // Active component startup
     // start rate groups
-    rg.start(0, 95, 20*1024);
+    rgTlm.start(0, 50, 20*1024);
+    rgXfer.start(0, 95, 20*1024);
     // start dispatcher
     cmdDisp.start(0,60,20*1024);
     // start sequencer
@@ -278,7 +285,8 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 void exitTasks(void) {
     hexRouter.quitReadThreads();
     DEBUG_PRINT("After HexRouter read thread quit\n");
-    rg.exit();
+    rgTlm.exit();
+    rgXfer.exit();
     cmdDisp.exit();
     eventLogger.exit();
     chanTlm.exit();
