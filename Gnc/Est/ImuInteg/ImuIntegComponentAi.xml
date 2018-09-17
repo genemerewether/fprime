@@ -3,7 +3,7 @@
 
 <component name="ImuInteg" kind="passive" namespace="Gnc" modeler="true">
 
-    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuStateUpdatePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdatePortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
@@ -26,7 +26,7 @@
         <port name="odomNoCov" data_type="ROS::nav_msgs::OdometryNoCov"  kind="output"    max_number="1">
         </port>
 
-        <port name="ImuStateUpdate" data_type="ROS::sensor_msgs::ImuStateUpdate"  kind="sync_input"    max_number="1">
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdate"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">

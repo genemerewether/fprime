@@ -75,7 +75,7 @@ namespace Gnc {
       //!
       void ImuStateUpdate_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::sensor_msgs::ImuStateUpdate &ImuStateUpdate
+          ROS::mav_msgs::ImuStateUpdate &ImuStateUpdate
       );
 
       //! Handler implementation for sched

@@ -337,7 +337,7 @@ namespace SDREF {
     }
 
 /*    void SDRosIfaceComponentImpl :: ImuStateUpdateHandler ::
-      imuStateUpdateCallback(const sensor_msgs::ImuStateUpdate::ConstPtr& msg)
+      imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg)
     {
         FW_ASSERT(this->compPtr);
         FW_ASSERT(this->portNum < NUM_IMUSTATEUPDATE_OUTPUT_PORTS);
@@ -346,7 +346,7 @@ namespace SDREF {
 
         {
             using namespace ROS::std_msgs;
-            using namespace ROS::sensor_msgs;
+            using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
             /*Odometry odom(
               Header(msg->header.seq,

@@ -1,4 +1,4 @@
-<serializable name="ImuStateUpdate" namespace="ROS::sensor_msgs">
+<serializable name="ImuStateUpdate" namespace="ROS::mav_msgs">
   <members>
     <member name="header" type="ROS::std_msgs::Header"/>
     <member name="child_frame_id" type="Fw::EightyCharString"/>

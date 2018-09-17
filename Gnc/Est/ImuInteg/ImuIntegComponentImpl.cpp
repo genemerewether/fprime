@@ -93,7 +93,7 @@ namespace Gnc {
   void ImuIntegComponentImpl ::
     ImuStateUpdate_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::sensor_msgs::ImuStateUpdate &ImuStateUpdate
+        ROS::mav_msgs::ImuStateUpdate &ImuStateUpdate
     )
   {
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();

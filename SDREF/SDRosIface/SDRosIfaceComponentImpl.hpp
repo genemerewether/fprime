@@ -102,7 +102,7 @@ namespace SDREF {
 
               ~ImuStateUpdateHandler();
 
-              //void imuStateUpdateCallback(const sensor_msgs::ImuStateUpdate::ConstPtr& msg);
+              //void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
 
           PRIVATE:
 
@@ -169,7 +169,7 @@ namespace SDREF {
 
         struct ImuStateUpdateSet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::sensor_msgs::ImuStateUpdate imuStateUpdate; //! message object
+            ROS::mav_msgs::ImuStateUpdate imuStateUpdate; //! message object
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
