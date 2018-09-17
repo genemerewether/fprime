@@ -176,7 +176,7 @@ Ref_MODULES := \
 	$(UTILS_MODULES)
 
 SDREF_DEPLOYMENT_MODULES := \
-	ROS/fprime_ws/src/SDREF \
+	ROS/fprime_ws/src/fprime \
 	HEXREF/Rpc \
 	SDREF/SDRosIface \
 	SDREF/Top
@@ -200,7 +200,7 @@ SDREF_MODULES := \
 	$(UTILS_MODULES)
 
 SIMREF_DEPLOYMENT_MODULES := \
-	ROS/fprime_ws/src/SIMREF \
+	ROS/fprime_ws/src/fprime \
 	SIMREF/RotorSDrv \
 	SIMREF/Top
 
