@@ -133,6 +133,12 @@ SDREF::SDRosIfaceComponentImpl sdRosIface
 #endif
 ;
 
+Gnc::ActuatorAdapterComponentImpl actuatorAdapter
+#if FW_OBJECT_NAMES == 1
+                    ("ACTADAP")
+#endif
+;
+
 Svc::AssertFatalAdapterComponentImpl fatalAdapter
 #if FW_OBJECT_NAMES == 1
 ("fatalAdapter")
@@ -199,6 +205,7 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter.init(10, 0);
     sdRosIface.init(10);
+    actuatorAdapter.init(0);
 
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
@@ -215,7 +222,8 @@ void constructApp(int port_number, char* hostname) {
     hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
 
     sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
-    //pwmAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
+    // this actuator <-> PWM converter is for commanding from the Linux side
+    actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?

@@ -25,6 +25,7 @@ void exitTasks(void);
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
+#include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
@@ -40,6 +41,7 @@ extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern SnapdragonFlight::KraitRouterComponentImpl kraitRouter;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;
+extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 extern Gnc::ImuIntegComponentImpl imuInteg;
 extern Drv::MPU9250ComponentImpl mpu9250;
 extern Drv::LinuxSpiDriverComponentImpl spiDrv;

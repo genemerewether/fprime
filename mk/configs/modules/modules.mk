@@ -75,10 +75,12 @@ SVC_MODULES := \
 DRV_MODULES := \
 	Drv/DataTypes \
 	Drv/BlockDriver \
-	Drv/GpioDriverPorts \
 	Drv/LinuxGpioDriver \
+	Drv/LinuxPwmDriver \
 	Drv/LinuxSerialDriver \
 	Drv/LinuxSpiDriver \
+	Drv/GpioDriverPorts \
+	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts
 
@@ -96,6 +98,7 @@ HEXAGON_MODULES := \
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
 	Gnc/Ctrl/BasicMixer \
+	Gnc/Ctrl/ActuatorAdapter \
 	Gnc/Est/ImuInteg \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
@@ -151,6 +154,8 @@ ROS_MODULES_ALL := \
 
 
 ROS_MODULES := \
+	ROS/fprime_ws/src/fprime \
+	\
 	ROS/RosCycle \
 	\
 	ROS/RosTime \
@@ -176,7 +181,6 @@ Ref_MODULES := \
 	$(UTILS_MODULES)
 
 SDREF_DEPLOYMENT_MODULES := \
-	ROS/fprime_ws/src/fprime \
 	HEXREF/Rpc \
 	SDREF/SDRosIface \
 	SDREF/Top
@@ -185,9 +189,13 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	$(QUEST_GNC_MODULES) \
+	\
 	$(SNAPDRAGON_MODULES) \
 	\
 	$(SVC_MODULES) \
+	\
+	$(DRV_MODULES) \
 	\
 	$(ROS_MODULES) \
 	\
@@ -200,7 +208,6 @@ SDREF_MODULES := \
 	$(UTILS_MODULES)
 
 SIMREF_DEPLOYMENT_MODULES := \
-	ROS/fprime_ws/src/fprime \
 	SIMREF/RotorSDrv \
 	SIMREF/Top
 

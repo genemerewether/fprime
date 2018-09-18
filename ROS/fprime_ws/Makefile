@@ -1,5 +1,5 @@
 all: src/std_msgs src/common_msgs .catkin_tools
-	ROS_LANG_DISABLE=gencpp:geneus:genlisp:gennodejs:genpy catkin build
+	ROS_LANG_DISABLE=geneus:genlisp:gennodejs:genpy catkin build
 
 clean:
 	catkin clean

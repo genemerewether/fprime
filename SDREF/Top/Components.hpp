@@ -28,6 +28,8 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
+#include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
+
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rgTlm;
 extern Svc::ActiveRateGroupImpl rgXfer;
@@ -43,5 +45,6 @@ extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
 extern SDREF::SDRosIfaceComponentImpl sdRosIface;
+extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 
 #endif

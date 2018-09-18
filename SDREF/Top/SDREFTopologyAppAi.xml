@@ -5,6 +5,7 @@
 	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
 	<import_component_type>Svc/TlmChan/TlmChanComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
@@ -23,6 +24,8 @@
    <instance namespace="Svc" name="rgDrv" type="RateGroupDriver" base_id="461"  base_id_window="20" />
 
    <instance namespace="Svc" name="chanTlm" type="TlmChan" base_id="61"  base_id_window="20" />
+
+   <instance namespace="Gnc" name="actuatorAdapter" type="ActuatorAdapter"/>
 
    <instance namespace="Svc" name="sockGndIf" type="GndIf" base_id="381"  base_id_window="20" />
 
@@ -58,178 +61,182 @@
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection4">
+	 <source component = "sdRosIface" port = "ActuatorsData" type = "Actuators" num = "0"/>
+ 	 <target component = "actuatorAdapter" port = "motor" type = "Actuators" num = "0"/>
+</connection>
+<connection name = "Connection5">
 	 <source component = "prmDb" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection5">
+<connection name = "Connection6">
 	 <source component = "rgTlm" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection6">
+<connection name = "Connection7">
 	 <source component = "fatalAdapter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection7">
+<connection name = "Connection8">
 	 <source component = "eventLogger" port = "PktSend" type = "Com" num = "0"/>
  	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
 </connection>
-<connection name = "Connection8">
+<connection name = "Connection9">
 	 <source component = "cmdSeq" port = "cmdResponseOut" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection9">
+<connection name = "Connection10">
 	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection10">
+<connection name = "Connection11">
 	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgTlm" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection11">
+<connection name = "Connection12">
 	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection12">
+<connection name = "Connection13">
 	 <source component = "sockGndIf" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection13">
+<connection name = "Connection14">
 	 <source component = "sockGndIf" port = "uplinkPort" type = "Com" num = "0"/>
  	 <target component = "cmdDisp" port = "seqCmdBuff" type = "Com" num = "1"/>
 </connection>
-<connection name = "Connection14">
+<connection name = "Connection15">
 	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "1"/>
  	 <target component = "rgXfer" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection15">
+<connection name = "Connection16">
 	 <source component = "cmdSeq" port = "timeCaller" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection16">
+<connection name = "Connection17">
 	 <source component = "cmdDisp" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection17">
+<connection name = "Connection18">
 	 <source component = "sockGndIf" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection18">
+<connection name = "Connection19">
 	 <source component = "cmdDisp" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection19">
+<connection name = "Connection20">
 	 <source component = "eventLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection20">
+<connection name = "Connection21">
 	 <source component = "prmDb" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection21">
+<connection name = "Connection22">
 	 <source component = "cmdDisp" port = "seqCmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdSeq" port = "cmdResponseIn" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection22">
+<connection name = "Connection23">
 	 <source component = "prmDb" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection23">
+<connection name = "Connection24">
 	 <source component = "rgTlm" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection24">
+<connection name = "Connection25">
 	 <source component = "rgTlm" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection25">
+<connection name = "Connection26">
 	 <source component = "rgXfer" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "sdRosIface" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection26">
+<connection name = "Connection27">
 	 <source component = "eventLogger" port = "FatalAnnounce" type = "FatalEvent" num = "0"/>
  	 <target component = "fatalHandler" port = "FatalReceive" type = "FatalEvent" num = "0"/>
 </connection>
-<connection name = "Connection27">
+<connection name = "Connection28">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "chanTlm" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection28">
+<connection name = "Connection29">
 	 <source component = "prmDb" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection29">
+<connection name = "Connection30">
 	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection30">
+<connection name = "Connection31">
 	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection31">
+<connection name = "Connection32">
 	 <source component = "cmdDisp" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection32">
+<connection name = "Connection33">
 	 <source component = "cmdSeq" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection33">
+<connection name = "Connection34">
 	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection34">
+<connection name = "Connection35">
 	 <source component = "chanTlm" port = "PktSend" type = "Com" num = "0"/>
  	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
 </connection>
-<connection name = "Connection35">
+<connection name = "Connection36">
 	 <source component = "eventLogger" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection36">
+<connection name = "Connection37">
 	 <source component = "eventLogger" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection37">
+<connection name = "Connection38">
 	 <source component = "cmdSeq" port = "logOut" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection38">
+<connection name = "Connection39">
 	 <source component = "rgTlm" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection39">
+<connection name = "Connection40">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "cmdSeq" port = "schedIn" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection40">
+<connection name = "Connection41">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "0"/>
  	 <target component = "prmDb" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection41">
+<connection name = "Connection42">
 	 <source component = "prmDb" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "0"/>
 </connection>
-<connection name = "Connection42">
+<connection name = "Connection43">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "1"/>
  	 <target component = "cmdDisp" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection43">
+<connection name = "Connection44">
 	 <source component = "cmdDisp" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "1"/>
 </connection>
-<connection name = "Connection44">
+<connection name = "Connection45">
 	 <source component = "eventLogger" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "2"/>
 </connection>
-<connection name = "Connection45">
+<connection name = "Connection46">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "2"/>
  	 <target component = "eventLogger" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection46">
+<connection name = "Connection47">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "3"/>
  	 <target component = "cmdSeq" port = "cmdIn" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection47">
+<connection name = "Connection48">
 	 <source component = "cmdSeq" port = "cmdRegOut" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "3"/>
 </connection>

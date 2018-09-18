@@ -139,6 +139,12 @@ Gnc::BasicMixerComponentImpl mixer
 #endif
 ;
 
+Gnc::ActuatorAdapterComponentImpl actuatorAdapter
+#if FW_OBJECT_NAMES == 1
+                    ("ACTADAP")
+#endif
+;
+
 Gnc::ImuIntegComponentImpl imuInteg
 #if FW_OBJECT_NAMES == 1
                     ("IMUINTEG")
@@ -221,6 +227,7 @@ void constructApp() {
     // Initialize the GNC components
     leeCtrl.init(0);
     mixer.init(0);
+    actuatorAdapter.init(0);
     imuInteg.init(0);
     mpu9250.init(0);
 
