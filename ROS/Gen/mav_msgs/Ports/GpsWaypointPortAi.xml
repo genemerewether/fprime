@@ -1,0 +1,6 @@
+<interface name="GpsWaypoint" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="GpsWaypoint" pass_by="reference" type="ROS::mav_msgs::GpsWaypoint"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/GpsWaypointSerializableAi.xml</import_serializable_type>
+</interface>

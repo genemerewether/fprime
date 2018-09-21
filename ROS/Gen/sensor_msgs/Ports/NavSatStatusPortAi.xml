@@ -1,0 +1,6 @@
+<interface name="NavSatStatus" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="NavSatStatus" pass_by="reference" type="ROS::sensor_msgs::NavSatStatus"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/NavSatStatusSerializableAi.xml</import_serializable_type>
+</interface>

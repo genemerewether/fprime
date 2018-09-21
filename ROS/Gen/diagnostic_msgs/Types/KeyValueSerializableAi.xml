@@ -1,0 +1,8 @@
+<serializable name="KeyValue" namespace="ROS::diagnostic_msgs">
+  <members>
+    <member name="key" type="Fw::EightyCharString"/>
+    <member name="value" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

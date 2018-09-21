@@ -1,0 +1,9 @@
+<serializable name="GoalStatus" namespace="ROS::actionlib_msgs">
+  <members>
+    <member name="goal_id" type="GoalID"/>
+    <member name="status" type="U8"/>
+    <member name="text" type="Fw::EightyCharString"/>
+  </members>
+  <import_serializable_type>ROS/Gen/actionlib_msgs/Types/GoalIDSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

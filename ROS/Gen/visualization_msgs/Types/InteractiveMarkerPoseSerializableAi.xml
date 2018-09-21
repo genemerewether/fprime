@@ -1,0 +1,10 @@
+<serializable name="InteractiveMarkerPose" namespace="ROS::visualization_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="pose" type="ROS::geometry_msgs::Pose"/>
+    <member name="name" type="Fw::EightyCharString"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

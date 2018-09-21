@@ -1,0 +1,6 @@
+<interface name="Mesh" namespace="ROS::shape_msgs">
+  <args>
+    <arg name="Mesh" pass_by="reference" type="ROS::shape_msgs::Mesh"/>
+  </args>
+  <import_serializable_type>ROS/Gen/shape_msgs/Types/MeshSerializableAi.xml</import_serializable_type>
+</interface>

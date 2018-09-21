@@ -1,0 +1,6 @@
+<interface name="Imu" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="Imu" pass_by="reference" type="ROS::sensor_msgs::Imu"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/ImuSerializableAi.xml</import_serializable_type>
+</interface>

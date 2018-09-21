@@ -1,0 +1,6 @@
+<interface name="SolidPrimitive" namespace="ROS::shape_msgs">
+  <args>
+    <arg name="SolidPrimitive" pass_by="reference" type="ROS::shape_msgs::SolidPrimitive"/>
+  </args>
+  <import_serializable_type>ROS/Gen/shape_msgs/Types/SolidPrimitiveSerializableAi.xml</import_serializable_type>
+</interface>

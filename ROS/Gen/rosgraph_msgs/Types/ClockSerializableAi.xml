@@ -1,0 +1,6 @@
+<serializable name="Clock" namespace="ROS::rosgraph_msgs">
+  <members>
+    <member name="clock" type="Fw::Time"/>
+  </members>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

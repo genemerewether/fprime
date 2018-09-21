@@ -1,0 +1,6 @@
+<interface name="RateThrust" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="RateThrust" pass_by="reference" type="ROS::mav_msgs::RateThrust"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/RateThrustSerializableAi.xml</import_serializable_type>
+</interface>

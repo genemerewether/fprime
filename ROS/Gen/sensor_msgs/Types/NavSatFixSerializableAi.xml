@@ -1,0 +1,13 @@
+<serializable name="NavSatFix" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="status" type="NavSatStatus"/>
+    <member name="latitude" type="F64"/>
+    <member name="longitude" type="F64"/>
+    <member name="altitude" type="F64"/>
+    <member name="position_covariance" size="9" type="F64"/>
+    <member name="position_covariance_type" type="U8"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/NavSatStatusSerializableAi.xml</import_serializable_type>
+</serializable>

@@ -1,0 +1,6 @@
+<interface name="MultiEchoLaserScan" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="MultiEchoLaserScan" pass_by="reference" type="ROS::sensor_msgs::MultiEchoLaserScan"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/MultiEchoLaserScanSerializableAi.xml</import_serializable_type>
+</interface>

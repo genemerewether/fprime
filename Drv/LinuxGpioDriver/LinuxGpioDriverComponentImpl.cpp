@@ -289,10 +289,12 @@ namespace Drv {
       stat = gpio_export(gpio);
       if (-1 == stat) {
           this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+          return false;
       }
       stat = gpio_set_dir(gpio, direction == GPIO_OUT ? 1 : 0);
       if (-1 == stat) {
           this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+          return false;
       }
 
       // If needed, set edge to rising in intTaskEntry()
@@ -301,10 +303,10 @@ namespace Drv {
       this->m_fd = gpio_fd_open(gpio);
       if (-1 == this->m_fd) {
           this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
-      } else {
-          this->m_gpio = gpio;
+          return false;
       }
 
+      this->m_gpio = gpio;
 
       return true;
   }

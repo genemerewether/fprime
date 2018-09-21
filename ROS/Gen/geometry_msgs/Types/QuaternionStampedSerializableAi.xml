@@ -1,0 +1,8 @@
+<serializable name="QuaternionStamped" namespace="ROS::geometry_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="quaternion" type="Quaternion"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionSerializableAi.xml</import_serializable_type>
+</serializable>

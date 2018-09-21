@@ -26,6 +26,8 @@ void exitTasks(void);
 #include <ROS/RosCycle/RosCycleComponentImpl.hpp>
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
+#include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
+#include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
@@ -45,5 +47,7 @@ extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern ROS::RosCycleComponentImpl rosCycle;
 extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
+extern Gnc::BasicMixerComponentImpl mixer;
+extern Gnc::ImuIntegComponentImpl imuInteg;
 
 #endif

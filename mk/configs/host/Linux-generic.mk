@@ -15,7 +15,7 @@ CKSUM_SUFFIX := .md5
 
 DOXYGEN := 
 
-JOBS := -j 4
+JOBS := -j `nproc`
 #JOBS =
 
 -include $(BUILD_ROOT)/mk/configs/target/wind-$(TARGET).mk

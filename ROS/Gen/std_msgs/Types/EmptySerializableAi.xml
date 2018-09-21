@@ -1,0 +1,10 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Empty.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="Empty" namespace="ROS::std_msgs">
+  <members>
+    <member name="unused" type="U8"/>
+  </members>
+</serializable>

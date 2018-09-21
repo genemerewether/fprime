@@ -19,20 +19,6 @@
 
 #define PRM_PATH "PrmDb.dat"
 
-// List of context IDs
-enum {
-    ACTIVE_COMP_1HZ_RG,
-    ACTIVE_COMP_RG_DECOUPLE,
-    ACTIVE_COMP_CMD_DISP,
-    ACTIVE_COMP_CMD_SEQ,
-    ACTIVE_COMP_LOGGER,
-    ACTIVE_COMP_TLM,
-    ACTIVE_COMP_PRMDB,
-
-    CYCLER_TASK,
-    NUM_ACTIVE_COMPS
-};
-
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
 static Fw::SimpleObjRegistry simpleReg;
@@ -46,6 +32,7 @@ static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     0, // chanTlm
     0, // rosCycle
     SIMREF::RSDRV_SCHED_CONTEXT_TLM, // rotorSDrv
+    Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
 };
 Svc::ActiveRateGroupImpl rg(
@@ -57,22 +44,23 @@ Svc::ActiveRateGroupImpl rg(
 
 Svc::RateGroupDecouplerComponentImpl rgDecouple
 #if FW_OBJECT_NAMES == 1
-                    ("RGDECOUPLE")
+                    ("RGDECOUPLE",
+                     100) // 100 dropped cycles before error
 #endif
 ;
 
-static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+//NOTE(mereweth) - change this in sync with RosCycle timeDivMS
+static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 100};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGGNCDRV",
 #endif
                     rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
-//NOTE(mereweth) - change this in sync with RosCycle timeDivMS
-
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_ATT,
+    Gnc::IMUINTEG_SCHED_CONTEXT_ATT,
     Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
 Svc::PassiveRateGroupImpl rgAtt(
@@ -85,6 +73,7 @@ Svc::PassiveRateGroupImpl rgAtt(
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_POS,
+    Gnc::IMUINTEG_SCHED_CONTEXT_POS,
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
 Svc::PassiveRateGroupImpl rgPos(
@@ -127,7 +116,7 @@ ROS::RosCycleComponentImpl rosCycle
 #else
                     (
 #endif
-                    1)
+                    10) // 10 milliseconds per division
 ;
 
 SIMREF::RotorSDrvComponentImpl rotorSDrv
@@ -139,6 +128,18 @@ SIMREF::RotorSDrvComponentImpl rotorSDrv
 Gnc::LeeCtrlComponentImpl leeCtrl
 #if FW_OBJECT_NAMES == 1
                     ("LEECTRL")
+#endif
+;
+
+Gnc::BasicMixerComponentImpl mixer
+#if FW_OBJECT_NAMES == 1
+                    ("MIXER")
+#endif
+;
+
+Gnc::ImuIntegComponentImpl imuInteg
+#if FW_OBJECT_NAMES == 1
+                    ("IMUINTEG")
 #endif
 ;
 
@@ -215,6 +216,8 @@ void constructApp(int port_number, char* hostname) {
 
     // Initialize the GNC components
     leeCtrl.init(0);
+    mixer.init(0);
+    imuInteg.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -259,16 +262,16 @@ void constructApp(int port_number, char* hostname) {
 
     // Active component startup
     // start rate groups
-    rg.start(ACTIVE_COMP_1HZ_RG, 50, 20*1024);
-    rgDecouple.start(ACTIVE_COMP_RG_DECOUPLE, 90, 20*1024);
+    rg.start(0, 50, 20*1024);
+    rgDecouple.start(0, 90, 20*1024);
     // start dispatcher
-    cmdDisp.start(ACTIVE_COMP_CMD_DISP,60,20*1024);
+    cmdDisp.start(0,60,20*1024);
     // start sequencer
-    cmdSeq.start(ACTIVE_COMP_CMD_SEQ,50,20*1024);
+    cmdSeq.start(0,50,20*1024);
     // start telemetry
-    eventLogger.start(ACTIVE_COMP_LOGGER,50,20*1024);
-    chanTlm.start(ACTIVE_COMP_TLM,60,20*1024);
-    prmDb.start(ACTIVE_COMP_PRMDB,50,20*1024);
+    eventLogger.start(0,50,20*1024);
+    chanTlm.start(0,60,20*1024);
+    prmDb.start(0,50,20*1024);
 
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);

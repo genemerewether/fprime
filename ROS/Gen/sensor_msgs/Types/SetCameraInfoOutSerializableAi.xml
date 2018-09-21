@@ -1,0 +1,7 @@
+<serializable name="SetCameraInfoResponse" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="success" type="U8"/>
+    <member name="status_message" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

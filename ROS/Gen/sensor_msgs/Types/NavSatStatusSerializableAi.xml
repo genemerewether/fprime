@@ -1,0 +1,6 @@
+<serializable name="NavSatStatus" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="status" type="I8"/>
+    <member name="service" type="U16"/>
+  </members>
+</serializable>

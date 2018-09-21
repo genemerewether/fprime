@@ -1,0 +1,6 @@
+<interface name="PointStamped" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="PointStamped" pass_by="reference" type="ROS::geometry_msgs::PointStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointStampedSerializableAi.xml</import_serializable_type>
+</interface>

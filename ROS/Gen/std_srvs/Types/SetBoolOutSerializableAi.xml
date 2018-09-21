@@ -1,0 +1,12 @@
+<!--
+std_srvs
+/Users/mereweth/quest/ROS/fprime_ws/src/ros_comm_msgs/std_srvs/srv/SetBool.srv
+{}
+-->
+<serializable name="SetBoolResponse" namespace="ROS::std_srvs">
+  <members>
+    <member name="success" type="U8"/>
+    <member name="message" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

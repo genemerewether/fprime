@@ -1,0 +1,8 @@
+<serializable name="Illuminance" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="illuminance" type="F64"/>
+    <member name="variance" type="F64"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+</serializable>

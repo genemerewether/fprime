@@ -1,0 +1,19 @@
+<serializable name="InteractiveMarkerFeedback" namespace="ROS::visualization_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="client_id" type="Fw::EightyCharString"/>
+    <member name="marker_name" type="Fw::EightyCharString"/>
+    <member name="control_name" type="Fw::EightyCharString"/>
+    <member name="event_type" type="U8"/>
+    <member name="pose" type="ROS::geometry_msgs::Pose"/>
+    <member name="menu_entry_id" type="U32"/>
+    <member name="mouse_point" type="ROS::geometry_msgs::Point"/>
+    <member name="mouse_point_valid" type="U8"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>
+</serializable>

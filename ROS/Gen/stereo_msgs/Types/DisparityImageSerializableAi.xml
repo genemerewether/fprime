@@ -1,0 +1,15 @@
+<serializable name="DisparityImage" namespace="ROS::stereo_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="image" type="ROS::sensor_msgs::Image"/>
+    <member name="f" type="F32"/>
+    <member name="T" type="F32"/>
+    <member name="valid_window" type="ROS::sensor_msgs::RegionOfInterest"/>
+    <member name="min_disparity" type="F32"/>
+    <member name="max_disparity" type="F32"/>
+    <member name="delta_d" type="F32"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/ImageSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/RegionOfInterestSerializableAi.xml</import_serializable_type>
+</serializable>

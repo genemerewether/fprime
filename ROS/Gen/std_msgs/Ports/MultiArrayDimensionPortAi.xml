@@ -1,0 +1,11 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/MultiArrayDimension.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<interface name="MultiArrayDimension" namespace="ROS::std_msgs">
+  <args>
+    <arg name="MultiArrayDimension" pass_by="reference" type="ROS::std_msgs::MultiArrayDimension"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/MultiArrayDimensionSerializableAi.xml</import_serializable_type>
+</interface>

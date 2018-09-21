@@ -136,6 +136,7 @@ namespace Drv {
               if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_REG_INT, (void *)&int_config) != 0) {
                   this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
                   DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_REG_INT failed\n");
+                  return false;
               }
           }
               break;
@@ -146,6 +147,7 @@ namespace Drv {
               if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_IO, (void *)&config) != 0) {
                   this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
                   DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_IO failed\n");
+                  return false;
               }
               break;
           default:

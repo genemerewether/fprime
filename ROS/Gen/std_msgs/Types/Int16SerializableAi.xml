@@ -1,0 +1,10 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Int16.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="Int16" namespace="ROS::std_msgs">
+  <members>
+    <member name="data" type="I16"/>
+  </members>
+</serializable>

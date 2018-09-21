@@ -1,0 +1,8 @@
+<serializable name="Path" namespace="ROS::nav_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="poses" size="100" type="ROS::geometry_msgs::PoseStamped"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseStampedSerializableAi.xml</import_serializable_type>
+</serializable>

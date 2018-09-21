@@ -1,0 +1,8 @@
+<serializable name="DiagnosticArray" namespace="ROS::diagnostic_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="status" size="100" type="DiagnosticStatus"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/DiagnosticStatusSerializableAi.xml</import_serializable_type>
+</serializable>

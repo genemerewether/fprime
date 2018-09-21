@@ -1,0 +1,6 @@
+<interface name="DisparityImage" namespace="ROS::stereo_msgs">
+  <args>
+    <arg name="DisparityImage" pass_by="reference" type="ROS::stereo_msgs::DisparityImage"/>
+  </args>
+  <import_serializable_type>ROS/Gen/stereo_msgs/Types/DisparityImageSerializableAi.xml</import_serializable_type>
+</interface>

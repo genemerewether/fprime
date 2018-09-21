@@ -1,0 +1,10 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Float64.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="Float64" namespace="ROS::std_msgs">
+  <members>
+    <member name="data" type="F64"/>
+  </members>
+</serializable>

@@ -1,0 +1,6 @@
+<interface name="OdometryNoCov" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="OdometryNoCov" pass_by="reference" type="ROS::nav_msgs::OdometryNoCov"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/OdometryNoCovSerializableAi.xml</import_serializable_type>
+</interface>

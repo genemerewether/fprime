@@ -1,0 +1,6 @@
+<interface name="Point" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="Point" pass_by="reference" type="ROS::geometry_msgs::Point"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>
+</interface>

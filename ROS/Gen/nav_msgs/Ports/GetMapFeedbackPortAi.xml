@@ -1,0 +1,6 @@
+<interface name="GetMapFeedback" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="GetMapFeedback" pass_by="reference" type="ROS::nav_msgs::GetMapFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetMapFeedbackSerializableAi.xml</import_serializable_type>
+</interface>

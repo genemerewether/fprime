@@ -159,8 +159,8 @@ namespace Gnc {
 
           ROS::std_msgs::Header h(this->seq, this->getTime(), "body");
           ROS::mav_msgs::TorqueThrust u_b__comm(h,
-            Vector3(thrust_b__comm(0), thrust_b__comm(1), thrust_b__comm(2)),
-            Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2)));
+            Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2)),
+            Vector3(thrust_b__comm(0), thrust_b__comm(1), thrust_b__comm(2)));
           if (this->isConnected_controls_OutputPort(0)) {
               this->controls_out(0, u_b__comm);
           }
@@ -184,15 +184,6 @@ namespace Gnc {
       else {
           // TODO(mereweth) - assert invalid port
       }
-  }
-
-  void LeeCtrlComponentImpl ::
-    pingIn_handler(
-        const NATIVE_INT_TYPE portNum,
-        U32 key
-    )
-  {
-      this->pingOut_out(portNum, key);
   }
 
 } // end namespace Gnc

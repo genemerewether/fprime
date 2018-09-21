@@ -18,10 +18,13 @@
 	url = https://github.com/ros/ros_comm_msgs.git
 [submodule "quest_gnc"]
 	path = Gnc/quest_gnc
-	url = /Users/mereweth/quest_gnc/.git
+	url = git@github.jpl.nasa.gov:mereweth/quest_gnc.git
 [submodule "Gnc/eigen"]
 	path = Gnc/eigen
 	url = https://github.com/eigenteam/eigen-git-mirror
 [submodule "Gnc/linter"]
 	path = Gnc/linter
 	url = git@github.com:genemerewether/linter.git
+[submodule "Gnc/tools/pybind11"]
+	path = Gnc/tools/pybind11
+	url = https://github.com/wjakob/pybind11.git

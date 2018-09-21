@@ -1,0 +1,6 @@
+<interface name="GetMapGoal" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="GetMapGoal" pass_by="reference" type="ROS::nav_msgs::GetMapGoal"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/GetMapGoalSerializableAi.xml</import_serializable_type>
+</interface>

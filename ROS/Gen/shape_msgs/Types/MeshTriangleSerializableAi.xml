@@ -1,0 +1,5 @@
+<serializable name="MeshTriangle" namespace="ROS::shape_msgs">
+  <members>
+    <member name="vertex_indices" size="3" type="U32"/>
+  </members>
+</serializable>

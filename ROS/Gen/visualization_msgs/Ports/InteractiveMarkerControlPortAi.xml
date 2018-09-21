@@ -1,0 +1,6 @@
+<interface name="InteractiveMarkerControl" namespace="ROS::visualization_msgs">
+  <args>
+    <arg name="InteractiveMarkerControl" pass_by="reference" type="ROS::visualization_msgs::InteractiveMarkerControl"/>
+  </args>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/InteractiveMarkerControlSerializableAi.xml</import_serializable_type>
+</interface>

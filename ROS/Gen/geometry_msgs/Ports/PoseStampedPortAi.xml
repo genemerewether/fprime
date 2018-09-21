@@ -1,0 +1,6 @@
+<interface name="PoseStamped" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="PoseStamped" pass_by="reference" type="ROS::geometry_msgs::PoseStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseStampedSerializableAi.xml</import_serializable_type>
+</interface>

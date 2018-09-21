@@ -1,0 +1,6 @@
+<interface name="AccelStamped" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="AccelStamped" pass_by="reference" type="ROS::geometry_msgs::AccelStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/AccelStampedSerializableAi.xml</import_serializable_type>
+</interface>

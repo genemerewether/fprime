@@ -1,0 +1,8 @@
+<serializable name="PolynomialTrajectory4D" namespace="ROS::planning_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="segments" size="100" type="PolynomialSegment4D"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/planning_msgs/Types/PolynomialSegment4DSerializableAi.xml</import_serializable_type>
+</serializable>

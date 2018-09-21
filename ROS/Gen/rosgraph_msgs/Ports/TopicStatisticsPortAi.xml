@@ -1,0 +1,6 @@
+<interface name="TopicStatistics" namespace="ROS::rosgraph_msgs">
+  <args>
+    <arg name="TopicStatistics" pass_by="reference" type="ROS::rosgraph_msgs::TopicStatistics"/>
+  </args>
+  <import_serializable_type>ROS/Gen/rosgraph_msgs/Types/TopicStatisticsSerializableAi.xml</import_serializable_type>
+</interface>

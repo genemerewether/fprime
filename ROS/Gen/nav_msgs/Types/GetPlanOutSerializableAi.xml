@@ -1,0 +1,6 @@
+<serializable name="GetPlanResponse" namespace="ROS::nav_msgs">
+  <members>
+    <member name="plan" type="ROS::nav_msgs::Path"/>
+  </members>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/PathSerializableAi.xml</import_serializable_type>
+</serializable>

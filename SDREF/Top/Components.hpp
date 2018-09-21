@@ -28,8 +28,11 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
+#include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
+
 extern Svc::RateGroupDriverImpl rgDrv;
-extern Svc::ActiveRateGroupImpl rg;
+extern Svc::ActiveRateGroupImpl rgTlm;
+extern Svc::ActiveRateGroupImpl rgXfer;
 extern Svc::CmdSequencerComponentImpl cmdSeq;
 extern Svc::SocketGndIfImpl sockGndIf;
 extern Svc::ConsoleTextLoggerImpl textLogger;
@@ -38,14 +41,10 @@ extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::TlmChanImpl chanTlm;
 extern Svc::CommandDispatcherImpl cmdDisp;
 extern Svc::PrmDbImpl prmDb;
-extern Svc::FileUplink fileUp;
-extern Svc::FileDownlink fileDown;
-extern Svc::BufferManager fileDownBufMgr;
-extern Svc::BufferManager fileUpBufMgr;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
-extern Svc::HealthImpl health;
 extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
 extern SDREF::SDRosIfaceComponentImpl sdRosIface;
+extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 
 #endif

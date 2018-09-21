@@ -1,0 +1,6 @@
+<interface name="JointState" namespace="ROS::sensor_msgs">
+  <args>
+    <arg name="JointState" pass_by="reference" type="ROS::sensor_msgs::JointState"/>
+  </args>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/JointStateSerializableAi.xml</import_serializable_type>
+</interface>

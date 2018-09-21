@@ -1,0 +1,9 @@
+<serializable name="GetPlanRequest" namespace="ROS::nav_msgs">
+  <members>
+    <member name="start" type="ROS::geometry_msgs::PoseStamped"/>
+    <member name="goal" type="ROS::geometry_msgs::PoseStamped"/>
+    <member name="tolerance" type="F32"/>
+  </members>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseStampedSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseStampedSerializableAi.xml</import_serializable_type>
+</serializable>

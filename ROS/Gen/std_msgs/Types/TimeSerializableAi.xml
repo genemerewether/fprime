@@ -1,0 +1,11 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Time.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="Time" namespace="ROS::std_msgs">
+  <members>
+    <member name="data" type="Fw::Time"/>
+  </members>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

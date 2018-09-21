@@ -25,7 +25,8 @@ namespace SnapdragonFlight {
 // TODO(mereweth) - add error status codes
 
 enum {
-    KR_PREINIT_SLEEP_US = 1000
+    KR_PREINIT_SLEEP_US = 1000,
+    KR_SCHED_MAX_ITER = 10 // max of 10 port calls out per sched call
 };
 
 enum KraitRouterReturnCode {

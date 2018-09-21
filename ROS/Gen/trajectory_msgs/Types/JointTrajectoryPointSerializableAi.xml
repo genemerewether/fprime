@@ -1,0 +1,10 @@
+<serializable name="JointTrajectoryPoint" namespace="ROS::trajectory_msgs">
+  <members>
+    <member name="positions" size="100" type="F64"/>
+    <member name="velocities" size="100" type="F64"/>
+    <member name="accelerations" size="100" type="F64"/>
+    <member name="effort" size="100" type="F64"/>
+    <member name="time_from_start" type="Fw::Time"/>
+  </members>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

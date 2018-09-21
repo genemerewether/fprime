@@ -1,0 +1,6 @@
+<interface name="MenuEntry" namespace="ROS::visualization_msgs">
+  <args>
+    <arg name="MenuEntry" pass_by="reference" type="ROS::visualization_msgs::MenuEntry"/>
+  </args>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/MenuEntrySerializableAi.xml</import_serializable_type>
+</interface>

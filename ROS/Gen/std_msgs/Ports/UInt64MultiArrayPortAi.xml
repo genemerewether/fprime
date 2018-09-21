@@ -1,0 +1,11 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/UInt64MultiArray.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<interface name="UInt64MultiArray" namespace="ROS::std_msgs">
+  <args>
+    <arg name="UInt64MultiArray" pass_by="reference" type="ROS::std_msgs::UInt64MultiArray"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/UInt64MultiArraySerializableAi.xml</import_serializable_type>
+</interface>

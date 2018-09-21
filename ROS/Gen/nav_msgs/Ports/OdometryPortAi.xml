@@ -1,0 +1,6 @@
+<interface name="Odometry" namespace="ROS::nav_msgs">
+  <args>
+    <arg name="Odometry" pass_by="reference" type="ROS::nav_msgs::Odometry"/>
+  </args>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/OdometrySerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,7 @@
+<serializable name="ChannelFloat32" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="name" type="Fw::EightyCharString"/>
+    <member name="values" size="100" type="F32"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

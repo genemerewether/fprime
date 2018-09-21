@@ -1,0 +1,8 @@
+<serializable name="SetMapRequest" namespace="ROS::nav_msgs">
+  <members>
+    <member name="map" type="ROS::nav_msgs::OccupancyGrid"/>
+    <member name="initial_pose" type="ROS::geometry_msgs::PoseWithCovarianceStamped"/>
+  </members>
+  <import_serializable_type>ROS/Gen/nav_msgs/Types/OccupancyGridSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseWithCovarianceStampedSerializableAi.xml</import_serializable_type>
+</serializable>

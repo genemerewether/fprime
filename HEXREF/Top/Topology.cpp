@@ -47,8 +47,8 @@ Svc::RateGroupDecouplerComponentImpl rgDecouple(
 ;
 
 static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
-    0,
-    0, // TODO(mereweth) - estimator
+    0, // unused
+    Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
 };
 Svc::ActiveRateGroupImpl rg(
@@ -67,8 +67,8 @@ Svc::RateGroupDriverImpl rgGncDrv(
 
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-    0, //TODO(mereweth) - estimator
-    Gnc::LCTRL_SCHED_CONTEXT_ATT,
+    Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+    Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
 };
 Svc::PassiveRateGroupImpl rgAtt(
 #if FW_OBJECT_NAMES == 1
@@ -79,8 +79,8 @@ Svc::PassiveRateGroupImpl rgAtt(
 
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     0, //TODO(mereweth) - IMU?
-    0, //TODO(mereweth) - estimator?
-    Gnc::LCTRL_SCHED_CONTEXT_POS,
+    Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+    Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
 };
 Svc::PassiveRateGroupImpl rgPos(
 #if FW_OBJECT_NAMES == 1
@@ -133,6 +133,24 @@ Gnc::LeeCtrlComponentImpl leeCtrl
 #endif
 ;
 
+Gnc::BasicMixerComponentImpl mixer
+#if FW_OBJECT_NAMES == 1
+                    ("MIXER")
+#endif
+;
+
+Gnc::ActuatorAdapterComponentImpl actuatorAdapter
+#if FW_OBJECT_NAMES == 1
+                    ("ACTADAP")
+#endif
+;
+
+Gnc::ImuIntegComponentImpl imuInteg
+#if FW_OBJECT_NAMES == 1
+                    ("IMUINTEG")
+#endif
+;
+
 Drv::MPU9250ComponentImpl mpu9250(
 #if FW_OBJECT_NAMES == 1
                     "MPU9250",
@@ -149,6 +167,12 @@ Drv::LinuxSpiDriverComponentImpl spiDrv
 Drv::LinuxGpioDriverComponentImpl imuDRInt
 #if FW_OBJECT_NAMES == 1
                     ("IMUDRINT")
+#endif
+;
+
+Drv::LinuxPwmDriverComponentImpl escPwm
+#if FW_OBJECT_NAMES == 1
+                    ("ESCPWM")
 #endif
 ;
 
@@ -177,6 +201,10 @@ void manualConstruct(void) {
 
     mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
     //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+    imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+
+    kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
+    kraitRouter.set_KraitPortsOut_OutputPort(2, escPwm.get_pwmSetDuty_InputPort(1));
 }
 
 void constructApp() {
@@ -198,10 +226,14 @@ void constructApp() {
 
     // Initialize the GNC components
     leeCtrl.init(0);
+    mixer.init(0);
+    actuatorAdapter.init(0);
+    imuInteg.init(0);
     mpu9250.init(0);
 
     spiDrv.init(0);
     imuDRInt.init(0);
+    escPwm.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -214,7 +246,7 @@ void constructApp() {
     fatalAdapter.init(0);
     fatalHandler.init(0);
 
-    kraitRouter.init(20, 512);
+    kraitRouter.init(50, 512);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -225,9 +257,18 @@ void constructApp() {
     /*eventLogger.regCommands();*/
 
     // Open devices
-    // /dev/spi-1 on QuRT
+#ifdef BUILD_DSPAL
+    // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt.open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+
+    // J13 is already at 5V, so use for 4 of the ESCs
+    NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
+    // /dev/pwm-1 on QuRT
+    escPwm.open(1, pwmPins, 4, 20 * 1000);
+
+    // reserve J15, bam-9, for Spektrum radio receiver
+#endif
 
     // Active component startup
     // start rate groups
@@ -306,7 +347,9 @@ int hexref_run(void) {
     // TODO(mereweth) - interrupt for cycling - local_cycle as argument
     bool local_cycle = true;
     int cycle = 0;
+#ifdef BUILD_DSPAL
     imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+#endif
 
     while (!terminate) {
         //DEBUG_PRINT("Cycle %d\n",cycle);
@@ -318,7 +361,9 @@ int hexref_run(void) {
     }
 
     // stop tasks
+#ifdef BUILD_DSPAL
     imuDRInt.exitThread();
+#endif
     exitTasks();
     // Give time for threads to exit
     DEBUG_PRINT("Waiting for threads...\n");
@@ -354,6 +399,19 @@ int hexref_wait() {
     while (!terminate) {
         DEBUG_PRINT("hexref_wait loop; terminate: %d", terminate);
         Os::Task::delay(1000);
+
+        // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
+        // Drv::InputPwmSetDutyCycleDataPort * port = escPwm.get_pwmSetDuty_InputPort(0);
+        // static F32 d1 = 0.05;
+        // static F32 d2 = 0.1;
+        // F32 duty[4] = {d1, d2, d1, d2};
+        // Drv::PwmSetDutyCycle config(duty, 4, 0x0f);
+        // port->invoke(config);
+        // d1 += 0.005;
+        // if (d1 > 0.1) {  d1 = 0.05;  }
+        // d2 -= 0.005;
+        // if (d2 < 0.05) {  d2 = 0.1;  }
+
     }
     return 0;
 }
@@ -401,7 +459,9 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM,sighandler);
     signal(SIGHUP,sighandler);
 
-    hexref_run();
+    preinit=false;
+
+    hexref_cycle(10);
 }
 
 #endif //ifndef BUILD_DSPAL

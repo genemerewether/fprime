@@ -1,0 +1,10 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/UInt64.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="UInt64" namespace="ROS::std_msgs">
+  <members>
+    <member name="data" type="U64"/>
+  </members>
+</serializable>

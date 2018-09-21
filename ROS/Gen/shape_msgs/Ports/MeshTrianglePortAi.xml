@@ -1,0 +1,6 @@
+<interface name="MeshTriangle" namespace="ROS::shape_msgs">
+  <args>
+    <arg name="MeshTriangle" pass_by="reference" type="ROS::shape_msgs::MeshTriangle"/>
+  </args>
+  <import_serializable_type>ROS/Gen/shape_msgs/Types/MeshTriangleSerializableAi.xml</import_serializable_type>
+</interface>

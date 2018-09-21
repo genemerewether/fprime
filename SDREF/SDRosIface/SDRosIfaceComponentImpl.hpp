@@ -25,6 +25,11 @@
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
+#include "mav_msgs/Actuators.h"
+
+// TODO - ImuStateUpdate.h
+
+#include "Os/Mutex.hpp"
 
 namespace SDREF {
 
@@ -62,6 +67,51 @@ namespace SDREF {
 
     PRIVATE:
 
+        //! Start interrupt task
+        Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
+                                          NATIVE_INT_TYPE stackSize,
+                                          NATIVE_INT_TYPE cpuAffinity = -1);
+
+      // ----------------------------------------------------------------------
+      // Utility classes for enumerating callbacks
+      // ----------------------------------------------------------------------
+
+        class ActuatorsHandler
+        {
+          public:
+              ActuatorsHandler(SDRosIfaceComponentImpl* compPtr,
+                             int portNum);
+
+              ~ActuatorsHandler();
+
+              void actuatorsCallback(const mav_msgs::Actuators::ConstPtr& msg);
+
+          PRIVATE:
+
+              SDRosIfaceComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class ActuatorsHandler
+
+        class ImuStateUpdateHandler
+        {
+          public:
+              ImuStateUpdateHandler(SDRosIfaceComponentImpl* compPtr,
+                              int portNum);
+
+              ~ImuStateUpdateHandler();
+
+              //void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
+
+          PRIVATE:
+
+              SDRosIfaceComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class ImuStateUpdateHandler
+
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
@@ -84,7 +134,7 @@ namespace SDREF {
       //!
       void Odometry_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::nav_msgs::Odometry &Odometry
+          ROS::nav_msgs::OdometryNoCov &Odometry
       );
 
       //! Handler implementation for pingIn
@@ -93,6 +143,10 @@ namespace SDREF {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       );
+
+      // ----------------------------------------------------------------------
+      // Member variables
+      // ----------------------------------------------------------------------
 
         //! NodeHandle pointer for use in RateGroup context
         //!
@@ -105,6 +159,27 @@ namespace SDREF {
         //! Publishers for Odometry data
         //!
         ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
+
+        //! Entry point for task waiting for interrupt
+        static void intTaskEntry(void * ptr);
+
+        //! Task object for RTI task
+        //!
+        Os::Task m_intTask;
+
+        struct ImuStateUpdateSet {
+            Os::Mutex mutex; //! Mutex lock to guard odometry object
+            ROS::mav_msgs::ImuStateUpdate imuStateUpdate; //! message object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
+
+        struct ActuatorsSet {
+            Os::Mutex mutex; //! Mutex lock to guard odometry object
+            ROS::mav_msgs::Actuators actuators; //! message object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_actuatorsSet[NUM_ACTUATORSDATA_OUTPUT_PORTS];
     };
 
 } // end namespace

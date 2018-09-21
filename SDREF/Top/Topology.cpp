@@ -38,33 +38,33 @@ enum {
 #define PRM_PATH "PrmDb.dat"
 //#endif
 
-enum {
-    DOWNLINK_PACKET_SIZE = 500,
-    DOWNLINK_BUFFER_STORE_SIZE = 2500,
-    DOWNLINK_BUFFER_QUEUE_SIZE = 5,
-    UPLINK_BUFFER_STORE_SIZE = 3000,
-    UPLINK_BUFFER_QUEUE_SIZE = 30
-};
-
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
 static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 // Component instance pointers
-static NATIVE_INT_TYPE rgDivs[] = {1};
+static NATIVE_INT_TYPE rgDivs[] = {100, 1};
 Svc::RateGroupDriverImpl rgDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGDRV",
 #endif
                     rgDivs,FW_NUM_ARRAY_ELEMENTS(rgDivs));
 
-static NATIVE_UINT_TYPE rgContext[] = {0,0,0,0,0,0,0,0,0,0};
-Svc::ActiveRateGroupImpl rg(
+static NATIVE_UINT_TYPE rgTlmContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
+Svc::ActiveRateGroupImpl rgTlm(
 #if FW_OBJECT_NAMES == 1
-                    "RG",
+                    "RGTLM",
 #endif
-                    rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
+                    rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
+;
+
+static NATIVE_UINT_TYPE rgXferContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
+Svc::ActiveRateGroupImpl rgXfer(
+#if FW_OBJECT_NAMES == 1
+                    "RGXFER",
+#endif
+                    rgXferContext,FW_NUM_ARRAY_ELEMENTS(rgXferContext));
 ;
 
 // Command Components
@@ -133,11 +133,11 @@ SDREF::SDRosIfaceComponentImpl sdRosIface
 #endif
 ;
 
-Svc::FileUplink fileUp ("fileUp");
-Svc::FileDownlink fileDown ("fileDown", DOWNLINK_PACKET_SIZE);
-Svc::BufferManager fileDownBufMgr("fileDownBufMgr", DOWNLINK_BUFFER_STORE_SIZE, DOWNLINK_BUFFER_QUEUE_SIZE);
-Svc::BufferManager fileUpBufMgr("fileUpBufMgr", UPLINK_BUFFER_STORE_SIZE, UPLINK_BUFFER_QUEUE_SIZE);
-Svc::HealthImpl health("health");
+Gnc::ActuatorAdapterComponentImpl actuatorAdapter
+#if FW_OBJECT_NAMES == 1
+                    ("ACTADAP")
+#endif
+;
 
 Svc::AssertFatalAdapterComponentImpl fatalAdapter
 #if FW_OBJECT_NAMES == 1
@@ -178,7 +178,8 @@ void constructApp(int port_number, char* hostname) {
     rgDrv.init();
 
     // Initialize the rate groups
-    rg.init(10,0);
+    rgTlm.init(10,0);
+    rgXfer.init(10,0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -199,17 +200,12 @@ void constructApp(int port_number, char* hostname) {
 
     sockGndIf.init(0);
 
-    fileUp.init(30, 0);
-    fileDown.init(30, 0);
-    fileUpBufMgr.init(0);
-    fileDownBufMgr.init(1);
-
     fatalAdapter.init(0);
     fatalHandler.init(0);
-    health.init(25,0);
 
     hexRouter.init(10, 0);
     sdRosIface.init(10);
+    actuatorAdapter.init(0);
 
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
@@ -223,6 +219,11 @@ void constructApp(int port_number, char* hostname) {
     hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
 
     hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
+    hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
+
+    sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
+    // this actuator <-> PWM converter is for commanding from the Linux side
+    actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?
@@ -234,30 +235,14 @@ void constructApp(int port_number, char* hostname) {
     cmdDisp.regCommands();
     eventLogger.regCommands();
     prmDb.regCommands();
-    fileDown.regCommands();
-    health.regCommands();
 
     // read parameters
     prmDb.readParamFile();
 
-    // set health ping entries
-
-    Svc::HealthImpl::PingEntry pingEntries[] = {
-        {3,5,rg.getObjName()}, // 0
-        {3,5,cmdDisp.getObjName()}, // 1
-        {3,5,eventLogger.getObjName()}, // 2
-        {3,5,cmdSeq.getObjName()}, // 3
-        {3,5,chanTlm.getObjName()}, // 4
-        {3,5,fileUp.getObjName()}, // 5
-        {3,5,fileDown.getObjName()}, // 6
-    };
-
-    // register ping table
-    health.setPingEntries(pingEntries,FW_NUM_ARRAY_ELEMENTS(pingEntries),0x123);
-
     // Active component startup
     // start rate groups
-    rg.start(0, 95, 20*1024);
+    rgTlm.start(0, 50, 20*1024);
+    rgXfer.start(0, 95, 20*1024);
     // start dispatcher
     cmdDisp.start(0,60,20*1024);
     // start sequencer
@@ -271,9 +256,6 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
-
-    fileDown.start(0, 40, 20*1024);
-    fileUp.start(0, 40, 20*1024);
 
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
@@ -311,13 +293,12 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 void exitTasks(void) {
     hexRouter.quitReadThreads();
     DEBUG_PRINT("After HexRouter read thread quit\n");
-    rg.exit();
+    rgTlm.exit();
+    rgXfer.exit();
     cmdDisp.exit();
     eventLogger.exit();
     chanTlm.exit();
     prmDb.exit();
-    fileUp.exit();
-    fileDown.exit();
     cmdSeq.exit();
     hexRouter.exit();
     DEBUG_PRINT("After HexRouter quit\n");

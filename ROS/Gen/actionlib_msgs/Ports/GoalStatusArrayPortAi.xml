@@ -1,0 +1,6 @@
+<interface name="GoalStatusArray" namespace="ROS::actionlib_msgs">
+  <args>
+    <arg name="GoalStatusArray" pass_by="reference" type="ROS::actionlib_msgs::GoalStatusArray"/>
+  </args>
+  <import_serializable_type>ROS/Gen/actionlib_msgs/Types/GoalStatusArraySerializableAi.xml</import_serializable_type>
+</interface>

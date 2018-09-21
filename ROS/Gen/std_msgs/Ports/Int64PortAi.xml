@@ -1,0 +1,11 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Int64.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<interface name="Int64" namespace="ROS::std_msgs">
+  <args>
+    <arg name="Int64" pass_by="reference" type="ROS::std_msgs::Int64"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/Int64SerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,6 @@
+<serializable name="SetCameraInfoRequest" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="camera_info" type="ROS::sensor_msgs::CameraInfo"/>
+  </members>
+  <import_serializable_type>ROS/Gen/sensor_msgs/Types/CameraInfoSerializableAi.xml</import_serializable_type>
+</serializable>

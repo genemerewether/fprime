@@ -1,0 +1,10 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Int8.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<serializable name="Int8" namespace="ROS::std_msgs">
+  <members>
+    <member name="data" type="I8"/>
+  </members>
+</serializable>

@@ -1,0 +1,12 @@
+<serializable name="GpsWaypoint" namespace="ROS::mav_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="latitude" type="F64"/>
+    <member name="longitude" type="F64"/>
+    <member name="altitude" type="F64"/>
+    <member name="heading" type="F64"/>
+    <member name="maxSpeed" type="F64"/>
+    <member name="maxAcc" type="F64"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+</serializable>

@@ -1,0 +1,13 @@
+<serializable name="DiagnosticStatus" namespace="ROS::diagnostic_msgs">
+  <members>
+    <member name="level" type="I8"/>
+    <member name="name" type="Fw::EightyCharString"/>
+    <member name="message" type="Fw::EightyCharString"/>
+    <member name="hardware_id" type="Fw::EightyCharString"/>
+    <member name="values" size="100" type="KeyValue"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/KeyValueSerializableAi.xml</import_serializable_type>
+</serializable>

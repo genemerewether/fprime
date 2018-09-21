@@ -1,0 +1,6 @@
+<serializable name="AddDiagnosticsRequest" namespace="ROS::diagnostic_msgs">
+  <members>
+    <member name="load_namespace" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

@@ -1,0 +1,6 @@
+<interface name="DiagnosticArray" namespace="ROS::diagnostic_msgs">
+  <args>
+    <arg name="DiagnosticArray" pass_by="reference" type="ROS::diagnostic_msgs::DiagnosticArray"/>
+  </args>
+  <import_serializable_type>ROS/Gen/diagnostic_msgs/Types/DiagnosticArraySerializableAi.xml</import_serializable_type>
+</interface>

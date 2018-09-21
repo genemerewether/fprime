@@ -1,0 +1,6 @@
+<interface name="Inertia" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="Inertia" pass_by="reference" type="ROS::geometry_msgs::Inertia"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/InertiaSerializableAi.xml</import_serializable_type>
+</interface>

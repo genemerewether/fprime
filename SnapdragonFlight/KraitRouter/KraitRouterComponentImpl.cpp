@@ -186,9 +186,7 @@ namespace SnapdragonFlight {
           NATIVE_UINT_TYPE context
       )
     {
-        // TODO(mereweth) - max loop iterations
-
-        while (1) {
+        for (int i = 0; i < KR_SCHED_MAX_ITER; i++) {
             U8 msgBuff[this->m_localMsgSize];
             Fw::ExternalSerializeBuffer msg(msgBuff,this->m_localMsgSize);
             NATIVE_INT_TYPE priority;
@@ -218,7 +216,7 @@ namespace SnapdragonFlight {
             if (outPortNum >= this->getNum_KraitPortsOut_OutputPorts()) {
                 DEBUG_PRINT("portNum %d too big\n", outPortNum, this->getNum_KraitPortsOut_OutputPorts());
                 //this->tlmWrite_HR_NumDecodeErrors(++this->m_numDecodeErrors);
-                break;
+                continue;
             }
 
             // if connected, call output port

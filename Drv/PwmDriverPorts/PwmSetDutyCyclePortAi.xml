@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/interface_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<interface name="PwmSetDutyCycleData" namespace="Drv">
+    <import_serializable_type>Drv/PwmDriverPorts/PwmSetDutyCycleSerializableAi.xml</import_serializable_type>
+    <comment>
+    Port Type interface arguments. TODO(make serializable)
+    </comment>
+    <args>
+        <arg name="pwmSetDutyCycle" type="PwmSetDutyCycle" pass_by="value">
+        </arg>
+    </args>
+</interface>

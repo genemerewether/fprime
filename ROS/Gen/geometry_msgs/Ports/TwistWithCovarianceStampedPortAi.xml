@@ -1,0 +1,6 @@
+<interface name="TwistWithCovarianceStamped" namespace="ROS::geometry_msgs">
+  <args>
+    <arg name="TwistWithCovarianceStamped" pass_by="reference" type="ROS::geometry_msgs::TwistWithCovarianceStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/TwistWithCovarianceStampedSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,6 @@
+<interface name="MultiDOFJointTrajectory" namespace="ROS::trajectory_msgs">
+  <args>
+    <arg name="MultiDOFJointTrajectory" pass_by="reference" type="ROS::trajectory_msgs::MultiDOFJointTrajectory"/>
+  </args>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/MultiDOFJointTrajectorySerializableAi.xml</import_serializable_type>
+</interface>

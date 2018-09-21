@@ -1,0 +1,11 @@
+<serializable name="MapMetaData" namespace="ROS::nav_msgs">
+  <members>
+    <member name="map_load_time" type="Fw::Time"/>
+    <member name="resolution" type="F32"/>
+    <member name="width" type="U32"/>
+    <member name="height" type="U32"/>
+    <member name="origin" type="ROS::geometry_msgs::Pose"/>
+  </members>
+  <include_header>Fw/Time/Time.hpp</include_header>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseSerializableAi.xml</import_serializable_type>
+</serializable>

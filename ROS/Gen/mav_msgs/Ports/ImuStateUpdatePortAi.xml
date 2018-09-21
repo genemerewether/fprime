@@ -1,0 +1,6 @@
+<interface name="ImuStateUpdate" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="ImuStateUpdate" pass_by="reference" type="ROS::mav_msgs::ImuStateUpdate"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/ImuStateUpdateSerializableAi.xml</import_serializable_type>
+</interface>

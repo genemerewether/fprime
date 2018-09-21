@@ -6,8 +6,8 @@ CompressedImagePortAi.xml \
 FluidPressurePortAi.xml \
 IlluminancePortAi.xml \
 ImagePortAi.xml \
-ImuPortAi.xml \
 ImuNoCovPortAi.xml \
+ImuPortAi.xml \
 JointStatePortAi.xml \
 JoyFeedbackArrayPortAi.xml \
 JoyFeedbackPortAi.xml \

@@ -1,0 +1,14 @@
+<serializable name="MultiDOFJointState" namespace="ROS::sensor_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="joint_names" size="100" type="Fw::EightyCharString"/>
+    <member name="transforms" size="100" type="ROS::geometry_msgs::Transform"/>
+    <member name="twist" size="100" type="ROS::geometry_msgs::Twist"/>
+    <member name="wrench" size="100" type="ROS::geometry_msgs::Wrench"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/TransformSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/TwistSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/WrenchSerializableAi.xml</import_serializable_type>
+</serializable>

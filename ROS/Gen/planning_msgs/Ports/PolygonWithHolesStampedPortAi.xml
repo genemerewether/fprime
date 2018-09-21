@@ -1,0 +1,6 @@
+<interface name="PolygonWithHolesStamped" namespace="ROS::planning_msgs">
+  <args>
+    <arg name="PolygonWithHolesStamped" pass_by="reference" type="ROS::planning_msgs::PolygonWithHolesStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/planning_msgs/Types/PolygonWithHolesStampedSerializableAi.xml</import_serializable_type>
+</interface>

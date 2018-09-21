@@ -1,0 +1,14 @@
+<serializable name="InteractiveMarkerUpdate" namespace="ROS::visualization_msgs">
+  <members>
+    <member name="server_id" type="Fw::EightyCharString"/>
+    <member name="seq_num" type="U64"/>
+    <member name="type" type="U8"/>
+    <member name="markers" size="100" type="InteractiveMarker"/>
+    <member name="poses" size="100" type="InteractiveMarkerPose"/>
+    <member name="erases" size="100" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/InteractiveMarkerSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/visualization_msgs/Types/InteractiveMarkerPoseSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

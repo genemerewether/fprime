@@ -11,6 +11,7 @@ GetPlanPortAi.xml \
 GridCellsPortAi.xml \
 MapMetaDataPortAi.xml \
 OccupancyGridPortAi.xml \
+OdometryNoCovPortAi.xml \
 OdometryPortAi.xml \
 PathPortAi.xml \
 SetMapPortAi.xml

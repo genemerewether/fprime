@@ -1,0 +1,11 @@
+<!--
+std_msgs
+/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Time.msg
+{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
+-->
+<interface name="Time" namespace="ROS::std_msgs">
+  <args>
+    <arg name="Time" pass_by="reference" type="ROS::std_msgs::Time"/>
+  </args>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/TimeSerializableAi.xml</import_serializable_type>
+</interface>
