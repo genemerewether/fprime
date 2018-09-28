@@ -3,5 +3,6 @@ BUILDS := \
 	LINUX \
 	CYGWIN \
 	SDFLIGHT \
-	DSPAL
+	DSPAL \
+	TIR5
 
