@@ -98,12 +98,14 @@ HEXAGON_MODULES := \
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
 	Gnc/Ctrl/BasicMixer \
-	Gnc/Ctrl/ActuatorAdapter \
 	Gnc/Est/ImuInteg \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
 	Gnc/quest_gnc/src/est
+
+QUEST_GNC_HW_MODULES := \
+	Gnc/Ctrl/ActuatorAdapter
 
 REF_MODULES := \
 	Ref/Top \
@@ -190,6 +192,7 @@ SDREF_MODULES := \
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
 	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(SNAPDRAGON_MODULES) \
 	\
@@ -237,6 +240,7 @@ TESTRPC_MODULES := \
 # 	Svc/Time \
 # 	Svc/Ping \
 # 	$(QUEST_GNC_MODULES) \
+#	$(QUEST_GNC_HW_MODULES) \
 # 	$(HEXAGON_MODULES) \
 # 	$(FW_MODULES) \
 # 	$(UTILS_MODULES) \
@@ -254,6 +258,7 @@ HEXREF_MODULES := \
 	$(ROS_PORT_MODULES) \
 	\
 	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(HEXAGON_MODULES) \
 	\
