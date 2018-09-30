@@ -1,5 +1,5 @@
-#ifndef __LITS_COMPONENTS_HEADER__
-#define __LITS_COMPONENTS_HEADER__
+#ifndef __HEXREF_COMPONENTS_HEADER__
+#define __HEXREF_COMPONENTS_HEADER__
 void constructHEXREFArchitecture(void);
 void exitTasks(void);
 

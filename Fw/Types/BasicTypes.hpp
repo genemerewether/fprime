@@ -128,7 +128,7 @@ typedef float   F32; //!< 32-bit floating point
 #endif
 
 // Not ideal, but VxWorks and DSPAL don't have strnlen
-#if defined __VXWORKS__ || defined BUILD_DSPAL
+#if defined __VXWORKS__ || defined BUILD_DSPAL || defined BUILD_TIR5
 NATIVE_INT_TYPE strnlen(const char *s, NATIVE_INT_TYPE maxlen);
 #endif
 

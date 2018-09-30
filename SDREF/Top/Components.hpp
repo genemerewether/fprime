@@ -1,5 +1,5 @@
-#ifndef __LITS_COMPONENTS_HEADER__
-#define __LITS_COMPONENTS_HEADER__
+#ifndef __SDREF_COMPONENTS_HEADER__
+#define __SDREF_COMPONENTS_HEADER__
 void constructSDREFArchitecture(void);
 void exitTasks(void);
 

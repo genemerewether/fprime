@@ -116,7 +116,6 @@ REF_MODULES := \
 
 ROS_PORT_MODULES := \
 	ROS/Gen/std_msgs/Ports  \
-	ROS/Gen/diagnostic_msgs/Ports    \
 	ROS/Gen/geometry_msgs/Ports      \
 	ROS/Gen/nav_msgs/Ports           \
 	ROS/Gen/std_srvs/Ports           \
@@ -127,7 +126,6 @@ ROS_PORT_MODULES := \
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
-	ROS/Gen/diagnostic_msgs/Types    \
 	ROS/Gen/geometry_msgs/Types      \
 	ROS/Gen/nav_msgs/Types           \
 	ROS/Gen/std_srvs/Types           \
@@ -140,12 +138,14 @@ ROS_MODULES_ALL := \
 	$(ROS_TYPE_MODULES) \
 	$(ROS_PORT_MODULES) \
 	\
+	ROS/Gen/diagnostic_msgs/Types    \
 	ROS/Gen/stereo_msgs/Types        \
 	ROS/Gen/trajectory_msgs/Types    \
 	ROS/Gen/planning_msgs/Types	 \
 	ROS/Gen/shape_msgs/Types         \
 	ROS/Gen/sensor_msgs/Types        \
 	\
+	ROS/Gen/diagnostic_msgs/Ports    \
 	ROS/Gen/stereo_msgs/Ports        \
 	ROS/Gen/trajectory_msgs/Ports    \
 	ROS/Gen/planning_msgs/Ports	 \
@@ -246,7 +246,8 @@ TESTRPC_MODULES := \
 # 	$(UTILS_MODULES) \
 # 	$(OS_MODULES) \
 # 	$(CFDP_MODULES) \
-# 	$(ROS_MODULES_ALL) \
+# 	$(ROS_TYPE_MODULES) \
+# 	$(ROS_PORT_MODULES) \
 	#SnapdragonFlight/RpcCommon \
 
 HEXREF_DEPLOYMENT_MODULES := \
@@ -308,6 +309,25 @@ HEXREF_MODULES := \
 	\
 	$(UTILS_MODULES)
 #Svc/ComLogger
+
+R5REF_DEPLOYMENT_MODULES := \
+	R5REF/Top
+
+R5REF_MODULES := \
+	$(ROS_TYPE_MODULES) \
+	$(ROS_PORT_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	\
+	$(R5REF_DEPLOYMENT_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	\
+	Svc/PassiveRateGroup \
+	Svc/RateGroupDriver \
+	\
+	$(FW_MODULES)
 
 ACDEVTEST_MODULES := \
 	Autocoders/test/active_tester \
@@ -388,7 +408,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse
