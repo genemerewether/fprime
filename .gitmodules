@@ -21,7 +21,7 @@
 	url = ../quest_gnc.git
 [submodule "Gnc/eigen"]
 	path = Gnc/eigen
-	url = https://github.com/eigenteam/eigen-git-mirror
+	url = https://github.com/genemerewether/eigen-git-mirror
 [submodule "Gnc/linter"]
 	path = Gnc/linter
 	url = git@github.com:genemerewether/linter.git

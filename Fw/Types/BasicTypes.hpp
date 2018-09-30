@@ -68,6 +68,10 @@ typedef unsigned int NATIVE_UINT_TYPE; //!< native unsigned integer type declara
  #error Cannot get size of pointer cast!
 #endif
 
+#elif defined __TMS470__
+  #define POINTER_CAST U32
+#elif defined BUILD_TIR5
+  #define POINTER_CAST U32
 #else
  #error Unsupported compiler!
 #endif

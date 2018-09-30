@@ -4,7 +4,7 @@ DEPEND_FILE := -ppa -ppd=
                
 CCS_CFLAGS_COMMON := $(CCS_COMMON) --c99 
 
-CCS_CXXFLAGS_COMMON := $(CCS_COMMON) --c++03
+CCS_CXXFLAGS_COMMON := $(CCS_COMMON)
 
 
 # Special compiler flags to get around known AC warnings

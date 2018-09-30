@@ -171,11 +171,8 @@ namespace Gnc {
           this->u_tlm[3] = moment_b__comm(2);
       }
       else if (context == LCTRL_SCHED_CONTEXT_TLM) {
-          #pragma GCC diagnostic push
-          #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
           COMPILE_TIME_ASSERT(FW_NUM_ARRAY_ELEMENTS(this->u_tlm) == 4,
                               LCTRL_THRUST_MOMENT_TLM_SIZE);
-          #pragma GCC diagnostic pop
           this->tlmWrite_LCTRL_ThrustComm(this->u_tlm[0]);
           this->tlmWrite_LCTRL_MomentCommX(this->u_tlm[1]);
           this->tlmWrite_LCTRL_MomentCommY(this->u_tlm[2]);

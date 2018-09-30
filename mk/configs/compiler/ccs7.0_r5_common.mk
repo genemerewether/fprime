@@ -3,13 +3,16 @@ include $(BUILD_ROOT)/mk/configs/compiler/defines_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ccs7.0-common.mk
 
 CCS_R5_COMMON_FLAGS :=	$(COMMON_DEFINES) \
-								$(CCS_FLAGS_COMMON) \
-								-mv7R5 \
-								--code_state=32 \
-								--float_support=VFPv3D16 \
-								--abi=eabi --enum_type=packed
-								
-								
+						$(CCS_FLAGS_COMMON) \
+						-mv7R5 \
+						--code_state=32 \
+						--float_support=VFPv3D16 \
+						--abi=eabi --enum_type=packed \
+						-DEIGEN_NO_DEBUG -D'EIGEN_ASM_COMMENT(X)=(X)' \
+						-DEIGEN_NO_MALLOC \
+						-D'EIGEN_ALIGN_TO_BOUNDARY(n)=__attribute__((aligned(n)))' \
+						-D'EIGEN_ALIGNOF(x)=__alignof(x)' \
+						-D'EIGEN_HAS_CXX11_ATOMIC=0'
 
 CCS_R5_COMMON_INCLUDES := 	$(COMMON_INCLUDES) \
 							$(CCS_INCLUDES_COMMON) \
