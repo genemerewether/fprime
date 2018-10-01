@@ -24,6 +24,9 @@ FW_GTEST_MODULES := \
 	Fw/FilePacket/GTest \
 	Fw/Types/GTest
 
+R5_MODULES := \
+	R5/TiHal
+
 OS_MODULES := \
 	Os
 
@@ -321,6 +324,8 @@ R5REF_MODULES := \
 	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(R5REF_DEPLOYMENT_MODULES) \
+	\
+	$(R5_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
 	\

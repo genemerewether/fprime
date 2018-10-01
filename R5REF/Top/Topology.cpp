@@ -114,3 +114,9 @@ void constructApp() {
 
     manualConstruct();
 }
+
+void cycleForever(void) {
+  while (1) {
+    //cycler.runCycles(1);
+  }
+}
