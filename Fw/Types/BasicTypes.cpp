@@ -24,7 +24,7 @@
 #endif
 
 // VxWorks and DSPAL don't have strnlen
-#if defined __VXWORKS__ || defined BUILD_DSPAL
+#if defined __VXWORKS__ || defined BUILD_DSPAL || defined BUILD_TIR5
 NATIVE_INT_TYPE strnlen(const char *s, NATIVE_INT_TYPE maxlen) {
     // walk buffer looking for NULL
     for (NATIVE_INT_TYPE index = 0; index < maxlen; index++) {

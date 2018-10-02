@@ -67,13 +67,6 @@ namespace Drv {
         NATIVE_UINT_TYPE context /*!< The call order*/
     );
 
-    //! Handler implementation for pingIn
-    //!
-    void pingIn_handler(
-        const NATIVE_INT_TYPE portNum, /*!< The port number*/
-        U32 key /*!< Value to return to pinger*/
-    );
-
     // ----------------------------------------------------------------------
     // Constants/Types
     // ----------------------------------------------------------------------

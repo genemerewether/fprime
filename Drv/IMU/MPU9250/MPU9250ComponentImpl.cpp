@@ -418,13 +418,4 @@ namespace Drv {
         }
     }
 
-    void MPU9250ComponentImpl ::
-      pingIn_handler(
-          const NATIVE_INT_TYPE portNum,
-          U32 key
-      )
-    {
-        // TODO
-    }
-
 } // end namespace Drv

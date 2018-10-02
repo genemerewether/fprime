@@ -25,7 +25,8 @@ FW_GTEST_MODULES := \
 	Fw/Types/GTest
 
 R5_MODULES := \
-	R5/TiHal
+	R5/TiHal \
+	R5/R5FlashApi
 
 OS_MODULES := \
 	Os
@@ -331,6 +332,16 @@ R5REF_MODULES := \
 	\
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
+	\
+	Svc/Sched \
+	Svc/Time \
+	Svc/Cycle \
+	\
+	Drv/PwmDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	\
+	Os \
 	\
 	$(FW_MODULES)
 

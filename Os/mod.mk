@@ -108,6 +108,9 @@ SRC_DSPAL =  Pthreads/Queue.cpp \
 				Posix/LocklessQueue.cpp \
 				Dspal/FileSystem.cpp
 
+SRC_TIR5 =	TIR5/IntervalTimer.cpp \
+		LogPrintf.cpp
+
 SUBDIRS = test
 
 # to use Pthread priority queue include:
