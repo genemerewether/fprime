@@ -276,13 +276,6 @@ void constructApp(int port_number, char* hostname) {
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
 
-    Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
-    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
-
-    rotorSDrv.startPub();
-    stat = rotorSDrv.startIntTask(70, 20*1024);
-    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
-
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -373,14 +366,21 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
-    ros::start();
-
     constructApp(port_number, hostname);
 
     if (!local_cycle) {
         rgGncDrv.set_CycleOut_OutputPort(2, rg.get_CycleIn_InputPort(0));
     }
     //dumparch();
+
+    ros::start();
+
+    Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+
+    rotorSDrv.startPub();
+    stat = rotorSDrv.startIntTask(70, 20*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);
