@@ -55,6 +55,7 @@ namespace Gnc {
                                  Eigen::Vector3d(1.0f, 1.0f, 1.0f),
                                  Eigen::Vector3d(1.0f, 1.0f, 1.0f));
 
+      //TODO(mgardine)  - update from rotors_simulator/rotors_gazebo/resource/firefly.yaml
       quest_gnc::multirotor::MultirotorModel mrModel = {1.0f,
                                                         1.0f, 1.0f, 1.0f,
                                                         0.0f, 0.0f, 0.0f};

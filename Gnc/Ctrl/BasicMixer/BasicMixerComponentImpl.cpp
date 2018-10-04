@@ -86,12 +86,21 @@ namespace Gnc {
        8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06;
 
        // TODO(mereweth) - calculate pseudoinverse in init
-
        Eigen::MatrixXd mixerPinv = mixer.transpose() * (mixer * mixer.transpose()).inverse();
 
        Eigen::VectorXd rotorVel = mixerPinv * controls;
 
-       // TODO(mereweth) - store actuator values
+       // Cast rotor vel to F64
+       F64 angVel[6], angles[0], normalized[0];
+       for (int i = 0; i < 6; i ++) {
+          angVel[i] = std::sqrt(rotorVel(i));
+       }
+
+       ROS::std_msgs::Header h = TorqueThrust.getheader();
+       ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, angVel, 6, normalized, 0);
+       if (this->isConnected_motor_OutputPort(0)) {
+         this->motor_out(0, rotorVel__comm);
+       }
   }
 
   void BasicMixerComponentImpl ::
