@@ -1,7 +1,7 @@
 /** @file HL_reg_ccmr5.h
 *   @brief CCMR5 Register Layer Header File
-*   @date 08-Feb-2017
-*   @version 04.06.01
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Definitions
@@ -78,7 +78,7 @@ typedef volatile struct ccmr5Base
     uint32 CCMPDSTAT0;  /* 0x24 Power Domain Status Register 0 */
 } ccmr5BASE_t;
 
-#define ccmr5REG   ((ccmr5BASE_t *)0xFFFFF600)
+#define ccmr5REG   ((ccmr5BASE_t *)0xFFFFF600U)
 /* USER CODE BEGIN (1) */
 /* USER CODE END */
 

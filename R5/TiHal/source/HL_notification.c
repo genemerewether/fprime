@@ -1,7 +1,7 @@
 /** @file HL_notification.c 
 *   @brief User Notification Definition File
-*   @date 08-Feb-2017
-*   @version 04.06.01
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file  defines  empty  notification  routines to avoid
 *   linker errors, Driver expects user to define the notification. 
@@ -53,6 +53,7 @@
 #include "HL_gio.h"
 #include "HL_sci.h"
 #include "HL_spi.h"
+#include "HL_het.h"
 #include "HL_rti.h"
 #include "HL_epc.h"
 #include "HL_sys_dma.h"
@@ -173,6 +174,36 @@ void spiEndNotification(spiBASE_t *spi)
 /* USER CODE BEGIN (37) */
 /* USER CODE END */
 
+#pragma WEAK(pwmNotification)
+void pwmNotification(hetBASE_t * hetREG,uint32 pwm, uint32 notification)
+{
+/*  enter user code between the USER CODE BEGIN and USER CODE END. */
+/* USER CODE BEGIN (38) */
+/* USER CODE END */
+}
+
+/* USER CODE BEGIN (39) */
+/* USER CODE END */
+#pragma WEAK(edgeNotification)
+void edgeNotification(hetBASE_t * hetREG,uint32 edge)
+{
+/*  enter user code between the USER CODE BEGIN and USER CODE END. */
+/* USER CODE BEGIN (40) */
+/* USER CODE END */
+}
+
+/* USER CODE BEGIN (41) */
+/* USER CODE END */
+#pragma WEAK(hetNotification)
+void hetNotification(hetBASE_t *het, uint32 offset)
+{
+/*  enter user code between the USER CODE BEGIN and USER CODE END. */
+/* USER CODE BEGIN (42) */
+/* USER CODE END */
+}
+
+/* USER CODE BEGIN (43) */
+/* USER CODE END */
 
 
 /* USER CODE BEGIN (46) */

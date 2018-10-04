@@ -1,7 +1,7 @@
 /** @file HL_gio.h
 *   @brief GIO Driver Definition File
-*   @date 08-Feb-2017
-*   @version 04.06.01
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 */
 

@@ -86,11 +86,10 @@ SECTIONS
 /* USER CODE BEGIN (5) */
 /* USER CODE END */
     .intvecs : {} > VECTORS
-    .text   align(32) : {} > FLASH0
-    .const  align(32) : {} > FLASH0
-    .cinit  align(32) : {} > FLASH0
-    .pinit  align(32) : {} > FLASH0
-    .init_array align(32) : {} > FLASH0
+    .text   align(32) : {} > FLASH0 | FLASH1
+    .const  align(32) : {} > FLASH0 | FLASH1
+    .cinit  align(32) : {} > FLASH0 | FLASH1
+    .pinit  align(32) : {} > FLASH0 | FLASH1
     .bss     : {} > RAM
     .data    : {} > RAM
     .sysmem  : {} > RAM

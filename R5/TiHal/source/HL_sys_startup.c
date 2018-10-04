@@ -1,7 +1,7 @@
 /** @file HL_sys_startup.c 
 *   @brief Startup Source File
-*   @date 08-Feb-2017
-*   @version 04.06.01
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file contains:
 *   - Include Files

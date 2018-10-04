@@ -1,7 +1,7 @@
 /** @file HL_etpwm.h
 *   @brief ETPWM Driver Header File
-*   @date 08-Feb-2017
-*   @version 04.06.01
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 */
 
@@ -468,10 +468,10 @@ typedef struct etpwm_config_reg
 
 #define ETPWM1_TBCTL_CONFIGVALUE          ((uint16)((uint16)0U << 7U) | (uint16)((uint16)0U << 10U))
 #define ETPWM1_TBPHS_CONFIGVALUE          0x00000000U
-#define ETPWM1_TBPRD_CONFIGVALUE          1000U
+#define ETPWM1_TBPRD_CONFIGVALUE          74U
 #define ETPWM1_CMPCTL_CONFIGVALUE         0x00000000U
-#define ETPWM1_CMPA_CONFIGVALUE           50U
-#define ETPWM1_CMPB_CONFIGVALUE           50U
+#define ETPWM1_CMPA_CONFIGVALUE           38U
+#define ETPWM1_CMPB_CONFIGVALUE           38U
 #define ETPWM1_AQCTLA_CONFIGVALUE         ((uint16)((uint16)ActionQual_Set << 0U) | (uint16)((uint16)ActionQual_Clear << 4U))
 #define ETPWM1_AQCTLB_CONFIGVALUE         ((uint16)((uint16)ActionQual_Set << 0U) | (uint16)((uint16)ActionQual_Clear << 8U))
 #define ETPWM1_DBCTL_CONFIGVALUE          ((uint16)((uint16)0U << 5U) | (uint16)((uint16)0u << 4U) | (uint16)((uint16)0U << 3U) | (uint16)((uint16)0U << 2U) | (uint16)((uint16)0U << 1U) | (uint16)((uint16)0U << 0U)) 
@@ -483,7 +483,7 @@ typedef struct etpwm_config_reg
 #define ETPWM1_TZEINT_CONFIGVALUE         (0x0000U  | 0x0000U | 0x0000U | 0x0000U | 0x0000U| 0x0000U)
 #define ETPWM1_ETSEL_CONFIGVALUE          ((((uint16)NO_EVENT == 0U)? 0x0000U : 0x0008U) | (uint16)NO_EVENT | (uint16)0x0000U | (uint16)0x0000U | (uint16)((uint16)DCAEVT1 << 8U) | (uint16)((uint16)DCBEVT1 << 12U))
 #define ETPWM1_ETPS_CONFIGVALUE           (1U | (uint16)((uint16)1U << 8U)  | (uint16)((uint16)1U << 12U))
-#define ETPWM1_PCCTL_CONFIGVALUE          ((uint16)((uint16)0U << 0U) | (uint16)((uint16)1U << 1U) | (uint16)((uint16)3U << 8U) | (uint16)((uint16)0U << 5U))
+#define ETPWM1_PCCTL_CONFIGVALUE          ((uint16)((uint16)0U << 0U) | (uint16)((uint16)0U << 1U) | (uint16)((uint16)3U << 8U) | (uint16)((uint16)0U << 5U))
 #define ETPWM1_DCTRIPSEL_CONFIGVALUE      0x00000000U
 #define ETPWM1_DCACTL_CONFIGVALUE         0x00000000U
 #define ETPWM1_DCBCTL_CONFIGVALUE         0x00000000U
@@ -494,10 +494,10 @@ typedef struct etpwm_config_reg
 
 #define ETPWM2_TBCTL_CONFIGVALUE          ((uint16)((uint16)0U << 7U) | (uint16)((uint16)0U << 10U))
 #define ETPWM2_TBPHS_CONFIGVALUE          0x00000000U
-#define ETPWM2_TBPRD_CONFIGVALUE          1000U
+#define ETPWM2_TBPRD_CONFIGVALUE          74U
 #define ETPWM2_CMPCTL_CONFIGVALUE         0x00000000U
-#define ETPWM2_CMPA_CONFIGVALUE           50U
-#define ETPWM2_CMPB_CONFIGVALUE           50U
+#define ETPWM2_CMPA_CONFIGVALUE           38U
+#define ETPWM2_CMPB_CONFIGVALUE           38U
 #define ETPWM2_AQCTLA_CONFIGVALUE         ((uint16)((uint16)ActionQual_Set << 0U) | (uint16)((uint16)ActionQual_Clear << 4U))
 #define ETPWM2_AQCTLB_CONFIGVALUE         ((uint16)((uint16)ActionQual_Set << 0U) | (uint16)((uint16)ActionQual_Clear << 8U))
 #define ETPWM2_DBCTL_CONFIGVALUE          ((uint16)((uint16)0U << 5U) | (uint16)((uint16)0u << 4U) | (uint16)((uint16)0U << 3U) | (uint16)((uint16)0U << 2U) | (uint16)((uint16)0U << 1U) | (uint16)((uint16)0U << 0U)) 
@@ -509,7 +509,7 @@ typedef struct etpwm_config_reg
 #define ETPWM2_TZEINT_CONFIGVALUE         (0x0000U  | 0x0000U | 0x0000U | 0x0000U | 0x0000U| 0x0000U)
 #define ETPWM2_ETSEL_CONFIGVALUE          ((((uint16)NO_EVENT == 0U)? 0x0000U : 0x0008U) | (uint16)NO_EVENT | (uint16)0x0000U | (uint16)0x0000U | (uint16)((uint16)DCAEVT1 << 8U) | (uint16)((uint16)DCBEVT1 << 12U))
 #define ETPWM2_ETPS_CONFIGVALUE           (1U | (uint16)((uint16)1U << 8U)  | (uint16)((uint16)1U << 12U))
-#define ETPWM2_PCCTL_CONFIGVALUE          ((uint16)((uint16)0U << 0U) | (uint16)((uint16)1U << 1U) | (uint16)((uint16)3U << 8U) | (uint16)((uint16)0U << 5U))
+#define ETPWM2_PCCTL_CONFIGVALUE          ((uint16)((uint16)0U << 0U) | (uint16)((uint16)0U << 1U) | (uint16)((uint16)3U << 8U) | (uint16)((uint16)0U << 5U))
 #define ETPWM2_DCTRIPSEL_CONFIGVALUE      0x00000000U
 #define ETPWM2_DCACTL_CONFIGVALUE         0x00000000U
 #define ETPWM2_DCBCTL_CONFIGVALUE         0x00000000U
