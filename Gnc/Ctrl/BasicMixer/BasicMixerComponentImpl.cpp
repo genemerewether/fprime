@@ -21,7 +21,7 @@
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
-#include <Eigen/Eigen>
+//#include <Eigen/Eigen>
 
 namespace Gnc {
 
@@ -37,7 +37,7 @@ namespace Gnc {
       BasicMixerComponentBase(compName),
 #else
     BasicMixerImpl(void) :
-      MasicMixerImpl(void),
+      BasicMixerImpl(void),
 #endif
       basicMixer()
   {
@@ -84,9 +84,16 @@ namespace Gnc {
       Vector3 moment_b = TorqueThrust.gettorque();
       Vector3 thrust_b = TorqueThrust.getthrust();
 
-      this->basicMixer.SetTorqueThrustDes(moment_b, thrust_b);
+      this->basicMixer.SetTorqueThrustDes(Eigen::Vector3d(
+                                            moment_b.getz(),
+                                            moment_b.gety(),
+                                            moment_b.getz()),
+                                          Eigen::Vector3d(
+                                            thrust_b.getx(),
+                                            thrust_b.gety(),
+                                            thrust_b.getz()));
       Eigen::VectorXd rotorVel;
-      this->basicMixer.GetRotorVelCommand(rotorVel);
+      this->basicMixer.GetRotorVelCommand(&rotorVel);
 
        F64 angVel[6], angles[0], normalized[0];
        for (int i = 0; i < 6; i ++) {

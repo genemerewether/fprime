@@ -89,6 +89,8 @@ namespace Gnc {
 
       F32 thrust_x_tlm;
       F32 thrust_y_tlm;
+      
+      double mass;
 
       ROS::geometry_msgs::Point x_w;
 

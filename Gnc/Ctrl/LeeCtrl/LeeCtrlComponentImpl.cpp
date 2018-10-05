@@ -41,6 +41,7 @@ namespace Gnc {
       u_tlm(),
       thrust_x_tlm(0.0f),
       thrust_y_tlm(0.0f),
+      mass(0.0f),
       x_w(0.0f, 0.0f, 0.0f),
       w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
       v_b(0.0f, 0.0f, 0.0f),
@@ -58,11 +59,12 @@ namespace Gnc {
                                  Eigen::Vector3d(1.0f, 1.0f, 1.0f));
 
       //TODO(mgardine)  - update from rotors_simulator/rotors_gazebo/resource/firefly.yaml
-      quest_gnc::multirotor::MultirotorModel mrModel = {1.0f,
-                                                        1.0f, 1.0f, 1.0f,
+      quest_gnc::multirotor::MultirotorModel mrModel = {1.56779f,
+                                                        0.0347563f, 0.0458929f, 0.0977f,
                                                         0.0f, 0.0f, 0.0f};
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
       (void) leeControl.SetWorldParams(wParams);
+      this->mass = mrModel.mass;
       (void) leeControl.SetModel(mrModel);
 
       //TODO(mereweth) - remove this
@@ -147,8 +149,8 @@ namespace Gnc {
           Eigen::Vector3d a_w__comm(this->a_w__comm.getx(),
                                     this->a_w__comm.gety(),
                                     this->a_w__comm.getz());
-          double mass = 1.5f; // TODO(mereweth) - replace with parm
-          Eigen::Vector3d thrust_b__comm = mass * (w_q_b.inverse() * a_w__comm);
+          Eigen::Vector3d thrust_b__comm = this->mass *
+                                             (w_q_b.inverse() * a_w__comm);
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
           this->leeControl.GetAngAccelCommand(&alpha_b__comm);
