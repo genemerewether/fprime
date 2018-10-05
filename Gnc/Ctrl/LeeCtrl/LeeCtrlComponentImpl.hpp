@@ -87,6 +87,9 @@ namespace Gnc {
 
       F32 u_tlm[4];
 
+      F32 thrust_x_tlm;
+      F32 thrust_y_tlm;
+
       ROS::geometry_msgs::Point x_w;
 
       ROS::geometry_msgs::Quaternion w_q_b;

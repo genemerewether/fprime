@@ -104,7 +104,7 @@ namespace SIMREF {
         int size = 0;
         const F64 *angVel = actuator.getangular_velocities(size);
         //TODO(mgardine) - Work out what is going on here
-        size = 6;
+	//        size = 6;
         msg.angular_velocities.resize(size);
         for (int i = 0; i < size; i++) {
             msg.angular_velocities[i] = angVel[i];

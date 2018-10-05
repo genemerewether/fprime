@@ -39,6 +39,8 @@ namespace Gnc {
 #endif
       seq(0u),
       u_tlm(),
+      thrust_x_tlm(0.0f),
+      thrust_y_tlm(0.0f),
       x_w(0.0f, 0.0f, 0.0f),
       w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
       v_b(0.0f, 0.0f, 0.0f),
@@ -145,7 +147,7 @@ namespace Gnc {
           Eigen::Vector3d a_w__comm(this->a_w__comm.getx(),
                                     this->a_w__comm.gety(),
                                     this->a_w__comm.getz());
-          double mass = 1.0f; // TODO(mereweth) - replace with parm
+          double mass = 1.5f; // TODO(mereweth) - replace with parm
           Eigen::Vector3d thrust_b__comm = mass * (w_q_b.inverse() * a_w__comm);
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
@@ -166,6 +168,9 @@ namespace Gnc {
               this->controls_out(0, u_b__comm);
           }
 
+          this->thrust_x_tlm = thrust_b__comm(0);
+          this->thrust_y_tlm = thrust_b__comm(1);
+	  
           this->u_tlm[0] = thrust_b__comm(2); // z-axis only
           this->u_tlm[1] = moment_b__comm(0);
           this->u_tlm[2] = moment_b__comm(1);
@@ -181,6 +186,9 @@ namespace Gnc {
           this->tlmWrite_LCTRL_MomentCommX(this->u_tlm[1]);
           this->tlmWrite_LCTRL_MomentCommY(this->u_tlm[2]);
           this->tlmWrite_LCTRL_MomentCommZ(this->u_tlm[3]);
+	  
+          this->tlmWrite_LCTRL_XThrustComm(this->thrust_x_tlm);
+          this->tlmWrite_LCTRL_YThrustComm(this->thrust_y_tlm);
       }
       else {
           // TODO(mereweth) - assert invalid port
