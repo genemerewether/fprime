@@ -2,6 +2,7 @@ SRC = \
 ActuatorsPortAi.xml \
 AttitudeThrustPortAi.xml \
 FilteredSensorDataPortAi.xml \
+FlatOutputPortAi.xml \
 GpsWaypointPortAi.xml \
 ImuStateUpdatePortAi.xml \
 RateThrustPortAi.xml \

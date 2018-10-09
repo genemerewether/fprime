@@ -1,0 +1,6 @@
+<interface name="PointCloudWithPose" namespace="ROS::mav_planning_msgs">
+  <args>
+    <arg name="PointCloudWithPose" pass_by="reference" type="ROS::mav_planning_msgs::PointCloudWithPose"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/PointCloudWithPoseSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,9 @@
+<serializable name="PolygonWithHolesStamped" namespace="ROS::mav_planning_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="altitude" type="F64"/>
+    <member name="polygon" type="ROS::mav_planning_msgs::PolygonWithHoles"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/PolygonWithHolesSerializableAi.xml</import_serializable_type>
+</serializable>

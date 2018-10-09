@@ -1,0 +1,6 @@
+<interface name="FlatOutput" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="FlatOutput" pass_by="reference" type="ROS::mav_msgs::FlatOutput"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/FlatOutputSerializableAi.xml</import_serializable_type>
+</interface>

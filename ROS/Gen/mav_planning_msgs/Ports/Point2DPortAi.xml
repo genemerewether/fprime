@@ -1,0 +1,6 @@
+<interface name="Point2D" namespace="ROS::mav_planning_msgs">
+  <args>
+    <arg name="Point2D" pass_by="reference" type="ROS::mav_planning_msgs::Point2D"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/Point2DSerializableAi.xml</import_serializable_type>
+</interface>

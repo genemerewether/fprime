@@ -1,8 +1,3 @@
-<!--
-std_msgs
-/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/UInt64MultiArray.msg
-{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
--->
 <serializable name="UInt64MultiArray" namespace="ROS::std_msgs">
   <members>
     <member name="layout" type="MultiArrayLayout"/>

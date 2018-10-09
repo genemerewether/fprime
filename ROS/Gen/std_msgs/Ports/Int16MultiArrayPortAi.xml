@@ -1,8 +1,3 @@
-<!--
-std_msgs
-/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Int16MultiArray.msg
-{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
--->
 <interface name="Int16MultiArray" namespace="ROS::std_msgs">
   <args>
     <arg name="Int16MultiArray" pass_by="reference" type="ROS::std_msgs::Int16MultiArray"/>

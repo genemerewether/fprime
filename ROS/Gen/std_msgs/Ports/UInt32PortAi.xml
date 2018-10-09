@@ -1,8 +1,3 @@
-<!--
-std_msgs
-/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/UInt32.msg
-{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
--->
 <interface name="UInt32" namespace="ROS::std_msgs">
   <args>
     <arg name="UInt32" pass_by="reference" type="ROS::std_msgs::UInt32"/>
