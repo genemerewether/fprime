@@ -50,6 +50,7 @@ namespace Gnc {
       x_w__des(0.0f, 0.0f, 0.0f),
       v_w__des(0.0f, 0.0f, 0.0f),
       a_w__des(0.0f, 0.0f, 0.0f),
+      yaw__des(0.0f),
       J_b(3,3),
       leeControl()
   {
@@ -57,10 +58,10 @@ namespace Gnc {
           this->u_tlm[i] = 0.0f;
       }
 
-      (void) leeControl.SetGains(Eigen::Vector3d(1.0f, 1.0f, 1.0f),
-                                 Eigen::Vector3d(1.0f, 1.0f, 1.0f),
-                                 Eigen::Vector3d(1.0f, 1.0f, 1.0f),
-                                 Eigen::Vector3d(1.0f, 1.0f, 1.0f));
+      (void) leeControl.SetGains(Eigen::Vector3d(6.0f, 6.0f, 6.0f),
+                                 Eigen::Vector3d(4.7f, 4.7f, 4.7f),
+                                 Eigen::Vector3d(3.0f, 3.0f, 0.15f),
+                                 Eigen::Vector3d(0.52f, 0.52f, 0.18f));
 
       //TODO(mgardine)  - update from rotors_simulator/rotors_gazebo/resource/firefly.yaml
       quest_gnc::multirotor::MultirotorModel mrModel = {1.56779f,
@@ -146,7 +147,7 @@ namespace Gnc {
                                                           this->a_w__des.gety(),
                                                           this->a_w__des.getz()));
 
-          // TODO(mgardine) - add yaw setpoint
+          this->leeControl.SetYawDes(this->yaw__des);
 
           // set position feedback
           this->leeControl.SetPositionLinVel(Eigen::Vector3d(this->x_w.getx(),

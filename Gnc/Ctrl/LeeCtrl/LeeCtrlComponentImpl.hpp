@@ -117,6 +117,8 @@ namespace Gnc {
 
       ROS::geometry_msgs::Vector3 a_w__des;
 
+      F64 yaw__des;
+
       quest_gnc::multirotor::LeeControl leeControl;
 
     };
