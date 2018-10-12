@@ -204,7 +204,7 @@ namespace SIMREF {
 
         OdometryHandler gtHandler(compPtr, 0);
         OdometryHandler odomHandler(compPtr, 1);
-        FlatOutputHandler flatoutHandler(compPtr, 2);
+        FlatOutputHandler flatoutHandler(compPtr, 0);
 
         ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 1000,
                                             &OdometryHandler::odometryCallback,
@@ -311,7 +311,7 @@ namespace SIMREF {
       flatOutputCallback(const mav_msgs::FlatOutput::ConstPtr& msg)
     {
         FW_ASSERT(this->compPtr);
-        FW_ASSERT(this->portNum < NUM_ODOMETRY_OUTPUT_PORTS);
+        FW_ASSERT(this->portNum < NUM_FLATOUTPUT_OUTPUT_PORTS);
 
         DEBUG_PRINT("Flat output port handler %d\n", this->portNum);
 

@@ -72,6 +72,13 @@ namespace Gnc {
           ROS::nav_msgs::Odometry &Odometry
       );
 
+      //! Handler implementation for flatOutput
+      //!
+      void flatOutput_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::FlatOutputSetpoint &FlatOutputSetpoint
+      );
+
       //! Handler implementation for sched
       //!
       void sched_handler(
@@ -92,15 +99,23 @@ namespace Gnc {
       
       double mass;
 
+      Eigen::Matrix3d J_b;
+
       ROS::geometry_msgs::Point x_w;
+
+      ROS::geometry_msgs::Point x_w__des;
 
       ROS::geometry_msgs::Quaternion w_q_b;
 
       ROS::geometry_msgs::Vector3 v_b;
 
+      ROS::geometry_msgs::Vector3 v_w__des;
+
       ROS::geometry_msgs::Vector3 omega_b;
 
       ROS::geometry_msgs::Vector3 a_w__comm;
+
+      ROS::geometry_msgs::Vector3 a_w__des;
 
       quest_gnc::multirotor::LeeControl leeControl;
 

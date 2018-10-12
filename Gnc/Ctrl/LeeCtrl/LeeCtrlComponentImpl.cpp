@@ -47,6 +47,10 @@ namespace Gnc {
       v_b(0.0f, 0.0f, 0.0f),
       omega_b(0.0f, 0.0f, 0.0f),
       a_w__comm(0.0f, 0.0f, 0.0f),
+      x_w__des(0.0f, 0.0f, 0.0f),
+      v_w__des(0.0f, 0.0f, 0.0f),
+      a_w__des(0.0f, 0.0f, 0.0f),
+      J_b(3,3),
       leeControl()
   {
       for (NATIVE_UINT_TYPE i = 0; i < FW_NUM_ARRAY_ELEMENTS(this->u_tlm); i++) {
@@ -65,12 +69,11 @@ namespace Gnc {
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
       (void) leeControl.SetWorldParams(wParams);
       this->mass = mrModel.mass;
+      this->J_b << mrModel.Ixx, mrModel.Ixy, mrModel.Ixz,
+                   mrModel.Ixy, mrModel.Iyy, mrModel.Iyz,
+                   mrModel.Ixz, mrModel.Iyz, mrModel.Izz;
       (void) leeControl.SetModel(mrModel);
 
-      //TODO(mereweth) - remove this
-      (void) leeControl.SetPositionDes(Eigen::Vector3d(0.0f, 0.0f, 1.5f),
-                                       Eigen::Vector3d(0.0f, 0.0f, 0.0f),
-                                       Eigen::Vector3d(0.0f, 0.0f, 0.0f));
   }
 
   void LeeCtrlComponentImpl ::
@@ -110,6 +113,18 @@ namespace Gnc {
   }
 
   void LeeCtrlComponentImpl ::
+    flatOutput_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::FlatOutputSetpoint &FlatOutputSetpoint
+    )
+  {
+      using namespace ROS::geometry_msgs;
+      this->x_w__des = FlatOutputSetpoint.getposition();
+      this->v_w__des = FlatOutputSetpoint.getvelocity();
+      this->a_w__des = FlatOutputSetpoint.getacceleration();
+  }
+
+  void LeeCtrlComponentImpl ::
     sched_handler(
         const NATIVE_INT_TYPE portNum,
         NATIVE_UINT_TYPE context
@@ -119,6 +134,19 @@ namespace Gnc {
 
       if (context == LCTRL_SCHED_CONTEXT_POS) {
           using ROS::geometry_msgs::Vector3;
+
+          // set desired position velocity acceleration
+          this->leeControl.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
+                                                          this->x_w__des.gety(),
+                                                          this->x_w__des.getz()),
+                                          Eigen::Vector3d(this->v_w__des.getx(),
+                                                          this->v_w__des.gety(),
+                                                          this->v_w__des.getz()),
+                                          Eigen::Vector3d(this->a_w__des.getx(),
+                                                          this->a_w__des.gety(),
+                                                          this->a_w__des.getz()));
+
+          // TODO(mgardine) - add yaw setpoint
 
           // set position feedback
           this->leeControl.SetPositionLinVel(Eigen::Vector3d(this->x_w.getx(),
@@ -155,12 +183,7 @@ namespace Gnc {
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
           this->leeControl.GetAngAccelCommand(&alpha_b__comm);
 
-          // TODO(mereweth) - replace with parm
-          Eigen::Matrix3d J_b;
-          J_b << 1.0f, 0.0f, 0.0f,
-                 0.0f, 1.0f, 0.0f,
-                 0.0f, 0.0f, 1.0f;
-          Eigen::Vector3d moment_b__comm = J_b * alpha_b__comm;
+          Eigen::Vector3d moment_b__comm = this->J_b * alpha_b__comm;
 
           ROS::std_msgs::Header h(this->seq, this->getTime(), "body");
           ROS::mav_msgs::TorqueThrust u_b__comm(h,
