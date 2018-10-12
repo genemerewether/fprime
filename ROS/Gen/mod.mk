@@ -7,5 +7,5 @@ SUBDIRS = std_msgs  \
 	  shape_msgs         \
 	  stereo_msgs        \
 	  trajectory_msgs    \
-	  visualization_msgs 
-
+		mav_msgs					 \
+	  visualization_msgs

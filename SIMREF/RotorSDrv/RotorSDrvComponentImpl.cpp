@@ -44,11 +44,16 @@ namespace SIMREF {
       RotorSDrvImpl(void),
   #endif
       m_rgNH(NULL),
-      m_odomSet() // zero-initialize instead of default-initializing
+      m_odomSet(), // zero-initialize instead of default-initializing
+      m_flatOutSet() // zero-initialize instead of default-initializing
     {
         for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
             m_odomSet[i].fresh = false;
             m_odomSet[i].overflows = 0u;
+        }
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
+            m_flatOutSet[i].fresh = false;
+            m_flatOutSet[i].overflows = 0u;
         }
     }
 
@@ -143,6 +148,31 @@ namespace SIMREF {
             this->tlmWrite_RSDRV_Odometry1Overflows(m_odomSet[0].overflows);
             this->tlmWrite_RSDRV_Odometry2Overflows(m_odomSet[1].overflows);
         }
+
+        // Flat output setpoint
+        if ((context == RSDRV_SCHED_CONTEXT_ATT) ||
+            (context == RSDRV_SCHED_CONTEXT_POS)) {
+            // TODO(mereweth) check context == flatoutput out context
+            // TODO(mgardine) remove for loop?
+            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
+                m_flatOutSet[i].mutex.lock();
+                if (m_flatOutSet[i].fresh) {
+                    if (this->isConnected_flatOutput_OutputPort(i)) {
+                        // mimics driver hardware getting and sending sensor data
+                        this->flatOutput_out(i, m_flatOutSet[i].flatOutput);
+                    }
+                    else {
+                        DEBUG_PRINT("Flat output port %d not connected\n", i);
+                    }
+                    m_flatOutSet[i].fresh = false;
+                }
+                // TODO(mereweth) - notify that no new odometry received?
+                m_flatOutSet[i].mutex.unLock();
+            }
+
+            // TODO(mereweth) check context == imu out context
+        }
+        // TODO(mgardine) copy else if block from above if we add telemetry
     }
 
     void RotorSDrvComponentImpl ::
@@ -174,6 +204,7 @@ namespace SIMREF {
 
         OdometryHandler gtHandler(compPtr, 0);
         OdometryHandler odomHandler(compPtr, 1);
+        FlatOutputHandler flatoutHandler(compPtr, 2);
 
         ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 1000,
                                             &OdometryHandler::odometryCallback,
@@ -184,6 +215,12 @@ namespace SIMREF {
                                               &OdometryHandler::odometryCallback,
                                               &odomHandler,
                                               ros::TransportHints().tcpNoDelay());
+
+        // TODO(mgardine) - what should the queue size be?
+        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 1000,
+                                                 &FlatOutputHandler::flatOutputCallback,
+                                                 &flatoutHandler,
+                                                 ros::TransportHints().tcpNoDelay());
 
         while (1) {
             // TODO(mereweth) - check for and respond to ping
@@ -250,6 +287,60 @@ namespace SIMREF {
             this->compPtr->m_odomSet[this->portNum].odom = odom;
             this->compPtr->m_odomSet[this->portNum].fresh = true;
             this->compPtr->m_odomSet[this->portNum].mutex.unLock();
+        }
+    }
+
+
+    // Flat output constructor/destructor/callback
+    RotorSDrvComponentImpl :: FlatOutputHandler ::
+      FlatOutputHandler(RotorSDrvComponentImpl* compPtr,
+                      int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_FLATOUTPUT_OUTPUT_PORTS); //compPtr->getNum_odometry_OutputPorts());
+    }
+
+    RotorSDrvComponentImpl :: FlatOutputHandler :: ~FlatOutputHandler()
+    {
+
+    }
+
+    void RotorSDrvComponentImpl :: FlatOutputHandler ::
+      flatOutputCallback(const mav_msgs::FlatOutput::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_ODOMETRY_OUTPUT_PORTS);
+
+        DEBUG_PRINT("Flat output port handler %d\n", this->portNum);
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::mav_msgs;
+            using namespace ROS::geometry_msgs;
+            FlatOutput flatOutput(
+              Header(msg->header.seq,
+                     Fw::Time(TB_ROS_TIME, 0,
+                              msg->header.stamp.sec,
+                              msg->header.stamp.nsec / 1000),
+                     Fw::EightyCharString(msg->header.frame_id.data())),
+
+              Point(msg->position.x, msg->position.y, msg->position.z),
+              Vector3(msg->velocity.x, msg->velocity.y, msg->velocity.z),
+              Vector3(msg->acceleration.x, msg->acceleration.y, msg->acceleration.z),
+              F64(msg->yaw)
+
+            ); // end FlatOutput constructor
+
+            this->compPtr->m_flatOutSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_flatOutSet[this->portNum].fresh) {
+                this->compPtr->m_flatOutSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting flatout port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_flatOutSet[this->portNum].flatOutput = flatOutput;
+            this->compPtr->m_flatOutSet[this->portNum].fresh = true;
+            this->compPtr->m_flatOutSet[this->portNum].mutex.unLock();
         }
     }
 
