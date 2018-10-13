@@ -45,7 +45,8 @@ namespace SIMREF {
   #endif
       m_rgNH(NULL),
       m_odomSet(), // zero-initialize instead of default-initializing
-      m_flatOutSet() // zero-initialize instead of default-initializing
+      m_flatOutSet(), // zero-initialize instead of default-initializing
+      m_attRateThrustSet() // zero-initialize instead of default-initializing
     {
         for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
             m_odomSet[i].fresh = false;
@@ -54,6 +55,10 @@ namespace SIMREF {
         for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
             m_flatOutSet[i].fresh = false;
             m_flatOutSet[i].overflows = 0u;
+        }
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_attRateThrustSet); i++) {
+            m_attRateThrustSet[i].fresh = false;
+            m_attRateThrustSet[i].overflows = 0u;
         }
     }
 
@@ -123,7 +128,6 @@ namespace SIMREF {
     {
         if ((context == RSDRV_SCHED_CONTEXT_ATT) ||
             (context == RSDRV_SCHED_CONTEXT_POS)) {
-            // TODO(mereweth) check context == odometry out context
             for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
                 m_odomSet[i].mutex.lock();
                 if (m_odomSet[i].fresh) {
@@ -140,20 +144,6 @@ namespace SIMREF {
                 m_odomSet[i].mutex.unLock();
             }
 
-            // TODO(mereweth) check context == imu out context
-        }
-        else if (context == RSDRV_SCHED_CONTEXT_TLM) {
-            FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(m_odomSet) >= 2,
-                      FW_NUM_ARRAY_ELEMENTS(m_odomSet));
-            this->tlmWrite_RSDRV_Odometry1Overflows(m_odomSet[0].overflows);
-            this->tlmWrite_RSDRV_Odometry2Overflows(m_odomSet[1].overflows);
-        }
-
-        // Flat output setpoint
-        if ((context == RSDRV_SCHED_CONTEXT_ATT) ||
-            (context == RSDRV_SCHED_CONTEXT_POS)) {
-            // TODO(mereweth) check context == flatoutput out context
-            // TODO(mgardine) remove for loop?
             for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
                 m_flatOutSet[i].mutex.lock();
                 if (m_flatOutSet[i].fresh) {
@@ -170,9 +160,28 @@ namespace SIMREF {
                 m_flatOutSet[i].mutex.unLock();
             }
 
-            // TODO(mereweth) check context == imu out context
+            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_attRateThrustSet); i++) {
+                m_attRateThrustSet[i].mutex.lock();
+                if (m_attRateThrustSet[i].fresh) {
+                    if (this->isConnected_attRateThrust_OutputPort(i)) {
+                        // mimics driver hardware getting and sending sensor data
+                        this->attRateThrust_out(i, m_attRateThrustSet[i].attRateThrust);
+                    }
+                    else {
+                        DEBUG_PRINT("Attitude rate thrust port %d not connected\n", i);
+                    }
+                    m_attRateThrustSet[i].fresh = false;
+                }
+                // TODO(mereweth) - notify that no new odometry received?
+                m_attRateThrustSet[i].mutex.unLock();
+            }
         }
-        // TODO(mgardine) copy else if block from above if we add telemetry
+        else if (context == RSDRV_SCHED_CONTEXT_TLM) {
+            FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(m_odomSet) >= 2,
+                      FW_NUM_ARRAY_ELEMENTS(m_odomSet));
+            this->tlmWrite_RSDRV_Odometry1Overflows(m_odomSet[0].overflows);
+            this->tlmWrite_RSDRV_Odometry2Overflows(m_odomSet[1].overflows);
+        }
     }
 
     void RotorSDrvComponentImpl ::
@@ -205,6 +214,7 @@ namespace SIMREF {
         OdometryHandler gtHandler(compPtr, 0);
         OdometryHandler odomHandler(compPtr, 1);
         FlatOutputHandler flatoutHandler(compPtr, 0);
+        AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
 
         ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 1000,
                                             &OdometryHandler::odometryCallback,
@@ -217,10 +227,15 @@ namespace SIMREF {
                                               ros::TransportHints().tcpNoDelay());
 
         // TODO(mgardine) - what should the queue size be?
-        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 1000,
+        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 10,
                                                  &FlatOutputHandler::flatOutputCallback,
                                                  &flatoutHandler,
                                                  ros::TransportHints().tcpNoDelay());
+
+        ros::Subscriber attRateThrustSub = n.subscribe("attitude_rate_thrust_setpoint", 10,
+                                                       &AttitudeRateThrustHandler::attitudeRateThrustCallback,
+                                                       &attRateThrustHandler,
+                                                       ros::TransportHints().tcpNoDelay());
 
         while (1) {
             // TODO(mereweth) - check for and respond to ping
@@ -294,7 +309,7 @@ namespace SIMREF {
     // Flat output constructor/destructor/callback
     RotorSDrvComponentImpl :: FlatOutputHandler ::
       FlatOutputHandler(RotorSDrvComponentImpl* compPtr,
-                      int portNum) :
+                        int portNum) :
       compPtr(compPtr),
       portNum(portNum)
     {
@@ -341,6 +356,58 @@ namespace SIMREF {
             this->compPtr->m_flatOutSet[this->portNum].flatOutput = flatOutput;
             this->compPtr->m_flatOutSet[this->portNum].fresh = true;
             this->compPtr->m_flatOutSet[this->portNum].mutex.unLock();
+        }
+    }
+
+    // AttitudeRateThrust constructor/destructor/callback
+    RotorSDrvComponentImpl :: AttitudeRateThrustHandler ::
+      AttitudeRateThrustHandler(RotorSDrvComponentImpl* compPtr,
+                                int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_ATTRATETHRUST_OUTPUT_PORTS); //compPtr->getNum_odometry_OutputPorts());
+    }
+
+    RotorSDrvComponentImpl :: AttitudeRateThrustHandler :: ~AttitudeRateThrustHandler()
+    {
+
+    }
+
+    void RotorSDrvComponentImpl :: AttitudeRateThrustHandler ::
+      attitudeRateThrustCallback(const mav_msgs::AttitudeRateThrust::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_ATTRATETHRUST_OUTPUT_PORTS);
+
+        DEBUG_PRINT("Attitude rate thrust output port handler %d\n", this->portNum);
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::mav_msgs;
+            using namespace ROS::geometry_msgs;
+            AttitudeRateThrust attRateThrust(
+              Header(msg->header.seq,
+                     Fw::Time(TB_ROS_TIME, 0,
+                              msg->header.stamp.sec,
+                              msg->header.stamp.nsec / 1000),
+                     Fw::EightyCharString(msg->header.frame_id.data())),
+
+              Quaternion(msg->attitude.x, msg->attitude.y, msg->attitude.z, msg->attitude.w),
+              Vector3(msg->angular_rates.x, msg->angular_rates.y, msg->angular_rates.z),
+              Vector3(msg->thrust.x, msg->thrust.y, msg->thrust.z)
+
+            ); // end AttitudeRateThrust constructor
+
+            this->compPtr->m_attRateThrustSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_attRateThrustSet[this->portNum].fresh) {
+                this->compPtr->m_attRateThrustSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting attitude rate thrust port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_attRateThrustSet[this->portNum].attRateThrust = attRateThrust;
+            this->compPtr->m_attRateThrustSet[this->portNum].fresh = true;
+            this->compPtr->m_attRateThrustSet[this->portNum].mutex.unLock();
         }
     }
 

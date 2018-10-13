@@ -249,7 +249,8 @@ void constructApp(int port_number, char* hostname) {
     constructSIMREFArchitecture();
 
     // Manual connections
-    rotorSDrv.set_flatOutput_OutputPort(0, leeCtrl.get_flatOutput_InputPort(0));
+    //rotorSDrv.set_flatOutput_OutputPort(0, leeCtrl.get_flatOutput_InputPort(0));
+    rotorSDrv.set_attRateThrust_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
 
     /* Register commands */
     cmdSeq.regCommands();

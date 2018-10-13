@@ -42,31 +42,39 @@ namespace Gnc {
       thrust_x_tlm(0.0f),
       thrust_y_tlm(0.0f),
       mass(0.0f),
-      x_w(0.0f, 0.0f, 0.0f),
-      w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
-      v_b(0.0f, 0.0f, 0.0f),
-      omega_b(0.0f, 0.0f, 0.0f),
-      a_w__comm(0.0f, 0.0f, 0.0f),
-      x_w__des(0.0f, 0.0f, 0.0f),
-      v_w__des(0.0f, 0.0f, 0.0f),
-      a_w__des(0.0f, 0.0f, 0.0f),
-      yaw__des(0.0f),
       J_b(3,3),
+      x_w(0.0f, 0.0f, 0.0f),
+      x_w__des(0.0f, 0.0f, 0.0f),
+      w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
+      w_q_b__des(0.0f, 0.0f, 0.0f, 1.0f),
+      v_b(0.0f, 0.0f, 0.0f),
+      v_w__des(0.0f, 0.0f, 0.0f),
+      omega_b(0.0f, 0.0f, 0.0f),
+      omega_b__des(0.0f, 0.0f, 0.0f),
+      a_w__comm(0.0f, 0.0f, 0.0f),
+      a_w__des(0.0f, 0.0f, 0.0f),
+      thrust_b__des(0.0f, 0.0f, 0.0f),
+      yaw__des(0.0f),
       leeControl()
   {
       for (NATIVE_UINT_TYPE i = 0; i < FW_NUM_ARRAY_ELEMENTS(this->u_tlm); i++) {
           this->u_tlm[i] = 0.0f;
       }
 
-      (void) leeControl.SetGains(Eigen::Vector3d(6.0f, 6.0f, 6.0f),
-                                 Eigen::Vector3d(4.7f, 4.7f, 4.7f),
-                                 Eigen::Vector3d(3.0f, 3.0f, 0.15f),
-                                 Eigen::Vector3d(0.52f, 0.52f, 0.18f));
-
       //TODO(mgardine)  - update from rotors_simulator/rotors_gazebo/resource/firefly.yaml
       quest_gnc::multirotor::MultirotorModel mrModel = {1.56779f,
                                                         0.0347563f, 0.0458929f, 0.0977f,
                                                         0.0f, 0.0f, 0.0f};
+
+      (void) leeControl.SetGains(Eigen::Vector3d(6.0f, 6.0f, 6.0f),
+                                 Eigen::Vector3d(4.7f, 4.7f, 4.7f),
+                                 Eigen::Vector3d(3.0f  * mrModel.Ixx,
+                                                 3.0f  * mrModel.Iyy,
+                                                 0.15f * mrModel.Izz),
+                                 Eigen::Vector3d(0.52f * mrModel.Ixx,
+                                                 0.52f * mrModel.Iyy,
+                                                 0.18f * mrModel.Izz));
+
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
       (void) leeControl.SetWorldParams(wParams);
       this->mass = mrModel.mass;
@@ -101,7 +109,6 @@ namespace Gnc {
         ROS::nav_msgs::Odometry &Odometry
     )
   {
-      using namespace ROS::geometry_msgs;
       ROS::std_msgs::Header h = Odometry.getheader();
       this->seq = h.getseq();
       // TODO(mereweth) check h.getstamp()
@@ -116,13 +123,24 @@ namespace Gnc {
   void LeeCtrlComponentImpl ::
     flatOutput_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::mav_msgs::FlatOutputSetpoint &FlatOutputSetpoint
+        ROS::mav_msgs::FlatOutput &FlatOutput
     )
   {
-      using namespace ROS::geometry_msgs;
-      this->x_w__des = FlatOutputSetpoint.getposition();
-      this->v_w__des = FlatOutputSetpoint.getvelocity();
-      this->a_w__des = FlatOutputSetpoint.getacceleration();
+      this->x_w__des = FlatOutput.getposition();
+      this->v_w__des = FlatOutput.getvelocity();
+      this->a_w__des = FlatOutput.getacceleration();
+      this->yaw__des = FlatOutput.getyaw();
+  }
+
+  void LeeCtrlComponentImpl ::
+    attRateThrust_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::AttitudeRateThrust &AttitudeRateThrust
+    )
+  {
+      this->w_q_b__des = AttitudeRateThrust.getattitude();
+      this->omega_b__des = AttitudeRateThrust.getangular_rates();
+      this->thrust_b__des = AttitudeRateThrust.getthrust();
   }
 
   void LeeCtrlComponentImpl ::
@@ -131,10 +149,12 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-      // TODO(mereweth) - use context instead? only if in same rategroup
 
       if (context == LCTRL_SCHED_CONTEXT_POS) {
           using ROS::geometry_msgs::Vector3;
+
+          // TODO(Mereweth) - switch on mode
+          return;
 
           // set desired position velocity acceleration
           this->leeControl.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
@@ -163,6 +183,21 @@ namespace Gnc {
       }
       else if (context == LCTRL_SCHED_CONTEXT_ATT) {
           using ROS::geometry_msgs::Vector3;
+          Eigen::Vector3d thrust_b__comm;
+
+          // TODO(mereweth) - switch on mode
+          Eigen::Quaterniond w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
+                                                             this->w_q_b__des.getx(),
+                                                             this->w_q_b__des.gety(),
+                                                             this->w_q_b__des.getz());
+          this->leeControl.SetAttitudeDes(w_q_b__des,
+                                          Eigen::Vector3d(
+                                              this->omega_b__des.getx(),
+                                              this->omega_b__des.gety(),
+                                              this->omega_b__des.getz()));
+          thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
+                                           this->thrust_b__des.gety(),
+                                           this->thrust_b__des.getz());
 
           // set angular feedback
           Eigen::Quaterniond w_q_b = Eigen::Quaterniond(this->w_q_b.getw(),
@@ -175,11 +210,11 @@ namespace Gnc {
                                                  this->omega_b.gety(),
                                                  this->omega_b.getz()));
 
-          Eigen::Vector3d a_w__comm(this->a_w__comm.getx(),
+          // TODO(mereweth) - switch on mode
+          /*Eigen::Vector3d a_w__comm(this->a_w__comm.getx(),
                                     this->a_w__comm.gety(),
                                     this->a_w__comm.getz());
-          Eigen::Vector3d thrust_b__comm = this->mass *
-                                             (w_q_b.inverse() * a_w__comm);
+          thrust_b__comm = this->mass * (w_q_b.inverse() * a_w__comm);*/
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
           this->leeControl.GetAngAccelCommand(&alpha_b__comm);
@@ -196,7 +231,7 @@ namespace Gnc {
 
           this->thrust_x_tlm = thrust_b__comm(0);
           this->thrust_y_tlm = thrust_b__comm(1);
-	  
+
           this->u_tlm[0] = thrust_b__comm(2); // z-axis only
           this->u_tlm[1] = moment_b__comm(0);
           this->u_tlm[2] = moment_b__comm(1);
@@ -212,7 +247,7 @@ namespace Gnc {
           this->tlmWrite_LCTRL_MomentCommX(this->u_tlm[1]);
           this->tlmWrite_LCTRL_MomentCommY(this->u_tlm[2]);
           this->tlmWrite_LCTRL_MomentCommZ(this->u_tlm[3]);
-	  
+
           this->tlmWrite_LCTRL_XThrustComm(this->thrust_x_tlm);
           this->tlmWrite_LCTRL_YThrustComm(this->thrust_y_tlm);
       }

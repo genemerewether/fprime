@@ -1,0 +1,6 @@
+<interface name="AttitudeRateThrust" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="AttitudeRateThrust" pass_by="reference" type="ROS::mav_msgs::AttitudeRateThrust"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/AttitudeRateThrustSerializableAi.xml</import_serializable_type>
+</interface>

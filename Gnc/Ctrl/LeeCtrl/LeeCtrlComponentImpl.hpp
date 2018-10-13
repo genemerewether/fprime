@@ -76,7 +76,14 @@ namespace Gnc {
       //!
       void flatOutput_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::mav_msgs::FlatOutputSetpoint &FlatOutputSetpoint
+          ROS::mav_msgs::FlatOutput &FlatOutput
+      );
+
+      //! Handler implementation for attThrust
+      //!
+      void attRateThrust_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::AttitudeRateThrust &AttitudeRateThrust
       );
 
       //! Handler implementation for sched
@@ -96,7 +103,7 @@ namespace Gnc {
 
       F32 thrust_x_tlm;
       F32 thrust_y_tlm;
-      
+
       double mass;
 
       Eigen::Matrix3d J_b;
@@ -107,15 +114,21 @@ namespace Gnc {
 
       ROS::geometry_msgs::Quaternion w_q_b;
 
+      ROS::geometry_msgs::Quaternion w_q_b__des;
+
       ROS::geometry_msgs::Vector3 v_b;
 
       ROS::geometry_msgs::Vector3 v_w__des;
 
       ROS::geometry_msgs::Vector3 omega_b;
 
+      ROS::geometry_msgs::Vector3 omega_b__des;
+
       ROS::geometry_msgs::Vector3 a_w__comm;
 
       ROS::geometry_msgs::Vector3 a_w__des;
+
+      ROS::geometry_msgs::Vector3 thrust_b__des;
 
       F64 yaw__des;
 
