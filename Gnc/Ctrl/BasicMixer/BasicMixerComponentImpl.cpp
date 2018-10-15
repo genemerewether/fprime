@@ -85,7 +85,7 @@ namespace Gnc {
       Vector3 thrust_b = TorqueThrust.getthrust();
 
       this->basicMixer.SetTorqueThrustDes(Eigen::Vector3d(
-                                            moment_b.getz(),
+                                            moment_b.getx(),
                                             moment_b.gety(),
                                             moment_b.getz()),
                                           Eigen::Vector3d(
@@ -95,16 +95,22 @@ namespace Gnc {
       Eigen::VectorXd rotorVel;
       this->basicMixer.GetRotorVelCommand(&rotorVel);
 
-       F64 angVel[6], angles[0], normalized[0];
-       for (int i = 0; i < 6; i ++) {
-          angVel[i] = rotorVel(i);
-       }
+      F64 angVel[6], angles[0], normalized[0];
+      for (int i = 0; i < 6; i ++) {
+	  angVel[i] = rotorVel(i);
+      }
+      this->tlmWrite_BMIX_Rot0(angVel[0]);
+      this->tlmWrite_BMIX_Rot1(angVel[1]);
+      this->tlmWrite_BMIX_Rot2(angVel[2]);
+      this->tlmWrite_BMIX_Rot3(angVel[3]);
+      this->tlmWrite_BMIX_Rot4(angVel[4]);
+      this->tlmWrite_BMIX_Rot5(angVel[5]);
 
-       ROS::std_msgs::Header h = TorqueThrust.getheader();
-       ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, angVel, 6, normalized, 0);
-       if (this->isConnected_motor_OutputPort(0)) {
-         this->motor_out(0, rotorVel__comm);
-       }
+      ROS::std_msgs::Header h = TorqueThrust.getheader();
+      ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, angVel, 6, normalized, 0);
+      if (this->isConnected_motor_OutputPort(0)) {
+	  this->motor_out(0, rotorVel__comm);
+      }
   }
 
   void BasicMixerComponentImpl ::
