@@ -16,6 +16,8 @@
 |LCTRL_Error_yaw|7 (0x7)|F32|Lee Control yaw error|
 |LCTRL_XThrustComm|8 (0x8)|F32|Lee Control commanded thrust in x direction|
 |LCTRL_YThrustComm|9 (0x9)|F32|Lee Control commanded thrust in x direction|
+|LCTRL_w_q_b__des|10 (0xa)|ROS::geometry_msgs::Quaternion|Lee Control desired orientation|
+|LCTRL_w_q_b|11 (0xb)|ROS::geometry_msgs::Quaternion|Lee Control orientation|
 
 ## Event List
 
