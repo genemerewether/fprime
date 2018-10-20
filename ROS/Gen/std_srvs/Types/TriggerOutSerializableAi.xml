@@ -1,8 +1,3 @@
-<!--
-std_srvs
-/Users/mereweth/quest/ROS/fprime_ws/src/ros_comm_msgs/std_srvs/srv/Trigger.srv
-{}
--->
 <serializable name="TriggerResponse" namespace="ROS::std_srvs">
   <members>
     <member name="success" type="U8"/>

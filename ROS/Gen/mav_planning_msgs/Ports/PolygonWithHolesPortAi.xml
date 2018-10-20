@@ -1,0 +1,6 @@
+<interface name="PolygonWithHoles" namespace="ROS::mav_planning_msgs">
+  <args>
+    <arg name="PolygonWithHoles" pass_by="reference" type="ROS::mav_planning_msgs::PolygonWithHoles"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/PolygonWithHolesSerializableAi.xml</import_serializable_type>
+</interface>

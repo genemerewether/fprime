@@ -1,8 +1,3 @@
-<!--
-std_msgs
-/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/Int16.msg
-{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
--->
 <interface name="Int16" namespace="ROS::std_msgs">
   <args>
     <arg name="Int16" pass_by="reference" type="ROS::std_msgs::Int16"/>

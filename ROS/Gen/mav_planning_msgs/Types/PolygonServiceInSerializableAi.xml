@@ -1,0 +1,6 @@
+<serializable name="PolygonServiceRequest" namespace="ROS::mav_planning_msgs">
+  <members>
+    <member name="polygon" type="ROS::mav_planning_msgs::PolygonWithHolesStamped"/>
+  </members>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/PolygonWithHolesStampedSerializableAi.xml</import_serializable_type>
+</serializable>

@@ -1,8 +1,0 @@
-<interface name="PlannerService" namespace="ROS::planning_msgs">
-  <args>
-    <arg name="PlannerServiceRequest" pass_by="reference" type="ROS::planning_msgs::PlannerServiceRequest"/>
-  </args>
-  <import_serializable_type>ROS/Gen/planning_msgs/Types/PlannerServiceInSerializableAi.xml</import_serializable_type>
-  <import_serializable_type>ROS/Gen/planning_msgs/Types/PlannerServiceOutSerializableAi.xml</import_serializable_type>
-  <return name="PlannerServiceResponse" pass_by="reference" type="ROS::planning_msgs::PlannerServiceResponse"/>
-</interface>

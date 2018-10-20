@@ -260,8 +260,6 @@ void constructApp(int port_number, char* hostname) {
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
 
-    sdRosIface.startPub();
-
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -392,6 +390,8 @@ int main(int argc, char* argv[]) {
     //dumparch();
 
     ros::start();
+
+    sdRosIface.startPub();
 
     Os::Task task;
     Os::Task waiter;

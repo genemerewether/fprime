@@ -21,7 +21,7 @@
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
-#include <Eigen/Eigen>
+//#include <Eigen/Eigen>
 
 namespace Gnc {
 
@@ -34,11 +34,24 @@ namespace Gnc {
     BasicMixerComponentImpl(
         const char *const compName
     ) :
-      BasicMixerComponentBase(compName)
+      BasicMixerComponentBase(compName),
 #else
-    BasicMixerImpl(void)
+    BasicMixerImpl(void) :
+      BasicMixerImpl(void),
 #endif
+      basicMixer()
   {
+
+    //NOTE(mgardie) - is there a better way of doing this? Use same mrModel as leeControl?
+    Eigen::MatrixXd mixer;
+    mixer.resize(4, 6);
+    mixer <<
+     9.18972e-07,  1.83794e-06,  9.18972e-07, -9.18972e-07, -1.83794e-06, -9.18972e-07,
+    -1.59171e-06, -8.99966e-18,  1.59171e-06,  1.59171e-06, -8.99966e-18, -1.59171e-06,
+    -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07,
+     8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06;
+
+     (void) basicMixer.SetMixer(mixer);
 
   }
 
@@ -71,27 +84,33 @@ namespace Gnc {
       Vector3 moment_b = TorqueThrust.gettorque();
       Vector3 thrust_b = TorqueThrust.getthrust();
 
-      // NOTE(mereweth) - we can only apply thrust in z body frame
-      Eigen::Vector4d controls(moment_b.getx(),
-                               moment_b.gety(),
-                               moment_b.getz(),
-                               thrust_b.getz());
+      this->basicMixer.SetTorqueThrustDes(Eigen::Vector3d(
+                                            moment_b.getx(),
+                                            moment_b.gety(),
+                                            moment_b.getz()),
+                                          Eigen::Vector3d(
+                                            thrust_b.getx(),
+                                            thrust_b.gety(),
+                                            thrust_b.getz()));
+      Eigen::VectorXd rotorVel;
+      this->basicMixer.GetRotorVelCommand(&rotorVel);
 
-      Eigen::MatrixXd mixer;
-      mixer.resize(4, 6);
-      mixer <<
-       9.18972e-07,  1.83794e-06,  9.18972e-07, -9.18972e-07, -1.83794e-06, -9.18972e-07,
-      -1.59171e-06, -8.99966e-18,  1.59171e-06,  1.59171e-06, -8.99966e-18, -1.59171e-06,
-      -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07,
-       8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06;
+      F64 angVel[6], angles[0], normalized[0];
+      for (int i = 0; i < 6; i ++) {
+	  angVel[i] = rotorVel(i);
+      }
+      this->tlmWrite_BMIX_Rot0(angVel[0]);
+      this->tlmWrite_BMIX_Rot1(angVel[1]);
+      this->tlmWrite_BMIX_Rot2(angVel[2]);
+      this->tlmWrite_BMIX_Rot3(angVel[3]);
+      this->tlmWrite_BMIX_Rot4(angVel[4]);
+      this->tlmWrite_BMIX_Rot5(angVel[5]);
 
-       // TODO(mereweth) - calculate pseudoinverse in init
-
-       Eigen::MatrixXd mixerPinv = mixer.transpose() * (mixer * mixer.transpose()).inverse();
-
-       Eigen::VectorXd rotorVel = mixerPinv * controls;
-
-       // TODO(mereweth) - store actuator values
+      ROS::std_msgs::Header h = TorqueThrust.getheader();
+      ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, angVel, 6, normalized, 0);
+      if (this->isConnected_motor_OutputPort(0)) {
+	  this->motor_out(0, rotorVel__comm);
+      }
   }
 
   void BasicMixerComponentImpl ::
@@ -100,7 +119,7 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-    // TODO(mereweth) - call Actuators output port
+    // NOTE(mgardine) - Output port now called in controls_handler
   }
 
 } // end namespace Gnc

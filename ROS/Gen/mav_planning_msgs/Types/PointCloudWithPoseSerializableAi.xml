@@ -1,4 +1,4 @@
-<serializable name="PointCloudWithPose" namespace="ROS::planning_msgs">
+<serializable name="PointCloudWithPose" namespace="ROS::mav_planning_msgs">
   <members>
     <member name="header" type="ROS::std_msgs::Header"/>
     <member name="sensor_pose" type="ROS::geometry_msgs::TransformStamped"/>

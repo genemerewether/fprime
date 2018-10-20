@@ -249,6 +249,8 @@ void constructApp(int port_number, char* hostname) {
     constructSIMREFArchitecture();
 
     // Manual connections
+    rotorSDrv.set_flatOutput_OutputPort(0, leeCtrl.get_flatOutput_InputPort(0));
+    rotorSDrv.set_attRateThrust_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
 
     /* Register commands */
     cmdSeq.regCommands();
@@ -275,13 +277,6 @@ void constructApp(int port_number, char* hostname) {
 
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
-
-    Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
-    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
-
-    rotorSDrv.startPub();
-    stat = rotorSDrv.startIntTask(70, 20*1024);
-    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -373,14 +368,21 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
-    ros::start();
-
     constructApp(port_number, hostname);
 
     if (!local_cycle) {
         rgGncDrv.set_CycleOut_OutputPort(2, rg.get_CycleIn_InputPort(0));
     }
     //dumparch();
+
+    ros::start();
+
+    Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+
+    rotorSDrv.startPub();
+    stat = rotorSDrv.startIntTask(70, 20*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);

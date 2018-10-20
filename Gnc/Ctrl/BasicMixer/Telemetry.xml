@@ -1,6 +1,27 @@
 <telemetry>
-    <channel id="0" name="BMIX_Dummy" data_type="F32" update="on_change" format_string="%.3fN">
+    <channel id="0" name="BMIX_Rot0" data_type="F32" format_string="%.3f rad">
         <comment>
         </comment>
     </channel>
+    <channel id="1" name="BMIX_Rot1" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="2" name="BMIX_Rot2" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="3" name="BMIX_Rot3" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="4" name="BMIX_Rot4" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="5" name="BMIX_Rot5" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+
 </telemetry>

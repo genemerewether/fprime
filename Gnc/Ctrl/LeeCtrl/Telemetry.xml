@@ -1,42 +1,62 @@
 <telemetry>
-    <channel id="0" name="LCTRL_ThrustComm" data_type="F32" update="on_change" format_string="%.3fN">
+    <channel id="0" name="LCTRL_ThrustComm" data_type="F32" format_string="%.3fN">
         <comment>
-            Lee Control commanded thrust
+            Lee Control commanded body axis thrust
         </comment>
     </channel>
-    <channel id="1" name="LCTRL_MomentCommX" data_type="F32" update="on_change" format_string="%.6fNm">
+    <channel id="1" name="LCTRL_MomentCommX" data_type="F32" format_string="%.6fNm">
         <comment>
             Lee Control commanded moment in x
         </comment>
     </channel>
-    <channel id="2" name="LCTRL_MomentCommY" data_type="F32" update="on_change" format_string="%.6fNm">
+    <channel id="2" name="LCTRL_MomentCommY" data_type="F32" format_string="%.6fNm">
         <comment>
             Lee Control commanded moment in y
         </comment>
     </channel>
-    <channel id="3" name="LCTRL_MomentCommZ" data_type="F32" update="on_change" format_string="%.6fNm">
+    <channel id="3" name="LCTRL_MomentCommZ" data_type="F32" format_string="%.6fNm">
         <comment>
             Lee Control commanded moment in z
         </comment>
     </channel>
-    <channel id="4" name="LCTRL_Error_x_w" data_type="F32" update="on_change" format_string="%.3fm">
+    <channel id="4" name="LCTRL_Error_x_w" data_type="F32" format_string="%.3fm">
         <comment>
             Lee Control x error
         </comment>
     </channel>
-    <channel id="5" name="LCTRL_Error_y_w" data_type="F32" update="on_change" format_string="%.3fm">
+    <channel id="5" name="LCTRL_Error_y_w" data_type="F32" format_string="%.3fm">
         <comment>
             Lee Control y error
         </comment>
     </channel>
-    <channel id="6" name="LCTRL_Error_z_w" data_type="F32" update="on_change" format_string="%.3fm">
+    <channel id="6" name="LCTRL_Error_z_w" data_type="F32" format_string="%.3fm">
         <comment>
             Lee Control z error
         </comment>
     </channel>
-    <channel id="7" name="LCTRL_Error_yaw" data_type="F32" update="on_change" format_string="%.3fdeg">
+    <channel id="7" name="LCTRL_Error_yaw" data_type="F32" format_string="%.3fdeg">
         <comment>
             Lee Control yaw error
+        </comment>
+    </channel>
+    <channel id="8" name="LCTRL_XThrustComm" data_type="F32" format_string="%.3fN">
+        <comment>
+            Lee Control commanded thrust in x direction
+        </comment>
+    </channel>
+    <channel id="9" name="LCTRL_YThrustComm" data_type="F32" format_string="%.3fN">
+        <comment>
+            Lee Control commanded thrust in x direction
+        </comment>
+    </channel>
+    <channel id="10" name="LCTRL_w_q_b__des" data_type="ROS::geometry_msgs::Quaternion">
+        <comment>
+            Lee Control desired orientation
+        </comment>
+    </channel>
+    <channel id="11" name="LCTRL_w_q_b" data_type="ROS::geometry_msgs::Quaternion">
+        <comment>
+            Lee Control orientation
         </comment>
     </channel>
 </telemetry>
