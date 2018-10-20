@@ -23,6 +23,8 @@
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
 #include "mav_msgs/Actuators.h"
+#include "mav_msgs/AttitudeRateThrust.h"
+#include "mav_msgs/FlatOutput.h"
 
 #include "Os/Mutex.hpp"
 
@@ -92,6 +94,43 @@ namespace SIMREF {
 
         }; // end class OdometryHandler
 
+        class FlatOutputHandler
+        {
+          public:
+              FlatOutputHandler(RotorSDrvComponentImpl* compPtr,
+                              int portNum);
+
+              ~FlatOutputHandler();
+
+              void flatOutputCallback(const mav_msgs::FlatOutput::ConstPtr& msg);
+
+          PRIVATE:
+
+              RotorSDrvComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class FlatOutputHandler
+
+
+        class AttitudeRateThrustHandler
+        {
+          public:
+              AttitudeRateThrustHandler(RotorSDrvComponentImpl* compPtr,
+                                        int portNum);
+
+              ~AttitudeRateThrustHandler();
+
+              void attitudeRateThrustCallback(const mav_msgs::AttitudeRateThrust::ConstPtr& msg);
+
+          PRIVATE:
+
+              RotorSDrvComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class AttitudeRateThrustHandler
+
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -144,6 +183,20 @@ namespace SIMREF {
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_odomSet[NUM_ODOMETRY_OUTPUT_PORTS];
+
+        struct FlatOutSet {
+            Os::Mutex mutex; //! Mutex lock to guard flat output object
+            ROS::mav_msgs::FlatOutput flatOutput; //! flat output object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_flatOutSet[NUM_FLATOUTPUT_OUTPUT_PORTS];
+
+        struct AttRateThrustSet {
+            Os::Mutex mutex; //! Mutex lock to guard object
+            ROS::mav_msgs::AttitudeRateThrust attRateThrust; //! Attitude, rate, and thrust object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_attRateThrustSet[NUM_ATTRATETHRUST_OUTPUT_PORTS];
     };
 
 } // end namespace SIMREF

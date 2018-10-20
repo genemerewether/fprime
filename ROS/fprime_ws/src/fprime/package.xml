@@ -21,6 +21,6 @@
   <depend>sensor_msgs</depend>
   <depend>roscpp</depend>
   <depend>mav_msgs</depend>
-  <depend>planning_msgs</depend>
+  <depend>mav_planning_msgs</depend>
   <depend>rosgraph_msgs</depend>
 </package>

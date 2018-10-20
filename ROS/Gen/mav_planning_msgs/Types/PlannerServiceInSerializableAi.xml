@@ -1,4 +1,4 @@
-<serializable name="PlannerServiceRequest" namespace="ROS::planning_msgs">
+<serializable name="PlannerServiceRequest" namespace="ROS::mav_planning_msgs">
   <members>
     <member name="start_pose" type="ROS::geometry_msgs::PoseStamped"/>
     <member name="start_velocity" type="ROS::geometry_msgs::Vector3"/>

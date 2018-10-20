@@ -1,6 +1,0 @@
-<interface name="PolynomialTrajectory4D" namespace="ROS::planning_msgs">
-  <args>
-    <arg name="PolynomialTrajectory4D" pass_by="reference" type="ROS::planning_msgs::PolynomialTrajectory4D"/>
-  </args>
-  <import_serializable_type>ROS/Gen/planning_msgs/Types/PolynomialTrajectory4DSerializableAi.xml</import_serializable_type>
-</interface>

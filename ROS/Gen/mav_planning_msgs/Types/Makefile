@@ -1,4 +1,4 @@
-MODULE_DIR = ROS/Gen/planning_msgs/Types
+MODULE_DIR = ROS/Gen/mav_planning_msgs/Types
 MODULE = $(subst /,,$(MODULE_DIR))
 BUILD_ROOT ?= $(subst /$(MODULE_DIR),,$(CURDIR))
 export BUILD_ROOT

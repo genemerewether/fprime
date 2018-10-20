@@ -1,0 +1,8 @@
+<interface name="PolygonService" namespace="ROS::mav_planning_msgs">
+  <args>
+    <arg name="PolygonServiceRequest" pass_by="reference" type="ROS::mav_planning_msgs::PolygonServiceRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/PolygonServiceInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/PolygonServiceOutSerializableAi.xml</import_serializable_type>
+  <return name="PolygonServiceResponse" pass_by="reference" type="ROS::mav_planning_msgs::PolygonServiceResponse"/>
+</interface>

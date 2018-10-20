@@ -1,8 +1,3 @@
-<!--
-std_msgs
-/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg/MultiArrayDimension.msg
-{'std_msgs': ['/Users/mereweth/quest/ROS/fprime_ws/src/std_msgs/msg']}
--->
 <interface name="MultiArrayDimension" namespace="ROS::std_msgs">
   <args>
     <arg name="MultiArrayDimension" pass_by="reference" type="ROS::std_msgs::MultiArrayDimension"/>

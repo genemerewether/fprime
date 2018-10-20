@@ -1,0 +1,6 @@
+<interface name="Polygon2D" namespace="ROS::mav_planning_msgs">
+  <args>
+    <arg name="Polygon2D" pass_by="reference" type="ROS::mav_planning_msgs::Polygon2D"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/Polygon2DSerializableAi.xml</import_serializable_type>
+</interface>
