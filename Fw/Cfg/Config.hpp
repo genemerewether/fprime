@@ -111,17 +111,17 @@
 // Adds the ability for all component related objects to register
 // centrally.
 #ifndef FW_OBJECT_REGISTRATION
-#define FW_OBJECT_REGISTRATION              1   //!< Indicates whether or not objects can register themselves (more code, more object tracking)
+#define FW_OBJECT_REGISTRATION              0   //!< Indicates whether or not objects can register themselves (more code, more object tracking)
 #endif
 
 #ifndef FW_QUEUE_REGISTRATION
-#define FW_QUEUE_REGISTRATION               1   //!< Indicates whether or not queue registration is used
+#define FW_QUEUE_REGISTRATION               0   //!< Indicates whether or not queue registration is used
 #endif
 // Port Facilities
 
 // This allows tracing calls through ports for debugging
 #ifndef FW_PORT_TRACING
-#define FW_PORT_TRACING                     1   //!< Indicates whether port calls are traced (more code, more visibility into execution)
+#define FW_PORT_TRACING                     0   //!< Indicates whether port calls are traced (more code, more visibility into execution)
 #endif
 
 // This generates code to connect to serialized ports

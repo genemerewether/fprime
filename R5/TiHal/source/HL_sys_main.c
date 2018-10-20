@@ -75,7 +75,7 @@
 
 /* USER CODE BEGIN (2) */
 
-void sw_main(void);
+void fsw_main(void);
 
 /* USER CODE END */
 
@@ -123,7 +123,7 @@ int main(void)
     adcStartConversion(adcREG2, adcGROUP1);
 
     // Call out to main()
-	sw_main();
+	fsw_main();
 
 //     printf("med_res_timestamp=%u high_res_timestamp=%u seconds=%u\n", rtiGetMedResTimestamp(),rtiGetMedResLow(),rtiGetMedResLow(), rtiGetHighResTimestamp(), rtiGetHighResSeconds());
 
