@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Type_Schema.rnc" type="compact"?>
+
+<interface name="PrmCheck" namespace="R5">
+    <args>
+        <arg name="stat" type="ENUM" pass_by="reference">
+            <enum name="PrmWriteStatus">
+                <item name="PRM_WRITE_IDLE"/>
+                <item name="PRM_WRITE_BUSY"/>
+                <item name="PRM_WRITE_FAIL"/>
+            </enum>
+        </arg>
+    </args>
+</interface>

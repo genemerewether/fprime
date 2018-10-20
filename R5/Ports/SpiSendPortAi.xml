@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Type_Schema.rnc" type="compact"?>
+
+<interface name="SpiSend" namespace="R5">
+  <import_serializable_type>Fw/Buffer/BufferSerializableAi.xml</import_serializable_type>
+    <args>
+        <arg name="buff" type="Fw::Buffer" pass_by="pointer">
+        </arg>
+        <arg name="numBuffs" type="U32" pass_by="value">
+        </arg>
+    </args>
+</interface>

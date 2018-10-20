@@ -25,6 +25,18 @@ FW_GTEST_MODULES := \
 	Fw/Types/GTest
 
 R5_MODULES := \
+	R5/Ports \
+	\
+	R5/A2DDrv \
+	R5/DmaDrv \
+	R5/GpioDrv \
+	R5/R5Mem \
+	R5/R5Prm \
+	R5/R5Time \
+	R5/SpiMasterDrv \
+	R5/SpiSlaveDrv \
+	R5/UartDrv \
+	\
 	R5/TiHal \
 	R5/R5FlashApi
 

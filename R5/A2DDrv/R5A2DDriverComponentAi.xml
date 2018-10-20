@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5A2DDriver" kind="passive" namespace="R5">
+    <import_port_type>R5/Ports/A2DGetPortAi.xml</import_port_type>
+
+    <ports>
+        <port name="get" data_type="R5::A2DGet"  kind="sync_input">
+           <comment>Get a A2D value</comment>
+        </port>
+    </ports>
+
+</component>

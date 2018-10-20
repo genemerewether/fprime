@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5SpiMasterDriver" kind="passive" namespace="R5">
+
+    <import_port_type>R5/Ports/SpiSendPortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/SpiReceivePortAi.xml</import_port_type>
+
+    <ports>
+
+        <port name="spiSend" data_type="R5::SpiSend"  kind="sync_input">
+           <comment>Port to send spi data</comment>
+        </port>
+
+        <port name="spiRecv" data_type="R5::SpiReceive"  kind="sync_input">
+           <comment>Port to receive spi data retrieved by driver</comment>
+        </port>
+
+    </ports>
+
+</component>

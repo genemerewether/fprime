@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5UartDriver" kind="passive" namespace="R5">
+
+    <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+
+    <ports>
+    
+        <port name="serialRecv" data_type="Drv::SerialRead"  kind="sync_input">
+           <comment>Port to receive serial data received from driver</comment>
+        </port>
+        <port name="serialSend" data_type="Drv::SerialWrite"  kind="sync_input">
+           <comment>Port to send serial data to serial driver</comment>
+        </port>
+        
+    </ports>
+
+</component>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5GpioDriver" kind="passive" namespace="R5">
+
+    <import_port_type>R5/Ports/GpioSetPortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/GpioGetPortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/GpioWaitPortAi.xml</import_port_type>
+
+    <ports>
+    
+        <port name="set" data_type="R5::GpioSet"  kind="sync_input">
+           <comment>Set a GPIO value</comment>
+        </port>
+        <port name="get" data_type="R5::GpioGet"  kind="sync_input">
+           <comment>Get a GPIO value</comment>
+        </port>
+        <port name="wait" data_type="R5::GpioWait"  kind="sync_input">
+           <comment>Wait for a GPIO value</comment>
+        </port>
+        
+    </ports>
+
+</component>
