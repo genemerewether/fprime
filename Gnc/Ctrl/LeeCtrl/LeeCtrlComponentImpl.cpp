@@ -68,12 +68,12 @@ namespace Gnc {
 
       (void) leeControl.SetGains(Eigen::Vector3d(6.0f, 6.0f, 6.0f),
                                  Eigen::Vector3d(4.7f, 4.7f, 4.7f),
-                                 Eigen::Vector3d(3.0f,//  * mrModel.Ixx,
-                                                 3.0f,//  * mrModel.Iyy,
-                                                 0.15f),// * mrModel.Izz),
-                                 Eigen::Vector3d(0, //0.52f * mrModel.Ixx,
-                                                 0, //0.52f * mrModel.Iyy,
-                                                 0)); //0.18f));// * mrModel.Izz));
+                                 Eigen::Vector3d(3.0f / mrModel.Ixx,
+                                                 3.0f / mrModel.Iyy,
+                                                 0.15f / mrModel.Izz),
+                                 Eigen::Vector3d(0.52f / mrModel.Ixx,
+                                                 0.52f / mrModel.Iyy,
+                                                 0.18f / mrModel.Izz));
 
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
       (void) leeControl.SetWorldParams(wParams);
@@ -154,7 +154,7 @@ namespace Gnc {
           using ROS::geometry_msgs::Vector3;
 
           // TODO(Mereweth) - switch on mode
-          return;
+          //return;
 
           // set desired position velocity acceleration
           this->leeControl.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
@@ -186,7 +186,7 @@ namespace Gnc {
           Eigen::Vector3d thrust_b__comm;
 
           // TODO(mereweth) - switch on mode
-          Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
+          /*Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
                                                              this->w_q_b__des.getx(),
                                                              this->w_q_b__des.gety(),
                                                              this->w_q_b__des.getz());
@@ -197,7 +197,7 @@ namespace Gnc {
                                               this->omega_b__des.getz()));
           thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
                                            this->thrust_b__des.gety(),
-                                           this->thrust_b__des.getz());
+                                           this->thrust_b__des.getz());*/
 
           // set angular feedback
           Eigen::Quaterniond _w_q_b = Eigen::Quaterniond(this->w_q_b.getw(),
@@ -211,10 +211,10 @@ namespace Gnc {
                                                  this->omega_b.getz()));
 
           // TODO(mereweth) - switch on mode
-          /*Eigen::Vector3d _a_w__comm(this->a_w__comm.getx(),
+          Eigen::Vector3d _a_w__comm(this->a_w__comm.getx(),
                                     this->a_w__comm.gety(),
                                     this->a_w__comm.getz());
-          thrust_b__comm = this->mass * (w_q_b.inverse() * _a_w__comm);*/
+				    thrust_b__comm = this->mass * (_w_q_b.inverse() * _a_w__comm);
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
           this->leeControl.GetAngAccelCommand(&alpha_b__comm);
@@ -253,6 +253,13 @@ namespace Gnc {
 
           this->tlmWrite_LCTRL_w_q_b__des(this->w_q_b__des);
           this->tlmWrite_LCTRL_w_q_b(this->w_q_b);
+
+	  this->tlmWrite_LCTRL_Error_x_w(this->x_w__des.getx()
+					 - this->x_w.getx());
+	  this->tlmWrite_LCTRL_Error_y_w(this->x_w__des.gety()
+					 - this->x_w.gety());
+	  this->tlmWrite_LCTRL_Error_z_w(this->x_w__des.getz()
+					 - this->x_w.getz());
       }
       else {
           // TODO(mereweth) - assert invalid port

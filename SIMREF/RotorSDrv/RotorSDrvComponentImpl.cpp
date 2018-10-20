@@ -113,6 +113,7 @@ namespace SIMREF {
         mav_msgs::Actuators msg;
         int size = 0;
         const F64 *angVel = actuator.getangular_velocities(size);
+	size = 6;
         msg.angular_velocities.resize(size);
         for (int i = 0; i < size; i++) {
             msg.angular_velocities[i] = angVel[i];
