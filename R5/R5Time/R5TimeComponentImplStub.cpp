@@ -30,12 +30,12 @@ namespace R5 {
             Fw::Time &time) {
     }
 
-  /*void R5TimeComponentImpl::timeSetPort_handler(const NATIVE_INT_TYPE portNum,
+    void R5TimeComponentImpl::timeSetPort_handler(const NATIVE_INT_TYPE portNum,
             Fw::Time &time) {
     }
 
     void R5TimeComponentImpl::timeStartPort_handler(
             const NATIVE_INT_TYPE portNum, Fw::TimeAction action) {
-    }*/
+    }
 
 } // end namespace R5

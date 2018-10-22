@@ -69,17 +69,17 @@ namespace R5 {
 
     //! Handler implementation for timeSetPort
     //!
-//     void timeSetPort_handler(
-//         const NATIVE_INT_TYPE portNum, /*!< The port number*/
-//         Fw::Time &time /*!< The time to set the system time to*/
-//     );
+    void timeSetPort_handler(
+        const NATIVE_INT_TYPE portNum, /*!< The port number*/
+        Fw::Time &time /*!< The time to set the system time to*/
+    );
 
     //! Handler implementation for timeStartPort
     //!
-//     void timeStartPort_handler(
-//         const NATIVE_INT_TYPE portNum, /*!< The port number*/
-//         Fw::TimeAction action /*!< Whether to start or stop clocks*/
-//     );
+    void timeStartPort_handler(
+        const NATIVE_INT_TYPE portNum, /*!< The port number*/
+        Fw::TimeAction action /*!< Whether to start or stop clocks*/
+    );
   };
 } // end namespace R5
 

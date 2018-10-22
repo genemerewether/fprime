@@ -40,7 +40,7 @@ namespace R5 {
       time.set(TB_WORKSTATION_TIME,rTime.seconds,rTime.subseconds/R5_USEC_DIV);
   }
 
-  /*void R5TimeComponentImpl ::
+  void R5TimeComponentImpl ::
     timeSetPort_handler(
         const NATIVE_INT_TYPE portNum,
         Fw::Time &time
@@ -67,6 +67,6 @@ namespace R5 {
             FW_ASSERT(0,action);
             break;
     }
-  }*/
+  }
 
 } // end namespace R5
