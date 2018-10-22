@@ -203,7 +203,7 @@ void constructApp() {
     prm_ptr->init(0);
 
     // Connect rate groups to rate group driver
-    //constructR5REFArchitecture();
+    constructR5REFArchitecture();
 
     manualConstruct();
 
