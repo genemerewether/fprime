@@ -11,7 +11,7 @@ export MARKDOWN ?= $(PYTHON_BASE)/bin/markdown_py -x markdown.extensions.extra -
 
 JOBS := -j 4
 
-TI_CCS_DIR := /opt/tools/leo/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.3.LTS
+TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
 export HEXAGON_SDK_ROOT := /opt/tools/leo/Qualcomm/Hexagon_SDK/3.0
 export HEXAGON_TOOLS_ROOT := /opt/tools/leo/Qualcomm/HEXAGON_Tools/7.2.12/Tools
