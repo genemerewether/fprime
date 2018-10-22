@@ -1,4 +1,4 @@
-SRC = SwMain.cpp Topology.cpp
+SRC = SwMain.cpp Topology.cpp R5REFTopologyAppAi.xml
 
 SRC_LINUX = UnixMain.cpp
 

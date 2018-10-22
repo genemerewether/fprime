@@ -1,7 +1,8 @@
 #ifndef __R5REF_COMPONENTS_HEADER__
 #define __R5REF_COMPONENTS_HEADER__
-//void constructR5REFArchitecture(void);
-void exitTasks(void);
+
+void constructR5REFArchitecture();
+void exitTasks();
 
 #include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
@@ -19,21 +20,22 @@ void exitTasks(void);
 #include <R5/R5Time/R5TimeComponentImpl.hpp>
 #include <R5/R5Prm/R5PrmComponentImpl.hpp>
 
-extern Svc::RateGroupDriverImpl rgGncDrv;
-extern Svc::PassiveRateGroupImpl rgAtt;
-extern Svc::PassiveRateGroupImpl rgPos;
-extern Gnc::LeeCtrlComponentImpl leeCtrl;
-extern Gnc::BasicMixerComponentImpl mixer;
-extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
-extern Gnc::ImuIntegComponentImpl imuInteg;
-extern Drv::MPU9250ComponentImpl mpu9250;
+extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
+extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
+extern Svc::PassiveRateGroupImpl* rgPos_ptr;
 
-extern R5::R5GpioDriverComponentImpl gpio;
-extern R5::R5SpiMasterDriverComponentImpl spiMaster;
-extern R5::R5UartDriverComponentImpl hlUart;
-extern R5::R5UartDriverComponentImpl debugUart;
-extern R5::R5TimeComponentImpl r5Time;
-extern R5::R5A2DDriverComponentImpl a2dDrv;
-extern R5::R5PrmComponentImpl prm;
+extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
+extern Gnc::BasicMixerComponentImpl* mixer_ptr;
+extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
+extern Gnc::ImuIntegComponentImpl* imuInteg_ptr;
+extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
+
+extern R5::R5GpioDriverComponentImpl* gpio_ptr;
+extern R5::R5SpiMasterDriverComponentImpl* spiMaster_ptr;
+extern R5::R5UartDriverComponentImpl* hlUart_ptr;
+extern R5::R5UartDriverComponentImpl* debugUart_ptr;
+extern R5::R5TimeComponentImpl* r5Time_ptr;
+extern R5::R5A2DDriverComponentImpl* a2dDrv_ptr;
+extern R5::R5PrmComponentImpl* prm_ptr;
 
 #endif

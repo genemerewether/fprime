@@ -17,113 +17,133 @@ enum UartInstances {
 
 // Component instance pointers
 
-static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
-Svc::RateGroupDriverImpl rgGncDrv(
-#if FW_OBJECT_NAMES == 1
-                    "RGDRV",
-#endif
-                    rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
+Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
+Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
+Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
 
-static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-    Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-    Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
-    Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
-};
-Svc::PassiveRateGroupImpl rgAtt(
-#if FW_OBJECT_NAMES == 1
-                    "RGATT",
-#endif
-                    rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
-;
+Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
+Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
+Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
+Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
+Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 
-static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-    0, //TODO(mereweth) - IMU?
-    Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
-    Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
-};
-Svc::PassiveRateGroupImpl rgPos(
-#if FW_OBJECT_NAMES == 1
-                    "RGPOS",
-#endif
-                    rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
-;
+R5::R5GpioDriverComponentImpl* gpio_ptr = 0;
+R5::R5SpiMasterDriverComponentImpl* spiMaster_ptr = 0;
+R5::R5UartDriverComponentImpl* hlUart_ptr = 0;
+R5::R5UartDriverComponentImpl* debugUart_ptr = 0;
+R5::R5TimeComponentImpl* r5Time_ptr = 0;
+R5::R5A2DDriverComponentImpl* a2dDrv_ptr = 0;
+R5::R5PrmComponentImpl* prm_ptr = 0;
 
-Gnc::LeeCtrlComponentImpl leeCtrl
-#if FW_OBJECT_NAMES == 1
-                    ("LEECTRL")
-#endif
-;
+static R5DmaAllocator alloc;
 
-Gnc::BasicMixerComponentImpl mixer
-#if FW_OBJECT_NAMES == 1
-                    ("MIXER")
-#endif
-;
+void allocComps() {
+    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+    rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
+    #if FW_OBJECT_NAMES == 1
+                        "RGDRV",
+    #endif
+                        rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
-Gnc::ActuatorAdapterComponentImpl actuatorAdapter
-#if FW_OBJECT_NAMES == 1
-                    ("ACTADAP")
-#endif
-;
+    NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        Drv::MPU9250_SCHED_CONTEXT_OPERATE,
+        Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+        Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+    };
+    rgAtt_ptr = new Svc::PassiveRateGroupImpl(
+    #if FW_OBJECT_NAMES == 1
+                        "RGATT",
+    #endif
+                        rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
+    ;
 
-Gnc::ImuIntegComponentImpl imuInteg
-#if FW_OBJECT_NAMES == 1
-                    ("IMUINTEG")
-#endif
-;
+    NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        0, //TODO(mereweth) - IMU?
+        Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+        Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
+    };
+    rgPos_ptr = new Svc::PassiveRateGroupImpl(
+    #if FW_OBJECT_NAMES == 1
+                        "RGPOS",
+    #endif
+                        rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
+    ;
 
-Drv::MPU9250ComponentImpl mpu9250(
-#if FW_OBJECT_NAMES == 1
-                    "MPU9250",
-#endif
-                     false) // don't use magnetometer for now
-;
+    leeCtrl_ptr = new Gnc::LeeCtrlComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("LEECTRL")
+    #endif
+    ;
 
-R5::R5GpioDriverComponentImpl gpio
-#if FW_OBJECT_NAMES == 1
-                    ("gpio")
-#endif
-;
+    mixer_ptr = new Gnc::BasicMixerComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("MIXER")
+    #endif
+    ;
 
-R5::R5SpiMasterDriverComponentImpl spiMaster
-#if FW_OBJECT_NAMES == 1
-                    ("spiMaster")
-#endif
-;
+    actuatorAdapter_ptr = new Gnc::ActuatorAdapterComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("ACTADAP")
+    #endif
+    ;
 
-R5::R5UartDriverComponentImpl hlUart
-#if FW_OBJECT_NAMES == 1
-                    ("hlUart")
-#endif
-;
+   imuInteg_ptr = new Gnc::ImuIntegComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("IMUINTEG")
+    #endif
+    ;
 
-R5::R5UartDriverComponentImpl debugUart
-#if FW_OBJECT_NAMES == 1
-                    ("debugUart")
-#endif
-;
+    mpu9250_ptr = new Drv::MPU9250ComponentImpl(
+    #if FW_OBJECT_NAMES == 1
+                        "MPU9250",
+    #endif
+                         false) // don't use magnetometer for now
+    ;
 
-R5::R5TimeComponentImpl r5Time
-#if FW_OBJECT_NAMES == 1
-                    ("time")
-#endif
-;
+    gpio_ptr = new R5::R5GpioDriverComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("gpio")
+    #endif
+    ;
 
-R5::R5A2DDriverComponentImpl a2dDrv
-#if FW_OBJECT_NAMES == 1
-                    ("a2d")
-#endif
-;
+    spiMaster_ptr = new R5::R5SpiMasterDriverComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("spiMaster")
+    #endif
+    ;
 
-R5::R5PrmComponentImpl prm
-#if FW_OBJECT_NAMES == 1
-                    ("prm")
-#endif
-;
+    hlUart_ptr = new R5::R5UartDriverComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("hlUart")
+    #endif
+    ;
 
-R5DmaAllocator alloc;
+    debugUart_ptr = new R5::R5UartDriverComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("debugUart")
+    #endif
+    ;
 
-void manualConstruct(void) {
+    r5Time_ptr = new R5::R5TimeComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("time")
+    #endif
+    ;
+
+    a2dDrv_ptr = new R5::R5A2DDriverComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("a2d")
+    #endif
+    ;
+
+    prm_ptr = new R5::R5PrmComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("prm")
+    #endif
+    ;
+}
+
+void manualConstruct() {
     // Manual connections
     // TODO(mereweth) - multiple DSPAL components with commands?
     //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
@@ -141,50 +161,46 @@ void manualConstruct(void) {
 }
 
 void constructApp() {
-
-#if FW_PORT_TRACING
-    Fw::PortBase::setTrace(false);
-#endif
+    allocComps();
 
     // Initialize rate group driver
-    rgGncDrv.init();
-
+    rgGncDrv_ptr->init();
     // Initialize the rate groups
-    rgAtt.init(1);
-    rgPos.init(0);
+    rgAtt_ptr->init(1);
+    rgPos_ptr->init(0);
 
     // Initialize the GNC components
-    leeCtrl.init(0);
-    mixer.init(0);
-    actuatorAdapter.init(0);
-    imuInteg.init(0);
-    mpu9250.init(0);
+    leeCtrl_ptr->init(0);
+    mixer_ptr->init(0);
+    actuatorAdapter_ptr->init(0);
+    imuInteg_ptr->init(0);
+    mpu9250_ptr->init(0);
 
     // initialize GPIO
-    gpio.init(0);
+    gpio_ptr->init(0);
 
     // inialize SPI drivers
-    spiMaster.init(0);
-    spiMaster.initDriver(0,
-                         0, (256 * 2),
-                         0, 256,
-                         alloc);
+    spiMaster_ptr->init(0);
+    spiMaster_ptr->initDriver(0,
+                              0, (256 * 2),
+                              0, 256,
+                              alloc);
 
-    hlUart.init(HL_UART_INSTANCE);
-    hlUart.initDriver(0,200, // bytes - max we could send in one cycle
-                      0,400, // bytes - two cycles worth
-                      alloc);
+    hlUart_ptr->init(HL_UART_INSTANCE);
+    hlUart_ptr->initDriver(0,200, // bytes - max we could send in one cycle
+                           0,400, // bytes - two cycles worth
+                           alloc);
 
-    debugUart.init(DEBUG_UART_INSTANCE);
-    debugUart.initDriver(0,200, // bytes - max we could send in one cycle
-                         0,0, // bytes - two cycles worth
-                         alloc);
+    debugUart_ptr->init(DEBUG_UART_INSTANCE);
+    debugUart_ptr->initDriver(0,200, // bytes - max we could send in one cycle
+                              0,0, // bytes - two cycles worth
+                              alloc);
 
     DmaDrvInit();
 
-    r5Time.init();
+    r5Time_ptr->init();
 
-    prm.init(0);
+    prm_ptr->init(0);
 
     // Connect rate groups to rate group driver
     //constructR5REFArchitecture();
@@ -192,7 +208,7 @@ void constructApp() {
     manualConstruct();
 
     // load parameters from flash
-    prm.load();
+    prm_ptr->load();
 }
 
 void cycleForever(void) {

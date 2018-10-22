@@ -155,7 +155,7 @@ class TopoFactory:
             component.set_ports(port_obj_list)
 
         # Instance a Topology class and give it namespace, comment and list of components.        
-        the_topology = Topology.Topology(x.get_namespace(), x.get_comment(), components, x.get_name() , instance_name_base_id_list , x.get_prepend_instance_name())
+        the_topology = Topology.Topology(x.get_namespace(), x.get_comment(), components, x.get_name() , instance_name_base_id_list , x.get_prepend_instance_name(), x.get_is_ptr())
         the_topology.set_instance_header_dict(x.get_comp_type_file_header_dict())
 
         return the_topology

@@ -39,7 +39,7 @@ class Topology(object):
     """
     This is a very simple topology meta-model class.
     """
-    def __init__(self, namespace, comment = None, comp_list = None, name = None , base_id_list = None , prepend_instance_name = None):
+    def __init__(self, namespace, comment = None, comp_list = None, name = None , base_id_list = None , prepend_instance_name = None, is_ptr = None):
         """
         Constructor
         """
@@ -52,8 +52,8 @@ class Topology(object):
         self.__instance_xml_list = []
         self.__instance_header_dict = {} #The key is a val from the __instance_xml_list, the associated value is either a path to where the header file is located or a None. If the value is a None, "predict" where the file loc will be
         self.__prepend_instance_name = prepend_instance_name
-        
-	self.is_ptr = False
+
+	self.is_ptr = is_ptr
 	self.connect_only = False
 
     def get_namespace(self):
@@ -113,6 +113,12 @@ class Topology(object):
     def get_instance_header_dict(self):
         return self.__instance_header_dict
     
+    
+    def set_generate_pointer(self , generate_pointer):
+        self.__is_ptr = generate_pointer
+    def get_generate_pointer(self):
+        return self.__is_ptr
+
     def set_single_instance_prepend_instance_name(self , prepend_instance_name):
         '''
         Only sets this variable if instance_dict is running.
