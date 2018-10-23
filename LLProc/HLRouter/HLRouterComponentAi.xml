@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="HLRouter" kind="passive" namespace="LLProc">
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>LLProc/Ports/DebugStringPortAi.xml</import_port_type>
+    
+    <comment>Sends and receives transactions to the HL processor</comment>
+    <ports>
+        <port name="LLPortsIn" data_type="Serial" kind="sync_input" max_number="25">
+            <comment>
+            Input ports from other components
+            </comment>
+        </port>
+        <port name="HLPortsOut" data_type="Serial" kind="output" max_number="25">
+            <comment>
+            Output ports to other components
+            </comment>
+        </port>
+        <port name="SerReadPort" data_type="Drv::SerialRead" kind="output" >
+            <comment>
+            Output port to serial driver to read accumulated data
+            </comment>
+        </port>
+        <port name="SerWritePort" data_type="Drv::SerialWrite" kind="output" >
+            <comment>
+            Output port to serial driver to read accumulated data
+            </comment>
+        </port>
+        <port name="Sched" data_type="Svc::Sched" kind="sync_input" >
+            <comment>
+            Input port to get called each cycle
+            </comment>
+        </port>
+        <port name="DebugOut" data_type="LLProc::DebugString"  kind="output">
+           <comment>Port for Debug strings</comment>
+        </port>
+    </ports>
+</component>
+

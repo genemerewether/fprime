@@ -100,6 +100,10 @@ DRV_MODULES := \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts
 
+LLPROC_MODULES := \
+	LLProc/HLRouter \
+	LLProc/Ports
+
 HLPROC_MODULES := \
 	HLProc/HLRosIface
 
@@ -340,6 +344,8 @@ R5REF_MODULES := \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
+	\
+	$(LLPROC_MODULES) \
 	\
 	$(R5REF_DEPLOYMENT_MODULES) \
 	\
