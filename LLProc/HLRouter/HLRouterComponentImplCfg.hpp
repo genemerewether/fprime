@@ -8,6 +8,8 @@
 #ifndef HLROUTER_HLROUTERCOMPONENTIMPLCFG_HPP_
 #define HLROUTER_HLROUTERCOMPONENTIMPLCFG_HPP_
 
+namespace LLProc {
+  
 enum {
     SERIAL_BUFFER_SIZE = 400 // 400 bytes, twice what we can send
 };
@@ -16,5 +18,6 @@ enum {
     HLRTR_SCHED_UART_SEND,
     HLRTR_SCHED_UART_RECEIVE
 };
-
+  
+}
 #endif /* HLROUTER_HLROUTERCOMPONENTIMPLCFG_HPP_ */

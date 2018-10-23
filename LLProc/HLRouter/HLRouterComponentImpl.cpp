@@ -159,6 +159,7 @@ namespace LLProc {
 #endif
 
                                       // TODO(mereweth) - add tlm back in
+                                      ++this->m_numResyncs;
                                       //this->TlmOut_out(0,LL_TLM_UART_RECV_RESYNC_ERRS,++this->m_numResyncs);
                                   }
                                   // add offset to buffOffset since we have moved there
@@ -237,6 +238,7 @@ namespace LLProc {
                   this->SerReadPort_out(0,this->m_inputBuffObj,status);
                   if (this->m_inputBuffObj.getsize()) {
                       // TODO(mereweth) - add tlm back in
+                      ++this->m_numPackets;
                       //this->TlmOut_out(0,LL_TLM_NUM_HL_PKTS,++this->m_numPackets);
                   }
                   this->processSerialBuffer(this->m_inputBuffObj);
@@ -286,6 +288,7 @@ namespace LLProc {
           DEBUG_PRINT("Output buffer overflow! Port %u in. Size: %u Left: %u\n",
                       portNum,total_size,this->m_outputBuffer.getBuffSerLeft());
           // TODO(mereweth) - add tlm back in
+          ++this->m_numOutputBufferOverflows;
           //this->TlmOut_out(0,LL_TLM_NUM_OUT_BUFFER_OVERFLOW_HL_PKTS,++this->m_numOutputBufferOverflows);
       }
 
@@ -307,12 +310,14 @@ namespace LLProc {
       // check crc
       if (sentCrc != compCrc) {
           // TODO(mereweth) - add tlm back in
+          ++this->m_numCrcErrors;
           //this->TlmOut_out(0,LL_TLM_UART_RECV_CRC_ERRS,++this->m_numCrcErrors);
           DEBUG_PRINT("CRC Error! 0x%04X 0x%4X\n",sentCrc,compCrc);
           return;
       }
 
       // TODO(mereweth) - add tlm back in
+      ++this->m_numGoodPackets;
       //this->TlmOut_out(0,LL_TLM_NUM_GOOD_HL_PKTS,++this->m_numGoodPackets);
 
       DEBUG_PRINT("Packet of %d bytes received.\n",size);
@@ -335,6 +340,7 @@ namespace LLProc {
               if (stat != Fw::FW_SERIALIZE_OK or portNum >= this->getNum_HLPortsOut_OutputPorts()) {
                   DEBUG_PRINT("Decode portnum error %d %d\n",stat,this->getNum_HLPortsOut_OutputPorts());
                   // TODO(mereweth) - add tlm back in
+                  ++this->m_numDecodeErrors;
                   //this->TlmOut_out(0,LL_TLM_NUM_DECODE_ERRS_HL_PKTS,++this->m_numDecodeErrors);
                   return;
               }
@@ -344,6 +350,7 @@ namespace LLProc {
               if (stat != Fw::FW_SERIALIZE_OK) {
                   DEBUG_PRINT("Decode size error\n");
                   // TODO(mereweth) - add tlm back in
+                  ++this->m_numDecodeErrors;
                   //this->TlmOut_out(0,LL_TLM_NUM_DECODE_ERRS_HL_PKTS,++this->m_numDecodeErrors);
                   return;
               }
@@ -354,6 +361,7 @@ namespace LLProc {
               if (stat != Fw::FW_SERIALIZE_OK) {
                   DEBUG_PRINT("Decode data error\n");
                   // TODO(mereweth) - add tlm back in
+                  ++this->m_numDecodeErrors;
                   //this->TlmOut_out(0,LL_TLM_NUM_DECODE_ERRS_HL_PKTS,++this->m_numDecodeErrors);
                   return;
               }
@@ -362,6 +370,7 @@ namespace LLProc {
               if (stat != Fw::FW_SERIALIZE_OK) {
                   DEBUG_PRINT("Set setBuffLen error\n");
                   // TODO(mereweth) - add tlm back in
+                  ++this->m_numDecodeErrors;
                   //this->TlmOut_out(0,LL_TLM_NUM_DECODE_ERRS_HL_PKTS,++this->m_numDecodeErrors);
                   return;
               }
@@ -377,6 +386,7 @@ namespace LLProc {
 
                       DEBUG_PRINT("HLPortsOut_out() serialize status error\n");
                       // TODO(mereweth) - add tlm back in
+                      ++this->m_numBadSerialPortCalls;
                       //this->TlmOut_out(0,LL_TLM_NUM_BAD_PORT_CALLS_HL_PKTS,++this->m_numBadSerialPortCalls);
                       return;
                   }
@@ -384,6 +394,7 @@ namespace LLProc {
               else {
 
                   // TODO(mereweth) - add tlm back in
+                  ++this->m_numInvalidPorts;
                   //this->TlmOut_out(0,LL_TLM_NUM_INVALID_PORTS_HL_PKTS,++this->m_numInvalidPorts);
                   DEBUG_PRINT("Invalid port number: %u\n",portNum);
                   return;
@@ -430,6 +441,7 @@ namespace LLProc {
           if (trans_size == 0) {
 
               // TODO(mereweth) - add tlm back in
+              ++this->m_numZeroPktSize;
               //this->TlmOut_out(0,LL_TLM_NUM_ZERO_PKT_SIZE_HL_PKTS,++this->m_numZeroPktSize);
               this->m_transState = TRAN_WAITING;
               return;
