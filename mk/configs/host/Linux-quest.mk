@@ -17,6 +17,8 @@ export HEXAGON_SDK_ROOT := /opt/tools/leo/Qualcomm/Hexagon_SDK/3.0
 export HEXAGON_TOOLS_ROOT := /opt/tools/leo/Qualcomm/HEXAGON_Tools/7.2.12/Tools
 export HEXAGON_ARM_SYSROOT := /opt/tools/leo/Qualcomm/qrlinux_sysroot
 
+export INDIGO_ARM_SYSROOT :=  /opt/tools/leo/Qualcomm/indigo_sysroot
+
 CRC := $(BUILD_ROOT)/mk/bin/run_file_crc.sh
 
 NM:= /usr/bin/nm
