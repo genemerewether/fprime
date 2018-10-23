@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  SDRosIfaceImpl.cpp
+// \title  HLRosIfaceImpl.cpp
 // \author mereweth
-// \brief  cpp file for SDRosIface component implementation class
+// \brief  cpp file for HLRosIface component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -18,8 +18,8 @@
 // ======================================================================
 
 
-#include <SDREF/SDRosIface/SDRosIfaceComponentImpl.hpp>
-#include <SDREF/SDRosIface/SDRosIfaceComponentImplCfg.hpp>
+#include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <HLProc/HLRosIface/HLRosIfaceComponentImplCfg.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
 #include <stdio.h>
@@ -29,20 +29,20 @@
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
-namespace SDREF {
+namespace HLProc {
 
   // ----------------------------------------------------------------------
   // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
-  SDRosIfaceComponentImpl ::
+  HLRosIfaceComponentImpl ::
 #if FW_OBJECT_NAMES == 1
-    SDRosIfaceComponentImpl(
+    HLRosIfaceComponentImpl(
         const char *const compName
     ) :
-      SDRosIfaceComponentBase(compName),
+      HLRosIfaceComponentBase(compName),
 #else
-    SDRosIfaceImpl(void),
+    HLRosIfaceImpl(void),
 #endif
     m_rgNH(NULL),
     m_imuStateUpdateSet() // zero-initialize instead of default-initializing
@@ -53,21 +53,21 @@ namespace SDREF {
       }
   }
 
-    void SDRosIfaceComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       init(
           const NATIVE_INT_TYPE instance
       )
     {
-      SDRosIfaceComponentBase::init(instance);
+      HLRosIfaceComponentBase::init(instance);
     }
 
-    SDRosIfaceComponentImpl ::
-      ~SDRosIfaceComponentImpl(void)
+    HLRosIfaceComponentImpl ::
+      ~HLRosIfaceComponentImpl(void)
     {
 
     }
 
-    void SDRosIfaceComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       startPub() {
         ros::NodeHandle n;
         m_rgNH = &n;
@@ -84,13 +84,13 @@ namespace SDREF {
         }
     }
 
-    Os::Task::TaskStatus SDRosIfaceComponentImpl ::
+    Os::Task::TaskStatus HLRosIfaceComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
-        Os::TaskString name("SDROSIFACE");
+        Os::TaskString name("HLROSIFACE");
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
-          stackSize, SDRosIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
+          stackSize, HLRosIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
         if (stat != Os::Task::TASK_OK) {
             DEBUG_PRINT("Task start error: %d\n",stat);
@@ -102,7 +102,7 @@ namespace SDREF {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-    void SDRosIfaceComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       Imu_handler(
           const NATIVE_INT_TYPE portNum,
           ROS::sensor_msgs::ImuNoCov &Imu
@@ -134,7 +134,7 @@ namespace SDREF {
         m_imuPub[portNum].publish(msg);
     }
 
-    void SDRosIfaceComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       sched_handler(
           const NATIVE_INT_TYPE portNum,
           NATIVE_UINT_TYPE context
@@ -173,7 +173,7 @@ namespace SDREF {
         }
     }
 
-    void SDRosIfaceComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       Odometry_handler(
           const NATIVE_INT_TYPE portNum,
           ROS::nav_msgs::OdometryNoCov &Odometry
@@ -215,7 +215,7 @@ namespace SDREF {
         m_odomPub[portNum].publish(msg);
     }
 
-    void SDRosIfaceComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       pingIn_handler(
           const NATIVE_INT_TYPE portNum,
           U32 key
@@ -230,29 +230,29 @@ namespace SDREF {
     // ----------------------------------------------------------------------
 
     //! Entry point for task waiting for messages
-    void SDRosIfaceComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       intTaskEntry(void * ptr) {
-        DEBUG_PRINT("SDRosIface task entry\n");
+        DEBUG_PRINT("HLRosIface task entry\n");
 
         FW_ASSERT(ptr);
-        SDRosIfaceComponentImpl* compPtr = (SDRosIfaceComponentImpl*) ptr;
-        //compPtr->log_ACTIVITY_LO_SDROSIFACE_IntTaskStarted();
+        HLRosIfaceComponentImpl* compPtr = (HLRosIfaceComponentImpl*) ptr;
+        //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
         ros::NodeHandle n;
         ros::CallbackQueue localCallbacks;
         n.setCallbackQueue(&localCallbacks);
-/*
-        OdometryHandler gtHandler(compPtr, 0);
 
-        ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 1000,
+        ImuStateUpdateHandler gtHandler(compPtr, 0);
+
+        ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 10,
                                             &ImuStateUpdateHandler::imuStateUpdateCallback,
                                             &gtHandler,
                                             ros::TransportHints().tcpNoDelay());
-*/
+
 
         ActuatorsHandler actuatorsHandler(compPtr, 0);
 
-        ros::Subscriber actuatorsSub0 = n.subscribe("command", 1000,
+        ros::Subscriber actuatorsSub0 = n.subscribe("command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler,
                                             ros::TransportHints().tcpNoDelay());
@@ -263,8 +263,8 @@ namespace SDREF {
         }
     }
 
-    SDRosIfaceComponentImpl :: ActuatorsHandler ::
-      ActuatorsHandler(SDRosIfaceComponentImpl* compPtr,
+    HLRosIfaceComponentImpl :: ActuatorsHandler ::
+      ActuatorsHandler(HLRosIfaceComponentImpl* compPtr,
                       int portNum) :
       compPtr(compPtr),
       portNum(portNum)
@@ -273,19 +273,19 @@ namespace SDREF {
         FW_ASSERT(portNum < NUM_ACTUATORSDATA_OUTPUT_PORTS); //compPtr->getNum_ImuStateUpdate_OutputPorts());
     }
 
-    SDRosIfaceComponentImpl :: ActuatorsHandler :: ~ActuatorsHandler()
+    HLRosIfaceComponentImpl :: ActuatorsHandler :: ~ActuatorsHandler()
     {
 
     }
 
-    void SDRosIfaceComponentImpl :: ActuatorsHandler ::
+    void HLRosIfaceComponentImpl :: ActuatorsHandler ::
       actuatorsCallback(const mav_msgs::Actuators::ConstPtr& msg)
     {
         //TODO(mereweth)
     }
 
-    SDRosIfaceComponentImpl :: ImuStateUpdateHandler ::
-      ImuStateUpdateHandler(SDRosIfaceComponentImpl* compPtr,
+    HLRosIfaceComponentImpl :: ImuStateUpdateHandler ::
+      ImuStateUpdateHandler(HLRosIfaceComponentImpl* compPtr,
                       int portNum) :
       compPtr(compPtr),
       portNum(portNum)
@@ -294,12 +294,12 @@ namespace SDREF {
         FW_ASSERT(portNum < NUM_IMUSTATEUPDATE_OUTPUT_PORTS); //compPtr->getNum_ImuStateUpdate_OutputPorts());
     }
 
-    SDRosIfaceComponentImpl :: ImuStateUpdateHandler :: ~ImuStateUpdateHandler()
+    HLRosIfaceComponentImpl :: ImuStateUpdateHandler :: ~ImuStateUpdateHandler()
     {
 
     }
 
-/*    void SDRosIfaceComponentImpl :: ImuStateUpdateHandler ::
+    void HLRosIfaceComponentImpl :: ImuStateUpdateHandler ::
       imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg)
     {
         FW_ASSERT(this->compPtr);
@@ -311,7 +311,7 @@ namespace SDREF {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
-            /*Odometry odom(
+            ImuStateUpdate imuStateUpdate(
               Header(msg->header.seq,
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
@@ -332,19 +332,25 @@ namespace SDREF {
                                         Vector3(msg->twist.twist.angular.x,
                                                 msg->twist.twist.angular.y,
                                                 msg->twist.twist.angular.z)),
-                                  msg->twist.covariance.data(), 36)
-            ); // end Odometry constructor
-*/
-/*            this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
+                                  msg->twist.covariance.data(), 36),
+              Vector3(msg->angular_velocity_bias.x,
+                      msg->angular_velocity_bias.y,
+                      msg->angular_velocity_bias.z),
+              Vector3(msg->linear_acceleration_bias.x,
+                      msg->linear_acceleration_bias.y,
+                      msg->linear_acceleration_bias.z)
+            ); // end ImuStateUpdate constructor
+
+            this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
             if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
                 this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
                 DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
             }
-            //this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
+            this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
             this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
         }
-    }*/
+    }
 
 
 } // end namespace

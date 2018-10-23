@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<component name="SDRosIface" kind="passive" namespace="SDREF" modeler="true">
+<component name="HLRosIface" kind="passive" namespace="HLProc" modeler="true">
 
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdatePortAi.xml</import_port_type>

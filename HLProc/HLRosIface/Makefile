@@ -4,7 +4,7 @@
 
 # derive module name from directory
 
-MODULE_DIR = SDREF/SDRosIface
+MODULE_DIR = HLProc/HLRosIface
 MODULE = $(subst /,,$(MODULE_DIR))
 
 BUILD_ROOT ?= $(subst /$(MODULE_DIR),,$(CURDIR))

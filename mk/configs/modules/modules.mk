@@ -100,6 +100,9 @@ DRV_MODULES := \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts
 
+HLPROC_MODULES := \
+	HLProc/HLRosIface
+
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter \
@@ -201,12 +204,13 @@ Ref_MODULES := \
 
 SDREF_DEPLOYMENT_MODULES := \
 	HEXREF/Rpc \
-	SDREF/SDRosIface \
 	SDREF/Top
 
 SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
+	\
+	$(HLPROC_MODULES) \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \

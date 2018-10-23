@@ -15,7 +15,7 @@
 	<import_component_type>Svc/PrmDb/PrmDbComponentAi.xml</import_component_type>
 	<import_component_type>Svc/CmdSequencer/CmdSequencerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveTextLogger/PassiveTextLoggerComponentAi.xml</import_component_type>
-	<import_component_type>SDREF/SDRosIface/SDRosIfaceComponentAi.xml</import_component_type>
+	<import_component_type>HLProc/HLRosIface/HLRosIfaceComponentAi.xml</import_component_type>
 
    <instance namespace="Svc" name="fatalHandler" type="FatalHandler" base_id="1"  base_id_window="20" />
 
@@ -45,7 +45,7 @@
 
    <instance namespace="Svc" name="textLogger" type="PassiveTextLogger" base_id="521"  base_id_window="20" />
 
-   <instance namespace="SDREF" name="sdRosIface" type="SDRosIface"/>
+   <instance namespace="HLProc" name="sdRosIface" type="HLRosIface"/>
 
 
 <connection name = "Connection1">

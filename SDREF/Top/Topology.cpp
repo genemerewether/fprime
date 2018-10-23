@@ -127,7 +127,7 @@ SnapdragonFlight::HexRouterComponentImpl hexRouter
 #endif
 ;
 
-SDREF::SDRosIfaceComponentImpl sdRosIface
+HLProc::HLRosIfaceComponentImpl sdRosIface
 #if FW_OBJECT_NAMES == 1
                     ("SDROSIFACE")
 #endif

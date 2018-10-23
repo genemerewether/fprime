@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  SDRosIfaceImpl.hpp
+// \title  HLRosIfaceImpl.hpp
 // \author mereweth
-// \brief  hpp file for SDRosIface component implementation class
+// \brief  hpp file for HLRosIface component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,24 +17,23 @@
 // countries or providing access to foreign persons.
 // ======================================================================
 
-#ifndef SDRosIface_HPP
-#define SDRosIface_HPP
+#ifndef HLRosIface_HPP
+#define HLRosIface_HPP
 
-#include "SDREF/SDRosIface/SDRosIfaceComponentAc.hpp"
+#include "HLProc/HLRosIface/HLRosIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
 #include "mav_msgs/Actuators.h"
-
-// TODO - ImuStateUpdate.h
+#include "mav_msgs/ImuStateUpdate.h"
 
 #include "Os/Mutex.hpp"
 
-namespace SDREF {
+namespace HLProc {
 
-  class SDRosIfaceComponentImpl :
-    public SDRosIfaceComponentBase
+  class HLRosIfaceComponentImpl :
+    public HLRosIfaceComponentBase
   {
 
     public:
@@ -43,9 +42,9 @@ namespace SDREF {
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
 
-      //! Construct object SDRosIface
+      //! Construct object HLRosIface
       //!
-      SDRosIfaceComponentImpl(
+      HLRosIfaceComponentImpl(
 #if FW_OBJECT_NAMES == 1
           const char *const compName /*!< The component name*/
 #else
@@ -53,15 +52,15 @@ namespace SDREF {
 #endif
       );
 
-      //! Initialize object SDRosIface
+      //! Initialize object HLRosIface
       //!
       void init(
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
-      //! Destroy object SDRosIface
+      //! Destroy object HLRosIface
       //!
-      ~SDRosIfaceComponentImpl(void);
+      ~HLRosIfaceComponentImpl(void);
 
       void startPub();
 
@@ -79,7 +78,7 @@ namespace SDREF {
         class ActuatorsHandler
         {
           public:
-              ActuatorsHandler(SDRosIfaceComponentImpl* compPtr,
+              ActuatorsHandler(HLRosIfaceComponentImpl* compPtr,
                              int portNum);
 
               ~ActuatorsHandler();
@@ -88,7 +87,7 @@ namespace SDREF {
 
           PRIVATE:
 
-              SDRosIfaceComponentImpl* compPtr;
+              HLRosIfaceComponentImpl* compPtr;
 
               const unsigned int portNum;
 
@@ -97,16 +96,16 @@ namespace SDREF {
         class ImuStateUpdateHandler
         {
           public:
-              ImuStateUpdateHandler(SDRosIfaceComponentImpl* compPtr,
+              ImuStateUpdateHandler(HLRosIfaceComponentImpl* compPtr,
                               int portNum);
 
               ~ImuStateUpdateHandler();
 
-              //void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
+              void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
 
           PRIVATE:
 
-              SDRosIfaceComponentImpl* compPtr;
+              HLRosIfaceComponentImpl* compPtr;
 
               const unsigned int portNum;
 

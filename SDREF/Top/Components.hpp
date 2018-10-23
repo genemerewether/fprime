@@ -22,7 +22,7 @@ void exitTasks(void);
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
-#include <SDREF/SDRosIface/SDRosIfaceComponentImpl.hpp>
+#include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 
 #include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
@@ -44,7 +44,7 @@ extern Svc::PrmDbImpl prmDb;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
-extern SDREF::SDRosIfaceComponentImpl sdRosIface;
+extern HLProc::HLRosIfaceComponentImpl sdRosIface;
 extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 
 #endif
