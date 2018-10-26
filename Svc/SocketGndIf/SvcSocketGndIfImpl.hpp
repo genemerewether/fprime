@@ -17,7 +17,7 @@ namespace Svc {
             void init(NATIVE_INT_TYPE instance);
             ~SocketGndIfImpl();
             void openSocket(NATIVE_INT_TYPE port);
-            void startSocketTask(I32 priority, U32 port_number, char* hostname);
+            void startSocketTask(I32 priority, NATIVE_INT_TYPE stackSize, U32 port_number, char* hostname, NATIVE_INT_TYPE cpuAffinity = -1);
         private:
 
 

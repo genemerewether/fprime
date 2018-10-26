@@ -29,9 +29,8 @@ enum {
 #include <HEXREF/Rpc/hexref.h>
 #endif
 
-#ifndef BUILD_SDFLIGHT
 #define LLROUTER
-#endif
+//#define LLROUTER_DEVICES
 
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
@@ -304,7 +303,7 @@ void constructApp(int port_number, char* hostname) {
     hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
-#ifdef LLROUTER
+#ifdef LLROUTER_DEVICES
     // Must start serial drivers after tasks that setup the buffers for the driver:
     serialDriverLL.open("/dev/ttyHS3",
                         Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
@@ -324,7 +323,7 @@ void constructApp(int port_number, char* hostname) {
 #endif
     
     // Initialize socket server
-    sockGndIf.startSocketTask(40, port_number, hostname);
+    sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -407,9 +406,9 @@ int main(int argc, char* argv[]) {
     bool kraitCycle = false;
     bool hexCycle = true;
     int numKraitCycles = 0;
-    U32 port_number = 0;
+    U32 port_number = 50000;
     I32 option = 0;
-    char *hostname = NULL;
+    char *hostname = "localhost";
     bool local_cycle = false;
 
     // Removes ROS cmdline args as a side-effect
