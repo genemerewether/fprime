@@ -951,7 +951,7 @@ namespace HLProc {
   void Tester ::
     from_SerialBufferSend_handler(
         const NATIVE_INT_TYPE portNum,
-        Fw::Buffer &fwBuffer
+        Fw::Buffer fwBuffer
     )
   {
     this->pushFromPortEntry_SerialBufferSend(fwBuffer);

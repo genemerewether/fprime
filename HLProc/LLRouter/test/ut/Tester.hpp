@@ -91,7 +91,7 @@ namespace HLProc {
       //!
       void from_SerialBufferSend_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &fwBuffer 
+          Fw::Buffer fwBuffer 
       );
 
     private:
