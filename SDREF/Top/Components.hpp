@@ -5,6 +5,7 @@ void exitTasks(void);
 
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
+#include <Svc/SerialTextConverter/SerialTextConverterImpl.hpp>
 
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
@@ -35,6 +36,8 @@ void exitTasks(void);
 
 extern Drv::LinuxSerialDriverComponentImpl serialDriverLL;
 extern Drv::LinuxSerialDriverComponentImpl serialDriverDebug;
+extern Svc::SerialTextConverterComponentImpl serialTextConv;
+extern HLProc::LLRouterComponentImpl llRouter;
 
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rgTlm;
@@ -51,7 +54,6 @@ extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
 extern HLProc::HLRosIfaceComponentImpl sdRosIface;
-extern HLProc::LLRouterComponentImpl llRouter;
 extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 
 #endif

@@ -149,6 +149,12 @@ Drv::LinuxSerialDriverComponentImpl serialDriverDebug
 #endif
 ;
 
+Svc::SerialTextConverterComponentImpl serialTextConv
+#if FW_OBJECT_NAMES == 1
+                    ("STCONVERTER")
+#endif
+;
+
 HLProc::HLRosIfaceComponentImpl sdRosIface
 #if FW_OBJECT_NAMES == 1
                     ("SDROSIFACE")
@@ -229,11 +235,10 @@ void constructApp(int port_number, char* hostname) {
     sdRosIface.init(10);
     actuatorAdapter.init(0);
 
-#ifdef LLROUTER
+    serialTextConv.init(20,0);
     llRouter.init(10,SERIAL_BUFFER_SIZE,0);
     serialDriverLL.init();
     serialDriverDebug.init();
-#endif
     
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
@@ -266,11 +271,16 @@ void constructApp(int port_number, char* hostname) {
 
 #ifdef LLROUTER
     llRouter.regCommands();
+    serialTextConv.regCommands();
 #endif
     
     // read parameters
     prmDb.readParamFile();
 
+    char logFileName[256];
+    snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", 0); //boot_count % 10);
+    serialTextConv.set_log_file(logFileName, 100*1024, 0);
+    
     // Active component startup
     // start rate groups
     rgTlm.start(0, 50, 20*1024);
@@ -288,6 +298,7 @@ void constructApp(int port_number, char* hostname) {
 
 #ifdef LLROUTER
     llRouter.start(0, 85, 20*1024);
+    serialTextConv.start(0,79,20*1024);
 #endif
     
     hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
@@ -350,6 +361,7 @@ void exitTasks(void) {
     serialDriverLL.quitReadThread();
     serialDriverDebug.quitReadThread();
     llRouter.exit();
+    serialTextConv.exit();
 #endif
     
     DEBUG_PRINT("After HexRouter read thread quit\n");
