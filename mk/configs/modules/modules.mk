@@ -84,9 +84,11 @@ SVC_MODULES := \
 	Svc/WatchDog \
 	Svc/FileUplink \
 	Svc/FileDownlink \
-    Svc/AssertFatalAdapter \
-    Svc/FatalHandler \
-	Svc/FileManager
+	Svc/AssertFatalAdapter \
+	Svc/FatalHandler \
+	Svc/FileManager \
+	Svc/SerialTextConverter \
+	Svc/ActiveTextLogger
 
 DRV_MODULES := \
 	Drv/DataTypes \

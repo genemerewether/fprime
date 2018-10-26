@@ -32,6 +32,9 @@ namespace Os {
                 flags = O_RDONLY;
                 break;
             case OPEN_WRITE:
+                flags = O_WRONLY | O_CREAT;
+                break;
+            case OPEN_CREATE:
                 flags = O_WRONLY | O_CREAT | O_TRUNC;
                 break;
             default:
@@ -43,7 +46,7 @@ namespace Os {
 #ifdef __VXWORKS__
         0;
 #else
-        S_IRUSR|S_IWRITE;
+        S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
 #endif
         NATIVE_INT_TYPE fd = ::open(fileName,flags,userFlags);
 
