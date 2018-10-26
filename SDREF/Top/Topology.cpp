@@ -29,6 +29,10 @@ enum {
 #include <HEXREF/Rpc/hexref.h>
 #endif
 
+#ifndef BUILD_SDFLIGHT
+#define LLROUTER
+#endif
+
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
@@ -127,6 +131,24 @@ SnapdragonFlight::HexRouterComponentImpl hexRouter
 #endif
 ;
 
+HLProc::LLRouterComponentImpl llRouter
+#if FW_OBJECT_NAMES == 1
+                    ("LLROUTER")
+#endif
+;
+
+Drv::LinuxSerialDriverComponentImpl serialDriverLL
+#if FW_OBJECT_NAMES == 1
+                    ("SERIALDRVLL")
+#endif
+;
+
+Drv::LinuxSerialDriverComponentImpl serialDriverDebug
+#if FW_OBJECT_NAMES == 1
+                    ("SERIALDRVDBUG")
+#endif
+;
+
 HLProc::HLRosIfaceComponentImpl sdRosIface
 #if FW_OBJECT_NAMES == 1
                     ("SDROSIFACE")
@@ -207,6 +229,12 @@ void constructApp(int port_number, char* hostname) {
     sdRosIface.init(10);
     actuatorAdapter.init(0);
 
+#ifdef LLROUTER
+    llRouter.init(10,SERIAL_BUFFER_SIZE,0);
+    serialDriverLL.init();
+    serialDriverDebug.init();
+#endif
+    
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
@@ -236,6 +264,10 @@ void constructApp(int port_number, char* hostname) {
     eventLogger.regCommands();
     prmDb.regCommands();
 
+#ifdef LLROUTER
+    llRouter.regCommands();
+#endif
+    
     // read parameters
     prmDb.readParamFile();
 
@@ -254,12 +286,35 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter.start(0, 90, 20*1024);//, CORE_RPC);
 
+#ifdef LLROUTER
+    llRouter.start(0, 85, 20*1024);
+#endif
+    
     hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
+#ifdef LLROUTER
+    // Must start serial drivers after tasks that setup the buffers for the driver:
+    serialDriverLL.open("/dev/ttyHS3",
+                        Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                        Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                        Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                        true);
+    
+    serialDriverDebug.open("/dev/ttyHS2",
+                           Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                           Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                           Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                           true);
+    
+    /* ---------- Done opening devices, now start device threads ---------- */
+    serialDriverLL.startReadThread(98, 20*1024);
+    serialDriverDebug.startReadThread(40, 20*1024);
+#endif
+    
     // Initialize socket server
     sockGndIf.startSocketTask(40, port_number, hostname);
-
+    
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -290,6 +345,13 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     hexRouter.quitReadThreads();
+    
+#ifdef LLROUTER
+    serialDriverLL.quitReadThread();
+    serialDriverDebug.quitReadThread();
+    llRouter.exit();
+#endif
+    
     DEBUG_PRINT("After HexRouter read thread quit\n");
     rgTlm.exit();
     rgXfer.exit();

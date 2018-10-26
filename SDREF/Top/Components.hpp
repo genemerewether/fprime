@@ -23,12 +23,18 @@ void exitTasks(void);
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 
 #include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
+
+#include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
+
+extern Drv::LinuxSerialDriverComponentImpl serialDriverLL;
+extern Drv::LinuxSerialDriverComponentImpl serialDriverDebug;
 
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rgTlm;
@@ -45,6 +51,7 @@ extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
 extern HLProc::HLRosIfaceComponentImpl sdRosIface;
+extern HLProc::LLRouterComponentImpl llRouter;
 extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 
 #endif
