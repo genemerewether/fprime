@@ -105,7 +105,9 @@ LLPROC_MODULES := \
 	LLProc/Ports
 
 HLPROC_MODULES := \
-	HLProc/HLRosIface
+	HLProc/HLRosIface \
+	HLProc/LLRouter \
+	HLProc/Cfg
 
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \

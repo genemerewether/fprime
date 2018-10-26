@@ -61,3 +61,5 @@ core
 *.map
 *_dead_funcs.xml
 *_linkInfo.xml
+
+*~
