@@ -29,3 +29,6 @@
 	path = Gnc/tools/pybind11
 	url = https://github.com/pybind/pybind11.git
 	branch = master
+[submodule "cross_toolchain"]
+	path = cross_toolchain
+	url = https://github.com/ATLFlight/cross_toolchain.git

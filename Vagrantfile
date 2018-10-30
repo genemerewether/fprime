@@ -65,4 +65,5 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_x11 = true
 
   config.vm.provision :shell, :path => "provision_vm.bash", privileged: false
+  config.vm.provision :shell, :path => "bootstrap.bash", privileged: false
 end
