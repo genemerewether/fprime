@@ -40,6 +40,9 @@ R5_MODULES := \
 	R5/TiHal \
 	R5/R5FlashApi
 
+COMMON_MODULES := \
+	Common/Ports
+
 OS_MODULES := \
 	Os
 
@@ -104,7 +107,11 @@ DRV_MODULES := \
 
 LLPROC_MODULES := \
 	LLProc/HLRouter \
-	LLProc/Ports
+	Utils/Hash \
+	LLProc/ShortLogQueue \
+	LLProc/Ports \
+	LLProc/LLDebug \
+	LLProc/LLCycle
 
 HLPROC_MODULES := \
 	HLProc/HLRosIface \
@@ -219,6 +226,8 @@ SDREF_MODULES := \
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
 	$(HLPROC_MODULES) \
+	\
+	$(COMMON_MODULES) \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
@@ -345,6 +354,8 @@ R5REF_DEPLOYMENT_MODULES := \
 R5REF_MODULES := \
 	$(ROS_TYPE_MODULES) \
 	$(ROS_PORT_MODULES) \
+	\
+	$(COMMON_MODULES) \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \

@@ -20,6 +20,11 @@ void exitTasks();
 #include <R5/R5Time/R5TimeComponentImpl.hpp>
 #include <R5/R5Prm/R5PrmComponentImpl.hpp>
 
+#include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
+#include <LLProc/LLDebug/LLDebugComponentImpl.hpp>
+#include <LLProc/LLCycle/LLCycleComponentImpl.hpp>
+#include <LLProc/HLRouter/HLRouterComponentImpl.hpp>
+
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
@@ -37,5 +42,10 @@ extern R5::R5UartDriverComponentImpl* debugUart_ptr;
 extern R5::R5TimeComponentImpl* r5Time_ptr;
 extern R5::R5A2DDriverComponentImpl* a2dDrv_ptr;
 extern R5::R5PrmComponentImpl* prm_ptr;
+
+extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
+extern LLProc::LLDebugComponentImpl* llDebug_ptr;
+extern LLProc::LLCycleComponentImpl* llCycle_ptr;
+extern LLProc::HLRouterComponentImpl* hlRouter_ptr;
 
 #endif

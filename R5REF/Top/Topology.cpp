@@ -35,6 +35,11 @@ R5::R5TimeComponentImpl* r5Time_ptr = 0;
 R5::R5A2DDriverComponentImpl* a2dDrv_ptr = 0;
 R5::R5PrmComponentImpl* prm_ptr = 0;
 
+LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
+LLProc::LLDebugComponentImpl* llDebug_ptr = 0;
+LLProc::LLCycleComponentImpl* llCycle_ptr = 0;
+LLProc::HLRouterComponentImpl* hlRouter_ptr = 0;
+
 static R5DmaAllocator alloc;
 
 void allocComps() {
@@ -141,6 +146,30 @@ void allocComps() {
                         ("prm")
     #endif
     ;
+
+    logQueue_ptr = new LLProc::ShortLogQueueComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("slog")
+    #endif
+    ;
+
+    llDebug_ptr = new LLProc::LLDebugComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("dbg")
+    #endif
+    ;
+
+    llCycle_ptr = new LLProc::LLCycleComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("cycle")
+    #endif
+    ;
+
+    hlRouter_ptr = new LLProc::HLRouterComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("hlRouter")
+    #endif
+    ;
 }
 
 void manualConstruct() {
@@ -158,6 +187,8 @@ void manualConstruct() {
 
     //kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
     //kraitRouter.set_KraitPortsOut_OutputPort(2, escPwm.get_pwmSetDuty_InputPort(1));
+
+    logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
 }
 
 void constructApp() {
@@ -175,6 +206,10 @@ void constructApp() {
     actuatorAdapter_ptr->init(0);
     imuInteg_ptr->init(0);
     mpu9250_ptr->init(0);
+
+    hlRouter_ptr->init(0);
+
+    a2dDrv_ptr->init(0);
 
     // initialize GPIO
     gpio_ptr->init(0);
@@ -202,6 +237,11 @@ void constructApp() {
 
     prm_ptr->init(0);
 
+    logQueue_ptr->init(0);
+
+    llDebug_ptr->init(0);
+    llCycle_ptr->init(0);
+
     // Connect rate groups to rate group driver
     constructR5REFArchitecture();
 
@@ -212,7 +252,7 @@ void constructApp() {
 }
 
 void cycleForever(void) {
-  while (1) {
-    //cycler.runCycles(1);
-  }
+    while (1) {
+        llCycle_ptr->runCycles(1);
+    }
 }

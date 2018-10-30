@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+
+<component name="LLCycle" kind="passive" namespace="LLProc">
+
+    <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
+
+    <import_port_type>R5/Ports/GpioWaitPortAi.xml</import_port_type>
+
+    <import_port_type>Fw/Time/SetTimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/StartTimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>LLProc/Ports/DebugStringPortAi.xml</import_port_type>
+
+    <ports>
+        <port name="RateGroupOut" data_type="Svc::Cycle" kind="output">
+            <comment>Output port to cycle rate group</comment>
+
+        </port>
+        <port name="RtiWait" data_type="R5::GpioWait"  kind="output">
+           <comment>Output port waiting for next RTI</comment>
+        </port>
+
+        <port name="TimeSetPort" data_type="Fw::SetTime"  kind="output"    max_number="1">
+           <comment>Output port to set time</comment>
+        </port>
+        <port name="TimeStartPort" data_type="Fw::StartTime"  kind="output"    max_number="1">
+           <comment>Output port to start/stop the clock</comment>
+        </port>
+        <port name="TimeGetPort" data_type="Fw::Time"  kind="output"    max_number="1">
+           <comment>Output port to get current time</comment>
+        </port>
+        
+        <port name="DebugStringOut" data_type="LLProc::DebugString"  kind="output">
+           <comment>Port for Debug strings</comment>
+        </port>
+        
+    </ports>
+       
+</component>
