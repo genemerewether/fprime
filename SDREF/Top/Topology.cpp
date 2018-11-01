@@ -300,7 +300,7 @@ void constructApp(int port_number, char* hostname) {
     serialTextConv.start(0,79,20*1024);
 #endif
     
-    hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
+    hexRouter.startPortReadThread(90,20*1024); //, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
 #ifdef LLROUTER_DEVICES
