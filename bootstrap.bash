@@ -13,7 +13,7 @@ export UBUNTU_SYSROOT=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/${UBUNTU_SYSROOT_NAME}/
 sudo mkdir -p $SDFLIGHT_TOOLS_ROOT
 sudo chown $USER $SDFLIGHT_TOOLS_ROOT
 
-#REINSTALL=1
+REINSTALL=1
 
 if [ $REINSTALL ]; then
 # Install software
