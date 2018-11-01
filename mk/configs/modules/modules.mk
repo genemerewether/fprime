@@ -345,7 +345,11 @@ HEXREF_MODULES := \
 	\
 	$(CFDP_MODULES) \
 	\
-	$(UTILS_MODULES)
+	$(UTILS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	LLProc/ShortLogQueue
 #Svc/ComLogger
 
 R5REF_DEPLOYMENT_MODULES := \

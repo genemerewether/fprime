@@ -103,6 +103,13 @@ Svc::ActiveLoggerImpl eventLogger
 #endif
 ;
 
+
+LLProc::ShortLogQueueComponentImpl logQueue
+#if FW_OBJECT_NAMES == 1
+                    ("SLOG")
+#endif
+;
+
 Svc::LinuxTimeImpl linuxTime
 #if FW_OBJECT_NAMES == 1
                     ("LTIME")
@@ -200,8 +207,9 @@ void manualConstruct(void) {
     //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
     mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
-    //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
     imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+    
+    logQueue.set_LogSend_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(4));
 
     kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
     kraitRouter.set_KraitPortsOut_OutputPort(2, escPwm.get_pwmSetDuty_InputPort(1));
@@ -240,6 +248,7 @@ void constructApp() {
 #endif
 
     eventLogger.init(10, 0);
+    logQueue.init(0);
 
     linuxTime.init(0);
 

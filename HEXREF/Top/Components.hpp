@@ -28,12 +28,15 @@ void exitTasks(void);
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 
+#include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
+
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
 extern Svc::PassiveRateGroupImpl rgAtt;
 extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::ConsoleTextLoggerImpl textLogger;
+extern LLProc::ShortLogQueueComponentImpl logQueue;
 extern Svc::ActiveLoggerImpl eventLogger;
 extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
