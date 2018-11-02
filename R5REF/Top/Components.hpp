@@ -20,6 +20,8 @@ void exitTasks();
 #include <R5/R5Time/R5TimeComponentImpl.hpp>
 #include <R5/R5Prm/R5PrmComponentImpl.hpp>
 
+#include <R5/GpioAdapter/R5GpioAdapterComponentImpl.hpp>
+
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
 #include <LLProc/LLDebug/LLDebugComponentImpl.hpp>
 #include <LLProc/LLCycle/LLCycleComponentImpl.hpp>
@@ -42,6 +44,9 @@ extern R5::R5UartDriverComponentImpl* debugUart_ptr;
 extern R5::R5TimeComponentImpl* r5Time_ptr;
 extern R5::R5A2DDriverComponentImpl* a2dDrv_ptr;
 extern R5::R5PrmComponentImpl* prm_ptr;
+
+extern R5::R5GpioAdapterComponentImpl* rtiGpio_ptr;
+extern R5::R5GpioAdapterComponentImpl* faultGpio_ptr;
 
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLDebugComponentImpl* llDebug_ptr;

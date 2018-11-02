@@ -3,7 +3,7 @@
 
 <component name="LLDebug" kind="passive" namespace="LLProc">
     <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
-    <import_port_type>R5/Ports/GpioSetPortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioWritePortAi.xml</import_port_type>
     <import_port_type>LLProc/Ports/DebugStringPortAi.xml</import_port_type>
     <import_port_type>Common/Ports/EnablePortAi.xml</import_port_type>
     <comment>Debug component to handle debug messages and asserts</comment>
@@ -13,7 +13,7 @@
             Output port to serial driver to read accumulated data
             </comment>
         </port>
-        <port name="SwFault" data_type="R5::GpioSet"  kind="output">
+        <port name="SwFault" data_type="Drv::GpioWrite"  kind="output">
            <comment>Output port to signal software error</comment>
         </port>
         <port name="DebugStringIn" data_type="LLProc::DebugString"  kind="sync_input">

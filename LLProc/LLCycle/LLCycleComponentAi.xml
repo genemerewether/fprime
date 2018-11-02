@@ -6,7 +6,7 @@
 
     <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
 
-    <import_port_type>R5/Ports/GpioWaitPortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioWaitPortAi.xml</import_port_type>
 
     <import_port_type>Fw/Time/SetTimePortAi.xml</import_port_type>
     <import_port_type>Fw/Time/StartTimePortAi.xml</import_port_type>
@@ -18,7 +18,7 @@
             <comment>Output port to cycle rate group</comment>
 
         </port>
-        <port name="RtiWait" data_type="R5::GpioWait"  kind="output">
+        <port name="RtiWait" data_type="Drv::GpioWait"  kind="output">
            <comment>Output port waiting for next RTI</comment>
         </port>
 

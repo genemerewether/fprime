@@ -35,6 +35,9 @@ R5::R5TimeComponentImpl* r5Time_ptr = 0;
 R5::R5A2DDriverComponentImpl* a2dDrv_ptr = 0;
 R5::R5PrmComponentImpl* prm_ptr = 0;
 
+R5::R5GpioAdapterComponentImpl* rtiGpio_ptr = 0;
+R5::R5GpioAdapterComponentImpl* faultGpio_ptr = 0;
+
 LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
 LLProc::LLDebugComponentImpl* llDebug_ptr = 0;
 LLProc::LLCycleComponentImpl* llCycle_ptr = 0;
@@ -147,6 +150,18 @@ void allocComps() {
     #endif
     ;
 
+    rtiGpio_ptr = new R5::R5GpioAdapterComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("rtigpio")
+    #endif
+    ;
+
+    faultGpio_ptr = new R5::R5GpioAdapterComponentImpl
+    #if FW_OBJECT_NAMES == 1
+                        ("faultgpio")
+    #endif
+    ;
+
     logQueue_ptr = new LLProc::ShortLogQueueComponentImpl
     #if FW_OBJECT_NAMES == 1
                         ("slog")
@@ -181,13 +196,13 @@ void manualConstruct() {
     //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
     //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
-    mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_HexPortsIn_InputPort(1));
-    imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_HexPortsIn_InputPort(2));
+    mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
+    imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
   
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
 
-    hlRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
-    hlRouter_ptr->set_KraitPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
+    //hlRouter_ptr->set_HLPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
 }
 
 void constructApp() {

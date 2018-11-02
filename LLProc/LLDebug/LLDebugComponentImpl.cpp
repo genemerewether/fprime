@@ -106,7 +106,7 @@ namespace LLProc {
     void LLDebugComponentImpl::doAssert(void) {
         // write to fault GPIO
         if (this->isConnected_SwFault_OutputPort(0)) {
-            this->SwFault_out(0,SW_ASSERT_GPIO_BANK,SW_ASSERT_GPIO_BIT,R5::GPIO_SET_SET);
+            this->SwFault_out(0, true);
         }
         // assert locally if GPIO output doesn't reset us
         if (not this->m_disableAssert) {

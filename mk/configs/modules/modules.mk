@@ -27,6 +27,13 @@ FW_GTEST_MODULES := \
 R5_MODULES := \
 	R5/Ports \
 	\
+	Drv/GpioDriverPorts \
+	Drv/PwmDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	\
+	R5/GpioAdapter \
+	\
 	R5/A2DDrv \
 	R5/DmaDrv \
 	R5/GpioDrv \

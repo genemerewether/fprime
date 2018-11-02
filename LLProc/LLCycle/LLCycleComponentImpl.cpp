@@ -74,12 +74,12 @@ namespace LLProc {
           DEBUG_PRINT("Wait for RTI %d\n",this->m_rtiNum);
           bool alreadySet;
           if (this->isConnected_RtiWait_OutputPort(0)) {
-              this->RtiWait_out(0,LL_RTI_BANK,LL_RTI_BIT,alreadySet);
+              this->RtiWait_out(0, alreadySet);
           }
           if (this->m_firstRti) {
               this->m_firstRti = false;
               if (this->isConnected_RtiWait_OutputPort(0)) {
-                  this->RtiWait_out(0,LL_RTI_BANK,LL_RTI_BIT,alreadySet);
+                  this->RtiWait_out(0, alreadySet);
               }
               DEBUG_PRINT("Received first RTI %d\n",this->m_rtiNum);
               this->m_rtiNum++;
