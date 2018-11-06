@@ -234,8 +234,8 @@ void constructApp() {
     // inialize SPI drivers
     spiMaster_ptr->init(0);
     spiMaster_ptr->initDriver(0,
-                              0, (256 * 2),
-                              0, 256,
+                              0, 32,
+                              0, 512,
                               alloc);
 
     hlUart_ptr->init(HL_UART_INSTANCE);
