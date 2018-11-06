@@ -107,7 +107,9 @@ namespace R5 {
     )
   {
       this->spiSend_handler(portNum, writeBuffer, (readBuffer.getsize() / sizeof(U16)));
-      this->spiRecv_handler(portNum, readBuffer);
+      if (0 < readBuffer.getsize()) {
+          this->spiRecv_handler(portNum, readBuffer);
+      }
   }
   
   void R5SpiMasterDriverComponentImpl ::

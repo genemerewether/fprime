@@ -128,10 +128,12 @@ void SpiMasterDrvSend(U16* transmitBufPtr, U32 transmitBufSize, U32 receiveBufSi
 {
     if(spiMasterDrvState.transmitFlag) {
         // Wait for the DMA BTC interrupt status (DMA channel 2 receive done)
+        const U32 waitReg = (0 < spiMasterDrvState.lastReceiveSize) ? (DMA_CH3_MASK | DMA_CH2_MASK) : DMA_CH3_MASK;
+        
         U32 reg_btc;
         do {
-            reg_btc = ((DMA_CH3_MASK | DMA_CH2_MASK) & dmaREG->BTCFLAG);
-        } while((DMA_CH3_MASK | DMA_CH2_MASK) != reg_btc);
+            reg_btc = (waitReg & dmaREG->BTCFLAG);
+        } while(waitReg != reg_btc);
 
         // Clear the DMA BTC interrupt status bit
         dmaREG->BTCFLAG = reg_btc;
@@ -160,12 +162,18 @@ void SpiMasterDrvSend(U16* transmitBufPtr, U32 transmitBufSize, U32 receiveBufSi
     if(lastBuff) {
         spiMasterDrvState.lastReceiveSize = sizeof(U16) * receiveBufSize;
 
-        configSpiMasterDrvDmaReceive(SPI1_RX_ADDR, spiMasterDrvState.receiveDmaBufferPtr, receiveBufSize, DMA_CH2);
+        if (0 < receiveBufSize) {
+            configSpiMasterDrvDmaReceive(SPI1_RX_ADDR, spiMasterDrvState.receiveDmaBufferPtr, receiveBufSize, DMA_CH2);
+        }
+        
         configSpiMasterDrvDmaTransmit(SPI1_TX_ADDR, spiMasterDrvState.transmitDmaBufferPtr, spiMasterDrvState.currTransmitBufferSize, DMA_CH3);
 
         spiMasterDrvState.currTransmitBufferSize = 0;
 
-        dmaSetChEnable(DMA_CH2, DMA_HW);
+        if (0 < receiveBufSize) {
+            dmaSetChEnable(DMA_CH2, DMA_HW);
+        }
+        
         dmaSetChEnable(DMA_CH3, DMA_HW);
 
         // Enable SPI1 receive and transmit DMA requests
