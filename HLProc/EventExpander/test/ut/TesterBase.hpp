@@ -20,13 +20,13 @@
 #ifndef EventExpander_TESTER_BASE_HPP
 #define EventExpander_TESTER_BASE_HPP
 
-#include <Svc/EventExpander/EventExpanderComponentAc.hpp>
+#include <HLProc/EventExpander/EventExpanderComponentAc.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <Fw/Comp/PassiveComponentBase.hpp>
 #include <stdio.h>
 #include <Fw/Port/InputSerializePort.hpp>
 
-namespace Svc {
+namespace HLProc {
 
   //! \class EventExpanderTesterBase
   //! \brief Auto-generated base class for EventExpander component test harness
@@ -381,6 +381,6 @@ namespace Svc {
 
   };
 
-} // end namespace Svc
+} // end namespace HLProc
 
 #endif

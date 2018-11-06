@@ -20,9 +20,9 @@
 #ifndef EventExpander_HPP
 #define EventExpander_HPP
 
-#include "Svc/EventExpander/EventExpanderComponentAc.hpp"
+#include "HLProc/EventExpander/EventExpanderComponentAc.hpp"
 
-namespace Svc {
+namespace HLProc {
 
   class EventExpanderComponentImpl :
     public EventExpanderComponentBase
@@ -72,6 +72,6 @@ namespace Svc {
 
     };
 
-} // end namespace Svc
+} // end namespace HLProc
 
 #endif

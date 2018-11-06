@@ -109,7 +109,7 @@
     << "  Actual:   " << _e.time << "\n"; \
   }
 
-namespace Svc {
+namespace HLProc {
 
   //! \class EventExpanderGTestBase
   //! \brief Auto-generated base class for EventExpander component Google Test harness
@@ -177,6 +177,6 @@ namespace Svc {
 
   };
 
-} // end namespace Svc
+} // end namespace HLProc
 
 #endif

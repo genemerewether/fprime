@@ -19,7 +19,7 @@
 
 #include "GTestBase.hpp"
 
-namespace Svc {
+namespace HLProc {
 
   // ----------------------------------------------------------------------
   // Construction and destruction
@@ -110,4 +110,4 @@ namespace Svc {
       << "  Actual:   " << this->fromPortHistory_Time->size() << "\n";
   }
 
-} // end namespace Svc
+} // end namespace HLProc

@@ -18,10 +18,10 @@
 // ====================================================================== 
 
 
-#include <Svc/EventExpander/EventExpanderComponentImpl.hpp>
+#include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
-namespace Svc {
+namespace HLProc {
 
   // ----------------------------------------------------------------------
   // Construction, initialization, and destruction 
@@ -74,4 +74,4 @@ namespace Svc {
       this->LogSend_out(0,id,time,static_cast<Fw::LogSeverity>(severity),args);
   }
 
-} // end namespace Svc
+} // end namespace HLProc

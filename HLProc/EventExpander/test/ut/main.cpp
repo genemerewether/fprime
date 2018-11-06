@@ -1,18 +1,17 @@
 /*
- * ImuMgrTester.cpp
  *
  *  Created on: Jan 18, 2017
  *      Author: Gorang Gandhi
  */
 
-#include <Svc/EventExpander/test/ut/Tester.hpp>
+#include <HLProc/EventExpander/test/ut/Tester.hpp>
 #include <gtest/gtest.h>
 #include <Fw/Test/UnitTest.hpp>
 
 TEST(TestNominal,Nominal) {
 
     TEST_CASE(100.1.1,"Test event conversion");
-    Svc::Tester tester;
+    HLProc::Tester tester;
     tester.nominal();
 }
 

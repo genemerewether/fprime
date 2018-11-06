@@ -22,7 +22,7 @@
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 10
 
-namespace Svc {
+namespace HLProc {
 
   // ----------------------------------------------------------------------
   // Construction and destruction 
@@ -138,4 +138,4 @@ namespace Svc {
     );
   }
 
-} // end namespace Svc
+} // end namespace HLProc

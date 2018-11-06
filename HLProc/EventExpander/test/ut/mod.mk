@@ -3,7 +3,7 @@ TEST_SRC = 		GTestBase.cpp \
 				Tester.cpp \
 				main.cpp
 
-TEST_MODS = 	Svc/EventExpander \
+TEST_MODS = 	HLProc/EventExpander \
 				Common/Ports \
 				Svc/Sched \
 				Fw/Comp \

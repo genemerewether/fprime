@@ -21,7 +21,7 @@
 #include <string.h>
 #include "TesterBase.hpp"
 
-namespace Svc {
+namespace HLProc {
 
   // ----------------------------------------------------------------------
   // Construction, initialization, and destruction
@@ -363,4 +363,4 @@ namespace Svc {
     this->clearFromPortHistory();
   }
 
-} // end namespace Svc
+} // end namespace HLProc

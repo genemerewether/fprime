@@ -21,9 +21,9 @@
 #define TESTER_HPP
 
 #include "GTestBase.hpp"
-#include "Svc/EventExpander/EventExpanderComponentImpl.hpp"
+#include "HLProc/EventExpander/EventExpanderComponentImpl.hpp"
 
-namespace Svc {
+namespace HLProc {
 
   class Tester :
     public EventExpanderGTestBase
@@ -102,6 +102,6 @@ namespace Svc {
 
   };
 
-} // end namespace Svc
+} // end namespace HLProc
 
 #endif

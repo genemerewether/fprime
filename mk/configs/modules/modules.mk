@@ -99,7 +99,6 @@ SVC_MODULES := \
 	Svc/FileManager \
 	Svc/SerialTextConverter \
 	Svc/ActiveTextLogger \
-	Svc/EventExpander \
 	Svc/Tee
 
 DRV_MODULES := \
@@ -125,6 +124,7 @@ LLPROC_MODULES := \
 HLPROC_MODULES := \
 	HLProc/HLRosIface \
 	HLProc/LLRouter \
+	HLProc/EventExpander \
 	HLProc/Cfg
 
 SNAPDRAGON_MODULES := \
