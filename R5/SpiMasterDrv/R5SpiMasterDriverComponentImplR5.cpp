@@ -82,20 +82,11 @@ namespace R5 {
   void R5SpiMasterDriverComponentImpl ::
     spiSend_handler(
         NATIVE_INT_TYPE portNum, /*!< The port number*/
-        Fw::Buffer *buff,
-        U32 numBuffs
+        Fw::Buffer &buff
     )
-    {
-        if(0 < numBuffs) {
-            --numBuffs;
-
-            for(U32 i = 0; i < numBuffs; ++i) {
-                SpiMasterDrvSend((U16*)(buff[i].getdata()), (buff[i].getsize() / sizeof(U16)), false);
-            }
-
-            SpiMasterDrvSend((U16*)(buff[numBuffs].getdata()), (buff[numBuffs].getsize() / sizeof(U16)), true);
-        }
-    }
+  {
+      SpiMasterDrvSend((U16*)(buff.getdata()), (buff.getsize() / sizeof(U16)), true);
+  }
 
   void R5SpiMasterDriverComponentImpl ::
     spiRecv_handler(
@@ -104,6 +95,27 @@ namespace R5 {
     )
   {
       buff.setsize(SpiMasterDrvReceive((U8*)(buff.getdata()), buff.getsize()));
+  }
+
+
+  void R5SpiMasterDriverComponentImpl ::
+    spiSendRecv_handler(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &writeBuffer,
+        Fw::Buffer &readBuffer
+    )
+  {
+      this->spiSend_handler(portNum, writeBuffer);
+      this->spiRecv_handler(portNum, readBuffer);
+  }
+  
+  void R5SpiMasterDriverComponentImpl ::
+    spiConfig_handler(
+        const NATIVE_INT_TYPE portNum,
+        U32 busSpeed
+    )
+  {
+    // TODO
   }
 
 } // end namespace R5

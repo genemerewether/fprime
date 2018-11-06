@@ -85,10 +85,7 @@ namespace R5 {
 //       spiEnableLoopback(spiREG1, Analog_Lbk);
 
       Fw::Buffer rx_buffer(0, 0, (U64)rx_buf, (BUF_SIZE * sizeof(U16)));
-      Fw::Buffer tx_buffer[4];
-      for(unsigned i = 0; i < FW_NUM_ARRAY_ELEMENTS(tx_buffer); ++i) {
-          tx_buffer[i].set(0, 1, (U64)tx_buf, (BUF_SIZE * sizeof(U16)));
-      }
+      Fw::Buffer tx_buffer(0, 0, (U64)tx_buf, (BUF_SIZE * sizeof(U16)));
 
       U32 tx_config = ((dataconfig_t.CS_HOLD) ? 0x10000000U : 0U) |
                       ((dataconfig_t.WDEL) ? 0x04000000U : 0U) |
@@ -115,7 +112,7 @@ namespace R5 {
 
           // Send data
           rx_buffer.setsize(BUF_SIZE * sizeof(U16));
-          unsigned num_bufs = (tx_size + (BUF_SIZE / FW_NUM_ARRAY_ELEMENTS(tx_buffer) - 1)) / (BUF_SIZE / FW_NUM_ARRAY_ELEMENTS(tx_buffer));
+          /*unsigned num_bufs = (tx_size + (BUF_SIZE / FW_NUM_ARRAY_ELEMENTS(tx_buffer) - 1)) / (BUF_SIZE / FW_NUM_ARRAY_ELEMENTS(tx_buffer));
           for(unsigned i = 0, num_placed = 0; i < num_bufs; ++i) {
               unsigned buf_size = (((BUF_SIZE / FW_NUM_ARRAY_ELEMENTS(tx_buffer)) * (i + 1)) <= tx_size) ?
                                   (BUF_SIZE / FW_NUM_ARRAY_ELEMENTS(tx_buffer)) :
@@ -124,8 +121,8 @@ namespace R5 {
               tx_buffer[i].setdata((U64)(tx_buf + num_placed));
               tx_buffer[i].setsize(buf_size * sizeof(U16));
               num_placed += buf_size;
-          }
-          invoke_to_spiSend(0, tx_buffer, num_bufs);
+              }*/
+          invoke_to_spiSend(0, tx_buffer);
 
           // Wait for DMA to complete transmitting data
           U32 reg_btc;
@@ -177,6 +174,17 @@ namespace R5 {
         this->component.get_spiRecv_InputPort(0)
     );
 
+    // spiSendRecv
+    this->connect_to_spiSendRecv(
+        0,
+        this->component.get_spiSendRecv_InputPort(0)
+    );
+
+    // spiConfig
+    this->connect_to_spiConfig(
+        0,
+        this->component.get_spiConfig_InputPort(0)
+    );
   }
 
   void Tester ::

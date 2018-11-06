@@ -72,9 +72,8 @@ namespace R5 {
 
   void R5SpiMasterDriverComponentImpl ::
     spiSend_handler(
-            NATIVE_INT_TYPE portNum, /*!< The port number*/
-            Fw::Buffer *buff,
-            U32 numBuffs
+        const NATIVE_INT_TYPE portNum, /*!< The port number*/
+        Fw::Buffer &buff
     )
   {
   }
@@ -83,6 +82,23 @@ namespace R5 {
     spiRecv_handler(
         const NATIVE_INT_TYPE portNum,
         Fw::Buffer &buff
+    )
+  {
+  }
+
+  void R5SpiMasterDriverComponentImpl ::
+    spiSendRecv_handler(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &writeBuffer,
+        Fw::Buffer &readBuffer
+    )
+  {
+  }
+
+  void R5SpiMasterDriverComponentImpl ::
+    spiConfig_handler(
+        const NATIVE_INT_TYPE portNum,
+        U32 busSpeed
     )
   {
   }

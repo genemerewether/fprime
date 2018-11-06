@@ -1,1 +1,1 @@
-SRC = SpiReadWritePortAi.xml SpiConfigPortAi.xml
+SRC = SpiReadWritePortAi.xml SpiReadPortAi.xml SpiWritePortAi.xml SpiConfigPortAi.xml

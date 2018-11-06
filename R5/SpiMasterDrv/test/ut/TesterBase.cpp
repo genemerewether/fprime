@@ -50,7 +50,9 @@ namespace R5 {
   }
 
   void R5SpiMasterDriverTesterBase ::
-    init(NATIVE_INT_TYPE instance)
+    init(
+        const NATIVE_INT_TYPE instance
+    )
   {
 
     // Initialize base class
@@ -103,6 +105,52 @@ namespace R5 {
 
     }
 
+    // Initialize output port spiSendRecv
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_to_spiSendRecv();
+        ++_port
+    ) {
+      this->m_to_spiSendRecv[_port].init();
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_to_spiSendRecv[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_to_spiSendRecv[_port].setObjName(_portName);
+#endif
+
+    }
+
+    // Initialize output port spiConfig
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_to_spiConfig();
+        ++_port
+    ) {
+      this->m_to_spiConfig[_port].init();
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_to_spiConfig[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_to_spiConfig[_port].setObjName(_portName);
+#endif
+
+    }
+
   }
 
   // ----------------------------------------------------------------------
@@ -121,6 +169,18 @@ namespace R5 {
     return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_to_spiRecv);
   }
 
+  NATIVE_INT_TYPE R5SpiMasterDriverTesterBase ::
+    getNum_to_spiSendRecv(void) const
+  {
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_to_spiSendRecv);
+  }
+
+  NATIVE_INT_TYPE R5SpiMasterDriverTesterBase ::
+    getNum_to_spiConfig(void) const
+  {
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_to_spiConfig);
+  }
+
   // ----------------------------------------------------------------------
   // Connectors for to ports 
   // ----------------------------------------------------------------------
@@ -128,7 +188,7 @@ namespace R5 {
   void R5SpiMasterDriverTesterBase ::
     connect_to_spiSend(
         const NATIVE_INT_TYPE portNum,
-        R5::InputSpiSendPort *const spiSend
+        Drv::InputSpiWritePort *const spiSend
     ) 
   {
     FW_ASSERT(portNum < this->getNum_to_spiSend(),static_cast<AssertArg>(portNum));
@@ -138,11 +198,31 @@ namespace R5 {
   void R5SpiMasterDriverTesterBase ::
     connect_to_spiRecv(
         const NATIVE_INT_TYPE portNum,
-        R5::InputSpiReceivePort *const spiRecv
+        Drv::InputSpiReadPort *const spiRecv
     ) 
   {
     FW_ASSERT(portNum < this->getNum_to_spiRecv(),static_cast<AssertArg>(portNum));
     this->m_to_spiRecv[portNum].addCallPort(spiRecv);
+  }
+
+  void R5SpiMasterDriverTesterBase ::
+    connect_to_spiSendRecv(
+        const NATIVE_INT_TYPE portNum,
+        Drv::InputSpiReadWritePort *const spiSendRecv
+    ) 
+  {
+    FW_ASSERT(portNum < this->getNum_to_spiSendRecv(),static_cast<AssertArg>(portNum));
+    this->m_to_spiSendRecv[portNum].addCallPort(spiSendRecv);
+  }
+
+  void R5SpiMasterDriverTesterBase ::
+    connect_to_spiConfig(
+        const NATIVE_INT_TYPE portNum,
+        Drv::InputSpiConfigPort *const spiConfig
+    ) 
+  {
+    FW_ASSERT(portNum < this->getNum_to_spiConfig(),static_cast<AssertArg>(portNum));
+    this->m_to_spiConfig[portNum].addCallPort(spiConfig);
   }
 
 
@@ -153,14 +233,13 @@ namespace R5 {
   void R5SpiMasterDriverTesterBase ::
     invoke_to_spiSend(
         const NATIVE_INT_TYPE portNum,
-        Fw::Buffer *buff,
-        U32 numBuffs
+        Fw::Buffer &buff
     )
   {
     FW_ASSERT(portNum < this->getNum_to_spiSend(),static_cast<AssertArg>(portNum));
     FW_ASSERT(portNum < this->getNum_to_spiSend(),static_cast<AssertArg>(portNum));
     this->m_to_spiSend[portNum].invoke(
-        buff, numBuffs
+        buff
     );
   }
 
@@ -174,6 +253,33 @@ namespace R5 {
     FW_ASSERT(portNum < this->getNum_to_spiRecv(),static_cast<AssertArg>(portNum));
     this->m_to_spiRecv[portNum].invoke(
         buff
+    );
+  }
+
+  void R5SpiMasterDriverTesterBase ::
+    invoke_to_spiSendRecv(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &writeBuffer,
+        Fw::Buffer &readBuffer
+    )
+  {
+    FW_ASSERT(portNum < this->getNum_to_spiSendRecv(),static_cast<AssertArg>(portNum));
+    FW_ASSERT(portNum < this->getNum_to_spiSendRecv(),static_cast<AssertArg>(portNum));
+    this->m_to_spiSendRecv[portNum].invoke(
+        writeBuffer, readBuffer
+    );
+  }
+
+  void R5SpiMasterDriverTesterBase ::
+    invoke_to_spiConfig(
+        const NATIVE_INT_TYPE portNum,
+        U32 busSpeed
+    )
+  {
+    FW_ASSERT(portNum < this->getNum_to_spiConfig(),static_cast<AssertArg>(portNum));
+    FW_ASSERT(portNum < this->getNum_to_spiConfig(),static_cast<AssertArg>(portNum));
+    this->m_to_spiConfig[portNum].invoke(
+        busSpeed
     );
   }
 
@@ -193,6 +299,20 @@ namespace R5 {
   {
     FW_ASSERT(portNum < this->getNum_to_spiRecv(), static_cast<AssertArg>(portNum));
     return this->m_to_spiRecv[portNum].isConnected();
+  }
+
+  bool R5SpiMasterDriverTesterBase ::
+    isConnected_to_spiSendRecv(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_to_spiSendRecv(), static_cast<AssertArg>(portNum));
+    return this->m_to_spiSendRecv[portNum].isConnected();
+  }
+
+  bool R5SpiMasterDriverTesterBase ::
+    isConnected_to_spiConfig(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_to_spiConfig(), static_cast<AssertArg>(portNum));
+    return this->m_to_spiConfig[portNum].isConnected();
   }
 
 } // end namespace R5

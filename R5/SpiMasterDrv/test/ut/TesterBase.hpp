@@ -58,14 +58,28 @@ namespace R5 {
       //!
       void connect_to_spiSend(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          R5::InputSpiSendPort *const spiSend /*!< The port*/
+          Drv::InputSpiWritePort *const spiSend /*!< The port*/
       );
 
       //! Connect spiRecv to to_spiRecv[portNum]
       //!
       void connect_to_spiRecv(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          R5::InputSpiReceivePort *const spiRecv /*!< The port*/
+          Drv::InputSpiReadPort *const spiRecv /*!< The port*/
+      );
+
+      //! Connect spiSendRecv to to_spiSendRecv[portNum]
+      //!
+      void connect_to_spiSendRecv(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Drv::InputSpiReadWritePort *const spiSendRecv /*!< The port*/
+      );
+
+      //! Connect spiConfig to to_spiConfig[portNum]
+      //!
+      void connect_to_spiConfig(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Drv::InputSpiConfigPort *const spiConfig /*!< The port*/
       );
 
     protected:
@@ -99,8 +113,7 @@ namespace R5 {
       //!
       void invoke_to_spiSend(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer *buff, 
-          U32 numBuffs 
+          Fw::Buffer &buff 
       );
 
       //! Invoke the to port connected to spiRecv
@@ -108,6 +121,21 @@ namespace R5 {
       void invoke_to_spiRecv(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           Fw::Buffer &buff 
+      );
+
+      //! Invoke the to port connected to spiSendRecv
+      //!
+      void invoke_to_spiSendRecv(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &writeBuffer, 
+          Fw::Buffer &readBuffer 
+      );
+
+      //! Invoke the to port connected to spiConfig
+      //!
+      void invoke_to_spiConfig(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          U32 busSpeed 
       );
 
     public:
@@ -127,6 +155,18 @@ namespace R5 {
       //! \return The number of to_spiRecv ports
       //!
       NATIVE_INT_TYPE getNum_to_spiRecv(void) const;
+
+      //! Get the number of to_spiSendRecv ports
+      //!
+      //! \return The number of to_spiSendRecv ports
+      //!
+      NATIVE_INT_TYPE getNum_to_spiSendRecv(void) const;
+
+      //! Get the number of to_spiConfig ports
+      //!
+      //! \return The number of to_spiConfig ports
+      //!
+      NATIVE_INT_TYPE getNum_to_spiConfig(void) const;
 
     protected:
 
@@ -150,6 +190,22 @@ namespace R5 {
           const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
+      //! Check whether port is connected
+      //!
+      //! Whether to_spiSendRecv[portNum] is connected
+      //!
+      bool isConnected_to_spiSendRecv(
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
+      );
+
+      //! Check whether port is connected
+      //!
+      //! Whether to_spiConfig[portNum] is connected
+      //!
+      bool isConnected_to_spiConfig(
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
+      );
+
     private:
 
       // ----------------------------------------------------------------------
@@ -158,11 +214,19 @@ namespace R5 {
 
       //! To port connected to spiSend
       //!
-      R5::OutputSpiSendPort m_to_spiSend[1];
+      Drv::OutputSpiWritePort m_to_spiSend[1];
 
       //! To port connected to spiRecv
       //!
-      R5::OutputSpiReceivePort m_to_spiRecv[1];
+      Drv::OutputSpiReadPort m_to_spiRecv[1];
+
+      //! To port connected to spiSendRecv
+      //!
+      Drv::OutputSpiReadWritePort m_to_spiSendRecv[1];
+
+      //! To port connected to spiConfig
+      //!
+      Drv::OutputSpiConfigPort m_to_spiConfig[1];
 
   };
 

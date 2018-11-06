@@ -2,7 +2,7 @@ TEST_SRC = Tester.cpp TesterBase.cpp main.cpp
 
 TEST_SRC_TIR5 =
 
-TEST_MODS = R5/SpiMasterDrv R5/Ports R5/R5Mem R5/DmaDrv \
+TEST_MODS = R5/SpiMasterDrv Drv/SpiDriverPorts R5/R5Mem R5/DmaDrv \
 			Fw/Buffer \
 			Fw/Comp \
 			Fw/Obj \
