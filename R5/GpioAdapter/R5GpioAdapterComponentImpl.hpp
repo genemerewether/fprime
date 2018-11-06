@@ -82,8 +82,6 @@ namespace R5 {
       //!
       void waitIn_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          GpioWaitBank bank,
-          U32 bit,
           bool &alreadySet
       );
 

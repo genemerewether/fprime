@@ -107,8 +107,6 @@ namespace R5 {
   void R5GpioAdapterComponentImpl ::
     waitIn_handler(
         const NATIVE_INT_TYPE portNum,
-        GpioWaitBank bank,
-        U32 bit,
         bool &alreadySet
     )
   {
