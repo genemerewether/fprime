@@ -239,8 +239,8 @@ void constructApp() {
                               alloc);
 
     hlUart_ptr->init(HL_UART_INSTANCE);
-    hlUart_ptr->initDriver(0,200, // bytes - max we could send in one cycle
-                           0,400, // bytes - two cycles worth
+    hlUart_ptr->initDriver(0,400, // bytes - max we could send in one cycle
+                           0,800, // bytes - two cycles worth
                            alloc);
 
     debugUart_ptr->init(DEBUG_UART_INSTANCE);
