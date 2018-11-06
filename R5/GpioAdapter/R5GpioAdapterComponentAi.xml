@@ -5,7 +5,7 @@
 
     <import_port_type>Drv/GpioDriverPorts/GpioWritePortAi.xml</import_port_type>
     <import_port_type>Drv/GpioDriverPorts/GpioReadPortAi.xml</import_port_type>
-    <import_port_type>Drv/GpioDriverPorts/GpioWaitPortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioPollPortAi.xml</import_port_type>
 
     <import_port_type>R5/Ports/GpioSetPortAi.xml</import_port_type>
     <import_port_type>R5/Ports/GpioGetPortAi.xml</import_port_type>
@@ -19,7 +19,7 @@
         <port name="getIn" data_type="Drv::GpioRead"  kind="sync_input">
            <comment>Get a GPIO value</comment>
         </port>
-        <port name="waitIn" data_type="Drv::GpioWait"  kind="sync_input">
+        <port name="waitIn" data_type="Drv::GpioPoll"  kind="sync_input">
            <comment>Wait for a GPIO value</comment>
         </port>
     

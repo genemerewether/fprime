@@ -198,7 +198,7 @@ void manualConstruct() {
 
     mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
     imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
-  
+
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
 
     hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
@@ -227,6 +227,9 @@ void constructApp() {
 
     // initialize GPIO
     gpio_ptr->init(0);
+
+    rtiGpio_ptr->init(0);
+    faultGpio_ptr->init(0);
 
     // inialize SPI drivers
     spiMaster_ptr->init(0);
@@ -260,6 +263,9 @@ void constructApp() {
     constructR5REFArchitecture();
 
     manualConstruct();
+
+    rtiGpio_ptr->waitMapping(R5::GPIO_WAIT_BANK_A, 2);
+    faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);
 
     // load parameters from flash
     prm_ptr->load();

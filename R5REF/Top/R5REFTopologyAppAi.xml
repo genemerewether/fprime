@@ -10,12 +10,15 @@
 	<import_component_type>LLProc/ShortLogQueue/ShortLogQueueComponentAi.xml</import_component_type>
 	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
 	<import_component_type>R5/UartDrv/R5UartDriverComponentAi.xml</import_component_type>
+	<import_component_type>R5/GpioAdapter/R5GpioAdapterComponentAi.xml</import_component_type>
 	<import_component_type>LLProc/LLCycle/LLCycleComponentAi.xml</import_component_type>
+	<import_component_type>R5/GpioAdapter/R5GpioAdapterComponentAi.xml</import_component_type>
 	<import_component_type>LLProc/HLRouter/HLRouterComponentAi.xml</import_component_type>
 	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/BasicMixer/BasicMixerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/LeeCtrl/LeeCtrlComponentAi.xml</import_component_type>
+	<import_component_type>R5/GpioDrv/R5GpioDriverComponentAi.xml</import_component_type>
 
    <instance namespace="R5" name="hlUart" type="R5UartDriver"/>
 
@@ -35,7 +38,11 @@
 
    <instance namespace="R5" name="debugUart" type="R5UartDriver"/>
 
+   <instance namespace="R5" name="faultGpio" type="R5GpioAdapter"/>
+
    <instance namespace="LLProc" name="llCycle" type="LLCycle"/>
+
+   <instance namespace="R5" name="rtiGpio" type="R5GpioAdapter"/>
 
    <instance namespace="LLProc" name="hlRouter" type="HLRouter"/>
 
@@ -47,6 +54,8 @@
 
    <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl"/>
 
+   <instance namespace="R5" name="gpio" type="R5GpioDriver"/>
+
 
 <connection name = "Connection1">
 	 <source component = "mpu9250" port = "Time" type = "Time" num = "0"/>
@@ -57,110 +66,126 @@
  	 <target component = "actuatorAdapter" port = "motor" type = "Actuators" num = "0"/>
 </connection>
 <connection name = "Connection3">
-	 <source component = "hlRouter" port = "DebugOut" type = "DebugString" num = "0"/>
- 	 <target component = "llDebug" port = "DebugStringIn" type = "DebugString" num = "0"/>
-</connection>
-<connection name = "Connection4">
 	 <source component = "actuatorAdapter" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection4">
+	 <source component = "hlRouter" port = "DebugOut" type = "DebugString" num = "0"/>
+ 	 <target component = "llDebug" port = "DebugStringIn" type = "DebugString" num = "0"/>
 </connection>
 <connection name = "Connection5">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection6">
+	 <source component = "rtiGpio" port = "waitOut" type = "GpioWait" num = "0"/>
+ 	 <target component = "gpio" port = "wait" type = "GpioWait" num = "0"/>
+</connection>
+<connection name = "Connection7">
 	 <source component = "imuInteg" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection7">
+<connection name = "Connection8">
 	 <source component = "actuatorAdapter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection8">
+<connection name = "Connection9">
+	 <source component = "llCycle" port = "RtiWait" type = "GpioPoll" num = "0"/>
+ 	 <target component = "rtiGpio" port = "waitIn" type = "GpioPoll" num = "0"/>
+</connection>
+<connection name = "Connection10">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "hlRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection9">
+<connection name = "Connection11">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "mpu9250" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection10">
+<connection name = "Connection12">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
  	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection11">
-	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection12">
+<connection name = "Connection13">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
  	 <target component = "logQueue" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection13">
+<connection name = "Connection14">
+	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection15">
 	 <source component = "hlRouter" port = "SerReadPort" type = "SerialRead" num = "0"/>
  	 <target component = "hlUart" port = "serialRecv" type = "SerialRead" num = "0"/>
 </connection>
-<connection name = "Connection14">
+<connection name = "Connection16">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "1"/>
 </connection>
-<connection name = "Connection15">
+<connection name = "Connection17">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "imuInteg" port = "sched" type = "Sched" num = "1"/>
 </connection>
-<connection name = "Connection16">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection17">
+<connection name = "Connection18">
 	 <source component = "leeCtrl" port = "controls" type = "TorqueThrust" num = "0"/>
  	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
 </connection>
-<connection name = "Connection18">
+<connection name = "Connection19">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+ 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection20">
 	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection19">
+<connection name = "Connection21">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection20">
+<connection name = "Connection22">
 	 <source component = "imuInteg" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection21">
+<connection name = "Connection23">
 	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection22">
+<connection name = "Connection24">
+	 <source component = "faultGpio" port = "setOut" type = "GpioSet" num = "0"/>
+ 	 <target component = "gpio" port = "set" type = "GpioSet" num = "0"/>
+</connection>
+<connection name = "Connection25">
 	 <source component = "mixer" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection23">
+<connection name = "Connection26">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
  	 <target component = "hlRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection24">
+<connection name = "Connection27">
 	 <source component = "imuInteg" port = "odometry" type = "Odometry" num = "0"/>
  	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
 </connection>
-<connection name = "Connection25">
+<connection name = "Connection28">
 	 <source component = "llDebug" port = "SerWritePort" type = "SerialWrite" num = "0"/>
  	 <target component = "debugUart" port = "serialSend" type = "SerialWrite" num = "0"/>
 </connection>
-<connection name = "Connection26">
+<connection name = "Connection29">
 	 <source component = "llCycle" port = "RateGroupOut" type = "Cycle" num = "0"/>
  	 <target component = "rgGncDrv" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection27">
+<connection name = "Connection30">
 	 <source component = "mpu9250" port = "Imu" type = "ImuNoCov" num = "0"/>
  	 <target component = "imuInteg" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
-<connection name = "Connection28">
+<connection name = "Connection31">
+	 <source component = "llDebug" port = "SwFault" type = "GpioWrite" num = "0"/>
+ 	 <target component = "faultGpio" port = "setIn" type = "GpioWrite" num = "0"/>
+</connection>
+<connection name = "Connection32">
 	 <source component = "mixer" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection29">
+<connection name = "Connection33">
 	 <source component = "hlRouter" port = "SerWritePort" type = "SerialWrite" num = "0"/>
  	 <target component = "hlUart" port = "serialSend" type = "SerialWrite" num = "0"/>
 </connection>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/interface_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<interface name="GpioWait" namespace="Drv">
+<interface name="GpioPoll" namespace="Drv">
 	<args>
 	    <arg name="alreadySet" type="bool" pass_by="reference">
 	    </arg>
