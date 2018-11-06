@@ -98,7 +98,9 @@ SVC_MODULES := \
 	Svc/FatalHandler \
 	Svc/FileManager \
 	Svc/SerialTextConverter \
-	Svc/ActiveTextLogger
+	Svc/ActiveTextLogger \
+	Svc/EventExpander \
+	Svc/Tee
 
 DRV_MODULES := \
 	Drv/DataTypes \
