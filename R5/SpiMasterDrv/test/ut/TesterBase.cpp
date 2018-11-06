@@ -233,13 +233,14 @@ namespace R5 {
   void R5SpiMasterDriverTesterBase ::
     invoke_to_spiSend(
         const NATIVE_INT_TYPE portNum,
-        Fw::Buffer &buff
+        Fw::Buffer &buff,
+        U32 numRead
     )
   {
     FW_ASSERT(portNum < this->getNum_to_spiSend(),static_cast<AssertArg>(portNum));
     FW_ASSERT(portNum < this->getNum_to_spiSend(),static_cast<AssertArg>(portNum));
     this->m_to_spiSend[portNum].invoke(
-        buff
+        buff, numRead
     );
   }
 

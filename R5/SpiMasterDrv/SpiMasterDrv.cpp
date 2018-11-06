@@ -91,11 +91,11 @@ void configSpiMasterDrvDmaTransmit(U32 spi_tx_buf, U32* tx_ptr, U32 tx_size, dma
 typedef struct {
     U32* transmitDmaBufferPtr;
     U32 transmitDmaBufferSize;   // Number of U16
-    U32 lastTransmitSize;        // Number of U8
     U32 currTransmitBufferSize;  // Number of U16
 
     U16* receiveDmaBufferPtr;
     U32 receiveDmaBufferSize;   // Number of U16
+    U32 lastReceiveSize;        // Number of U8
 
     U32 transmitFlag;
 } SpiMasterDrvState;
@@ -124,7 +124,7 @@ void SpiMasterDrvInit(U32* transmitDmaBufferPtr, U32 transmitBufferSize, U16* re
 }
 
 
-void SpiMasterDrvSend(U16* transmitBufPtr, U32 transmitBufSize, bool lastBuff)
+void SpiMasterDrvSend(U16* transmitBufPtr, U32 transmitBufSize, U32 receiveBufSize, bool lastBuff)
 {
     if(spiMasterDrvState.transmitFlag) {
         // Wait for the DMA BTC interrupt status (DMA channel 2 receive done)
@@ -158,9 +158,9 @@ void SpiMasterDrvSend(U16* transmitBufPtr, U32 transmitBufSize, bool lastBuff)
     curTrBuffPtr[i] = SPI_TX_CONFIG_LAST | transmitBufPtr[i];
 
     if(lastBuff) {
-        spiMasterDrvState.lastTransmitSize = sizeof(U16) * spiMasterDrvState.currTransmitBufferSize;
+        spiMasterDrvState.lastReceiveSize = sizeof(U16) * receiveBufSize;
 
-        configSpiMasterDrvDmaReceive(SPI1_RX_ADDR, spiMasterDrvState.receiveDmaBufferPtr, spiMasterDrvState.currTransmitBufferSize, DMA_CH2);
+        configSpiMasterDrvDmaReceive(SPI1_RX_ADDR, spiMasterDrvState.receiveDmaBufferPtr, receiveBufSize, DMA_CH2);
         configSpiMasterDrvDmaTransmit(SPI1_TX_ADDR, spiMasterDrvState.transmitDmaBufferPtr, spiMasterDrvState.currTransmitBufferSize, DMA_CH3);
 
         spiMasterDrvState.currTransmitBufferSize = 0;
@@ -186,10 +186,10 @@ NATIVE_INT_TYPE SpiMasterDrvReceive(U8* receiveBufPtr, U32 receiveBufSize)
         } while((DMA_CH3_MASK | DMA_CH2_MASK) != reg_btc);
     }
 
-    FW_ASSERT((spiMasterDrvState.lastTransmitSize <= receiveBufSize), spiMasterDrvState.lastTransmitSize, receiveBufSize);
+    FW_ASSERT((spiMasterDrvState.lastReceiveSize <= receiveBufSize), spiMasterDrvState.lastReceiveSize, receiveBufSize);
 
     // Copy received data from the DMA buffer
-    memcpy(receiveBufPtr, spiMasterDrvState.receiveDmaBufferPtr, spiMasterDrvState.lastTransmitSize);
+    memcpy(receiveBufPtr, spiMasterDrvState.receiveDmaBufferPtr, spiMasterDrvState.lastReceiveSize);
 
-    return spiMasterDrvState.lastTransmitSize;
+    return spiMasterDrvState.lastReceiveSize;
 }

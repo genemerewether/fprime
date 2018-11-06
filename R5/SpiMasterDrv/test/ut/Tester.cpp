@@ -122,7 +122,7 @@ namespace R5 {
               tx_buffer[i].setsize(buf_size * sizeof(U16));
               num_placed += buf_size;
               }*/
-          invoke_to_spiSend(0, tx_buffer);
+          invoke_to_spiSend(0, tx_buffer, rx_buffer.getsize() / sizeof(U16));
 
           // Wait for DMA to complete transmitting data
           U32 reg_btc;

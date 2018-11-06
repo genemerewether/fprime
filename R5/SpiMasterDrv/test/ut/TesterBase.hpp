@@ -113,7 +113,8 @@ namespace R5 {
       //!
       void invoke_to_spiSend(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &buff 
+          Fw::Buffer &buff, 
+          U32 numRead 
       );
 
       //! Invoke the to port connected to spiRecv

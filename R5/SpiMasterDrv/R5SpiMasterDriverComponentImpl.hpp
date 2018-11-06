@@ -73,7 +73,8 @@ namespace R5 {
       //!
       void spiSend_handler(
           NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &buff
+          Fw::Buffer &buff,
+          U32 numRead
       );
 
       //! Handler implementation for spiRecv

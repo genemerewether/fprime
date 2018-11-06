@@ -82,10 +82,11 @@ namespace R5 {
   void R5SpiMasterDriverComponentImpl ::
     spiSend_handler(
         NATIVE_INT_TYPE portNum, /*!< The port number*/
-        Fw::Buffer &buff
+        Fw::Buffer &buff,
+        U32 numRead
     )
   {
-      SpiMasterDrvSend((U16*)(buff.getdata()), (buff.getsize() / sizeof(U16)), true);
+      SpiMasterDrvSend((U16*)(buff.getdata()), (buff.getsize() / sizeof(U16)), numRead, true);
   }
 
   void R5SpiMasterDriverComponentImpl ::
@@ -105,7 +106,7 @@ namespace R5 {
         Fw::Buffer &readBuffer
     )
   {
-      this->spiSend_handler(portNum, writeBuffer);
+      this->spiSend_handler(portNum, writeBuffer, (readBuffer.getsize() / sizeof(U16)));
       this->spiRecv_handler(portNum, readBuffer);
   }
   

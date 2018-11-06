@@ -73,7 +73,8 @@ namespace R5 {
   void R5SpiMasterDriverComponentImpl ::
     spiSend_handler(
         const NATIVE_INT_TYPE portNum, /*!< The port number*/
-        Fw::Buffer &buff
+        Fw::Buffer &buff,
+        U32 numRead
     )
   {
   }

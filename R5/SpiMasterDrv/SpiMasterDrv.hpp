@@ -40,7 +40,7 @@ enum {
 void SpiMasterDrvInit(U32* transmitDmaBufferPtr, U32 transmitBufferSize, U16* receiveDmaBufferPtr, U32  receiveBufferSize);
 
 // transmitBufSize is a number of entries in the transmitBufPtr array
-void SpiMasterDrvSend(U16* transmitBufPtr, U32 transmitBufSize, bool lastBuff);
+void SpiMasterDrvSend(U16* transmitBufPtr, U32 transmitBufSize, U32 receiveBufSize, bool lastBuff);
 
 // receiveBufSize is a number of entries in the receiveBufPtr array
 NATIVE_INT_TYPE SpiMasterDrvReceive(U8* receiveBufPtr, U32 receiveBufSize);

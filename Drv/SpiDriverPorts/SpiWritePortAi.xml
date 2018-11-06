@@ -6,5 +6,7 @@
     <args>
         <arg name="buff" type="Fw::Buffer" pass_by="reference">
         </arg>
+        <arg name="numRead" type = "U32" pass_by="value">
+        </arg>
     </args>
 </interface>
