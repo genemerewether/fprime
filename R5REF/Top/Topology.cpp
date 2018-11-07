@@ -10,6 +10,10 @@
 #include <ctype.h>
 #endif
 
+#ifdef BUILD_TIR5
+#include <R5/TiHal/include/HL_rti.h>
+#endif
+
 enum UartInstances {
   HL_UART_INSTANCE = 2,
   DEBUG_UART_INSTANCE = 0,
@@ -272,6 +276,30 @@ void constructApp() {
 }
 
 void cycleForever(void) {
+    while (!mpu9250_ptr->isReady()) {
+        Svc::InputCyclePort* port = rgGncDrv_ptr->get_CycleIn_InputPort(0);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        port->invoke(cycleStart);
+
+#ifdef BUILD_TIR5
+        U32 start = rtiGetMedResTimestamp();
+        bool keepGoing = true;
+        while (keepGoing) {
+            U32 stampNow = rtiGetMedResTimestamp();
+            // NOTE(mereweth) - rollover occurred
+            if (stampNow < start) {
+                start = 0; // restarts this timer, but that is OK
+            }
+
+            // one millisecond elapsed
+            if (stampNow > start + 1000) {
+                keepGoing = false;
+            }
+        }
+#endif
+    }
+
     while (1) {
         llCycle_ptr->runCycles(1);
     }

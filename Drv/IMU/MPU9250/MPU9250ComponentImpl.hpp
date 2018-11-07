@@ -54,6 +54,8 @@ namespace Drv {
       //!
       ~MPU9250ComponentImpl(void);
 
+      bool isReady(void);
+
     PRIVATE:
 
     // ----------------------------------------------------------------------

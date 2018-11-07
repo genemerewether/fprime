@@ -33,7 +33,7 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif // BUILD_DSPAL
 
-#if defined BUILD_SDFLIGHT || defined BUILD_DSPAL
+#if defined BUILD_SDFLIGHT || defined BUILD_DSPAL || defined BUILD_TIR5
 #define BIG_ENDIAN
 #else // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
 #define LITTLE_ENDIAN
@@ -82,6 +82,12 @@ namespace Drv {
       ~MPU9250ComponentImpl(void)
     {
 
+    }
+
+    bool MPU9250ComponentImpl ::
+      isReady()
+    {
+        return (INIT_COMPLETE == m_initState) ? true : false;
     }
 
   // ----------------------------------------------------------------------

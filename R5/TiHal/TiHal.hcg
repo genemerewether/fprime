@@ -317,7 +317,8 @@
         <NAME>HL_het.h</NAME>
       </HDRHET>
       <SRCHET>
-        </SRCHET>
+        <NAME>HL_het.c</NAME>
+      </SRCHET>
       <HDRHTU_R>
         <NAME>HL_reg_htu.h</NAME>
       </HDRHTU_R>
@@ -628,7 +629,7 @@
         <PATH>include\HL_het.h</PATH>
       </HDRHET>
       <SRCHET>
-        <PATH></PATH>
+        <PATH>source\HL_het.c</PATH>
       </SRCHET>
       <HDRHTU_R>
         <PATH>include\HL_reg_htu.h</PATH>
