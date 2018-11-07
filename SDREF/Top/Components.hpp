@@ -1,10 +1,11 @@
-#ifndef __LITS_COMPONENTS_HEADER__
-#define __LITS_COMPONENTS_HEADER__
+#ifndef __SDREF_COMPONENTS_HEADER__
+#define __SDREF_COMPONENTS_HEADER__
 void constructSDREFArchitecture(void);
 void exitTasks(void);
 
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
+#include <Svc/SerialTextConverter/SerialTextConverterImpl.hpp>
 
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
@@ -22,13 +23,21 @@ void exitTasks(void);
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
-#include <SDREF/SDRosIface/SDRosIfaceComponentImpl.hpp>
+#include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 
 #include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
+
+#include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
+
+extern Drv::LinuxSerialDriverComponentImpl serialDriverLL;
+extern Drv::LinuxSerialDriverComponentImpl serialDriverDebug;
+extern Svc::SerialTextConverterComponentImpl serialTextConv;
+extern HLProc::LLRouterComponentImpl llRouter;
 
 extern Svc::RateGroupDriverImpl rgDrv;
 extern Svc::ActiveRateGroupImpl rgTlm;
@@ -44,7 +53,7 @@ extern Svc::PrmDbImpl prmDb;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
-extern SDREF::SDRosIfaceComponentImpl sdRosIface;
+extern HLProc::HLRosIfaceComponentImpl sdRosIface;
 extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 
 #endif

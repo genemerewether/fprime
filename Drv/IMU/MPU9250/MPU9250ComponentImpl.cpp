@@ -33,7 +33,7 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif // BUILD_DSPAL
 
-#if defined BUILD_SDFLIGHT || defined BUILD_DSPAL
+#if defined BUILD_SDFLIGHT || defined BUILD_DSPAL || defined BUILD_TIR5
 #define BIG_ENDIAN
 #else // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
 #define LITTLE_ENDIAN
@@ -84,6 +84,12 @@ namespace Drv {
 
     }
 
+    bool MPU9250ComponentImpl ::
+      isReady()
+    {
+        return (INIT_COMPLETE == m_initState) ? true : false;
+    }
+
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -96,10 +102,11 @@ namespace Drv {
     {
         // outside of switch statement for clarity
         if (context == MPU9250_SCHED_CONTEXT_OPERATE) {
-            BYTE writeBuf[2] = {0};
+            BYTE writeBuf[MPU9250_FIFO_LEN + 1] = {0};
             Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, 2);
             Fw::Buffer dummyReadBufObj(0, 0, 0, 0);
             BYTE readBuf[MPU9250_FIFO_LEN + 1] = {0}; // biggest read
+            BYTE* readBufOffset = readBuf;
             Fw::Buffer readBufObj(0, 0, (U64) readBuf, 2); // most reads are a single byte
 
             if (m_initState == INIT_COMPLETE) {
@@ -111,10 +118,19 @@ namespace Drv {
                     // this is done when leaving last INIT phase
                     //this->SpiConfig_out(0, MPU9250_SPI_DATA_HZ);
                     writeBuf[0] = MPU9250_REG_ACCEL_XOUT_H | SPI_BITS_READ;
-                    writeBuf[1] = 0; // TODO(mereweth) - needed?
+#ifdef BUILD_DSPAL || BUILD_LINUX
                     readBufObj.setsize(1 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
-                    DEBUG_PRINT("MPU9250 before read\n");
+#else // most microcontrollers
+                    writeBufObj.setsize(2 + 1 + MPU9250_REG_GYRO_ZOUT_L
+                                       - MPU9250_REG_ACCEL_XOUT_H);
+                    readBufObj.setsize(2 + 1 + MPU9250_REG_GYRO_ZOUT_L
+                                       - MPU9250_REG_ACCEL_XOUT_H);
+
+                    // Offset returned data by one half-word
+                    readBufOffset = readBuf + 2;
+#endif
+                    //DEBUG_PRINT("MPU9250 before read\n");
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     timer.stop();
                     DEBUG_PRINT("reg read %d bytes in %u usec\n",
@@ -140,29 +156,29 @@ namespace Drv {
                     // read starts at index 1 in read buffer
 #ifdef LITTLE_ENDIAN // little-endian - x86
                     for (sIdx = 0; sIdx < 3; sIdx++) {
-                        accel[sIdx] = ((int16_t) readBuf[2*sIdx+1+sBase]) << 8 |
-                                        (int16_t) readBuf[2*sIdx+sBase];
+                        accel[sIdx] = ((int16_t) readBufOffset[2*sIdx+1+sBase]) << 8 |
+                                        (int16_t) readBufOffset[2*sIdx+sBase];
                     }
                     sBase += 6;
-                    temp = ((int16_t) readBuf[1+sBase]) << 8 |
-                           (int16_t) readBuf[sBase];
+                    temp = ((int16_t) readBufOffset[1+sBase]) << 8 |
+                           (int16_t) readBufOffset[sBase];
                     sBase += 2;
                     for (sIdx = 0; sIdx < 3; sIdx++) {
-                        gyro[sIdx] = ((int16_t) readBuf[2*sIdx+1+sBase]) << 8 |
-                                        (int16_t) readBuf[2*sIdx+sBase];
+                        gyro[sIdx] = ((int16_t) readBufOffset[2*sIdx+1+sBase]) << 8 |
+                                        (int16_t) readBufOffset[2*sIdx+sBase];
                     }
 #else // big endian - ARM & Hexagon
                     for (sIdx = 0; sIdx < 3; sIdx++) {
-                        accel[sIdx] = ((int16_t) readBuf[2*sIdx+sBase]) << 8 |
-                                        (int16_t) readBuf[1+2*sIdx+sBase];
+                        accel[sIdx] = ((int16_t) readBufOffset[2*sIdx+sBase]) << 8 |
+                                        (int16_t) readBufOffset[1+2*sIdx+sBase];
                     }
                     sBase += 6;
-                    temp = ((int16_t) readBuf[sBase]) << 8 |
-                           (int16_t) readBuf[1+sBase];
+                    temp = ((int16_t) readBufOffset[sBase]) << 8 |
+                           (int16_t) readBufOffset[1+sBase];
                     sBase += 2;
                     for (sIdx = 0; sIdx < 3; sIdx++) {
-                        gyro[sIdx] = ((int16_t) readBuf[2*sIdx+sBase]) << 8 |
-                                        (int16_t) readBuf[1+2*sIdx+sBase];
+                        gyro[sIdx] = ((int16_t) readBufOffset[2*sIdx+sBase]) << 8 |
+                                        (int16_t) readBufOffset[1+2*sIdx+sBase];
                     }
 #endif
 
@@ -416,15 +432,6 @@ namespace Drv {
         else if (context == MPU9250_SCHED_CONTEXT_TLM) {
 
         }
-    }
-
-    void MPU9250ComponentImpl ::
-      pingIn_handler(
-          const NATIVE_INT_TYPE portNum,
-          U32 key
-      )
-    {
-        // TODO
     }
 
 } // end namespace Drv

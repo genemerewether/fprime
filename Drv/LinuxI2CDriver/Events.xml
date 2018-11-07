@@ -1,0 +1,53 @@
+<events>
+    <!-- Open error -->
+    <event id="0" name="I2C_OpenError" severity="WARNING_HI" format_string = "Error opening I2C device %d: %d" >
+        <comment>
+        I2C open error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+        </args>
+    </event>
+    <!-- Open error -->
+    <event id="1" name="I2C_ConfigError" severity="WARNING_HI" format_string = "Error configuring I2C device %d: %d" >
+        <comment>
+        I2C config error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+        </args>
+    </event>
+    <event id="2" name="I2C_WriteError" severity="WARNING_HI" format_string = "Error writing/reading I2C device %d: %d"  throttle = "5">
+        <comment>
+        I2C write error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+        </args>
+    </event>
+    <event id="4" name="I2C_PortOpened" severity="ACTIVITY_HI" format_string = "I2C Device %d configured" >
+        <comment>
+        I2C open notification
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+        </args>
+    </event>
+</events>

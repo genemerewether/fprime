@@ -54,6 +54,8 @@ namespace Drv {
       //!
       ~MPU9250ComponentImpl(void);
 
+      bool isReady(void);
+
     PRIVATE:
 
     // ----------------------------------------------------------------------
@@ -65,13 +67,6 @@ namespace Drv {
     void sched_handler(
         const NATIVE_INT_TYPE portNum, /*!< The port number*/
         NATIVE_UINT_TYPE context /*!< The call order*/
-    );
-
-    //! Handler implementation for pingIn
-    //!
-    void pingIn_handler(
-        const NATIVE_INT_TYPE portNum, /*!< The port number*/
-        U32 key /*!< Value to return to pinger*/
     );
 
     // ----------------------------------------------------------------------

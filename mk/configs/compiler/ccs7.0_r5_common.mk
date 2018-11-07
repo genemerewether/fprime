@@ -3,13 +3,16 @@ include $(BUILD_ROOT)/mk/configs/compiler/defines_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ccs7.0-common.mk
 
 CCS_R5_COMMON_FLAGS :=	$(COMMON_DEFINES) \
-								$(CCS_FLAGS_COMMON) \
-								-mv7R5 \
-								--code_state=32 \
-								--float_support=VFPv3D16 \
-								--abi=eabi --enum_type=packed
-								
-								
+						$(CCS_FLAGS_COMMON) \
+						-mv7R5 \
+						--code_state=32 \
+						--float_support=VFPv3D16 \
+						--abi=eabi --enum_type=packed \
+						-DEIGEN_NO_DEBUG -D'EIGEN_ASM_COMMENT(X)=(X)' \
+						-DEIGEN_NO_MALLOC \
+						-D'EIGEN_ALIGN_TO_BOUNDARY(n)=__attribute__((aligned(n)))' \
+						-D'EIGEN_ALIGNOF(x)=__alignof(x)' \
+						-D'EIGEN_HAS_CXX11_ATOMIC=0'
 
 CCS_R5_COMMON_INCLUDES := 	$(COMMON_INCLUDES) \
 							$(CCS_INCLUDES_COMMON) \
@@ -40,8 +43,8 @@ LINK_BIN_FLAGS := 	-mv7R5 \
 					--abi=eabi \
 					--enum_type=packed \
 					-z -m"R5Bin.map" \
-					--heap_size=0x600 \
-					--stack_size=0x800 \
+					--heap_size=0x10000 \
+					--stack_size=0x1000 \
 					--generate_dead_funcs_list="R5Bin_dead_funcs.xml" \
 					--xml_link_info="R5Bin_linkInfo.xml" \
 					--rom_model \

@@ -59,6 +59,12 @@
 			</attribute>
 		</optional>
 		<optional>
+			<attribute name="generate_pointer">
+				<a:documentation>If True, all uses of components will be generated as pointer references.</a:documentation>
+				<data type="boolean"/>
+			</attribute>
+		</optional>
+		<optional>
 			<attribute name="deployment">
 				<a:documentation>Name of the deployment.</a:documentation>
 			</attribute>

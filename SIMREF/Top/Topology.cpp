@@ -276,7 +276,7 @@ void constructApp(int port_number, char* hostname) {
     prmDb.start(0,50,20*1024);
 
     // Initialize socket server
-    sockGndIf.startSocketTask(40, port_number, hostname);
+    sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();

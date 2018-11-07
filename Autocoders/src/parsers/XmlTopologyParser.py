@@ -45,6 +45,7 @@ class XmlTopologyParser(object):
         self.__in_connection = False
         self.__namespace = None
         self.__name = None
+        self.__is_ptr = False # don't generate pointer references to components by default
         self.__deployment = None
         self.__comment = ""
         self.__xml_filename = xml_file
@@ -107,6 +108,11 @@ class XmlTopologyParser(object):
                     self.__base_id_window = e.attrib['base_id_range']
                 else:
                     self.__base_id_window = None
+                #
+                if 'generate_pointer' in e.attrib:
+                    if e.attrib['generate_pointer'].upper() == "TRUE":
+                        self.__is_ptr = True
+                #
                     
                 if 'prepend_instance_name' in e.attrib:
                     if e.attrib['prepend_instance_name'].upper() == "TRUE":
@@ -259,6 +265,12 @@ class XmlTopologyParser(object):
         Return name
         """
         return self.__name
+    
+    def get_is_ptr(self):
+        """
+        Return whether to generate pointer references
+        """
+        return self.__is_ptr
     
     def get_deployment(self):
         """

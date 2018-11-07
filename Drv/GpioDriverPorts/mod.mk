@@ -1,1 +1,1 @@
-SRC = GpioReadPortAi.xml GpioWritePortAi.xml
+SRC = GpioReadPortAi.xml GpioWritePortAi.xml GpioPollPortAi.xml

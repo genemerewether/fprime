@@ -103,6 +103,13 @@ Svc::ActiveLoggerImpl eventLogger
 #endif
 ;
 
+
+LLProc::ShortLogQueueComponentImpl logQueue
+#if FW_OBJECT_NAMES == 1
+                    ("SLOG")
+#endif
+;
+
 Svc::LinuxTimeImpl linuxTime
 #if FW_OBJECT_NAMES == 1
                     ("LTIME")
@@ -164,6 +171,12 @@ Drv::LinuxSpiDriverComponentImpl spiDrv
 #endif
 ;
 
+Drv::LinuxI2CDriverComponentImpl i2cDrv
+#if FW_OBJECT_NAMES == 1
+                    ("I2CDRV")
+#endif
+;
+
 Drv::LinuxGpioDriverComponentImpl imuDRInt
 #if FW_OBJECT_NAMES == 1
                     ("IMUDRINT")
@@ -200,8 +213,9 @@ void manualConstruct(void) {
     //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
 
     mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
-    //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
     imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+    
+    logQueue.set_LogSend_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(4));
 
     kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
     kraitRouter.set_KraitPortsOut_OutputPort(2, escPwm.get_pwmSetDuty_InputPort(1));
@@ -232,6 +246,7 @@ void constructApp() {
     mpu9250.init(0);
 
     spiDrv.init(0);
+    i2cDrv.init(0);
     imuDRInt.init(0);
     escPwm.init(0);
 
@@ -240,6 +255,7 @@ void constructApp() {
 #endif
 
     eventLogger.init(10, 0);
+    logQueue.init(0);
 
     linuxTime.init(0);
 
@@ -261,13 +277,17 @@ void constructApp() {
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt.open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    
+    // J9, BLSP2
+    i2cDrv.open(2, Drv::I2C_FREQUENCY_400KHZ);
+
+    // J15, BLSP9
+    // TODO(mereweth) - Spektrum UART and binding GPIO
 
     // J13 is already at 5V, so use for 4 of the ESCs
     NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
     // /dev/pwm-1 on QuRT
     escPwm.open(1, pwmPins, 4, 20 * 1000);
-
-    // reserve J15, bam-9, for Spektrum radio receiver
 #endif
 
     // Active component startup

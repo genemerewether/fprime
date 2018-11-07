@@ -1,5 +1,5 @@
-#ifndef __LITS_COMPONENTS_HEADER__
-#define __LITS_COMPONENTS_HEADER__
+#ifndef __SIMREF_COMPONENTS_HEADER__
+#define __SIMREF_COMPONENTS_HEADER__
 void constructSIMREFArchitecture(void);
 void exitTasks(void);
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Type_Schema.rnc" type="compact"?>
+
+<interface name="SetTime" namespace="Fw">
+    <include_header>Fw/Time/Time.hpp</include_header>
+    <args>
+        <arg name="time" type="Fw::Time" pass_by="reference">
+            <comment>The time to set the system time to</comment>
+        </arg>
+    </args>
+</interface>

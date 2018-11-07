@@ -29,6 +29,9 @@ enum {
 #include <HEXREF/Rpc/hexref.h>
 #endif
 
+#define LLROUTER
+//#define LLROUTER_DEVICES
+
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
@@ -127,7 +130,31 @@ SnapdragonFlight::HexRouterComponentImpl hexRouter
 #endif
 ;
 
-SDREF::SDRosIfaceComponentImpl sdRosIface
+HLProc::LLRouterComponentImpl llRouter
+#if FW_OBJECT_NAMES == 1
+                    ("LLROUTER")
+#endif
+;
+
+Drv::LinuxSerialDriverComponentImpl serialDriverLL
+#if FW_OBJECT_NAMES == 1
+                    ("SERIALDRVLL")
+#endif
+;
+
+Drv::LinuxSerialDriverComponentImpl serialDriverDebug
+#if FW_OBJECT_NAMES == 1
+                    ("SERIALDRVDBUG")
+#endif
+;
+
+Svc::SerialTextConverterComponentImpl serialTextConv
+#if FW_OBJECT_NAMES == 1
+                    ("STCONVERTER")
+#endif
+;
+
+HLProc::HLRosIfaceComponentImpl sdRosIface
 #if FW_OBJECT_NAMES == 1
                     ("SDROSIFACE")
 #endif
@@ -165,6 +192,34 @@ void dumpobj(const char* objName) {
 #endif
 
 #endif
+
+void manualConstruct() {
+    //hexRouter.set_HexPortsOut_OutputPort(1, prmDb.get_
+
+#ifndef LLROUTER_DEVICES
+    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
+    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
+    hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
+
+    hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
+    hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
+
+    sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
+    // this actuator <-> PWM converter is for commanding from the Linux side
+    actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
+#else
+    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
+    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter.get_HLPortsIn_InputPort(0));
+    llRouter.set_LLPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
+
+    llRouter.set_LLPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
+    llRouter.set_LLPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
+
+    sdRosIface.set_ImuStateUpdate_OutputPort(0, llRouter.get_HLPortsIn_InputPort(1));
+    // this actuator <-> PWM converter is for commanding from the Linux side
+    actuatorAdapter.set_pwmSetDuty_OutputPort(0, llRouter.get_HLPortsIn_InputPort(2));
+#endif
+}
 
 void constructApp(int port_number, char* hostname) {
 
@@ -207,23 +262,15 @@ void constructApp(int port_number, char* hostname) {
     sdRosIface.init(10);
     actuatorAdapter.init(0);
 
+    serialTextConv.init(20,0);
+    llRouter.init(10,SERIAL_BUFFER_SIZE,0);
+    serialDriverLL.init();
+    serialDriverDebug.init();
+    
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
-    // Manual connections
-
-    //hexRouter.set_HexPortsOut_OutputPort(1, prmDb.get_
-
-    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
-    hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
-
-    hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
-    hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
-
-    sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
-    // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
+    manualConstruct();
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?
@@ -236,9 +283,18 @@ void constructApp(int port_number, char* hostname) {
     eventLogger.regCommands();
     prmDb.regCommands();
 
+#ifdef LLROUTER
+    llRouter.regCommands();
+    serialTextConv.regCommands();
+#endif
+    
     // read parameters
     prmDb.readParamFile();
 
+    char logFileName[256];
+    snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", 0); //boot_count % 10);
+    serialTextConv.set_log_file(logFileName, 100*1024, 0);
+    
     // Active component startup
     // start rate groups
     rgTlm.start(0, 50, 20*1024);
@@ -254,12 +310,50 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter.start(0, 90, 20*1024);//, CORE_RPC);
 
-    hexRouter.startPortReadThread(90,20*1024, CORE_RPC);
+#ifdef LLROUTER
+    llRouter.start(0, 85, 20*1024);
+    serialTextConv.start(0,79,20*1024);
+#endif
+    
+    hexRouter.startPortReadThread(90,20*1024); //, CORE_RPC);
     //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
 
+#ifdef LLROUTER_DEVICES
+    // Must start serial drivers after tasks that setup the buffers for the driver:
+    serialDriverLL.open(
+#ifdef BUILD_SDFLIGHT
+                        "/dev/ttyHS3",
+#elif defined BUILD_LINUX
+                        "/dev/ttyUSB0",
+#else
+                        "/dev/ttyUSB0",
+#endif
+                        Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                        Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                        Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                        true);
+    
+    serialDriverDebug.open(
+#ifdef BUILD_SDFLIGHT
+                           "/dev/ttyHS2",
+#elif defined BUILD_LINUX
+                           "/dev/ttyUSB0",
+#else
+                           "/dev/ttyUSB0",
+#endif
+                           Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                           Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                           Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                           true);
+    
+    /* ---------- Done opening devices, now start device threads ---------- */
+    serialDriverLL.startReadThread(98, 20*1024);
+    serialDriverDebug.startReadThread(40, 20*1024);
+#endif
+    
     // Initialize socket server
-    sockGndIf.startSocketTask(40, port_number, hostname);
-
+    sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
+    
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -290,6 +384,14 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 
 void exitTasks(void) {
     hexRouter.quitReadThreads();
+    
+#ifdef LLROUTER
+    serialDriverLL.quitReadThread();
+    serialDriverDebug.quitReadThread();
+    llRouter.exit();
+    serialTextConv.exit();
+#endif
+    
     DEBUG_PRINT("After HexRouter read thread quit\n");
     rgTlm.exit();
     rgXfer.exit();
@@ -333,9 +435,9 @@ int main(int argc, char* argv[]) {
     bool kraitCycle = false;
     bool hexCycle = true;
     int numKraitCycles = 0;
-    U32 port_number = 0;
+    U32 port_number = 50000;
     I32 option = 0;
-    char *hostname = NULL;
+    char *hostname = "localhost";
     bool local_cycle = false;
 
     // Removes ROS cmdline args as a side-effect

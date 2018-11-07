@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5GpioAdapter" kind="passive" namespace="R5">
+
+    <import_port_type>Drv/GpioDriverPorts/GpioWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioPollPortAi.xml</import_port_type>
+
+    <import_port_type>R5/Ports/GpioSetPortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/GpioGetPortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/GpioWaitPortAi.xml</import_port_type>
+
+    <ports>
+    
+        <port name="setIn" data_type="Drv::GpioWrite"  kind="sync_input">
+           <comment>Set a GPIO value</comment>
+        </port>
+        <port name="getIn" data_type="Drv::GpioRead"  kind="sync_input">
+           <comment>Get a GPIO value</comment>
+        </port>
+        <port name="waitIn" data_type="Drv::GpioPoll"  kind="sync_input">
+           <comment>Wait for a GPIO value</comment>
+        </port>
+    
+        <port name="setOut" data_type="R5::GpioSet"  kind="output">
+           <comment>Set a GPIO value</comment>
+        </port>
+        <port name="getOut" data_type="R5::GpioGet"  kind="output">
+           <comment>Get a GPIO value</comment>
+        </port>
+        <port name="waitOut" data_type="R5::GpioWait"  kind="output">
+           <comment>Wait for a GPIO value</comment>
+        </port>
+        
+    </ports>
+
+</component>

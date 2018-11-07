@@ -1,5 +1,5 @@
-#ifndef __LITS_COMPONENTS_HEADER__
-#define __LITS_COMPONENTS_HEADER__
+#ifndef __HEXREF_COMPONENTS_HEADER__
+#define __HEXREF_COMPONENTS_HEADER__
 void constructHEXREFArchitecture(void);
 void exitTasks(void);
 
@@ -21,6 +21,7 @@ void exitTasks(void);
 
 #include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
 #include <Drv/LinuxSpiDriver/LinuxSpiDriverComponentImpl.hpp>
+#include <Drv/LinuxI2CDriver/LinuxI2CDriverComponentImpl.hpp>
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
@@ -28,12 +29,15 @@ void exitTasks(void);
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 
+#include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
+
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
 extern Svc::PassiveRateGroupImpl rgAtt;
 extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::ConsoleTextLoggerImpl textLogger;
+extern LLProc::ShortLogQueueComponentImpl logQueue;
 extern Svc::ActiveLoggerImpl eventLogger;
 extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
@@ -45,6 +49,7 @@ extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 extern Gnc::ImuIntegComponentImpl imuInteg;
 extern Drv::MPU9250ComponentImpl mpu9250;
 extern Drv::LinuxSpiDriverComponentImpl spiDrv;
+extern Drv::LinuxI2CDriverComponentImpl i2cDrv;
 extern Drv::LinuxGpioDriverComponentImpl imuDRInt;
 extern Drv::LinuxPwmDriverComponentImpl escPwm;
 

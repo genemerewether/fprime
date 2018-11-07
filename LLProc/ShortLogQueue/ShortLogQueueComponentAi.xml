@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+
+<component name="ShortLogQueue" kind="passive" namespace="LLProc">
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Common/Ports/ShortLogPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <comment>A component that queues events and forwards one short version each cycle</comment>
+    <ports>
+        <port name="LogRecv" data_type="Fw::Log" kind="sync_input" >
+            <comment>
+            Event input port
+            </comment>
+        </port>
+        <port name="LogSend" data_type="Common::ShortLog" kind="output" >
+            <comment>
+            Short Event output port
+            </comment>
+        </port>
+        <port name="Run" data_type="Svc::Sched" kind="sync_input" >
+            <comment>
+            Scheduler port
+            </comment>
+        </port>
+    </ports>
+</component>
+
