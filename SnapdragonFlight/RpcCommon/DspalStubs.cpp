@@ -83,7 +83,7 @@ void _Read_sleb(void)
 void __cxa_guard_acquire(void)
 {
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
-  block_indefinite();
+  //block_indefinite();
 }
 
 void __cxa_pure_virtual()

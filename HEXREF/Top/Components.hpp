@@ -21,6 +21,7 @@ void exitTasks(void);
 
 #include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
 #include <Drv/LinuxSpiDriver/LinuxSpiDriverComponentImpl.hpp>
+#include <Drv/LinuxI2CDriver/LinuxI2CDriverComponentImpl.hpp>
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
@@ -48,6 +49,7 @@ extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
 extern Gnc::ImuIntegComponentImpl imuInteg;
 extern Drv::MPU9250ComponentImpl mpu9250;
 extern Drv::LinuxSpiDriverComponentImpl spiDrv;
+extern Drv::LinuxI2CDriverComponentImpl i2cDrv;
 extern Drv::LinuxGpioDriverComponentImpl imuDRInt;
 extern Drv::LinuxPwmDriverComponentImpl escPwm;
 

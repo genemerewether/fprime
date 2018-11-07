@@ -31,6 +31,7 @@ R5_MODULES := \
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
 	\
 	R5/GpioAdapter \
 	\
@@ -108,10 +109,12 @@ DRV_MODULES := \
 	Drv/LinuxPwmDriver \
 	Drv/LinuxSerialDriver \
 	Drv/LinuxSpiDriver \
+	Drv/LinuxI2CDriver \
 	Drv/GpioDriverPorts \
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
-	Drv/SpiDriverPorts
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts
 
 LLPROC_MODULES := \
 	LLProc/HLRouter \
@@ -317,8 +320,10 @@ HEXREF_MODULES := \
 	Drv/GpioDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
 	Drv/LinuxGpioDriver \
 	Drv/LinuxSpiDriver \
+	Drv/LinuxI2CDriver \
 	Drv/LinuxPwmDriver \
 	\
 	Svc/BufferManager \
@@ -391,6 +396,7 @@ R5REF_MODULES := \
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
 	\
 	Os \
 	\

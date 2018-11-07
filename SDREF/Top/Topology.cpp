@@ -193,6 +193,34 @@ void dumpobj(const char* objName) {
 
 #endif
 
+void manualConstruct() {
+    //hexRouter.set_HexPortsOut_OutputPort(1, prmDb.get_
+
+#ifndef LLROUTER_DEVICES
+    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
+    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
+    hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
+
+    hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
+    hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
+
+    sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
+    // this actuator <-> PWM converter is for commanding from the Linux side
+    actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
+#else
+    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
+    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter.get_HLPortsIn_InputPort(0));
+    llRouter.set_LLPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
+
+    llRouter.set_LLPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
+    llRouter.set_LLPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
+
+    sdRosIface.set_ImuStateUpdate_OutputPort(0, llRouter.get_HLPortsIn_InputPort(1));
+    // this actuator <-> PWM converter is for commanding from the Linux side
+    actuatorAdapter.set_pwmSetDuty_OutputPort(0, llRouter.get_HLPortsIn_InputPort(2));
+#endif
+}
+
 void constructApp(int port_number, char* hostname) {
 
     localTargetInit();
@@ -242,20 +270,7 @@ void constructApp(int port_number, char* hostname) {
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
-    // Manual connections
-
-    //hexRouter.set_HexPortsOut_OutputPort(1, prmDb.get_
-
-    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
-    hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
-
-    hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
-    hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
-
-    sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
-    // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
+    manualConstruct();
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?
@@ -305,13 +320,27 @@ void constructApp(int port_number, char* hostname) {
 
 #ifdef LLROUTER_DEVICES
     // Must start serial drivers after tasks that setup the buffers for the driver:
-    serialDriverLL.open("/dev/ttyHS3",
+    serialDriverLL.open(
+#ifdef BUILD_SDFLIGHT
+                        "/dev/ttyHS3",
+#elif defined BUILD_LINUX
+                        "/dev/ttyUSB0",
+#else
+                        "/dev/ttyUSB0",
+#endif
                         Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
                         Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                         Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                         true);
     
-    serialDriverDebug.open("/dev/ttyHS2",
+    serialDriverDebug.open(
+#ifdef BUILD_SDFLIGHT
+                           "/dev/ttyHS2",
+#elif defined BUILD_LINUX
+                           "/dev/ttyUSB0",
+#else
+                           "/dev/ttyUSB0",
+#endif
                            Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
                            Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                            Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,

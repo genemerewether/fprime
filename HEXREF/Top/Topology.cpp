@@ -171,6 +171,12 @@ Drv::LinuxSpiDriverComponentImpl spiDrv
 #endif
 ;
 
+Drv::LinuxI2CDriverComponentImpl i2cDrv
+#if FW_OBJECT_NAMES == 1
+                    ("I2CDRV")
+#endif
+;
+
 Drv::LinuxGpioDriverComponentImpl imuDRInt
 #if FW_OBJECT_NAMES == 1
                     ("IMUDRINT")
@@ -240,6 +246,7 @@ void constructApp() {
     mpu9250.init(0);
 
     spiDrv.init(0);
+    i2cDrv.init(0);
     imuDRInt.init(0);
     escPwm.init(0);
 
@@ -270,13 +277,17 @@ void constructApp() {
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt.open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    
+    // J9, BLSP2
+    i2cDrv.open(2, Drv::I2C_FREQUENCY_400KHZ);
+
+    // J15, BLSP9
+    // TODO(mereweth) - Spektrum UART and binding GPIO
 
     // J13 is already at 5V, so use for 4 of the ESCs
     NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
     // /dev/pwm-1 on QuRT
     escPwm.open(1, pwmPins, 4, 20 * 1000);
-
-    // reserve J15, bam-9, for Spektrum radio receiver
 #endif
 
     // Active component startup

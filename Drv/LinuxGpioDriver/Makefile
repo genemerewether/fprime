@@ -14,4 +14,4 @@ include $(BUILD_ROOT)/mk/makefiles/module_targets.mk
 
 # Add module specific targets here
 load: ut_nocov_SDFLIGHT
-	adb push test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut /home/linaro/gpio_test_ut
+	adb push test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut /eng/load/gpio_test_ut
