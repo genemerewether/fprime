@@ -23,6 +23,8 @@
 
 #include <Fw/Types/Assert.hpp>
 
+#include <R5/TiHal/include/HL_rti.h>
+
 #include <string.h>
 // #include <stdio.h>  // for printf
 
@@ -53,7 +55,7 @@ void configSpiMasterDrvDmaReceive(U32 spi_rx_buf, U16* rx_ptr, U32 rx_size, dmaC
     g_dmaCTRLPKT.PORTASGN  = PORTB_READ_PORTA_WRITE; // DMA port
     g_dmaCTRLPKT.RDSIZE    = ACCESS_16_BIT;          // Read element size
     g_dmaCTRLPKT.WRSIZE    = ACCESS_16_BIT;          // Write element size
-    g_dmaCTRLPKT.TTYPE     = BLOCK_TRANSFER;         // Trigger type - frame/block
+    g_dmaCTRLPKT.TTYPE     = FRAME_TRANSFER;         // Trigger type - frame/block
     g_dmaCTRLPKT.ADDMODERD = ADDR_FIXED;             // Addressing mode for source
     g_dmaCTRLPKT.ADDMODEWR = ADDR_INC1;              // Addressing mode for destination
     g_dmaCTRLPKT.AUTOINIT  = AUTOINIT_OFF;           // Auto-init mode
@@ -79,7 +81,7 @@ void configSpiMasterDrvDmaTransmit(U32 spi_tx_buf, U32* tx_ptr, U32 tx_size, dma
     g_dmaCTRLPKT.PORTASGN  = PORTA_READ_PORTB_WRITE; // DMA port
     g_dmaCTRLPKT.RDSIZE    = ACCESS_32_BIT;          // Read element size
     g_dmaCTRLPKT.WRSIZE    = ACCESS_32_BIT;          // Write element size
-    g_dmaCTRLPKT.TTYPE     = BLOCK_TRANSFER;         // Trigger type - frame/block
+    g_dmaCTRLPKT.TTYPE     = FRAME_TRANSFER;         // Trigger type - frame/block
     g_dmaCTRLPKT.ADDMODERD = ADDR_INC1;              // Addressing mode for source
     g_dmaCTRLPKT.ADDMODEWR = ADDR_FIXED;             // Addressing mode for destination
     g_dmaCTRLPKT.AUTOINIT  = AUTOINIT_OFF;           // Auto-init mode
