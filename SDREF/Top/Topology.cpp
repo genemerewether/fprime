@@ -225,7 +225,9 @@ void manualConstruct() {
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
-
+    
+    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(1, hexRouter_ptr->get_Sched_InputPort(0));
+    
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     // this actuator <-> PWM converter is for commanding from the Linux side
     actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));

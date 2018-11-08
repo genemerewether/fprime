@@ -2,8 +2,9 @@ GNU_COMMON := -Wall -Wextra \
                -fno-builtin \
                -fstrength-reduce \
                -Wno-unused-parameter \
-               -Wno-long-long
-               
+               -Wno-long-long \
+	       -Wshadow
+
 DEPEND_FILE := -MMD -MP -MF
 
 GNU_CFLAGS_COMMON := $(GNU_COMMON) -std=c99 \
