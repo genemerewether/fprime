@@ -29,7 +29,7 @@ enum {
 #include <HEXREF/Rpc/hexref.h>
 #endif
 
-#define LLROUTER
+//#define LLROUTER
 //#define LLROUTER_DEVICES
 
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
@@ -531,6 +531,12 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
+#ifdef BUILD_SDFLIGHT
+    if (!noInit) {
+        hexref_init();
+    }
+#endif
+    
     constructApp(port_number, hostname);
     //dumparch();
 
@@ -545,9 +551,6 @@ int main(int argc, char* argv[]) {
 #ifdef BUILD_SDFLIGHT
     // TODO(mereweth) - test that calling other functions before init has no effect
     //hexref_rpc_relay_buff_allocate(10);
-    if (!noInit) {
-        hexref_init();
-    }
     if (hexCycle) {
         Os::TaskString task_name("HEXRPC");
         DEBUG_PRINT("Starting cycler on hexagon\n");

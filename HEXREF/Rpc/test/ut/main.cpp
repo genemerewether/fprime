@@ -96,7 +96,8 @@ int main(int argc, char* argv[]) {
         hexref_init();
     }
     DEBUG_PRINT("Starting HexRouter\n");
-    hexRouter.init(10, 0);
+    hexRouter.init(10, 200);
+    hexRouter.start(0, 90, 20*1024, 0);
     hexRouter.startPortReadThread(90, 20*1024, 0);
     if (hexCycle) {
         Os::TaskString task_name("HEXRPC");
@@ -123,6 +124,15 @@ int main(int argc, char* argv[]) {
     if (hexCycle) {
         while (!terminate) {
             DEBUG_PRINT("Waiting on Krait\n");
+
+            Fw::ExternalSerializeBuffer bufObj;
+            char buf[200] = {"hi"};
+            DEBUG_PRINT("Contents of buf: %s\n", buf);
+            bufObj.setExtBuffer((U8*) buf, 200);
+            bufObj.setBuffLen(3);
+            Fw::InputSerializePort* port = hexRouter.get_KraitPortsIn_InputPort(0);
+            port->invokeSerial(bufObj);
+            
             Os::Task::delay(1000);
         }
         DEBUG_PRINT("Terminate is true\n");

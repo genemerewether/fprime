@@ -31,26 +31,26 @@ void exitTasks(void);
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
 
-extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
-extern Svc::RateGroupDriverImpl rgGncDrv;
-extern Svc::ActiveRateGroupImpl rg;
-extern Svc::PassiveRateGroupImpl rgAtt;
-extern Svc::PassiveRateGroupImpl rgPos;
-extern Svc::ConsoleTextLoggerImpl textLogger;
-extern LLProc::ShortLogQueueComponentImpl logQueue;
-extern Svc::ActiveLoggerImpl eventLogger;
-extern Svc::LinuxTimeImpl linuxTime;
-extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
-extern Svc::FatalHandlerComponentImpl fatalHandler;
-extern SnapdragonFlight::KraitRouterComponentImpl kraitRouter;
-extern Gnc::LeeCtrlComponentImpl leeCtrl;
-extern Gnc::BasicMixerComponentImpl mixer;
-extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
-extern Gnc::ImuIntegComponentImpl imuInteg;
-extern Drv::MPU9250ComponentImpl mpu9250;
-extern Drv::LinuxSpiDriverComponentImpl spiDrv;
-extern Drv::LinuxI2CDriverComponentImpl i2cDrv;
-extern Drv::LinuxGpioDriverComponentImpl imuDRInt;
-extern Drv::LinuxPwmDriverComponentImpl escPwm;
+extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
+extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
+extern Svc::ActiveRateGroupImpl* rg_ptr;
+extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
+extern Svc::PassiveRateGroupImpl* rgPos_ptr;
+extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
+extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
+extern Svc::ActiveLoggerImpl* eventLogger_ptr;
+extern Svc::LinuxTimeImpl* linuxTime_ptr;
+extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
+extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
+extern SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr;
+extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
+extern Gnc::BasicMixerComponentImpl* mixer_ptr;
+extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
+extern Gnc::ImuIntegComponentImpl* imuInteg_ptr;
+extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
+extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
+extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;
+extern Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr;
+extern Drv::LinuxPwmDriverComponentImpl* escPwm_ptr;
 
 #endif
