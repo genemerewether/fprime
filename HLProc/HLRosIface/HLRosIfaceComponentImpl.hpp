@@ -64,12 +64,12 @@ namespace HLProc {
 
       void startPub();
 
-    PRIVATE:
+      //! Start interrupt task
+      Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
+                                        NATIVE_INT_TYPE stackSize,
+                                        NATIVE_INT_TYPE cpuAffinity = -1);
 
-        //! Start interrupt task
-        Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
-                                          NATIVE_INT_TYPE stackSize,
-                                          NATIVE_INT_TYPE cpuAffinity = -1);
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Utility classes for enumerating callbacks

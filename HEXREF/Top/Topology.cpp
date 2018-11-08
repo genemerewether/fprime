@@ -219,6 +219,8 @@ void manualConstruct(void) {
 
     kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
     kraitRouter.set_KraitPortsOut_OutputPort(2, escPwm.get_pwmSetDuty_InputPort(1));
+    kraitRouter.set_KraitPortsOut_OutputPort(3, i2cDrv.get_I2CConfig_InputPort(0));
+    kraitRouter.set_KraitPortsOut_OutputPort(4, i2cDrv.get_I2CReadWrite_InputPort(0));
 }
 
 void constructApp() {

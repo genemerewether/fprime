@@ -54,6 +54,20 @@ namespace Gnc {
 
   }
 
+  bool ActuatorAdapterComponentImpl ::
+    setupI2C(
+             U32 actuator,
+             I2CMetadata meta
+    )
+  {
+      if (actuator >= AA_MAX_ACTUATORS) {
+          return false;
+      }
+
+      this->outputInfo[actuator].type = OUTPUT_I2C;
+      this->outputInfo[actuator].i2cMeta = meta;
+  }
+
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -64,7 +78,51 @@ namespace Gnc {
         ROS::mav_msgs::Actuators &Actuators
     )
   {
-    // TODO
+
+      // TODO(mereweth) - add size arg to Actuators message
+      for (U32 i = 0; i < FW_MIN(4, AA_MAX_ACTUATORS); i++) {
+          switch (this->outputInfo[i].type) {
+              case OUTPUT_UNSET:
+              {
+                  //TODO(mereweth) - issue error
+              }
+                  break;
+              case OUTPUT_PWM:
+              {
+                if (this->isConnected_pwmSetDuty_OutputPort(0)) {
+                    
+                  }
+                  else {
+                      //TODO(mereweth) - issue error
+                  }
+              }
+                  break;
+              case OUTPUT_I2C:
+              {
+                  if (this->isConnected_escConfig_OutputPort(0) &&
+                      this->isConnected_escReadWrite_OutputPort(0)) {
+                      // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
+                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 9000);
+
+                      I2CMetadata i2c = this->outputInfo[i].i2cMeta;
+                      U32 out = (/*val*/0.0f - i2c.minIn) / (i2c.maxIn - i2c.minIn) * (i2c.maxOut - i2c.minOut) + i2c.minOut;
+                      
+                      U8 readBuf[2] = { (U8) (out / 8), (U8) (out % 8) };
+                      U8 writeBuf[2] = {0};
+                      Fw::Buffer readBufObj(0, 0, (U64) readBuf, 2);
+                      Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, 2);
+                      this->escReadWrite_out(0, writeBufObj, readBufObj);
+                  }
+                  else {
+                      //TODO(mereweth) - issue error
+                  }
+              }
+                  break;
+              default:
+                  //TODO(mereweth) - DEBUG_PRINT
+                  FW_ASSERT(0, this->outputInfo[i].type);
+          }
+      }
   }
 
 } // end namespace Gnc

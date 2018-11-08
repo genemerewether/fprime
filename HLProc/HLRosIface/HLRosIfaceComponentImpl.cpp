@@ -281,7 +281,34 @@ namespace HLProc {
     void HLRosIfaceComponentImpl :: ActuatorsHandler ::
       actuatorsCallback(const mav_msgs::Actuators::ConstPtr& msg)
     {
-        //TODO(mereweth)
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_ACTUATORSDATA_OUTPUT_PORTS);
+
+        DEBUG_PRINT("ActuatorsData port handler %d\n", this->portNum);
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::mav_msgs;
+            Actuators actuators(
+              Header(msg->header.seq,
+                     Fw::Time(TB_ROS_TIME, 0,
+                              msg->header.stamp.sec,
+                              msg->header.stamp.nsec / 1000),
+                     Fw::EightyCharString(msg->header.frame_id.data())),
+              msg->angles.data(), msg->angles.size(),
+              msg->angular_velocities.data(), msg->angular_velocities.size(),
+              msg->normalized.data(), msg->normalized.size()
+            );
+
+            this->compPtr->m_actuatorsSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_actuatorsSet[this->portNum].fresh) {
+                this->compPtr->m_actuatorsSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting Actuators port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_actuatorsSet[this->portNum].actuators = actuators;
+            this->compPtr->m_actuatorsSet[this->portNum].fresh = true;
+            this->compPtr->m_actuatorsSet[this->portNum].mutex.unLock();
+        }
     }
 
     HLRosIfaceComponentImpl :: ImuStateUpdateHandler ::

@@ -207,6 +207,8 @@ void manualConstruct() {
     sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
     // this actuator <-> PWM converter is for commanding from the Linux side
     actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
+    actuatorAdapter.set_escConfig_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(3));
+    actuatorAdapter.set_escReadWrite_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(4));
 #else
     // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
     cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter.get_HLPortsIn_InputPort(0));
@@ -258,10 +260,26 @@ void constructApp(int port_number, char* hostname) {
     fatalAdapter.init(0);
     fatalHandler.init(0);
 
-    hexRouter.init(10, 0);
+    hexRouter.init(10, 200); // message size
     sdRosIface.init(10);
     actuatorAdapter.init(0);
 
+    // passthrough to DSP
+    Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
+    meta.minIn = 0.0f;
+    meta.maxIn = 1000.0f;
+    meta.minOut = 0;
+    meta.maxOut = 800;
+    
+    meta.addr = 11;
+    actuatorAdapter.setupI2C(0, meta);
+    meta.addr = 12;
+    actuatorAdapter.setupI2C(1, meta);
+    meta.addr = 13;
+    actuatorAdapter.setupI2C(2, meta);
+    meta.addr = 14;
+    actuatorAdapter.setupI2C(3, meta);
+    
     serialTextConv.init(20,0);
     llRouter.init(10,SERIAL_BUFFER_SIZE,0);
     serialDriverLL.init();
@@ -494,6 +512,7 @@ int main(int argc, char* argv[]) {
     ros::start();
 
     sdRosIface.startPub();
+    sdRosIface.startIntTask(30, 20*1024);
 
     Os::Task task;
     Os::Task waiter;
