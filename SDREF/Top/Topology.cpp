@@ -46,138 +46,160 @@ enum {
 static Fw::SimpleObjRegistry simpleReg;
 #endif
 
-// Component instance pointers
-static NATIVE_INT_TYPE rgDivs[] = {100, 1};
-Svc::RateGroupDriverImpl rgDrv(
-#if FW_OBJECT_NAMES == 1
-                    "RGDRV",
-#endif
-                    rgDivs,FW_NUM_ARRAY_ELEMENTS(rgDivs));
-
-static NATIVE_UINT_TYPE rgTlmContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
-Svc::ActiveRateGroupImpl rgTlm(
-#if FW_OBJECT_NAMES == 1
-                    "RGTLM",
-#endif
-                    rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
-;
-
-static NATIVE_UINT_TYPE rgXferContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
-Svc::ActiveRateGroupImpl rgXfer(
-#if FW_OBJECT_NAMES == 1
-                    "RGXFER",
-#endif
-                    rgXferContext,FW_NUM_ARRAY_ELEMENTS(rgXferContext));
-;
-
-// Command Components
-Svc::SocketGndIfImpl sockGndIf
-#if FW_OBJECT_NAMES == 1
-                    ("SGIF")
-#endif
-;
-
-#if FW_ENABLE_TEXT_LOGGING
-Svc::ConsoleTextLoggerImpl textLogger
-#if FW_OBJECT_NAMES == 1
-                    ("TLOG")
-#endif
-;
-#endif
-
-Svc::ActiveLoggerImpl eventLogger
-#if FW_OBJECT_NAMES == 1
-                    ("ELOG")
-#endif
-;
-
-Svc::LinuxTimeImpl linuxTime
-#if FW_OBJECT_NAMES == 1
-                    ("LTIME")
-#endif
-;
-
-Svc::TlmChanImpl chanTlm
-#if FW_OBJECT_NAMES == 1
-                    ("TLM")
-#endif
-;
-
-Svc::CommandDispatcherImpl cmdDisp
-#if FW_OBJECT_NAMES == 1
-                    ("CMDDISP")
-#endif
-;
-
 Fw::MallocAllocator seqMallocator;
-Svc::CmdSequencerComponentImpl cmdSeq
+
+Svc::RateGroupDriverImpl* rgDrv_ptr = 0;
+Svc::ActiveRateGroupImpl* rgTlm_ptr = 0;
+Svc::ActiveRateGroupImpl* rgXfer_ptr = 0;
+
+Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
+Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
+Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
+Svc::LinuxTimeImpl* linuxTime_ptr = 0;
+Svc::TlmChanImpl* chanTlm_ptr = 0;
+Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
+Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
+Svc::PrmDbImpl* prmDb_ptr = 0;
+Svc::SerialTextConverterComponentImpl* serialTextConv_ptr = 0;
+Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
+Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
+
+SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
+HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
+HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
+
+Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
+Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
+
+Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
+
+void allocComps() {
+    // Component instance pointers
+    NATIVE_INT_TYPE rgDivs[] = {100, 1};
+    rgDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
-                    ("CMDSEQ")
+                        "RGDRV",
+#endif
+                        rgDivs,FW_NUM_ARRAY_ELEMENTS(rgDivs));
+
+    NATIVE_UINT_TYPE rgTlmContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
+    rgTlm_ptr = new Svc::ActiveRateGroupImpl(
+#if FW_OBJECT_NAMES == 1
+                        "RGTLM",
+#endif
+                        rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
+
+    NATIVE_UINT_TYPE rgXferContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = { 0 };
+    rgXfer_ptr = new Svc::ActiveRateGroupImpl(
+#if FW_OBJECT_NAMES == 1
+                        "RGXFER",
+#endif
+                        rgXferContext,FW_NUM_ARRAY_ELEMENTS(rgXferContext));
+
+    sockGndIf_ptr = new Svc::SocketGndIfImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SGIF")
 #endif
 ;
 
-Svc::PrmDbImpl prmDb
+    textLogger_ptr = new Svc::ConsoleTextLoggerImpl
 #if FW_OBJECT_NAMES == 1
-                    ("PRM",PRM_PATH)
+                        ("TLOG")
+#endif
+;
+
+    eventLogger_ptr = new Svc::ActiveLoggerImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ELOG")
+#endif
+;
+
+    linuxTime_ptr = new Svc::LinuxTimeImpl
+#if FW_OBJECT_NAMES == 1
+                        ("LTIME")
+#endif
+;
+
+    chanTlm_ptr = new Svc::TlmChanImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TLM")
+#endif
+;
+
+    cmdDisp_ptr = new Svc::CommandDispatcherImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDDISP")
+#endif
+;
+
+    cmdSeq_ptr = new Svc::CmdSequencerComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDSEQ")
+#endif
+;
+
+    prmDb_ptr = new Svc::PrmDbImpl
+#if FW_OBJECT_NAMES == 1
+                        ("PRM",PRM_PATH)
 #else
-                    (PRM_PATH)
+                        (PRM_PATH)
 #endif
 ;
 
-SnapdragonFlight::HexRouterComponentImpl hexRouter
+    hexRouter_ptr = new SnapdragonFlight::HexRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("HEXRTR")
+                        ("HEXRTR")
 #endif
 ;
 
-HLProc::LLRouterComponentImpl llRouter
+    llRouter_ptr = new HLProc::LLRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("LLROUTER")
+                        ("LLROUTER")
 #endif
 ;
 
-Drv::LinuxSerialDriverComponentImpl serialDriverLL
+    serialDriverLL_ptr = new Drv::LinuxSerialDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("SERIALDRVLL")
+                        ("SERIALDRVLL")
 #endif
 ;
 
-Drv::LinuxSerialDriverComponentImpl serialDriverDebug
+    serialDriverDebug_ptr = new Drv::LinuxSerialDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("SERIALDRVDBUG")
+                        ("SERIALDRVDBUG")
 #endif
 ;
 
-Svc::SerialTextConverterComponentImpl serialTextConv
+    serialTextConv_ptr = new Svc::SerialTextConverterComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("STCONVERTER")
+                        ("STCONVERTER")
 #endif
 ;
 
-HLProc::HLRosIfaceComponentImpl sdRosIface
+    sdRosIface_ptr = new HLProc::HLRosIfaceComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("SDROSIFACE")
+                        ("SDROSIFACE")
 #endif
 ;
 
-Gnc::ActuatorAdapterComponentImpl actuatorAdapter
+    actuatorAdapter_ptr = new Gnc::ActuatorAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("ACTADAP")
+                        ("ACTADAP")
 #endif
 ;
 
-Svc::AssertFatalAdapterComponentImpl fatalAdapter
+    fatalAdapter_ptr = new Svc::AssertFatalAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
-("fatalAdapter")
+                        ("fatalAdapter")
 #endif
 ;
 
-Svc::FatalHandlerComponentImpl fatalHandler
+    fatalHandler_ptr = new Svc::FatalHandlerComponentImpl
 #if FW_OBJECT_NAMES == 1
-("fatalHandler")
+                        ("fatalHandler")
 #endif
 ;
-
+}
 
 #if FW_OBJECT_REGISTRATION == 1
 
@@ -194,37 +216,38 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct() {
-    //hexRouter.set_HexPortsOut_OutputPort(1, prmDb.get_
+    //hexRouter_ptr->set_HexPortsOut_OutputPort(1, prmDb_ptr->get_
 
 #ifndef LLROUTER_DEVICES
     // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter.get_KraitPortsIn_InputPort(0));
-    hexRouter.set_HexPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
+    cmdDisp_ptr->set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter_ptr->get_KraitPortsIn_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
 
-    hexRouter.set_HexPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
-    hexRouter.set_HexPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
 
-    sdRosIface.set_ImuStateUpdate_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(1));
+    sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter.set_pwmSetDuty_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(2));
-    actuatorAdapter.set_escConfig_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(3));
-    actuatorAdapter.set_escReadWrite_OutputPort(0, hexRouter.get_KraitPortsIn_InputPort(4));
+    actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
+    actuatorAdapter_ptr->set_escConfig_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
 #else
     // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp.set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter.get_HLPortsIn_InputPort(0));
-    llRouter.set_LLPortsOut_OutputPort(0, cmdDisp.get_compCmdStat_InputPort(0));
+    cmdDisp_ptr->set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter_ptr->get_HLPortsIn_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
 
-    llRouter.set_LLPortsOut_OutputPort(1, sdRosIface.get_Imu_InputPort(0));
-    llRouter.set_LLPortsOut_OutputPort(2, sdRosIface.get_Odometry_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
 
-    sdRosIface.set_ImuStateUpdate_OutputPort(0, llRouter.get_HLPortsIn_InputPort(1));
+    sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter.set_pwmSetDuty_OutputPort(0, llRouter.get_HLPortsIn_InputPort(2));
+    actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
 #endif
 }
 
 void constructApp(int port_number, char* hostname) {
-
+    allocComps();
+  
     localTargetInit();
 
 #if FW_PORT_TRACING
@@ -232,37 +255,37 @@ void constructApp(int port_number, char* hostname) {
 #endif
 
     // Initialize rate group driver
-    rgDrv.init();
+    rgDrv_ptr->init();
 
     // Initialize the rate groups
-    rgTlm.init(10,0);
-    rgXfer.init(10,0);
+    rgTlm_ptr->init(10,0);
+    rgXfer_ptr->init(10,0);
 
 #if FW_ENABLE_TEXT_LOGGING
-    textLogger.init();
+    textLogger_ptr->init();
 #endif
 
-    eventLogger.init(10,0);
+    eventLogger_ptr->init(10,0);
 
-    linuxTime.init(0);
+    linuxTime_ptr->init(0);
 
-    chanTlm.init(10,0);
+    chanTlm_ptr->init(10,0);
 
-    cmdDisp.init(20,0);
+    cmdDisp_ptr->init(20,0);
 
-    cmdSeq.init(10,0);
-    cmdSeq.allocateBuffer(0,seqMallocator,5*1024);
+    cmdSeq_ptr->init(10,0);
+    cmdSeq_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
-    prmDb.init(10,0);
+    prmDb_ptr->init(10,0);
 
-    sockGndIf.init(0);
+    sockGndIf_ptr->init(0);
 
-    fatalAdapter.init(0);
-    fatalHandler.init(0);
+    fatalAdapter_ptr->init(0);
+    fatalHandler_ptr->init(0);
 
-    hexRouter.init(10, 200); // message size
-    sdRosIface.init(10);
-    actuatorAdapter.init(0);
+    hexRouter_ptr->init(10, 200); // message size
+    sdRosIface_ptr->init(10);
+    actuatorAdapter_ptr->init(0);
 
     // passthrough to DSP
     Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
@@ -272,18 +295,18 @@ void constructApp(int port_number, char* hostname) {
     meta.maxOut = 800;
     
     meta.addr = 11;
-    actuatorAdapter.setupI2C(0, meta);
+    actuatorAdapter_ptr->setupI2C(0, meta);
     meta.addr = 12;
-    actuatorAdapter.setupI2C(1, meta);
+    actuatorAdapter_ptr->setupI2C(1, meta);
     meta.addr = 13;
-    actuatorAdapter.setupI2C(2, meta);
+    actuatorAdapter_ptr->setupI2C(2, meta);
     meta.addr = 14;
-    actuatorAdapter.setupI2C(3, meta);
+    actuatorAdapter_ptr->setupI2C(3, meta);
     
-    serialTextConv.init(20,0);
-    llRouter.init(10,SERIAL_BUFFER_SIZE,0);
-    serialDriverLL.init();
-    serialDriverDebug.init();
+    serialTextConv_ptr->init(20,0);
+    llRouter_ptr->init(10,SERIAL_BUFFER_SIZE,0);
+    serialDriverLL_ptr->init();
+    serialDriverDebug_ptr->init();
     
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
@@ -292,53 +315,53 @@ void constructApp(int port_number, char* hostname) {
 
     // Proxy registration
     // TODO(mereweth) - multiple DSPAL components with commands?
-    //hexCmdProxy.set_CmdReg_OutputPort(0,cmdDisp.get_compCmdReg_InputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1));
-    //hexCmdProxy.regCommands();
+    //hexCmdProxy_ptr->set_CmdReg_OutputPort(0,cmdDisp_ptr->get_compCmdReg_InputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1));
+    //hexCmdProxy_ptr->regCommands();
 
     /* Register commands */
-    cmdSeq.regCommands();
-    cmdDisp.regCommands();
-    eventLogger.regCommands();
-    prmDb.regCommands();
+    cmdSeq_ptr->regCommands();
+    cmdDisp_ptr->regCommands();
+    eventLogger_ptr->regCommands();
+    prmDb_ptr->regCommands();
 
 #ifdef LLROUTER
-    llRouter.regCommands();
-    serialTextConv.regCommands();
+    llRouter_ptr->regCommands();
+    serialTextConv_ptr->regCommands();
 #endif
     
     // read parameters
-    prmDb.readParamFile();
+    prmDb_ptr->readParamFile();
 
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", 0); //boot_count % 10);
-    serialTextConv.set_log_file(logFileName, 100*1024, 0);
+    serialTextConv_ptr->set_log_file(logFileName, 100*1024, 0);
     
     // Active component startup
     // start rate groups
-    rgTlm.start(0, 50, 20*1024);
-    rgXfer.start(0, 95, 20*1024);
+    rgTlm_ptr->start(0, 50, 20*1024);
+    rgXfer_ptr->start(0, 95, 20*1024);
     // start dispatcher
-    cmdDisp.start(0,60,20*1024);
+    cmdDisp_ptr->start(0,60,20*1024);
     // start sequencer
-    cmdSeq.start(0,50,20*1024);
+    cmdSeq_ptr->start(0,50,20*1024);
     // start telemetry
-    eventLogger.start(0,50,20*1024);
-    chanTlm.start(0,60,20*1024);
-    prmDb.start(0,50,20*1024);
+    eventLogger_ptr->start(0,50,20*1024);
+    chanTlm_ptr->start(0,60,20*1024);
+    prmDb_ptr->start(0,50,20*1024);
 
-    hexRouter.start(0, 90, 20*1024);//, CORE_RPC);
+    hexRouter_ptr->start(0, 90, 20*1024);//, CORE_RPC);
 
 #ifdef LLROUTER
-    llRouter.start(0, 85, 20*1024);
-    serialTextConv.start(0,79,20*1024);
+    llRouter_ptr->start(0, 85, 20*1024);
+    serialTextConv_ptr->start(0,79,20*1024);
 #endif
     
-    hexRouter.startPortReadThread(90,20*1024); //, CORE_RPC);
-    //hexRouter.startBuffReadThread(60,20*1024, CORE_RPC);
+    hexRouter_ptr->startPortReadThread(90,20*1024); //, CORE_RPC);
+    //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_RPC);
 
 #ifdef LLROUTER_DEVICES
     // Must start serial drivers after tasks that setup the buffers for the driver:
-    serialDriverLL.open(
+    serialDriverLL_ptr->open(
 #ifdef BUILD_SDFLIGHT
                         "/dev/ttyHS3",
 #elif defined BUILD_LINUX
@@ -351,7 +374,7 @@ void constructApp(int port_number, char* hostname) {
                         Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                         true);
     
-    serialDriverDebug.open(
+    serialDriverDebug_ptr->open(
 #ifdef BUILD_SDFLIGHT
                            "/dev/ttyHS2",
 #elif defined BUILD_LINUX
@@ -365,12 +388,12 @@ void constructApp(int port_number, char* hostname) {
                            true);
     
     /* ---------- Done opening devices, now start device threads ---------- */
-    serialDriverLL.startReadThread(98, 20*1024);
-    serialDriverDebug.startReadThread(40, 20*1024);
+    serialDriverLL_ptr->startReadThread(98, 20*1024);
+    serialDriverDebug_ptr->startReadThread(40, 20*1024);
 #endif
     
     // Initialize socket server
-    sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
+    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -381,7 +404,7 @@ void constructApp(int port_number, char* hostname) {
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    Svc::InputCyclePort* port = rgDrv.get_CycleIn_InputPort(0);
+    Svc::InputCyclePort* port = rgDrv_ptr->get_CycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
@@ -401,24 +424,24 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 }
 
 void exitTasks(void) {
-    hexRouter.quitReadThreads();
+    hexRouter_ptr->quitReadThreads();
     
 #ifdef LLROUTER
-    serialDriverLL.quitReadThread();
-    serialDriverDebug.quitReadThread();
-    llRouter.exit();
-    serialTextConv.exit();
+    serialDriverLL_ptr->quitReadThread();
+    serialDriverDebug_ptr->quitReadThread();
+    llRouter_ptr->exit();
+    serialTextConv_ptr->exit();
 #endif
     
     DEBUG_PRINT("After HexRouter read thread quit\n");
-    rgTlm.exit();
-    rgXfer.exit();
-    cmdDisp.exit();
-    eventLogger.exit();
-    chanTlm.exit();
-    prmDb.exit();
-    cmdSeq.exit();
-    hexRouter.exit();
+    rgTlm_ptr->exit();
+    rgXfer_ptr->exit();
+    cmdDisp_ptr->exit();
+    eventLogger_ptr->exit();
+    chanTlm_ptr->exit();
+    prmDb_ptr->exit();
+    cmdSeq_ptr->exit();
+    hexRouter_ptr->exit();
     DEBUG_PRINT("After HexRouter quit\n");
 }
 
@@ -511,8 +534,8 @@ int main(int argc, char* argv[]) {
 
     ros::start();
 
-    sdRosIface.startPub();
-    sdRosIface.startIntTask(30, 20*1024);
+    sdRosIface_ptr->startPub();
+    sdRosIface_ptr->startIntTask(30, 20*1024);
 
     Os::Task task;
     Os::Task waiter;

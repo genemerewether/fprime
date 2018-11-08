@@ -34,26 +34,26 @@ void exitTasks(void);
 
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
 
-extern Drv::LinuxSerialDriverComponentImpl serialDriverLL;
-extern Drv::LinuxSerialDriverComponentImpl serialDriverDebug;
-extern Svc::SerialTextConverterComponentImpl serialTextConv;
-extern HLProc::LLRouterComponentImpl llRouter;
+extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
+extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
+extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
+extern HLProc::LLRouterComponentImpl* llRouter_ptr;
 
-extern Svc::RateGroupDriverImpl rgDrv;
-extern Svc::ActiveRateGroupImpl rgTlm;
-extern Svc::ActiveRateGroupImpl rgXfer;
-extern Svc::CmdSequencerComponentImpl cmdSeq;
-extern Svc::SocketGndIfImpl sockGndIf;
-extern Svc::ConsoleTextLoggerImpl textLogger;
-extern Svc::ActiveLoggerImpl eventLogger;
-extern Svc::LinuxTimeImpl linuxTime;
-extern Svc::TlmChanImpl chanTlm;
-extern Svc::CommandDispatcherImpl cmdDisp;
-extern Svc::PrmDbImpl prmDb;
-extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
-extern Svc::FatalHandlerComponentImpl fatalHandler;
-extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
-extern HLProc::HLRosIfaceComponentImpl sdRosIface;
-extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
+extern Svc::RateGroupDriverImpl* rgDrv_ptr;
+extern Svc::ActiveRateGroupImpl* rgTlm_ptr;
+extern Svc::ActiveRateGroupImpl* rgXfer_ptr;
+extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
+extern Svc::SocketGndIfImpl* sockGndIf_ptr;
+extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
+extern Svc::ActiveLoggerImpl* eventLogger_ptr;
+extern Svc::LinuxTimeImpl* linuxTime_ptr;
+extern Svc::TlmChanImpl* chanTlm_ptr;
+extern Svc::CommandDispatcherImpl* cmdDisp_ptr;
+extern Svc::PrmDbImpl* prmDb_ptr;
+extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
+extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
+extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
+extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
+extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 
 #endif

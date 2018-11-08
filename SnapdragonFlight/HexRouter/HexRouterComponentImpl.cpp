@@ -94,9 +94,9 @@ namespace SnapdragonFlight {
 #ifdef BUILD_SDFLIGHT
         // TODO(mereweth) - switch to DspRpcAllocator?
         rpcmem_init();
-        uint8_t* m_rpcPortWriteBuff = (uint8_t*)rpcmem_alloc(22, 0, m_localMsgSize);
+        this->m_rpcPortWriteBuff = (uint8_t*)rpcmem_alloc(22, 0, m_localMsgSize);
 #else
-        uint8_t* m_rpcPortWriteBuff = (uint8_t*)malloc(m_localMsgSize);
+        this->m_rpcPortWriteBuff = (uint8_t*)malloc(m_localMsgSize);
 #endif
     }
 
