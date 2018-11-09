@@ -6,7 +6,9 @@
     <member name="description" type="Fw::EightyCharString"/>
     <member name="scale" type="F32"/>
     <member name="menu_entries" size="100" type="MenuEntry"/>
+    <member name="menu_entries_count" type="U32"/>
     <member name="controls" size="100" type="InteractiveMarkerControl"/>
+    <member name="controls_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseSerializableAi.xml</import_serializable_type>

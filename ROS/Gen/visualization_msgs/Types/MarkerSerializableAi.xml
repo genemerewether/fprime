@@ -11,7 +11,9 @@
     <member name="lifetime" type="Fw::Time"/>
     <member name="frame_locked" type="U8"/>
     <member name="points" size="100" type="ROS::geometry_msgs::Point"/>
+    <member name="points_count" type="U32"/>
     <member name="colors" size="100" type="ROS::std_msgs::ColorRGBA"/>
+    <member name="colors_count" type="U32"/>
     <member name="text" type="Fw::EightyCharString"/>
     <member name="mesh_resource" type="Fw::EightyCharString"/>
     <member name="mesh_use_embedded_materials" type="U8"/>

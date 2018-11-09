@@ -12,6 +12,7 @@
     <member name="power_supply_technology" type="U8"/>
     <member name="present" type="U8"/>
     <member name="cell_voltage" size="100" type="F32"/>
+    <member name="cell_voltage_count" type="U32"/>
     <member name="location" type="Fw::EightyCharString"/>
     <member name="serial_number" type="Fw::EightyCharString"/>
   </members>

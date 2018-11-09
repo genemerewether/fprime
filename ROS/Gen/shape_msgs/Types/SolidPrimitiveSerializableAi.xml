@@ -2,5 +2,6 @@
   <members>
     <member name="type" type="U8"/>
     <member name="dimensions" size="100" type="F64"/>
+    <member name="dimensions_count" type="U32"/>
   </members>
 </serializable>

@@ -4,9 +4,13 @@
     <member name="num_coeffs" type="I32"/>
     <member name="segment_time" type="Fw::Time"/>
     <member name="x" size="100" type="F64"/>
+    <member name="x_count" type="U32"/>
     <member name="y" size="100" type="F64"/>
+    <member name="y_count" type="U32"/>
     <member name="z" size="100" type="F64"/>
+    <member name="z_count" type="U32"/>
     <member name="yaw" size="100" type="F64"/>
+    <member name="yaw_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <include_header>Fw/Time/Time.hpp</include_header>

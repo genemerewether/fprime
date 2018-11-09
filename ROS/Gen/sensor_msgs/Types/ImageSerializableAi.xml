@@ -7,6 +7,7 @@
     <member name="is_bigendian" type="U8"/>
     <member name="step" type="U32"/>
     <member name="data" size="100" type="U8"/>
+    <member name="data_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>

@@ -2,6 +2,7 @@
   <members>
     <member name="name" type="Fw::EightyCharString"/>
     <member name="values" size="100" type="F32"/>
+    <member name="values_count" type="U32"/>
   </members>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>
 </serializable>

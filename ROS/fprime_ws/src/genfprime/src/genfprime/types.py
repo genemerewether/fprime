@@ -47,13 +47,16 @@ def msg_field_to_fprime(pkg, field):
 
     @param type: The message type
     @type type: str
-    @return: A tuple of the F Prime type, the size, and any imports necessary
+    @return: A tuple of the F Prime type, the pre-allocated size, any imports necessary,
+        and a name and type for a count of actual elements present
     @rtype: str
     """
     fprime_type = None
     header_includes = []
     serial_imports = []
     array_len = None
+    count_name = None
+    count_type = "U32"
 
     if field.is_header:
         field.base_type = 'std_msgs%sHeader'%SEP
@@ -73,7 +76,8 @@ def msg_field_to_fprime(pkg, field):
     if field.is_array:
         if field.array_len is None or field.array_len > MAX_ARRAY_LEN:
             array_len = MAX_ARRAY_LEN
+            count_name = field.name + "_count"
         else:
             array_len = field.array_len
 
-    return (fprime_type, array_len, header_includes, serial_imports)
+    return (fprime_type, array_len, header_includes, serial_imports, count_name, count_type)
