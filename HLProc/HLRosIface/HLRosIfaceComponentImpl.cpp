@@ -250,11 +250,16 @@ namespace HLProc {
                                             ros::TransportHints().tcpNoDelay());
 
 
-        ActuatorsHandler actuatorsHandler(compPtr, 0);
-
-        ros::Subscriber actuatorsSub0 = n.subscribe("command", 10,
+        ActuatorsHandler actuatorsHandler0(compPtr, 0);
+        ros::Subscriber actuatorsSub0 = n.subscribe("dsp_pwm_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
-                                            &actuatorsHandler,
+                                            &actuatorsHandler0,
+                                            ros::TransportHints().tcpNoDelay());
+        
+        ActuatorsHandler actuatorsHandler1(compPtr, 1);
+        ros::Subscriber actuatorsSub1 = n.subscribe("dsp_i2c_command", 10,
+                                            &ActuatorsHandler::actuatorsCallback,
+                                            &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());
 
         while (1) {

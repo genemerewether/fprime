@@ -37,7 +37,9 @@ namespace Gnc {
     ActuatorAdapterImpl(void)
 #endif
   {
-
+      for (U32 i = 0; i < AA_MAX_ACTUATORS; i++) {
+          this->outputInfo[i].type = OUTPUT_UNSET;
+      }
   }
 
   void ActuatorAdapterComponentImpl ::

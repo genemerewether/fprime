@@ -246,8 +246,7 @@ void manualConstruct(void) {
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, i2cDrv_ptr->get_I2CConfig_InputPort(0));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, i2cDrv_ptr->get_I2CReadWrite_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
 }
 
 void constructApp() {
@@ -303,6 +302,22 @@ void constructApp() {
     /*eventLogger_ptr->regCommands();*/
 
     // Open devices
+
+    Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
+    meta.minIn = 0.0f;
+    meta.maxIn = 1000.0f;
+    meta.minOut = 0;
+    meta.maxOut = 800;
+    
+    meta.addr = 11;
+    actuatorAdapter_ptr->setupI2C(0, meta);
+    meta.addr = 12;
+    actuatorAdapter_ptr->setupI2C(1, meta);
+    meta.addr = 13;
+    actuatorAdapter_ptr->setupI2C(2, meta);
+    meta.addr = 14;
+    actuatorAdapter_ptr->setupI2C(3, meta);
+    
 #ifdef BUILD_DSPAL
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv_ptr->open(1, 0, Drv::SPI_FREQUENCY_1MHZ);

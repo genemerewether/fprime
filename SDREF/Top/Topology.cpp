@@ -231,8 +231,7 @@ void manualConstruct() {
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     // this actuator <-> PWM converter is for commanding from the Linux side
     actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
-    actuatorAdapter_ptr->set_escConfig_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
-    actuatorAdapter_ptr->set_escReadWrite_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
 #else
     // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
     cmdDisp_ptr->set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter_ptr->get_HLPortsIn_InputPort(0));
@@ -285,25 +284,9 @@ void constructApp(int port_number, char* hostname) {
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
-    hexRouter_ptr->init(10, 200); // message size
-    sdRosIface_ptr->init(10);
+    hexRouter_ptr->init(10, 500); // message size
+    sdRosIface_ptr->init(0);
     actuatorAdapter_ptr->init(0);
-
-    // passthrough to DSP
-    Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
-    meta.minIn = 0.0f;
-    meta.maxIn = 1000.0f;
-    meta.minOut = 0;
-    meta.maxOut = 800;
-    
-    meta.addr = 11;
-    actuatorAdapter_ptr->setupI2C(0, meta);
-    meta.addr = 12;
-    actuatorAdapter_ptr->setupI2C(1, meta);
-    meta.addr = 13;
-    actuatorAdapter_ptr->setupI2C(2, meta);
-    meta.addr = 14;
-    actuatorAdapter_ptr->setupI2C(3, meta);
     
     serialTextConv_ptr->init(20,0);
     llRouter_ptr->init(10,SERIAL_BUFFER_SIZE,0);

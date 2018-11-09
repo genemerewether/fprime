@@ -81,6 +81,17 @@ namespace Drv {
         read_write.write_buf = (U8*) writeBuffer.getdata();
         read_write.write_buf_len = writeBuffer.getsize();
 
+        U8 bakWriteBuf[1] = {0};
+        U8 bakReadBuf[1] = {0};
+        if (NULL == read_write.read_buf) {
+            read_write.read_buf = bakReadBuf;
+            read_write.read_buf_len = 1;
+        }
+        if (NULL == read_write.write_buf) {
+            read_write.write_buf = bakWriteBuf;
+            read_write.write_buf_len = 1;
+        }
+        
         unsigned int byte;
         unsigned char* read_data = (unsigned char*) readBuffer.getdata();
         for (byte = 0; byte < read_write.read_buf_len; byte++) {

@@ -28,7 +28,7 @@
         <port name="escReadWrite" data_type="Drv::I2CReadWrite"  kind="output"    max_number="1">
         </port>
 
-        <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="1">
+        <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="2">
         </port>
 
         <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
