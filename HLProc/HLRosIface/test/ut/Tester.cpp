@@ -22,6 +22,14 @@
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 10
 
+#include <stdio.h>
+#include <iostream>
+
+//#define DEBUG_MODE
+
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+//#define DEBUG_PRINT(x,...)
+
 namespace HLProc {
 
   // ----------------------------------------------------------------------
@@ -40,6 +48,9 @@ namespace HLProc {
   {
     this->initComponents();
     this->connectPorts();
+
+    component.startPub();
+    component.startIntTask(30, 20*1024);
   }
 
   Tester ::
@@ -53,9 +64,9 @@ namespace HLProc {
   // ----------------------------------------------------------------------
 
   void Tester ::
-    toDo(void) 
+    callSched(void) 
   {
-    // TODO
+      this->invoke_to_sched(0, 0);
   }
 
   // ----------------------------------------------------------------------
@@ -131,6 +142,20 @@ namespace HLProc {
     )
   {
     this->pushFromPortEntry_ActuatorsData(Actuators);
+    NATIVE_INT_TYPE angSize;
+    NATIVE_INT_TYPE angVelSize;
+    NATIVE_INT_TYPE normSize;
+    (void) Actuators.getangles(angSize);
+    (void) Actuators.getangular_velocities(angVelSize);
+    (void) Actuators.getnormalized(normSize);
+    
+    DEBUG_PRINT("Got angles sz %d cnt %u, angvel sz %d cnt %u, norm sz %d cnt %u\n",
+                angSize, Actuators.getangles_count(),
+                angVelSize, Actuators.getangular_velocities_count(),
+                normSize, Actuators.getnormalized_count());
+#ifdef DEBUG_MODE
+    std::cout << Actuators << "\n";
+#endif
   }
 
   // ----------------------------------------------------------------------

@@ -49,9 +49,7 @@ namespace HLProc {
       // Tests
       // ---------------------------------------------------------------------- 
 
-      //! To do
-      //!
-      void toDo(void);
+      void callSched(void);
 
     private:
 
