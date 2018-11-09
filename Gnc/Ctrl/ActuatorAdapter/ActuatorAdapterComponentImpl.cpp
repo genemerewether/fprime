@@ -21,6 +21,17 @@
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -81,7 +92,10 @@ namespace Gnc {
     )
   {
 
-      // TODO(mereweth) - add size arg to Actuators message
+      NATIVE_INT_TYPE angVelSize = FW_MIN(4, AA_MAX_ACTUATORS);
+      const F64* angVels = Actuators.getangular_velocities(angVelSize);
+
+      // TODO(mereweth) - add size arg to Actuators message fields
       for (U32 i = 0; i < FW_MIN(4, AA_MAX_ACTUATORS); i++) {
           switch (this->outputInfo[i].type) {
               case OUTPUT_UNSET:
@@ -104,13 +118,18 @@ namespace Gnc {
                   if (this->isConnected_escConfig_OutputPort(0) &&
                       this->isConnected_escReadWrite_OutputPort(0)) {
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 9000);
+                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
 
                       I2CMetadata i2c = this->outputInfo[i].i2cMeta;
-                      U32 out = (/*val*/0.0f - i2c.minIn) / (i2c.maxIn - i2c.minIn) * (i2c.maxOut - i2c.minOut) + i2c.minOut;
+                      F64 inVal = angVels[i];
+                      if (inVal > i2c.maxIn) {  inVal = i2c.maxIn;  }
+                      if (inVal < i2c.minIn) {  inVal = i2c.minIn;  }
+                      U32 out = (inVal - i2c.minIn) / (i2c.maxIn - i2c.minIn) * (i2c.maxOut - i2c.minOut) + i2c.minOut;
+
+                      DEBUG_PRINT("esc addr %u, in %f, out %u\n", i2c.addr, angVels[i], out);
                       
-                      U8 readBuf[2] = { (U8) (out / 8), (U8) (out % 8) };
-                      U8 writeBuf[2] = {0};
+                      U8 readBuf[2] = { 0 };
+                      U8 writeBuf[2] = { (U8) (out / 8), (U8) (out % 8) };
                       Fw::Buffer readBufObj(0, 0, (U64) readBuf, 2);
                       Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, 2);
                       this->escReadWrite_out(0, writeBufObj, readBufObj);

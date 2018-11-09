@@ -223,6 +223,30 @@ void dumpobj(const char* objName) {
 volatile bool terminate = false;
 volatile bool preinit = true;
 
+int hexref_arm() {
+    FARF(ALWAYS, "hexref_arm");
+    if (preinit) {
+        DEBUG_PRINT("hexref_arm preinit - returning");
+        return -1;
+    }
+    Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
+    Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
+    for (U32 i = 0; i < 35; i++) {
+        FARF(ALWAYS, "arm %u", i);
+        for (U32 j = 11; j <= 14; j++) {
+            confPort->invoke(400, j, 100);
+            U8 readBuf[1] = { 0 };
+            U8 writeBuf[1] = { 0 };
+            Fw::Buffer writeObj = Fw::Buffer(0, 0, (U64) writeBuf, 1);
+            Fw::Buffer readObj = Fw::Buffer(0, 0, (U64) readBuf, 1);
+            rwPort->invoke(writeObj,
+                           readObj);
+            usleep(2500);
+        }
+    }
+    return 0;
+}
+
 int hexref_init() {
     FARF(ALWAYS, "hexref_init");
     allocComps();

@@ -388,7 +388,7 @@ void run1cycle(void) {
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(1000);
+    Os::Task::delay(100);
 }
 
 void runcycles(NATIVE_INT_TYPE cycles) {
