@@ -29,7 +29,6 @@ enum {
 #include <HEXREF/Rpc/hexref.h>
 #endif
 
-//#define LLROUTER
 //#define LLROUTER_DEVICES
 
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
@@ -309,10 +308,8 @@ void constructApp(int port_number, char* hostname) {
     eventLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
 
-#ifdef LLROUTER
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
-#endif
     
     // read parameters
     prmDb_ptr->readParamFile();
@@ -336,10 +333,8 @@ void constructApp(int port_number, char* hostname) {
 
     hexRouter_ptr->start(0, 90, 20*1024);//, CORE_RPC);
 
-#ifdef LLROUTER
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
-#endif
     
     hexRouter_ptr->startPortReadThread(90,20*1024); //, CORE_RPC);
     //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_RPC);
@@ -411,12 +406,13 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 void exitTasks(void) {
     hexRouter_ptr->quitReadThreads();
     
-#ifdef LLROUTER
+#ifdef LLROUTER_DEVICES
     serialDriverLL_ptr->quitReadThread();
     serialDriverDebug_ptr->quitReadThread();
+#endif
+    
     llRouter_ptr->exit();
     serialTextConv_ptr->exit();
-#endif
     
     DEBUG_PRINT("After HexRouter read thread quit\n");
     rgTlm_ptr->exit();
