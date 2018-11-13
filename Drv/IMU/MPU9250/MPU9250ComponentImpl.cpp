@@ -122,9 +122,9 @@ namespace Drv {
                     readBufObj.setsize(2 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
 #else // most microcontrollers
-                    writeBufObj.setsize(2 + 1 + MPU9250_REG_GYRO_ZOUT_L
+                    writeBufObj.setsize(5 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
-                    readBufObj.setsize(2 + 1 + MPU9250_REG_GYRO_ZOUT_L
+                    readBufObj.setsize(5 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
 
                     // Offset returned data by one half-word

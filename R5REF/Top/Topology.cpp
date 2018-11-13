@@ -238,7 +238,7 @@ void constructApp() {
     // inialize SPI drivers
     spiMaster_ptr->init(0);
     spiMaster_ptr->initDriver(0,
-                              0, 32,
+                              0, 64,
                               0, 512,
                               alloc);
 

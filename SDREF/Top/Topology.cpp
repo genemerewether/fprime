@@ -358,9 +358,9 @@ void constructApp(int port_number, char* hostname) {
 #ifdef BUILD_SDFLIGHT
                            "/dev/ttyHS2",
 #elif defined BUILD_LINUX
-                           "/dev/ttyUSB0",
+                           "/dev/ttyUSB1",
 #else
-                           "/dev/ttyUSB0",
+                           "/dev/ttyUSB1",
 #endif
                            Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
                            Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
