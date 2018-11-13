@@ -119,7 +119,7 @@ namespace Drv {
                     //this->SpiConfig_out(0, MPU9250_SPI_DATA_HZ);
                     writeBuf[0] = MPU9250_REG_ACCEL_XOUT_H | SPI_BITS_READ;
 #ifdef BUILD_DSPAL || BUILD_LINUX
-                    readBufObj.setsize(1 + MPU9250_REG_GYRO_ZOUT_L
+                    readBufObj.setsize(2 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
 #else // most microcontrollers
                     writeBufObj.setsize(2 + 1 + MPU9250_REG_GYRO_ZOUT_L

@@ -291,7 +291,7 @@ void constructApp() {
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
-    kraitRouter_ptr->init(50, 512);
+    kraitRouter_ptr->init(50, 1000);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();

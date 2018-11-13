@@ -283,7 +283,7 @@ void constructApp(int port_number, char* hostname) {
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
-    hexRouter_ptr->init(10, 500); // message size
+    hexRouter_ptr->init(10, 1000); // message size
     sdRosIface_ptr->init(0);
     actuatorAdapter_ptr->init(0);
     
