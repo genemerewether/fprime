@@ -318,6 +318,11 @@ namespace HLProc {
             actuators.setnormalized(msg->normalized.data(), size);
             actuators.setnormalized_count(msg->normalized.size());
 
+            DEBUG_PRINT("Actuators port %d sizes %u, %u, %u\n",
+                        msg->angles.size(),
+                        msg->angular_velocities.size(),
+                        msg->normalized.size());
+
             this->compPtr->m_actuatorsSet[this->portNum].mutex.lock();
             if (this->compPtr->m_actuatorsSet[this->portNum].fresh) {
                 this->compPtr->m_actuatorsSet[this->portNum].overflows++;

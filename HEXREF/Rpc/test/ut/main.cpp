@@ -44,15 +44,19 @@ void print_usage() {
 
 int main(int argc, char* argv[]) {
     bool noInit = false;
+    bool doArm = false;
     bool kraitCycle = false;
     bool hexCycle = false;
     int numKraitCycles = 0;
     int option = 0;
-    while ((option = getopt(argc, argv, "ifho:c")) != -1) {
+    while ((option = getopt(argc, argv, "ifho:ca")) != -1) {
         switch(option) {
             case 'h':
                 print_usage();
                 return 0;
+                break;
+            case 'a':
+                doArm = true;
                 break;
             case 'i':
                 noInit = true;
@@ -84,7 +88,15 @@ int main(int argc, char* argv[]) {
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);
     signal(SIGHUP,sighandler);
-
+    
+#ifdef BUILD_SDFLIGHT
+    if (doArm) {
+        DEBUG_PRINT("Arming\n");
+        hexref_arm();
+        return 0;
+    }
+#endif
+    
     Os::Task task;
     Os::Task waiter;
     Os::TaskString waiter_task_name("WAITER");
@@ -114,7 +126,7 @@ int main(int argc, char* argv[]) {
     waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
 #endif //BUILD_SDFLIGHT
 
-#ifdef BUILD_SDFLIGHT
+#ifdef BUILD_SDFLIGHT    
     if (kraitCycle) {
         DEBUG_PRINT("Cycling from Krait\n");
         hexref_cycle(numKraitCycles);
