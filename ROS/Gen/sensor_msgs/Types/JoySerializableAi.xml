@@ -2,7 +2,9 @@
   <members>
     <member name="header" type="ROS::std_msgs::Header"/>
     <member name="axes" size="100" type="F32"/>
+    <member name="axes_count" type="U32"/>
     <member name="buttons" size="100" type="I32"/>
+    <member name="buttons_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
 </serializable>

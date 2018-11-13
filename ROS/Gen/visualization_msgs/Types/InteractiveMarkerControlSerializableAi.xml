@@ -6,6 +6,7 @@
     <member name="interaction_mode" type="U8"/>
     <member name="always_visible" type="U8"/>
     <member name="markers" size="100" type="Marker"/>
+    <member name="markers_count" type="U32"/>
     <member name="independent_marker_orientation" type="U8"/>
     <member name="description" type="Fw::EightyCharString"/>
   </members>

@@ -1,6 +1,7 @@
 <serializable name="MarkerArray" namespace="ROS::visualization_msgs">
   <members>
     <member name="markers" size="100" type="Marker"/>
+    <member name="markers_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/visualization_msgs/Types/MarkerSerializableAi.xml</import_serializable_type>
 </serializable>

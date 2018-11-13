@@ -79,7 +79,7 @@ ifdef CHECK_LINK_BIN
 	@echo Checking for missing symbols
 	$(CHECK_LINK_BIN) $(LINK_BIN_TO) $@$(CHECK_LINK_BIN_NAME) $(basename $@)_test_lib$(LIB_SUFFIX) $(TEST_MODS_LIBS_<module_name>_$(BUILD)) $(TEST_LIBS_<module_name>_$(BUILD)) $(LINK_LIBS) $(CHECK_LINK_BIN_SRC)
 endif
-	$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $(basename $@)_test_lib$(LIB_SUFFIX) $(TEST_MODS_LIBS_<module_name>_$(BUILD)) $(TEST_LIBS_<module_name>_$(BUILD)) $(LINK_LIBS) $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
+	$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $(basename $@)_test_lib$(LIB_SUFFIX) $(TEST_MODS_LIBS_<module_name>_$(BUILD)) $(TEST_LIBS_<module_name>_$(BUILD)) $(EXTRA_LIBS_<module_name>_$(BUILD)) $(LINK_LIBS) $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
 
 # clean unit test binary
 test_<module_name>_clean: $(foreach module,$(TEST_MODS_<module_name>_$(BUILD)),$(module)_bin_clean)

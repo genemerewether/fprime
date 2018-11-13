@@ -294,16 +294,29 @@ namespace HLProc {
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
-            Actuators actuators(
-              Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
-                     Fw::EightyCharString(msg->header.frame_id.data())),
-              msg->angles.data(), msg->angles.size(),
-              msg->angular_velocities.data(), msg->angular_velocities.size(),
-              msg->normalized.data(), msg->normalized.size()
-            );
+            Header head(msg->header.seq,
+                        Fw::Time(TB_ROS_TIME, 0,
+                                 msg->header.stamp.sec,
+                                 msg->header.stamp.nsec / 1000),
+                        Fw::EightyCharString(msg->header.frame_id.data()));
+
+            Actuators actuators;
+            actuators.setheader(head);
+            NATIVE_INT_TYPE size;
+            /* TODO(mereweth) - convention on whether to make count fields the original
+             * ROS value or the min of that and the allocated size
+             */
+            size = msg->angles.size();
+            actuators.setangles(msg->angles.data(), size);
+            actuators.setangles_count(msg->angles.size());
+            
+            size = msg->angular_velocities.size();
+            actuators.setangular_velocities(msg->angular_velocities.data(), size);
+            actuators.setangular_velocities_count(msg->angular_velocities.size());
+
+            size = msg->normalized.size();
+            actuators.setnormalized(msg->normalized.data(), size);
+            actuators.setnormalized_count(msg->normalized.size());
 
             this->compPtr->m_actuatorsSet[this->portNum].mutex.lock();
             if (this->compPtr->m_actuatorsSet[this->portNum].fresh) {

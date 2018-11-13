@@ -5,6 +5,7 @@
     <member name="width" type="U32"/>
     <member name="distortion_model" type="Fw::EightyCharString"/>
     <member name="D" size="100" type="F64"/>
+    <member name="D_count" type="U32"/>
     <member name="K" size="9" type="F64"/>
     <member name="R" size="9" type="F64"/>
     <member name="P" size="12" type="F64"/>

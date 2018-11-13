@@ -12,7 +12,9 @@
     <member name="fill_color" type="ROS::std_msgs::ColorRGBA"/>
     <member name="lifetime" type="Fw::Time"/>
     <member name="points" size="100" type="ROS::geometry_msgs::Point"/>
+    <member name="points_count" type="U32"/>
     <member name="outline_colors" size="100" type="ROS::std_msgs::ColorRGBA"/>
+    <member name="outline_colors_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>

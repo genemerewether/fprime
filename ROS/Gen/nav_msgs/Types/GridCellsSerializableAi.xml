@@ -4,6 +4,7 @@
     <member name="cell_width" type="F32"/>
     <member name="cell_height" type="F32"/>
     <member name="cells" size="100" type="ROS::geometry_msgs::Point"/>
+    <member name="cells_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>

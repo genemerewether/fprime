@@ -5,6 +5,7 @@
     <member name="message" type="Fw::EightyCharString"/>
     <member name="hardware_id" type="Fw::EightyCharString"/>
     <member name="values" size="100" type="KeyValue"/>
+    <member name="values_count" type="U32"/>
   </members>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>

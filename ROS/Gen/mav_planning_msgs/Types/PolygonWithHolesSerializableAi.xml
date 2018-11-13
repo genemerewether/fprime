@@ -2,6 +2,7 @@
   <members>
     <member name="hull" type="ROS::mav_planning_msgs::Polygon2D"/>
     <member name="holes" size="100" type="ROS::mav_planning_msgs::Polygon2D"/>
+    <member name="holes_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/Polygon2DSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/mav_planning_msgs/Types/Polygon2DSerializableAi.xml</import_serializable_type>
