@@ -107,7 +107,7 @@ namespace Gnc {
       this->tlmWrite_BMIX_Rot5(angVel[5]);
 
       ROS::std_msgs::Header h = TorqueThrust.getheader();
-      ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, angVel, 6, normalized, 0);
+      ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, 0, angVel, 6, 6, normalized, 0, 0);
       if (this->isConnected_motor_OutputPort(0)) {
 	  this->motor_out(0, rotorVel__comm);
       }
