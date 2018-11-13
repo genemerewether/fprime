@@ -21,6 +21,17 @@
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -96,6 +107,8 @@ namespace Gnc {
         ROS::mav_msgs::ImuStateUpdate &ImuStateUpdate
     )
   {
+      DEBUG_PRINT("IMU state update\n");
+    
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();
       //this->seq = h.getseq();
       // TODO(mereweth) convert h.getstamp()
