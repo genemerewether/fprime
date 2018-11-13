@@ -72,6 +72,20 @@ namespace Gnc {
           ROS::nav_msgs::Odometry &Odometry
       );
 
+      //! Handler implementation for flatOutput
+      //!
+      void flatOutput_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::FlatOutput &FlatOutput
+      );
+
+      //! Handler implementation for attThrust
+      //!
+      void attRateThrust_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::AttitudeRateThrust &AttitudeRateThrust
+      );
+
       //! Handler implementation for sched
       //!
       void sched_handler(
@@ -87,15 +101,36 @@ namespace Gnc {
 
       F32 u_tlm[4];
 
+      F32 thrust_x_tlm;
+      F32 thrust_y_tlm;
+
+      double mass;
+
+      Eigen::Matrix3d J_b;
+
       ROS::geometry_msgs::Point x_w;
+
+      ROS::geometry_msgs::Point x_w__des;
 
       ROS::geometry_msgs::Quaternion w_q_b;
 
+      ROS::geometry_msgs::Quaternion w_q_b__des;
+
       ROS::geometry_msgs::Vector3 v_b;
+
+      ROS::geometry_msgs::Vector3 v_w__des;
 
       ROS::geometry_msgs::Vector3 omega_b;
 
+      ROS::geometry_msgs::Vector3 omega_b__des;
+
       ROS::geometry_msgs::Vector3 a_w__comm;
+
+      ROS::geometry_msgs::Vector3 a_w__des;
+
+      ROS::geometry_msgs::Vector3 thrust_b__des;
+
+      F64 yaw__des;
 
       quest_gnc::multirotor::LeeControl leeControl;
 

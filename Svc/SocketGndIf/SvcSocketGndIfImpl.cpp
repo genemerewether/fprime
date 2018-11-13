@@ -88,7 +88,7 @@ namespace Svc {
     SocketGndIfImpl::~SocketGndIfImpl() {
     }
 
-    void SocketGndIfImpl::startSocketTask(I32 priority, U32 port_number, char* hostname) {
+    void SocketGndIfImpl::startSocketTask(I32 priority, NATIVE_INT_TYPE stackSize, U32 port_number, char* hostname, NATIVE_INT_TYPE cpuAffinity) {
         Fw::EightyCharString name("ScktRead");
         this->port_number = port_number;
         this->hostname = hostname;
@@ -102,7 +102,7 @@ namespace Svc {
                	openSocket(port_number);
 
                 // Spawn read task:
-        	Os::Task::TaskStatus stat = this->socketTask.start(name,0,priority,10*1024,SocketGndIfImpl::socketReadTask, (void*) this);
+        	Os::Task::TaskStatus stat = this->socketTask.start(name,0,priority,stackSize,SocketGndIfImpl::socketReadTask, (void*) this, cpuAffinity);
         	FW_ASSERT(Os::Task::TASK_OK == stat,static_cast<NATIVE_INT_TYPE>(stat));
         }
     }

@@ -1,5 +1,0 @@
-<serializable name="PolygonServiceResponse" namespace="ROS::planning_msgs">
-  <members>
-    <member name="success" type="U8"/>
-  </members>
-</serializable>

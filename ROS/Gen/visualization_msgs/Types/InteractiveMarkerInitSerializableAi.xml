@@ -3,6 +3,7 @@
     <member name="server_id" type="Fw::EightyCharString"/>
     <member name="seq_num" type="U64"/>
     <member name="markers" size="100" type="InteractiveMarker"/>
+    <member name="markers_count" type="U32"/>
   </members>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>
   <import_serializable_type>ROS/Gen/visualization_msgs/Types/InteractiveMarkerSerializableAi.xml</import_serializable_type>

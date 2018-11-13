@@ -57,3 +57,9 @@ core
 .swp
 
 .vagrant
+
+*.map
+*_dead_funcs.xml
+*_linkInfo.xml
+
+*~

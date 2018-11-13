@@ -8,6 +8,7 @@
     <member name="function" type="Fw::EightyCharString"/>
     <member name="line" type="U32"/>
     <member name="topics" size="100" type="Fw::EightyCharString"/>
+    <member name="topics_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5Time" kind="passive" namespace="R5" modeler="true">
+
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/SetTimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/StartTimePortAi.xml</import_port_type>
+    <ports>
+        <port name="timeGetPort" data_type="Fw::Time"  kind="sync_input"    max_number="1">
+        </port>
+        <port name="timeSetPort" data_type="Fw::SetTime"  kind="sync_input"    max_number="1">
+        </port>
+        <port name="timeStartPort" data_type="Fw::StartTime"  kind="sync_input"    max_number="1">
+        </port>
+    </ports>
+
+</component>

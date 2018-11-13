@@ -4,10 +4,12 @@
     <member name="height" type="U32"/>
     <member name="width" type="U32"/>
     <member name="fields" size="100" type="PointField"/>
+    <member name="fields_count" type="U32"/>
     <member name="is_bigendian" type="U8"/>
     <member name="point_step" type="U32"/>
     <member name="row_step" type="U32"/>
     <member name="data" size="100" type="U8"/>
+    <member name="data_count" type="U32"/>
     <member name="is_dense" type="U8"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>

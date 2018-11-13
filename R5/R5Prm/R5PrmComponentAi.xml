@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5Prm" kind="passive" namespace="R5">
+
+    <import_port_type>R5/Ports/PrmGetPortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/PrmSetPortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/PrmWritePortAi.xml</import_port_type>
+    <import_port_type>R5/Ports/PrmCheckPortAi.xml</import_port_type>
+
+    <ports>
+    
+        <port name="set" data_type="R5::PrmSet"  kind="sync_input">
+           <comment>Set a parameter</comment>
+        </port>
+        <port name="get" data_type="R5::PrmGet"  kind="sync_input">
+           <comment>Get a parameter</comment>
+        </port>
+        <port name="write" data_type="R5::PrmWrite"  kind="sync_input">
+           <comment>Write parameters to storage</comment>
+        </port>
+        <port name="check" data_type="R5::PrmCheck"  kind="sync_input">
+           <comment>Check state of parameter write</comment>
+        </port>
+        
+    </ports>
+
+</component>

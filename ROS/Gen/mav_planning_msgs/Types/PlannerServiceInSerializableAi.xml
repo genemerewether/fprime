@@ -1,0 +1,14 @@
+<serializable name="PlannerServiceRequest" namespace="ROS::mav_planning_msgs">
+  <members>
+    <member name="start_pose" type="ROS::geometry_msgs::PoseStamped"/>
+    <member name="start_velocity" type="ROS::geometry_msgs::Vector3"/>
+    <member name="goal_pose" type="ROS::geometry_msgs::PoseStamped"/>
+    <member name="goal_velocity" type="ROS::geometry_msgs::Vector3"/>
+    <member name="bounding_box" type="ROS::geometry_msgs::Vector3"/>
+  </members>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseStampedSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseStampedSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+</serializable>

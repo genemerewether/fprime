@@ -3,6 +3,7 @@
     <member name="header" type="ROS::std_msgs::Header"/>
     <member name="info" type="MapMetaData"/>
     <member name="data" size="100" type="I8"/>
+    <member name="data_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/nav_msgs/Types/MapMetaDataSerializableAi.xml</import_serializable_type>

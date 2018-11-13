@@ -111,17 +111,17 @@
 // Adds the ability for all component related objects to register
 // centrally.
 #ifndef FW_OBJECT_REGISTRATION
-#define FW_OBJECT_REGISTRATION              1   //!< Indicates whether or not objects can register themselves (more code, more object tracking)
+#define FW_OBJECT_REGISTRATION              0   //!< Indicates whether or not objects can register themselves (more code, more object tracking)
 #endif
 
 #ifndef FW_QUEUE_REGISTRATION
-#define FW_QUEUE_REGISTRATION               1   //!< Indicates whether or not queue registration is used
+#define FW_QUEUE_REGISTRATION               0   //!< Indicates whether or not queue registration is used
 #endif
 // Port Facilities
 
 // This allows tracing calls through ports for debugging
 #ifndef FW_PORT_TRACING
-#define FW_PORT_TRACING                     1   //!< Indicates whether port calls are traced (more code, more visibility into execution)
+#define FW_PORT_TRACING                     0   //!< Indicates whether port calls are traced (more code, more visibility into execution)
 #endif
 
 // This generates code to connect to serialized ports
@@ -306,9 +306,8 @@
 enum TimeBase {
     TB_NONE, //!< No time base has been established
     TB_PROC_TIME, //!< Indicates time is processor cycle time. Not tied to external time
-    TB_WORKSTATION_TIME, //!< Time as reported on workstation where software is running. For testing.
+    TB_WORKSTATION_TIME, //!< Time as reported on workstation where software is running
     TB_ROS_TIME, //!< Indicates time is ROS time, either real or sim.
-    TB_HEXAGON_DSP_TIME, //!< Time on Hexagon DSP
     TB_DONT_CARE = 0xFFFF //!< Don't care value for sequences. If FwTimeBaseStoreType is changed, value should be changed
 };
 

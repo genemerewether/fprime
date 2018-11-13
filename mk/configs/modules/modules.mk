@@ -24,6 +24,33 @@ FW_GTEST_MODULES := \
 	Fw/FilePacket/GTest \
 	Fw/Types/GTest
 
+R5_MODULES := \
+	R5/Ports \
+	\
+	Drv/GpioDriverPorts \
+	Drv/PwmDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
+	\
+	R5/GpioAdapter \
+	\
+	R5/A2DDrv \
+	R5/DmaDrv \
+	R5/GpioDrv \
+	R5/R5Mem \
+	R5/R5Prm \
+	R5/R5Time \
+	R5/SpiMasterDrv \
+	R5/SpiSlaveDrv \
+	R5/UartDrv \
+	\
+	R5/TiHal \
+	R5/R5FlashApi
+
+COMMON_MODULES := \
+	Common/Ports
+
 OS_MODULES := \
 	Os
 
@@ -68,9 +95,12 @@ SVC_MODULES := \
 	Svc/WatchDog \
 	Svc/FileUplink \
 	Svc/FileDownlink \
-    Svc/AssertFatalAdapter \
-    Svc/FatalHandler \
-	Svc/FileManager
+	Svc/AssertFatalAdapter \
+	Svc/FatalHandler \
+	Svc/FileManager \
+	Svc/SerialTextConverter \
+	Svc/ActiveTextLogger \
+	Svc/Tee
 
 DRV_MODULES := \
 	Drv/DataTypes \
@@ -79,10 +109,26 @@ DRV_MODULES := \
 	Drv/LinuxPwmDriver \
 	Drv/LinuxSerialDriver \
 	Drv/LinuxSpiDriver \
+	Drv/LinuxI2CDriver \
 	Drv/GpioDriverPorts \
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
-	Drv/SpiDriverPorts
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts
+
+LLPROC_MODULES := \
+	LLProc/HLRouter \
+	Utils/Hash \
+	LLProc/ShortLogQueue \
+	LLProc/Ports \
+	LLProc/LLDebug \
+	LLProc/LLCycle
+
+HLPROC_MODULES := \
+	HLProc/HLRosIface \
+	HLProc/LLRouter \
+	HLProc/EventExpander \
+	HLProc/Cfg
 
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
@@ -102,7 +148,8 @@ QUEST_GNC_MODULES := \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
-	Gnc/quest_gnc/src/est
+	Gnc/quest_gnc/src/est \
+	Gnc/quest_gnc/src/mixer
 
 QUEST_GNC_HW_MODULES := \
 	Gnc/Ctrl/ActuatorAdapter
@@ -116,7 +163,6 @@ REF_MODULES := \
 
 ROS_PORT_MODULES := \
 	ROS/Gen/std_msgs/Ports  \
-	ROS/Gen/diagnostic_msgs/Ports    \
 	ROS/Gen/geometry_msgs/Ports      \
 	ROS/Gen/nav_msgs/Ports           \
 	ROS/Gen/std_srvs/Ports           \
@@ -127,7 +173,6 @@ ROS_PORT_MODULES := \
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
-	ROS/Gen/diagnostic_msgs/Types    \
 	ROS/Gen/geometry_msgs/Types      \
 	ROS/Gen/nav_msgs/Types           \
 	ROS/Gen/std_srvs/Types           \
@@ -140,12 +185,14 @@ ROS_MODULES_ALL := \
 	$(ROS_TYPE_MODULES) \
 	$(ROS_PORT_MODULES) \
 	\
+	ROS/Gen/diagnostic_msgs/Types    \
 	ROS/Gen/stereo_msgs/Types        \
 	ROS/Gen/trajectory_msgs/Types    \
 	ROS/Gen/planning_msgs/Types	 \
 	ROS/Gen/shape_msgs/Types         \
 	ROS/Gen/sensor_msgs/Types        \
 	\
+	ROS/Gen/diagnostic_msgs/Ports    \
 	ROS/Gen/stereo_msgs/Ports        \
 	ROS/Gen/trajectory_msgs/Ports    \
 	ROS/Gen/planning_msgs/Ports	 \
@@ -184,12 +231,15 @@ Ref_MODULES := \
 
 SDREF_DEPLOYMENT_MODULES := \
 	HEXREF/Rpc \
-	SDREF/SDRosIface \
 	SDREF/Top
 
 SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
+	\
+	$(HLPROC_MODULES) \
+	\
+	$(COMMON_MODULES) \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
@@ -232,23 +282,6 @@ SIMREF_MODULES := \
 	\
 	$(UTILS_MODULES)
 
-TESTRPC_MODULES := \
-	TESTRPC/Top \
-	HEXREF/Rpc
-
-# 	Svc/Sched \
-# 	Svc/Time \
-# 	Svc/Ping \
-# 	$(QUEST_GNC_MODULES) \
-#	$(QUEST_GNC_HW_MODULES) \
-# 	$(HEXAGON_MODULES) \
-# 	$(FW_MODULES) \
-# 	$(UTILS_MODULES) \
-# 	$(OS_MODULES) \
-# 	$(CFDP_MODULES) \
-# 	$(ROS_MODULES_ALL) \
-	#SnapdragonFlight/RpcCommon \
-
 HEXREF_DEPLOYMENT_MODULES := \
 	HEXREF/Top \
 	HEXREF/Rpc
@@ -269,8 +302,10 @@ HEXREF_MODULES := \
 	Drv/GpioDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
 	Drv/LinuxGpioDriver \
 	Drv/LinuxSpiDriver \
+	Drv/LinuxI2CDriver \
 	Drv/LinuxPwmDriver \
 	\
 	Svc/BufferManager \
@@ -306,8 +341,110 @@ HEXREF_MODULES := \
 	\
 	$(CFDP_MODULES) \
 	\
-	$(UTILS_MODULES)
+	$(UTILS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	LLProc/ShortLogQueue
 #Svc/ComLogger
+
+TESTRPC_MODULES := \
+	TESTRPC/Top \
+	HEXREF/Rpc \
+	\
+	$(ROS_TYPE_MODULES) \
+	$(ROS_PORT_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	\
+	$(HEXAGON_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	Drv/PwmDriverPorts \
+	Drv/GpioDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
+	Drv/LinuxGpioDriver \
+	Drv/LinuxSpiDriver \
+	Drv/LinuxI2CDriver \
+	Drv/LinuxPwmDriver \
+	\
+	Svc/BufferManager \
+	Svc/CmdDispatcher \
+	Svc/CmdSequencer \
+	Svc/Seq \
+	Svc/ActiveRateGroup \
+	Svc/PassiveRateGroup \
+	Svc/RateGroupDriver \
+	Svc/RateGroupDecoupler \
+	Svc/Sched \
+	Svc/PassiveTextLogger \
+	Svc/PassiveConsoleTextLogger \
+	Svc/Time \
+	Svc/Cycle \
+	Svc/LinuxTime \
+	Svc/ActiveLogger \
+	Svc/Fatal \
+	Svc/PolyIf \
+	Svc/PolyDb \
+	Svc/PrmDb \
+	Svc/Ping \
+	Svc/Health \
+	Svc/WatchDog \
+	Svc/AssertFatalAdapter \
+	Svc/FatalHandler \
+	\
+	$(FW_MODULES) \
+	\
+	$(UTILS_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	LLProc/ShortLogQueue
+
+R5REF_DEPLOYMENT_MODULES := \
+	R5REF/Top
+
+R5REF_MODULES := \
+	$(ROS_TYPE_MODULES) \
+	$(ROS_PORT_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	\
+	$(LLPROC_MODULES) \
+	\
+	$(R5REF_DEPLOYMENT_MODULES) \
+	\
+	$(R5_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	\
+	Svc/PassiveRateGroup \
+	Svc/RateGroupDriver \
+	\
+	Svc/Sched \
+	Svc/Time \
+	Svc/Cycle \
+	\
+	Drv/PwmDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
+	\
+	Os \
+	\
+	$(FW_MODULES)
 
 ACDEVTEST_MODULES := \
 	Autocoders/test/active_tester \
@@ -388,7 +525,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

@@ -1,10 +1,11 @@
-#ifndef __LITS_COMPONENTS_HEADER__
-#define __LITS_COMPONENTS_HEADER__
+#ifndef __SDREF_COMPONENTS_HEADER__
+#define __SDREF_COMPONENTS_HEADER__
 void constructSDREFArchitecture(void);
 void exitTasks(void);
 
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
+#include <Svc/SerialTextConverter/SerialTextConverterImpl.hpp>
 
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
@@ -22,7 +23,8 @@ void exitTasks(void);
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
-#include <SDREF/SDRosIface/SDRosIfaceComponentImpl.hpp>
+#include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 
 #include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
@@ -30,21 +32,28 @@ void exitTasks(void);
 
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 
-extern Svc::RateGroupDriverImpl rgDrv;
-extern Svc::ActiveRateGroupImpl rgTlm;
-extern Svc::ActiveRateGroupImpl rgXfer;
-extern Svc::CmdSequencerComponentImpl cmdSeq;
-extern Svc::SocketGndIfImpl sockGndIf;
-extern Svc::ConsoleTextLoggerImpl textLogger;
-extern Svc::ActiveLoggerImpl eventLogger;
-extern Svc::LinuxTimeImpl linuxTime;
-extern Svc::TlmChanImpl chanTlm;
-extern Svc::CommandDispatcherImpl cmdDisp;
-extern Svc::PrmDbImpl prmDb;
-extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
-extern Svc::FatalHandlerComponentImpl fatalHandler;
-extern SnapdragonFlight::HexRouterComponentImpl hexRouter;
-extern SDREF::SDRosIfaceComponentImpl sdRosIface;
-extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;
+#include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
+
+extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
+extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
+extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
+extern HLProc::LLRouterComponentImpl* llRouter_ptr;
+
+extern Svc::RateGroupDriverImpl* rgDrv_ptr;
+extern Svc::ActiveRateGroupImpl* rgTlm_ptr;
+extern Svc::ActiveRateGroupImpl* rgXfer_ptr;
+extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
+extern Svc::SocketGndIfImpl* sockGndIf_ptr;
+extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
+extern Svc::ActiveLoggerImpl* eventLogger_ptr;
+extern Svc::LinuxTimeImpl* linuxTime_ptr;
+extern Svc::TlmChanImpl* chanTlm_ptr;
+extern Svc::CommandDispatcherImpl* cmdDisp_ptr;
+extern Svc::PrmDbImpl* prmDb_ptr;
+extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
+extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
+extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
+extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
+extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 
 #endif

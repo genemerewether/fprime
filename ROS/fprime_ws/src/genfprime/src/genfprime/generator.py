@@ -81,7 +81,7 @@ def gen_serializable_xml(spec, pkg):
     # TODO(mereweth) - what is field.type vs field.base_type?
     for field in spec.parsed_fields():
         # TODO(mereweth) - decide how to handle arrays besides just capping size
-        type_, size_, header_includes, serial_imports = compute_type(pkg, field)
+        type_, size_, header_includes, serial_imports, countName, countType = compute_type(pkg, field)
 
         for header in header_includes:
             include_header = etree.SubElement(root, "include_header")
@@ -102,6 +102,11 @@ def gen_serializable_xml(spec, pkg):
                                       type=type_,
                                       size=str(size_))
 
+            if countName is not None:
+                member = etree.SubElement(members,
+                                          "member",
+                                          name=countName,
+                                          type=countType)
         else:
             member = etree.SubElement(members,
                                       "member",

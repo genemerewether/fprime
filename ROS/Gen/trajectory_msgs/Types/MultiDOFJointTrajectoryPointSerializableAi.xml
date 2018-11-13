@@ -1,8 +1,11 @@
 <serializable name="MultiDOFJointTrajectoryPoint" namespace="ROS::trajectory_msgs">
   <members>
     <member name="transforms" size="100" type="ROS::geometry_msgs::Transform"/>
+    <member name="transforms_count" type="U32"/>
     <member name="velocities" size="100" type="ROS::geometry_msgs::Twist"/>
+    <member name="velocities_count" type="U32"/>
     <member name="accelerations" size="100" type="ROS::geometry_msgs::Twist"/>
+    <member name="accelerations_count" type="U32"/>
     <member name="time_from_start" type="Fw::Time"/>
   </members>
   <import_serializable_type>ROS/Gen/geometry_msgs/Types/TransformSerializableAi.xml</import_serializable_type>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+
+<component name="EventExpander" kind="passive" namespace="HLProc">
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Common/Ports/ShortLogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <comment>A component that expands short version of EVRs</comment>
+    <ports>
+        <port name="LogRecv" data_type="Common::ShortLog" kind="sync_input" >
+            <comment>
+            Short Event input port
+            </comment>
+        </port>
+        <port name="LogSend" data_type="Fw::Log" kind="output" >
+            <comment>
+            Event output port
+            </comment>
+        </port>
+        <port name="Time" data_type="Fw::Time" kind="output" >
+            <comment>
+            Time Port to time tag event
+            </comment>
+        </port>
+    </ports>
+</component>
+

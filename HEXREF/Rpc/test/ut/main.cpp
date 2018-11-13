@@ -44,15 +44,19 @@ void print_usage() {
 
 int main(int argc, char* argv[]) {
     bool noInit = false;
+    bool doArm = false;
     bool kraitCycle = false;
     bool hexCycle = false;
     int numKraitCycles = 0;
     int option = 0;
-    while ((option = getopt(argc, argv, "ifho:c")) != -1) {
+    while ((option = getopt(argc, argv, "ifho:ca")) != -1) {
         switch(option) {
             case 'h':
                 print_usage();
                 return 0;
+                break;
+            case 'a':
+                doArm = true;
                 break;
             case 'i':
                 noInit = true;
@@ -84,7 +88,15 @@ int main(int argc, char* argv[]) {
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);
     signal(SIGHUP,sighandler);
-
+    
+#ifdef BUILD_SDFLIGHT
+    if (doArm) {
+        DEBUG_PRINT("Arming\n");
+        hexref_arm();
+        return 0;
+    }
+#endif
+    
     Os::Task task;
     Os::Task waiter;
     Os::TaskString waiter_task_name("WAITER");
@@ -96,7 +108,8 @@ int main(int argc, char* argv[]) {
         hexref_init();
     }
     DEBUG_PRINT("Starting HexRouter\n");
-    hexRouter.init(10, 0);
+    hexRouter.init(10, 200);
+    hexRouter.start(0, 90, 20*1024, 0);
     hexRouter.startPortReadThread(90, 20*1024, 0);
     if (hexCycle) {
         Os::TaskString task_name("HEXRPC");
@@ -113,7 +126,7 @@ int main(int argc, char* argv[]) {
     waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
 #endif //BUILD_SDFLIGHT
 
-#ifdef BUILD_SDFLIGHT
+#ifdef BUILD_SDFLIGHT    
     if (kraitCycle) {
         DEBUG_PRINT("Cycling from Krait\n");
         hexref_cycle(numKraitCycles);
@@ -123,6 +136,15 @@ int main(int argc, char* argv[]) {
     if (hexCycle) {
         while (!terminate) {
             DEBUG_PRINT("Waiting on Krait\n");
+
+            Fw::ExternalSerializeBuffer bufObj;
+            char buf[200] = {"hi"};
+            DEBUG_PRINT("Contents of buf: %s\n", buf);
+            bufObj.setExtBuffer((U8*) buf, 200);
+            bufObj.setBuffLen(3);
+            Fw::InputSerializePort* port = hexRouter.get_KraitPortsIn_InputPort(0);
+            port->invokeSerial(bufObj);
+            
             Os::Task::delay(1000);
         }
         DEBUG_PRINT("Terminate is true\n");

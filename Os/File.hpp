@@ -14,7 +14,8 @@ namespace Os {
             typedef enum {
                 OPEN_NO_MODE,   //!<  File mode not yet selected
                 OPEN_READ, //!<  Open file for reading
-                OPEN_WRITE //!<  Open file for writing
+                OPEN_WRITE, //!<  Open file for writing
+                OPEN_CREATE, //!< Open file for writing and truncates file if it exists, ie same flags as creat()
             } Mode;
 
             typedef enum {

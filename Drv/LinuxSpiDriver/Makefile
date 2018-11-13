@@ -13,6 +13,6 @@ export BUILD_ROOT
 include $(BUILD_ROOT)/mk/makefiles/module_targets.mk
 
 load: ut_nocov_SDFLIGHT
-	adb push test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut /home/linaro/spi_test_ut
+	adb push test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut /eng/load/spi_test_ut
 
 # Add module specific targets here

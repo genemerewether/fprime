@@ -21,6 +21,17 @@
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -96,6 +107,8 @@ namespace Gnc {
         ROS::mav_msgs::ImuStateUpdate &ImuStateUpdate
     )
   {
+      DEBUG_PRINT("IMU state update\n");
+    
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();
       //this->seq = h.getseq();
       // TODO(mereweth) convert h.getstamp()
@@ -164,15 +177,17 @@ namespace Gnc {
               this->odometry_out(0, odom);
           }
 
-          ROS::nav_msgs::OdometryNoCov odomNoCov(h, "body",
-                                 Pose(Point(x_w(0), x_w(1), x_w(2)),
-                                      Quaternion(w_q_b.x(), w_q_b.y(),
-                                                 w_q_b.z(), w_q_b.w())),
-                                 Twist(Vector3(v_b(0), v_b(1), v_b(2)),
-                                        Vector3(omega_b(0), omega_b(1), omega_b(2)))
-              );
-          if (this->isConnected_odomNoCov_OutputPort(0)) {
-              this->odomNoCov_out(0, odomNoCov);
+          if (context == IMUINTEG_SCHED_CONTEXT_POS) {
+              ROS::nav_msgs::OdometryNoCov odomNoCov(h, "body",
+                                     Pose(Point(x_w(0), x_w(1), x_w(2)),
+                                          Quaternion(w_q_b.x(), w_q_b.y(),
+                                                     w_q_b.z(), w_q_b.w())),
+                                     Twist(Vector3(v_b(0), v_b(1), v_b(2)),
+                                            Vector3(omega_b(0), omega_b(1), omega_b(2)))
+                  );
+              if (this->isConnected_odomNoCov_OutputPort(0)) {
+                  this->odomNoCov_out(0, odomNoCov);
+              }
           }
       }
       else if (context == IMUINTEG_SCHED_CONTEXT_TLM) {

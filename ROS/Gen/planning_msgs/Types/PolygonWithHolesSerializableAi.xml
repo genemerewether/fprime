@@ -1,8 +1,0 @@
-<serializable name="PolygonWithHoles" namespace="ROS::planning_msgs">
-  <members>
-    <member name="hull" type="ROS::planning_msgs::Polygon2D"/>
-    <member name="holes" size="100" type="ROS::planning_msgs::Polygon2D"/>
-  </members>
-  <import_serializable_type>ROS/Gen/planning_msgs/Types/Polygon2DSerializableAi.xml</import_serializable_type>
-  <import_serializable_type>ROS/Gen/planning_msgs/Types/Polygon2DSerializableAi.xml</import_serializable_type>
-</serializable>

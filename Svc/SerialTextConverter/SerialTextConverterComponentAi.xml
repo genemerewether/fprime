@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="SerialTextConverter" kind="active" namespace="Svc">
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
+
+    <comment>Component that converts serial data into Events</comment>
+    <ports>
+    
+        <port name="SerReadPort" data_type="Drv::SerialRead" kind="async_input" full="drop" >
+            <comment>
+            Input port for serial driver to send serial data to read
+            </comment>
+        </port>
+        
+        <port name="SerialBufferSend" data_type="Fw::BufferSend"  kind="output">
+           <comment>Port to send buffers for the serial driver to use</comment>
+        </port>
+    </ports>
+    
+    <commands>
+       
+       <command kind="async" opcode="1" mnemonic="STC_SET_MODE">
+            <args>
+                <arg name="mode" type="ENUM">
+                    <enum name="StcMode">
+                        <item name="EVR_MODE"/>
+                        <item name="FILE_MODE"/>
+                    </enum>
+                </arg>
+            </args> 
+            <comment>
+            Command to put in FILE (write texts to a file) or EVR (write texts to Evrs) mode.
+            </comment>
+       </command>
+       
+    </commands>
+       
+    <events>
+        
+        <event id="0" name="STC_SerialText" severity="ACTIVITY_LO" format_string = "%s" >
+            <comment>
+            Serial data received
+            </comment>
+            <args>
+                <arg name="data" type="string" size="80">
+                    <comment>Serial data turned into a string</comment>
+                </arg>          
+            </args>
+        </event>
+        
+        <event id="1" name="STC_SerialReadBadStatus" severity="WARNING_LO" format_string = "Serial read had bad status of %d." throttle="5" >
+            <comment>
+            Serial read had bad status.
+            </comment>
+            <args>
+                <arg name="status" type="I32">
+                    <comment>Serial read status</comment>
+                </arg>             
+            </args>
+        </event>
+
+        <event id="2" name="STC_SetMode_Cmd_Sent" severity="ACTIVITY_LO" format_string = "Sent the STC_SET_MODE command with mode: %d" >
+            <comment>
+            STC_SET_MODE command sent
+            </comment>
+            <args>
+                <arg name="mode" type="ENUM">
+                    <enum name="StcModeEv">
+                        <item name="EVR_MODE_EV"/>
+                        <item name="FILE_MODE_EV"/>
+                    </enum>
+                </arg>     
+            </args>
+        </event>
+
+        <event id="3" name="STC_SetMode_Cmd_Invalid" severity="WARNING_LO" format_string = "Tried to transition to FILE mode without an open log file." >
+            <comment>
+            STC_SET_MODE command sent to transition to FILE mode, but not log file has been specified.
+            </comment>
+        </event>
+
+        <event id="4" name="STC_File" severity="ACTIVITY_LO" format_string = "Logging to file: %s" >
+            <comment>
+            Displays the log file being used
+            </comment>
+            <args>
+                <arg name="log_file" type="string" size="80">
+                    <comment>Log file being used</comment>
+                </arg>          
+            </args>
+        </event>
+                                
+    </events>
+    
+</component>
+

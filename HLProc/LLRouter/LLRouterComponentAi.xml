@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="LLRouter" kind="active" namespace="HLProc">
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
+    <import_port_type>Svc/PolyIf/PolyPortAi.xml</import_port_type>
+     
+    <comment>Sends and receives transactions to the low-level processor</comment>
+    <ports>
+        <port name="HLPortsIn" data_type="Serial" kind="async_input" max_number="25">
+            <comment>
+            Input ports from other components
+            </comment>
+        </port>
+        <port name="LLPortsOut" data_type="Serial" kind="output" max_number="25">
+            <comment>
+            Output ports to other components
+            </comment>
+        </port>
+        <port name="SerReadPort" data_type="Drv::SerialRead" kind="async_input" >
+            <comment>
+            Output port to serial driver to read accumulated data
+            </comment>
+        </port>
+        <port name="SerWritePort" data_type="Drv::SerialWrite" kind="output" >
+            <comment>
+            Output port to serial driver to read accumulated data
+            </comment>
+        </port>
+        <port name="Sched" data_type="Svc::Sched" kind="async_input" >
+            <comment>
+            Input port to get called each cycle by rate group
+            </comment>
+        </port>
+        <port name="CycleDone" data_type="Svc::Sched" kind="async_input" >
+            <comment>
+            Input port to get when high-level estimation cycle is done
+            </comment>
+        </port>
+        <port name="SerialBufferSend" data_type="Fw::BufferSend"  kind="output">
+           <comment>Port to send buffers for the serial driver to use</comment>
+        </port>
+        <port name="pingIn" data_type="Svc::Ping" kind="async_input"  max_number = "1">
+            <comment>
+            Ping input port
+            </comment>
+        </port>
+        <port name="pingOut" data_type="Svc::Ping" kind="output"  max_number = "1">
+            <comment>
+            Ping output port
+            </comment>
+        </port>
+        <port name="PolyGet" data_type="Svc::Poly" kind="output">
+            <comment>
+                The port for getting values from PolyDb
+            </comment>
+        </port>
+    </ports>
+    <events>
+        <event id="0" name="LLR_DataReceiveError" severity="WARNING_HI" format_string = "LL Router Serial Receive data error %d" throttle = "5">
+            <comment>
+            Serial receive error
+            </comment>
+            <args>
+                <arg name="error" type="ENUM">
+                    <enum name="LLR_ReceiveError">
+                        <item name="LLR_PARITY" comment="Parity error"/>
+                        <item name="LLR_NO_BUFFERS" comment="Driver didn't have any buffers left"/>
+                        <item name="LLR_BUFFER_TOO_SMALL" comment="Not enough room in buffer"/>
+                        <item name="LLR_OTHER_ERR" comment="Other error"/>
+                    </enum>
+                    <comment>The receive eror code</comment>
+                </arg>          
+            </args>
+        </event>
+        <event id="1" name="LLR_DataCrcError" severity="WARNING_HI" format_string = "LL Router CRC error: exp: 0x%04X actual: 0x%04X" throttle = "5">
+            <comment>
+            Serial CRC error
+            </comment>
+            <args>
+                <arg name="expected" type="U16"/>
+                <arg name="actual" type="U16"/>
+            </args>
+        </event>
+        <event id="2" name="LLR_InvalidPortNum" severity="WARNING_HI" format_string = "LL Router invalid port number: %u." throttle = "5">
+            <comment>
+            Input serial data packet had a invalid port number, ie port number is not connected.
+            </comment>
+            <args>
+                <arg name="portNum" type="U8"/>
+            </args>
+        </event>
+        <event id="3" name="LLR_BadSerialPortCall" severity="WARNING_HI" format_string = "LL Router bad serial port call with status %d and port number %d." throttle = "5">
+            <comment>
+            Bad status returned from output Serial port call, ie LLPortsOut() call had issues deserializing the buffer.
+            </comment>
+            <args>
+                <arg name="status" type="I32"/>
+                <arg name="portNum" type="U8"/>
+            </args>
+        </event>
+        <event id="4" name="LLR_PatchFileOpen" severity="ACTIVITY_HI" format_string = "LL Router opened %s with a file size of %d." >
+            <comment>
+            LL Router successfully opened patch binary from filesystem.
+            </comment>
+            <args>
+                <arg name="filename" type="string" size="40"/>
+                <arg name="filesize" type="U32"/>
+            </args>
+        </event>
+        <event id="5" name="LLR_PatchModeChange" severity="ACTIVITY_HI" format_string = "LL Router mode changed to %s.">
+            <comment>
+            LL Router mode changed.
+            </comment>
+            <args>
+                <arg name="newmode" type="string" size="20"/>
+            </args>
+        </event>
+        <event id="6" name="LLR_FirstACK" severity="ACTIVITY_HI" format_string = "LL Router saw first patch ACK.">
+            <comment>
+            LL Router saw first ACK of the patch
+            </comment>
+        </event>
+        <event id="7" name="LLR_PatchEvent" severity="ACTIVITY_HI" format_string = "LL Router sent %d KB.">
+            <comment>
+            LL Router patch progress in Kilobytes.
+            </comment>
+            <args>
+                <arg name="progress" type="U32"/>
+            </args>
+        </event>
+        <event id="8" name="LLR_PatchComplete" severity="ACTIVITY_HI" format_string = "LL Router Patch Complete.">
+            <comment>
+            LL Router patch completed.
+            </comment>
+        </event>
+        <event id="9" name="LLR_PatchError" severity="WARNING_HI" format_string = "LL Patch error %d %d %s.">
+            <comment>
+            LL Router patch error.
+            </comment>
+            <args>
+                <arg name="error" type="ENUM">
+                    <enum name="LLR_PatchError">
+                        <item name="LLR_PERR_NO_START_ACK" comment="No start ack found"/>
+                        <item name="LLR_PERR_TIMEOUT" comment="LL Router timed out waiting for an ack"/>
+                        <item name="LLR_PERR_OPEN" comment="LL Router cannot open file"/>
+                        <item name="LLR_PERR_READ" comment="LL Router cannot read file"/>
+                        <item name="LLR_PERR_OTHER" comment="LL Other error"/>
+                    </enum>
+                </arg>
+                <arg name="err_num" type="I32" />
+                <arg name="err_string" type="string" size="40"/>
+            </args>
+        </event>
+        <event id="10" name="LLR_PolyError" severity="WARNING_HI" format_string = "Error getting PolyDb value" throttle = "5">
+            <comment>
+            Error retrieving PolyDb value
+            </comment>
+        </event>                                    
+    </events>
+    <telemetry>
+        <channel id="0" name="LLR_CrcErrors" data_type="U32">
+            <comment>
+            Number of CRC errors on receive
+            </comment>
+        </channel>
+        <channel id="1" name="LLR_ResyncErrors" data_type="U32">
+            <comment>
+            Number of packet resync errors
+            </comment>
+        </channel>
+        <channel id="2" name="LLR_NumPackets" data_type="U32">
+            <comment>
+            Number of packets from LL
+            </comment>
+        </channel>
+        <channel id="3" name="LLR_NumSerialErrors" data_type="U32">
+            <comment>
+            Number of serial read errors
+            </comment>
+        </channel>
+        <channel id="4" name="LLR_NumGoodPackets" data_type="U32">
+            <comment>
+            Number of good packets from LL, ie passed CRC check
+            </comment>
+        </channel>
+        <channel id="5" name="LLR_NumDecodeErrors" data_type="U32">
+            <comment>
+            Number of packet decode errors on receive
+            </comment>
+        </channel>
+        <channel id="6" name="LLR_NumInvalidPorts" data_type="U32">
+            <comment>
+            Number of packets with invalid ports
+            </comment>
+        </channel>
+        <channel id="7" name="LLR_NumBadSerialPortCalls" data_type="U32">
+            <comment>
+            Number of bad Serial port calls, ie bad serialize status returned
+            </comment>
+        </channel>
+        <channel id="8" name="LLR_NumOuputBufferOverflows" data_type="U32">
+            <comment>
+            Number of output buffer overflows
+            </comment>
+        </channel>
+        <channel id="9" name="LLR_NumZeroPktSize" data_type="U32">
+            <comment>
+            Number of packets with zero size
+            </comment>
+        </channel>
+        <channel id="10" name="LLR_MaxCycleTime" data_type="U32" format_string="%dus">
+            <comment>
+            Max GNC cycle time
+            </comment>
+        </channel>
+        <channel id="11" name="LLR_CycleTime" data_type="U32" format_string="%dus">
+            <comment>
+            Current GNC cycle time
+            </comment>
+        </channel>
+        <channel id="12" name="LLR_PatchProgress" data_type="U32">
+            <comment>
+            Number of patch bytes written
+            </comment>
+        </channel>
+    </telemetry>
+    <commands>
+        <!-- LLR_SET_PATCH_MODE command -->
+        <command kind="async" opcode="0" mnemonic="LLR_SET_PATCH_MODE" >
+            <comment>
+            No-op command
+            </comment>
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="LLRPatchMode">
+                        <item name="LLR_NORMAL"/>
+                        <item name="LLR_PATCH"/>
+                    </enum>
+                </arg>
+            </args>
+        </command>
+        <!-- LLR_LOAD_PATCH_FILE command -->
+        <command kind="async" opcode="1" mnemonic="LLR_LOAD_PATCH_FILE">
+            <comment>
+            Load and patch the LL
+            </comment>
+            <args>
+                <arg name="file" type="string" size="40">
+                    <comment>Patch file</comment>
+                </arg>
+                <arg name="updatingLL" type="ENUM">
+                    <comment>The LL to update</comment>
+                    <enum name="LL">
+                        <item name="LL_A"/>
+                        <item name="LL_B"/>
+                    </enum>
+                </arg>
+                <arg name="legacyBootloader" type="bool">
+                    <comment>Updating LLs with an old bootloader</comment>
+                </arg>
+                <arg name="forceboot" type="bool">
+                    <comment>Tell the bootloader to ignore CRC32 checks on startup</comment>
+                </arg>
+                <arg name="disabled_selftests" type="U64">
+                    <comment>Bitmask of tests to disable on startup. A 1 indicates that the test should not be run</comment>
+                </arg>
+            </args>
+        </command>        
+        <command kind="async" opcode="2" mnemonic="LLR_CYCLE_SERIAL">
+            <comment>
+            Command to have scheduler port send serial data if GNC loop is not running
+            </comment>
+            <args>
+                <arg name="on" type="bool">
+                    <comment>Turn the command sending on or off.</comment>
+                </arg>
+            </args>
+       </command>
+    </commands>
+</component>
+

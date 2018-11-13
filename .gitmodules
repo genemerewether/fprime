@@ -12,7 +12,7 @@
 	url = https://github.com/ros/common_msgs.git
 [submodule "ROS/fprime_ws/src/mav_comm"]
 	path = ROS/fprime_ws/src/mav_comm
-	url = https://github.com/ethz-asl/mav_comm.git
+	url = ../mav_comm.git
 [submodule "ROS/fprime_ws/src/ros_comm_msgs"]
 	path = ROS/fprime_ws/src/ros_comm_msgs
 	url = https://github.com/ros/ros_comm_msgs.git
@@ -21,7 +21,7 @@
 	url = ../quest_gnc.git
 [submodule "Gnc/eigen"]
 	path = Gnc/eigen
-	url = https://github.com/eigenteam/eigen-git-mirror
+	url = https://github.com/genemerewether/eigen-git-mirror
 [submodule "Gnc/linter"]
 	path = Gnc/linter
 	url = git@github.com:genemerewether/linter.git
@@ -29,3 +29,6 @@
 	path = Gnc/tools/pybind11
 	url = https://github.com/pybind/pybind11.git
 	branch = master
+[submodule "cross_toolchain"]
+	path = cross_toolchain
+	url = https://github.com/ATLFlight/cross_toolchain.git

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Type_Schema.rnc" type="compact"?>
+<interface name="ShortLog" namespace="Common">
+    <include_header>Fw/Log/LogBuffer.hpp</include_header>
+    <comment>
+        Shorter Log port - no time, shorter severity
+    </comment>
+    <args>
+        <arg name="id" type="FwEventIdType">
+            <comment>Log ID</comment>
+        </arg>
+        <arg name="severity" type="U8">
+            <comment>The shorter severity argument</comment>
+        </arg>
+        <arg name="args" type="Fw::LogBuffer" pass_by="reference">
+            <comment>Buffer containing serialized log entry</comment>
+        </arg>
+    </args>
+</interface>

@@ -39,142 +39,182 @@ static Fw::SimpleObjRegistry simpleReg;
 
 // Component instance pointers
 
-Svc::RateGroupDecouplerComponentImpl rgDecouple(
+Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
+Svc::ActiveRateGroupImpl* rg_ptr = 0;
+Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
+Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
+Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
+Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
+Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
+LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
+Svc::LinuxTimeImpl* linuxTime_ptr = 0;
+SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr = 0;
+Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
+Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
+Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
+Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
+Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
+Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
+Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
+Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
+Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr = 0;
+Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr = 0;
+Drv::LinuxPwmDriverComponentImpl* escPwm_ptr = 0;
+
+void allocComps() {
+    rgDecouple_ptr = new Svc::RateGroupDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
-                    "RGDECOUPLE",
+                        "RGDECOUPLE",
 #endif
-                    5) // 50 dropped hardware cycles before an error
+                        5) // 50 dropped hardware cycles before an error
 ;
 
-static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
-    0, // unused
-    Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
-    Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
-};
-Svc::ActiveRateGroupImpl rg(
+    NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
+        0, // unused
+        Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+        Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
+    };
+    
+    rg_ptr = new Svc::ActiveRateGroupImpl(
 #if FW_OBJECT_NAMES == 1
-                    "RG",
+                        "RG",
 #endif
-                    rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
+                        rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
 ;
 
-static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
-Svc::RateGroupDriverImpl rgGncDrv(
+    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+    
+    rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
-                    "RGDRV",
+                        "RGDRV",
 #endif
-                    rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
+                        rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
-static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-    Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-    Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
-    Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
-};
-Svc::PassiveRateGroupImpl rgAtt(
+    NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        Drv::MPU9250_SCHED_CONTEXT_OPERATE,
+        Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+        Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+    };
+
+    rgAtt_ptr = new Svc::PassiveRateGroupImpl(
 #if FW_OBJECT_NAMES == 1
-                    "RGATT",
+                            "RGATT",
 #endif
-                    rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
+                            rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
 ;
 
-static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-    0, //TODO(mereweth) - IMU?
-    Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
-    Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
-};
-Svc::PassiveRateGroupImpl rgPos(
+    NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        0, //TODO(mereweth) - IMU?
+        Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+        Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
+    };
+    
+    rgPos_ptr = new Svc::PassiveRateGroupImpl(
 #if FW_OBJECT_NAMES == 1
                     "RGPOS",
 #endif
                     rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
 ;
 
-#if FW_ENABLE_TEXT_LOGGING
-Svc::ConsoleTextLoggerImpl textLogger
+    textLogger_ptr = new Svc::ConsoleTextLoggerImpl
 #if FW_OBJECT_NAMES == 1
-                    ("TLOG")
-#endif
-;
-#endif
-
-Svc::ActiveLoggerImpl eventLogger
-#if FW_OBJECT_NAMES == 1
-                    ("ELOG")
+                        ("TLOG")
 #endif
 ;
 
-Svc::LinuxTimeImpl linuxTime
+    eventLogger_ptr = new Svc::ActiveLoggerImpl
 #if FW_OBJECT_NAMES == 1
-                    ("LTIME")
+                        ("ELOG")
 #endif
 ;
 
-SnapdragonFlight::KraitRouterComponentImpl kraitRouter
+
+    logQueue_ptr = new LLProc::ShortLogQueueComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("KRAITRTR")
+                        ("SLOG")
 #endif
 ;
 
-Svc::AssertFatalAdapterComponentImpl fatalAdapter
+    linuxTime_ptr = new Svc::LinuxTimeImpl
 #if FW_OBJECT_NAMES == 1
-("fatalAdapter")
+                        ("LTIME")
 #endif
 ;
 
-Svc::FatalHandlerComponentImpl fatalHandler
+    kraitRouter_ptr = new SnapdragonFlight::KraitRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
-("fatalHandler")
+                        ("KRAITRTR")
 #endif
 ;
 
-Gnc::LeeCtrlComponentImpl leeCtrl
+    fatalAdapter_ptr = new Svc::AssertFatalAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("LEECTRL")
+                        ("fatalAdapter")
 #endif
 ;
 
-Gnc::BasicMixerComponentImpl mixer
+    fatalHandler_ptr = new Svc::FatalHandlerComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("MIXER")
+                        ("fatalHandler")
 #endif
 ;
 
-Gnc::ActuatorAdapterComponentImpl actuatorAdapter
+    leeCtrl_ptr = new Gnc::LeeCtrlComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("ACTADAP")
+                        ("LEECTRL")
 #endif
 ;
 
-Gnc::ImuIntegComponentImpl imuInteg
+    mixer_ptr = new Gnc::BasicMixerComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("IMUINTEG")
+                        ("MIXER")
 #endif
 ;
 
-Drv::MPU9250ComponentImpl mpu9250(
+    actuatorAdapter_ptr = new Gnc::ActuatorAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    "MPU9250",
-#endif
-                     false) // don't use magnetometer for now
-;
-
-Drv::LinuxSpiDriverComponentImpl spiDrv
-#if FW_OBJECT_NAMES == 1
-                    ("SPIDRV")
+                        ("ACTADAP")
 #endif
 ;
 
-Drv::LinuxGpioDriverComponentImpl imuDRInt
+    imuInteg_ptr = new Gnc::ImuIntegComponentImpl
 #if FW_OBJECT_NAMES == 1
-                    ("IMUDRINT")
+                        ("IMUINTEG")
 #endif
 ;
 
-Drv::LinuxPwmDriverComponentImpl escPwm
+    mpu9250_ptr = new Drv::MPU9250ComponentImpl(
 #if FW_OBJECT_NAMES == 1
-                    ("ESCPWM")
+                        "MPU9250",
+#endif
+                         false) // don't use magnetometer for now
+;
+
+    spiDrv_ptr = new Drv::LinuxSpiDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SPIDRV")
 #endif
 ;
+
+    i2cDrv_ptr = new Drv::LinuxI2CDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                    ("I2CDRV")
+#endif
+;
+
+    imuDRInt_ptr = new Drv::LinuxGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("IMUDRINT")
+#endif
+;
+
+    escPwm_ptr = new Drv::LinuxPwmDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ESCPWM")
+#endif
+;
+
+}
 
 #if FW_OBJECT_REGISTRATION == 1
 
@@ -189,25 +229,28 @@ void dumpobj(const char* objName) {
 #endif
 
 #endif
-
+ 
 void manualConstruct(void) {
     // Manual connections
     // TODO(mereweth) - multiple DSPAL components with commands?
-    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
-    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
+    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, _ptr->get_CmdDisp_InputPort(0));
+    //_ptr->set_CmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0);
 
-    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
-    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
+    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, _ptr->get_CmdDisp_InputPort(0));
+    //_ptr->set_CmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0);
 
-    mpu9250.set_Imu_OutputPort(1, kraitRouter.get_HexPortsIn_InputPort(1));
-    //mpu9250.set_FIFORaw_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
-    imuInteg.set_odomNoCov_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(2));
+    mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
+    imuInteg_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
+    
+    logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
 
-    kraitRouter.set_KraitPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
-    kraitRouter.set_KraitPortsOut_OutputPort(2, escPwm.get_pwmSetDuty_InputPort(1));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
 }
 
 void constructApp() {
+    allocComps();
 
     localTargetInit();
 
@@ -216,37 +259,39 @@ void constructApp() {
 #endif
 
     // Initialize rate group driver
-    rgGncDrv.init();
+    rgGncDrv_ptr->init();
 
     // Initialize the rate groups
-    rg.init(10,0);
-    rgDecouple.init(10, 0);
-    rgAtt.init(1);
-    rgPos.init(0);
+    rg_ptr->init(10,0);
+    rgDecouple_ptr->init(10, 0);
+    rgAtt_ptr->init(1);
+    rgPos_ptr->init(0);
 
     // Initialize the GNC components
-    leeCtrl.init(0);
-    mixer.init(0);
-    actuatorAdapter.init(0);
-    imuInteg.init(0);
-    mpu9250.init(0);
+    leeCtrl_ptr->init(0);
+    mixer_ptr->init(0);
+    actuatorAdapter_ptr->init(0);
+    imuInteg_ptr->init(0);
+    mpu9250_ptr->init(0);
 
-    spiDrv.init(0);
-    imuDRInt.init(0);
-    escPwm.init(0);
+    spiDrv_ptr->init(0);
+    i2cDrv_ptr->init(0);
+    imuDRInt_ptr->init(0);
+    escPwm_ptr->init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
-    textLogger.init();
+    textLogger_ptr->init();
 #endif
 
-    eventLogger.init(10, 0);
+    eventLogger_ptr->init(10, 0);
+    logQueue_ptr->init(0);
 
-    linuxTime.init(0);
+    linuxTime_ptr->init(0);
 
-    fatalAdapter.init(0);
-    fatalHandler.init(0);
+    fatalAdapter_ptr->init(0);
+    fatalHandler_ptr->init(0);
 
-    kraitRouter.init(50, 512);
+    kraitRouter_ptr->init(50, 1000);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -254,29 +299,49 @@ void constructApp() {
     manualConstruct();
 
     /* Register commands */
-    /*eventLogger.regCommands();*/
+    /*eventLogger_ptr->regCommands();*/
 
     // Open devices
+
+    Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
+    meta.minIn = 0.0f;
+    meta.maxIn = 1000.0f;
+    meta.minOut = 0;
+    meta.maxOut = 800;
+    
+    meta.addr = 11;
+    actuatorAdapter_ptr->setupI2C(0, meta);
+    meta.addr = 12;
+    actuatorAdapter_ptr->setupI2C(1, meta);
+    meta.addr = 13;
+    actuatorAdapter_ptr->setupI2C(2, meta);
+    meta.addr = 14;
+    actuatorAdapter_ptr->setupI2C(3, meta);
+    
 #ifdef BUILD_DSPAL
     // /dev/spi-1 on QuRT; connected to MPU9250
-    spiDrv.open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
-    imuDRInt.open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    spiDrv_ptr->open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
+    imuDRInt_ptr->open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    
+    // J9, BLSP2
+    i2cDrv_ptr->open(2, Drv::I2C_FREQUENCY_400KHZ);
+
+    // J15, BLSP9
+    // TODO(mereweth) - Spektrum UART and binding GPIO
 
     // J13 is already at 5V, so use for 4 of the ESCs
     NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
     // /dev/pwm-1 on QuRT
-    escPwm.open(1, pwmPins, 4, 20 * 1000);
-
-    // reserve J15, bam-9, for Spektrum radio receiver
+    escPwm_ptr->open(1, pwmPins, 4, 20 * 1000);
 #endif
 
     // Active component startup
     // start rate groups
-    rg.start(0, 50, 2 * 1024);
+    rg_ptr->start(0, 50, 2 * 1024);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
-    rgDecouple.start(0, 90, 5*1024);
+    rgDecouple_ptr->start(0, 90, 5*1024);
     // start telemetry
-    eventLogger.start(0, 40, 2*1024);
+    eventLogger_ptr->start(0, 40, 2*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -286,7 +351,7 @@ void constructApp() {
 
 void run1cycle(void) {
     // call interrupt to emulate a clock
-    Svc::InputCyclePort* port = rgDecouple.get_BackupCycleIn_InputPort(0);
+    Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
@@ -296,29 +361,46 @@ void run1cycle(void) {
     char buf[200] = {"hi"};
     bufObj.setExtBuffer((U8*) buf, 200);
     bufObj.setBuffLen(12);
-    Fw::InputSerializePort* serPort = kraitRouter.get_HexPortsIn_InputPort(1);
+    Fw::InputSerializePort* serPort = kraitRouter_ptr->get_HexPortsIn_InputPort(1);
     serPort->invokeSerial(bufObj);
 #endif
 }
 
 void exitTasks(void) {
-    rg.exit();
-    rgDecouple.exit();
-    eventLogger.exit();
-    imuDRInt.exitThread();
-    kraitRouter.exit();
+    rg_ptr->exit();
+    rgDecouple_ptr->exit();
+    eventLogger_ptr->exit();
+    imuDRInt_ptr->exitThread();
+    kraitRouter_ptr->exit();
 }
 
 volatile bool terminate = false;
 volatile bool preinit = true;
 
-/* TODO(mereweth)
- * use singleton pattern to only allow one instance of the topology?
- * return error if already initialized or if terminate is already true?
- *
- * split into init and run so SDREF can wait for init to be done? init would be called in
- * Topology (first thread) and would block. Then, hexref_run would be called in thread
- */
+int hexref_arm() {
+    FARF(ALWAYS, "hexref_arm");
+    if (preinit) {
+        DEBUG_PRINT("hexref_arm preinit - returning");
+        return -1;
+    }
+    Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
+    Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
+    for (U32 i = 0; i < 35; i++) {
+        FARF(ALWAYS, "arm %u", i);
+        for (U32 j = 11; j <= 14; j++) {
+            confPort->invoke(400, j, 100);
+            U8 readBuf[1] = { 0 };
+            U8 writeBuf[1] = { 0 };
+            Fw::Buffer writeObj = Fw::Buffer(0, 0, (U64) writeBuf, 1);
+            Fw::Buffer readObj = Fw::Buffer(0, 0, (U64) readBuf, 1);
+            rwPort->invoke(writeObj,
+                           readObj);
+            usleep(2500);
+        }
+    }
+    return 0;
+}
+
 int hexref_init(void) {
     DEBUG_PRINT("Before constructing app\n");
     constructApp();
@@ -348,7 +430,7 @@ int hexref_run(void) {
     bool local_cycle = true;
     int cycle = 0;
 #ifdef BUILD_DSPAL
-    imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+    imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
 
     while (!terminate) {
@@ -362,7 +444,7 @@ int hexref_run(void) {
 
     // stop tasks
 #ifdef BUILD_DSPAL
-    imuDRInt.exitThread();
+    imuDRInt_ptr->exitThread();
 #endif
     exitTasks();
     // Give time for threads to exit
@@ -381,14 +463,14 @@ int hexref_cycle(unsigned int cycles) {
         return -1;
     }
 
-    imuDRInt.startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+    imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
     for (unsigned int i = 0; i < cycles; i++) {
         //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
         run1cycle();
         Os::Task::delay(10);
     }
-    imuDRInt.exitThread();
+    imuDRInt_ptr->exitThread();
     DEBUG_PRINT("hexref_cycle returning");
 
     return 0;
@@ -424,19 +506,19 @@ int hexref_fini(void) {
 }
 
 int hexref_rpc_relay_buff_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-    return kraitRouter.buffRead(port, buff, buffLen, bytes);
+    return kraitRouter_ptr->buffRead(port, buff, buffLen, bytes);
 }
 
 int hexref_rpc_relay_port_read(unsigned char* buff, int buffLen, int* bytes) {
-    return kraitRouter.portRead(buff, buffLen, bytes);
+    return kraitRouter_ptr->portRead(buff, buffLen, bytes);
 }
 
 int hexref_rpc_relay_buff_write(unsigned int port, const unsigned char* buff, int buffLen) {
-    return kraitRouter.buffWrite(port, buff, buffLen);
+    return kraitRouter_ptr->buffWrite(port, buff, buffLen);
 }
 
 int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
-    return kraitRouter.portWrite(buff, buffLen);
+    return kraitRouter_ptr->portWrite(buff, buffLen);
 }
 
 #ifndef BUILD_DSPAL

@@ -2,9 +2,13 @@
   <members>
     <member name="header" type="ROS::std_msgs::Header"/>
     <member name="joint_names" size="100" type="Fw::EightyCharString"/>
+    <member name="joint_names_count" type="U32"/>
     <member name="transforms" size="100" type="ROS::geometry_msgs::Transform"/>
+    <member name="transforms_count" type="U32"/>
     <member name="twist" size="100" type="ROS::geometry_msgs::Twist"/>
+    <member name="twist_count" type="U32"/>
     <member name="wrench" size="100" type="ROS::geometry_msgs::Wrench"/>
+    <member name="wrench_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <include_header>Fw/Types/EightyCharString.hpp</include_header>

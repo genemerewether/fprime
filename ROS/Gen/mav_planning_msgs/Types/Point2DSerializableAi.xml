@@ -1,0 +1,6 @@
+<serializable name="Point2D" namespace="ROS::mav_planning_msgs">
+  <members>
+    <member name="x" type="F64"/>
+    <member name="y" type="F64"/>
+  </members>
+</serializable>

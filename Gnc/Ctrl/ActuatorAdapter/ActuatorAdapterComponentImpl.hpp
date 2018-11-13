@@ -21,6 +21,7 @@
 #define ActuatorAdapter_HPP
 
 #include "Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentAc.hpp"
+#include "Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImplCfg.hpp"
 
 namespace Gnc {
 
@@ -54,6 +55,24 @@ namespace Gnc {
       //!
       ~ActuatorAdapterComponentImpl(void);
 
+      // TODO(mereweth) - check for near-zero and zero in this setter
+      struct PwmMetadata {
+          F64 minIn;
+          F64 maxIn;
+          F32 minOut;
+          F32 maxOut;
+      };
+
+      struct I2CMetadata {
+          U32 addr;
+          F64 minIn;
+          F64 maxIn;
+          U32 minOut;
+          U32 maxOut;
+      };
+
+      bool setupI2C(U32 actuator, I2CMetadata meta);
+    
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -64,10 +83,23 @@ namespace Gnc {
       //!
       void motor_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::mav_msgs::Actuators &Actuators 
+          ROS::mav_msgs::Actuators &Actuators
       );
 
+      enum OutputType {
+          OUTPUT_UNSET,
+          OUTPUT_PWM,
+          OUTPUT_I2C
+      };
 
+      struct OutputInfo {
+          OutputType type;
+          union {
+              PwmMetadata pwmMeta;
+              I2CMetadata i2cMeta;
+          };
+      } outputInfo[AA_MAX_ACTUATORS];
+    
     };
 
 } // end namespace Gnc
