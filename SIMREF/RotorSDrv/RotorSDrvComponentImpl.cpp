@@ -110,6 +110,10 @@ namespace SIMREF {
           ROS::mav_msgs::Actuators &actuator
       )
     {
+        if (NULL == m_rgNH) {
+            return;
+        }
+        
         mav_msgs::Actuators msg;
         int size = 0;
         const F64 *angVel = actuator.getangular_velocities(size);

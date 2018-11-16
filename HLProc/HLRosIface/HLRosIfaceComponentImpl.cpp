@@ -108,6 +108,10 @@ namespace HLProc {
           ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
+        if (NULL == m_rgNH) {
+            return;
+        }
+      
         sensor_msgs::Imu msg;
 
         ROS::std_msgs::Header header = Imu.getheader();
@@ -179,6 +183,10 @@ namespace HLProc {
           ROS::nav_msgs::OdometryNoCov &Odometry
       )
     {
+        if (NULL == m_rgNH) {
+            return;
+        }
+        
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
