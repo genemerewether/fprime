@@ -215,12 +215,10 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct() {
-    //hexRouter_ptr->set_HexPortsOut_OutputPort(1, prmDb_ptr->get_
-
 #ifndef LLROUTER_DEVICES
-    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp_ptr->set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter_ptr->get_KraitPortsIn_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    // Sequence Com buffer and cmd response
+    //cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
+    //hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
@@ -232,9 +230,9 @@ void manualConstruct() {
     actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
 #else
-    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp_ptr->set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter_ptr->get_HLPortsIn_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    // Sequence Com buffer and cmd response
+    //cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(0));
+    //llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
 
     llRouter_ptr->set_LLPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));

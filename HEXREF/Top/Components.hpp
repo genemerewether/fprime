@@ -30,6 +30,7 @@ void exitTasks(void);
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
+#include <LLProc/LLCmdDispatcher/LLCmdDispatcherComponentImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
@@ -38,6 +39,7 @@ extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
+extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;

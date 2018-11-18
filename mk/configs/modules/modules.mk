@@ -122,7 +122,8 @@ LLPROC_MODULES := \
 	LLProc/ShortLogQueue \
 	LLProc/Ports \
 	LLProc/LLDebug \
-	LLProc/LLCycle
+	LLProc/LLCycle \
+	LLProc/LLCmdDispatcher
 
 HLPROC_MODULES := \
 	HLProc/HLRosIface \
@@ -345,7 +346,8 @@ HEXREF_MODULES := \
 	\
 	$(COMMON_MODULES) \
 	\
-	LLProc/ShortLogQueue
+	LLProc/ShortLogQueue \
+	LLProc/LLCmdDispatcher
 #Svc/ComLogger
 
 TESTRPC_MODULES := \

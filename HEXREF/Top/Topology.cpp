@@ -51,6 +51,7 @@ Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr = 0;
 Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
+LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
@@ -156,6 +157,12 @@ void allocComps() {
     fatalHandler_ptr = new Svc::FatalHandlerComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("fatalHandler")
+#endif
+;
+
+    cmdDisp_ptr = new LLProc::LLCmdDispatcherImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDDISP")
 #endif
 ;
 
@@ -291,6 +298,8 @@ void constructApp() {
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
+    cmdDisp_ptr->init(0);
+
     kraitRouter_ptr->init(50, 1000);
 
     // Connect rate groups to rate group driver
@@ -299,7 +308,8 @@ void constructApp() {
     manualConstruct();
 
     /* Register commands */
-    /*eventLogger_ptr->regCommands();*/
+    cmdDisp_ptr->regCommands();
+    eventLogger_ptr->regCommands();
 
     // Open devices
 
@@ -378,7 +388,7 @@ volatile bool terminate = false;
 volatile bool preinit = true;
 
 int hexref_arm() {
-    FARF(ALWAYS, "hexref_arm");
+    DEBUG_PRINT("hexref_arm");
     if (preinit) {
         DEBUG_PRINT("hexref_arm preinit - returning");
         return -1;
@@ -386,7 +396,7 @@ int hexref_arm() {
     Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
     Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
     for (U32 i = 0; i < 35; i++) {
-        FARF(ALWAYS, "arm %u", i);
+        DEBUG_PRINT("arm %u", i);
         for (U32 j = 11; j <= 14; j++) {
             confPort->invoke(400, j, 100);
             U8 readBuf[1] = { 0 };
