@@ -52,12 +52,14 @@ Svc::ActiveRateGroupImpl* rgTlm_ptr = 0;
 Svc::ActiveRateGroupImpl* rgXfer_ptr = 0;
 
 Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
+Svc::SocketGndIfImpl* sockGndIfLL_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
 Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
+Svc::CmdSequencerComponentImpl* cmdSeqLL_ptr = 0;
 Svc::PrmDbImpl* prmDb_ptr = 0;
 Svc::SerialTextConverterComponentImpl* serialTextConv_ptr = 0;
 Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
@@ -101,6 +103,12 @@ void allocComps() {
 #endif
 ;
 
+    sockGndIfLL_ptr = new Svc::SocketGndIfImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SGIFLL")
+#endif
+;
+
     textLogger_ptr = new Svc::ConsoleTextLoggerImpl
 #if FW_OBJECT_NAMES == 1
                         ("TLOG")
@@ -134,6 +142,12 @@ void allocComps() {
     cmdSeq_ptr = new Svc::CmdSequencerComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("CMDSEQ")
+#endif
+;
+
+    cmdSeqLL_ptr = new Svc::CmdSequencerComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDSEQLL")
 #endif
 ;
 
@@ -217,8 +231,8 @@ void dumpobj(const char* objName) {
 void manualConstruct() {
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
-    //cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
-    //hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
+    cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
@@ -231,8 +245,8 @@ void manualConstruct() {
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
 #else
     // Sequence Com buffer and cmd response
-    //cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(0));
-    //llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
+    cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
 
     llRouter_ptr->set_LLPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
@@ -243,7 +257,7 @@ void manualConstruct() {
 #endif
 }
 
-void constructApp(int port_number, char* hostname) {
+void constructApp(int port_number, int ll_port_number, char* hostname) {
     allocComps();
   
     localTargetInit();
@@ -274,9 +288,13 @@ void constructApp(int port_number, char* hostname) {
     cmdSeq_ptr->init(10,0);
     cmdSeq_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
+    cmdSeqLL_ptr->init(10,0);
+    cmdSeqLL_ptr->allocateBuffer(0,seqMallocator,5*1024);
+
     prmDb_ptr->init(10,0);
 
     sockGndIf_ptr->init(0);
+    sockGndIfLL_ptr->init(0);
 
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
@@ -302,6 +320,7 @@ void constructApp(int port_number, char* hostname) {
 
     /* Register commands */
     cmdSeq_ptr->regCommands();
+    cmdSeqLL_ptr->regCommands();
     cmdDisp_ptr->regCommands();
     eventLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
@@ -324,6 +343,7 @@ void constructApp(int port_number, char* hostname) {
     cmdDisp_ptr->start(0,60,20*1024);
     // start sequencer
     cmdSeq_ptr->start(0,50,20*1024);
+    cmdSeqLL_ptr->start(0,50,20*1024);
     // start telemetry
     eventLogger_ptr->start(0,50,20*1024);
     chanTlm_ptr->start(0,60,20*1024);
@@ -372,6 +392,7 @@ void constructApp(int port_number, char* hostname) {
     
     // Initialize socket server
     sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
+    sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -420,12 +441,13 @@ void exitTasks(void) {
     chanTlm_ptr->exit();
     prmDb_ptr->exit();
     cmdSeq_ptr->exit();
+    cmdSeqLL_ptr->exit();
     hexRouter_ptr->exit();
     DEBUG_PRINT("After HexRouter quit\n");
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
 }
 
 
@@ -456,6 +478,7 @@ int main(int argc, char* argv[]) {
     bool hexCycle = true;
     int numKraitCycles = 0;
     U32 port_number = 50000;
+    U32 ll_port_number = 50001;
     I32 option = 0;
     char *hostname = "localhost";
     bool local_cycle = false;
@@ -463,7 +486,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:a:o:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlp:x:a:o:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -474,6 +497,9 @@ int main(int argc, char* argv[]) {
               break;
             case 'p':
                 port_number = atoi(optarg);
+                break;
+            case 'x':
+                ll_port_number = atoi(optarg);
                 break;
             case 'a':
                 hostname = optarg;
@@ -514,7 +540,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
     
-    constructApp(port_number, hostname);
+    constructApp(port_number, ll_port_number, hostname);
     //dumparch();
 
     ros::start();
