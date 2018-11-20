@@ -243,6 +243,7 @@ void manualConstruct() {
     // this actuator <-> PWM converter is for commanding from the Linux side
     actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
+    sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
 #else
     // Sequence Com buffer and cmd response
     cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(0));
@@ -254,6 +255,8 @@ void manualConstruct() {
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     // this actuator <-> PWM converter is for commanding from the Linux side
     actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
+    sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
 #endif
 }
 

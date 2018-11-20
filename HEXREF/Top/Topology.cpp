@@ -239,12 +239,8 @@ void dumpobj(const char* objName) {
  
 void manualConstruct(void) {
     // Manual connections
-    // TODO(mereweth) - multiple DSPAL components with commands?
-    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, _ptr->get_CmdDisp_InputPort(0));
-    //_ptr->set_CmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0);
-
-    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, _ptr->get_CmdDisp_InputPort(0));
-    //_ptr->set_CmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0);
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
+    cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
     mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     imuInteg_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
@@ -254,6 +250,7 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
 }
 
 void constructApp() {
@@ -310,6 +307,7 @@ void constructApp() {
     /* Register commands */
     cmdDisp_ptr->regCommands();
     eventLogger_ptr->regCommands();
+    fatalHandler_ptr->regCommands();
 
     // Open devices
 
