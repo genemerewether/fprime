@@ -231,8 +231,8 @@ void dumpobj(const char* objName) {
 void manualConstruct() {
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
-    cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
+    cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
@@ -246,8 +246,8 @@ void manualConstruct() {
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
 #else
     // Sequence Com buffer and cmd response
-    cmdSeqLL_ptr->set_comCmdOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeqLL_ptr->get_cmdResponseIn_InputPort(0));
+    cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
     llRouter_ptr->set_LLPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
@@ -316,10 +316,17 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 
     manualConstruct();
 
-    // Proxy registration
-    // TODO(mereweth) - multiple DSPAL components with commands?
-    //hexCmdProxy_ptr->set_CmdReg_OutputPort(0,cmdDisp_ptr->get_compCmdReg_InputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1));
-    //hexCmdProxy_ptr->regCommands();
+    const U32 tempPortNum[2] = {0, 1};
+    const FwOpcodeType tempMinOpcode[2] = {0, 10000};
+    const FwOpcodeType tempMaxOpcode[2] = {9999, 19999};
+    cmdSeq_ptr->setOpCodeRanges(2,
+                                tempPortNum,
+                                tempMinOpcode,
+                                tempMaxOpcode);
+    /*cmdSeq1_ptr->setOpCodeRanges(2,
+                                  tempPortNum,
+                                  tempMinOpcode,
+                                  tempMaxOpcode);*/
 
     /* Register commands */
     cmdSeq_ptr->regCommands();

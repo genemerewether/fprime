@@ -51,9 +51,9 @@ namespace Svc {
                     );
 
             void setOpCodeRanges(U32 numRanges,
-                                 U32* portNum,
-                                 FwOpcodeType* minOpCode,
-                                 FwOpcodeType* maxOpCode);
+                                 const U32* portNum,
+                                 const FwOpcodeType* minOpCode,
+                                 const FwOpcodeType* maxOpCode);
 
             //! optional - set a timeout. Sequence will quit if a command takes longer than the number of
             //! cycles in the timeout value.
@@ -416,9 +416,10 @@ namespace Svc {
             U32 m_cmdPortNum;
 
             struct {
-              U32 port;
-              FwOpcodeType min;
-              FwOpcodeType max;
+                U32 port;
+                FwOpcodeType min;
+                FwOpcodeType max;
+                bool valid;
             } m_portOpcodeCorr[NUM_COMCMDOUT_OUTPUT_PORTS];
 
             //! The command time timer

@@ -63,6 +63,7 @@ namespace Svc {
             m_portOpcodeCorr[i].port = 0u;
             m_portOpcodeCorr[i].min = 0u;
             m_portOpcodeCorr[i].max = 0u;
+            m_portOpcodeCorr[i].valid = false;
         }
     }
 
@@ -93,9 +94,9 @@ namespace Svc {
 
     void CmdSequencerComponentImpl::setOpCodeRanges(
             U32 numRanges,
-            U32* portNum,
-            FwOpcodeType* minOpCode,
-            FwOpcodeType* maxOpCode) {
+            const U32* portNum,
+            const FwOpcodeType* minOpCode,
+            const FwOpcodeType* maxOpCode) {
         FW_ASSERT(numRanges <= FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr),
                   numRanges,
                   FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr));
@@ -104,12 +105,15 @@ namespace Svc {
         FW_ASSERT(NULL != minOpCode, (U64) minOpCode);
         FW_ASSERT(NULL != maxOpCode, (U64) maxOpCode);
 
-        for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr); i++) {
+        for (U32 i = 0; i < FW_MIN(numRanges, FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr)); i++) {
             m_portOpcodeCorr[i].port = portNum[i];
             m_portOpcodeCorr[i].min = minOpCode[i];
             m_portOpcodeCorr[i].max = maxOpCode[i];
+            m_portOpcodeCorr[i].valid = true;
 
-            FW_ASSERT(this->isConnected_comCmdOut_OutputPort(i),
+            FW_ASSERT(minOpCode[i] < maxOpCode[i], minOpCode[i], maxOpCode[i]);
+
+            FW_ASSERT(this->isConnected_comCmdOut_OutputPort(portNum[i]),
                       this->isConnected_comCmdOut_OutputPort(i));
         }
     }
@@ -119,8 +123,11 @@ namespace Svc {
     // ----------------------------------------------------------------------
 
     U32 CmdSequencerComponentImpl::portFromOpcode(FwOpcodeType opcode) {
+        //TODO(mereweth) - how to handle missing spec?
+
         for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr); i++) {
-            if ((opcode >= m_portOpcodeCorr[i].min) &&
+            if (m_portOpcodeCorr[i].valid           && 
+                (opcode >= m_portOpcodeCorr[i].min) &&
                 (opcode < m_portOpcodeCorr[i].max)) {
                 return m_portOpcodeCorr[i].port;
             }
