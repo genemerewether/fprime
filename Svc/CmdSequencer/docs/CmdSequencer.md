@@ -94,3 +94,7 @@
 | | | |command|U32||The command that was stepped|    
 |CS_CmdStarted|22 (0x16)|A manual sequence was started| | | | |
 | | | |filename|Fw::LogStringArg&|60|The sequence file|    
+|CS_NoOpcode|23 (0x17)|The format of a command record was invalid.| | | | |
+| | | |fileName|Fw::LogStringArg&|60|The name of the sequence file|    
+| | | |recordNumber|U32||The record number|    
+| | | |error|I32||The error code|    

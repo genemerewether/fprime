@@ -46,6 +46,7 @@ LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
 LLProc::LLDebugComponentImpl* llDebug_ptr = 0;
 LLProc::LLCycleComponentImpl* llCycle_ptr = 0;
 LLProc::HLRouterComponentImpl* hlRouter_ptr = 0;
+LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 
 static R5DmaAllocator alloc;
 
@@ -189,16 +190,18 @@ void allocComps() {
                         ("hlRouter")
     #endif
     ;
+
+    cmdDisp_ptr = new LLProc::LLCmdDispatcherImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDDISP")
+#endif
+;
 }
 
 void manualConstruct() {
     // Manual connections
-    // TODO(mereweth) - multiple DSPAL components with commands?
-    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
-    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
-
-    //kraitRouter.set_KraitPortsOut_OutputPort(0, .get_CmdDisp_InputPort(0));
-    //.set_CmdStatus_OutputPort(0, kraitRouter.get_HexPortsIn_InputPort(0);
+    hlRouter_ptr->set_HLPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
+    cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(0));
 
     mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
     imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
@@ -207,6 +210,8 @@ void manualConstruct() {
 
     hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     //hlRouter_ptr->set_HLPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
 }
 
 void constructApp() {
@@ -226,6 +231,7 @@ void constructApp() {
     mpu9250_ptr->init(0);
 
     hlRouter_ptr->init(0);
+    cmdDisp_ptr->init(0);
 
     a2dDrv_ptr->init(0);
 
@@ -267,6 +273,9 @@ void constructApp() {
     constructR5REFArchitecture();
 
     manualConstruct();
+
+    /* Register commands */
+    cmdDisp_ptr->regCommands();
 
     rtiGpio_ptr->waitMapping(R5::GPIO_WAIT_BANK_A, 2);
     faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);
