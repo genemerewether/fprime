@@ -309,6 +309,8 @@ void constructApp() {
     eventLogger_ptr->regCommands();
     fatalHandler_ptr->regCommands();
 
+    leeCtrl_ptr->regCommands();
+
     // Open devices
 
     Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;

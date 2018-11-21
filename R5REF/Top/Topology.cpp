@@ -277,6 +277,8 @@ void constructApp() {
     /* Register commands */
     cmdDisp_ptr->regCommands();
 
+    leeCtrl_ptr->regCommands();
+
     rtiGpio_ptr->waitMapping(R5::GPIO_WAIT_BANK_A, 2);
     faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);
 
