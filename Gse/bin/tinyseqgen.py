@@ -19,6 +19,8 @@ import os
 import copy
 from datetime import datetime, timedelta
 
+from fprime.gse.models.serialize.type_exceptions import *
+
 __author__ = "Kevin Dinkel"
 __copyright__ = "Copyright 2015, California Institute of Technology."
 __version__ = "1.0"
@@ -33,10 +35,10 @@ def __error(string):
   sys.exit(1)
 
 # try:
-from models.common.command import Descriptor
-from views.seq_panel import SeqBinaryWriter
-from controllers import command_loader
-from controllers import exceptions as gseExceptions
+from fprime.gse.models.common.command import Descriptor
+from fprime.gse.views.seq_panel import SeqBinaryWriter
+from fprime.gse.controllers import command_loader
+from fprime.gse.controllers import exceptions as gseExceptions
 
 # except:
 #  __error("The Gse source code was not found in your $PYTHONPATH variable. Please set PYTHONPATH to something like: $BUILD_ROOT/Gse/src:$BUILD_ROOT/Gse/generated/$DEPLOYMENT_NAME")
@@ -122,13 +124,21 @@ def __parse(seqfile):
       # If the string contains a "." assume that it is a float:
       elif "." in arg:
         return float(arg)
+      elif arg == 'True' or arg == 'true' or arg == 'TRUE':
+        return True
+      elif arg == 'False' or arg == 'false' or arg == 'FALSE':
+        return False
       else:
         try:
           # See if it translates to an integer:
           return int(arg)
         except ValueError:
-          # Otherwise it is an enum type:
-          return str(arg)
+          try:
+            # See if it translates to a float:
+            return float(arg)
+          except ValueError:
+            # Otherwise it is an enum type:
+            return str(arg)
     return map(parseArg, args)
 
   def parseTime(lineNumber, time):
@@ -238,15 +248,15 @@ def generateSequence(inputFile, outputFile=None):
     generated_command_path = generated_path + "/commands"
   except:
     __error("Environment variable 'GSE_GENERATED_PATH' not set. It should be set to something like '$BUILD_ROOT/Gse/generated/$DEPLOYMENT' and also added to $PYTHONPATH.")
-  command_loader = command_loader.CommandLoader.getInstance()
+  cmds = command_loader.CommandLoader.getInstance()
   try:
-    command_loader.create(generated_command_path)
+    cmds.create(generated_command_path)
   except gseExceptions.GseControllerUndefinedDirectoryException:
     __error("Environment variable 'GSE_GENERATED_PATH' is set to '" + generated_path + "'. This is not a valid directory. Make sure this variable is set correctly, and the GSE python deployment autocode as been installed in this location.")
 
   # Parse the input file:
   command_list = []
-  command_obj_dict = command_loader.getCommandDict()
+  command_obj_dict = cmds.getCommandDict()
   for i, descriptor, seconds, useconds, mnemonic, args in __parse(inputFile):
     # Make sure that command is in the command dictionary:
     if mnemonic in command_obj_dict:
