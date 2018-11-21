@@ -55,7 +55,8 @@ namespace Gnc {
       a_w__des(0.0f, 0.0f, 0.0f),
       thrust_b__des(0.0f, 0.0f, 0.0f),
       yaw__des(0.0f),
-      leeControl()
+      leeControl(),
+      ctrlMode(CTRL_DISABLED)
   {
       for (NATIVE_UINT_TYPE i = 0; i < FW_NUM_ARRAY_ELEMENTS(this->u_tlm); i++) {
           this->u_tlm[i] = 0.0f;
@@ -97,6 +98,57 @@ namespace Gnc {
     ~LeeCtrlComponentImpl(void)
   {
 
+  }
+
+  // ----------------------------------------------------------------------
+  // Command handler implementations 
+  // ----------------------------------------------------------------------
+
+  void LeeCtrlComponentImpl ::
+    LCTRL_SetCtrlMode_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        CtrlMode mode
+    )
+  {
+      // TODO(Mereweth) - bounds on discontinuity in commanded thrust/moment
+      this->ctrlMode = mode;
+  }
+
+
+  void LeeCtrlComponentImpl ::
+    LCTRL_FlatOutputSetpoint_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        F64 x_w__x,
+        F64 x_w__y,
+        F64 x_w__z,
+        F64 yaw
+    )
+  {
+      this->x_w__des.set(x_w__x, x_w__y, x_w__z);
+      this->v_w__des.set(0.0, 0.0, 0.0);
+      this->a_w__des.set(0.0, 0.0, 0.0);
+      this->yaw__des = yaw;
+  }
+
+  void LeeCtrlComponentImpl ::
+    LCTRL_AttThrustSetpoint_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        F64 thrust,
+        F64 w_q_b__x,
+        F64 w_q_b__y,
+        F64 w_q_b__z,
+        F64 w_q_b__w
+    )
+  {
+      this->w_q_b__des.setx(w_q_b__x);
+      this->w_q_b__des.sety(w_q_b__y);
+      this->w_q_b__des.setz(w_q_b__z);
+      this->w_q_b__des.setw(w_q_b__w);
+      this->omega_b__des.set(0.0, 0.0, 0.0);
+      this->thrust_b__des.set(0.0, 0.0, thrust);
   }
 
   // ----------------------------------------------------------------------
@@ -153,8 +205,10 @@ namespace Gnc {
       if (context == LCTRL_SCHED_CONTEXT_POS) {
           using ROS::geometry_msgs::Vector3;
 
-          // TODO(Mereweth) - switch on mode
-          //return;
+          if (!((FLAT_OUTPUT_LIN_ACC_FF == this->ctrlMode) ||
+                (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode))) {
+              return;
+          }
 
           // set desired position velocity acceleration
           this->leeControl.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
@@ -185,19 +239,20 @@ namespace Gnc {
           using ROS::geometry_msgs::Vector3;
           Eigen::Vector3d thrust_b__comm;
 
-          // TODO(mereweth) - switch on mode
-          /*Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
-                                                             this->w_q_b__des.getx(),
-                                                             this->w_q_b__des.gety(),
-                                                             this->w_q_b__des.getz());
-          this->leeControl.SetAttitudeDes(_w_q_b__des,
-                                          Eigen::Vector3d(
-                                              this->omega_b__des.getx(),
-                                              this->omega_b__des.gety(),
-                                              this->omega_b__des.getz()));
-          thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
-                                           this->thrust_b__des.gety(),
-                                           this->thrust_b__des.getz());*/
+          if (ATT_RATE_THRUST == this->ctrlMode) {
+              Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
+                                                                  this->w_q_b__des.getx(),
+                                                                  this->w_q_b__des.gety(),
+                                                                  this->w_q_b__des.getz());
+              this->leeControl.SetAttitudeDes(_w_q_b__des,
+                                              Eigen::Vector3d(
+                                                  this->omega_b__des.getx(),
+                                                  this->omega_b__des.gety(),
+                                                  this->omega_b__des.getz()));
+              thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
+                                               this->thrust_b__des.gety(),
+                                               this->thrust_b__des.getz());
+          }
 
           // set angular feedback
           Eigen::Quaterniond _w_q_b = Eigen::Quaterniond(this->w_q_b.getw(),
@@ -210,11 +265,13 @@ namespace Gnc {
                                                  this->omega_b.gety(),
                                                  this->omega_b.getz()));
 
-          // TODO(mereweth) - switch on mode
-          Eigen::Vector3d _a_w__comm(this->a_w__comm.getx(),
-                                    this->a_w__comm.gety(),
-                                    this->a_w__comm.getz());
-				    thrust_b__comm = this->mass * (_w_q_b.inverse() * _a_w__comm);
+          if ((FLAT_OUTPUT_LIN_ACC_FF == this->ctrlMode) ||
+              (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode)) {
+              Eigen::Vector3d _a_w__comm(this->a_w__comm.getx(),
+                                         this->a_w__comm.gety(),
+                                         this->a_w__comm.getz());
+              thrust_b__comm = this->mass * (_w_q_b.inverse() * _a_w__comm);
+          }
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
           this->leeControl.GetAngAccelCommand(&alpha_b__comm);
@@ -225,7 +282,8 @@ namespace Gnc {
           ROS::mav_msgs::TorqueThrust u_b__comm(h,
             Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2)),
             Vector3(thrust_b__comm(0), thrust_b__comm(1), thrust_b__comm(2)));
-          if (this->isConnected_controls_OutputPort(0)) {
+          if (this->isConnected_controls_OutputPort(0) &&
+              (CTRL_DISABLED != this->ctrlMode)) {
               this->controls_out(0, u_b__comm);
           }
 

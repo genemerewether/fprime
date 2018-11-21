@@ -92,9 +92,45 @@ namespace Gnc {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
       );
+    PRIVATE:
 
       // ----------------------------------------------------------------------
-      // Handler implementations for user-defined typed input ports
+      // Command handler implementations 
+      // ----------------------------------------------------------------------
+
+      //! Implementation for LCTRL_SetCtrlMode command handler
+      //! Set controller mode
+      void LCTRL_SetCtrlMode_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          CtrlMode mode 
+      );
+
+      //! Implementation for LCTRL_FlatOutputSetpoint command handler
+      //! 
+      void LCTRL_FlatOutputSetpoint_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          F64 x_w__x, 
+          F64 x_w__y, 
+          F64 x_w__z, 
+          F64 yaw 
+      );
+
+      //! Implementation for LCTRL_AttThrustSetpoint command handler
+      //! 
+      void LCTRL_AttThrustSetpoint_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          F64 thrust,
+          F64 w_q_b__x, 
+          F64 w_q_b__y, 
+          F64 w_q_b__z,
+          F64 w_q_b__w
+      );
+
+      // ----------------------------------------------------------------------
+      // Private member variables
       // ----------------------------------------------------------------------
 
       U32 seq;
@@ -133,6 +169,8 @@ namespace Gnc {
       F64 yaw__des;
 
       quest_gnc::multirotor::LeeControl leeControl;
+
+      CtrlMode ctrlMode;
 
     };
 
