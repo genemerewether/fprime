@@ -62,28 +62,50 @@ namespace Gnc {
           this->u_tlm[i] = 0.0f;
       }
 
-      //TODO(mgardine)  - update from rotors_simulator/rotors_gazebo/resource/firefly.yaml
-      quest_gnc::multirotor::MultirotorModel mrModel = {1.56779f,
-                                                        0.0347563f, 0.0458929f, 0.0977f,
-                                                        0.0f, 0.0f, 0.0f};
-
-      (void) leeControl.SetGains(Eigen::Vector3d(6.0f, 6.0f, 6.0f),
-                                 Eigen::Vector3d(4.7f, 4.7f, 4.7f),
-                                 Eigen::Vector3d(3.0f / mrModel.Ixx,
-                                                 3.0f / mrModel.Iyy,
-                                                 0.15f / mrModel.Izz),
-                                 Eigen::Vector3d(0.52f / mrModel.Ixx,
-                                                 0.52f / mrModel.Iyy,
-                                                 0.18f / mrModel.Izz));
-
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
       (void) leeControl.SetWorldParams(wParams);
+  }
+
+  void LeeCtrlComponentImpl ::
+    parametersLoaded()
+  {
+      Fw::ParamValid valid[12];
+
+      quest_gnc::multirotor::MultirotorModel mrModel = {paramGet_mass(valid[0]),
+                                                        paramGet_I_xx(valid[1]),
+                                                        paramGet_I_yy(valid[2]),
+                                                        paramGet_I_zz(valid[3]),
+                                                        paramGet_I_xy(valid[4]),
+                                                        paramGet_I_xz(valid[5]),
+                                                        paramGet_I_yz(valid[6])};
+
+      for (U32 i = 0; i < 7; i++) {
+          if (Fw::PARAM_VALID != valid[i]) {  return;  }
+      }
+
       this->mass = mrModel.mass;
       this->J_b << mrModel.Ixx, mrModel.Ixy, mrModel.Ixz,
                    mrModel.Ixy, mrModel.Iyy, mrModel.Iyz,
                    mrModel.Ixz, mrModel.Iyz, mrModel.Izz;
       (void) leeControl.SetModel(mrModel);
 
+      (void) leeControl.SetGains(Eigen::Vector3d(paramGet_k_x__x(valid[0]),
+                                                 paramGet_k_x__y(valid[1]),
+                                                 paramGet_k_x__z(valid[2])),
+                                 Eigen::Vector3d(paramGet_k_v__x(valid[3]),
+                                                 paramGet_k_v__y(valid[4]),
+                                                 paramGet_k_v__z(valid[5])),
+                                 Eigen::Vector3d(paramGet_k_R__x(valid[6]),
+                                                 paramGet_k_R__y(valid[7]),
+                                                 paramGet_k_R__z(valid[8])),
+                                 Eigen::Vector3d(paramGet_k_omega__x(valid[9]),
+                                                 paramGet_k_omega__y(valid[10]),
+                                                 paramGet_k_omega__z(valid[11])));
+
+      for (U32 i = 0; i < 12; i++) {
+          if (Fw::PARAM_VALID != valid[i]) {  return;  }
+      }
+      // TODO(mereweth) - mark params as initialized
   }
 
   void LeeCtrlComponentImpl ::
@@ -113,6 +135,8 @@ namespace Gnc {
   {
       // TODO(Mereweth) - bounds on discontinuity in commanded thrust/moment
       this->ctrlMode = mode;
+
+      this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
   }
 
 
@@ -130,6 +154,8 @@ namespace Gnc {
       this->v_w__des.set(0.0, 0.0, 0.0);
       this->a_w__des.set(0.0, 0.0, 0.0);
       this->yaw__des = yaw;
+
+      this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
   }
 
   void LeeCtrlComponentImpl ::
@@ -149,6 +175,8 @@ namespace Gnc {
       this->w_q_b__des.setw(w_q_b__w);
       this->omega_b__des.set(0.0, 0.0, 0.0);
       this->thrust_b__des.set(0.0, 0.0, thrust);
+
+      this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
   }
 
   // ----------------------------------------------------------------------

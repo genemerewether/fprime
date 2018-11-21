@@ -60,6 +60,7 @@ namespace Gnc {
       ~LeeCtrlComponentImpl(void);
 
     PRIVATE:
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports

@@ -259,8 +259,11 @@ void constructApp(int port_number, char* hostname) {
     prmDb.regCommands();
     fatalHandler.regCommands();
 
+    leeCtrl.regCommands();
+
     // read parameters
     prmDb.readParamFile();
+    leeCtrl.loadParameters();
 
     // Active component startup
     // start rate groups
