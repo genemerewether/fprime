@@ -22,6 +22,9 @@
 #include <HLProc/HLRosIface/HLRosIfaceComponentImplCfg.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <Svc/ActiveFileLogger/ActiveFileLoggerPacket.hpp>
+#include <Svc/ActiveFileLogger/ActiveFileLoggerStreams.hpp>
+
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
@@ -108,6 +111,23 @@ namespace HLProc {
           ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_IMUNOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Imu.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+        
         if (NULL == m_rgNH) {
             return;
         }
@@ -122,7 +142,7 @@ namespace HLProc {
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
-        Fw::EightyCharString frame_id = header.getframe_id();
+        U32 frame_id = header.getframe_id();
         msg.header.frame_id = "mpu9250";
 
         msg.orientation_covariance[0] = -1;
@@ -183,6 +203,23 @@ namespace HLProc {
           ROS::nav_msgs::OdometryNoCov &Odometry
       )
     {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ODOMNOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Odometry.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+        
         if (NULL == m_rgNH) {
             return;
         }
@@ -197,7 +234,7 @@ namespace HLProc {
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
-        Fw::EightyCharString frame_id = header.getframe_id();
+        U32 frame_id = header.getframe_id();
         msg.header.frame_id = "odom";
 
         msg.child_frame_id = "body";
@@ -306,7 +343,8 @@ namespace HLProc {
                         Fw::Time(TB_ROS_TIME, 0,
                                  msg->header.stamp.sec,
                                  msg->header.stamp.nsec / 1000),
-                        Fw::EightyCharString(msg->header.frame_id.data()));
+                        // TODO(mereweth) - convert frame id
+                        0/*Fw::EightyCharString(msg->header.frame_id.data())*/);
 
             Actuators actuators;
             actuators.setheader(head);
@@ -374,8 +412,9 @@ namespace HLProc {
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
                               msg->header.stamp.nsec / 1000),
-                     Fw::EightyCharString(msg->header.frame_id.data())),
-              Fw::EightyCharString(msg->child_frame_id.data()),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+              0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
               PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
                                             msg->pose.pose.position.y,
                                             msg->pose.pose.position.z),

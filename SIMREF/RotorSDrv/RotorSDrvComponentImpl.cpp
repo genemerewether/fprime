@@ -280,8 +280,9 @@ namespace SIMREF {
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
                               msg->header.stamp.nsec / 1000),
-                     Fw::EightyCharString(msg->header.frame_id.data())),
-              Fw::EightyCharString(msg->child_frame_id.data()),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+              0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
               PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
                                             msg->pose.pose.position.y,
                                             msg->pose.pose.position.z),
@@ -344,7 +345,8 @@ namespace SIMREF {
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
                               msg->header.stamp.nsec / 1000),
-                     Fw::EightyCharString(msg->header.frame_id.data())),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
 
               Point(msg->position.x, msg->position.y, msg->position.z),
               Vector3(msg->velocity.x, msg->velocity.y, msg->velocity.z),
@@ -397,7 +399,8 @@ namespace SIMREF {
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
                               msg->header.stamp.nsec / 1000),
-                     Fw::EightyCharString(msg->header.frame_id.data())),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
 
               Quaternion(msg->attitude.x, msg->attitude.y, msg->attitude.z, msg->attitude.w),
               Vector3(msg->angular_rates.x, msg->angular_rates.y, msg->angular_rates.z),

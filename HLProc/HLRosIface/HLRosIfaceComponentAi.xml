@@ -11,16 +11,24 @@
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
-    <ports>
 
+    <import_dictionary>HLProc/HLRosIface/Telemetry.xml</import_dictionary>
+    
+    <ports>
+        <port name="FileLogger" data_type="Svc::ActiveFileLogPort" kind="output">
+        </port>
 
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
         </port>
+
+        <port name="Time" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port-->
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>
@@ -32,9 +40,6 @@
         </port>
 
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
-        </port>
-
-        <port name="Time" data_type="Fw::Time"  kind="output"    max_number="1">
         </port>
 
         <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="1">

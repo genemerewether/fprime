@@ -306,7 +306,8 @@ namespace Gnc {
 
           Eigen::Vector3d moment_b__comm = this->J_b * alpha_b__comm;
 
-          ROS::std_msgs::Header h(this->seq, this->getTime(), "body");
+          // TODO(mereweth) - convert frame id
+          ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"body"*/);
           ROS::mav_msgs::TorqueThrust u_b__comm(h,
             Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2)),
             Vector3(thrust_b__comm(0), thrust_b__comm(1), thrust_b__comm(2)));

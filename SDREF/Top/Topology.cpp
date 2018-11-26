@@ -55,6 +55,7 @@ Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
 Svc::SocketGndIfImpl* sockGndIfLL_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
+Svc::ActiveFileLoggerImpl* fileLogger_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
@@ -118,6 +119,11 @@ void allocComps() {
     eventLogger_ptr = new Svc::ActiveLoggerImpl
 #if FW_OBJECT_NAMES == 1
                         ("ELOG")
+#endif
+;
+    fileLogger_ptr = new Svc::ActiveFileLoggerImpl
+#if FW_OBJECT_NAMES == 1
+                        ("FLOG")
 #endif
 ;
 
@@ -281,6 +287,7 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 #endif
 
     eventLogger_ptr->init(10,0);
+    fileLogger_ptr->init(10);
 
     linuxTime_ptr->init(0);
 
@@ -333,11 +340,15 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
     cmdSeqLL_ptr->regCommands();
     cmdDisp_ptr->regCommands();
     eventLogger_ptr->regCommands();
+    fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
 
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
     
+    // initialize file logs
+    fileLogger_ptr->initLog("/log/");
+
     // read parameters
     prmDb_ptr->readParamFile();
 
@@ -363,6 +374,8 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
+
+    fileLogger_ptr->start(0,50,20*1024);
     
     hexRouter_ptr->startPortReadThread(90,20*1024); //, CORE_RPC);
     //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_RPC);
@@ -450,6 +463,7 @@ void exitTasks(void) {
     eventLogger_ptr->exit();
     chanTlm_ptr->exit();
     prmDb_ptr->exit();
+    fileLogger_ptr->exit();
     cmdSeq_ptr->exit();
     cmdSeqLL_ptr->exit();
     hexRouter_ptr->exit();

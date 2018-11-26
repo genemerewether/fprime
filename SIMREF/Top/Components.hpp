@@ -7,7 +7,7 @@ void exitTasks(void);
 #include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 #include <Svc/RateGroupDecoupler/RateGroupDecouplerComponentImpl.hpp>
-
+#include <Svc/ActiveFileLogger/ActiveFileLoggerImpl.hpp>
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
@@ -38,6 +38,7 @@ extern Svc::CmdSequencerComponentImpl cmdSeq;
 extern Svc::SocketGndIfImpl sockGndIf;
 extern Svc::ConsoleTextLoggerImpl textLogger;
 extern Svc::ActiveLoggerImpl eventLogger;
+extern Svc::ActiveFileLoggerImpl fileLogger;
 extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::TlmChanImpl chanTlm;
 extern Svc::CommandDispatcherImpl cmdDisp;

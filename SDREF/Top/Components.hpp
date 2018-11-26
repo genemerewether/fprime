@@ -6,7 +6,7 @@ void exitTasks(void);
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 #include <Svc/SerialTextConverter/SerialTextConverterImpl.hpp>
-
+#include <Svc/ActiveFileLogger/ActiveFileLoggerImpl.hpp>
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
@@ -48,6 +48,7 @@ extern Svc::SocketGndIfImpl* sockGndIf_ptr;
 extern Svc::SocketGndIfImpl* sockGndIfLL_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
+extern Svc::ActiveFileLoggerImpl* fileLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;
 extern Svc::CommandDispatcherImpl* cmdDisp_ptr;
