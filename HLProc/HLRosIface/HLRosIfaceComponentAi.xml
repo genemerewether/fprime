@@ -45,7 +45,7 @@
         <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="ImuStateUpdate" data_type="ROS::sensor_msgs::ImuStateUpdate"  kind="output"  max_number="1">
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdate"  kind="output"  max_number="1">
         </port>
 
         <port name="ActuatorsData" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="2">

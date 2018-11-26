@@ -137,6 +137,14 @@ namespace SIMREF {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+
+        //! Handler implementation for Odometry
+        //!
+        void OdomLog_handler(
+            const NATIVE_INT_TYPE portNum, /*!< The port number*/
+            ROS::nav_msgs::OdometryNoCov &Odometry
+        );
+    
         //! Handler implementation for motor
         //!
         void motor_handler(

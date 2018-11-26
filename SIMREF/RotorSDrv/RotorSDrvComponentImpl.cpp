@@ -21,6 +21,9 @@
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <Svc/ActiveFileLogger/ActiveFileLoggerPacket.hpp>
+#include <Svc/ActiveFileLogger/ActiveFileLoggerStreams.hpp>
+
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
@@ -104,6 +107,30 @@ namespace SIMREF {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
+    void RotorSDrvComponentImpl ::
+      OdomLog_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::nav_msgs::OdometryNoCov &Odometry
+      )
+    {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ODOMNOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Odometry.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+    }
+  
     void RotorSDrvComponentImpl ::
       motor_handler(
           const NATIVE_INT_TYPE portNum,
