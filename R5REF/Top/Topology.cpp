@@ -62,6 +62,9 @@ void allocComps() {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+        0, //logQueue
+        LLProc::HLRTR_SCHED_UART_SEND,
+        LLProc::HLRTR_SCHED_UART_RECEIVE,
     };
     rgAtt_ptr = new Svc::PassiveRateGroupImpl(
     #if FW_OBJECT_NAMES == 1
