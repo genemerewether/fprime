@@ -50,6 +50,7 @@ extern Svc::SocketGndIfImpl* sockGndIf_ptr;
 extern Svc::SocketGndIfImpl* sockGndIfLL_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
+extern Svc::ActiveLoggerImpl* eventLoggerLL_ptr;
 extern Svc::ActiveFileLoggerImpl* fileLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;

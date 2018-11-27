@@ -55,6 +55,7 @@ Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
 Svc::SocketGndIfImpl* sockGndIfLL_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
+Svc::ActiveLoggerImpl* eventLoggerLL_ptr = 0;
 Svc::ActiveFileLoggerImpl* fileLogger_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
@@ -122,6 +123,13 @@ void allocComps() {
                         ("ELOG")
 #endif
 ;
+
+    eventLoggerLL_ptr = new Svc::ActiveLoggerImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ELOGLL")
+#endif
+;
+
     fileLogger_ptr = new Svc::ActiveFileLoggerImpl
 #if FW_OBJECT_NAMES == 1
                         ("FLOG")
@@ -303,6 +311,7 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 #endif
 
     eventLogger_ptr->init(10,0);
+    eventLoggerLL_ptr->init(10,0);
     fileLogger_ptr->init(10);
 
     linuxTime_ptr->init(0);
@@ -358,6 +367,7 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
     cmdSeqLL_ptr->regCommands();
     cmdDisp_ptr->regCommands();
     eventLogger_ptr->regCommands();
+    eventLoggerLL_ptr->regCommands();
     fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
 
@@ -385,6 +395,7 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
     cmdSeqLL_ptr->start(0,50,20*1024);
     // start telemetry
     eventLogger_ptr->start(0,50,20*1024);
+    eventLoggerLL_ptr->start(0,50,20*1024);
     chanTlm_ptr->start(0,60,20*1024);
     prmDb_ptr->start(0,50,20*1024);
 
@@ -479,6 +490,7 @@ void exitTasks(void) {
     rgXfer_ptr->exit();
     cmdDisp_ptr->exit();
     eventLogger_ptr->exit();
+    eventLoggerLL_ptr->exit();
     chanTlm_ptr->exit();
     prmDb_ptr->exit();
     fileLogger_ptr->exit();
