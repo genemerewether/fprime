@@ -14,6 +14,8 @@
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
 
     <import_dictionary>HLProc/HLRosIface/Telemetry.xml</import_dictionary>
     
@@ -49,6 +51,12 @@
         </port>
 
         <port name="ActuatorsData" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="2">
+        </port>
+        
+        <port name="flatOutput" data_type="ROS::mav_msgs::FlatOutput"  kind="output" max_number="1">
+        </port>
+
+        <port name="attRateThrust" data_type="ROS::mav_msgs::AttitudeRateThrust"  kind="output" max_number="1">
         </port>
 
         <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">

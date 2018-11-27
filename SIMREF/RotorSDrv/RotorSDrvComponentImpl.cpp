@@ -47,10 +47,20 @@ namespace SIMREF {
       RotorSDrvImpl(void),
   #endif
       m_rgNH(NULL),
+      m_imuSet(), // zero-initialize instead of default-initializing
+      m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
       m_odomSet(), // zero-initialize instead of default-initializing
       m_flatOutSet(), // zero-initialize instead of default-initializing
       m_attRateThrustSet() // zero-initialize instead of default-initializing
     {
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuSet); i++) {
+            m_imuSet[i].fresh = false;
+            m_imuSet[i].overflows = 0u;
+        }
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
+            m_imuStateUpdateSet[i].fresh = false;
+            m_imuStateUpdateSet[i].overflows = 0u;
+        }
         for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
             m_odomSet[i].fresh = false;
             m_odomSet[i].overflows = 0u;
@@ -160,6 +170,22 @@ namespace SIMREF {
     {
         if ((context == RSDRV_SCHED_CONTEXT_ATT) ||
             (context == RSDRV_SCHED_CONTEXT_POS)) {
+            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuSet); i++) {
+                m_imuSet[i].mutex.lock();
+                if (m_imuSet[i].fresh) {
+                    if (this->isConnected_SimImu_OutputPort(i)) {
+                        // mimics driver hardware getting and sending sensor data
+                        this->SimImu_out(i, m_imuSet[i].imu);
+                    }
+                    else {
+                        DEBUG_PRINT("Imu port %d not connected\n", i);
+                    }
+                    m_imuSet[i].fresh = false;
+                }
+                // TODO(mereweth) - notify that no new imu received?
+                m_imuSet[i].mutex.unLock();
+            }
+            
             for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
                 m_odomSet[i].mutex.lock();
                 if (m_odomSet[i].fresh) {
@@ -245,6 +271,7 @@ namespace SIMREF {
 
         OdometryHandler gtHandler(compPtr, 0);
         OdometryHandler odomHandler(compPtr, 1);
+        ImuHandler imuHandler(compPtr, 0);
         FlatOutputHandler flatoutHandler(compPtr, 0);
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
 
@@ -256,6 +283,11 @@ namespace SIMREF {
         ros::Subscriber odomSub = n.subscribe("odometry_sensor1/odometry", 1000,
                                               &OdometryHandler::odometryCallback,
                                               &odomHandler,
+                                              ros::TransportHints().tcpNoDelay());
+
+        ros::Subscriber imuSub = n.subscribe("imu", 1000,
+                                              &ImuHandler::imuCallback,
+                                              &imuHandler,
                                               ros::TransportHints().tcpNoDelay());
 
         // TODO(mgardine) - what should the queue size be?
@@ -275,6 +307,63 @@ namespace SIMREF {
         }
     }
 
+    RotorSDrvComponentImpl :: ImuHandler ::
+      ImuHandler(RotorSDrvComponentImpl* compPtr,
+                 int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_SIMIMU_OUTPUT_PORTS); //compPtr->getNum_odometry_OutputPorts());
+    }
+
+    RotorSDrvComponentImpl :: ImuHandler :: ~ImuHandler()
+    {
+
+    }
+
+    void RotorSDrvComponentImpl :: ImuHandler ::
+      imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_SIMIMU_OUTPUT_PORTS);
+
+        DEBUG_PRINT("Odom port handler %d\n", this->portNum);
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::sensor_msgs;
+            using namespace ROS::geometry_msgs;
+            ImuNoCov imu(
+              Header(msg->header.seq,
+                     Fw::Time(TB_ROS_TIME, 0,
+                              msg->header.stamp.sec,
+                              msg->header.stamp.nsec / 1000),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+              Quaternion(msg->orientation.x,
+                         msg->orientation.y,
+                         msg->orientation.z,
+                         msg->orientation.w),
+              Vector3(msg->angular_velocity.x,
+                      msg->angular_velocity.y,
+                      msg->angular_velocity.z),
+              Vector3(msg->linear_acceleration.x,
+                      msg->linear_acceleration.y,
+                      msg->linear_acceleration.z)
+            ); // end Imu constructor
+
+            this->compPtr->m_imuSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_imuSet[this->portNum].fresh) {
+                this->compPtr->m_imuSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting imu port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_imuSet[this->portNum].imu = imu;
+            this->compPtr->m_imuSet[this->portNum].fresh = true;
+            this->compPtr->m_imuSet[this->portNum].mutex.unLock();
+        }
+    }
+  
     RotorSDrvComponentImpl :: OdometryHandler ::
       OdometryHandler(RotorSDrvComponentImpl* compPtr,
                       int portNum) :
