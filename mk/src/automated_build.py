@@ -11,7 +11,7 @@ if not os.environ.has_key("WORKSPACE"):
     print("Setting workspace to %s"%os.environ["WORKSPACE"])
 	
 
-linux_make = "make rebuild sloc"
+linux_make = "make gen_make LINUX"
 R5_make = "make gen_make TIR5" #TIR5_clean TIR5"
 SD_make = "make gen_make SDFLIGHT" #SDFLIGHT_clean SDFLIGHT"
 HEX_make = "make gen_make DSPAL" #DSPAL_clean DSPAL"
