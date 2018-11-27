@@ -79,7 +79,7 @@ Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 
 void allocComps() {
     // Component instance pointers
-    NATIVE_INT_TYPE rgDivs[] = {100, 1};
+    NATIVE_INT_TYPE rgDivs[] = {10, 1};
     rgDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
                         "RGDRV",

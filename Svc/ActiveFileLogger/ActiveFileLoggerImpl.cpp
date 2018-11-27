@@ -154,6 +154,10 @@ namespace Svc {
         switch (stream) {
             case AFL_SERIAL_DATA:
                 return "Ser";
+            case AFL_HLROSIFACE_IMUNOCOV:
+                return "ImuNoCov";
+            case AFL_HLROSIFACE_ODOMNOCOV:
+                return "OdomNoCov";
             default:
                 return "Unknown";
         }
