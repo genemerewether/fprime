@@ -259,7 +259,7 @@ void manualConstruct() {
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
 
-    hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(4, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(1, hexRouter_ptr->get_Sched_InputPort(0));
     
