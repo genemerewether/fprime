@@ -13,4 +13,13 @@ enum {
     SERIAL_RECEIVE_BUFFER_POOL_SIZE = 10 // allows slip of 10 cycles
 };
 
+namespace HLProc {
+
+enum {
+    LLRTR_SCHED_TLM,
+    LLRTR_SCHED_CYCLE_SERIAL
+};
+
+}
+
 #endif /* LLROUTER_LLROUTERCOMPONENTIMPLCFG_HPP_ */

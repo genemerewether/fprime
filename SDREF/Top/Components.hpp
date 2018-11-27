@@ -24,6 +24,7 @@ void exitTasks(void);
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
 #include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 
 #include <SDREF/Top/TargetInit.hpp>
@@ -38,6 +39,7 @@ extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
 extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
 extern HLProc::LLRouterComponentImpl* llRouter_ptr;
+extern HLProc::EventExpanderComponentImpl* eventExp_ptr;
 
 extern Svc::RateGroupDriverImpl* rgDrv_ptr;
 extern Svc::ActiveRateGroupImpl* rgTlm_ptr;
