@@ -310,7 +310,7 @@ namespace Svc {
                 // if magic number to quit, exit loop
                 if (packetDelimiter == 0xA5A5A5A5) {
                     (void) printf("packetDelimiter = 0x%x\n", packetDelimiter);
-                    //break;
+                    break;
                 } else if (packetDelimiter != SocketGndIfImpl::PKT_DELIM) {
                     (void) printf("Unexpected delimiter 0x%08X\n",packetDelimiter);
                     // just keep reading until a delimiter is found
