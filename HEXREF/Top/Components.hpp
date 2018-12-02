@@ -9,7 +9,6 @@ void exitTasks(void);
 #include <Svc/RateGroupDecoupler/RateGroupDecouplerComponentImpl.hpp>
 
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
-#include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 
@@ -40,7 +39,6 @@ extern Svc::PassiveRateGroupImpl* rgPos_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
-extern Svc::ActiveLoggerImpl* eventLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;

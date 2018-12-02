@@ -21,6 +21,8 @@
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <stdio.h>
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -69,6 +71,7 @@ namespace Gnc {
   void LeeCtrlComponentImpl ::
     parameterUpdated(FwPrmIdType id)
   {
+    printf("prm %d updated\n", id);
   }
   
   void LeeCtrlComponentImpl ::

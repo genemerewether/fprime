@@ -45,7 +45,6 @@ Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
-Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr = 0;
@@ -244,8 +243,8 @@ void manualConstruct(void) {
 
     mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     imuInteg_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
-    
-    eventLogger_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
+
+    logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
@@ -289,7 +288,6 @@ void constructApp() {
     textLogger_ptr->init();
 #endif
 
-    eventLogger_ptr->init(10, 0);
     logQueue_ptr->init(0);
 
     linuxTime_ptr->init(0);
@@ -308,7 +306,6 @@ void constructApp() {
 
     /* Register commands */
     cmdDisp_ptr->regCommands();
-    eventLogger_ptr->regCommands();
     fatalHandler_ptr->regCommands();
 
     leeCtrl_ptr->regCommands();
@@ -352,8 +349,6 @@ void constructApp() {
     rg_ptr->start(0, 50, 2 * 1024);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple_ptr->start(0, 90, 5*1024);
-    // start telemetry
-    eventLogger_ptr->start(0, 40, 2*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -408,7 +403,6 @@ void run1cycle(void) {
 void exitTasks(void) {
     rg_ptr->exit();
     rgDecouple_ptr->exit();
-    eventLogger_ptr->exit();
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif
