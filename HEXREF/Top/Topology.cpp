@@ -114,13 +114,6 @@ void allocComps() {
 #endif
 ;
 
-    eventLogger_ptr = new Svc::ActiveLoggerImpl
-#if FW_OBJECT_NAMES == 1
-                        ("ELOG")
-#endif
-;
-
-
     logQueue_ptr = new LLProc::ShortLogQueueComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SLOG")
