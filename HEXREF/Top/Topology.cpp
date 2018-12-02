@@ -40,7 +40,6 @@ static Fw::SimpleObjRegistry simpleReg;
 // Component instance pointers
 
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
-Svc::ActiveRateGroupImpl* rg_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
@@ -73,14 +72,7 @@ void allocComps() {
         0, // unused
         Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
-    };
-    
-    rg_ptr = new Svc::ActiveRateGroupImpl(
-#if FW_OBJECT_NAMES == 1
-                        "RG",
-#endif
-                        rgContext,FW_NUM_ARRAY_ELEMENTS(rgContext));
-;
+    };   
 
     NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
     
@@ -267,7 +259,6 @@ void constructApp() {
     rgGncDrv_ptr->init();
 
     // Initialize the rate groups
-    rg_ptr->init(10,0);
     rgDecouple_ptr->init(10, 0);
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
@@ -345,8 +336,6 @@ void constructApp() {
 #endif
 
     // Active component startup
-    // start rate groups
-    rg_ptr->start(0, 50, 2 * 1024);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple_ptr->start(0, 90, 5*1024);
 
@@ -401,7 +390,6 @@ void run1cycle(void) {
 }
 
 void exitTasks(void) {
-    rg_ptr->exit();
     rgDecouple_ptr->exit();
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();

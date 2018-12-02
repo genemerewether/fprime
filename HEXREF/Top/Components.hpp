@@ -33,7 +33,6 @@ void exitTasks(void);
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
-extern Svc::ActiveRateGroupImpl* rg_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
