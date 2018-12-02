@@ -361,6 +361,25 @@ void constructApp() {
 
 }
 
+int hexref_rpc_relay_buff_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
+    return kraitRouter_ptr->buffRead(port, buff, buffLen, bytes);
+}
+
+int hexref_rpc_relay_port_read(unsigned char* buff, int buffLen, int* bytes) {
+#ifndef BUILD_DSPAL
+    DEBUG_PRINT("hexref_rpc_relay_port_read\n");
+#endif
+    return kraitRouter_ptr->portRead(buff, buffLen, bytes);
+}
+
+int hexref_rpc_relay_buff_write(unsigned int port, const unsigned char* buff, int buffLen) {
+    return kraitRouter_ptr->buffWrite(port, buff, buffLen);
+}
+
+int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
+    return kraitRouter_ptr->portWrite(buff, buffLen);
+}
+
 void run1cycle(void) {
     // call interrupt to emulate a clock
     Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
@@ -368,13 +387,21 @@ void run1cycle(void) {
     cycleStart.take();
     port->invoke(cycleStart);
 
-#if 0 // stress test, small amount of data
-    Fw::ExternalSerializeBuffer bufObj;
-    char buf[200] = {"hi"};
-    bufObj.setExtBuffer((U8*) buf, 200);
-    bufObj.setBuffLen(12);
-    Fw::InputSerializePort* serPort = kraitRouter_ptr->get_HexPortsIn_InputPort(1);
-    serPort->invokeSerial(bufObj);
+#ifndef BUILD_DSPAL // stress test
+    for (int i = 0; i < 45; i++) {
+        Fw::ExternalSerializeBuffer bufObj;
+        char buf[996] = {"hi"};
+        bufObj.setExtBuffer((U8*) buf, sizeof(buf));
+        bufObj.setBuffLen(sizeof(buf));
+        Fw::InputSerializePort* serPort = kraitRouter_ptr->get_HexPortsIn_InputPort(1);
+        serPort->invokeSerial(bufObj);
+    }
+#endif
+    
+#ifndef BUILD_DSPAL
+    U8 readBuf[4096*1000];
+    int len = 0;
+    hexref_rpc_relay_port_read(readBuf, sizeof(readBuf), &len);
 #endif
 }
 
@@ -382,19 +409,45 @@ void exitTasks(void) {
     rg_ptr->exit();
     rgDecouple_ptr->exit();
     eventLogger_ptr->exit();
+#ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
+#endif
     kraitRouter_ptr->exit();
 }
 
 volatile bool terminate = false;
 volatile bool preinit = true;
 
+#include <Fw/Cmd/CmdPacket.hpp>
+
 int hexref_arm() {
-    DEBUG_PRINT("hexref_arm");
+    DEBUG_PRINT("hexref_arm\n");
     if (preinit) {
-        DEBUG_PRINT("hexref_arm preinit - returning");
+        DEBUG_PRINT("hexref_arm preinit - returning\n");
         return -1;
     }
+
+    U8 buf[16] = {0};
+    buf[2+4] = 0x01;
+    buf[3+4] = 0xA1;
+
+    Fw::CmdPacket cmdPkt;
+    Fw::ComBuffer dat0(&buf[0], sizeof(buf));
+    Fw::SerializeStatus stat = cmdPkt.deserialize(dat0);
+    Fw::InputCmdPort* p2 = leeCtrl_ptr->get_CmdDisp_InputPort(0);
+    p2->invoke(0x1a1,0,cmdPkt.getArgBuffer());
+    usleep(50000);
+    DEBUG_PRINT("hexref_arm after sleep\n");
+
+    /*
+    Fw::InputComPort* port = cmdDisp_ptr->get_seqCmdBuff_InputPort(0);
+    usleep(50000);
+    Fw::ComBuffer dat(buf, sizeof(buf));
+    port->invoke(dat, 0);
+    usleep(50000);
+    DEBUG_PRINT("hexref_arm after sleep\n");
+    */
+    /*
     Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
     Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
     for (U32 i = 0; i < 35; i++) {
@@ -409,7 +462,7 @@ int hexref_arm() {
                            readObj);
             usleep(2500);
         }
-    }
+    }*/
     return 0;
 }
 
@@ -432,9 +485,9 @@ int hexref_init(void) {
 }
 
 int hexref_run(void) {
-    DEBUG_PRINT("hexref_run");
+    DEBUG_PRINT("hexref_run\n");
     if (preinit) {
-        DEBUG_PRINT("hexref_run preinit - returning");
+        DEBUG_PRINT("hexref_run preinit - returning\n");
         return -1;
     }
 
@@ -469,21 +522,25 @@ int hexref_run(void) {
 }
 
 int hexref_cycle(unsigned int cycles) {
-    DEBUG_PRINT("hexref_cycle");
+    DEBUG_PRINT("hexref_cycle\n");
     if (preinit) {
-        DEBUG_PRINT("hexref_cycle preinit - returning");
+        DEBUG_PRINT("hexref_cycle preinit - returning\n");
         return -1;
     }
 
+#ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+#endif
     for (unsigned int i = 0; i < cycles; i++) {
         //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
         if (terminate) return -1;
         run1cycle();
         Os::Task::delay(10);
     }
+#ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
-    DEBUG_PRINT("hexref_cycle returning");
+#endif
+    DEBUG_PRINT("hexref_cycle returning\n");
 
     return 0;
 }
@@ -491,7 +548,7 @@ int hexref_cycle(unsigned int cycles) {
 int hexref_wait() {
     DEBUG_PRINT("hexref_wait\n");
     while (!terminate) {
-        DEBUG_PRINT("hexref_wait loop; terminate: %d", terminate);
+        DEBUG_PRINT("hexref_wait loop; terminate: %d\n", terminate);
         Os::Task::delay(1000);
 
         // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
@@ -517,22 +574,6 @@ int hexref_fini(void) {
     return 0;
 }
 
-int hexref_rpc_relay_buff_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-    return kraitRouter_ptr->buffRead(port, buff, buffLen, bytes);
-}
-
-int hexref_rpc_relay_port_read(unsigned char* buff, int buffLen, int* bytes) {
-    return kraitRouter_ptr->portRead(buff, buffLen, bytes);
-}
-
-int hexref_rpc_relay_buff_write(unsigned int port, const unsigned char* buff, int buffLen) {
-    return kraitRouter_ptr->buffWrite(port, buff, buffLen);
-}
-
-int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
-    return kraitRouter_ptr->portWrite(buff, buffLen);
-}
-
 #ifndef BUILD_DSPAL
 
 #include <signal.h>
@@ -555,7 +596,11 @@ int main(int argc, char* argv[]) {
 
     preinit=false;
 
-    hexref_cycle(10);
+    hexref_cycle(50);
+
+    hexref_arm();
+    
+    hexref_cycle(2);
 }
 
 #endif //ifndef BUILD_DSPAL

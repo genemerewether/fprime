@@ -60,6 +60,8 @@ namespace Gnc {
       ~LeeCtrlComponentImpl(void);
 
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
       void parametersLoaded();
 
       // ----------------------------------------------------------------------

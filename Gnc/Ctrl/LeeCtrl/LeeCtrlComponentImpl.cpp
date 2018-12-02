@@ -67,6 +67,11 @@ namespace Gnc {
   }
 
   void LeeCtrlComponentImpl ::
+    parameterUpdated(FwPrmIdType id)
+  {
+  }
+  
+  void LeeCtrlComponentImpl ::
     parametersLoaded()
   {
       Fw::ParamValid valid[12];
@@ -265,6 +270,13 @@ namespace Gnc {
       }
       else if (context == LCTRL_SCHED_CONTEXT_ATT) {
           using ROS::geometry_msgs::Vector3;
+
+          if (!((FLAT_OUTPUT_LIN_ACC_FF == this->ctrlMode) ||
+                (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode) ||
+                (ATT_RATE_THRUST        == this->ctrlMode))) {
+              return;
+          }
+          
           Eigen::Vector3d thrust_b__comm;
 
           if (ATT_RATE_THRUST == this->ctrlMode) {
