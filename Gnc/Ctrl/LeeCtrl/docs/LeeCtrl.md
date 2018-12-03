@@ -19,6 +19,7 @@
 | | | |w_q_b__y|F64||                    
 | | | |w_q_b__z|F64||                    
 | | | |w_q_b__w|F64||                    
+|LCTRL_InitParams|3 (0x3)|| | |   
 
 ## Telemetry Channel List
 

@@ -40,4 +40,8 @@
             </arg>
          </args>
     </command>
+    <command kind="sync" opcode="3" mnemonic="LCTRL_InitParams">
+      <args>
+      </args>
+    </command>
 </commands>
