@@ -131,6 +131,13 @@ namespace Gnc {
           F64 w_q_b__z,
           F64 w_q_b__w
       );
+    
+      //! Implementation for LCTRL_InitParams command handler
+      //! 
+      void LCTRL_InitParams_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
 
       // ----------------------------------------------------------------------
       // Private member variables
@@ -175,6 +182,7 @@ namespace Gnc {
 
       CtrlMode ctrlMode;
 
+      bool paramsInited;
     };
 
 } // end namespace Gnc

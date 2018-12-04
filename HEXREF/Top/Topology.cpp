@@ -402,6 +402,7 @@ int hexref_arm() {
         return -1;
     }
 
+    /*
     U8 buf[16] = {0};
     buf[2+4] = 0x01;
     buf[3+4] = 0xA1;
@@ -413,6 +414,7 @@ int hexref_arm() {
     p2->invoke(0x1a1,0,cmdPkt.getArgBuffer());
     usleep(50000);
     DEBUG_PRINT("hexref_arm after sleep\n");
+    */
 
     /*
     Fw::InputComPort* port = cmdDisp_ptr->get_seqCmdBuff_InputPort(0);
@@ -422,7 +424,7 @@ int hexref_arm() {
     usleep(50000);
     DEBUG_PRINT("hexref_arm after sleep\n");
     */
-    /*
+    
     Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
     Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
     for (U32 i = 0; i < 35; i++) {
@@ -437,7 +439,21 @@ int hexref_arm() {
                            readObj);
             usleep(2500);
         }
-    }*/
+    }
+
+    // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
+    /*
+    Drv::InputPwmSetDutyCycleDataPort * port = escPwm_ptr->get_pwmSetDuty_InputPort(0);
+    static F32 d1 = 0.05;
+    static F32 d2 = 0.1;
+    F32 duty[4] = {d1, d2, d1, d2};
+    Drv::PwmSetDutyCycle config(duty, 4, 0x0f);
+    port->invoke(config);
+    d1 += 0.005;
+    if (d1 > 0.1) {  d1 = 0.05;  }
+    d2 -= 0.005;
+    if (d2 < 0.05) {  d2 = 0.1;  }
+    */
     return 0;
 }
 
@@ -525,19 +541,6 @@ int hexref_wait() {
     while (!terminate) {
         DEBUG_PRINT("hexref_wait loop; terminate: %d\n", terminate);
         Os::Task::delay(1000);
-
-        // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
-        // Drv::InputPwmSetDutyCycleDataPort * port = escPwm.get_pwmSetDuty_InputPort(0);
-        // static F32 d1 = 0.05;
-        // static F32 d2 = 0.1;
-        // F32 duty[4] = {d1, d2, d1, d2};
-        // Drv::PwmSetDutyCycle config(duty, 4, 0x0f);
-        // port->invoke(config);
-        // d1 += 0.005;
-        // if (d1 > 0.1) {  d1 = 0.05;  }
-        // d2 -= 0.005;
-        // if (d2 < 0.05) {  d2 = 0.1;  }
-
     }
     return 0;
 }
@@ -546,6 +549,7 @@ int hexref_fini(void) {
     DEBUG_PRINT("hexref_fini called...\n");
     terminate = true;
     DEBUG_PRINT("hexref_fini done...\n");
+    assert(0);
     return 0;
 }
 

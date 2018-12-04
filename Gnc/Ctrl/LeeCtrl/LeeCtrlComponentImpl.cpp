@@ -58,7 +58,8 @@ namespace Gnc {
       thrust_b__des(0.0f, 0.0f, 0.0f),
       yaw__des(0.0f),
       leeControl(),
-      ctrlMode(CTRL_DISABLED)
+      ctrlMode(CTRL_DISABLED),
+      paramsInited(false)
   {
       for (NATIVE_UINT_TYPE i = 0; i < FW_NUM_ARRAY_ELEMENTS(this->u_tlm); i++) {
           this->u_tlm[i] = 0.0f;
@@ -113,7 +114,8 @@ namespace Gnc {
       for (U32 i = 0; i < 12; i++) {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
       }
-      // TODO(mereweth) - mark params as initialized
+
+      paramsInited = true;
   }
 
   void LeeCtrlComponentImpl ::
@@ -142,9 +144,26 @@ namespace Gnc {
     )
   {
       // TODO(Mereweth) - bounds on discontinuity in commanded thrust/moment
-      this->ctrlMode = mode;
+      if (!paramsInited &&
+          mode != CTRL_DISABLED) {
+          this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
+      }
+      else {
+          this->ctrlMode = mode;
+          this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
+      }
 
-      this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
+      if (CTRL_DISABLED == mode) {
+          using ROS::geometry_msgs::Vector3;
+          // TODO(mereweth) - convert frame id
+          ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"body"*/);
+          ROS::mav_msgs::TorqueThrust u_b__comm(h,
+                                                Vector3(0.0, 0.0, 0.0),
+                                                Vector3(0.0, 0.0, 0.0));
+          if (this->isConnected_controls_OutputPort(0)) {
+              this->controls_out(0, u_b__comm);
+          }
+      }
   }
 
 
@@ -187,6 +206,20 @@ namespace Gnc {
       this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
   }
 
+  void LeeCtrlComponentImpl ::
+    LCTRL_InitParams_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      this->parametersLoaded();
+      if (this->paramsInited) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+      }
+  }
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
