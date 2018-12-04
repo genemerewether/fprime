@@ -570,7 +570,7 @@ def main_window_start():
     """
     root = Tkinter.Tk()
     #root.option_readfile('optionDB')
-    root.title('Mars Helicopter Ground System')
+    root.title('QUEST Ground System')
     Pmw.initialise()
     t=TopPanel(root)
     c=command_panel.CommandPanel(t.p1())
