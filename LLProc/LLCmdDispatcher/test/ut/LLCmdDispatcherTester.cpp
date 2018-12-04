@@ -49,7 +49,7 @@ TEST(CmdDispTestNominal,NominalDispatch) {
 
     LLProc::LLCmdDispatcherImpl impl("CmdDispImpl");
 
-    impl.init(10,0);
+    impl.init(0);
 
     LLProc::LLCmdDispatcherImplTester tester(impl);
 
@@ -69,7 +69,7 @@ TEST(CmdDispTestNominal,NopTest) {
 
     LLProc::LLCmdDispatcherImpl impl("CmdDispImpl");
 
-    impl.init(10,0);
+    impl.init(0);
 
     LLProc::LLCmdDispatcherImplTester tester(impl);
 
@@ -90,7 +90,7 @@ TEST(CmdDispTestOffNominal,InvalidOpcodeDispatch) {
 
     LLProc::LLCmdDispatcherImpl impl("CmdDispImpl");
 
-    impl.init(10,0);
+    impl.init(0);
 
     LLProc::LLCmdDispatcherImplTester tester(impl);
 
@@ -110,7 +110,7 @@ TEST(CmdDispTestOffNominal,FailedCommand) {
 
     LLProc::LLCmdDispatcherImpl impl("CmdDispImpl");
 
-    impl.init(10,0);
+    impl.init(0);
 
     LLProc::LLCmdDispatcherImplTester tester(impl);
 
@@ -130,7 +130,7 @@ TEST(CmdDispTestOffNominal,InvalidCommand) {
 
     LLProc::LLCmdDispatcherImpl impl("CmdDispImpl");
 
-    impl.init(10,0);
+    impl.init(0);
 
     LLProc::LLCmdDispatcherImplTester tester(impl);
 
@@ -150,7 +150,7 @@ TEST(CmdDispTestOffNominal,CommandOverflow) {
 
     LLProc::LLCmdDispatcherImpl impl("CmdDispImpl");
 
-    impl.init(10,0);
+    impl.init(0);
 
     LLProc::LLCmdDispatcherImplTester tester(impl);
 
@@ -170,7 +170,7 @@ TEST(CmdDispTestOffNominal,ClearSequenceTracker) {
 
     LLProc::LLCmdDispatcherImpl impl("CmdDispImpl");
 
-    impl.init(10,0);
+    impl.init(0);
 
     LLProc::LLCmdDispatcherImplTester tester(impl);
 
