@@ -59,6 +59,8 @@ namespace Gnc {
       //!
       ~LeeCtrlComponentImpl(void);
 
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     PRIVATE:
       void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
     
