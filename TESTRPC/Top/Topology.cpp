@@ -226,7 +226,7 @@ volatile bool preinit = true;
 int hexref_arm() {
     FARF(ALWAYS, "hexref_arm");
     if (preinit) {
-        DEBUG_PRINT("hexref_arm preinit - returning");
+        FARF(ALWAYS, "hexref_arm preinit - returning");
         return -1;
     }
     Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
