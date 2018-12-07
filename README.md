@@ -4,7 +4,7 @@
 
 You'll need the submodules and dependencies, so clone like so:
 ```
-git clone --recurse-submodules https://github.com/genemerewether/quest-fw
+git clone --recurse-submodules REPO_ADDRESS
 ```
 
 Or, after cloning, run:
