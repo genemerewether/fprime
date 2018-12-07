@@ -120,7 +120,7 @@ namespace ROS {
       ros::CallbackQueue localCallbacks;
       n.setCallbackQueue(&localCallbacks);
 
-      ros::Subscriber sub = n.subscribe("/clock", 1000,
+      ros::Subscriber sub = n.subscribe("/clock", 10,
                                         &RosCycleComponentImpl::clockCallback,
                                         compPtr,
                                         ros::TransportHints().tcpNoDelay());

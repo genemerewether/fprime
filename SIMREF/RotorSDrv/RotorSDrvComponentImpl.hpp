@@ -223,6 +223,10 @@ namespace SIMREF {
         //!
         ros::Publisher m_motorPub;
 
+        //! Publishers for Odometry data
+        //!
+        ros::Publisher m_odomPub[NUM_ODOMLOG_INPUT_PORTS];
+
         struct ImuSet {
             Os::Mutex mutex; //! Mutex lock to guard imu object
             ROS::sensor_msgs::ImuNoCov imu; //! imu object

@@ -334,12 +334,12 @@ namespace HLProc {
         ros::CallbackQueue localCallbacks;
         n.setCallbackQueue(&localCallbacks);
 
-        ImuStateUpdateHandler gtHandler(compPtr, 0);
+        ImuStateUpdateHandler updateHandler(compPtr, 0);
 
-        ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 10,
-                                            &ImuStateUpdateHandler::imuStateUpdateCallback,
-                                            &gtHandler,
-                                            ros::TransportHints().tcpNoDelay());
+        ros::Subscriber updateSub = n.subscribe("imu_state_update", 10,
+                                                &ImuStateUpdateHandler::imuStateUpdateCallback,
+                                                &updateHandler,
+                                                ros::TransportHints().tcpNoDelay());
 
 
         ActuatorsHandler actuatorsHandler0(compPtr, 0);
@@ -356,7 +356,7 @@ namespace HLProc {
 
         FlatOutputHandler flatoutHandler(compPtr, 0);
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
-        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 10,
+        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 1,
                                                  &FlatOutputHandler::flatOutputCallback,
                                                  &flatoutHandler,
                                                  ros::TransportHints().tcpNoDelay());
