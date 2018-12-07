@@ -33,7 +33,7 @@ catkin build
 ## Using without ROS
 From the top directory of the repo, run:
 ```
-ROS/fprime_ws/src/fprime/mod.mk
+touch ROS/fprime_ws/src/fprime/mod.mk
 ```
 
 ## `SDREF`: High-level processor deployment
