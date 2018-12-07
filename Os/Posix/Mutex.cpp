@@ -6,7 +6,16 @@ namespace Os {
     
     Mutex::Mutex(void) {
         pthread_mutex_t* handle = new pthread_mutex_t;
+#ifdef BUILD_DSPAL
+        pthread_mutexattr_t attr;
+        NATIVE_INT_TYPE stat = pthread_mutexattr_init(&attr);
+        FW_ASSERT(stat == 0, stat); // If this fails, something horrible happened.
+        stat = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
+        FW_ASSERT(stat == 0, stat); // If this fails, something horrible happened.
+        stat = pthread_mutex_init(handle, &attr);
+#else
         NATIVE_INT_TYPE stat = pthread_mutex_init(handle,0);
+#endif
         FW_ASSERT(stat == 0,stat);
         this->m_handle = (POINTER_CAST) handle;
     }

@@ -55,6 +55,8 @@ namespace Gnc {
       //!
       ~BasicMixerComponentImpl(void);
 
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     PRIVATE:
 
       // ----------------------------------------------------------------------

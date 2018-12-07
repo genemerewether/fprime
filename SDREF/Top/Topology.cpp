@@ -52,12 +52,16 @@ Svc::ActiveRateGroupImpl* rgTlm_ptr = 0;
 Svc::ActiveRateGroupImpl* rgXfer_ptr = 0;
 
 Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
+Svc::SocketGndIfImpl* sockGndIfLL_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
+Svc::ActiveLoggerImpl* eventLoggerLL_ptr = 0;
+Svc::ActiveFileLoggerImpl* fileLogger_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
 Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
+Svc::CmdSequencerComponentImpl* cmdSeqLL_ptr = 0;
 Svc::PrmDbImpl* prmDb_ptr = 0;
 Svc::SerialTextConverterComponentImpl* serialTextConv_ptr = 0;
 Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
@@ -66,6 +70,7 @@ Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
+HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
 
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
@@ -74,7 +79,7 @@ Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 
 void allocComps() {
     // Component instance pointers
-    NATIVE_INT_TYPE rgDivs[] = {100, 1};
+    NATIVE_INT_TYPE rgDivs[] = {10, 1};
     rgDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
                         "RGDRV",
@@ -101,6 +106,12 @@ void allocComps() {
 #endif
 ;
 
+    sockGndIfLL_ptr = new Svc::SocketGndIfImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SGIFLL")
+#endif
+;
+
     textLogger_ptr = new Svc::ConsoleTextLoggerImpl
 #if FW_OBJECT_NAMES == 1
                         ("TLOG")
@@ -110,6 +121,18 @@ void allocComps() {
     eventLogger_ptr = new Svc::ActiveLoggerImpl
 #if FW_OBJECT_NAMES == 1
                         ("ELOG")
+#endif
+;
+
+    eventLoggerLL_ptr = new Svc::ActiveLoggerImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ELOGLL")
+#endif
+;
+
+    fileLogger_ptr = new Svc::ActiveFileLoggerImpl
+#if FW_OBJECT_NAMES == 1
+                        ("FLOG")
 #endif
 ;
 
@@ -134,6 +157,12 @@ void allocComps() {
     cmdSeq_ptr = new Svc::CmdSequencerComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("CMDSEQ")
+#endif
+;
+
+    cmdSeqLL_ptr = new Svc::CmdSequencerComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDSEQLL")
 #endif
 ;
 
@@ -181,6 +210,13 @@ void allocComps() {
 #endif
 ;
 
+    eventExp_ptr = new HLProc::EventExpanderComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("EVEXP")
+#endif
+;
+
+
     actuatorAdapter_ptr = new Gnc::ActuatorAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("ACTADAP")
@@ -215,15 +251,15 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct() {
-    //hexRouter_ptr->set_HexPortsOut_OutputPort(1, prmDb_ptr->get_
-
 #ifndef LLROUTER_DEVICES
-    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp_ptr->set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,hexRouter_ptr->get_KraitPortsIn_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    // Sequence Com buffer and cmd response
+    cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
+
+    hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(1, hexRouter_ptr->get_Sched_InputPort(0));
     
@@ -231,21 +267,30 @@ void manualConstruct() {
     // this actuator <-> PWM converter is for commanding from the Linux side
     actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
+    sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
+    sdRosIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
+    sdRosIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
 #else
-    // Commanding - use last port to allow MagicDraw plug-in to autocount the other components
-    cmdDisp_ptr->set_compCmdSend_OutputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1,llRouter_ptr->get_HLPortsIn_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    // Sequence Com buffer and cmd response
+    cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
     llRouter_ptr->set_LLPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
 
+    llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
+
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     // this actuator <-> PWM converter is for commanding from the Linux side
     actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
+    sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
+    sdRosIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
+    sdRosIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
 #endif
 }
 
-void constructApp(int port_number, char* hostname) {
+void constructApp(int port_number, int ll_port_number, char* hostname) {
     allocComps();
   
     localTargetInit();
@@ -266,6 +311,8 @@ void constructApp(int port_number, char* hostname) {
 #endif
 
     eventLogger_ptr->init(10,0);
+    eventLoggerLL_ptr->init(10,0);
+    fileLogger_ptr->init(10);
 
     linuxTime_ptr->init(0);
 
@@ -276,9 +323,15 @@ void constructApp(int port_number, char* hostname) {
     cmdSeq_ptr->init(10,0);
     cmdSeq_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
+    cmdSeqLL_ptr->init(10,0);
+    cmdSeqLL_ptr->allocateBuffer(0,seqMallocator,5*1024);
+
     prmDb_ptr->init(10,0);
 
     sockGndIf_ptr->init(0);
+    sockGndIfLL_ptr->init(0);
+
+    eventExp_ptr->init(0);
 
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
@@ -297,20 +350,33 @@ void constructApp(int port_number, char* hostname) {
 
     manualConstruct();
 
-    // Proxy registration
-    // TODO(mereweth) - multiple DSPAL components with commands?
-    //hexCmdProxy_ptr->set_CmdReg_OutputPort(0,cmdDisp_ptr->get_compCmdReg_InputPort(Svc::CommandDispatcherImpl::NUM_CMD_PORTS-1));
-    //hexCmdProxy_ptr->regCommands();
+    const U32 tempPortNum[2] = {0, 1};
+    const FwOpcodeType tempMinOpcode[2] = {0, 10000};
+    const FwOpcodeType tempMaxOpcode[2] = {9999, 19999};
+    cmdSeq_ptr->setOpCodeRanges(2,
+                                tempPortNum,
+                                tempMinOpcode,
+                                tempMaxOpcode);
+    /*cmdSeq1_ptr->setOpCodeRanges(2,
+                                  tempPortNum,
+                                  tempMinOpcode,
+                                  tempMaxOpcode);*/
 
     /* Register commands */
     cmdSeq_ptr->regCommands();
+    cmdSeqLL_ptr->regCommands();
     cmdDisp_ptr->regCommands();
     eventLogger_ptr->regCommands();
+    eventLoggerLL_ptr->regCommands();
+    fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
 
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
     
+    // initialize file logs
+    fileLogger_ptr->initLog("/log/");
+
     // read parameters
     prmDb_ptr->readParamFile();
 
@@ -326,8 +392,10 @@ void constructApp(int port_number, char* hostname) {
     cmdDisp_ptr->start(0,60,20*1024);
     // start sequencer
     cmdSeq_ptr->start(0,50,20*1024);
+    cmdSeqLL_ptr->start(0,50,20*1024);
     // start telemetry
     eventLogger_ptr->start(0,50,20*1024);
+    eventLoggerLL_ptr->start(0,50,20*1024);
     chanTlm_ptr->start(0,60,20*1024);
     prmDb_ptr->start(0,50,20*1024);
 
@@ -335,6 +403,8 @@ void constructApp(int port_number, char* hostname) {
 
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
+
+    fileLogger_ptr->start(0,50,20*1024);
     
     hexRouter_ptr->startPortReadThread(90,20*1024); //, CORE_RPC);
     //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_RPC);
@@ -374,6 +444,7 @@ void constructApp(int port_number, char* hostname) {
     
     // Initialize socket server
     sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
+    sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -419,15 +490,18 @@ void exitTasks(void) {
     rgXfer_ptr->exit();
     cmdDisp_ptr->exit();
     eventLogger_ptr->exit();
+    eventLoggerLL_ptr->exit();
     chanTlm_ptr->exit();
     prmDb_ptr->exit();
+    fileLogger_ptr->exit();
     cmdSeq_ptr->exit();
+    cmdSeqLL_ptr->exit();
     hexRouter_ptr->exit();
     DEBUG_PRINT("After HexRouter quit\n");
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
 }
 
 
@@ -458,6 +532,7 @@ int main(int argc, char* argv[]) {
     bool hexCycle = true;
     int numKraitCycles = 0;
     U32 port_number = 50000;
+    U32 ll_port_number = 50001;
     I32 option = 0;
     char *hostname = "localhost";
     bool local_cycle = false;
@@ -465,7 +540,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:a:o:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlp:x:a:o:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -476,6 +551,9 @@ int main(int argc, char* argv[]) {
               break;
             case 'p':
                 port_number = atoi(optarg);
+                break;
+            case 'x':
+                ll_port_number = atoi(optarg);
                 break;
             case 'a':
                 hostname = optarg;
@@ -516,7 +594,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
     
-    constructApp(port_number, hostname);
+    constructApp(port_number, ll_port_number, hostname);
     //dumparch();
 
     ros::start();

@@ -22,9 +22,11 @@
 
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
+#include "sensor_msgs/Imu.h"
 #include "mav_msgs/Actuators.h"
 #include "mav_msgs/AttitudeRateThrust.h"
 #include "mav_msgs/FlatOutput.h"
+#include "mav_msgs/ImuStateUpdate.h"
 
 #include "Os/Mutex.hpp"
 
@@ -75,6 +77,42 @@ namespace SIMREF {
       // ----------------------------------------------------------------------
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
+
+        class ImuHandler
+        {
+          public:
+              ImuHandler(RotorSDrvComponentImpl* compPtr,
+                         int portNum);
+
+              ~ImuHandler();
+
+              void imuCallback(const sensor_msgs::Imu::ConstPtr& msg);
+
+          PRIVATE:
+
+              RotorSDrvComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class ImuHandler
+
+        class ImuStateUpdateHandler
+        {
+          public:
+              ImuStateUpdateHandler(RotorSDrvComponentImpl* compPtr,
+                              int portNum);
+
+              ~ImuStateUpdateHandler();
+
+              void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
+
+          PRIVATE:
+
+              RotorSDrvComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class ImuStateUpdateHandler
 
         class OdometryHandler
         {
@@ -137,6 +175,14 @@ namespace SIMREF {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+
+        //! Handler implementation for Odometry
+        //!
+        void OdomLog_handler(
+            const NATIVE_INT_TYPE portNum, /*!< The port number*/
+            ROS::nav_msgs::OdometryNoCov &Odometry
+        );
+    
         //! Handler implementation for motor
         //!
         void motor_handler(
@@ -176,6 +222,20 @@ namespace SIMREF {
         //! Publisher for motor speeds
         //!
         ros::Publisher m_motorPub;
+
+        struct ImuSet {
+            Os::Mutex mutex; //! Mutex lock to guard imu object
+            ROS::sensor_msgs::ImuNoCov imu; //! imu object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_imuSet[NUM_SIMIMU_OUTPUT_PORTS];
+
+        struct ImuStateUpdateSet {
+            Os::Mutex mutex; //! Mutex lock to guard odometry object
+            ROS::mav_msgs::ImuStateUpdate imuStateUpdate; //! message object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
 
         struct OdomSet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object

@@ -1,0 +1,47 @@
+<commands>
+    <command kind="sync" opcode="0" mnemonic="LCTRL_SetCtrlMode">
+        <comment>
+        Set controller mode
+        </comment>
+        <args>
+            <arg name="mode" type="ENUM">
+                <enum name="CtrlMode">
+                    <item name="FLAT_OUTPUT_LIN_ACC_FF"/>
+                    <item name="FLAT_OUTPUT_ANG_ACC_FF"/>
+                    <item name="ATT_RATE_THRUST"/>
+                    <item name="CTRL_DISABLED"/>
+                </enum>
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="1" mnemonic="LCTRL_FlatOutputSetpoint">
+        <args>
+            <arg name="x_w__x" type="F64">
+            </arg>
+            <arg name="x_w__y" type="F64">
+            </arg>
+            <arg name="x_w__z" type="F64">
+            </arg>
+            <arg name="yaw" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="2" mnemonic="LCTRL_AttThrustSetpoint">
+        <args>
+            <arg name="thrust" type="F64">
+            </arg>
+            <arg name="w_q_b__x" type="F64">
+            </arg>
+            <arg name="w_q_b__y" type="F64">
+            </arg>
+            <arg name="w_q_b__z" type="F64">
+            </arg>
+            <arg name="w_q_b__w" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="3" mnemonic="LCTRL_InitParams">
+      <args>
+      </args>
+    </command>
+</commands>

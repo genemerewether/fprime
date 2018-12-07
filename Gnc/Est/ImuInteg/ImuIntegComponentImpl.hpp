@@ -58,6 +58,8 @@ namespace Gnc {
       //!
       ~ImuIntegComponentImpl(void);
 
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     PRIVATE:
 
       // ----------------------------------------------------------------------

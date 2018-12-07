@@ -282,6 +282,7 @@ namespace SnapdragonFlight {
                     Fw::SerializeStatus serStat = Fw::FW_SERIALIZE_OK;
                     // set buffer to total size of data*/
                     serStat = rpcCallBuff.setBuffLen(sizeRead);
+                    rpcCallBuff.resetDeser();
                     if (serStat != Fw::FW_SERIALIZE_OK) {
                         DEBUG_PRINT("Set setBuffLen error\n");
                         comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
@@ -290,8 +291,12 @@ namespace SnapdragonFlight {
                     while (serStat == Fw::FW_SERIALIZE_OK) {
                         serStat = rpcCallBuff.deserialize(portNum);
                         // first read into loop; could be empty here
-                        if ((serStat != Fw::FW_SERIALIZE_OK)              &&
-                            (serStat != Fw::FW_DESERIALIZE_BUFFER_EMPTY)) {
+                        if (serStat == Fw::FW_DESERIALIZE_BUFFER_EMPTY) {
+                            DEBUG_PRINT("first read into loop - empty here\n");
+                            break;
+                        }
+                        
+                        if (serStat != Fw::FW_SERIALIZE_OK) {
                             DEBUG_PRINT("deserialize portNum error\n");
                             comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
                             break;
@@ -301,7 +306,7 @@ namespace SnapdragonFlight {
                         Fw::ExternalSerializeBuffer portBuff;
                         serStat = rpcCallBuff.deserializeNoCopy(portBuff);
                         if (serStat != Fw::FW_SERIALIZE_OK) {
-                            DEBUG_PRINT("deserialize portNum error\n");
+                            DEBUG_PRINT("deserialize portBuff error %d, port %d\n", serStat, portNum);
                             comp->tlmWrite_HR_NumDecodeErrors(++comp->m_numDecodeErrors);
                             break;
                         }

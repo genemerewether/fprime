@@ -7,7 +7,7 @@
 
     <comment>Forwards port calls over FastRPC to the Krait</comment>
     <ports>
-        <port name="HexPortsIn" data_type="Serial" kind="async_input" max_number="25">
+        <port name="HexPortsIn" data_type="Serial" kind="async_input" max_number="25" full="drop">
             <comment>
                 Input ports from other Hexagon components, destination is Krait
             </comment>

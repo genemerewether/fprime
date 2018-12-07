@@ -50,6 +50,11 @@ namespace Svc {
                     const NATIVE_INT_TYPE instance //!< The instance number
                     );
 
+            void setOpCodeRanges(U32 numRanges,
+                                 const U32* portNum,
+                                 const FwOpcodeType* minOpCode,
+                                 const FwOpcodeType* maxOpCode);
+
             //! optional - set a timeout. Sequence will quit if a command takes longer than the number of
             //! cycles in the timeout value.
             void setTimeout(NATIVE_UINT_TYPE seconds);
@@ -62,6 +67,14 @@ namespace Svc {
 
             //! Destroy a CmdDispatcherComponentBase
             ~CmdSequencerComponentImpl(void);
+
+            // ----------------------------------------------------------------------
+            // Helper implementations
+            // ----------------------------------------------------------------------
+
+        PRIVATE:
+
+            U32 portFromOpcode(FwOpcodeType opcode);
 
             // ----------------------------------------------------------------------
             // Handler implementations
@@ -398,6 +411,16 @@ namespace Svc {
 
             //! The command record currently being processed
             CmdRecord m_cmdRecord;
+      
+            //! The output port for the command currently being processed
+            U32 m_cmdPortNum;
+
+            struct {
+                U32 port;
+                FwOpcodeType min;
+                FwOpcodeType max;
+                bool valid;
+            } m_portOpcodeCorr[NUM_COMCMDOUT_OUTPUT_PORTS];
 
             //! The command time timer
             Timer m_cmdTimer;

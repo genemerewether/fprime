@@ -38,13 +38,13 @@
         <port name="timeCaller" data_type="Fw::Time"  kind="output" role="TimeGet"    max_number="1">
         </port>
 
-        <port name="comCmdOut" data_type="Fw::Com"  kind="output"    max_number="1">
+        <port name="comCmdOut" data_type="Fw::Com"  kind="output"    max_number="3">
         </port>
 
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
         </port>
 
-        <port name="cmdResponseIn" data_type="Fw::CmdResponse"  kind="async_input"    max_number="1">
+        <port name="cmdResponseIn" data_type="Fw::CmdResponse"  kind="async_input"    max_number="3">
         </port>
 
         <port name="cmdIn" data_type="Fw::Cmd"  kind="input" role="Cmd"    max_number="1">

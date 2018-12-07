@@ -22,6 +22,9 @@
 #include <HLProc/HLRosIface/HLRosIfaceComponentImplCfg.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <Svc/ActiveFileLogger/ActiveFileLoggerPacket.hpp>
+#include <Svc/ActiveFileLogger/ActiveFileLoggerStreams.hpp>
+
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
@@ -45,11 +48,26 @@ namespace HLProc {
     HLRosIfaceImpl(void),
 #endif
     m_rgNH(NULL),
-    m_imuStateUpdateSet() // zero-initialize instead of default-initializing
+    m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
+    m_actuatorsSet(), // zero-initialize instead of default-initializing
+    m_flatOutSet(), // zero-initialize instead of default-initializing
+    m_attRateThrustSet() // zero-initialize instead of default-initializing
   {
       for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
           m_imuStateUpdateSet[i].fresh = false;
           m_imuStateUpdateSet[i].overflows = 0u;
+      }
+      for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_actuatorsSet); i++) {
+          m_actuatorsSet[i].fresh = false;
+          m_actuatorsSet[i].overflows = 0u;
+      }
+      for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
+          m_flatOutSet[i].fresh = false;
+          m_flatOutSet[i].overflows = 0u;
+      }
+      for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_attRateThrustSet); i++) {
+          m_attRateThrustSet[i].fresh = false;
+          m_attRateThrustSet[i].overflows = 0u;
       }
   }
 
@@ -108,6 +126,23 @@ namespace HLProc {
           ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_IMUNOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Imu.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+        
         if (NULL == m_rgNH) {
             return;
         }
@@ -122,7 +157,7 @@ namespace HLProc {
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
-        Fw::EightyCharString frame_id = header.getframe_id();
+        U32 frame_id = header.getframe_id();
         msg.header.frame_id = "mpu9250";
 
         msg.orientation_covariance[0] = -1;
@@ -175,6 +210,38 @@ namespace HLProc {
             // TODO(mereweth) - notify that no new actuators received?
             m_actuatorsSet[i].mutex.unLock();
         }
+
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
+            m_flatOutSet[i].mutex.lock();
+            if (m_flatOutSet[i].fresh) {
+                if (this->isConnected_flatOutput_OutputPort(i)) {
+                    // mimics driver hardware getting and sending sensor data
+                    this->flatOutput_out(i, m_flatOutSet[i].flatOutput);
+                }
+                else {
+                    DEBUG_PRINT("Flat output port %d not connected\n", i);
+                }
+                m_flatOutSet[i].fresh = false;
+            }
+            // TODO(mereweth) - notify that no new odometry received?
+            m_flatOutSet[i].mutex.unLock();
+        }
+
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_attRateThrustSet); i++) {
+            m_attRateThrustSet[i].mutex.lock();
+            if (m_attRateThrustSet[i].fresh) {
+                if (this->isConnected_attRateThrust_OutputPort(i)) {
+                    // mimics driver hardware getting and sending sensor data
+                    this->attRateThrust_out(i, m_attRateThrustSet[i].attRateThrust);
+                }
+                else {
+                    DEBUG_PRINT("Attitude rate thrust port %d not connected\n", i);
+                }
+                m_attRateThrustSet[i].fresh = false;
+            }
+            // TODO(mereweth) - notify that no new odometry received?
+            m_attRateThrustSet[i].mutex.unLock();
+        }
     }
 
     void HLRosIfaceComponentImpl ::
@@ -183,6 +250,23 @@ namespace HLProc {
           ROS::nav_msgs::OdometryNoCov &Odometry
       )
     {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ODOMNOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Odometry.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+        
         if (NULL == m_rgNH) {
             return;
         }
@@ -197,7 +281,7 @@ namespace HLProc {
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
-        Fw::EightyCharString frame_id = header.getframe_id();
+        U32 frame_id = header.getframe_id();
         msg.header.frame_id = "odom";
 
         msg.child_frame_id = "body";
@@ -270,6 +354,18 @@ namespace HLProc {
                                             &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());
 
+        FlatOutputHandler flatoutHandler(compPtr, 0);
+        AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
+        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 10,
+                                                 &FlatOutputHandler::flatOutputCallback,
+                                                 &flatoutHandler,
+                                                 ros::TransportHints().tcpNoDelay());
+
+        ros::Subscriber attRateThrustSub = n.subscribe("attitude_rate_thrust_setpoint", 10,
+                                                       &AttitudeRateThrustHandler::attitudeRateThrustCallback,
+                                                       &attRateThrustHandler,
+                                                       ros::TransportHints().tcpNoDelay());
+        
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -306,7 +402,8 @@ namespace HLProc {
                         Fw::Time(TB_ROS_TIME, 0,
                                  msg->header.stamp.sec,
                                  msg->header.stamp.nsec / 1000),
-                        Fw::EightyCharString(msg->header.frame_id.data()));
+                        // TODO(mereweth) - convert frame id
+                        0/*Fw::EightyCharString(msg->header.frame_id.data())*/);
 
             Actuators actuators;
             actuators.setheader(head);
@@ -374,8 +471,9 @@ namespace HLProc {
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
                               msg->header.stamp.nsec / 1000),
-                     Fw::EightyCharString(msg->header.frame_id.data())),
-              Fw::EightyCharString(msg->child_frame_id.data()),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+              0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
               PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
                                             msg->pose.pose.position.y,
                                             msg->pose.pose.position.z),
@@ -410,5 +508,111 @@ namespace HLProc {
         }
     }
 
+    // Flat output constructor/destructor/callback
+    HLRosIfaceComponentImpl :: FlatOutputHandler ::
+      FlatOutputHandler(HLRosIfaceComponentImpl* compPtr,
+                        int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_FLATOUTPUT_OUTPUT_PORTS); //compPtr->getNum_odometry_OutputPorts());
+    }
 
+    HLRosIfaceComponentImpl :: FlatOutputHandler :: ~FlatOutputHandler()
+    {
+
+    }
+
+    void HLRosIfaceComponentImpl :: FlatOutputHandler ::
+      flatOutputCallback(const mav_msgs::FlatOutput::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_FLATOUTPUT_OUTPUT_PORTS);
+
+        DEBUG_PRINT("Flat output port handler %d\n", this->portNum);
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::mav_msgs;
+            using namespace ROS::geometry_msgs;
+            FlatOutput flatOutput(
+              Header(msg->header.seq,
+                     Fw::Time(TB_ROS_TIME, 0,
+                              msg->header.stamp.sec,
+                              msg->header.stamp.nsec / 1000),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+
+              Point(msg->position.x, msg->position.y, msg->position.z),
+              Vector3(msg->velocity.x, msg->velocity.y, msg->velocity.z),
+              Vector3(msg->acceleration.x, msg->acceleration.y, msg->acceleration.z),
+              F64(msg->yaw)
+
+            ); // end FlatOutput constructor
+
+            this->compPtr->m_flatOutSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_flatOutSet[this->portNum].fresh) {
+                this->compPtr->m_flatOutSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting flatout port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_flatOutSet[this->portNum].flatOutput = flatOutput;
+            this->compPtr->m_flatOutSet[this->portNum].fresh = true;
+            this->compPtr->m_flatOutSet[this->portNum].mutex.unLock();
+        }
+    }
+
+    // AttitudeRateThrust constructor/destructor/callback
+    HLRosIfaceComponentImpl :: AttitudeRateThrustHandler ::
+      AttitudeRateThrustHandler(HLRosIfaceComponentImpl* compPtr,
+                                int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_ATTRATETHRUST_OUTPUT_PORTS); //compPtr->getNum_odometry_OutputPorts());
+    }
+
+    HLRosIfaceComponentImpl :: AttitudeRateThrustHandler :: ~AttitudeRateThrustHandler()
+    {
+
+    }
+
+    void HLRosIfaceComponentImpl :: AttitudeRateThrustHandler ::
+      attitudeRateThrustCallback(const mav_msgs::AttitudeRateThrust::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_ATTRATETHRUST_OUTPUT_PORTS);
+
+        DEBUG_PRINT("Attitude rate thrust output port handler %d\n", this->portNum);
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::mav_msgs;
+            using namespace ROS::geometry_msgs;
+            AttitudeRateThrust attRateThrust(
+              Header(msg->header.seq,
+                     Fw::Time(TB_ROS_TIME, 0,
+                              msg->header.stamp.sec,
+                              msg->header.stamp.nsec / 1000),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+
+              Quaternion(msg->attitude.x, msg->attitude.y, msg->attitude.z, msg->attitude.w),
+              Vector3(msg->angular_rates.x, msg->angular_rates.y, msg->angular_rates.z),
+              Vector3(msg->thrust.x, msg->thrust.y, msg->thrust.z)
+
+            ); // end AttitudeRateThrust constructor
+
+            this->compPtr->m_attRateThrustSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_attRateThrustSet[this->portNum].fresh) {
+                this->compPtr->m_attRateThrustSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting attitude rate thrust port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_attRateThrustSet[this->portNum].attRateThrust = attRateThrust;
+            this->compPtr->m_attRateThrustSet[this->portNum].fresh = true;
+            this->compPtr->m_attRateThrustSet[this->portNum].mutex.unLock();
+        }
+    }
+  
 } // end namespace

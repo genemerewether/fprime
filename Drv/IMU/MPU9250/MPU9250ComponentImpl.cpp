@@ -202,7 +202,8 @@ namespace Drv {
 
                         ImuNoCov imu(
                           // TODO(mereweth) - add/use time port from GPIO interrupt
-                          Header(m_cycleCount, ImuNow, Fw::EightyCharString("mpu9250")),
+                          // TODO(mereweth) - convert frame name to U32 idx
+                          Header(m_cycleCount, ImuNow, 0/*Fw::EightyCharString("mpu9250")*/),
                           Quaternion(0, 0, 0, 1), // TODO(mereweth) - mag goes here
                           Vector3(gyroX, gyroY, gyroZ),
                           Vector3(accelX, accelY, accelZ)

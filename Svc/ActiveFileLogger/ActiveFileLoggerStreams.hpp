@@ -3,6 +3,8 @@
 
 typedef enum {
     AFL_SERIAL_DATA = 0,
+    AFL_HLROSIFACE_IMUNOCOV,
+    AFL_HLROSIFACE_ODOMNOCOV, 
     NUM_AFL_STREAMS,
 } active_file_logger_stream_t;
 

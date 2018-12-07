@@ -1,7 +1,7 @@
 <serializable name="OdometryNoCov" namespace="ROS::nav_msgs">
   <members>
     <member name="header" type="ROS::std_msgs::Header"/>
-    <member name="child_frame_id" type="Fw::EightyCharString"/>
+    <member name="child_frame_id" type="U32"/>
     <member name="pose" type="ROS::geometry_msgs::Pose"/>
     <member name="twist" type="ROS::geometry_msgs::Twist"/>
   </members>

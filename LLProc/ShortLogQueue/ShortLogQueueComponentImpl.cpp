@@ -70,6 +70,9 @@ namespace LLProc {
         Fw::LogBuffer &args
     )
   {
+      if (Fw::LOG_DIAGNOSTIC == severity) {
+          return;
+      }
       // assert if we would overrun
       FW_ASSERT((this->m_head+1)%SHORT_LOG_QUEUE_DEPTH != this->m_tail);
       // store the event at the head of the queue

@@ -10,8 +10,11 @@
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdatePortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
@@ -20,9 +23,15 @@
     <import_dictionary>SIMREF/RotorSDrv/Events.xml</import_dictionary>
 
     <ports>
+        <port name="FileLogger" data_type="Svc::ActiveFileLogPort" kind="output">
+        </port>
+        
         <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="output" max_number="2">
         </port>
 
+        <port name="OdomLog" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="1">
+        </port>
+        
         <port name="flatOutput" data_type="ROS::mav_msgs::FlatOutput"  kind="output" max_number="1">
         </port>
 
@@ -32,6 +41,9 @@
         <port name="SimImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output" max_number="1">
         </port>
 
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdate"  kind="output"  max_number="1">
+        </port>
+        
         <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="1">
         </port>
 

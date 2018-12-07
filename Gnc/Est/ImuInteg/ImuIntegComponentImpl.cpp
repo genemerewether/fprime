@@ -163,8 +163,9 @@ namespace Gnc {
                                   &v_b,
                                   &omega_b);
 
-          ROS::std_msgs::Header h(this->seq, this->getTime(), "odom");
-          ROS::nav_msgs::Odometry odom(h, "body",
+          // TODO(mereweth) - convert frame name to U32 idx
+          ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"odom"*/);
+          ROS::nav_msgs::Odometry odom(h, 0/*"body"*/,
               PoseWithCovariance(Pose(Point(x_w(0), x_w(1), x_w(2)),
                                       Quaternion(w_q_b.x(), w_q_b.y(),
                                                  w_q_b.z(), w_q_b.w())),
@@ -178,7 +179,7 @@ namespace Gnc {
           }
 
           if (context == IMUINTEG_SCHED_CONTEXT_POS) {
-              ROS::nav_msgs::OdometryNoCov odomNoCov(h, "body",
+              ROS::nav_msgs::OdometryNoCov odomNoCov(h, 0/*"body"*/,
                                      Pose(Point(x_w(0), x_w(1), x_w(2)),
                                           Quaternion(w_q_b.x(), w_q_b.y(),
                                                      w_q_b.z(), w_q_b.w())),

@@ -14,7 +14,13 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
 
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionSerializableAi.xml</import_serializable_type>
+
     <import_dictionary>Gnc/Ctrl/LeeCtrl/Telemetry.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/LeeCtrl/Commands.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/LeeCtrl/Params.xml</import_dictionary>
     <import_dictionary>Gnc/Ctrl/LeeCtrl/Events.xml</import_dictionary>
 
     <ports>
