@@ -12,8 +12,8 @@
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
-    <import_dictionary>Gnc/Ctrl/LeeCtrl/Telemetry.xml</import_dictionary>
-    <import_dictionary>Gnc/Ctrl/ImuInteg/Events.xml</import_dictionary>
+    <import_dictionary>Gnc/Est/ImuInteg/Telemetry.xml</import_dictionary>
+    <import_dictionary>Gnc/Est/ImuInteg/Events.xml</import_dictionary>
     <ports>
 
 
@@ -32,10 +32,10 @@
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">
         </port>
 
-        <port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
         </port>
 
-        <!--port name="Log" data_type="Fw::Log"  kind="output"    max_number="1">
+        <port name="Log" data_type="Fw::Log"  kind="output"    max_number="1">
         </port>
 
         <port name="LogText" data_type="Fw::LogText"  kind="output"    max_number="1">
