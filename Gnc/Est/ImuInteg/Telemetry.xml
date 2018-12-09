@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="IMUINTEG_Dummy" data_type="F32" format_string="%.3fN">
+        <comment>
+            Imu Integ dummy
+        </comment>
+    </channel>
+</telemetry>
