@@ -9,7 +9,7 @@ export LXML_PATH :=
 export CHEETAH_COMPILE ?= cheetah-compile
 export MARKDOWN ?= $(PYTHON_BASE)/bin/markdown_py -x markdown.extensions.extra -x markdown.extensions.codehilite
 
-JOBS := -j 4
+JOBS := -j `nproc`
 
 TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
