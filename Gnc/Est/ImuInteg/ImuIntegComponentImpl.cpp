@@ -95,7 +95,7 @@ namespace Gnc {
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
-
+  
   void ImuIntegComponentImpl ::
     Imu_handler(
         const NATIVE_INT_TYPE portNum,
@@ -215,6 +215,25 @@ namespace Gnc {
       }
       else {
           // TODO(mereweth) - assert invalid context
+      }
+  }
+
+  // ----------------------------------------------------------------------
+  // Command handler implementations 
+  // ----------------------------------------------------------------------
+
+  void ImuIntegComponentImpl ::
+    IMUINTEG_InitParams_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      this->parametersLoaded();
+      if (this->paramsInited) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
       }
   }
 

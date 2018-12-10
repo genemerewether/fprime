@@ -39,10 +39,11 @@ namespace Gnc {
     BasicMixerImpl(void) :
       BasicMixerImpl(void),
 #endif
-      basicMixer()
+      basicMixer(),
+      paramsInited(false)
   {
 
-    //NOTE(mgardie) - is there a better way of doing this? Use same mrModel as leeControl?
+    // TODO(mereweth) - replace with parameters
     Eigen::MatrixXd mixer;
     mixer.resize(4, 6);
     mixer <<
@@ -68,17 +69,36 @@ namespace Gnc {
   {
 
   }
+  
+  void BasicMixerComponentImpl ::
+    parameterUpdated(FwPrmIdType id)
+  {
+    printf("prm %d updated\n", id);
+  }
+  
+  void BasicMixerComponentImpl ::
+    parametersLoaded()
+  {
+      Fw::ParamValid valid[1];
+      //if (Fw::PARAM_VALID != valid[0]) {  return;  }
+      
+      paramsInited = true;
+  }
 
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
-
+  
   void BasicMixerComponentImpl ::
     controls_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::mav_msgs::TorqueThrust &TorqueThrust
     )
   {
+      if (!paramsInited) {
+          return;
+      }
+    
       using ROS::geometry_msgs::Vector3;
 
       Vector3 moment_b = TorqueThrust.gettorque();
@@ -122,4 +142,24 @@ namespace Gnc {
     // NOTE(mgardine) - Output port now called in controls_handler
   }
 
+  // ----------------------------------------------------------------------
+  // Command handler implementations 
+  // ----------------------------------------------------------------------
+
+  void BasicMixerComponentImpl ::
+    BMIX_InitParams_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      this->parametersLoaded();
+      if (this->paramsInited) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+      }
+  }
+
+  
 } // end namespace Gnc

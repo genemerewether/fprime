@@ -68,7 +68,7 @@ namespace Gnc {
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
-
+    
       //! Handler implementation for Imu
       //!
       void Imu_handler(
@@ -88,6 +88,19 @@ namespace Gnc {
       void sched_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
+      );
+
+    PRIVATE:
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations 
+      // ----------------------------------------------------------------------
+
+      //! Implementation for IMUINTEG_InitParams command handler
+      //! 
+      void IMUINTEG_InitParams_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
       );
 
       U32 seq;
