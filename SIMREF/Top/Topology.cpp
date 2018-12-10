@@ -264,9 +264,11 @@ void constructApp(int port_number, char* hostname) {
     fatalHandler.regCommands();
 
     leeCtrl.regCommands();
+    imuInteg.regCommands();
+    mixer.regCommands();
 
     // initialize file logs
-    fileLogger.initLog("/log/");
+    fileLogger.initLog("./log/");
     
     // read parameters
     prmDb.readParamFile();
