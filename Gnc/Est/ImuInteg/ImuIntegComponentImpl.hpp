@@ -61,6 +61,9 @@ namespace Gnc {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -107,6 +110,8 @@ namespace Gnc {
       ROS::geometry_msgs::Vector3 v_b;
 
       quest_gnc::estimation::ImuInteg imuInteg;
+
+      bool paramsInited;
 
     };
 

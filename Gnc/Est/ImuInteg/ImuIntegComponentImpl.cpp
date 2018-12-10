@@ -54,7 +54,8 @@ namespace Gnc {
       x_w(0.0f, 0.0f, 0.0f),
       w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
       v_b(0.0f, 0.0f, 0.0f),
-      imuInteg()
+      imuInteg(),
+      paramsInited(false)
   {
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
       (void) imuInteg.SetWorldParams(wParams);
@@ -74,7 +75,23 @@ namespace Gnc {
   {
 
   }
-
+  
+  void ImuIntegComponentImpl ::
+    parameterUpdated(FwPrmIdType id)
+  {
+    printf("prm %d updated\n", id);
+  }
+  
+  void ImuIntegComponentImpl ::
+    parametersLoaded()
+  {
+      Fw::ParamValid valid[1];
+      imuInteg.SetTimeStep(paramGet_dt(valid[0]));
+      if (Fw::PARAM_VALID != valid[0]) {  return;  }
+      
+      paramsInited = true;
+  }
+      
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -150,6 +167,8 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
+      //TODO(mereweth) - report uninitialized status if params not good
+    
       if ((context == IMUINTEG_SCHED_CONTEXT_POS) ||
           (context == IMUINTEG_SCHED_CONTEXT_ATT)) {
           using namespace ROS::geometry_msgs;
