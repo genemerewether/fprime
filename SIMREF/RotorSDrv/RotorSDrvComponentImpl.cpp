@@ -96,6 +96,11 @@ namespace SIMREF {
 
         char buf[32];
         m_motorPub = m_rgNH->advertise<mav_msgs::Actuators>("command/motor_speed", 5);
+
+        for (int i = 0; i < NUM_ODOMLOG_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
+            m_odomPub[i] = m_rgNH->advertise<nav_msgs::Odometry>(buf, 5);
+        }
     }
 
     Os::Task::TaskStatus RotorSDrvComponentImpl ::
@@ -139,6 +144,45 @@ namespace SIMREF {
 
             this->FileLogger_out(0,fileBuff);
         }
+
+        
+        if (NULL == m_rgNH) {
+            return;
+        }
+        
+        nav_msgs::Odometry msg;
+
+        ROS::std_msgs::Header header = Odometry.getheader();
+        Fw::Time stamp = header.getstamp();
+        msg.header.stamp = ros::Time::now();
+
+        msg.header.seq = header.getseq();
+
+        // TODO(mereweth) - convert frame ID
+        U32 frame_id = header.getframe_id();
+        msg.header.frame_id = "odom";
+
+        msg.child_frame_id = "body";
+
+        ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
+        msg.pose.pose.position.x = p.getx();
+        msg.pose.pose.position.y = p.gety();
+        msg.pose.pose.position.z = p.getz();
+        ROS::geometry_msgs::Quaternion q = Odometry.getpose().getorientation();
+        msg.pose.pose.orientation.w = q.getw();
+        msg.pose.pose.orientation.x = q.getx();
+        msg.pose.pose.orientation.y = q.gety();
+        msg.pose.pose.orientation.z = q.getz();
+        ROS::geometry_msgs::Vector3 vec = Odometry.gettwist().getlinear();
+        msg.twist.twist.linear.x = vec.getx();
+        msg.twist.twist.linear.y = vec.gety();
+        msg.twist.twist.linear.z = vec.getz();
+        vec = Odometry.gettwist().getangular();
+        msg.twist.twist.angular.x = vec.getx();
+        msg.twist.twist.angular.y = vec.gety();
+        msg.twist.twist.angular.z = vec.getz();
+
+        m_odomPub[portNum].publish(msg);
     }
   
     void RotorSDrvComponentImpl ::
@@ -186,6 +230,22 @@ namespace SIMREF {
                 m_imuSet[i].mutex.unLock();
             }
             
+            for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
+                m_imuStateUpdateSet[i].mutex.lock();
+                if (m_imuStateUpdateSet[i].fresh) {
+                    if (this->isConnected_ImuStateUpdate_OutputPort(i)) {
+                        // mimics driver hardware getting and sending sensor data
+                        this->ImuStateUpdate_out(i, m_imuStateUpdateSet[i].imuStateUpdate);
+                    }
+                    else {
+                        DEBUG_PRINT("Imu state update port %d not connected\n", i);
+                    }
+                    m_imuStateUpdateSet[i].fresh = false;
+                }
+                // TODO(mereweth) - notify that no new imu received?
+                m_imuStateUpdateSet[i].mutex.unLock();
+            }
+
             for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_odomSet); i++) {
                 m_odomSet[i].mutex.lock();
                 if (m_odomSet[i].fresh) {
@@ -269,29 +329,35 @@ namespace SIMREF {
         ros::CallbackQueue localCallbacks;
         n.setCallbackQueue(&localCallbacks);
 
+        ImuStateUpdateHandler updateHandler(compPtr, 0);
+        ros::Subscriber updateSub = n.subscribe("imu_state_update", 10,
+                                                &ImuStateUpdateHandler::imuStateUpdateCallback,
+                                                &updateHandler,
+                                                ros::TransportHints().tcpNoDelay());
+
         OdometryHandler gtHandler(compPtr, 0);
         OdometryHandler odomHandler(compPtr, 1);
         ImuHandler imuHandler(compPtr, 0);
         FlatOutputHandler flatoutHandler(compPtr, 0);
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
 
-        ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 1000,
+        ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 10,
                                             &OdometryHandler::odometryCallback,
                                             &gtHandler,
                                             ros::TransportHints().tcpNoDelay());
 
-        ros::Subscriber odomSub = n.subscribe("odometry_sensor1/odometry", 1000,
+        ros::Subscriber odomSub = n.subscribe("odometry_sensor1/odometry", 10,
                                               &OdometryHandler::odometryCallback,
                                               &odomHandler,
                                               ros::TransportHints().tcpNoDelay());
 
-        ros::Subscriber imuSub = n.subscribe("imu", 1000,
+        ros::Subscriber imuSub = n.subscribe("imu", 10,
                                               &ImuHandler::imuCallback,
                                               &imuHandler,
                                               ros::TransportHints().tcpNoDelay());
 
         // TODO(mgardine) - what should the queue size be?
-        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 10,
+        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 1,
                                                  &FlatOutputHandler::flatOutputCallback,
                                                  &flatoutHandler,
                                                  ros::TransportHints().tcpNoDelay());
@@ -427,6 +493,74 @@ namespace SIMREF {
         }
     }
 
+    RotorSDrvComponentImpl :: ImuStateUpdateHandler ::
+      ImuStateUpdateHandler(RotorSDrvComponentImpl* compPtr,
+                      int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_IMUSTATEUPDATE_OUTPUT_PORTS); //compPtr->getNum_ImuStateUpdate_OutputPorts());
+    }
+
+    RotorSDrvComponentImpl :: ImuStateUpdateHandler :: ~ImuStateUpdateHandler()
+    {
+
+    }
+
+    void RotorSDrvComponentImpl :: ImuStateUpdateHandler ::
+      imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_IMUSTATEUPDATE_OUTPUT_PORTS);
+
+        DEBUG_PRINT("imuStateUpdate port handler %d\n", this->portNum);
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::mav_msgs;
+            using namespace ROS::geometry_msgs;
+            ImuStateUpdate imuStateUpdate(
+              Header(msg->header.seq,
+                     Fw::Time(TB_ROS_TIME, 0,
+                              msg->header.stamp.sec,
+                              msg->header.stamp.nsec / 1000),
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+              0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
+              PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
+                                            msg->pose.pose.position.y,
+                                            msg->pose.pose.position.z),
+                                      Quaternion(msg->pose.pose.orientation.x,
+                                                 msg->pose.pose.orientation.y,
+                                                 msg->pose.pose.orientation.z,
+                                                 msg->pose.pose.orientation.w)),
+                                 msg->pose.covariance.data(), 36),
+              TwistWithCovariance(Twist(Vector3(msg->twist.twist.linear.x,
+                                                msg->twist.twist.linear.y,
+                                                msg->twist.twist.linear.z),
+                                        Vector3(msg->twist.twist.angular.x,
+                                                msg->twist.twist.angular.y,
+                                                msg->twist.twist.angular.z)),
+                                  msg->twist.covariance.data(), 36),
+              Vector3(msg->angular_velocity_bias.x,
+                      msg->angular_velocity_bias.y,
+                      msg->angular_velocity_bias.z),
+              Vector3(msg->linear_acceleration_bias.x,
+                      msg->linear_acceleration_bias.y,
+                      msg->linear_acceleration_bias.z)
+            ); // end ImuStateUpdate constructor
+
+            this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
+                this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
+            this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+            this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
+        }
+    }
 
     // Flat output constructor/destructor/callback
     RotorSDrvComponentImpl :: FlatOutputHandler ::

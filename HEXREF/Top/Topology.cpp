@@ -293,6 +293,8 @@ void constructApp() {
     fatalHandler_ptr->regCommands();
 
     leeCtrl_ptr->regCommands();
+    imuInteg_ptr->regCommands();
+    mixer_ptr->regCommands();
 
     // Open devices
 

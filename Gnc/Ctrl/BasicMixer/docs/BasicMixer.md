@@ -2,6 +2,12 @@
 # BasicMixer Component Dictionary
 
 
+## Command List
+
+|Mnemonic|ID|Description|Arg Name|Arg Type|Comment
+|---|---|---|---|---|---|
+|BMIX_InitParams|0 (0x0)|| | |   
+
 ## Telemetry Channel List
 
 |Channel Name|ID|Type|Description|
