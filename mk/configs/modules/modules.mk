@@ -123,7 +123,8 @@ LLPROC_MODULES := \
 	LLProc/Ports \
 	LLProc/LLDebug \
 	LLProc/LLCycle \
-	LLProc/LLCmdDispatcher
+	LLProc/LLCmdDispatcher \
+	LLProc/LLTlmChan
 
 HLPROC_MODULES := \
 	HLProc/HLRosIface \
