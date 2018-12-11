@@ -43,17 +43,6 @@ namespace Gnc {
       paramsInited(false)
   {
 
-    // TODO(mereweth) - replace with parameters
-    Eigen::MatrixXd mixer;
-    mixer.resize(4, 6);
-    mixer <<
-     9.18972e-07,  1.83794e-06,  9.18972e-07, -9.18972e-07, -1.83794e-06, -9.18972e-07,
-    -1.59171e-06, -8.99966e-18,  1.59171e-06,  1.59171e-06, -8.99966e-18, -1.59171e-06,
-    -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07,
-     8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06;
-
-     (void) basicMixer.SetMixer(mixer);
-
   }
 
   void BasicMixerComponentImpl ::
@@ -79,9 +68,60 @@ namespace Gnc {
   void BasicMixerComponentImpl ::
     parametersLoaded()
   {
-      Fw::ParamValid valid[1];
-      //if (Fw::PARAM_VALID != valid[0]) {  return;  }
+      Fw::ParamValid valid[4];
+      Eigen::MatrixXd mixer;
+      mixer.resize(4, paramGet_numRotors(valid[0]));
+      if (Fw::PARAM_VALID != valid[0]) {  return;  }
+    
+      for (U32 i = 0; i < mixer.cols(); i++) {
+          switch (i) {
+              case 0:
+                  mixer.col(i) << paramGet_m_x__1(valid[0]),
+                                  paramGet_m_y__1(valid[1]),
+                                  paramGet_m_z__1(valid[2]),
+                                  paramGet_t__1(valid[3]);
+                  break;
+              case 1:
+                  mixer.col(i) << paramGet_m_x__2(valid[0]),
+                                  paramGet_m_y__2(valid[1]),
+                                  paramGet_m_z__2(valid[2]),
+                                  paramGet_t__2(valid[3]);
+                  break;
+              case 2:
+                  mixer.col(i) << paramGet_m_x__3(valid[0]),
+                                  paramGet_m_y__3(valid[1]),
+                                  paramGet_m_z__3(valid[2]),
+                                  paramGet_t__3(valid[3]);
+                  break;
+              case 3:
+                  mixer.col(i) << paramGet_m_x__4(valid[0]),
+                                  paramGet_m_y__4(valid[1]),
+                                  paramGet_m_z__4(valid[2]),
+                                  paramGet_t__4(valid[3]);
+                  break;
+              case 4:
+                  mixer.col(i) << paramGet_m_x__5(valid[0]),
+                                  paramGet_m_y__5(valid[1]),
+                                  paramGet_m_z__5(valid[2]),
+                                  paramGet_t__5(valid[3]);
+                  break;
+              case 5:
+                  mixer.col(i) << paramGet_m_x__6(valid[0]),
+                                  paramGet_m_y__6(valid[1]),
+                                  paramGet_m_z__6(valid[2]),
+                                  paramGet_t__6(valid[3]);
+                  break;
+              default:
+                  FW_ASSERT(0, i);
+          }
+
+          for (U32 j = 0; j < 4; j++) {
+              if (Fw::PARAM_VALID != valid[j]) {  return;  }
+          }
+      }
       
+      (void) basicMixer.SetMixer(mixer);
+
       paramsInited = true;
   }
 
