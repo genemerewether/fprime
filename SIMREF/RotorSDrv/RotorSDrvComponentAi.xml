@@ -14,7 +14,7 @@
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdatePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdateNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
@@ -41,7 +41,7 @@
         <port name="SimImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output" max_number="1">
         </port>
 
-        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdate"  kind="output"  max_number="1">
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">
         </port>
         
         <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="1">
