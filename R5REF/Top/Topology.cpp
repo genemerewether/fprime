@@ -24,6 +24,7 @@ enum UartInstances {
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
+Svc::PassiveRateGroupImpl* rgTlm_ptr = 0;
 
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
@@ -47,10 +48,28 @@ LLProc::LLDebugComponentImpl* llDebug_ptr = 0;
 LLProc::LLCycleComponentImpl* llCycle_ptr = 0;
 LLProc::HLRouterComponentImpl* hlRouter_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
+LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 
 static R5DmaAllocator alloc;
 
 void allocComps() {
+    NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
+        Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+        Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
+        0, // mixer
+        0, // logQueue
+        0, // chanTlm
+        LLProc::HLRTR_SCHED_UART_SEND,
+    };
+
+    rgTlm_ptr = new Svc::PassiveRateGroupImpl(
+#if FW_OBJECT_NAMES == 1
+                            "RGTLM",
+#endif
+                            rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
+;
+
     NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
     #if FW_OBJECT_NAMES == 1
@@ -62,6 +81,7 @@ void allocComps() {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+        0, //mixer
         0, //logQueue
         LLProc::HLRTR_SCHED_UART_SEND,
         LLProc::HLRTR_SCHED_UART_RECEIVE,
@@ -77,6 +97,10 @@ void allocComps() {
         0, //TODO(mereweth) - IMU?
         Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
+        0, //mixer
+        0, //logQueue
+        LLProc::HLRTR_SCHED_UART_SEND,
+        LLProc::HLRTR_SCHED_UART_RECEIVE,
     };
     rgPos_ptr = new Svc::PassiveRateGroupImpl(
     #if FW_OBJECT_NAMES == 1
@@ -199,6 +223,12 @@ void allocComps() {
                         ("CMDDISP")
 #endif
 ;
+
+    tlmChan_ptr = new LLProc::LLTlmChanImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TLMCHAN")
+#endif
+;
 }
 
 void manualConstruct() {
@@ -210,6 +240,7 @@ void manualConstruct() {
     imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
 
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
+    tlmChan_ptr->set_PktSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(5));
 
     hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     //hlRouter_ptr->set_HLPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
@@ -227,6 +258,7 @@ void constructApp() {
     // Initialize the rate groups
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
+    rgTlm_ptr->init(2);
 
     // Initialize the GNC components
     leeCtrl_ptr->init(0);
@@ -237,6 +269,7 @@ void constructApp() {
 
     hlRouter_ptr->init(0);
     cmdDisp_ptr->init(0);
+    tlmChan_ptr->init(0);
 
     a2dDrv_ptr->init(0);
 
@@ -254,8 +287,8 @@ void constructApp() {
                               alloc);
 
     hlUart_ptr->init(HL_UART_INSTANCE);
-    hlUart_ptr->initDriver(0,400, // bytes - max we could send in one cycle
-                           0,800, // bytes - two cycles worth
+    hlUart_ptr->initDriver(0,1000, // bytes - max we could send in one cycle
+                           0,1600, // bytes - two cycles worth
                            alloc);
 
     debugUart_ptr->init(DEBUG_UART_INSTANCE);
@@ -283,6 +316,8 @@ void constructApp() {
     cmdDisp_ptr->regCommands();
 
     leeCtrl_ptr->regCommands();
+    imuInteg_ptr->regCommands();
+    mixer_ptr->regCommands();
 
     rtiGpio_ptr->waitMapping(R5::GPIO_WAIT_BANK_A, 2);
     faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);

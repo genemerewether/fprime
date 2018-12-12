@@ -43,6 +43,7 @@ Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
+Svc::PassiveRateGroupImpl* rgTlm_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
@@ -50,6 +51,7 @@ SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr = 0;
 Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
+LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
@@ -68,11 +70,21 @@ void allocComps() {
                         5) // 50 dropped hardware cycles before an error
 ;
 
-    NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
-        0, // unused
+    NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
-    };   
+        0, // mixer
+        0, // logQueue
+        0, // chanTlm
+    };
+
+    rgTlm_ptr = new Svc::PassiveRateGroupImpl(
+#if FW_OBJECT_NAMES == 1
+                            "RGTLM",
+#endif
+                            rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
+;
 
     NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
     
@@ -86,6 +98,9 @@ void allocComps() {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+        0, //mixer
+        0, //logQueue
+        0, //kraitRouter
     };
 
     rgAtt_ptr = new Svc::PassiveRateGroupImpl(
@@ -99,6 +114,9 @@ void allocComps() {
         0, //TODO(mereweth) - IMU?
         Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
+        0, //mixer
+        0, //logQueue
+        0, //kraitRouter
     };
     
     rgPos_ptr = new Svc::PassiveRateGroupImpl(
@@ -147,6 +165,12 @@ void allocComps() {
     cmdDisp_ptr = new LLProc::LLCmdDispatcherImpl
 #if FW_OBJECT_NAMES == 1
                         ("CMDDISP")
+#endif
+;
+
+    tlmChan_ptr = new LLProc::LLTlmChanImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TLMCHAN")
 #endif
 ;
 
@@ -230,6 +254,7 @@ void manualConstruct(void) {
     imuInteg_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
 
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
+    tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
@@ -255,6 +280,7 @@ void constructApp() {
     rgDecouple_ptr->init(10, 0);
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
+    rgTlm_ptr->init(2);
 
     // Initialize the GNC components
     leeCtrl_ptr->init(0);
@@ -280,6 +306,7 @@ void constructApp() {
     fatalHandler_ptr->init(0);
 
     cmdDisp_ptr->init(0);
+    tlmChan_ptr->init(0);
 
     kraitRouter_ptr->init(50, 1000);
 
@@ -551,7 +578,6 @@ int hexref_fini(void) {
     DEBUG_PRINT("hexref_fini called...\n");
     terminate = true;
     DEBUG_PRINT("hexref_fini done...\n");
-    assert(0);
     return 0;
 }
 
