@@ -1,0 +1,6 @@
+<interface name="ImuStateUpdateNoCov" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="ImuStateUpdateNoCov" pass_by="reference" type="ROS::mav_msgs::ImuStateUpdateNoCov"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/ImuStateUpdateNoCovSerializableAi.xml</import_serializable_type>
+</interface>

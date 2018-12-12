@@ -79,7 +79,9 @@ namespace Gnc {
   void ImuIntegComponentImpl ::
     parameterUpdated(FwPrmIdType id)
   {
+#ifndef BUILD_TIR5
     printf("prm %d updated\n", id);
+#endif
   }
   
   void ImuIntegComponentImpl ::
@@ -121,7 +123,7 @@ namespace Gnc {
   void ImuIntegComponentImpl ::
     ImuStateUpdate_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::mav_msgs::ImuStateUpdate &ImuStateUpdate
+        ROS::mav_msgs::ImuStateUpdateNoCov &ImuStateUpdate
     )
   {
       DEBUG_PRINT("IMU state update\n");
@@ -130,11 +132,11 @@ namespace Gnc {
       //this->seq = h.getseq();
       // TODO(mereweth) convert h.getstamp()
 
-      this->x_w = ImuStateUpdate.getpose().getpose().getposition();
-      this->w_q_b = ImuStateUpdate.getpose().getpose().getorientation();
+      this->x_w = ImuStateUpdate.getpose().getposition();
+      this->w_q_b = ImuStateUpdate.getpose().getorientation();
 
-      ROS::geometry_msgs::Vector3 v_w = ImuStateUpdate.gettwist().gettwist().getlinear();
-      this->omega_b = ImuStateUpdate.gettwist().gettwist().getangular();
+      ROS::geometry_msgs::Vector3 v_w = ImuStateUpdate.gettwist().getlinear();
+      this->omega_b = ImuStateUpdate.gettwist().getangular();
 
       this->wBias = ImuStateUpdate.getangular_velocity_bias();
       this->aBias = ImuStateUpdate.getlinear_acceleration_bias();

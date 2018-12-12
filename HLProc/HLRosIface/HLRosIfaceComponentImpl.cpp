@@ -466,7 +466,7 @@ namespace HLProc {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
-            ImuStateUpdate imuStateUpdate(
+            ImuStateUpdateNoCov imuStateUpdate(
               Header(msg->header.seq,
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
@@ -474,21 +474,19 @@ namespace HLProc {
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
-              PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
-                                            msg->pose.pose.position.y,
-                                            msg->pose.pose.position.z),
-                                      Quaternion(msg->pose.pose.orientation.x,
-                                                 msg->pose.pose.orientation.y,
-                                                 msg->pose.pose.orientation.z,
-                                                 msg->pose.pose.orientation.w)),
-                                 msg->pose.covariance.data(), 36),
-              TwistWithCovariance(Twist(Vector3(msg->twist.twist.linear.x,
-                                                msg->twist.twist.linear.y,
-                                                msg->twist.twist.linear.z),
-                                        Vector3(msg->twist.twist.angular.x,
-                                                msg->twist.twist.angular.y,
-                                                msg->twist.twist.angular.z)),
-                                  msg->twist.covariance.data(), 36),
+              Pose(Point(msg->pose.pose.position.x,
+                         msg->pose.pose.position.y,
+                         msg->pose.pose.position.z),
+                   Quaternion(msg->pose.pose.orientation.x,
+                              msg->pose.pose.orientation.y,
+                              msg->pose.pose.orientation.z,
+                              msg->pose.pose.orientation.w)),
+              Twist(Vector3(msg->twist.twist.linear.x,
+                            msg->twist.twist.linear.y,
+                            msg->twist.twist.linear.z),
+                    Vector3(msg->twist.twist.angular.x,
+                            msg->twist.twist.angular.y,
+                            msg->twist.twist.angular.z)),
               Vector3(msg->angular_velocity_bias.x,
                       msg->angular_velocity_bias.y,
                       msg->angular_velocity_bias.z),

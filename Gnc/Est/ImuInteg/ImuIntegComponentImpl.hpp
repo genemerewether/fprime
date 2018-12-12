@@ -80,7 +80,7 @@ namespace Gnc {
       //!
       void ImuStateUpdate_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::mav_msgs::ImuStateUpdate &ImuStateUpdate
+          ROS::mav_msgs::ImuStateUpdateNoCov &ImuStateUpdate
       );
 
       //! Handler implementation for sched

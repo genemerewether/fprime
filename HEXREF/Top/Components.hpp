@@ -30,14 +30,17 @@ void exitTasks(void);
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
 #include <LLProc/LLCmdDispatcher/LLCmdDispatcherComponentImpl.hpp>
+#include <LLProc/LLTlmChan/LLTlmChanImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
+extern Svc::PassiveRateGroupImpl* rgTlm_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
+extern LLProc::LLTlmChanImpl* tlmChan_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;

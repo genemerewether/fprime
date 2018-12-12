@@ -6,6 +6,7 @@ FilteredSensorDataSerializableAi.xml \
 FlatOutputSerializableAi.xml \
 GpsWaypointSerializableAi.xml \
 ImuStateUpdateSerializableAi.xml \
+ImuStateUpdateNoCovSerializableAi.xml \
 RateThrustSerializableAi.xml \
 RollPitchYawrateThrustSerializableAi.xml \
 StatusSerializableAi.xml \
