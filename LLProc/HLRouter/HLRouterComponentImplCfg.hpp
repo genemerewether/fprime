@@ -11,7 +11,7 @@
 namespace LLProc {
   
 enum {
-    SERIAL_BUFFER_SIZE = 1000
+    SERIAL_BUFFER_SIZE = 2000
 };
 
 enum {

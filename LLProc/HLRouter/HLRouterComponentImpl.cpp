@@ -525,8 +525,15 @@ namespace LLProc {
       DEBUG_PRINT("Bytes to copy: %d\n",bytesToCopy);
 
       // copy bytes
-      Fw::SerializeStatus stat = this->m_inputAccumulator.serialize(ptr,bytesToCopy,true);
-      FW_ASSERT(Fw::FW_SERIALIZE_OK == stat,stat);
+      if (bytesToCopy <= this->m_inputAccumulator.getBuffSerLeft()) {
+          Fw::SerializeStatus stat = this->m_inputAccumulator.serialize(ptr,bytesToCopy,true);
+          FW_ASSERT(Fw::FW_SERIALIZE_OK == stat,stat);
+      }
+      else {
+          this->m_transState = TRAN_WAITING;
+          printf("Only %d bytes free in inputAccum; not copying\n",
+                      this->m_inputAccumulator.getBuffSerLeft());
+      }
 
       // subtract bytes from remaining transaction size
       this->m_tranLeft -= bytesToCopy;
