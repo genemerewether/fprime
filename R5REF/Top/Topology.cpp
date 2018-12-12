@@ -81,6 +81,7 @@ void allocComps() {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+        0, //mixer
         0, //logQueue
         LLProc::HLRTR_SCHED_UART_SEND,
         LLProc::HLRTR_SCHED_UART_RECEIVE,
@@ -96,6 +97,7 @@ void allocComps() {
         0, //TODO(mereweth) - IMU?
         Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
+        0, //mixer
         0, //logQueue
         LLProc::HLRTR_SCHED_UART_SEND,
         LLProc::HLRTR_SCHED_UART_RECEIVE,
@@ -285,8 +287,8 @@ void constructApp() {
                               alloc);
 
     hlUart_ptr->init(HL_UART_INSTANCE);
-    hlUart_ptr->initDriver(0,400, // bytes - max we could send in one cycle
-                           0,800, // bytes - two cycles worth
+    hlUart_ptr->initDriver(0,800, // bytes - max we could send in one cycle
+                           0,1600, // bytes - two cycles worth
                            alloc);
 
     debugUart_ptr->init(DEBUG_UART_INSTANCE);
@@ -314,6 +316,8 @@ void constructApp() {
     cmdDisp_ptr->regCommands();
 
     leeCtrl_ptr->regCommands();
+    imuInteg_ptr->regCommands();
+    mixer_ptr->regCommands();
 
     rtiGpio_ptr->waitMapping(R5::GPIO_WAIT_BANK_A, 2);
     faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);
