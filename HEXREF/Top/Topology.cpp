@@ -578,7 +578,6 @@ int hexref_fini(void) {
     DEBUG_PRINT("hexref_fini called...\n");
     terminate = true;
     DEBUG_PRINT("hexref_fini done...\n");
-    assert(0);
     return 0;
 }
 
