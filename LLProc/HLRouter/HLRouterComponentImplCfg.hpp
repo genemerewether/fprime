@@ -11,7 +11,8 @@
 namespace LLProc {
   
 enum {
-    SERIAL_BUFFER_SIZE = 400 // 400 bytes, twice what we can send
+    SERIAL_BUFFER_SIZE = 2000,
+    MAX_TRANS_SIZE = 1000
 };
 
 enum {
