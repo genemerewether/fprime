@@ -86,7 +86,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 100};
+    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
     
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -417,6 +417,8 @@ void exitTasks(void) {
     imuDRInt_ptr->exitThread();
 #endif
     kraitRouter_ptr->exit();
+
+    assert(0);
 }
 
 volatile bool terminate = false;

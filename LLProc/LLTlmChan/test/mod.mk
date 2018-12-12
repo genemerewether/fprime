@@ -1,1 +1,2 @@
-SUBDIRS = ut perf
+SUBDIRS = ut
+#perf
