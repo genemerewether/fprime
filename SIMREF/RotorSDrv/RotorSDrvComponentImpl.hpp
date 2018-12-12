@@ -236,7 +236,7 @@ namespace SIMREF {
 
         struct ImuStateUpdateSet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::mav_msgs::ImuStateUpdate imuStateUpdate; //! message object
+            ROS::mav_msgs::ImuStateUpdateNoCov imuStateUpdate; //! message object
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
