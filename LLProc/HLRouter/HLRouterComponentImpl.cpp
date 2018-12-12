@@ -174,11 +174,8 @@ namespace LLProc {
                       } // end context for start
                       break;
                   case TRAN_SIZE:
-                      // if it gets here, first byte is size
-                      this->extractPacket(buff);
-                      break;
                   case TRAN_SIZE2:
-                      // if it gets here, first byte is 2nd byte of size
+                      // if it gets here, 1st or 2nd byte finishes size
                       this->extractPacket(buff);
                       break;
                   case TRAN_PROCESSING:
@@ -441,7 +438,8 @@ namespace LLProc {
           this->m_transState = TRAN_SIZE;
       }
       // see if only one byte of the size is there
-      else if (this->m_buffOffset == buffSize-2) {
+      else if ((this->m_buffOffset == buffSize-2) &&
+               (TRAN_SIZE2 == this->m_transState)) {
           // look for 2nd byte of size next time
           DEBUG_PRINT("Look for size2\n");
           this->m_tempSize = ptr[this->m_buffOffset];

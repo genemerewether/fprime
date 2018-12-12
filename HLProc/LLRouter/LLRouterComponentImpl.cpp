@@ -62,6 +62,7 @@ namespace HLProc {
     LLRouterImpl(void)
 #endif
     ,m_transState(TRAN_WAITING)
+    ,m_tempSize(0)
     ,m_tranLeft(0)
     ,m_buffOffset(0) // ,m_pktSeqNum(0) // ,m_ackPktSeqNum(0)
     ,m_numResyncs(0)
@@ -73,6 +74,7 @@ namespace HLProc {
     ,m_numInvalidPorts(0)
     ,m_numBadSerialPortCalls(0)
     ,m_numOutputBufferOverflows(0)
+    ,m_numTooBigPktSize(0)
     ,m_numZeroPktSize(0)
     ,m_numPatchBytesSent(0)
     ,m_maxCycleTime(0)
@@ -411,7 +413,8 @@ namespace HLProc {
                       } // end context for start
                       break;
                   case TRAN_SIZE:
-                      // if it gets here, first byte is size
+                  case TRAN_SIZE2:
+                      // if it gets here, 1st or 2nd byte finishes size
                       this->extractPacket(buff);
                       break;
                   case TRAN_PROCESSING:
@@ -569,21 +572,49 @@ namespace HLProc {
           this->m_transState = TRAN_SIZE;
       }
       // see if only one byte of the size is there
-      else if (this->m_buffOffset == buffSize-2) {
-          // look for 2nd byte of size next
-          printf("Look for size2\n");
-          this->m_transState = TRAN_SIZE;
-      } else { // next byte is size
-          if (this->m_transState != TRAN_SIZE) { // if sync was already found, don't move ahead
+      else if ((this->m_buffOffset == buffSize-2) &&
+               (TRAN_SIZE2 == this->m_transState)) {
+          // look for 2nd byte of size next time
+          DEBUG_PRINT("Look for size2\n");
+          this->m_tempSize = ptr[this->m_buffOffset];
+          this->m_buffOffset+=2;
+          this->m_transState = TRAN_SIZE2;
+      } else { // next byte(s) complete the size
+          if ((this->m_transState != TRAN_SIZE) &&
+              (this->m_transState != TRAN_SIZE2)) {
+              // if sync was already found, don't move ahead
               this->m_buffOffset++;
           }
 
-          Fw::SerialBuffer tempBuff(&ptr[this->m_buffOffset], 2);
-          tempBuff.fill();
           U16 trans_size = 0u;
-          // TODO(mereweth) - check ser status
-          tempBuff.deserialize(trans_size);
-          DEBUG_PRINT("Transaction size is %d\n",trans_size);
+          if (TRAN_SIZE2 == this->m_transState) {
+              // use the stored first size byte from last time
+              U8 tempB[2];
+              tempB[0] = ptr[this->m_buffOffset];
+              tempB[1] = this->m_tempSize;
+              Fw::SerialBuffer tempBuff(tempB, 2);
+              tempBuff.fill();
+              // TODO(mereweth) - check ser status
+              tempBuff.deserialize(trans_size);
+              DEBUG_PRINT("Transaction size is %d\n",trans_size);
+          }
+          else {
+              Fw::SerialBuffer tempBuff(&ptr[this->m_buffOffset], 2);
+              tempBuff.fill();
+              // TODO(mereweth) - check ser status
+              tempBuff.deserialize(trans_size);
+              DEBUG_PRINT("Transaction size is %d\n",trans_size);
+          }
+          
+          // If the transaction size is greater than the safety bound, reset
+          if (trans_size >= MAX_TRANS_SIZE) {
+
+              // TODO(mereweth) - add tlm back in
+              ++this->m_numTooBigPktSize;
+              //this->TlmOut_out(0,LL_TLM_NUM_ZERO_PKT_SIZE_HL_PKTS,++this->m_numZeroPktSize);
+              this->m_transState = TRAN_WAITING;
+              return;
+          }
 
           // If the transaction size is zero, then skip this entire packet, as this can only
           // occur if there was corruption of data (data loss, corrupted bytes):
@@ -597,7 +628,13 @@ namespace HLProc {
           this->m_tranLeft = trans_size + CRC_SIZE; // data + CRC
 
           // see how many bytes are left in buffer
-          this->m_buffOffset+=2; // point to first byte
+          if (TRAN_SIZE2 == this->m_transState) {
+              // used the stored first size byte from last time
+              this->m_buffOffset++; // point to first byte
+          }
+          else {
+              this->m_buffOffset+=2; // point to first byte
+          }
 
           NATIVE_UINT_TYPE bytesLeft = buffSize - this->m_buffOffset;
           DEBUG_PRINT("bytesLeft %d\n",bytesLeft);
