@@ -25,6 +25,7 @@
 #include <Os/File.hpp>
 #include <Os/FileSystem.hpp>
 #include <string.h> // memcpy
+#include <Fw/Types/SerialBuffer.hpp>
 
 #ifdef __cplusplus
 extern "C" {
@@ -221,7 +222,7 @@ namespace HLProc {
       // We can only send one FPGA command per schedule call or we risk the FPGA
       // not updating properly. This state machine allows one or both of the LLs
       // to be rebooted into normal or patching mode
-      DEBUG_PRINT("Reboot mode: %u\n", this->m_LLRebootState);
+      //DEBUG_PRINT("Reboot mode: %u\n", this->m_LLRebootState);
       switch (this->m_LLRebootState) {
           case REBOOT_NONE:
               break;
@@ -268,13 +269,17 @@ namespace HLProc {
           this->tlmWrite_LLR_MaxCycleTime(this->m_cycleTime);
       }
       // Send out serial data if there is data beyond SYNC and size bytes
-      if (this->m_outputBuffer.getBuffLength() > 2*sizeof(BYTE)) {
+      if (this->m_outputBuffer.getBuffLength() > 3*sizeof(BYTE)) {
           // set size
           BYTE* ptr = this->m_outputBuffer.getBuffAddr();
+          Fw::SerialBuffer tempBuff(&ptr[1], 2);
           // poke in size
-          ptr[1] = static_cast<BYTE>(this->m_outputBuffer.getBuffLength() - 2*sizeof(BYTE)); // data minus SYNC and size byte
+          // TODO(mereweth) - check ser status
+          // data minus SYNC and size bytes
+          tempBuff.serialize(static_cast<U16>(this->m_outputBuffer.getBuffLength()
+                                              - 3*sizeof(BYTE)));
           // set CRC - CRC starts after sync and size bytes
-          U16 crc = LLRouterComponentImpl::calculate_crc_chksum(&ptr[2*sizeof(BYTE)],this->m_outputBuffer.getBuffLength()-2*sizeof(BYTE));
+          U16 crc = LLRouterComponentImpl::calculate_crc_chksum(&ptr[3*sizeof(BYTE)],this->m_outputBuffer.getBuffLength()-3*sizeof(BYTE));
           Fw::SerializeStatus stat = this->m_outputBuffer.serialize(crc);
           FW_ASSERT(Fw::FW_SERIALIZE_OK == stat,stat);
           // set the serial buffer size
@@ -302,12 +307,12 @@ namespace HLProc {
       stat = this->m_outputBuffer.serialize(Cfg::UART_SYNC_BYTE);
       FW_ASSERT(Fw::FW_SERIALIZE_OK == stat,stat);
       // serialize placeholder size - will be filled in when packet is complete
-      stat = this->m_outputBuffer.serialize((U8)0);
+      stat = this->m_outputBuffer.serialize((U16)0);
       FW_ASSERT(Fw::FW_SERIALIZE_OK == stat,stat);
   }
 
   U16 LLRouterComponentImpl ::
-      calculate_crc_chksum(const U8 *buff, U8 size) {
+      calculate_crc_chksum(const U8 *buff, U16 size) {
 
       FW_ASSERT(buff != NULL);
 
@@ -334,7 +339,7 @@ namespace HLProc {
       DEBUG_PRINT("Port %d in. Size: %d\n",portNum,Buffer.getBuffLength());
 
       // Check if we can fit the data in the output buffer:
-      const NATIVE_UINT_TYPE total_size = sizeof(U8) + sizeof(U8) + Buffer.getBuffLength();
+      const NATIVE_UINT_TYPE total_size = sizeof(U8) + 2*sizeof(U8) + Buffer.getBuffLength();
 
       if (total_size > Buffer.getBuffLength() && // Checking for overflow in addition above
           total_size <= this->m_outputBuffer.getBuffSerLeft()) {
@@ -344,7 +349,7 @@ namespace HLProc {
           FW_ASSERT(Fw::FW_SERIALIZE_OK == stat,stat);
 
           // Add size of buffer
-          stat = this->m_outputBuffer.serialize((U8)Buffer.getBuffLength());
+          stat = this->m_outputBuffer.serialize((U16)Buffer.getBuffLength());
           FW_ASSERT(Fw::FW_SERIALIZE_OK == stat,stat);
 
           // Add data
@@ -471,7 +476,7 @@ namespace HLProc {
                   return;
               }
               // get size
-              U8 entrySize;
+              U16 entrySize;
               stat = this->m_inputAccumulator.deserialize(entrySize);
               if (stat != Fw::FW_SERIALIZE_OK) {
                   DEBUG_PRINT("Decode size error\n");
@@ -562,12 +567,22 @@ namespace HLProc {
           DEBUG_PRINT("Look for size\n");
           this->m_buffOffset++;
           this->m_transState = TRAN_SIZE;
+      }
+      // see if only one byte of the size is there
+      else if (this->m_buffOffset == buffSize-2) {
+          // look for 2nd byte of size next
+          printf("Look for size2\n");
+          this->m_transState = TRAN_SIZE;
       } else { // next byte is size
           if (this->m_transState != TRAN_SIZE) { // if sync was already found, don't move ahead
               this->m_buffOffset++;
           }
 
-          BYTE trans_size = ptr[this->m_buffOffset];
+          Fw::SerialBuffer tempBuff(&ptr[this->m_buffOffset], 2);
+          tempBuff.fill();
+          U16 trans_size = 0u;
+          // TODO(mereweth) - check ser status
+          tempBuff.deserialize(trans_size);
           DEBUG_PRINT("Transaction size is %d\n",trans_size);
 
           // If the transaction size is zero, then skip this entire packet, as this can only
@@ -582,7 +597,7 @@ namespace HLProc {
           this->m_tranLeft = trans_size + CRC_SIZE; // data + CRC
 
           // see how many bytes are left in buffer
-          this->m_buffOffset++; // point to first byte
+          this->m_buffOffset+=2; // point to first byte
 
           NATIVE_UINT_TYPE bytesLeft = buffSize - this->m_buffOffset;
           DEBUG_PRINT("bytesLeft %d\n",bytesLeft);

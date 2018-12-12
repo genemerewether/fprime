@@ -155,7 +155,7 @@ namespace HLProc {
       void resetSerOutBuff(void);
 
       // Calculates 16 bit CRC for the passed buffer
-      static U16 calculate_crc_chksum(const U8 *buff, U8 size);
+      static U16 calculate_crc_chksum(const U8 *buff, U16 size);
 
       // CRC size:
       static const U8 CRC_SIZE = sizeof(U16);
