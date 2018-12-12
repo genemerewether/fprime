@@ -537,7 +537,7 @@ int main(int argc, char* argv[]) {
     U32 ll_port_number = 50001;
     I32 option = 0;
     char *hostname = "localhost";
-    bool local_cycle = false;
+    bool local_cycle = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
@@ -634,7 +634,7 @@ int main(int argc, char* argv[]) {
     int cycle = 0;
 
     while (!terminate) {
-      DEBUG_PRINT("Cycle %d\n",cycle);
+      //DEBUG_PRINT("Cycle %d\n",cycle);
       if (local_cycle) {
         runcycles(1);
       } else {

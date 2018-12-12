@@ -4,7 +4,7 @@
 <component name="HLRosIface" kind="passive" namespace="HLProc" modeler="true">
 
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdatePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdateNoCovPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
@@ -47,7 +47,7 @@
         <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdate"  kind="output"  max_number="1">
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">
         </port>
 
         <port name="ActuatorsData" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="2">

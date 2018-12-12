@@ -150,8 +150,11 @@ namespace LLProc {
       enum TransState {
           TRAN_WAITING, //!< waiting for the beginning of a transaction
           TRAN_SIZE, //!< waiting for size of transaction
+          TRAN_SIZE2, //!< waiting for 2nd byte of size of transaction
           TRAN_PROCESSING //!< processing a transaction
       } m_transState;
+
+      U8 m_tempSize;
 
       NATIVE_UINT_TYPE m_tranLeft; //!< number of bytes left in transaction
       NATIVE_UINT_TYPE m_buffOffset; //!< location in current receive buffer
@@ -177,6 +180,7 @@ namespace LLProc {
       U32 m_numBadSerialPortCalls;  //<! number of bad Serial port calls, ie bad serialize status returned
       U32 m_numOutputBufferOverflows; //<! number of output buffer overflows
       U32 m_numZeroPktSize; //<! number of packets with zero size
+      U32 m_numTooBigPktSize; //<! number of packets with greater than max size
       U32 m_maxSerialSendSize; //<! max size of serial packet sent
 
     };
