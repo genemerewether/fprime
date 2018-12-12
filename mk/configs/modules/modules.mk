@@ -348,7 +348,8 @@ HEXREF_MODULES := \
 	$(COMMON_MODULES) \
 	\
 	LLProc/ShortLogQueue \
-	LLProc/LLCmdDispatcher
+	LLProc/LLCmdDispatcher \
+	LLProc/LLTlmChan
 #Svc/ComLogger
 
 TESTRPC_MODULES := \

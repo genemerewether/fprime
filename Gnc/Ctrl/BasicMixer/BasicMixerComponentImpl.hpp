@@ -97,6 +97,8 @@ namespace Gnc {
 
       bool paramsInited;
 
+      F64 angVelTlm[6];
+
     };
 
 } // end namespace Gnc

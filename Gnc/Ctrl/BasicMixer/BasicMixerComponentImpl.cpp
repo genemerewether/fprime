@@ -40,7 +40,8 @@ namespace Gnc {
       BasicMixerImpl(void),
 #endif
       basicMixer(),
-      paramsInited(false)
+      paramsInited(false),
+      angVelTlm()
   {
 
   }
@@ -156,15 +157,12 @@ namespace Gnc {
       this->basicMixer.GetRotorVelCommand(&rotorVel);
 
       F64 angVel[6], angles[0], normalized[0];
-      for (int i = 0; i < 6; i ++) {
+      for (U32 i = 0; i < 6; i ++) {
 	  angVel[i] = rotorVel(i);
+          if (i < FW_NUM_ARRAY_ELEMENTS(angVelTlm)) {
+              angVelTlm[i] = rotorVel(i);
+          }
       }
-      this->tlmWrite_BMIX_Rot0(angVel[0]);
-      this->tlmWrite_BMIX_Rot1(angVel[1]);
-      this->tlmWrite_BMIX_Rot2(angVel[2]);
-      this->tlmWrite_BMIX_Rot3(angVel[3]);
-      this->tlmWrite_BMIX_Rot4(angVel[4]);
-      this->tlmWrite_BMIX_Rot5(angVel[5]);
 
       ROS::std_msgs::Header h = TorqueThrust.getheader();
       ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, 0, angVel, 6, 6, normalized, 0, 0);
@@ -179,7 +177,12 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-    // NOTE(mgardine) - Output port now called in controls_handler
+      this->tlmWrite_BMIX_Rot0(angVelTlm[0]);
+      this->tlmWrite_BMIX_Rot1(angVelTlm[1]);
+      this->tlmWrite_BMIX_Rot2(angVelTlm[2]);
+      this->tlmWrite_BMIX_Rot3(angVelTlm[3]);
+      this->tlmWrite_BMIX_Rot4(angVelTlm[4]);
+      this->tlmWrite_BMIX_Rot5(angVelTlm[5]);
   }
 
   // ----------------------------------------------------------------------

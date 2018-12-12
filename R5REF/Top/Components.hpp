@@ -27,10 +27,12 @@ void exitTasks();
 #include <LLProc/LLCycle/LLCycleComponentImpl.hpp>
 #include <LLProc/HLRouter/HLRouterComponentImpl.hpp>
 #include <LLProc/LLCmdDispatcher/LLCmdDispatcherComponentImpl.hpp>
+#include <LLProc/LLTlmChan/LLTlmChanImpl.hpp>
 
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
+extern Svc::PassiveRateGroupImpl* rgTlm_ptr;
 
 extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
 extern Gnc::BasicMixerComponentImpl* mixer_ptr;
@@ -54,5 +56,6 @@ extern LLProc::LLDebugComponentImpl* llDebug_ptr;
 extern LLProc::LLCycleComponentImpl* llCycle_ptr;
 extern LLProc::HLRouterComponentImpl* hlRouter_ptr;
 extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
+extern LLProc::LLTlmChanImpl* tlmChan_ptr;
 
 #endif
