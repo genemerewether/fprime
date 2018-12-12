@@ -8,13 +8,13 @@
 	<import_component_type>Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>SnapdragonFlight/KraitRouter/KraitRouterComponentAi.xml</import_component_type>
+	<import_component_type>LLProc/ShortLogQueue/ShortLogQueueComponentAi.xml</import_component_type>
 	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxPwmDriver/LinuxPwmDriverComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
 	<import_component_type>Svc/RateGroupDecoupler/RateGroupDecouplerComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxI2CDriver/LinuxI2CDriverComponentAi.xml</import_component_type>
+	<import_component_type>LLProc/LLCmdDispatcher/LLCmdDispatcherComponentAi.xml</import_component_type>
 	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/BasicMixer/BasicMixerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
@@ -36,19 +36,19 @@
 
    <instance namespace="SnapdragonFlight" name="kraitRouter" type="KraitRouter"/>
 
+   <instance namespace="LLProc" name="logQueue" type="ShortLogQueue"/>
+
    <instance namespace="Svc" name="rgGncDrv" type="RateGroupDriver" base_id="461"  base_id_window="20" />
 
    <instance namespace="Drv" name="escPwm" type="LinuxPwmDriver"/>
-
-   <instance namespace="Svc" name="eventLogger" type="ActiveLogger" base_id="421"  base_id_window="20" />
 
    <instance namespace="Svc" name="linuxTime" type="Time" base_id="441"  base_id_window="20" />
 
    <instance namespace="Svc" name="rgDecouple" type="RateGroupDecoupler"/>
 
-   <instance namespace="Svc" name="rg" type="ActiveRateGroup" base_id="21"  base_id_window="20" />
-
    <instance namespace="Drv" name="i2cDrv" type="LinuxI2CDriver"/>
+
+   <instance namespace="LLProc" name="cmdDisp" type="LLCmdDispatcher"/>
 
    <instance namespace="Drv" name="mpu9250" type="MPU9250"/>
 
@@ -64,112 +64,112 @@
 
 
 <connection name = "Connection1">
-	 <source component = "eventLogger" port = "FatalAnnounce" type = "FatalEvent" num = "0"/>
- 	 <target component = "fatalHandler" port = "FatalReceive" type = "FatalEvent" num = "0"/>
+	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection2">
-	 <source component = "eventLogger" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "mixer" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection3">
+	 <source component = "imuDRInt" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection4">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "1"/>
 </connection>
-<connection name = "Connection4">
-	 <source component = "eventLogger" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
 <connection name = "Connection5">
-	 <source component = "imuDRInt" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection6">
 	 <source component = "escPwm" port = "logText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection7">
-	 <source component = "rg" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+<connection name = "Connection6">
+	 <source component = "escPwm" port = "log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection8">
-	 <source component = "rg" port = "Time" type = "Time" num = "0"/>
+<connection name = "Connection7">
+	 <source component = "imuDRInt" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection9">
+<connection name = "Connection8">
 	 <source component = "spiDrv" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection9">
+	 <source component = "actuatorAdapter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection10">
 	 <source component = "actuatorAdapter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection11">
-	 <source component = "actuatorAdapter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+	 <source component = "cmdDisp" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection12">
-	 <source component = "actuatorAdapter" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "fatalHandler" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection13">
-	 <source component = "imuDRInt" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection14">
 	 <source component = "fatalAdapter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection15">
+<connection name = "Connection14">
 	 <source component = "kraitRouter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection16">
+<connection name = "Connection15">
 	 <source component = "rgDecouple" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgGncDrv" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection17">
+<connection name = "Connection16">
 	 <source component = "spiDrv" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection18">
+<connection name = "Connection17">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection19">
-	 <source component = "spiDrv" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection20">
+<connection name = "Connection18">
 	 <source component = "actuatorAdapter" port = "escReadWrite" type = "I2CReadWrite" num = "0"/>
  	 <target component = "i2cDrv" port = "I2CReadWrite" type = "I2CReadWrite" num = "0"/>
 </connection>
-<connection name = "Connection21">
+<connection name = "Connection19">
 	 <source component = "mpu9250" port = "SpiConfig" type = "SpiConfig" num = "0"/>
  	 <target component = "spiDrv" port = "SpiConfig" type = "SpiConfig" num = "0"/>
 </connection>
-<connection name = "Connection22">
+<connection name = "Connection20">
 	 <source component = "mixer" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection23">
-	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+<connection name = "Connection21">
+	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
+ 	 <target component = "logQueue" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection24">
+<connection name = "Connection22">
+	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection23">
 	 <source component = "mpu9250" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection25">
+<connection name = "Connection24">
 	 <source component = "mixer" port = "motor" type = "Actuators" num = "0"/>
  	 <target component = "actuatorAdapter" port = "motor" type = "Actuators" num = "0"/>
 </connection>
-<connection name = "Connection26">
+<connection name = "Connection25">
 	 <source component = "i2cDrv" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
+<connection name = "Connection26">
+	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
 <connection name = "Connection27">
-	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection28">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
@@ -180,16 +180,16 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection30">
-	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "cmdDisp" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection31">
-	 <source component = "mixer" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection32">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "1"/>
+</connection>
+<connection name = "Connection32">
+	 <source component = "mixer" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection33">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
@@ -208,16 +208,16 @@
  	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection37">
-	 <source component = "mixer" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection38">
 	 <source component = "actuatorAdapter" port = "pwmSetDuty" type = "PwmSetDutyCycle" num = "0"/>
  	 <target component = "escPwm" port = "pwmSetDuty" type = "PwmSetDutyCycle" num = "0"/>
 </connection>
-<connection name = "Connection39">
+<connection name = "Connection38">
 	 <source component = "kraitRouter" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection39">
+	 <source component = "cmdDisp" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection40">
 	 <source component = "i2cDrv" port = "Time" type = "Time" num = "0"/>
@@ -228,83 +228,127 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection42">
-	 <source component = "i2cDrv" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection43">
 	 <source component = "mpu9250" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection44">
+<connection name = "Connection43">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection45">
+<connection name = "Connection44">
 	 <source component = "imuDRInt" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection46">
-	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection47">
-	 <source component = "kraitRouter" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection48">
+<connection name = "Connection45">
 	 <source component = "imuInteg" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection49">
-	 <source component = "mpu9250" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
- 	 <target component = "spiDrv" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
-</connection>
-<connection name = "Connection50">
-	 <source component = "imuInteg" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection51">
+<connection name = "Connection46">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "imuInteg" port = "sched" type = "Sched" num = "1"/>
 </connection>
-<connection name = "Connection52">
-	 <source component = "imuInteg" port = "odometry" type = "Odometry" num = "0"/>
- 	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
+<connection name = "Connection47">
+	 <source component = "mpu9250" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
+ 	 <target component = "spiDrv" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
 </connection>
-<connection name = "Connection53">
+<connection name = "Connection48">
 	 <source component = "leeCtrl" port = "controls" type = "TorqueThrust" num = "0"/>
  	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
 </connection>
-<connection name = "Connection54">
+<connection name = "Connection49">
+	 <source component = "imuInteg" port = "odometry" type = "Odometry" num = "0"/>
+ 	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
+</connection>
+<connection name = "Connection50">
 	 <source component = "escPwm" port = "time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection55">
+<connection name = "Connection51">
 	 <source component = "imuInteg" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection56">
+<connection name = "Connection52">
+	 <source component = "mixer" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection53">
+	 <source component = "actuatorAdapter" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection54">
 	 <source component = "mpu9250" port = "Imu" type = "ImuNoCov" num = "0"/>
  	 <target component = "imuInteg" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
-<connection name = "Connection57">
+<connection name = "Connection55">
 	 <source component = "imuDRInt" port = "intOut" type = "Cycle" num = "0"/>
  	 <target component = "rgDecouple" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
+<connection name = "Connection56">
+	 <source component = "i2cDrv" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection57">
+	 <source component = "imuInteg" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
 <connection name = "Connection58">
-	 <source component = "rg" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+	 <source component = "leeCtrl" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection59">
-	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "2"/>
- 	 <target component = "rg" port = "CycleIn" type = "Cycle" num = "0"/>
+	 <source component = "kraitRouter" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection60">
+	 <source component = "imuInteg" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection61">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection61">
-	 <source component = "escPwm" port = "log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+<connection name = "Connection62">
+	 <source component = "spiDrv" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection63">
+	 <source component = "mixer" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "0"/>
+</connection>
+<connection name = "Connection64">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "0"/>
+ 	 <target component = "mixer" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection65">
+	 <source component = "fatalHandler" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "1"/>
+</connection>
+<connection name = "Connection66">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "1"/>
+ 	 <target component = "fatalHandler" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection67">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "2"/>
+ 	 <target component = "leeCtrl" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection68">
+	 <source component = "leeCtrl" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "2"/>
+</connection>
+<connection name = "Connection69">
+	 <source component = "cmdDisp" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "3"/>
+</connection>
+<connection name = "Connection70">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "3"/>
+ 	 <target component = "cmdDisp" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection71">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "4"/>
+ 	 <target component = "imuInteg" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection72">
+	 <source component = "imuInteg" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "4"/>
 </connection>
 </assembly>

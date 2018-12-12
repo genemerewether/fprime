@@ -1,14 +1,13 @@
 <serializable name="ImuStateUpdate" namespace="ROS::mav_msgs">
   <members>
     <member name="header" type="ROS::std_msgs::Header"/>
-    <member name="child_frame_id" type="Fw::EightyCharString"/>
+    <member name="child_frame_id" type="U32"/>
     <member name="pose" type="ROS::geometry_msgs::PoseWithCovariance"/>
     <member name="twist" type="ROS::geometry_msgs::TwistWithCovariance"/>
     <member name="angular_velocity_bias" type="ROS::geometry_msgs::Vector3"/>
     <member name="linear_acceleration_bias" type="ROS::geometry_msgs::Vector3"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
-  <include_header>Fw/Types/EightyCharString.hpp</include_header>
   <import_serializable_type>ROS/Gen/geometry_msgs/Types/PoseWithCovarianceSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/geometry_msgs/Types/TwistWithCovarianceSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>

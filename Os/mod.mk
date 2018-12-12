@@ -97,7 +97,7 @@ SRC_DSPAL =  Pthreads/Queue.cpp \
 	 	Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
-				Dspal/File.cpp \
+				Dspal/FileStub.cpp \
 				Dspal/Task.cpp \
 				LogPrintf.cpp \
 				Linux/InterruptLock.cpp \
@@ -109,7 +109,8 @@ SRC_DSPAL =  Pthreads/Queue.cpp \
 				Dspal/FileSystem.cpp
 
 SRC_TIR5 =	TIR5/IntervalTimer.cpp \
-		LogPrintf.cpp
+		LogPrintf.cpp \
+		MutexStub.cpp
 
 SUBDIRS = test
 

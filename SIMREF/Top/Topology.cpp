@@ -104,6 +104,12 @@ Svc::ActiveLoggerImpl eventLogger
 #endif
 ;
 
+Svc::ActiveFileLoggerImpl fileLogger
+#if FW_OBJECT_NAMES == 1
+                    ("FLOG")
+#endif
+;
+
 Svc::LinuxTimeImpl linuxTime
 #if FW_OBJECT_NAMES == 1
                     ("LTIME")
@@ -224,6 +230,7 @@ void constructApp(int port_number, char* hostname) {
 #endif
 
     eventLogger.init(10,0);
+    fileLogger.init(10);
 
     rosCycle.init(0);
 
@@ -248,19 +255,24 @@ void constructApp(int port_number, char* hostname) {
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
 
-    // Manual connections
-    rotorSDrv.set_flatOutput_OutputPort(0, leeCtrl.get_flatOutput_InputPort(0));
-    rotorSDrv.set_attRateThrust_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
-
     /* Register commands */
     cmdSeq.regCommands();
     cmdDisp.regCommands();
     eventLogger.regCommands();
+    fileLogger.regCommands();
     prmDb.regCommands();
     fatalHandler.regCommands();
 
+    leeCtrl.regCommands();
+    imuInteg.regCommands();
+    mixer.regCommands();
+
+    // initialize file logs
+    fileLogger.initLog("./log/");
+    
     // read parameters
     prmDb.readParamFile();
+    leeCtrl.loadParameters();
 
     // Active component startup
     // start rate groups
@@ -275,6 +287,8 @@ void constructApp(int port_number, char* hostname) {
     chanTlm.start(0,60,20*1024);
     prmDb.start(0,50,20*1024);
 
+    fileLogger.start(0,50,20*1024);
+    
     // Initialize socket server
     sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
 
@@ -311,6 +325,7 @@ void exitTasks(void) {
     rgDecouple.exit();
     cmdDisp.exit();
     eventLogger.exit();
+    fileLogger.exit();
     chanTlm.exit();
     prmDb.exit();
     cmdSeq.exit();

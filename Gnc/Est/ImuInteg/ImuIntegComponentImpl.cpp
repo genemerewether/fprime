@@ -54,7 +54,8 @@ namespace Gnc {
       x_w(0.0f, 0.0f, 0.0f),
       w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
       v_b(0.0f, 0.0f, 0.0f),
-      imuInteg()
+      imuInteg(),
+      paramsInited(false)
   {
       quest_gnc::WorldParams wParams = {9.80665f, 1.2f};
       (void) imuInteg.SetWorldParams(wParams);
@@ -74,11 +75,27 @@ namespace Gnc {
   {
 
   }
-
+  
+  void ImuIntegComponentImpl ::
+    parameterUpdated(FwPrmIdType id)
+  {
+    printf("prm %d updated\n", id);
+  }
+  
+  void ImuIntegComponentImpl ::
+    parametersLoaded()
+  {
+      Fw::ParamValid valid[1];
+      imuInteg.SetTimeStep(paramGet_dt(valid[0]));
+      if (Fw::PARAM_VALID != valid[0]) {  return;  }
+      
+      paramsInited = true;
+  }
+      
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
-
+  
   void ImuIntegComponentImpl ::
     Imu_handler(
         const NATIVE_INT_TYPE portNum,
@@ -150,6 +167,8 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
+      //TODO(mereweth) - report uninitialized status if params not good
+    
       if ((context == IMUINTEG_SCHED_CONTEXT_POS) ||
           (context == IMUINTEG_SCHED_CONTEXT_ATT)) {
           using namespace ROS::geometry_msgs;
@@ -163,8 +182,9 @@ namespace Gnc {
                                   &v_b,
                                   &omega_b);
 
-          ROS::std_msgs::Header h(this->seq, this->getTime(), "odom");
-          ROS::nav_msgs::Odometry odom(h, "body",
+          // TODO(mereweth) - convert frame name to U32 idx
+          ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"odom"*/);
+          ROS::nav_msgs::Odometry odom(h, 0/*"body"*/,
               PoseWithCovariance(Pose(Point(x_w(0), x_w(1), x_w(2)),
                                       Quaternion(w_q_b.x(), w_q_b.y(),
                                                  w_q_b.z(), w_q_b.w())),
@@ -178,7 +198,7 @@ namespace Gnc {
           }
 
           if (context == IMUINTEG_SCHED_CONTEXT_POS) {
-              ROS::nav_msgs::OdometryNoCov odomNoCov(h, "body",
+              ROS::nav_msgs::OdometryNoCov odomNoCov(h, 0/*"body"*/,
                                      Pose(Point(x_w(0), x_w(1), x_w(2)),
                                           Quaternion(w_q_b.x(), w_q_b.y(),
                                                      w_q_b.z(), w_q_b.w())),
@@ -195,6 +215,25 @@ namespace Gnc {
       }
       else {
           // TODO(mereweth) - assert invalid context
+      }
+  }
+
+  // ----------------------------------------------------------------------
+  // Command handler implementations 
+  // ----------------------------------------------------------------------
+
+  void ImuIntegComponentImpl ::
+    IMUINTEG_InitParams_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      this->parametersLoaded();
+      if (this->paramsInited) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
       }
   }
 

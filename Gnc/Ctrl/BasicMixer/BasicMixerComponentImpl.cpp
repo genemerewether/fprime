@@ -39,19 +39,9 @@ namespace Gnc {
     BasicMixerImpl(void) :
       BasicMixerImpl(void),
 #endif
-      basicMixer()
+      basicMixer(),
+      paramsInited(false)
   {
-
-    //NOTE(mgardie) - is there a better way of doing this? Use same mrModel as leeControl?
-    Eigen::MatrixXd mixer;
-    mixer.resize(4, 6);
-    mixer <<
-     9.18972e-07,  1.83794e-06,  9.18972e-07, -9.18972e-07, -1.83794e-06, -9.18972e-07,
-    -1.59171e-06, -8.99966e-18,  1.59171e-06,  1.59171e-06, -8.99966e-18, -1.59171e-06,
-    -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07, -1.36777e-07,  1.36777e-07,
-     8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06,  8.54858e-06;
-
-     (void) basicMixer.SetMixer(mixer);
 
   }
 
@@ -68,17 +58,87 @@ namespace Gnc {
   {
 
   }
+  
+  void BasicMixerComponentImpl ::
+    parameterUpdated(FwPrmIdType id)
+  {
+    printf("prm %d updated\n", id);
+  }
+  
+  void BasicMixerComponentImpl ::
+    parametersLoaded()
+  {
+      Fw::ParamValid valid[4];
+      Eigen::MatrixXd mixer;
+      mixer.resize(4, paramGet_numRotors(valid[0]));
+      if (Fw::PARAM_VALID != valid[0]) {  return;  }
+    
+      for (U32 i = 0; i < mixer.cols(); i++) {
+          switch (i) {
+              case 0:
+                  mixer.col(i) << paramGet_m_x__1(valid[0]),
+                                  paramGet_m_y__1(valid[1]),
+                                  paramGet_m_z__1(valid[2]),
+                                  paramGet_t__1(valid[3]);
+                  break;
+              case 1:
+                  mixer.col(i) << paramGet_m_x__2(valid[0]),
+                                  paramGet_m_y__2(valid[1]),
+                                  paramGet_m_z__2(valid[2]),
+                                  paramGet_t__2(valid[3]);
+                  break;
+              case 2:
+                  mixer.col(i) << paramGet_m_x__3(valid[0]),
+                                  paramGet_m_y__3(valid[1]),
+                                  paramGet_m_z__3(valid[2]),
+                                  paramGet_t__3(valid[3]);
+                  break;
+              case 3:
+                  mixer.col(i) << paramGet_m_x__4(valid[0]),
+                                  paramGet_m_y__4(valid[1]),
+                                  paramGet_m_z__4(valid[2]),
+                                  paramGet_t__4(valid[3]);
+                  break;
+              case 4:
+                  mixer.col(i) << paramGet_m_x__5(valid[0]),
+                                  paramGet_m_y__5(valid[1]),
+                                  paramGet_m_z__5(valid[2]),
+                                  paramGet_t__5(valid[3]);
+                  break;
+              case 5:
+                  mixer.col(i) << paramGet_m_x__6(valid[0]),
+                                  paramGet_m_y__6(valid[1]),
+                                  paramGet_m_z__6(valid[2]),
+                                  paramGet_t__6(valid[3]);
+                  break;
+              default:
+                  FW_ASSERT(0, i);
+          }
+
+          for (U32 j = 0; j < 4; j++) {
+              if (Fw::PARAM_VALID != valid[j]) {  return;  }
+          }
+      }
+      
+      (void) basicMixer.SetMixer(mixer);
+
+      paramsInited = true;
+  }
 
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
-
+  
   void BasicMixerComponentImpl ::
     controls_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::mav_msgs::TorqueThrust &TorqueThrust
     )
   {
+      if (!paramsInited) {
+          return;
+      }
+    
       using ROS::geometry_msgs::Vector3;
 
       Vector3 moment_b = TorqueThrust.gettorque();
@@ -122,4 +182,24 @@ namespace Gnc {
     // NOTE(mgardine) - Output port now called in controls_handler
   }
 
+  // ----------------------------------------------------------------------
+  // Command handler implementations 
+  // ----------------------------------------------------------------------
+
+  void BasicMixerComponentImpl ::
+    BMIX_InitParams_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      this->parametersLoaded();
+      if (this->paramsInited) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+      }
+  }
+
+  
 } // end namespace Gnc

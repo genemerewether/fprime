@@ -12,8 +12,12 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
 
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/WrenchSerializableAi.xml</import_serializable_type>
+
     <import_dictionary>Gnc/Ctrl/BasicMixer/Telemetry.xml</import_dictionary>
     <import_dictionary>Gnc/Ctrl/BasicMixer/Events.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/BasicMixer/Commands.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/BasicMixer/Params.xml</import_dictionary>
 
     <ports>
         <port name="controls" data_type="ROS::mav_msgs::TorqueThrust"  kind="sync_input" max_number="1">

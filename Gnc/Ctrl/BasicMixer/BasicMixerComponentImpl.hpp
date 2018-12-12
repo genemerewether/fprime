@@ -55,7 +55,12 @@ namespace Gnc {
       //!
       ~BasicMixerComponentImpl(void);
 
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -75,7 +80,22 @@ namespace Gnc {
           NATIVE_UINT_TYPE context /*!< The call order*/
       );
 
+    PRIVATE:
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations 
+      // ----------------------------------------------------------------------
+
+      //! Implementation for BMIX_InitParams command handler
+      //! 
+      void BMIX_InitParams_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
+
       quest_gnc::multirotor::BasicMixer basicMixer;
+
+      bool paramsInited;
 
     };
 

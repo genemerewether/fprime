@@ -4,7 +4,7 @@
 
 You'll need the submodules and dependencies, so clone like so:
 ```
-git clone --recurse-submodules https://github.com/genemerewether/quest-fw
+git clone --recurse-submodules REPO_ADDRESS
 ```
 
 Or, after cloning, run:
@@ -33,7 +33,7 @@ catkin build
 ## Using without ROS
 From the top directory of the repo, run:
 ```
-ROS/fprime_ws/src/fprime/mod.mk
+touch ROS/fprime_ws/src/fprime/mod.mk
 ```
 
 ## `SDREF`: High-level processor deployment

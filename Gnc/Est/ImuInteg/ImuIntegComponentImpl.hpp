@@ -58,12 +58,17 @@ namespace Gnc {
       //!
       ~ImuIntegComponentImpl(void);
 
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
-
+    
       //! Handler implementation for Imu
       //!
       void Imu_handler(
@@ -83,6 +88,19 @@ namespace Gnc {
       void sched_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
+      );
+
+    PRIVATE:
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations 
+      // ----------------------------------------------------------------------
+
+      //! Implementation for IMUINTEG_InitParams command handler
+      //! 
+      void IMUINTEG_InitParams_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
       );
 
       U32 seq;
@@ -105,6 +123,8 @@ namespace Gnc {
       ROS::geometry_msgs::Vector3 v_b;
 
       quest_gnc::estimation::ImuInteg imuInteg;
+
+      bool paramsInited;
 
     };
 

@@ -9,8 +9,17 @@
 #define LLROUTER_LLROUTERCOMPONENTIMPLCFG_HPP_
 
 enum {
-    SERIAL_BUFFER_SIZE = 400, // 400 bytes, twice what we can send
+    SERIAL_BUFFER_SIZE = 1000,
     SERIAL_RECEIVE_BUFFER_POOL_SIZE = 10 // allows slip of 10 cycles
 };
+
+namespace HLProc {
+
+enum {
+    LLRTR_SCHED_TLM,
+    LLRTR_SCHED_CYCLE_SERIAL
+};
+
+}
 
 #endif /* LLROUTER_LLROUTERCOMPONENTIMPLCFG_HPP_ */

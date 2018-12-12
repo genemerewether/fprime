@@ -6,7 +6,7 @@ void exitTasks(void);
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 #include <Svc/SerialTextConverter/SerialTextConverterImpl.hpp>
-
+#include <Svc/ActiveFileLogger/ActiveFileLoggerImpl.hpp>
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
@@ -24,6 +24,7 @@ void exitTasks(void);
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
 #include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 
 #include <SDREF/Top/TargetInit.hpp>
@@ -38,14 +39,19 @@ extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
 extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
 extern HLProc::LLRouterComponentImpl* llRouter_ptr;
+extern HLProc::EventExpanderComponentImpl* eventExp_ptr;
 
 extern Svc::RateGroupDriverImpl* rgDrv_ptr;
 extern Svc::ActiveRateGroupImpl* rgTlm_ptr;
 extern Svc::ActiveRateGroupImpl* rgXfer_ptr;
 extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
+extern Svc::CmdSequencerComponentImpl* cmdSeqLL_ptr;
 extern Svc::SocketGndIfImpl* sockGndIf_ptr;
+extern Svc::SocketGndIfImpl* sockGndIfLL_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
+extern Svc::ActiveLoggerImpl* eventLoggerLL_ptr;
+extern Svc::ActiveFileLoggerImpl* fileLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;
 extern Svc::CommandDispatcherImpl* cmdDisp_ptr;

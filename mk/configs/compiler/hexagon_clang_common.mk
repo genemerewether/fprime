@@ -2,8 +2,9 @@ HEX_CLANG_COMMON := -Wall -Wextra \
                -fno-builtin -fno-asm \
                \
                -Wno-unused-parameter \
-               -Wno-long-long -v
-               
+               -Wno-long-long -v \
+	       -fno-short-enums
+
 DEPEND_FILE := -MMD -MP -MF
 
 HEX_CLANG_CFLAGS_COMMON := $(HEX_CLANG_COMMON) -std=c99 \
@@ -11,7 +12,7 @@ HEX_CLANG_CFLAGS_COMMON := $(HEX_CLANG_COMMON) -std=c99 \
 				-Werror-implicit-function-declaration \
 				-Wstrict-prototypes
 
-HEX_CLANG_CXXFLAGS_COMMON := $(HEX_CLANG_COMMON)
+HEX_CLANG_CXXFLAGS_COMMON := $(HEX_CLANG_COMMON) -fno-exceptions
 
 # Special compiler flags to get around known AC warnings
 

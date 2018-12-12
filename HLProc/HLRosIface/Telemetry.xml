@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="HLROSIFACE_Dummy" data_type="U32">
+        <comment>
+            HLROSIFACE dummy channel
+        </comment>
+    </channel>
+</telemetry>

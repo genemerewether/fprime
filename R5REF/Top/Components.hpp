@@ -26,6 +26,7 @@ void exitTasks();
 #include <LLProc/LLDebug/LLDebugComponentImpl.hpp>
 #include <LLProc/LLCycle/LLCycleComponentImpl.hpp>
 #include <LLProc/HLRouter/HLRouterComponentImpl.hpp>
+#include <LLProc/LLCmdDispatcher/LLCmdDispatcherComponentImpl.hpp>
 
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
@@ -52,5 +53,6 @@ extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLDebugComponentImpl* llDebug_ptr;
 extern LLProc::LLCycleComponentImpl* llCycle_ptr;
 extern LLProc::HLRouterComponentImpl* hlRouter_ptr;
+extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
 
 #endif
