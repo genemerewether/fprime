@@ -79,7 +79,9 @@ namespace Gnc {
   void ImuIntegComponentImpl ::
     parameterUpdated(FwPrmIdType id)
   {
+#ifndef BUILD_TIR5
     printf("prm %d updated\n", id);
+#endif
   }
   
   void ImuIntegComponentImpl ::
