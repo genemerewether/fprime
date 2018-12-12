@@ -417,8 +417,6 @@ void exitTasks(void) {
     imuDRInt_ptr->exitThread();
 #endif
     kraitRouter_ptr->exit();
-
-    assert(0);
 }
 
 volatile bool terminate = false;
