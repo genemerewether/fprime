@@ -42,6 +42,7 @@ touch ROS/fprime_ws/src/fprime/mod.mk
 - Interfaces with ROS and F' ground station
 - On Snapdragon Flight, loads `HEXREF` onto DSP and interfaces with that code
 - On any Linux environment, interfaces to low-level processor over two UARTS (one data and one debug)
+- Works out of the box with https://github.com/genemerewether/ethzasl_sensor_fusion for testing high-level filter updates
 
 ## `R5REF`: TI TMS570 deployment
 
