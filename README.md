@@ -42,7 +42,6 @@ touch ROS/fprime_ws/src/fprime/mod.mk
 - Interfaces with ROS and F' ground station
 - On Snapdragon Flight, loads `HEXREF` onto DSP and interfaces with that code
 - On any Linux environment, interfaces to low-level processor over two UARTS (one data and one debug)
-- Works out of the box with https://github.com/genemerewether/ethzasl_sensor_fusion for testing high-level filter updates
 
 ## `R5REF`: TI TMS570 deployment
 
@@ -62,6 +61,8 @@ ROS_NAMESPACE=firefly ./linux-linux-x86-debug-gnu-bin/SIMREF
 ```
 
 When you start the RotorS (https://github.com/ethz-asl/rotors_simulator) firefly example, SIMREF will use the /clock message to carry out control cycles. This parallels what happens on hardware targets, where the IMU data-ready interrupt triggers the estimation and control loops.
+
+Works out of the box with https://github.com/genemerewether/ethzasl_sensor_fusion for testing high-level filter updates, but can be easily adapted to simulated sensors in Gazebo. Just run additional ROS nodes as necessary, and remap the pose or position sensor topics of the sensor fusion packages. Or, publish the `mav_msgs/ImuStateUpdate` message (see the `mav_msgs` submodule of this repo) from an appropriate filter.
 
 # fprime
 
