@@ -62,6 +62,8 @@ ROS_NAMESPACE=firefly ./linux-linux-x86-debug-gnu-bin/SIMREF
 
 When you start the RotorS (https://github.com/ethz-asl/rotors_simulator) firefly example, SIMREF will use the /clock message to carry out control cycles. This parallels what happens on hardware targets, where the IMU data-ready interrupt triggers the estimation and control loops.
 
+Works out of the box with https://github.com/genemerewether/ethzasl_sensor_fusion for testing high-level filter updates, but can be easily adapted to simulated sensors in Gazebo. Just run additional ROS nodes as necessary, and remap the pose or position sensor topics of the sensor fusion packages. Or, publish the `mav_msgs/ImuStateUpdate` message (see the `mav_msgs` submodule of this repo) from an appropriate filter.
+
 # fprime
 
 F' Release Notes
