@@ -16,6 +16,7 @@
 
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Telemetry.xml</import_dictionary>
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Events.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Commands.xml</import_dictionary>
 
     <ports>
 
@@ -29,6 +30,9 @@
         </port>
 
         <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="2">
+        </port>
+
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>
 
         <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

@@ -21,6 +21,7 @@
 #define BasicMixer_HPP
 
 #include "Gnc/Ctrl/BasicMixer/BasicMixerComponentAc.hpp"
+#include "Gnc/Ctrl/BasicMixer/BasicMixerComponentImplCfg.hpp"
 #include "quest_gnc/mixer/basic_mixer.h"
 
 namespace Gnc {
@@ -59,7 +60,7 @@ namespace Gnc {
 
     PRIVATE:
       void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
-    
+
       void parametersLoaded();
 
       // ----------------------------------------------------------------------
@@ -83,11 +84,11 @@ namespace Gnc {
     PRIVATE:
 
       // ----------------------------------------------------------------------
-      // Command handler implementations 
+      // Command handler implementations
       // ----------------------------------------------------------------------
 
       //! Implementation for BMIX_InitParams command handler
-      //! 
+      //!
       void BMIX_InitParams_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq /*!< The command sequence number*/
@@ -97,7 +98,9 @@ namespace Gnc {
 
       bool paramsInited;
 
-      F64 angVelTlm[6];
+      U32 numRotors;
+
+      F64 angVelTlm[BM_MAX_ACTUATORS];
 
     };
 

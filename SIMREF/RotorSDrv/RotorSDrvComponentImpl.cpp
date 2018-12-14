@@ -145,11 +145,11 @@ namespace SIMREF {
             this->FileLogger_out(0,fileBuff);
         }
 
-        
+
         if (NULL == m_rgNH) {
             return;
         }
-        
+
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
@@ -184,7 +184,7 @@ namespace SIMREF {
 
         m_odomPub[portNum].publish(msg);
     }
-  
+
     void RotorSDrvComponentImpl ::
       motor_handler(
           const NATIVE_INT_TYPE portNum,
@@ -194,11 +194,11 @@ namespace SIMREF {
         if (NULL == m_rgNH) {
             return;
         }
-        
+
         mav_msgs::Actuators msg;
         int size = 0;
         const F64 *angVel = actuator.getangular_velocities(size);
-	size = 6;
+        size = FW_MIN(size, actuator.getangular_velocities_count());
         msg.angular_velocities.resize(size);
         for (int i = 0; i < size; i++) {
             msg.angular_velocities[i] = angVel[i];
@@ -229,7 +229,7 @@ namespace SIMREF {
                 // TODO(mereweth) - notify that no new imu received?
                 m_imuSet[i].mutex.unLock();
             }
-            
+
             for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
                 m_imuStateUpdateSet[i].mutex.lock();
                 if (m_imuStateUpdateSet[i].fresh) {
@@ -429,7 +429,7 @@ namespace SIMREF {
             this->compPtr->m_imuSet[this->portNum].mutex.unLock();
         }
     }
-  
+
     RotorSDrvComponentImpl :: OdometryHandler ::
       OdometryHandler(RotorSDrvComponentImpl* compPtr,
                       int portNum) :
