@@ -100,11 +100,12 @@ namespace Gnc {
           return;
       }
 
-      NATIVE_INT_TYPE angVelSize = FW_MIN(4, AA_MAX_ACTUATORS);
+      U32 angVelCount = FW_MIN(Actuators.getangular_velocities_count(),
+                               AA_MAX_ACTUATORS);
+      NATIVE_INT_TYPE angVelSize = 0;
       const F64* angVels = Actuators.getangular_velocities(angVelSize);
 
-      // TODO(mereweth) - add size arg to Actuators message fields
-      for (U32 i = 0; i < FW_MIN(4, AA_MAX_ACTUATORS); i++) {
+      for (U32 i = 0; i < FW_MIN(angVelCount, angVelSize); i++) {
           switch (this->outputInfo[i].type) {
               case OUTPUT_UNSET:
               {

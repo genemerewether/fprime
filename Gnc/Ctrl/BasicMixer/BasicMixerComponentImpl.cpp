@@ -41,6 +41,7 @@ namespace Gnc {
 #endif
       basicMixer(),
       paramsInited(false),
+      numRotors(0u),
       angVelTlm()
   {
 
@@ -59,7 +60,7 @@ namespace Gnc {
   {
 
   }
-  
+
   void BasicMixerComponentImpl ::
     parameterUpdated(FwPrmIdType id)
   {
@@ -67,15 +68,17 @@ namespace Gnc {
     printf("prm %d updated\n", id);
 #endif
   }
-  
+
   void BasicMixerComponentImpl ::
     parametersLoaded()
   {
       Fw::ParamValid valid[4];
-      Eigen::MatrixXd mixer;
-      mixer.resize(4, paramGet_numRotors(valid[0]));
+      this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-    
+      if (this->numRotors >= BM_MAX_ACTUATORS) {  return;  }
+      Eigen::MatrixXd mixer;
+      mixer.resize(4, this->numRotors);
+
       for (U32 i = 0; i < mixer.cols(); i++) {
           switch (i) {
               case 0:
@@ -122,7 +125,7 @@ namespace Gnc {
               if (Fw::PARAM_VALID != valid[j]) {  return;  }
           }
       }
-      
+
       (void) basicMixer.SetMixer(mixer);
 
       paramsInited = true;
@@ -131,7 +134,7 @@ namespace Gnc {
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
-  
+
   void BasicMixerComponentImpl ::
     controls_handler(
         const NATIVE_INT_TYPE portNum,
@@ -141,7 +144,7 @@ namespace Gnc {
       if (!paramsInited) {
           return;
       }
-    
+
       using ROS::geometry_msgs::Vector3;
 
       Vector3 moment_b = TorqueThrust.gettorque();
@@ -158,18 +161,20 @@ namespace Gnc {
       Eigen::VectorXd rotorVel;
       this->basicMixer.GetRotorVelCommand(&rotorVel);
 
-      F64 angVel[6], angles[0], normalized[0];
-      for (U32 i = 0; i < 6; i ++) {
-	  angVel[i] = rotorVel(i);
-          if (i < FW_NUM_ARRAY_ELEMENTS(angVelTlm)) {
-              angVelTlm[i] = rotorVel(i);
-          }
+      FW_ASSERT(BM_MAX_ACTUATORS > this->numRotors, this->numRotors);
+      F64 angVel[BM_MAX_ACTUATORS], angles[0], normalized[0];
+      for (U32 i = 0; i < this->numRotors; i ++) {
+          angVel[i] = rotorVel(i);
+          angVelTlm[i] = rotorVel(i);
       }
 
       ROS::std_msgs::Header h = TorqueThrust.getheader();
-      ROS::mav_msgs::Actuators rotorVel__comm(h, angles, 0, 0, angVel, 6, 6, normalized, 0, 0);
+      ROS::mav_msgs::Actuators rotorVel__comm(h,
+                                              angles, 0, 0,
+                                              angVel, BM_MAX_ACTUATORS, this->numRotors,
+                                              normalized, 0, 0);
       if (this->isConnected_motor_OutputPort(0)) {
-	  this->motor_out(0, rotorVel__comm);
+          this->motor_out(0, rotorVel__comm);
       }
   }
 
@@ -179,6 +184,7 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
+      COMPILE_TIME_ASSERT(BM_MAX_ACTUATORS >= 6, BM_MAX_ACT_VS_TLM);
       this->tlmWrite_BMIX_Rot0(angVelTlm[0]);
       this->tlmWrite_BMIX_Rot1(angVelTlm[1]);
       this->tlmWrite_BMIX_Rot2(angVelTlm[2]);
@@ -188,7 +194,7 @@ namespace Gnc {
   }
 
   // ----------------------------------------------------------------------
-  // Command handler implementations 
+  // Command handler implementations
   // ----------------------------------------------------------------------
 
   void BasicMixerComponentImpl ::
@@ -206,5 +212,5 @@ namespace Gnc {
       }
   }
 
-  
+
 } // end namespace Gnc
