@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  ActuatorAdapterComponentImplCfg.hpp
+// \title  BasicMixerComponentImplCfg.hpp
 // \author mereweth
-// \brief  hpp defines file for ActuatorAdapter component implementation class
+// \brief  hpp defines file for BasicMixer component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,16 +17,15 @@
 // countries or providing access to foreign persons.
 // ======================================================================
 
-#ifndef ActuatorAdapterCfg_HPP
-#define ActuatorAdapterCfg_HPP
+#ifndef BasicMixerCfg_HPP
+#define BasicMixerCfg_HPP
 
 namespace Gnc {
 
 enum {
-    AA_MAX_ACTUATORS = 8,
-    AA_ARM_COUNT = 35
+    BM_MAX_ACTUATORS = 8
 };
 
 }
 
-#endif //ActuatorAdapterCfg_HPP
+#endif //BasicMixerCfg_HPP

@@ -145,11 +145,11 @@ namespace SIMREF {
             this->FileLogger_out(0,fileBuff);
         }
 
-        
+
         if (NULL == m_rgNH) {
             return;
         }
-        
+
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
@@ -184,7 +184,7 @@ namespace SIMREF {
 
         m_odomPub[portNum].publish(msg);
     }
-  
+
     void RotorSDrvComponentImpl ::
       motor_handler(
           const NATIVE_INT_TYPE portNum,
@@ -194,11 +194,11 @@ namespace SIMREF {
         if (NULL == m_rgNH) {
             return;
         }
-        
+
         mav_msgs::Actuators msg;
         int size = 0;
         const F64 *angVel = actuator.getangular_velocities(size);
-	size = 6;
+        size = FW_MIN(size, actuator.getangular_velocities_count());
         msg.angular_velocities.resize(size);
         for (int i = 0; i < size; i++) {
             msg.angular_velocities[i] = angVel[i];
@@ -229,7 +229,7 @@ namespace SIMREF {
                 // TODO(mereweth) - notify that no new imu received?
                 m_imuSet[i].mutex.unLock();
             }
-            
+
             for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
                 m_imuStateUpdateSet[i].mutex.lock();
                 if (m_imuStateUpdateSet[i].fresh) {
@@ -429,7 +429,7 @@ namespace SIMREF {
             this->compPtr->m_imuSet[this->portNum].mutex.unLock();
         }
     }
-  
+
     RotorSDrvComponentImpl :: OdometryHandler ::
       OdometryHandler(RotorSDrvComponentImpl* compPtr,
                       int portNum) :
@@ -520,7 +520,7 @@ namespace SIMREF {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
-            ImuStateUpdate imuStateUpdate(
+            ImuStateUpdateNoCov imuStateUpdate(
               Header(msg->header.seq,
                      Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
@@ -528,21 +528,19 @@ namespace SIMREF {
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
-              PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
-                                            msg->pose.pose.position.y,
-                                            msg->pose.pose.position.z),
-                                      Quaternion(msg->pose.pose.orientation.x,
-                                                 msg->pose.pose.orientation.y,
-                                                 msg->pose.pose.orientation.z,
-                                                 msg->pose.pose.orientation.w)),
-                                 msg->pose.covariance.data(), 36),
-              TwistWithCovariance(Twist(Vector3(msg->twist.twist.linear.x,
-                                                msg->twist.twist.linear.y,
-                                                msg->twist.twist.linear.z),
-                                        Vector3(msg->twist.twist.angular.x,
-                                                msg->twist.twist.angular.y,
-                                                msg->twist.twist.angular.z)),
-                                  msg->twist.covariance.data(), 36),
+              Pose(Point(msg->pose.pose.position.x,
+                         msg->pose.pose.position.y,
+                         msg->pose.pose.position.z),
+                   Quaternion(msg->pose.pose.orientation.x,
+                              msg->pose.pose.orientation.y,
+                              msg->pose.pose.orientation.z,
+                              msg->pose.pose.orientation.w)),
+              Twist(Vector3(msg->twist.twist.linear.x,
+                            msg->twist.twist.linear.y,
+                            msg->twist.twist.linear.z),
+                    Vector3(msg->twist.twist.angular.x,
+                            msg->twist.twist.angular.y,
+                            msg->twist.twist.angular.z)),
               Vector3(msg->angular_velocity_bias.x,
                       msg->angular_velocity_bias.y,
                       msg->angular_velocity_bias.z),
