@@ -23,7 +23,8 @@
 namespace Gnc {
 
 enum {
-    AA_MAX_ACTUATORS = 8
+    AA_MAX_ACTUATORS = 8,
+    AA_ARM_COUNT = 35
 };
 
 }

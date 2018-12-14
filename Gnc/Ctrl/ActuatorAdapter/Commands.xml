@@ -1,0 +1,8 @@
+<commands>
+  <command kind="sync" opcode="0" mnemonic="ACTADAP_Arm">
+    <args>
+        <arg name="armState" type="bool">
+        </arg>
+    </args>
+  </command>
+</commands>

@@ -75,6 +75,7 @@ void allocComps() {
         Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
+        0, // adapter
         0, // logQueue
         0, // chanTlm
     };
@@ -87,7 +88,7 @@ void allocComps() {
 ;
 
     NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
-    
+
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
                         "RGDRV",
@@ -98,9 +99,10 @@ void allocComps() {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
-        0, //mixer
-        0, //logQueue
-        0, //kraitRouter
+        0, // mixer
+        0, // adapter
+        0, // logQueue
+        0, // kraitRouter
     };
 
     rgAtt_ptr = new Svc::PassiveRateGroupImpl(
@@ -114,11 +116,12 @@ void allocComps() {
         0, //TODO(mereweth) - IMU?
         Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
-        0, //mixer
-        0, //logQueue
-        0, //kraitRouter
+        0, // mixer
+        0, // adapter
+        0, // logQueue
+        0, // kraitRouter
     };
-    
+
     rgPos_ptr = new Svc::PassiveRateGroupImpl(
 #if FW_OBJECT_NAMES == 1
                     "RGPOS",
@@ -244,7 +247,7 @@ void dumpobj(const char* objName) {
 #endif
 
 #endif
- 
+
 void manualConstruct(void) {
     // Manual connections
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
@@ -322,29 +325,30 @@ void constructApp() {
     leeCtrl_ptr->regCommands();
     imuInteg_ptr->regCommands();
     mixer_ptr->regCommands();
+    actuatorAdapter_ptr->regCommands();
 
     // Open devices
 
     Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
     meta.minIn = 0.0f;
     meta.maxIn = 1000.0f;
-    meta.minOut = 0;
+    meta.minOut = 1;
     meta.maxOut = 800;
-    
-    meta.addr = 11;
+
+    meta.addr = 8;
     actuatorAdapter_ptr->setupI2C(0, meta);
-    meta.addr = 12;
+    meta.addr = 9;
     actuatorAdapter_ptr->setupI2C(1, meta);
-    meta.addr = 13;
+    meta.addr = 10;
     actuatorAdapter_ptr->setupI2C(2, meta);
-    meta.addr = 14;
+    meta.addr = 11;
     actuatorAdapter_ptr->setupI2C(3, meta);
-    
+
 #ifdef BUILD_DSPAL
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv_ptr->open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt_ptr->open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
-    
+
     // J9, BLSP2
     i2cDrv_ptr->open(2, Drv::I2C_FREQUENCY_400KHZ);
 
@@ -403,7 +407,7 @@ void run1cycle(void) {
         serPort->invokeSerial(bufObj);
     }
 #endif
-    
+
 #ifndef BUILD_DSPAL
     U8 readBuf[4096*1000];
     int len = 0;
@@ -453,7 +457,8 @@ int hexref_arm() {
     usleep(50000);
     DEBUG_PRINT("hexref_arm after sleep\n");
     */
-    
+
+    /*
     Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
     Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
     for (U32 i = 0; i < 35; i++) {
@@ -469,6 +474,7 @@ int hexref_arm() {
             usleep(2500);
         }
     }
+    */
 
     // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
     /*
@@ -606,7 +612,7 @@ int main(int argc, char* argv[]) {
     hexref_cycle(50);
 
     hexref_arm();
-    
+
     hexref_cycle(2);
 }
 

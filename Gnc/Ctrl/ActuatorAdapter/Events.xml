@@ -1,5 +1,5 @@
 <events>
-    <event id="0" name="ACTADAP_Dummy" severity="ACTIVITY_LO" format_string = "Actuator adapter dummy event" >
+    <event id="0" name="ACTADAP_AlreadyArmed" severity="WARNING_LO" format_string = "Must disarm before re-arming" >
         <comment>
         </comment>
     </event>

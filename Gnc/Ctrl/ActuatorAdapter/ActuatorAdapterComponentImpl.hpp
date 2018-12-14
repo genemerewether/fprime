@@ -1,4 +1,4 @@
-// ====================================================================== 
+// ======================================================================
 // \title  ActuatorAdapterImpl.hpp
 // \author mereweth
 // \brief  hpp file for ActuatorAdapter component implementation class
@@ -8,14 +8,14 @@
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
 // acknowledged. Any commercial use must be negotiated with the Office
 // of Technology Transfer at the California Institute of Technology.
-// 
+//
 // This software may be subject to U.S. export control laws and
 // regulations.  By accepting this document, the user agrees to comply
 // with all U.S. export laws and regulations.  User has the
 // responsibility to obtain export licenses, or other export authority
 // as may be required before exporting such information to foreign
 // countries or providing access to foreign persons.
-// ====================================================================== 
+// ======================================================================
 
 #ifndef ActuatorAdapter_HPP
 #define ActuatorAdapter_HPP
@@ -72,7 +72,7 @@ namespace Gnc {
       };
 
       bool setupI2C(U32 actuator, I2CMetadata meta);
-    
+
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -84,6 +84,27 @@ namespace Gnc {
       void motor_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::mav_msgs::Actuators &Actuators
+      );
+
+      //! Handler implementation for sched
+      //!
+      void sched_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          NATIVE_UINT_TYPE context /*!< The call order*/
+      );
+
+    PRIVATE:
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations
+      // ----------------------------------------------------------------------
+
+      //! Implementation for ACTADAP_Arm command handler
+      //!
+      void ACTADAP_Arm_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          bool armState
       );
 
       enum OutputType {
@@ -99,7 +120,19 @@ namespace Gnc {
               I2CMetadata i2cMeta;
           };
       } outputInfo[AA_MAX_ACTUATORS];
-    
+
+      enum ArmingState {
+          DISARMED,
+          ARMING,
+          ARMED
+      } armedState;
+
+      FwOpcodeType opCode;
+
+      U32 cmdSeq;
+
+      U32 armCount;
+
     };
 
 } // end namespace Gnc
