@@ -77,11 +77,12 @@ namespace Svc {
         // check to see if the time has exceeded the previous maximum
         if (cycle_time > this->m_maxTime) {
             this->m_maxTime = cycle_time;
-            // TODO(mereweth) - telemeter this->m_maxTime
+            this->tlmWrite_PassiveRgMaxTime(this->m_maxTime);
         }
 
         this->m_cycles++;
-        // TODO(mereweth) - telemeter this->m_cycles and cycle_time
+        this->tlmWrite_PassiveRgTime(cycle_time);
+        this->tlmWrite_PassiveRgNumCycles(this->m_cycles);
 
         DEBUG_PRINT("PRG instance %d max time: %d; time %d; # cycles: %d\n",
                     this->getInstance(), this->m_maxTime, cycle_time, this->m_cycles);

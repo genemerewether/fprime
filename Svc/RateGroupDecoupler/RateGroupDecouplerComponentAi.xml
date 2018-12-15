@@ -5,7 +5,7 @@
     <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
     <comment>A rate group decoupler component with input and output cycle ports</comment>
     <ports>
-        <port name="BackupCycleIn" data_type="Cycle" kind="async_input" max_number="1" full="drop">
+        <port name="BackupCycleIn" data_type="Cycle" kind="sync_input" max_number="1">
             <comment>
             Backup cycle in, usually timer based
             </comment>
@@ -20,5 +20,65 @@
             Cycle output from the rate group decoupler
             </comment>
         </port>
+        <port name="BackupCycleOut" data_type="Cycle" kind="output" max_number="1">
+            <comment>
+            Backup cycle output from the rate group decoupler
+            </comment>
+        </port>
     </ports>
+    <telemetry>
+        <channel id="0" name="RgDecoupMaxTime" data_type="U32" update="on_change" format_string = "%u us">
+            <comment>
+            Max execution time rate group
+            </comment>
+        </channel>
+        <channel id="1" name="RgDecoupCycleSlips" data_type="U32" update="on_change">
+            <comment>
+            Cycle slips for rate group
+            </comment>
+        </channel>
+        <channel id="2" name="RgDecoupNumCycles" data_type="U32" update="on_change">
+            <comment>
+            Number of cycles
+            </comment>
+        </channel>
+    </telemetry>
+    <events>
+        <event id="0" name="RgDecoupCycleSlip" severity="WARNING_HI" format_string = "Rate group cycle slipped on cycle %u" >
+            <comment>
+            Warning event that rate group has had a cycle slip
+            </comment>
+            <args>
+                <arg name="cycle" type="U32">
+                    <comment>The cycle where the cycle occurred</comment>
+                </arg>
+            </args>
+        </event>
+        <event id="1" name="RgDecoupBackupCycle" severity="WARNING_HI" throttle="5" format_string = "Backup cycle %u; regular cycle %u" >
+            <comment>
+            Warning event that backup cycle is happening
+            </comment>
+            <args>
+                <arg name="backupCycle" type="U32">
+                    <comment>The cycle where the cycle occurred</comment>
+                </arg>
+                <arg name="cycle" type="U32">
+                    <comment>The cycle where the cycle occurred</comment>
+                </arg>
+            </args>
+        </event>
+        <event id="2" name="RgDecoupRegularCycle" severity="ACTIVITY_HI" throttle="5" format_string = "Backup cycle %u; regular cycle %u" >
+            <comment>
+            Event that regular cycle is happening again
+            </comment>
+            <args>
+                <arg name="backupCycle" type="U32">
+                    <comment>The cycle where the cycle occurred</comment>
+                </arg>
+                <arg name="cycle" type="U32">
+                    <comment>The cycle where the cycle occurred</comment>
+                </arg>
+            </args>
+        </event>
+    </events>
 </component>

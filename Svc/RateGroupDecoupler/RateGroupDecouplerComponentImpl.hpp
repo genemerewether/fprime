@@ -88,9 +88,8 @@ namespace Svc {
       U32 m_cycles; //!< cycles executed
       U32 m_maxTime; //!< maximum execution time in microseconds
       volatile bool m_cycleStarted; //!< indicate that cycle has started. Used to detect overruns.
-      NATIVE_INT_TYPE m_overrunThrottle; //!< throttle value for overrun events
       U32 m_cycleSlips; //!< tracks number of cycle slips
-      U32 m_backupCycles; //!< tracks number of missing regular cycles
+      volatile U32 m_backupCycles; //!< tracks number of missing regular cycles
       U32 m_droppedCyclesError; //!< Number of missing regular cycles before error
   };
 

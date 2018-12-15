@@ -67,7 +67,7 @@ void allocComps() {
 #if FW_OBJECT_NAMES == 1
                         "RGDECOUPLE",
 #endif
-                        5) // 50 dropped hardware cycles before an error
+                        5) // multiply by sleep duration in run1backupCycle
 ;
 
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
@@ -363,7 +363,7 @@ void constructApp() {
 
     // Active component startup
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
-    rgDecouple_ptr->start(0, 90, 5*1024);
+    rgDecouple_ptr->start(0, 90, 20*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -390,12 +390,13 @@ int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
     return kraitRouter_ptr->portWrite(buff, buffLen);
 }
 
-void run1cycle(void) {
+void run1backupCycle(void) {
     // call interrupt to emulate a clock
     Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
+    Os::Task::delay(10);
 
 #ifndef BUILD_DSPAL // stress test
     for (int i = 0; i < 45; i++) {
@@ -517,20 +518,14 @@ int hexref_run(void) {
         return -1;
     }
 
-    // TODO(mereweth) - interrupt for cycling - local_cycle as argument
-    bool local_cycle = true;
-    int cycle = 0;
+    int backupCycle = 0;
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
 
     while (!terminate) {
-        //DEBUG_PRINT("Cycle %d\n",cycle);
-        if (local_cycle) {
-            run1cycle();
-        }
-        Os::Task::delay(10);
-        cycle++;
+        run1backupCycle();
+        backupCycle++;
     }
 
     // stop tasks
@@ -547,7 +542,7 @@ int hexref_run(void) {
     return 0;
 }
 
-int hexref_cycle(unsigned int cycles) {
+int hexref_cycle(unsigned int backupCycles) {
     DEBUG_PRINT("hexref_cycle\n");
     if (preinit) {
         DEBUG_PRINT("hexref_cycle preinit - returning\n");
@@ -557,11 +552,9 @@ int hexref_cycle(unsigned int cycles) {
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
-    for (unsigned int i = 0; i < cycles; i++) {
-        //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
+    for (unsigned int i = 0; i < backupCycles; i++) {
         if (terminate) return -1;
-        run1cycle();
-        Os::Task::delay(10);
+        run1backupCycle();
     }
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
@@ -609,11 +602,23 @@ int main(int argc, char* argv[]) {
 
     preinit=false;
 
-    hexref_cycle(50);
+    for (int i = 0; i < 1000; i++) {
+        // call interrupt to emulate a clock
+        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        port->invoke(cycleStart);
 
-    hexref_arm();
+        if (0 == i%10) {
+            // call interrupt to emulate a clock
+            Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
+            Svc::TimerVal cycleStart;
+            cycleStart.take();
+            port->invoke(cycleStart);
+        }
 
-    hexref_cycle(2);
+        Os::Task::delay(1);
+    }
 }
 
 #endif //ifndef BUILD_DSPAL
