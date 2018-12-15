@@ -8,6 +8,7 @@
                 <enum name="CtrlMode">
                     <item name="FLAT_OUTPUT_LIN_ACC_FF"/>
                     <item name="FLAT_OUTPUT_ANG_ACC_FF"/>
+                    <item name="LIN_VEL"/>
                     <item name="ATT_RATE_THRUST"/>
                     <item name="CTRL_DISABLED"/>
                 </enum>
@@ -21,6 +22,12 @@
             <arg name="x_w__y" type="F64">
             </arg>
             <arg name="x_w__z" type="F64">
+            </arg>
+            <arg name="v_w__x" type="F64">
+            </arg>
+            <arg name="v_w__y" type="F64">
+            </arg>
+            <arg name="v_w__z" type="F64">
             </arg>
             <arg name="yaw" type="F64">
             </arg>

@@ -119,6 +119,9 @@ namespace Gnc {
           F64 x_w__x, 
           F64 x_w__y, 
           F64 x_w__z, 
+          F64 v_w__x, 
+          F64 v_w__y, 
+          F64 v_w__z, 
           F64 yaw 
       );
 
