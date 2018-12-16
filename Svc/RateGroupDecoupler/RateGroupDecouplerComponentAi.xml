@@ -42,9 +42,14 @@
             Number of cycles
             </comment>
         </channel>
+        <channel id="3" name="RgDecoupTime" data_type="U32" update="on_change" format_string = "%u us">
+            <comment>
+            Execution time rate group
+            </comment>
+        </channel>
     </telemetry>
     <events>
-        <event id="0" name="RgDecoupCycleSlip" severity="WARNING_HI" format_string = "Rate group cycle slipped on cycle %u" >
+        <event id="0" name="RgDecoupCycleSlip" severity="WARNING_HI" format_string = "Rate group cycle slipped on cycle %u" throttle="5">
             <comment>
             Warning event that rate group has had a cycle slip
             </comment>

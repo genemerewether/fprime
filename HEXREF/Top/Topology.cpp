@@ -332,16 +332,16 @@ void constructApp() {
     Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
     meta.minIn = 0.0f;
     meta.maxIn = 1000.0f;
-    meta.minOut = 1;
+    meta.minOut = 0;
     meta.maxOut = 800;
 
-    meta.addr = 8;
-    actuatorAdapter_ptr->setupI2C(0, meta);
-    meta.addr = 9;
-    actuatorAdapter_ptr->setupI2C(1, meta);
-    meta.addr = 10;
-    actuatorAdapter_ptr->setupI2C(2, meta);
     meta.addr = 11;
+    actuatorAdapter_ptr->setupI2C(0, meta);
+    meta.addr = 12;
+    actuatorAdapter_ptr->setupI2C(1, meta);
+    meta.addr = 13;
+    actuatorAdapter_ptr->setupI2C(2, meta);
+    meta.addr = 14;
     actuatorAdapter_ptr->setupI2C(3, meta);
 
 #ifdef BUILD_DSPAL
@@ -517,6 +517,14 @@ int hexref_run(void) {
         DEBUG_PRINT("hexref_run preinit - returning\n");
         return -1;
     }
+    
+    while (!mpu9250_ptr->isReady()) {
+        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        port->invoke(cycleStart);
+        Os::Task::delay(10);
+    }
 
     int backupCycle = 0;
 #ifdef BUILD_DSPAL
@@ -548,12 +556,20 @@ int hexref_cycle(unsigned int backupCycles) {
         DEBUG_PRINT("hexref_cycle preinit - returning\n");
         return -1;
     }
+    
+    while (!mpu9250_ptr->isReady()) {
+        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        port->invoke(cycleStart);
+        Os::Task::delay(10);
+    }
 
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
     for (unsigned int i = 0; i < backupCycles; i++) {
-        if (terminate) return -1;
+        if (terminate) break;
         run1backupCycle();
     }
 #ifdef BUILD_DSPAL

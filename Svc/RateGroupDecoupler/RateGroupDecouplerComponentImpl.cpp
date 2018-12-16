@@ -116,6 +116,7 @@ namespace Svc {
         }
 
         // update cycle telemetry
+        this->tlmWrite_RgDecoupTime(cycle_time);
         this->tlmWrite_RgDecoupMaxTime(this->m_maxTime);
 
         // check for cycle slip. That will happen if new cycle message has been received
