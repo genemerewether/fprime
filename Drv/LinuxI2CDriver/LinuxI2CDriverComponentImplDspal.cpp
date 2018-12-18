@@ -110,7 +110,7 @@ namespace Drv {
             return;
         }
 
-        this->m_bytes += readBuffer.getsize();
+        this->m_bytes += writeBuffer.getsize();
         this->tlmWrite_I2C_Bytes(this->m_bytes);
     }
 

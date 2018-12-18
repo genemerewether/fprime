@@ -45,7 +45,6 @@ namespace Svc {
         m_cycles(0u),
         m_maxTime(0u),
         m_cycleStarted(false),
-        m_overrunThrottle(0),
         m_cycleSlips(0u),
         m_backupCycles(0u),
         m_droppedCyclesError(droppedCyclesError)
@@ -84,20 +83,12 @@ namespace Svc {
          */
 
         if (this->m_backupCycles > m_droppedCyclesError) {
-            this->CycleIn_handler(portNum, cycleStart);
-        }
-    }
+            this->log_WARNING_HI_RgDecoupBackupCycle(this->m_backupCycles,
+                                                     this->m_cycles);
 
-    void RateGroupDecouplerComponentImpl ::
-      BackupCycleIn_preMsgHook(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart) {
-        // set flag to indicate cycle has started. Check in thread for overflow.
-
-        // we are using backup cycler, so allow for checking for cycle slip
-        // TODO(mereweth) - might see a fake slip when backup cycler starts/stops
-        if (this->m_backupCycles > m_droppedCyclesError) {
-            DEBUG_PRINT("Backup cycle %u gt than error threshold %u; cycle %u\n",
-                        this->m_backupCycles, m_droppedCyclesError, this->m_cycles);
-            this->m_cycleStarted = true;
+            if (this->isConnected_BackupCycleOut_OutputPort(0)) {
+                this->BackupCycleOut_out(0, cycleStart);
+            }
         }
     }
 
@@ -125,43 +116,38 @@ namespace Svc {
         }
 
         // update cycle telemetry
-        //this->tlmWrite_RgMaxTime(this->m_maxTime);
+        this->tlmWrite_RgDecoupTime(cycle_time);
+        this->tlmWrite_RgDecoupMaxTime(this->m_maxTime);
 
         // check for cycle slip. That will happen if new cycle message has been received
         // which will cause flag will be set again.
         if (this->m_cycleStarted) {
             this->m_cycleSlips++;
-            if (this->m_overrunThrottle < 5/*RATE_GROUP_DECOUPLER_OVERRUN_THROTTLE*/) {
-                //this->log_WARNING_HI_RateGroupCycleSlip(this->m_cycles);
-                this->m_overrunThrottle++;
-            }
-            // update cycle cycle slips
+            this->log_WARNING_HI_RgDecoupCycleSlip(this->m_cycles);
             DEBUG_PRINT("RG Decoupled cycle slips %d on cycle %d\n",
                         this->m_cycleSlips, this->m_cycles);
-            //this->tlmWrite_RgCycleSlips(this->m_cycleSlips);
-        } else { // if cycle is okay start decrementing throttle value
-            if (this->m_overrunThrottle > 0) {
-                this->m_overrunThrottle--;
-            }
+            this->tlmWrite_RgDecoupCycleSlips(this->m_cycleSlips);
         }
 
         // increment cycle
         this->m_cycles++;
-        //this->tlmWrite_RgNumCycles(this->m_cycles);
-    }
-
-    void RateGroupDecouplerComponentImpl ::
-      CycleIn_preMsgHook(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart) {
-        // set flag to indicate cycle has started. Check in thread for overflow.
-        this->m_cycleStarted = true;
+        this->tlmWrite_RgDecoupNumCycles(this->m_cycles);
 
         if (this->m_backupCycles > m_droppedCyclesError) {
+            this->log_ACTIVITY_HI_RgDecoupRegularCycle(this->m_backupCycles,
+                                                       this->m_cycles);
             DEBUG_PRINT("Got a real cycle after %u backup; switching\n",
                         this->m_backupCycles);
         }
 
         // reset the number of backup cycles because we got a real cycle
         this->m_backupCycles = 0;
+    }
+
+    void RateGroupDecouplerComponentImpl ::
+      CycleIn_preMsgHook(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart) {
+        // set flag to indicate cycle has started. Check in thread for overflow.
+        this->m_cycleStarted = true;
     }
 
 } // end namespace Svc

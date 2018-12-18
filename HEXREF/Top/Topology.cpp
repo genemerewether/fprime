@@ -67,7 +67,7 @@ void allocComps() {
 #if FW_OBJECT_NAMES == 1
                         "RGDECOUPLE",
 #endif
-                        5) // 50 dropped hardware cycles before an error
+                        5) // multiply by sleep duration in run1backupCycle
 ;
 
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
@@ -331,17 +331,17 @@ void constructApp() {
 
     Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
     meta.minIn = 0.0f;
-    meta.maxIn = 1000.0f;
-    meta.minOut = 1;
+    meta.maxIn = 3840.0f;
+    meta.minOut = 0;
     meta.maxOut = 800;
 
-    meta.addr = 8;
-    actuatorAdapter_ptr->setupI2C(0, meta);
-    meta.addr = 9;
-    actuatorAdapter_ptr->setupI2C(1, meta);
-    meta.addr = 10;
-    actuatorAdapter_ptr->setupI2C(2, meta);
     meta.addr = 11;
+    actuatorAdapter_ptr->setupI2C(0, meta);
+    meta.addr = 12;
+    actuatorAdapter_ptr->setupI2C(1, meta);
+    meta.addr = 13;
+    actuatorAdapter_ptr->setupI2C(2, meta);
+    meta.addr = 14;
     actuatorAdapter_ptr->setupI2C(3, meta);
 
 #ifdef BUILD_DSPAL
@@ -363,7 +363,7 @@ void constructApp() {
 
     // Active component startup
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
-    rgDecouple_ptr->start(0, 90, 5*1024);
+    rgDecouple_ptr->start(0, 90, 20*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -390,12 +390,13 @@ int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
     return kraitRouter_ptr->portWrite(buff, buffLen);
 }
 
-void run1cycle(void) {
+void run1backupCycle(void) {
     // call interrupt to emulate a clock
     Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
+    Os::Task::delay(10);
 
 #ifndef BUILD_DSPAL // stress test
     for (int i = 0; i < 45; i++) {
@@ -516,21 +517,23 @@ int hexref_run(void) {
         DEBUG_PRINT("hexref_run preinit - returning\n");
         return -1;
     }
+    
+    while (!mpu9250_ptr->isReady()) {
+        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        port->invoke(cycleStart);
+        Os::Task::delay(10);
+    }
 
-    // TODO(mereweth) - interrupt for cycling - local_cycle as argument
-    bool local_cycle = true;
-    int cycle = 0;
+    int backupCycle = 0;
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
 
     while (!terminate) {
-        //DEBUG_PRINT("Cycle %d\n",cycle);
-        if (local_cycle) {
-            run1cycle();
-        }
-        Os::Task::delay(10);
-        cycle++;
+        run1backupCycle();
+        backupCycle++;
     }
 
     // stop tasks
@@ -547,21 +550,27 @@ int hexref_run(void) {
     return 0;
 }
 
-int hexref_cycle(unsigned int cycles) {
+int hexref_cycle(unsigned int backupCycles) {
     DEBUG_PRINT("hexref_cycle\n");
     if (preinit) {
         DEBUG_PRINT("hexref_cycle preinit - returning\n");
         return -1;
     }
+    
+    while (!mpu9250_ptr->isReady()) {
+        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        port->invoke(cycleStart);
+        Os::Task::delay(10);
+    }
 
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
-    for (unsigned int i = 0; i < cycles; i++) {
-        //DEBUG_PRINT("Cycle %d of %d\n", i, cycles);
-        if (terminate) return -1;
-        run1cycle();
-        Os::Task::delay(10);
+    for (unsigned int i = 0; i < backupCycles; i++) {
+        if (terminate) break;
+        run1backupCycle();
     }
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
@@ -609,11 +618,23 @@ int main(int argc, char* argv[]) {
 
     preinit=false;
 
-    hexref_cycle(50);
+    for (int i = 0; i < 1000; i++) {
+        // call interrupt to emulate a clock
+        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        port->invoke(cycleStart);
 
-    hexref_arm();
+        if (0 == i%10) {
+            // call interrupt to emulate a clock
+            Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
+            Svc::TimerVal cycleStart;
+            cycleStart.take();
+            port->invoke(cycleStart);
+        }
 
-    hexref_cycle(2);
+        Os::Task::delay(1);
+    }
 }
 
 #endif //ifndef BUILD_DSPAL
