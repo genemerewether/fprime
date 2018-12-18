@@ -176,11 +176,14 @@ namespace Gnc {
         F64 x_w__x,
         F64 x_w__y,
         F64 x_w__z,
+        F64 v_w__x,
+        F64 v_w__y,
+        F64 v_w__z,
         F64 yaw
     )
   {
       this->x_w__des.set(x_w__x, x_w__y, x_w__z);
-      this->v_w__des.set(0.0, 0.0, 0.0);
+      this->v_w__des.set(v_w__x, v_w__y, v_w__z);
       this->a_w__des.set(0.0, 0.0, 0.0);
       this->yaw__des = yaw;
 
@@ -277,20 +280,30 @@ namespace Gnc {
           using ROS::geometry_msgs::Vector3;
 
           if (!((FLAT_OUTPUT_LIN_ACC_FF == this->ctrlMode) ||
-                (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode))) {
+                (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode) ||
+                (LIN_VEL                == this->ctrlMode))) {
               return;
           }
 
           // set desired position velocity acceleration
-          this->leeControl.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
-                                                          this->x_w__des.gety(),
-                                                          this->x_w__des.getz()),
-                                          Eigen::Vector3d(this->v_w__des.getx(),
-                                                          this->v_w__des.gety(),
-                                                          this->v_w__des.getz()),
-                                          Eigen::Vector3d(this->a_w__des.getx(),
-                                                          this->a_w__des.gety(),
-                                                          this->a_w__des.getz()));
+          if (LIN_VEL == this->ctrlMode) {
+              this->leeControl.SetVelocityDes(Eigen::Vector3d(this->v_w__des.getx(),
+                                                              this->v_w__des.gety(),
+                                                              this->v_w__des.getz()),
+                                              Eigen::Vector3d(this->a_w__des.getx(),
+                                                              this->a_w__des.gety(),
+                                                              this->a_w__des.getz()));
+          } else {
+              this->leeControl.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
+                                                              this->x_w__des.gety(),
+                                                              this->x_w__des.getz()),
+                                              Eigen::Vector3d(this->v_w__des.getx(),
+                                                              this->v_w__des.gety(),
+                                                              this->v_w__des.getz()),
+                                              Eigen::Vector3d(this->a_w__des.getx(),
+                                                              this->a_w__des.gety(),
+                                                              this->a_w__des.getz()));
+          }
 
           this->leeControl.SetYawDes(this->yaw__des);
 
@@ -303,18 +316,17 @@ namespace Gnc {
                                                              this->v_b.getz()));
 
           Eigen::Vector3d a_w__comm(0, 0, 0);
-          this->leeControl.GetAccelCommand(&a_w__comm);
+          if (LIN_VEL == this->ctrlMode) {
+              // don't use position
+              this->leeControl.GetAccelCommand(&a_w__comm, true);
+          } else {
+              this->leeControl.GetAccelCommand(&a_w__comm, false);
+          }
           this->a_w__comm = Vector3(a_w__comm(0), a_w__comm(1), a_w__comm(2));
       }
       else if (context == LCTRL_SCHED_CONTEXT_ATT) {
           using ROS::geometry_msgs::Vector3;
 
-          if (!((FLAT_OUTPUT_LIN_ACC_FF == this->ctrlMode) ||
-                (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode) ||
-                (ATT_RATE_THRUST        == this->ctrlMode))) {
-              return;
-          }
-          
           Eigen::Vector3d thrust_b__comm;
 
           if (ATT_RATE_THRUST == this->ctrlMode) {
@@ -344,7 +356,8 @@ namespace Gnc {
                                                  this->omega_b.getz()));
 
           if ((FLAT_OUTPUT_LIN_ACC_FF == this->ctrlMode) ||
-              (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode)) {
+              (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode) ||
+              (LIN_VEL                == this->ctrlMode)) {
               Eigen::Vector3d _a_w__comm(this->a_w__comm.getx(),
                                          this->a_w__comm.gety(),
                                          this->a_w__comm.getz());

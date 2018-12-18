@@ -12,12 +12,29 @@
             The rate group cycle input
             </comment>
         </port>
-        
+
         <!-- Output Scheduler Ports -->
         <port name="RateGroupMemberOut" data_type="Sched" kind="output" max_number="$PassiveRateGroupOutputPorts">
             <comment>Scheduler output port to rate group members</comment>
-        </port>            
-        
-    </ports>
-</component>
+        </port>
 
+    </ports>
+
+    <telemetry>
+        <channel id="0" name="PassiveRgMaxTime" data_type="U32" update="on_change" format_string = "%u us">
+            <comment>
+            Max execution time rate group
+            </comment>
+        </channel>
+        <channel id="1" name="PassiveRgTime" data_type="U32" update="on_change" format_string = "%u us">
+            <comment>
+            Execution time rate group
+            </comment>
+        </channel>
+        <channel id="2" name="PassiveRgNumCycles" data_type="U32" update="on_change">
+            <comment>
+            Number of cycles
+            </comment>
+        </channel>
+    </telemetry>
+</component>

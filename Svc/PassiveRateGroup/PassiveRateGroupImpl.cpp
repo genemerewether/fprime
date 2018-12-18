@@ -57,7 +57,9 @@ namespace Svc {
 
     void PassiveRateGroupImpl::CycleIn_handler(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart) {
 
+        TimerVal start;
         TimerVal end;
+        start.take();
 
         // invoke any members of the rate group
         for (NATIVE_INT_TYPE port = 0; port < this->getNum_RateGroupMemberOut_OutputPorts(); port++) {
@@ -72,16 +74,17 @@ namespace Svc {
         end.take();
 
         // get rate group execution time
-        U32 cycle_time = end.diffUSec(cycleStart);
+        U32 cycle_time = end.diffUSec(start);
 
         // check to see if the time has exceeded the previous maximum
         if (cycle_time > this->m_maxTime) {
             this->m_maxTime = cycle_time;
-            // TODO(mereweth) - telemeter this->m_maxTime
+            this->tlmWrite_PassiveRgMaxTime(this->m_maxTime);
         }
 
         this->m_cycles++;
-        // TODO(mereweth) - telemeter this->m_cycles and cycle_time
+        this->tlmWrite_PassiveRgTime(cycle_time);
+        this->tlmWrite_PassiveRgNumCycles(this->m_cycles);
 
         DEBUG_PRINT("PRG instance %d max time: %d; time %d; # cycles: %d\n",
                     this->getInstance(), this->m_maxTime, cycle_time, this->m_cycles);
