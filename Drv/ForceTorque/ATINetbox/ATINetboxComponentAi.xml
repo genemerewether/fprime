@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="ATINetbox" kind="passive" namespace="Drv">
+  <import_port_type>ROS/Gen/geometry_msgs/Ports/WrenchStampedPortAi.xml</import_port_type>
+  <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
+
+  <comment>A driver component for the ATI Netbox Ethernet-based Force/Torque sensor.</comment>
+  
+  <ports>
+    <port name="ATINetboxData" data_type="ROS::geometry_msgs::WrenchStamped"
+	  kind="output" max_number="1" />
+    <port name="ATINetboxLog" data_type="Svc::ActiveFileLogPort"
+	  kind="output" max_number="1" />
+  </ports>
+
+  <commands>
+    <command kind="sync" opcode="0x0" mnemonic="ATINET_BIAS"/>
+    <command kind="sync" opcode="0x1" mnemonic="ATINET_ENABLE">
+      <args>
+	<arg name="mode" type="ENUM">
+	  <enum name="ATINetboxEnableMode">
+	    <item name="ATINET_ENABLE" comment="Enable ATINetbox data collection" />
+	    <item name="ATINET_DISABLE" comment="Disable ATINetbox data collection" />
+	  </enum>
+	</arg>
+      </args>
+    </command>
+    <command kind="sync" opcode="0x2" mnemonic="ATINET_DEBUG"/>
+    <command kind="sync" opcode="0x3" mnemonic="ATINET_TARE">
+      <args>
+        <arg name="cycles" type="U32"/>
+      </args>
+    </command>
+    <command kind="sync" opcode="0x4" mnemonic="ATINET_FLOW">
+      <args>
+	<arg name="mode" type="ENUM">
+	  <enum name="ATINetboxFlowMode">
+	    <item name="ATINET_FLOW" comment="Send F/T data" />
+	    <item name="ATINET_NOFLOW" comment="Disable sending F/T data" />
+	  </enum>
+	</arg>
+      </args>
+    </command>
+  </commands>
+
+  <parameters>
+    <parameter id="0x0" set_opcode="0x10" save_opcode="0x11"
+	       name="CountsPerForce" data_type="F32" default = "1000000">
+      <comment>CountsPerForce</comment>
+    </parameter>
+    <parameter id="0x1" set_opcode="0x12" save_opcode="0x13"
+	       name="CountsPerTorque" data_type="F32"  default = "1000000">
+      <comment>CountsPerTorque</comment>
+    </parameter>
+    <parameter id="0x2" set_opcode="0x14" save_opcode="0x15"
+	       name="FTAveA1" data_type="F32" default="-1.982228929792529" >
+      <comment>FTAveA1</comment>
+    </parameter>
+    <parameter id="0x3" set_opcode="0x16" save_opcode="0x17"
+	       name="FTAveA2" data_type="F32" default="0.982385450614126" >
+      <comment>FTAveA2</comment>
+    </parameter>
+    <parameter id="0x4" set_opcode="0x18" save_opcode="0x19"
+	       name="FTAveB0" data_type="F32" default="0.391302053991682e-4" >
+      <comment>FTAveB0</comment>
+    </parameter>
+    <parameter id="0x5" set_opcode="0x1A" save_opcode="0x1B"
+	       name="FTAveB1" data_type="F32" default="0.782604107983365e-4" >
+      <comment>FTAveB1</comment>
+    </parameter>
+    <parameter id="0x6" set_opcode="0x1C" save_opcode="0x1D"
+	       name="FTAveB2" data_type="F32" default="0.391302053991682e-4" >
+      <comment>FTAveB2</comment>
+    </parameter>
+    <parameter id="0x10" set_opcode="0x20" save_opcode="0x21"
+	       name="R11" data_type="F32" default="0" >
+      <comment>R11</comment>
+    </parameter>
+    <parameter id="0x11" set_opcode="0x22" save_opcode="0x23"
+	       name="R12" data_type="F32" default="0" >
+      <comment>R12</comment>
+    </parameter>
+    <parameter id="0x12" set_opcode="0x24" save_opcode="0x25"
+	       name="R13" data_type="F32" default="-1" >
+      <comment>R13</comment>
+    </parameter>
+    <parameter id="0x13" set_opcode="0x26" save_opcode="0x27"
+	       name="R21" data_type="F32" default="0" >
+      <comment>R21</comment>
+    </parameter>
+    <parameter id="0x14" set_opcode="0x28" save_opcode="0x29"
+	       name="R22" data_type="F32" default="1" >
+      <comment>R22</comment>
+    </parameter>
+    <parameter id="0x15" set_opcode="0x2A" save_opcode="0x2B"
+	       name="R23" data_type="F32" default="0" >
+      <comment>R23</comment>
+    </parameter>
+    <parameter id="0x16" set_opcode="0x2C" save_opcode="0x2D"
+	       name="R31" data_type="F32" default="1" >
+      <comment>R31</comment>
+    </parameter>
+    <parameter id="0x17" set_opcode="0x2E" save_opcode="0x2F"
+	       name="R32" data_type="F32" default="0" >
+      <comment>R32</comment>
+    </parameter>
+    <parameter id="0x18" set_opcode="0x30" save_opcode="0x31"
+	       name="R33" data_type="F32" default="0" >
+      <comment>R33</comment>
+    </parameter>
+
+
+    <parameter id="0x40" set_opcode="0x60" save_opcode="0x61"
+	       name="BTX" data_type="F32" default="0" >
+      <comment>BTX</comment>
+    </parameter>
+    <parameter id="0x41" set_opcode="0x62" save_opcode="0x63"
+	       name="BTY" data_type="F32" default="0" >
+      <comment>BTY</comment>
+    </parameter>
+    <parameter id="0x42" set_opcode="0x64" save_opcode="0x65"
+	       name="BTZ" data_type="F32" default="0" >
+      <comment>BTZ</comment>
+    </parameter>
+
+    <parameter id="0x50" set_opcode="0x70" save_opcode="0x71"
+	       name="BFX" data_type="F32" default="0" >
+      <comment>BFX</comment>
+    </parameter>
+    <parameter id="0x51" set_opcode="0x72" save_opcode="0x73"
+	       name="BFY" data_type="F32" default="0" >
+      <comment>BFY</comment>
+    </parameter>
+    <parameter id="0x52" set_opcode="0x74" save_opcode="0x75"
+	       name="BFZ" data_type="F32" default="0" >
+      <comment>BFZ</comment>
+    </parameter>
+    <parameter id="0x53" set_opcode="0x76" save_opcode="0x77"
+               name="PX" data_type="F32" default="11.5" >
+      <comment>PX</comment>
+    </parameter>
+    <parameter id="0x54" set_opcode="0x78" save_opcode="0x79"
+               name="PY" data_type="F32" default="0" >
+      <comment>PY</comment>
+    </parameter>
+    <parameter id="0x55" set_opcode="0x7A" save_opcode="0x7B"
+               name="PZ" data_type="F32" default="92" >
+      <comment>PZ</comment>
+    </parameter>
+
+    <parameter id="0x60" set_opcode="0x80" save_opcode="0x81"
+               name="FTAntiAlias1" data_type="F64" default="1.636805385483393e-07" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x61" set_opcode="0x82" save_opcode="0x83"
+               name="FTAntiAlias2" data_type="F64" default="-1.629195834427811e-07" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x62" set_opcode="0x84" save_opcode="0x85"
+               name="FTAntiAlias3" data_type="F64" default="0" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x63" set_opcode="0x86" save_opcode="0x87"
+               name="FTAntiAlias4" data_type="F64" default="0" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x64" set_opcode="0x88" save_opcode="0x89"
+               name="FTAntiAlias5" data_type="F64" default="0" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x65" set_opcode="0x8A" save_opcode="0x8B"
+               name="FTAntiAlias6" data_type="F64" default="0" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x66" set_opcode="0x8C" save_opcode="0x8D"
+               name="FTAntiAlias7" data_type="F64" default="1.0" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x67" set_opcode="0x8E" save_opcode="0x8F"
+               name="FTAntiAlias8" data_type="F64" default="-4.951201950969632e+00" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x68" set_opcode="0x90" save_opcode="0x91"
+               name="FTAntiAlias9" data_type="F64" default="9.805996309503511e+00" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x69" set_opcode="0x92" save_opcode="0x93"
+               name="FTAntiAlias10" data_type="F64" default="-9.710759371901556e+00" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x6A" set_opcode="0x94" save_opcode="0x95"
+               name="FTAntiAlias11" data_type="F64" default="4.808337784376357e+00" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+    <parameter id="0x6B" set_opcode="0x96" save_opcode="0x97"
+               name="FTAntiAlias12" data_type="F64" default="-9.523727702477243e-01" >
+      <comment>Antialiasing filter for decimation and sending</comment>
+    </parameter>
+
+  </parameters>
+
+  <telemetry>
+    <channel id="0x0" name="ATINET_ForceX" data_type="F32"
+	     format_string="%4.3f N" />
+    <channel id="0x1" name="ATINET_ForceY" data_type="F32"
+	     format_string="%4.3f N" />
+    <channel id="0x2" name="ATINET_ForceZ" data_type="F32"
+	     format_string="%4.3f N" />
+    <channel id="0x3" name="ATINET_TorqueX" data_type="F32"
+	     format_string="%4.3f Nm"/>
+    <channel id="0x4" name="ATINET_TorqueY" data_type="F32"
+	     format_string="%4.3f Nm"/>
+    <channel id="0x5" name="ATINET_TorqueZ" data_type="F32"
+	     format_string="%4.3f Nm"/>
+
+    <channel id="0x6" name="ATINET_ForceXRaw" data_type="F32"
+             format_string="%4.3f N" />
+    <channel id="0x7" name="ATINET_ForceYRaw" data_type="F32"
+             format_string="%4.3f N" />
+    <channel id="0x8" name="ATINET_ForceZRaw" data_type="F32"
+             format_string="%4.3f N" />
+    <channel id="0x9" name="ATINET_TorqueXRaw" data_type="F32"
+             format_string="%4.3f Nm" />
+    <channel id="0xA" name="ATINET_TorqueYRaw" data_type="F32"
+             format_string="%4.3f Nm" />
+    <channel id="0xB" name="ATINET_TorqueZRaw" data_type="F32"
+             format_string="%4.3f Nm" />
+
+    <channel id="0xC" name="ATINET_Health" data_type="U32"
+             format_string="0x%08X" />
+    <channel id="0xD" name="ATINET_Packets" data_type="U32"/>
+  </telemetry>
+
+  <events>
+    <event id="0x0" name="ATINET_WorkerStarted" severity="ACTIVITY_LO"
+	   format_string="ATINetbox worker thread started." />
+    <event id="0x1" name="ATINET_WorkerStopped" severity="ACTIVITY_LO"
+	   format_string="ATINetbox worker thread stopped." />
+    <event id="0x2" name="ATINET_SocketCreateFail" severity="WARNING_HI"
+	   format_string="ATINetbox socket creation failed!" />
+    <event id="0x3" name="ATINET_SocketBindFail" severity="WARNING_HI"
+	   format_string="ATINetbox socket bind operation failed!" />
+    <event id="0x4" name="ATINET_SocketCreated" severity="ACTIVITY_LO"
+	   format_string="ATINetbox socket creation successful." />
+    <event id="0x5" name="ATINET_Biased" severity="ACTIVITY_HI"
+	   format_string="ATINetbox sensor has been biased." />
+    <event id="0x6" name="ATINET_Msg" severity="ACTIVITY_HI"
+	   format_string="FT Msg: %s">
+      <args>
+	<arg name="Msg" type="string" size="40">
+	  <comment>general string message</comment>
+	</arg>
+      </args>
+    </event>
+    <event id="0x7" name="ATINET_Err_Msg" severity="WARNING_HI"
+	   format_string="FT Msg: %s">
+      <args>
+	<arg name="Msg" type="string" size="40">
+	  <comment>error string message</comment>
+	</arg>
+      </args>
+    </event>
+    <event id="0x8" name="ATINET_PrmLdErr" severity="WARNING_HI"
+	   format_string="Paramter ID %d load error">
+      <args>
+	<arg name="id" type="U32">
+	  <comment>ID of parameter</comment>
+	</arg>
+      </args>
+    </event>
+    <event id="0x9" name="ATINET_PrmUpdated" severity="ACTIVITY_HI"
+           format_string="Paramter ID %d was updated">
+      <args>
+        <arg name="id" type="U32">
+          <comment>ID of parameter</comment>
+        </arg>
+      </args>
+    </event>
+    <event id="0xA" name="ATINET_TareStarted" severity="ACTIVITY_HI"
+           format_string="F/T tare started for %d cycles. Old tare values: %f %f %f %f %f %f">
+      <args>
+        <arg name="cycles" type="U32">
+          <comment>force x tare</comment>
+        </arg>
+        <arg name="fx" type="F32">
+          <comment>force x tare</comment>
+        </arg>
+        <arg name="fy" type="F32">
+          <comment>force y tare</comment>
+        </arg>
+        <arg name="fz" type="F32">
+          <comment>force z tare</comment>
+        </arg>
+        <arg name="tx" type="F32">
+          <comment>torque x tare</comment>
+        </arg>
+        <arg name="ty" type="F32">
+          <comment>torque y tare</comment>
+        </arg>
+        <arg name="tz" type="F32">
+          <comment>torque xz tare</comment>
+        </arg>
+      </args>
+    </event>
+    <event id="0xB" name="ATINET_TareComplete" severity="ACTIVITY_HI"
+           format_string="F/T tare completed. New tare values: %f %f %f %f %f %f">
+      <args>
+        <arg name="fx" type="F32">
+          <comment>force x tare</comment>
+        </arg>
+        <arg name="fy" type="F32">
+          <comment>force y tare</comment>
+        </arg>
+        <arg name="fz" type="F32">
+          <comment>force z tare</comment>
+        </arg>
+        <arg name="tx" type="F32">
+          <comment>torque x tare</comment>
+        </arg>
+        <arg name="ty" type="F32">
+          <comment>torque y tare</comment>
+        </arg>
+        <arg name="tz" type="F32">
+          <comment>torque xz tare</comment>
+        </arg>
+      </args>
+    </event>
+
+  </events>
+</component>

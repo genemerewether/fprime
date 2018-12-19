@@ -239,6 +239,8 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	Drv/ForceTorque/ATINetbox \
+	\
 	$(HLPROC_MODULES) \
 	\
 	$(COMMON_MODULES) \

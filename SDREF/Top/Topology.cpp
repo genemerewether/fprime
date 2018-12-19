@@ -445,8 +445,12 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 #endif
     
     // Initialize socket server
-    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
-    sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
+    if (port_number && hostname) {
+        sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
+    }
+    if (ll_port_number && hostname) {
+        sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
+    }
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -533,10 +537,10 @@ int main(int argc, char* argv[]) {
     bool kraitCycle = false;
     bool hexCycle = true;
     int numKraitCycles = 0;
-    U32 port_number = 50000;
-    U32 ll_port_number = 50001;
+    U32 port_number = 0;
+    U32 ll_port_number = 0;
     I32 option = 0;
-    char *hostname = "localhost";
+    char *hostname = NULL;
     bool local_cycle = true;
 
     // Removes ROS cmdline args as a side-effect
