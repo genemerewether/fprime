@@ -436,6 +436,7 @@ R5REF_MODULES := \
 	$(R5_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/Mavlink/ActuatorControls \
 	\
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \

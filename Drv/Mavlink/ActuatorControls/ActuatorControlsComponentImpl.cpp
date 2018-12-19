@@ -22,7 +22,21 @@
 #include "Fw/Types/BasicTypes.hpp"
 
 #define MAVLINK_NO_CONVERSION_HELPERS
+
+#ifdef BUILD_TIR5
+
+#ifndef __GNUC__
+#define __GNUC__
 #include <Drv/Mavlink/c_library_v2/mavlink_types.h>
+#undef __GNUC__
+#endif //__GNUC__
+
+#else //BUILD_TIR5
+
+#include <Drv/Mavlink/c_library_v2/mavlink_types.h>
+
+#endif //BUILD_TIR5
+
 
 extern mavlink_system_t mavlink_system;
 
