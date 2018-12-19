@@ -32,3 +32,6 @@
 [submodule "cross_toolchain"]
 	path = cross_toolchain
 	url = https://github.com/ATLFlight/cross_toolchain.git
+[submodule "Drv/Mavlink/c_library_v2"]
+	path = Drv/Mavlink/c_library_v2
+	url = https://github.com/mavlink/c_library_v2.git
