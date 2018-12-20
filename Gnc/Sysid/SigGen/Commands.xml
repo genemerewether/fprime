@@ -1,2 +1,44 @@
 <commands>
+    <command kind="sync" opcode="0" mnemonic="SIGGEN_SetChirp">
+        <args>
+            <arg name="omega_i" type="F64">
+            </arg>
+            <arg name="omega_f" type="F64">
+            </arg>
+            <arg name="amplitude" type="F64">
+            </arg>
+            <arg name="duration" type="F64">
+            </arg>
+            <arg name="offset" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="1" mnemonic="SIGGEN_SetAxis">
+        <args>
+            <arg name="x" type="F64">
+            </arg>
+            <arg name="y" type="F64">
+            </arg>
+            <arg name="z" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="2" mnemonic="SIGGEN_DoChirp">
+        <args>
+            <arg name="mode" type="ENUM">
+                <enum name="ChirpMode">
+                    <item name="ACTUATOR"/>
+                    <item name="THRUST"/>
+                    <item name="MOMENT"/>
+                    <item name="ATT_RATE"/>
+                </enum>
+            </arg>
+            <arg name="index" type="U8">
+            </arg>
+        </args>
+    </command>
+    <command kind="sync" opcode="3" mnemonic="SIGGEN_Cancel">
+        <args>
+        </args>
+    </command>
 </commands>

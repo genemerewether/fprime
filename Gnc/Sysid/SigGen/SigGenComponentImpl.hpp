@@ -23,6 +23,8 @@
 #include "Gnc/Sysid/SigGen/SigGenComponentAc.hpp"
 #include "Gnc/Sysid/SigGen/SigGenComponentImplCfg.hpp"
 
+#include "quest_gnc/sysid/signal_gen.h"
+
 namespace Gnc {
 
   class SigGenComponentImpl :
@@ -55,7 +57,12 @@ namespace Gnc {
       //!
       ~SigGenComponentImpl(void);
 
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -68,6 +75,68 @@ namespace Gnc {
           NATIVE_UINT_TYPE context /*!< The call order*/
       );
 
+      // ----------------------------------------------------------------------
+      // Command handler implementations 
+      // ----------------------------------------------------------------------
+
+      //! Implementation for SIGGEN_SetChirp command handler
+      //! 
+      void SIGGEN_SetChirp_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          F64 omega_i, 
+          F64 omega_f, 
+          F64 amplitude, 
+          F64 duration,
+          F64 offset
+      );
+
+      //! Implementation for SIGGEN_SetAxis command handler
+      //! 
+      void SIGGEN_SetAxis_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          F64 x, 
+          F64 y, 
+          F64 z 
+      );
+
+      //! Implementation for SIGGEN_DoChirp command handler
+      //! 
+      void SIGGEN_DoChirp_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          ChirpMode mode, 
+          U8 index 
+      );
+
+      //! Implementation for SIGGEN_Cancel command handler
+      //! 
+      void SIGGEN_Cancel_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
+
+      bool paramsInited;
+
+      F64 dt;
+
+      enum SignalType {
+          IDLE,
+          CHIRP,
+          STEP
+      } sigType;
+
+      ChirpMode chirpMode;
+      F64 offset;
+      U32 actuatorIdx;
+      U32 seq;
+
+      FwOpcodeType opCode;
+
+      U32 cmdSeq;
+
+      quest_gnc::sysid::SignalGen signalGen;
 
     };
 

@@ -9,6 +9,10 @@ enum {
     SIGGEN_SCHED_CONTEXT_POS
 };
 
+enum {
+    SIGGEN_MAX_ACTUATORS = 10
+};
+
 } // namespace Gnc
 
 #endif // SigGenCfg_HPP

@@ -152,7 +152,8 @@ QUEST_GNC_MODULES := \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
 	Gnc/quest_gnc/src/est \
-	Gnc/quest_gnc/src/mixer
+	Gnc/quest_gnc/src/mixer \
+	Gnc/quest_gnc/src/sysid
 
 QUEST_GNC_HW_MODULES := \
 	Gnc/Ctrl/ActuatorAdapter

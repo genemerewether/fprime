@@ -81,6 +81,7 @@ namespace Gnc {
     parametersLoaded()
   {
       Fw::ParamValid valid[12];
+      int stat;
 
       quest_gnc::multirotor::MultirotorModel mrModel = {paramGet_mass(valid[0]),
                                                         paramGet_I_xx(valid[1]),
@@ -98,9 +99,10 @@ namespace Gnc {
       this->J_b << mrModel.Ixx, mrModel.Ixy, mrModel.Ixz,
                    mrModel.Ixy, mrModel.Iyy, mrModel.Iyz,
                    mrModel.Ixz, mrModel.Iyz, mrModel.Izz;
-      (void) leeControl.SetModel(mrModel);
+      stat = leeControl.SetModel(mrModel);
+      if (stat) {  return;  }
 
-      (void) leeControl.SetGains(Eigen::Vector3d(paramGet_k_x__x(valid[0]),
+      stat = leeControl.SetGains(Eigen::Vector3d(paramGet_k_x__x(valid[0]),
                                                  paramGet_k_x__y(valid[1]),
                                                  paramGet_k_x__z(valid[2])),
                                  Eigen::Vector3d(paramGet_k_v__x(valid[3]),
@@ -112,6 +114,7 @@ namespace Gnc {
                                  Eigen::Vector3d(paramGet_k_omega__x(valid[9]),
                                                  paramGet_k_omega__y(valid[10]),
                                                  paramGet_k_omega__z(valid[11])));
+      if (stat) {  return;  }
 
       for (U32 i = 0; i < 12; i++) {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
