@@ -55,6 +55,7 @@ LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
+Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
@@ -73,6 +74,7 @@ void allocComps() {
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+        Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
         0, // adapter
@@ -98,6 +100,7 @@ void allocComps() {
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+        Gnc::SIGGEN_SCHED_CONTEXT_ATT, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
         0, // mixer
         0, // adapter
@@ -115,9 +118,10 @@ void allocComps() {
     NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         0, //TODO(mereweth) - IMU?
         Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+        0, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
         0, // mixer
-        0, // adapter
+        0, // adapter - for arming
         0, // logQueue
         0, // kraitRouter
     };
@@ -192,6 +196,12 @@ void allocComps() {
     actuatorAdapter_ptr = new Gnc::ActuatorAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("ACTADAP")
+#endif
+;
+
+    sigGen_ptr = new Gnc::SigGenComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SIGGEN")
 #endif
 ;
 
@@ -290,6 +300,7 @@ void constructApp() {
     leeCtrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
+    sigGen_ptr->init(0);
     imuInteg_ptr->init(0);
     mpu9250_ptr->init(0);
 
@@ -327,6 +338,7 @@ void constructApp() {
     imuInteg_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
+    sigGen_ptr->regCommands(0);
 
     // Open devices
 

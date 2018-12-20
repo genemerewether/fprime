@@ -27,6 +27,7 @@ void exitTasks(void);
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
+#include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
@@ -49,6 +50,7 @@ extern ROS::RosCycleComponentImpl rosCycle;
 extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;
+extern Gnc::SigGenComponentImpl sigGen;
 extern Gnc::ImuIntegComponentImpl imuInteg;
 
 #endif

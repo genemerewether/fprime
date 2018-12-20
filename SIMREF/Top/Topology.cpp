@@ -33,6 +33,7 @@ static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     0, // rosCycle
     SIMREF::RSDRV_SCHED_CONTEXT_TLM, // rotorSDrv
     Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+    Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
 };
 Svc::ActiveRateGroupImpl rg(
@@ -61,6 +62,7 @@ static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = 
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_ATT,
     Gnc::IMUINTEG_SCHED_CONTEXT_ATT,
+    Gnc::SIGGEN_SCHED_CONTEXT_ATT,
     Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
 Svc::PassiveRateGroupImpl rgAtt(
@@ -74,6 +76,7 @@ static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = 
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_POS,
     Gnc::IMUINTEG_SCHED_CONTEXT_POS,
+    Gnc::SIGGEN_SCHED_CONTEXT_POS,
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
 Svc::PassiveRateGroupImpl rgPos(
@@ -146,6 +149,12 @@ Gnc::BasicMixerComponentImpl mixer
 Gnc::ImuIntegComponentImpl imuInteg
 #if FW_OBJECT_NAMES == 1
                     ("IMUINTEG")
+#endif
+;
+
+Gnc::SigGenComponentImpl sigGen
+#if FW_OBJECT_NAMES == 1
+                    ("SIGGEN")
 #endif
 ;
 
@@ -224,6 +233,7 @@ void constructApp(int port_number, char* hostname) {
     leeCtrl.init(0);
     mixer.init(0);
     imuInteg.init(0);
+    sigGen.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger.init();
@@ -266,6 +276,7 @@ void constructApp(int port_number, char* hostname) {
     leeCtrl.regCommands();
     imuInteg.regCommands();
     mixer.regCommands();
+    sigGen.regCommands();
 
     // initialize file logs
     fileLogger.initLog("./log/");
@@ -273,6 +284,9 @@ void constructApp(int port_number, char* hostname) {
     // read parameters
     prmDb.readParamFile();
     leeCtrl.loadParameters();
+    imuInteg.loadParameters();
+    mixer.loadParameters();
+    sigGen.loadParameters();
 
     // Active component startup
     // start rate groups

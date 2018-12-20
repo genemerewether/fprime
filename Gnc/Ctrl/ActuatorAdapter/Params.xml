@@ -1,0 +1,5 @@
+<parameters>
+    <parameter id="0" set_opcode="20" save_opcode="21" name="numActuators" data_type="F64" >
+      <comment>number of actuators</comment>
+    </parameter>
+</parameters>

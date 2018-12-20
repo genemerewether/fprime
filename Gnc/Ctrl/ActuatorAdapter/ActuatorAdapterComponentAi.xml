@@ -17,6 +17,7 @@
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Telemetry.xml</import_dictionary>
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Events.xml</import_dictionary>
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Commands.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Params.xml</import_dictionary>
 
     <ports>
 
