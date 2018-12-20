@@ -31,8 +31,6 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
-#include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
-
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
 
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
@@ -60,6 +58,5 @@ extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
 extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
-extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 
 #endif

@@ -343,13 +343,13 @@ namespace HLProc {
 
 
         ActuatorsHandler actuatorsHandler0(compPtr, 0);
-        ros::Subscriber actuatorsSub0 = n.subscribe("dsp_pwm_command", 10,
+        ros::Subscriber actuatorsSub0 = n.subscribe("flight_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler0,
                                             ros::TransportHints().tcpNoDelay());
         
         ActuatorsHandler actuatorsHandler1(compPtr, 1);
-        ros::Subscriber actuatorsSub1 = n.subscribe("dsp_i2c_command", 10,
+        ros::Subscriber actuatorsSub1 = n.subscribe("aux_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());

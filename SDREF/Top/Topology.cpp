@@ -75,8 +75,6 @@ HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
 
-Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
-
 void allocComps() {
     // Component instance pointers
     NATIVE_INT_TYPE rgDivs[] = {10, 1};
@@ -216,13 +214,6 @@ void allocComps() {
 #endif
 ;
 
-
-    actuatorAdapter_ptr = new Gnc::ActuatorAdapterComponentImpl
-#if FW_OBJECT_NAMES == 1
-                        ("ACTADAP")
-#endif
-;
-
     fatalAdapter_ptr = new Svc::AssertFatalAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("fatalAdapter")
@@ -265,8 +256,7 @@ void manualConstruct() {
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(2, hexRouter_ptr->get_Sched_InputPort(0));
     
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
-    // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
     sdRosIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
@@ -283,8 +273,7 @@ void manualConstruct() {
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
 
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
-    // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
     sdRosIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
@@ -340,7 +329,6 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 
     hexRouter_ptr->init(10, 1000); // message size
     sdRosIface_ptr->init(0);
-    actuatorAdapter_ptr->init(0);
     
     serialTextConv_ptr->init(20,0);
     llRouter_ptr->init(10,SERIAL_BUFFER_SIZE,0);
