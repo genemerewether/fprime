@@ -338,7 +338,7 @@ void constructApp() {
     imuInteg_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
-    sigGen_ptr->regCommands(0);
+    sigGen_ptr->regCommands();
 
     // Open devices
 
