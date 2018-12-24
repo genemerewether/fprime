@@ -122,6 +122,7 @@ namespace Gnc {
                   this->sigType = IDLE;
                   // TODO(mereweth) - issue EVR
                   // TODO(mereweth) - check for "done" return code only
+                  // TODO(mereweth) - set actuator back to home setpoint
                   this->cmdResponse_out(this->opCode, this->cmdSeq,
                                         Fw::COMMAND_OK);
                   return;

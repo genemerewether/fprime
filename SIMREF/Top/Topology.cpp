@@ -35,6 +35,8 @@ static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
+    0, // mixer
+    0 // activeFileLogger
 };
 Svc::ActiveRateGroupImpl rg(
 #if FW_OBJECT_NAMES == 1
