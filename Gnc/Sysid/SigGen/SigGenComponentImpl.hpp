@@ -134,6 +134,8 @@ namespace Gnc {
           STEP
       } sigType;
 
+      // TODO(mereweth) - home setpoints for each actuator
+
       ChirpMode chirpMode;
       F64 offset;
       U32 actuatorIdx;

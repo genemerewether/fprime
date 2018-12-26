@@ -23,4 +23,9 @@
   <depend>mav_msgs</depend>
   <depend>mav_planning_msgs</depend>
   <depend>rosgraph_msgs</depend>
+
+  <!-- for manipulation -->
+  <depend>trac_ik_lib</depend>
+  <depend>orocos_kdl</depend>
+  <exec_depend>xacro</exec_depend>
 </package>
