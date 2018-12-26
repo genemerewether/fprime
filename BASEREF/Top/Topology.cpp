@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
     ros::start();
 
     ros::NodeHandle n;
-    ros::Subscriber updateSub = n.subscribe("att_setpoint", 10,
+    ros::Subscriber updateSub = n.subscribe("attitude_rate_thrust_setpoint", 1,
                                             attCallback);
         
     ros::spin();
