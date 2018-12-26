@@ -117,6 +117,13 @@ namespace Gnc {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
+      //! Implementation for SIGGEN_InitParams command handler
+      //! 
+      void SIGGEN_InitParams_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
+
       bool paramsInited;
 
       F64 dt;

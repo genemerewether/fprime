@@ -228,8 +228,27 @@ namespace Gnc {
         const U32 cmdSeq
     )
   {
+      if (IDLE != this->sigType) {
+          this->cmdResponse_out(this->opCode, this->cmdSeq,
+                                Fw::COMMAND_EXECUTION_ERROR);
+      }
       this->sigType = IDLE;
       this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
   }
 
+  void SigGenComponentImpl ::
+    SIGGEN_InitParams_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      this->parametersLoaded();
+      if (this->paramsInited) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+      }
+  }
+  
 } // end namespace Gnc

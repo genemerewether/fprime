@@ -20,6 +20,7 @@
 | | | |mode|ChirpMode||                    
 | | | |index|U8||                    
 |SIGGEN_Cancel|3 (0x3)|| | |   
+|SIGGEN_InitParams|4 (0x4)|| | |   
 
 ## Telemetry Channel List
 

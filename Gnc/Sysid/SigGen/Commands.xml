@@ -41,4 +41,8 @@
         <args>
         </args>
     </command>
+    <command kind="sync" opcode="4" mnemonic="SIGGEN_InitParams">
+        <args>
+        </args>
+    </command>
 </commands>
