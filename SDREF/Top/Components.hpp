@@ -27,6 +27,8 @@ void exitTasks(void);
 #include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
 #include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 
+#include <Svc/UdpReceiver/UdpReceiverComponentImpl.hpp>
+
 #include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
@@ -58,5 +60,6 @@ extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
 extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
+extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
 
 #endif

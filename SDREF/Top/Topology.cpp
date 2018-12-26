@@ -71,6 +71,7 @@ SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
 HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
+Svc::UdpReceiverComponentImpl* udpReceiver_ptr = 0;
 
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
@@ -225,6 +226,12 @@ void allocComps() {
                         ("fatalHandler")
 #endif
 ;
+
+    udpReceiver_ptr = new Svc::UdpReceiverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("UDPRECV")
+#endif
+;
 }
 
 #if FW_OBJECT_REGISTRATION == 1
@@ -241,7 +248,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct() {
+void manualConstruct() {  
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -261,6 +268,7 @@ void manualConstruct() {
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
     sdRosIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
+    udpReceiver_ptr->set_PortsOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(7));
 #else
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
@@ -278,10 +286,11 @@ void manualConstruct() {
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
     sdRosIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
+    udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn__InputPort(7));
 #endif
 }
 
-void constructApp(int port_number, int ll_port_number, char* hostname) {
+void constructApp(int port_number, int ll_port_number, char* udp_string, char* hostname) {
     allocComps();
   
     localTargetInit();
@@ -334,6 +343,8 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
     llRouter_ptr->init(10,SERIAL_BUFFER_SIZE,0);
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
+
+    udpReceiver_ptr->init(0);
     
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
@@ -439,6 +450,11 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
     if (ll_port_number && hostname) {
         sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
     }
+
+    if (udp_string) {
+        udpReceiver_ptr->open(udp_string);
+        udpReceiver_ptr->startThread(85,20*1024);
+    }
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -495,7 +511,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
 }
 
 
@@ -529,12 +545,13 @@ int main(int argc, char* argv[]) {
     U32 ll_port_number = 0;
     I32 option = 0;
     char *hostname = NULL;
+    char* udp_string = 0;
     bool local_cycle = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:x:a:o:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlp:x:a:u:o:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -551,6 +568,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'a':
                 hostname = optarg;
+                break;
+            case 'u':
+                udp_string = optarg;
                 break;
             case 'i':
                 noInit = true;
@@ -588,7 +608,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
     
-    constructApp(port_number, ll_port_number, hostname);
+    constructApp(port_number, ll_port_number, udp_string, hostname);
     //dumparch();
 
     ros::start();

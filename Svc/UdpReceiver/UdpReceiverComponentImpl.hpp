@@ -64,7 +64,7 @@ namespace Svc {
       void startThread(
               NATIVE_UINT_TYPE priority, /*!< read task priority */
               NATIVE_UINT_TYPE stackSize, /*!< stack size */
-              NATIVE_UINT_TYPE affinity /*!< cpu affinity */
+              NATIVE_UINT_TYPE affinity = -1 /*!< cpu affinity */
       );
 
 

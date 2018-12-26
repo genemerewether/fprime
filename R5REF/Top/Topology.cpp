@@ -249,6 +249,7 @@ void manualConstruct() {
     hlRouter_ptr->set_HLPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     hlRouter_ptr->set_HLPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 }
 
 void constructApp() {

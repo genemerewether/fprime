@@ -276,6 +276,7 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 }
 
 void constructApp() {
@@ -346,7 +347,7 @@ void constructApp() {
     meta.minIn = 0.0f;
     meta.maxIn = 3840.0f;
     meta.minOut = 0;
-    meta.maxOut = 800;
+    meta.maxOut = 300;
 
     meta.addr = 11;
     actuatorAdapter_ptr->setupI2C(0, meta);
