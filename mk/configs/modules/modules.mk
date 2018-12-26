@@ -100,7 +100,9 @@ SVC_MODULES := \
 	Svc/FileManager \
 	Svc/SerialTextConverter \
 	Svc/ActiveTextLogger \
-	Svc/Tee
+	Svc/Tee \
+	Svc/UdpSender \
+	Svc/UdpReceiver
 
 DRV_MODULES := \
 	Drv/DataTypes \
@@ -241,8 +243,6 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
-	Drv/ForceTorque/ATINetbox \
-	\
 	$(HLPROC_MODULES) \
 	\
 	$(COMMON_MODULES) \
@@ -251,6 +251,31 @@ SDREF_MODULES := \
 	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(SNAPDRAGON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+BASEREF_DEPLOYMENT_MODULES := \
+	BASEREF/Top
+
+BASEREF_MODULES := \
+	\
+	$(BASEREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	\
+	$(COMMON_MODULES) \
 	\
 	$(SVC_MODULES) \
 	\
@@ -535,7 +560,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse
