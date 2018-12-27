@@ -7,8 +7,8 @@ NUMROTORS_PRM_SET, 4
 # back_arm_x 0.05 m
 # back_arm_y 0.05 m
 
-M_X__1_PRM_SET, 2e-9
-M_Y__1_PRM_SET, 4.2e-9
+M_X__1_PRM_SET, 4.2e-9
+M_Y__1_PRM_SET, 1.5e-9
 M_Z__1_PRM_SET, -7e-10
 T__1_PRM_SET, 6.5e-8
 
@@ -17,8 +17,8 @@ M_Y__2_PRM_SET, -3.3e-9
 M_Z__2_PRM_SET, -7e-10
 T__2_PRM_SET, 6.5e-8
 
-M_X__3_PRM_SET, -2e-9
-M_Y__3_PRM_SET, 4.2e-9
+M_X__3_PRM_SET, -4.2e-9
+M_Y__3_PRM_SET, 1.5e-9
 M_Z__3_PRM_SET, 7e-10
 T__3_PRM_SET, 6.5e-8
 

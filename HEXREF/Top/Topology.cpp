@@ -345,9 +345,9 @@ void constructApp() {
 
     Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
     meta.minIn = 0.0f;
-    meta.maxIn = 3840.0f;
+    meta.maxIn = 6000.0f;
     meta.minOut = 0;
-    meta.maxOut = 300;
+    meta.maxOut = 800;
 
     meta.addr = 11;
     actuatorAdapter_ptr->setupI2C(0, meta);
