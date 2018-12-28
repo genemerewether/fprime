@@ -57,6 +57,7 @@ Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLoggerLL_ptr = 0;
 Svc::ActiveFileLoggerImpl* fileLogger_ptr = 0;
+Svc::SerLoggerComponentImpl* serLogger_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
@@ -135,6 +136,12 @@ void allocComps() {
 #endif
 ;
 
+    serLogger_ptr = new Svc::SerLoggerComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SERLOG")
+#endif
+;
+    
     linuxTime_ptr = new Svc::LinuxTimeImpl
 #if FW_OBJECT_NAMES == 1
                         ("LTIME")
@@ -259,6 +266,7 @@ void manualConstruct() {
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
     
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(2, hexRouter_ptr->get_Sched_InputPort(0));
     
@@ -279,7 +287,8 @@ void manualConstruct() {
 
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
-
+    llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+    
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
@@ -313,6 +322,7 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     eventLogger_ptr->init(10,0);
     eventLoggerLL_ptr->init(10,0);
     fileLogger_ptr->init(10);
+    serLogger_ptr->init(0);
 
     linuxTime_ptr->init(0);
 

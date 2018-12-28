@@ -69,6 +69,8 @@ namespace Gnc {
           F64 maxIn;
           U32 minOut;
           U32 maxOut;
+          // unused in setup - stores I2C response
+          U8 respBytes[2];
       };
 
       bool setupI2C(U32 actuator, I2CMetadata meta);

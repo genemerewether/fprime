@@ -241,6 +241,7 @@ void manualConstruct() {
 
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(5));
+    actuatorAdapter_ptr->set_serialDat_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(6));
 
     hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));

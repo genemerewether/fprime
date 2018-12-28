@@ -35,6 +35,9 @@
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>
+        
+        <port name="serialDat" data_type="Serial"  kind="output"    max_number="1">
+        </port>
 
         <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
         </port>

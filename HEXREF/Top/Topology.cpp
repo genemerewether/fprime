@@ -268,6 +268,7 @@ void manualConstruct(void) {
 
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
+    actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));

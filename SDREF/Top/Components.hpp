@@ -7,6 +7,7 @@ void exitTasks(void);
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 #include <Svc/SerialTextConverter/SerialTextConverterImpl.hpp>
 #include <Svc/ActiveFileLogger/ActiveFileLoggerImpl.hpp>
+#include <Svc/SerLogger/SerLoggerComponentImpl.hpp>
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
@@ -52,6 +53,7 @@ extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLoggerLL_ptr;
 extern Svc::ActiveFileLoggerImpl* fileLogger_ptr;
+extern Svc::SerLoggerComponentImpl* serLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;
 extern Svc::CommandDispatcherImpl* cmdDisp_ptr;

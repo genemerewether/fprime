@@ -20,6 +20,7 @@
 
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
+#include "Fw/Types/SerialBuffer.hpp"
 
 #ifdef BUILD_DSPAL
 #include <HAP_farf.h>
@@ -142,6 +143,29 @@ namespace Gnc {
                       Fw::Buffer readBufObj(0, 0, (U64) readBuf, 2);
                       Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, 2);
                       this->escReadWrite_out(0, writeBufObj, readBufObj);
+                      
+                      this->outputInfo[i].i2cMeta.respBytes[0] = readBuf[0];
+                      this->outputInfo[i].i2cMeta.respBytes[1] = readBuf[1];
+                      
+                      Fw::SerializeStatus status;
+                      // sec, usec, motor id, response
+                      U8 buff[2 * sizeof(U32) + sizeof(U8) + 2 * sizeof(U8)];
+                      Fw::SerialBuffer buffObj(buff, FW_NUM_ARRAY_ELEMENTS(buff));
+                      Fw::Time now = this->getTime();
+                      status = buffObj.serialize(now.getSeconds());
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(now.getUSeconds());
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize((U8) i);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(readBuf[0]);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(readBuf[1]);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+
+                      if (this->isConnected_serialDat_OutputPort(0)) {
+                          this->serialDat_out(0, buffObj);
+                      }
                   }
                   else {
                       //TODO(mereweth) - issue error
