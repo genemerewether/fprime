@@ -39,7 +39,7 @@ namespace Gnc {
       paramsInited(false),
       dt(0.0),
       sigType(IDLE),
-      chirpMode(ACTUATOR),
+      outputMode(ACTUATOR),
       offset(0.0),
       actuatorIdx(0u),
       seq(0u),
@@ -78,6 +78,8 @@ namespace Gnc {
       Fw::ParamValid valid[1];
       this->dt = paramGet_SIGGEN_dt(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
+      // TODO(mereweth) - shared constant for small number
+      if (this->dt < 1e-6) {  return;  }
       
       paramsInited = true;
   }
@@ -97,12 +99,12 @@ namespace Gnc {
       else if (SIGGEN_SCHED_CONTEXT_TLM == context) {
       }
       else if (SIGGEN_SCHED_CONTEXT_ATT == context) {
-          if (CHIRP != this->sigType) {
+          if (IDLE == this->sigType) {
               return;
           }
 
-          if (ACTUATOR == this->chirpMode) {
-              F64 angVel[SIGGEN_MAX_ACTUATORS];
+          if (ACTUATOR == this->outputMode) {
+              F64 angVel[SIGGEN_MAX_ACTUATORS] = {0.0};
               NATIVE_INT_TYPE stat = 0;
               if (this->actuatorIdx >= SIGGEN_MAX_ACTUATORS) {
                   this->sigType = IDLE;
@@ -122,10 +124,11 @@ namespace Gnc {
                   this->sigType = IDLE;
                   // TODO(mereweth) - issue EVR
                   // TODO(mereweth) - check for "done" return code only
-                  // TODO(mereweth) - set actuator back to home setpoint
+                  // TODO(mereweth) - set actuator back to home setpoint (not zero)
                   this->cmdResponse_out(this->opCode, this->cmdSeq,
                                         Fw::COMMAND_OK);
-                  return;
+
+                  angVel[this->actuatorIdx] = 0.0;
               }
 
               ROS::std_msgs::Header h(this->seq++,
@@ -202,10 +205,36 @@ namespace Gnc {
   }
 
   void SigGenComponentImpl ::
-    SIGGEN_DoChirp_cmdHandler(
+    SIGGEN_SetRamp_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq,
-        ChirpMode mode,
+        F64 amplitude,
+        F64 halfDuration,
+        F64 offset
+    )
+  {
+      if (!this->paramsInited ||
+          IDLE != this->sigType) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+          return;
+      }
+      int stat = signalGen.SetRamp(amplitude,
+                                   static_cast<U32>(2.0 * halfDuration / this->dt),
+                                   this->dt);
+      this->offset = offset;
+      if (stat) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+          return;
+      }
+      this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+  }
+  
+  void SigGenComponentImpl ::
+    SIGGEN_Start_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        OutputMode outputMode,
+        SignalType signalType,
         U8 index
     )
   {
@@ -214,13 +243,17 @@ namespace Gnc {
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
           return;
       }
+      
       this->opCode = opCode;
       this->cmdSeq = cmdSeq;
 
-      // TODO(mereweth) - convert ChirpMode to OutputMode and use for steps also
-      this->sigType = CHIRP;
+      this->sigType = signalType;
       this->actuatorIdx = index;
-      this->chirpMode = mode;
+      this->outputMode = outputMode;
+
+      if (IDLE == this->sigType) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }      
   }
 
   void SigGenComponentImpl ::
@@ -229,6 +262,7 @@ namespace Gnc {
         const U32 cmdSeq
     )
   {
+      // NOTE(Mereweth) - notify that previous command did not finish
       if (IDLE != this->sigType) {
           this->cmdResponse_out(this->opCode, this->cmdSeq,
                                 Fw::COMMAND_EXECUTION_ERROR);

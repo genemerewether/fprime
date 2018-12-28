@@ -23,14 +23,22 @@
             </arg>
          </args>
     </command>
-    <command kind="sync" opcode="2" mnemonic="SIGGEN_DoChirp">
+    <command kind="sync" opcode="2" mnemonic="SIGGEN_Start">
         <args>
-            <arg name="mode" type="ENUM">
-                <enum name="ChirpMode">
+            <arg name="outputMode" type="ENUM">
+                <enum name="OutputMode">
                     <item name="ACTUATOR"/>
                     <item name="THRUST"/>
                     <item name="MOMENT"/>
                     <item name="ATT_RATE"/>
+                </enum>
+            </arg>
+            <arg name="signalType" type="ENUM">
+                <enum name="SignalType">
+                    <item name="IDLE"/>
+                    <item name="CHIRP"/>
+                    <item name="RAMP"/>
+                    <item name="STEP"/>
                 </enum>
             </arg>
             <arg name="index" type="U8">
@@ -44,5 +52,15 @@
     <command kind="sync" opcode="4" mnemonic="SIGGEN_InitParams">
         <args>
         </args>
+    </command>
+    <command kind="sync" opcode="5" mnemonic="SIGGEN_SetRamp">
+        <args>
+            <arg name="amplitude" type="F64">
+            </arg>
+            <arg name="halfDuration" type="F64">
+            </arg>
+            <arg name="offset" type="F64">
+            </arg>
+         </args>
     </command>
 </commands>

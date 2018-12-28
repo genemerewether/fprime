@@ -100,13 +100,24 @@ namespace Gnc {
           F64 y, 
           F64 z 
       );
-
-      //! Implementation for SIGGEN_DoChirp command handler
+    
+      //! Implementation for SIGGEN_SetRamp command handler
       //! 
-      void SIGGEN_DoChirp_cmdHandler(
+      void SIGGEN_SetRamp_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq, /*!< The command sequence number*/
-          ChirpMode mode, 
+          F64 amplitude, 
+          F64 halfDuration, 
+          F64 offset 
+      );    
+    
+      //! Implementation for SIGGEN_Start command handler
+      //! 
+      void SIGGEN_Start_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          OutputMode outputMode, 
+          SignalType signalType, 
           U8 index 
       );
 
@@ -128,15 +139,11 @@ namespace Gnc {
 
       F64 dt;
 
-      enum SignalType {
-          IDLE,
-          CHIRP,
-          STEP
-      } sigType;
+      SignalType sigType;
 
       // TODO(mereweth) - home setpoints for each actuator
 
-      ChirpMode chirpMode;
+      OutputMode outputMode;
       F64 offset;
       U32 actuatorIdx;
       U32 seq;

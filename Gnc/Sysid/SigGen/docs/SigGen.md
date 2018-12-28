@@ -16,11 +16,16 @@
 | | | |x|F64||                    
 | | | |y|F64||                    
 | | | |z|F64||                    
-|SIGGEN_DoChirp|2 (0x2)|| | |   
-| | | |mode|ChirpMode||                    
+|SIGGEN_Start|2 (0x2)|| | |   
+| | | |outputMode|OutputMode||                    
+| | | |signalType|SignalType||                    
 | | | |index|U8||                    
 |SIGGEN_Cancel|3 (0x3)|| | |   
 |SIGGEN_InitParams|4 (0x4)|| | |   
+|SIGGEN_SetRamp|5 (0x5)|| | |   
+| | | |amplitude|F64||                    
+| | | |halfDuration|F64||                    
+| | | |offset|F64||                    
 
 ## Telemetry Channel List
 
