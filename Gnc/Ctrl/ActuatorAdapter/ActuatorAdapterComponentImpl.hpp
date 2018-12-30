@@ -69,11 +69,14 @@ namespace Gnc {
           F64 maxIn;
           U32 minOut;
           U32 maxOut;
-          // unused in setup - stores I2C response
-          U8 respBytes[2];
+          bool reverse;
       };
 
       bool setupI2C(U32 actuator, I2CMetadata meta);
+
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+
+      void parametersLoaded();
 
     PRIVATE:
 
@@ -109,10 +112,28 @@ namespace Gnc {
           bool armState
       );
 
+      //! Implementation for ACTADAP_InitParams command handler
+      //!
+      void ACTADAP_InitParams_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
+
       enum OutputType {
-          OUTPUT_UNSET,
-          OUTPUT_PWM,
-          OUTPUT_I2C
+          OUTPUT_UNSET = 0,
+          OUTPUT_VALID_MIN = 1,
+          OUTPUT_PWM = OUTPUT_VALID_MIN,
+          OUTPUT_I2C = 2,
+          OUTPUT_VALID_MAX = OUTPUT_I2C
+      };
+
+      struct Feedback {
+          U32 sec;
+          U32 usec;
+          U32 counts;
+          F32 voltage; // voltage of supply
+          F32 temperature; // celsius?
+          F32 current; // amps?
       };
 
       struct OutputInfo {
@@ -121,6 +142,7 @@ namespace Gnc {
               PwmMetadata pwmMeta;
               I2CMetadata i2cMeta;
           };
+          Feedback feedback;
       } outputInfo[AA_MAX_ACTUATORS];
 
       enum ArmingState {
@@ -134,6 +156,10 @@ namespace Gnc {
       U32 cmdSeq;
 
       U32 armCount;
+
+      U32 numActuators;
+
+      bool paramsInited;
 
     };
 

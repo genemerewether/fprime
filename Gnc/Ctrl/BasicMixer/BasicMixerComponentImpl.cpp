@@ -72,6 +72,7 @@ namespace Gnc {
   void BasicMixerComponentImpl ::
     parametersLoaded()
   {
+      this->paramsInited = false;
       Fw::ParamValid valid[4];
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
@@ -128,7 +129,7 @@ namespace Gnc {
 
       (void) basicMixer.SetMixer(mixer);
 
-      paramsInited = true;
+      this->paramsInited = true;
   }
 
   // ----------------------------------------------------------------------

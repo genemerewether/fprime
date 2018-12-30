@@ -344,21 +344,6 @@ void constructApp() {
 
     // Open devices
 
-    Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
-    meta.minIn = 0.0f;
-    meta.maxIn = 6000.0f;
-    meta.minOut = 0;
-    meta.maxOut = 800;
-
-    meta.addr = 11;
-    actuatorAdapter_ptr->setupI2C(0, meta);
-    meta.addr = 12;
-    actuatorAdapter_ptr->setupI2C(1, meta);
-    meta.addr = 13;
-    actuatorAdapter_ptr->setupI2C(2, meta);
-    meta.addr = 14;
-    actuatorAdapter_ptr->setupI2C(3, meta);
-
 #ifdef BUILD_DSPAL
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv_ptr->open(1, 0, Drv::SPI_FREQUENCY_1MHZ);

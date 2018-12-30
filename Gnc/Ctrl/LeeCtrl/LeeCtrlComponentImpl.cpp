@@ -80,6 +80,7 @@ namespace Gnc {
   void LeeCtrlComponentImpl ::
     parametersLoaded()
   {
+      this->paramsInited = false;
       Fw::ParamValid valid[12];
       int stat;
 
@@ -120,7 +121,7 @@ namespace Gnc {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
       }
 
-      paramsInited = true;
+      this->paramsInited = true;
   }
 
   void LeeCtrlComponentImpl ::

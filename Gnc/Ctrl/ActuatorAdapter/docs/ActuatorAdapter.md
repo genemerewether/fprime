@@ -8,6 +8,7 @@
 |---|---|---|---|---|---|
 |ACTADAP_Arm|0 (0x0)|| | |   
 | | | |armState|bool||                    
+|ACTADAP_InitParams|1 (0x1)|| | |   
 
 ## Telemetry Channel List
 
