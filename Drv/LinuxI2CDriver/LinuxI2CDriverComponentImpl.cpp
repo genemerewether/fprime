@@ -80,8 +80,10 @@ namespace Drv {
         if (stat < 1) {
             this->log_WARNING_HI_I2C_WriteError(this->m_device,stat);
         }
-        this->m_bytes += readBuffer.getsize();
-        this->tlmWrite_I2C_Bytes(this->m_bytes);
+        this->m_readBytes += readBuffer.getsize();
+        this->m_writeBytes += writeBuffer.getsize();
+        this->tlmWrite_I2C_ReadBytes(this->m_readBytes);
+        this->tlmWrite_I2C_WriteBytes(this->m_writeBytes);
 
     }
 

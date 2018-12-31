@@ -22,6 +22,14 @@
 #include "Fw/Types/BasicTypes.hpp"
 #include "Fw/Types/SerialBuffer.hpp"
 
+#include <math.h>
+
+#ifndef M_PI
+#ifdef BUILD_DSPAL
+#define M_PI 3.14159265358979323846
+#endif
+#endif
+
 #ifdef BUILD_DSPAL
 #include <HAP_farf.h>
 #define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
@@ -84,6 +92,9 @@ namespace Gnc {
       if (actuator >= AA_MAX_ACTUATORS) {
           return false;
       }
+      if (0 == meta.countsPerRev) {
+          return false;
+      }
 
       this->outputInfo[actuator].type = OUTPUT_I2C;
       this->outputInfo[actuator].i2cMeta = meta;
@@ -103,13 +114,14 @@ namespace Gnc {
     parametersLoaded()
   {
       this->paramsInited = false;
-      Fw::ParamValid valid[6];
+      Fw::ParamValid valid[7];
       this->numActuators = paramGet_numActuators(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       if (this->numActuators >= AA_MAX_ACTUATORS) {  return;  }
 
       OutputType outType = OUTPUT_UNSET;
       I2CMetadata i2c;
+      // TODO(mereweth) - macro-ize the param get calls
       for (U32 i = 0; i < this->numActuators; i++) {
           switch (i) {
               case 0:
@@ -126,6 +138,7 @@ namespace Gnc {
                           i2c.minOut = (U32) paramGet_a1_minOut(valid[3]);
                           i2c.maxOut = (U32) paramGet_a1_maxOut(valid[4]);
                           i2c.reverse = paramGet_a1_reverse(valid[5]);
+                          i2c.countsPerRev = paramGet_a1_counts(valid[6]);
                           if (!setupI2C(i, i2c)) {  return;  }
                           break;
                       default:
@@ -148,6 +161,7 @@ namespace Gnc {
                           i2c.minOut = (U32) paramGet_a2_minOut(valid[3]);
                           i2c.maxOut = (U32) paramGet_a2_maxOut(valid[4]);
                           i2c.reverse = paramGet_a2_reverse(valid[5]);
+                          i2c.countsPerRev = paramGet_a2_counts(valid[6]);
                           if (!setupI2C(i, i2c)) {  return;  }
                           break;
                       default:
@@ -170,6 +184,7 @@ namespace Gnc {
                           i2c.minOut = (U32) paramGet_a3_minOut(valid[3]);
                           i2c.maxOut = (U32) paramGet_a3_maxOut(valid[4]);
                           i2c.reverse = paramGet_a3_reverse(valid[5]);
+                          i2c.countsPerRev = paramGet_a3_counts(valid[6]);
                           if (!setupI2C(i, i2c)) {  return;  }
                           break;
                       default:
@@ -192,6 +207,7 @@ namespace Gnc {
                           i2c.minOut = (U32) paramGet_a4_minOut(valid[3]);
                           i2c.maxOut = (U32) paramGet_a4_maxOut(valid[4]);
                           i2c.reverse = paramGet_a4_reverse(valid[5]);
+                          i2c.countsPerRev = paramGet_a4_counts(valid[6]);
                           if (!setupI2C(i, i2c)) {  return;  }
                           break;
                       default:
@@ -214,6 +230,7 @@ namespace Gnc {
                           i2c.minOut = (U32) paramGet_a5_minOut(valid[3]);
                           i2c.maxOut = (U32) paramGet_a5_maxOut(valid[4]);
                           i2c.reverse = paramGet_a5_reverse(valid[5]);
+                          i2c.countsPerRev = paramGet_a5_counts(valid[6]);
                           if (!setupI2C(i, i2c)) {  return;  }
                           break;
                       default:
@@ -236,6 +253,7 @@ namespace Gnc {
                           i2c.minOut = (U32) paramGet_a6_minOut(valid[3]);
                           i2c.maxOut = (U32) paramGet_a6_maxOut(valid[4]);
                           i2c.reverse = paramGet_a6_reverse(valid[5]);
+                          i2c.countsPerRev = paramGet_a6_counts(valid[6]);
                           if (!setupI2C(i, i2c)) {  return;  }
                           break;
                       default:
@@ -277,11 +295,12 @@ namespace Gnc {
       NATIVE_INT_TYPE angVelSize = 0;
       const F64* angVels = Actuators.getangular_velocities(angVelSize);
 
+      // send commands - lower latency
       for (U32 i = 0; i < FW_MIN(angVelCount, angVelSize); i++) {
           switch (this->outputInfo[i].type) {
               case OUTPUT_UNSET:
               {
-                  //TODO(mereweth) - issue error
+                  //TODO(mereweth) - issue diagnostic that this is unset
               }
                   break;
               case OUTPUT_PWM:
@@ -298,7 +317,7 @@ namespace Gnc {
               {
                   if (this->isConnected_escConfig_OutputPort(0) &&
                       this->isConnected_escReadWrite_OutputPort(0)) {
-                      Fw::Time now = this->getTime();
+                      Fw::Time cmdTime = this->getTime();
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
                       this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
@@ -313,10 +332,50 @@ namespace Gnc {
 
                       // TODO(mereweth) - run controller here
 
-                      U8 readBuf[9] = { 0 };
                       // MSB is reverse bit
-                      U8 writeBuf[2] = { (U8) ((out / 8) | ((i2c.reverse ? 1 : 0) << 7)),
+                      U8 writeBuf[3] = { 0x00,
+                                         (U8) ((out / 8) | ((i2c.reverse ? 1 : 0) << 7)),
                                          (U8) (out % 8) };
+                      Fw::Buffer readBufObj(0, 0, 0, 0); // no read
+                      Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                      this->escReadWrite_out(0, writeBufObj, readBufObj);
+
+                      this->outputInfo[i].feedback.cmd     = out;
+                      this->outputInfo[i].feedback.cmdSec  = cmdTime.getSeconds();
+                      this->outputInfo[i].feedback.cmdUsec = cmdTime.getUSeconds();
+                  }
+                  else {
+                      //TODO(mereweth) - issue error
+                  }
+              }
+                  break;
+              default:
+                  //TODO(mereweth) - DEBUG_PRINT
+                  FW_ASSERT(0, this->outputInfo[i].type);
+          }
+      }
+
+      // get feedback - higher latency OK
+      for (U32 i = 0; i < FW_MIN(angVelCount, angVelSize); i++) {
+          switch (this->outputInfo[i].type) {
+              case OUTPUT_UNSET:
+              case OUTPUT_PWM:
+                  //NOTE(mereweth) - no way to get feedback
+                  break;
+              case OUTPUT_I2C:
+              {
+                  if (this->isConnected_escConfig_OutputPort(0) &&
+                      this->isConnected_escReadWrite_OutputPort(0)) {
+                      Fw::Time fbTime = this->getTime();
+                      F64 fbTimeLast = (F64) this->outputInfo[i].feedback.fbSec +
+                        (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
+                      U32 countsLast = this->outputInfo[i].feedback.counts;
+
+                      // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
+                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
+
+                      U8 readBuf[9] = { 0 };
+                      U8 writeBuf[1] = { 0x02 }; // start at rev_count_h
                       Fw::Buffer readBufObj(0, 0, (U64) readBuf, FW_NUM_ARRAY_ELEMENTS(readBuf));
                       Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
                       this->escReadWrite_out(0, writeBufObj, readBufObj);
@@ -326,29 +385,72 @@ namespace Gnc {
                           this->outputInfo[i].feedback.voltage     = (F32) ((readBuf[2] << 8) + readBuf[3]) / 1000.0;
                           this->outputInfo[i].feedback.temperature = (F32) ((readBuf[4] << 8) + readBuf[5]) / 1000.0;
                           this->outputInfo[i].feedback.current     = (F32) ((readBuf[6] << 8) + readBuf[7]) / 1000.0;
-                          this->outputInfo[i].feedback.sec         = now.getSeconds();
-                          this->outputInfo[i].feedback.usec        = now.getUSeconds();
-                      }
+                          this->outputInfo[i].feedback.fbSec       = fbTime.getSeconds();
+                          this->outputInfo[i].feedback.fbUsec      = fbTime.getUSeconds();
+                          
+                          F64 fbTimeFloat = (F64) this->outputInfo[i].feedback.fbSec +
+                            (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
 
-                      // TODO(mereweth) - run rate estimator here
+                          U32 countsDiff = 0u;
+                          //To account for the CSC rolling over at 0xFFFF = 2^16-1
+                          if (countsLast > this->outputInfo[i].feedback.counts) {
+                              countsDiff = 0xFFFF - countsLast + this->outputInfo[i].feedback.counts;
+                          }
+                          else{
+                              countsDiff = this->outputInfo[i].feedback.counts - countsLast;
+                          }
+
+                          // guard against bad parameter setting and small time increment
+                          if ((this->outputInfo[i].i2cMeta.countsPerRev > 0) && 
+                              (fbTimeFloat - fbTimeLast > 1e-4)) {
+                              this->outputInfo[i].feedback.angVel = 2.0 * M_PI * countsDiff / 
+                                (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
+                              // TODO(mereweth) - run rate estimator here
+
+                              switch (i) {
+                                  case 0:
+                                      this->tlmWrite_ACTADAP_Rot0(this->outputInfo[i].feedback.angVel);
+                                      break;
+                                  case 1:
+                                      this->tlmWrite_ACTADAP_Rot1(this->outputInfo[i].feedback.angVel);
+                                      break;
+                                  case 2:
+                                      this->tlmWrite_ACTADAP_Rot2(this->outputInfo[i].feedback.angVel);
+                                      break;
+                                  case 3:
+                                      this->tlmWrite_ACTADAP_Rot3(this->outputInfo[i].feedback.angVel);
+                                      break;
+                                  case 4:
+                                      this->tlmWrite_ACTADAP_Rot4(this->outputInfo[i].feedback.angVel);
+                                      break;
+                                  case 5:
+                                      this->tlmWrite_ACTADAP_Rot5(this->outputInfo[i].feedback.angVel);
+                                      break;
+                                  default:
+                                      break;
+                              }
+                          }
+                      }
                       
                       Fw::SerializeStatus status;
                       // sec, usec, motor id, command, response
                       U8 buff[2 * sizeof(U32) + sizeof(U8) + 2 * sizeof(U8)];
                       Fw::SerialBuffer buffObj(buff, FW_NUM_ARRAY_ELEMENTS(buff));
-                      status = buffObj.serialize(now.getSeconds());
-                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
-                      status = buffObj.serialize(now.getUSeconds());
-                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
-                      status = buffObj.serialize((U8) i);
+                      status = buffObj.serialize((U16) i);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
 
-                      NATIVE_INT_TYPE size = FW_NUM_ARRAY_ELEMENTS(writeBuf);
-                      status = buffObj.serialize(writeBuf, size, false); // serialize length
-                      FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(writeBuf) == size, size);
+                      status = buffObj.serialize(this->outputInfo[i].feedback.cmdSec);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(this->outputInfo[i].feedback.cmdUsec);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(this->outputInfo[i].feedback.cmd);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
 
-                      size = FW_NUM_ARRAY_ELEMENTS(readBuf);
+                      status = buffObj.serialize(this->outputInfo[i].feedback.fbSec);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(this->outputInfo[i].feedback.fbUsec);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      NATIVE_INT_TYPE size = FW_NUM_ARRAY_ELEMENTS(readBuf);
                       status = buffObj.serialize(readBuf, size, false); // serialize length
                       FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(readBuf) == size, size);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));

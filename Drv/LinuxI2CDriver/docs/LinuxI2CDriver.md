@@ -6,7 +6,8 @@
 
 |Channel Name|ID|Type|Description|
 |---|---|---|---|
-|I2C_Bytes|0 (0x0)|U32|Bytes Sent/Received|
+|I2C_ReadBytes|0 (0x0)|U32|Bytes Received|
+|I2C_WriteBytes|1 (0x1)|U32|Bytes Sent|
 
 ## Event List
 

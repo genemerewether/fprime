@@ -70,6 +70,7 @@ namespace Gnc {
           U32 minOut;
           U32 maxOut;
           bool reverse;
+          U32 countsPerRev;
       };
 
       bool setupI2C(U32 actuator, I2CMetadata meta);
@@ -128,9 +129,13 @@ namespace Gnc {
       };
 
       struct Feedback {
-          U32 sec;
-          U32 usec;
+          U32 cmdSec;
+          U32 cmdUsec;
+          U32 cmd;
+          U32 fbSec;
+          U32 fbUsec;
           U32 counts;
+          F64 angVel;
           F32 voltage; // voltage of supply
           F32 temperature; // celsius?
           F32 current; // amps?

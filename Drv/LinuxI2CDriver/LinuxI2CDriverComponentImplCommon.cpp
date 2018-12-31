@@ -33,7 +33,7 @@ namespace Drv {
 #else
     LinuxI2CDriverImpl(void)
 #endif
-    ,m_fd(-1),m_device(-1),m_bytes(0)
+    ,m_fd(-1),m_device(-1),m_readBytes(0),m_writeBytes(0)
     {
 
     }

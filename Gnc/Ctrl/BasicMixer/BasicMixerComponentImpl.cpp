@@ -80,6 +80,7 @@ namespace Gnc {
       Eigen::MatrixXd mixer;
       mixer.resize(4, this->numRotors);
 
+      // TODO(mereweth) - macro-ize the param get calls?
       for (U32 i = 0; i < mixer.cols(); i++) {
           switch (i) {
               case 0:
