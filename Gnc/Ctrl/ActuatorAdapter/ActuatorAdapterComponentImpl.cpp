@@ -382,15 +382,17 @@ namespace Gnc {
                       
                       if (0xab == readBuf[8]) {
                           this->outputInfo[i].feedback.counts      = (readBuf[0] << 8) + readBuf[1];
-                          this->outputInfo[i].feedback.voltage     = (F32) ((readBuf[2] << 8) + readBuf[3]) / 1000.0;
-                          this->outputInfo[i].feedback.temperature = (F32) ((readBuf[4] << 8) + readBuf[5]) / 1000.0;
-                          this->outputInfo[i].feedback.current     = (F32) ((readBuf[6] << 8) + readBuf[7]) / 1000.0;
+                          // TODO(mereweth) - establish units and validity
+                          this->outputInfo[i].feedback.voltage     = (F32) ((readBuf[2] << 8) + readBuf[3]);
+                          this->outputInfo[i].feedback.temperature = (F32) ((readBuf[4] << 8) + readBuf[5]);
+                          this->outputInfo[i].feedback.current     = (F32) ((readBuf[6] << 8) + readBuf[7]);
                           this->outputInfo[i].feedback.fbSec       = fbTime.getSeconds();
                           this->outputInfo[i].feedback.fbUsec      = fbTime.getUSeconds();
                           
                           F64 fbTimeFloat = (F64) this->outputInfo[i].feedback.fbSec +
                             (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
 
+                          /* if using the diff between readings (also change below)
                           U32 countsDiff = 0u;
                           //To account for the CSC rolling over at 0xFFFF = 2^16-1
                           if (countsLast > this->outputInfo[i].feedback.counts) {
@@ -399,12 +401,14 @@ namespace Gnc {
                           else{
                               countsDiff = this->outputInfo[i].feedback.counts - countsLast;
                           }
+                          */
 
                           // guard against bad parameter setting and small time increment
                           if ((this->outputInfo[i].i2cMeta.countsPerRev > 0) && 
                               (fbTimeFloat - fbTimeLast > 1e-4)) {
-                              this->outputInfo[i].feedback.angVel = 2.0 * M_PI * countsDiff / 
-                                (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
+                              this->outputInfo[i].feedback.angVel = 2.0 * M_PI
+                                * this->outputInfo[i].feedback.counts
+                                / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
                               // TODO(mereweth) - run rate estimator here
 
                               switch (i) {
