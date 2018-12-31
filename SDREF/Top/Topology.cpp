@@ -255,7 +255,9 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct() {  
+void manualConstruct() {
+    serLogger_ptr->set_LogOut_OutputPort(0, fileLogger_ptr->get_LogQueue_InputPort(0));
+  
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
