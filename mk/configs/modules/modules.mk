@@ -126,6 +126,7 @@ LLPROC_MODULES := \
 	LLProc/LLDebug \
 	LLProc/LLCycle \
 	LLProc/LLCmdDispatcher \
+	LLProc/LLPrmDb \
 	LLProc/LLTlmChan
 
 HLPROC_MODULES := \
