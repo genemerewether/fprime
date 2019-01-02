@@ -84,7 +84,7 @@ namespace Drv {
         if (((NULL == read_write.read_buf)  ||
              (0 == read_write.read_buf_len))   &&
             ((NULL == read_write.write_buf) ||
-             (0 == read_write.read_buf_len))) {
+             (0 == read_write.write_buf_len))) {
             // nothing to read or write
             this->log_WARNING_HI_I2C_WriteError(this->m_device,-1);
             return;
@@ -98,12 +98,15 @@ namespace Drv {
                                        read_write.write_buf_len);
             if (writeBytes != read_write.write_buf_len) {
                 // TODO(mereweth) - new EVR for this
-                this->log_WARNING_HI_I2C_WriteError(this->m_device,-1);
+                this->log_WARNING_HI_I2C_WriteError(this->m_device,-2);
+                DEBUG_PRINT("Tried to write %d bytes; wrote %d",
+                            read_write.write_buf_len,
+                            writeBytes);
             }
             this->m_writeBytes += writeBytes;
         }
         else if ((NULL == read_write.write_buf) ||
-                 (0 == read_write.read_buf_len)) {
+                 (0 == read_write.write_buf_len)) {
             // I2C read only
             for (U32 byte = 0; byte < read_write.read_buf_len; byte++) {
                 read_write.read_buf[byte] = 0xA5;
@@ -113,9 +116,12 @@ namespace Drv {
                                      read_write.read_buf_len);
             if (readBytes != read_write.read_buf_len) {
                 // TODO(mereweth) - new EVR for this
-                this->log_WARNING_HI_I2C_WriteError(this->m_device,-1);
+                this->log_WARNING_HI_I2C_WriteError(this->m_device,-3);
+                DEBUG_PRINT("Tried to write %d bytes; wrote %d",
+                            read_write.read_buf_len,
+                            readBytes);
             }
-            this->m_readBytes += readBuffer.getsize();
+            this->m_readBytes += readBytes;
         }
         else {
             // Combined read-write

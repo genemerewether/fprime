@@ -438,7 +438,7 @@ namespace Gnc {
                       
                       Fw::SerializeStatus status;
                       // sec, usec, motor id, command, response
-                      U8 buff[2 * sizeof(U32) + sizeof(U8) + 2 * sizeof(U8)];
+                      U8 buff[sizeof(U16) + 2 * sizeof(U32) + sizeof(U32) + 2 * sizeof(U32) + sizeof(readBuf) + sizeof(U32)];
                       Fw::SerialBuffer buffObj(buff, FW_NUM_ARRAY_ELEMENTS(buff));
                       status = buffObj.serialize((U16) i);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
