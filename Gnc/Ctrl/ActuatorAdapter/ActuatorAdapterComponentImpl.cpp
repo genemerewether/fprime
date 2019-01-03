@@ -516,11 +516,12 @@ namespace Gnc {
                           // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
                           this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
 
-                          U8 readBuf[1] = { 0 };
-                          U8 writeBuf[1] = { 0 };
-                          Fw::Buffer writeObj = Fw::Buffer(0, 0, (U64) writeBuf, 1);
-                          Fw::Buffer readObj = Fw::Buffer(0, 0, (U64) readBuf, 1);
-                          this->escReadWrite_out(0, writeObj, readObj);
+                          I2CMetadata i2c = this->outputInfo[i].i2cMeta;
+                          // MSB is reverse bit
+                          U8 writeBuf[3] = { 0 };
+                          Fw::Buffer readBufObj(0, 0, 0, 0); // no read
+                          Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                          this->escReadWrite_out(0, writeBufObj, readBufObj);
                       }
                       else {
                           //TODO(mereweth) - issue error
