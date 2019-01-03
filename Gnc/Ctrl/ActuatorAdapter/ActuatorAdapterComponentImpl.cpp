@@ -456,21 +456,27 @@ namespace Gnc {
                               switch (i) {
                                   case 0:
                                       this->tlmWrite_ACTADAP_Rot0(this->outputInfo[i].feedback.angVel);
+                                      this->tlmWrite_ACTADAP_Cmd0(this->outputInfo[i].feedback.cmd);
                                       break;
                                   case 1:
                                       this->tlmWrite_ACTADAP_Rot1(this->outputInfo[i].feedback.angVel);
+                                      this->tlmWrite_ACTADAP_Cmd1(this->outputInfo[i].feedback.cmd);
                                       break;
                                   case 2:
                                       this->tlmWrite_ACTADAP_Rot2(this->outputInfo[i].feedback.angVel);
+                                      this->tlmWrite_ACTADAP_Cmd2(this->outputInfo[i].feedback.cmd);
                                       break;
                                   case 3:
                                       this->tlmWrite_ACTADAP_Rot3(this->outputInfo[i].feedback.angVel);
+                                      this->tlmWrite_ACTADAP_Cmd3(this->outputInfo[i].feedback.cmd);
                                       break;
                                   case 4:
                                       this->tlmWrite_ACTADAP_Rot4(this->outputInfo[i].feedback.angVel);
+                                      this->tlmWrite_ACTADAP_Cmd4(this->outputInfo[i].feedback.cmd);
                                       break;
                                   case 5:
                                       this->tlmWrite_ACTADAP_Rot5(this->outputInfo[i].feedback.angVel);
+                                      this->tlmWrite_ACTADAP_Cmd5(this->outputInfo[i].feedback.cmd);
                                       break;
                                   default:
                                       break;

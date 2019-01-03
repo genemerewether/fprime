@@ -32,6 +32,8 @@
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
+#define DECOUPLE_ACTUATORS
+
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
 static Fw::SimpleObjRegistry simpleReg;
@@ -279,9 +281,12 @@ void manualConstruct(void) {
     actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
-    
+#ifdef DECOUPLE_ACTUATORS
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actDecouple_ptr->get_DataIn_InputPort(3));
     actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
+#else
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
+#endif
     // aux actuator command
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
@@ -290,11 +295,17 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 
     // other serial ports
+#ifdef DECOUPLE_ACTUATORS
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
     actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
         
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
+#else
+    mixer_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+        
+    sigGen_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+#endif
 }
 
 void constructApp() {

@@ -23,4 +23,28 @@
       <comment>
       </comment>
     </channel>
+    <channel id="6" name="ACTADAP_Cmd0" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="7" name="ACTADAP_Cmd1" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="8" name="ACTADAP_Cmd2" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="9" name="ACTADAP_Cmd3" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="10" name="ACTADAP_Cmd4" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="11" name="ACTADAP_Cmd5" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
 </telemetry>
