@@ -15,6 +15,7 @@ void exitTasks(void);
 #include <HEXREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
+#include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 
@@ -34,6 +35,7 @@ void exitTasks(void);
 #include <LLProc/LLTlmChan/LLTlmChanImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
+extern Svc::ActiveDecouplerComponentImpl* actDecouple_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;

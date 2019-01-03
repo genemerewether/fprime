@@ -40,6 +40,7 @@ static Fw::SimpleObjRegistry simpleReg;
 // Component instance pointers
 
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
+Svc::ActiveDecouplerComponentImpl* actDecouple_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
@@ -69,6 +70,13 @@ void allocComps() {
                         "RGDECOUPLE",
 #endif
                         5) // multiply by sleep duration in run1backupCycle
+;
+
+    actDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
+#if FW_OBJECT_NAMES == 1
+                        "ACTDECOUPLE"
+#endif
+                                                            )
 ;
 
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
@@ -258,7 +266,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(void) {
+void manualConstruct(void) {  
     // Manual connections
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
@@ -271,13 +279,22 @@ void manualConstruct(void) {
     actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
+    
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actDecouple_ptr->get_DataIn_InputPort(3));
+    actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
     // aux actuator command
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+
+    // other serial ports
+    mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
+    actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+        
+    sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
+    actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
 }
 
 void constructApp() {
@@ -294,6 +311,7 @@ void constructApp() {
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0);
+    actDecouple_ptr->init(2, 500); // big message queue entry, few entries
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
     rgTlm_ptr->init(2);
@@ -364,6 +382,8 @@ void constructApp() {
     // Active component startup
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple_ptr->start(0, 90, 20*1024);
+    // NOTE(mereweth) - ESC I2C calls happen in this thread:
+    actDecouple_ptr->start(0, 89, 20*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -418,6 +438,7 @@ void run1backupCycle(void) {
 
 void exitTasks(void) {
     rgDecouple_ptr->exit();
+    actDecouple_ptr->exit();
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif

@@ -101,6 +101,7 @@ SVC_MODULES := \
 	Svc/SerialTextConverter \
 	Svc/ActiveTextLogger \
 	Svc/Tee \
+	Svc/ActiveDecoupler \
 	Svc/UdpSender \
 	Svc/UdpReceiver
 
@@ -365,6 +366,7 @@ HEXREF_MODULES := \
 	Svc/WatchDog \
 	Svc/AssertFatalAdapter \
 	Svc/FatalHandler \
+	Svc/ActiveDecoupler \
 	\
 	$(FW_MODULES) \
 	\
