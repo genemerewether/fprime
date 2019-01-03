@@ -86,7 +86,7 @@ namespace Drv {
             ((NULL == read_write.write_buf) ||
              (0 == read_write.write_buf_len))) {
             // nothing to read or write
-            this->log_WARNING_HI_I2C_WriteError(this->m_device,-1);
+            this->log_WARNING_HI_I2C_BadReadWriteCall(this->m_device);
             return;
         }
 
@@ -97,11 +97,13 @@ namespace Drv {
                                        read_write.write_buf,
                                        read_write.write_buf_len);
             if (writeBytes != read_write.write_buf_len) {
-                // TODO(mereweth) - new EVR for this
-                this->log_WARNING_HI_I2C_WriteError(this->m_device,-2);
+                this->log_WARNING_HI_I2C_WriteError(this->m_device, errno,
+                                                    writeBytes,
+                                                    read_write.write_buf_len);
                 DEBUG_PRINT("Tried to write %d bytes; wrote %d",
                             read_write.write_buf_len,
                             writeBytes);
+                return;
             }
             this->m_writeBytes += writeBytes;
         }
@@ -115,11 +117,13 @@ namespace Drv {
                                      read_write.read_buf,
                                      read_write.read_buf_len);
             if (readBytes != read_write.read_buf_len) {
-                // TODO(mereweth) - new EVR for this
-                this->log_WARNING_HI_I2C_WriteError(this->m_device,-3);
+                this->log_WARNING_HI_I2C_ReadError(this->m_device, errno,
+                                                   readBytes,
+                                                   read_write.read_buf_len);
                 DEBUG_PRINT("Tried to write %d bytes; wrote %d",
                             read_write.read_buf_len,
                             readBytes);
+                return;
             }
             this->m_readBytes += readBytes;
         }
@@ -136,7 +140,10 @@ namespace Drv {
                 DEBUG_PRINT("I2C %d read/write error %d vs %d actual! %d: %s",
                             this->m_fd, read_write.read_buf_len, result,
                             errno,strerror(errno));
-                this->log_WARNING_HI_I2C_WriteError(this->m_device,errno);
+                this->log_WARNING_HI_I2C_ReadWriteError(this->m_device, errno,
+                                                        result,
+                                                        read_write.read_buf_len);
+                
                 return;
             }
             this->m_readBytes += readBuffer.getsize();
