@@ -144,10 +144,6 @@
 	 <source component = "mpu9250" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection19">
-	 <source component = "mixer" port = "motor" type = "Actuators" num = "0"/>
- 	 <target component = "actuatorAdapter" port = "motor" type = "Actuators" num = "0"/>
-</connection>
 <connection name = "Connection20">
 	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
@@ -179,10 +175,6 @@
 <connection name = "Connection27">
 	 <source component = "actuatorAdapter" port = "pwmSetDuty" type = "PwmSetDutyCycle" num = "0"/>
  	 <target component = "escPwm" port = "pwmSetDuty" type = "PwmSetDutyCycle" num = "0"/>
-</connection>
-<connection name = "Connection28">
-	 <source component = "sigGen" port = "motor" type = "Actuators" num = "0"/>
- 	 <target component = "actuatorAdapter" port = "motor" type = "Actuators" num = "0"/>
 </connection>
 <connection name = "Connection29">
 	 <source component = "cmdDisp" port = "CmdStatus" type = "CmdResponse" num = "0"/>
