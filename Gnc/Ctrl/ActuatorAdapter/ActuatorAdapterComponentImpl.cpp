@@ -86,7 +86,8 @@ namespace Gnc {
   bool ActuatorAdapterComponentImpl ::
     setupI2C(
              U32 actuator,
-             I2CMetadata meta
+             I2CMetadata meta,
+             bool useSimple
     )
   {
       if (actuator >= AA_MAX_ACTUATORS) {
@@ -96,7 +97,12 @@ namespace Gnc {
           return false;
       }
 
-      this->outputInfo[actuator].type = OUTPUT_I2C;
+      if (useSimple) {
+          this->outputInfo[actuator].type = OUTPUT_I2C_SIMPLE;
+      }
+      else {
+          this->outputInfo[actuator].type = OUTPUT_I2C;
+      }
       this->outputInfo[actuator].i2cMeta = meta;
 
       return true;
@@ -132,6 +138,7 @@ namespace Gnc {
                   }
                   switch (outType) {
                       case OUTPUT_I2C:
+                      case OUTPUT_I2C_SIMPLE:
                           i2c.addr = paramGet_a1_addr(valid[0]);
                           i2c.minIn = paramGet_a1_minCmd(valid[1]);
                           i2c.maxIn = paramGet_a1_maxCmd(valid[2]);
@@ -139,7 +146,9 @@ namespace Gnc {
                           i2c.maxOut = (U32) paramGet_a1_maxOut(valid[4]);
                           i2c.reverse = paramGet_a1_reverse(valid[5]);
                           i2c.countsPerRev = paramGet_a1_counts(valid[6]);
-                          if (!setupI2C(i, i2c)) {  return;  }
+                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
+                              return;
+                          }
                           break;
                       default:
                           DEBUG_PRINT("Unhandled act adap type %u\n", outType);
@@ -155,6 +164,7 @@ namespace Gnc {
                   }
                   switch (outType) {
                       case OUTPUT_I2C:
+                      case OUTPUT_I2C_SIMPLE:
                           i2c.addr = paramGet_a2_addr(valid[0]);
                           i2c.minIn = paramGet_a2_minCmd(valid[1]);
                           i2c.maxIn = paramGet_a2_maxCmd(valid[2]);
@@ -162,7 +172,9 @@ namespace Gnc {
                           i2c.maxOut = (U32) paramGet_a2_maxOut(valid[4]);
                           i2c.reverse = paramGet_a2_reverse(valid[5]);
                           i2c.countsPerRev = paramGet_a2_counts(valid[6]);
-                          if (!setupI2C(i, i2c)) {  return;  }
+                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
+                              return;
+                          }
                           break;
                       default:
                           DEBUG_PRINT("Unhandled act adap type %u\n", outType);
@@ -178,6 +190,7 @@ namespace Gnc {
                   }
                   switch (outType) {
                       case OUTPUT_I2C:
+                      case OUTPUT_I2C_SIMPLE:
                           i2c.addr = paramGet_a3_addr(valid[0]);
                           i2c.minIn = paramGet_a3_minCmd(valid[1]);
                           i2c.maxIn = paramGet_a3_maxCmd(valid[2]);
@@ -185,7 +198,9 @@ namespace Gnc {
                           i2c.maxOut = (U32) paramGet_a3_maxOut(valid[4]);
                           i2c.reverse = paramGet_a3_reverse(valid[5]);
                           i2c.countsPerRev = paramGet_a3_counts(valid[6]);
-                          if (!setupI2C(i, i2c)) {  return;  }
+                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
+                              return;
+                          }
                           break;
                       default:
                           DEBUG_PRINT("Unhandled act adap type %u\n", outType);
@@ -201,6 +216,7 @@ namespace Gnc {
                   }
                   switch (outType) {
                       case OUTPUT_I2C:
+                      case OUTPUT_I2C_SIMPLE:
                           i2c.addr = paramGet_a4_addr(valid[0]);
                           i2c.minIn = paramGet_a4_minCmd(valid[1]);
                           i2c.maxIn = paramGet_a4_maxCmd(valid[2]);
@@ -208,7 +224,9 @@ namespace Gnc {
                           i2c.maxOut = (U32) paramGet_a4_maxOut(valid[4]);
                           i2c.reverse = paramGet_a4_reverse(valid[5]);
                           i2c.countsPerRev = paramGet_a4_counts(valid[6]);
-                          if (!setupI2C(i, i2c)) {  return;  }
+                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
+                              return;
+                          }
                           break;
                       default:
                           DEBUG_PRINT("Unhandled act adap type %u\n", outType);
@@ -224,6 +242,7 @@ namespace Gnc {
                   }
                   switch (outType) {
                       case OUTPUT_I2C:
+                      case OUTPUT_I2C_SIMPLE:
                           i2c.addr = paramGet_a5_addr(valid[0]);
                           i2c.minIn = paramGet_a5_minCmd(valid[1]);
                           i2c.maxIn = paramGet_a5_maxCmd(valid[2]);
@@ -231,7 +250,9 @@ namespace Gnc {
                           i2c.maxOut = (U32) paramGet_a5_maxOut(valid[4]);
                           i2c.reverse = paramGet_a5_reverse(valid[5]);
                           i2c.countsPerRev = paramGet_a5_counts(valid[6]);
-                          if (!setupI2C(i, i2c)) {  return;  }
+                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
+                              return;
+                          }
                           break;
                       default:
                           DEBUG_PRINT("Unhandled act adap type %u\n", outType);
@@ -247,6 +268,7 @@ namespace Gnc {
                   }
                   switch (outType) {
                       case OUTPUT_I2C:
+                      case OUTPUT_I2C_SIMPLE:
                           i2c.addr = paramGet_a6_addr(valid[0]);
                           i2c.minIn = paramGet_a6_minCmd(valid[1]);
                           i2c.maxIn = paramGet_a6_maxCmd(valid[2]);
@@ -254,7 +276,9 @@ namespace Gnc {
                           i2c.maxOut = (U32) paramGet_a6_maxOut(valid[4]);
                           i2c.reverse = paramGet_a6_reverse(valid[5]);
                           i2c.countsPerRev = paramGet_a6_counts(valid[6]);
-                          if (!setupI2C(i, i2c)) {  return;  }
+                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
+                              return;
+                          }
                           break;
                       default:
                           DEBUG_PRINT("Unhandled act adap type %u\n", outType);
@@ -314,13 +338,14 @@ namespace Gnc {
               }
                   break;
               case OUTPUT_I2C:
+              case OUTPUT_I2C_SIMPLE:
               {
                   if (this->isConnected_escConfig_OutputPort(0) &&
                       this->isConnected_escReadWrite_OutputPort(0)) {
                       Fw::Time cmdTime = this->getTime();
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
+                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
 
                       I2CMetadata i2c = this->outputInfo[i].i2cMeta;
                       F64 inVal = angVels[i];
@@ -332,13 +357,20 @@ namespace Gnc {
 
                       // TODO(mereweth) - run controller here
 
-                      // MSB is reverse bit
-                      U8 writeBuf[3] = { 0x00,
-                                         (U8) ((out / 8) | ((i2c.reverse ? 1 : 0) << 7)),
-                                         (U8) (out % 8) };
                       Fw::Buffer readBufObj(0, 0, 0, 0); // no read
-                      Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                      this->escReadWrite_out(0, writeBufObj, readBufObj);
+                      if (OUTPUT_I2C == this->outputInfo[i].type) {
+                          // MSB is reverse bit
+                          U8 writeBuf[3] = { 0x00,
+                                             (U8) ((out / 8) | ((i2c.reverse ? 1 : 0) << 7)),
+                                             (U8) (out % 8) };
+                          Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                      }
+                      else { // simple protocol
+                          U8 writeBuf[2] = { (U8) (out / 8), (U8) (out % 8) };
+                          Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                      }
 
                       this->outputInfo[i].feedback.cmd     = out;
                       this->outputInfo[i].feedback.cmdSec  = cmdTime.getSeconds();
@@ -363,6 +395,7 @@ namespace Gnc {
                   //NOTE(mereweth) - no way to get feedback
                   break;
               case OUTPUT_I2C:
+              case OUTPUT_I2C_SIMPLE:
               {
                   if (this->isConnected_escConfig_OutputPort(0) &&
                       this->isConnected_escReadWrite_OutputPort(0)) {
@@ -372,15 +405,24 @@ namespace Gnc {
                       U32 countsLast = this->outputInfo[i].feedback.counts;
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
+                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
 
                       U8 readBuf[9] = { 0 };
-                      U8 writeBuf[1] = { 0x02 }; // start at rev_count_h
-                      Fw::Buffer readBufObj(0, 0, (U64) readBuf, FW_NUM_ARRAY_ELEMENTS(readBuf));
-                      Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                      this->escReadWrite_out(0, writeBufObj, readBufObj);
                       
-                      if (0xab == readBuf[8]) {
+                      if (OUTPUT_I2C == this->outputInfo[i].type) {
+                          U8 writeBuf[1] = { 0x02 }; // start at rev_count_h
+                          Fw::Buffer readBufObj(0, 0, (U64) readBuf, FW_NUM_ARRAY_ELEMENTS(readBuf));
+                          Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                      }
+                      else { // simple protocol
+                          Fw::Buffer readBufObj(0, 0, (U64) readBuf, 2);
+                          Fw::Buffer writeBufObj(0, 0, 0, 0); // no write in simple protocol
+                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                      }
+                      
+                      if ((0xab == readBuf[8]) ||
+                          (OUTPUT_I2C_SIMPLE == this->outputInfo[i].type)) {
                           this->outputInfo[i].feedback.counts      = (readBuf[0] << 8) + readBuf[1];
                           // TODO(mereweth) - establish units and validity
                           this->outputInfo[i].feedback.voltage     = (F32) ((readBuf[2] << 8) + readBuf[3]);
@@ -510,18 +552,25 @@ namespace Gnc {
                   }
                       break;
                   case OUTPUT_I2C:
+                  case OUTPUT_I2C_SIMPLE:
                   {
                       if (this->isConnected_escConfig_OutputPort(0) &&
                           this->isConnected_escReadWrite_OutputPort(0)) {
                           // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                          this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
+                          this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
 
-                          I2CMetadata i2c = this->outputInfo[i].i2cMeta;
-                          // MSB is reverse bit
-                          U8 writeBuf[3] = { 0 };
                           Fw::Buffer readBufObj(0, 0, 0, 0); // no read
-                          Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          if (OUTPUT_I2C == this->outputInfo[i].type) {
+                              // MSB is reverse bit
+                              U8 writeBuf[3] = { 0 };
+                              Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          }
+                          else { // simple protocol
+                              U8 writeBuf[1] = { 0 };
+                              Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          }
                       }
                       else {
                           //TODO(mereweth) - issue error
