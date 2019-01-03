@@ -73,7 +73,7 @@ namespace Gnc {
           U32 countsPerRev;
       };
 
-      bool setupI2C(U32 actuator, I2CMetadata meta);
+      bool setupI2C(U32 actuator, I2CMetadata meta, bool useSimple);
 
       void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
 
@@ -125,7 +125,8 @@ namespace Gnc {
           OUTPUT_VALID_MIN = 1,
           OUTPUT_PWM = OUTPUT_VALID_MIN,
           OUTPUT_I2C = 2,
-          OUTPUT_VALID_MAX = OUTPUT_I2C
+          OUTPUT_I2C_SIMPLE = 3,
+          OUTPUT_VALID_MAX = OUTPUT_I2C_SIMPLE
       };
 
       struct Feedback {
