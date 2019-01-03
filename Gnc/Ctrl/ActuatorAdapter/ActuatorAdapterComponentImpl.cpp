@@ -320,7 +320,7 @@ namespace Gnc {
                       Fw::Time cmdTime = this->getTime();
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 9000);
+                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
 
                       I2CMetadata i2c = this->outputInfo[i].i2cMeta;
                       F64 inVal = angVels[i];
@@ -372,7 +372,7 @@ namespace Gnc {
                       U32 countsLast = this->outputInfo[i].feedback.counts;
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 9000);
+                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
 
                       U8 readBuf[9] = { 0 };
                       U8 writeBuf[1] = { 0x02 }; // start at rev_count_h
@@ -514,7 +514,7 @@ namespace Gnc {
                       if (this->isConnected_escConfig_OutputPort(0) &&
                           this->isConnected_escReadWrite_OutputPort(0)) {
                           // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                          this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 9000);
+                          this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 100);
 
                           I2CMetadata i2c = this->outputInfo[i].i2cMeta;
                           // MSB is reverse bit

@@ -90,6 +90,7 @@ namespace Drv {
 
             NATIVE_INT_TYPE m_fd;
             NATIVE_INT_TYPE m_device;
+            U32 m_addr;
             U32 m_readBytes;
             U32 m_writeBytes;
 

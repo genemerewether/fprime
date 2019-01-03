@@ -60,6 +60,7 @@ namespace Drv {
             this->log_WARNING_HI_I2C_ConfigError(this->m_device,errno);
             return;
         } else {
+          this->m_addr = slaveAddr;
           DEBUG_PRINT("I2C fd %d freq %u, slave 0x%0x",this->m_fd, busSpeed, slaveAddr);
         }
     }
@@ -97,7 +98,9 @@ namespace Drv {
                                        read_write.write_buf,
                                        read_write.write_buf_len);
             if (writeBytes != read_write.write_buf_len) {
-                this->log_WARNING_HI_I2C_WriteError(this->m_device, errno,
+                this->log_WARNING_HI_I2C_WriteError(this->m_device,
+                                                    this->m_addr,
+                                                    errno,
                                                     writeBytes,
                                                     read_write.write_buf_len);
                 DEBUG_PRINT("Tried to write %d bytes; wrote %d",
@@ -117,7 +120,9 @@ namespace Drv {
                                      read_write.read_buf,
                                      read_write.read_buf_len);
             if (readBytes != read_write.read_buf_len) {
-                this->log_WARNING_HI_I2C_ReadError(this->m_device, errno,
+                this->log_WARNING_HI_I2C_ReadError(this->m_device,
+                                                   this->m_addr,
+                                                   errno,
                                                    readBytes,
                                                    read_write.read_buf_len);
                 DEBUG_PRINT("Tried to write %d bytes; wrote %d",
@@ -140,7 +145,9 @@ namespace Drv {
                 DEBUG_PRINT("I2C %d read/write error %d vs %d actual! %d: %s",
                             this->m_fd, read_write.read_buf_len, result,
                             errno,strerror(errno));
-                this->log_WARNING_HI_I2C_ReadWriteError(this->m_device, errno,
+                this->log_WARNING_HI_I2C_ReadWriteError(this->m_device,
+                                                        this->m_addr,
+                                                        errno,
                                                         result,
                                                         read_write.read_buf_len);
                 

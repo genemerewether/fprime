@@ -21,11 +21,13 @@
 | | | |error|I32||The error code|    
 |I2C_ReadWriteError|2 (0x2)|I2C write error| | | | |
 | | | |device|I32||The device|    
+| | | |addr|U32|||    
 | | | |error|I32||The error code|    
 | | | |bytesAct|I32|||    
 | | | |bytesDes|I32|||    
 |I2C_WriteError|3 (0x3)|I2C write error| | | | |
 | | | |device|I32||The device|    
+| | | |addr|U32|||    
 | | | |error|I32||The error code|    
 | | | |bytesAct|I32|||    
 | | | |bytesDes|I32|||    
@@ -33,6 +35,7 @@
 | | | |device|I32||The device|    
 |I2C_ReadError|5 (0x5)|I2C read error| | | | |
 | | | |device|I32||The device|    
+| | | |addr|U32|||    
 | | | |error|I32||The error code|    
 | | | |bytesAct|I32|||    
 | | | |bytesDes|I32|||    

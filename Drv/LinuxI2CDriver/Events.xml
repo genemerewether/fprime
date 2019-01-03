@@ -27,13 +27,15 @@
             </arg>
         </args>
     </event>
-    <event id="2" name="I2C_ReadWriteError" severity="WARNING_HI" format_string = "Error writing/reading I2C device %d: %d; %d bytes actual; %d bytes desired"  throttle = "5">
+    <event id="2" name="I2C_ReadWriteError" severity="WARNING_HI" format_string = "Error writing/reading I2C device %d addr %u: %d; %d bytes actual; %d bytes desired"  throttle = "5">
         <comment>
         I2C write error
         </comment>
         <args>
             <arg name="device" type="I32">
                 <comment>The device</comment>
+            </arg>
+            <arg name="addr" type="U32">
             </arg>
             <arg name="error" type="I32">
                 <comment>The error code</comment>
@@ -44,13 +46,15 @@
             </arg>
         </args>
     </event>
-    <event id="3" name="I2C_WriteError" severity="WARNING_HI" format_string = "Error writing I2C device %d: %d; %d bytes actual; %d bytes desired"  throttle = "5">
+    <event id="3" name="I2C_WriteError" severity="WARNING_HI" format_string = "Error writing I2C device %d addr %u: %d; %d bytes actual; %d bytes desired"  throttle = "5">
         <comment>
         I2C write error
         </comment>
         <args>
             <arg name="device" type="I32">
                 <comment>The device</comment>
+            </arg>
+            <arg name="addr" type="U32">
             </arg>
             <arg name="error" type="I32">
                 <comment>The error code</comment>
@@ -71,13 +75,15 @@
             </arg>
         </args>
     </event>
-    <event id="5" name="I2C_ReadError" severity="WARNING_HI" format_string = "Error reading I2C device %d: %d; %d bytes actual; %d bytes desired"  throttle = "5">
+    <event id="5" name="I2C_ReadError" severity="WARNING_HI" format_string = "Error reading I2C device %d addr %u: %d; %d bytes actual; %d bytes desired"  throttle = "5">
         <comment>
         I2C read error
         </comment>
         <args>
             <arg name="device" type="I32">
                 <comment>The device</comment>
+            </arg>
+            <arg name="addr" type="U32">
             </arg>
             <arg name="error" type="I32">
                 <comment>The error code</comment>
