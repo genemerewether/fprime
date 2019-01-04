@@ -3,6 +3,7 @@
 set -e
 
 cd TESTRPC
+make gen_make
 make
 cd ../
 cd HEXREF/Top
@@ -20,17 +21,25 @@ tar -czvf HEXREF.tar.gz \
     HEXREF/Rpc/test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut \
     HEXREF/dspal-hex-clang-cross-opt-dspal-bin/HEXREF
 
+cd ROS/RosCycle
+make clean
+cd ../../
 cd SIMREF/Top
 make clean
+cd ../RotorSDrv/
+make clean
 cd ..
+mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_16.04_kinetic
 make
+mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_18.04_melodic
 make dict_install
 cd ..
 touch Gse/generated/SIMREF/serializable/ROS/__init__.py
 tar -czvf SIMREF.tar.gz \
     Gse/generated/SIMREF \
     SIMREF/*PrmDb.dat \
-    SIMREF/linux-linux-x86-debug-gnu-bin/SIMREF
+    SIMREF/linux-linux-x86-debug-gnu-bin_16.04_kinetic/SIMREF \
+    SIMREF/linux-linux-x86-debug-gnu-bin_18.04_melodic/SIMREF
 
 cd R5REF/Top
 make clean
