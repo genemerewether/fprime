@@ -100,7 +100,10 @@ SVC_MODULES := \
 	Svc/FileManager \
 	Svc/SerialTextConverter \
 	Svc/ActiveTextLogger \
-	Svc/Tee
+	Svc/Tee \
+	Svc/ActiveDecoupler \
+	Svc/UdpSender \
+	Svc/UdpReceiver
 
 DRV_MODULES := \
 	Drv/DataTypes \
@@ -124,6 +127,7 @@ LLPROC_MODULES := \
 	LLProc/LLDebug \
 	LLProc/LLCycle \
 	LLProc/LLCmdDispatcher \
+	LLProc/LLPrmDb \
 	LLProc/LLTlmChan
 
 HLPROC_MODULES := \
@@ -147,11 +151,13 @@ QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
 	Gnc/Ctrl/BasicMixer \
 	Gnc/Est/ImuInteg \
+	Gnc/Sysid/SigGen \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
 	Gnc/quest_gnc/src/est \
-	Gnc/quest_gnc/src/mixer
+	Gnc/quest_gnc/src/mixer \
+	Gnc/quest_gnc/src/sysid
 
 QUEST_GNC_HW_MODULES := \
 	Gnc/Ctrl/ActuatorAdapter
@@ -262,6 +268,31 @@ SDREF_MODULES := \
 	\
 	$(UTILS_MODULES)
 
+BASEREF_DEPLOYMENT_MODULES := \
+	BASEREF/Top
+
+BASEREF_MODULES := \
+	\
+	$(BASEREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
 SIMREF_DEPLOYMENT_MODULES := \
 	SIMREF/RotorSDrv \
 	SIMREF/Top
@@ -300,6 +331,7 @@ HEXREF_MODULES := \
 	$(HEXREF_DEPLOYMENT_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/Mavlink/ActuatorControls \
 	Drv/PwmDriverPorts \
 	Drv/GpioDriverPorts \
 	Drv/SerialDriverPorts \
@@ -334,6 +366,7 @@ HEXREF_MODULES := \
 	Svc/WatchDog \
 	Svc/AssertFatalAdapter \
 	Svc/FatalHandler \
+	Svc/ActiveDecoupler \
 	\
 	$(FW_MODULES) \
 	\
@@ -433,6 +466,7 @@ R5REF_MODULES := \
 	$(R5_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/Mavlink/ActuatorControls \
 	\
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
@@ -529,7 +563,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

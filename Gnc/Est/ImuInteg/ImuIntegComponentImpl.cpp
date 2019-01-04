@@ -87,11 +87,12 @@ namespace Gnc {
   void ImuIntegComponentImpl ::
     parametersLoaded()
   {
+      this->paramsInited = false;
       Fw::ParamValid valid[1];
       imuInteg.SetTimeStep(paramGet_dt(valid[0]));
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       
-      paramsInited = true;
+      this->paramsInited = true;
   }
       
   // ----------------------------------------------------------------------

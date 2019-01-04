@@ -32,6 +32,8 @@
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
+#define DECOUPLE_ACTUATORS
+
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
 static Fw::SimpleObjRegistry simpleReg;
@@ -40,6 +42,7 @@ static Fw::SimpleObjRegistry simpleReg;
 // Component instance pointers
 
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
+Svc::ActiveDecouplerComponentImpl* actDecouple_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
@@ -55,6 +58,7 @@ LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
+Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
@@ -70,9 +74,17 @@ void allocComps() {
                         5) // multiply by sleep duration in run1backupCycle
 ;
 
+    actDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
+#if FW_OBJECT_NAMES == 1
+                        "ACTDECOUPLE"
+#endif
+                                                            )
+;
+
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+        Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
         0, // adapter
@@ -98,6 +110,7 @@ void allocComps() {
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+        Gnc::SIGGEN_SCHED_CONTEXT_ATT, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
         0, // mixer
         0, // adapter
@@ -115,9 +128,10 @@ void allocComps() {
     NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         0, //TODO(mereweth) - IMU?
         Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+        0, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
         0, // mixer
-        0, // adapter
+        0, // adapter - for arming
         0, // logQueue
         0, // kraitRouter
     };
@@ -195,6 +209,12 @@ void allocComps() {
 #endif
 ;
 
+    sigGen_ptr = new Gnc::SigGenComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SIGGEN")
+#endif
+;
+
     imuInteg_ptr = new Gnc::ImuIntegComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("IMUINTEG")
@@ -248,7 +268,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(void) {
+void manualConstruct(void) {  
     // Manual connections
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
@@ -258,13 +278,34 @@ void manualConstruct(void) {
 
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
+    actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, escPwm_ptr->get_pwmSetDuty_InputPort(1));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
+#ifdef DECOUPLE_ACTUATORS
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actDecouple_ptr->get_DataIn_InputPort(3));
+    actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
+#else
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
+#endif
+    // aux actuator command
+    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+
+    // other serial ports
+#ifdef DECOUPLE_ACTUATORS
+    mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
+    actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+        
+    sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
+    actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
+#else
+    mixer_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+        
+    sigGen_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+#endif
 }
 
 void constructApp() {
@@ -281,6 +322,7 @@ void constructApp() {
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0);
+    actDecouple_ptr->init(2, 500); // big message queue entry, few entries
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
     rgTlm_ptr->init(2);
@@ -289,6 +331,7 @@ void constructApp() {
     leeCtrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
+    sigGen_ptr->init(0);
     imuInteg_ptr->init(0);
     mpu9250_ptr->init(0);
 
@@ -326,23 +369,9 @@ void constructApp() {
     imuInteg_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
+    sigGen_ptr->regCommands();
 
     // Open devices
-
-    Gnc::ActuatorAdapterComponentImpl::I2CMetadata meta;
-    meta.minIn = 0.0f;
-    meta.maxIn = 3840.0f;
-    meta.minOut = 0;
-    meta.maxOut = 800;
-
-    meta.addr = 11;
-    actuatorAdapter_ptr->setupI2C(0, meta);
-    meta.addr = 12;
-    actuatorAdapter_ptr->setupI2C(1, meta);
-    meta.addr = 13;
-    actuatorAdapter_ptr->setupI2C(2, meta);
-    meta.addr = 14;
-    actuatorAdapter_ptr->setupI2C(3, meta);
 
 #ifdef BUILD_DSPAL
     // /dev/spi-1 on QuRT; connected to MPU9250
@@ -364,6 +393,8 @@ void constructApp() {
     // Active component startup
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple_ptr->start(0, 90, 20*1024);
+    // NOTE(mereweth) - ESC I2C calls happen in this thread:
+    actDecouple_ptr->start(0, 89, 20*1024);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -418,6 +449,7 @@ void run1backupCycle(void) {
 
 void exitTasks(void) {
     rgDecouple_ptr->exit();
+    actDecouple_ptr->exit();
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif

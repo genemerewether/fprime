@@ -5,4 +5,8 @@
         </arg>
     </args>
   </command>
+  <command kind="sync" opcode="1" mnemonic="ACTADAP_InitParams">
+    <args>
+    </args>
+  </command>
 </commands>

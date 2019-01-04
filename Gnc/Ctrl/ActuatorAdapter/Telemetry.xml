@@ -1,6 +1,50 @@
 <telemetry>
-    <channel id="0" name="ACTADAP_Dummy" data_type="F32" update="on_change" format_string="%.3fN">
+    <channel id="0" name="ACTADAP_Rot0" data_type="F32" format_string="%.3f rad">
         <comment>
         </comment>
+    </channel>
+    <channel id="1" name="ACTADAP_Rot1" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="2" name="ACTADAP_Rot2" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="3" name="ACTADAP_Rot3" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="4" name="ACTADAP_Rot4" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="5" name="ACTADAP_Rot5" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="6" name="ACTADAP_Cmd0" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="7" name="ACTADAP_Cmd1" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="8" name="ACTADAP_Cmd2" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="9" name="ACTADAP_Cmd3" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="10" name="ACTADAP_Cmd4" data_type="U32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="11" name="ACTADAP_Cmd5" data_type="U32">
+      <comment>
+      </comment>
     </channel>
 </telemetry>

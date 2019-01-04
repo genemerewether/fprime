@@ -60,6 +60,7 @@ namespace Drv {
             this->log_WARNING_HI_I2C_ConfigError(this->m_device,errno);
             return;
         } else {
+          this->m_addr = slaveAddr;
           DEBUG_PRINT("I2C fd %d freq %u, slave 0x%0x",this->m_fd, busSpeed, slaveAddr);
         }
     }
@@ -81,37 +82,83 @@ namespace Drv {
         read_write.write_buf = (U8*) writeBuffer.getdata();
         read_write.write_buf_len = writeBuffer.getsize();
 
-        U8 bakWriteBuf[1] = {0};
-        U8 bakReadBuf[1] = {0};
-        if (NULL == read_write.read_buf) {
-            read_write.read_buf = bakReadBuf;
-            read_write.read_buf_len = 1;
-        }
-        if (NULL == read_write.write_buf) {
-            read_write.write_buf = bakWriteBuf;
-            read_write.write_buf_len = 1;
-        }
-        
-        unsigned int byte;
-        unsigned char* read_data = (unsigned char*) readBuffer.getdata();
-        for (byte = 0; byte < read_write.read_buf_len; byte++) {
-            read_data[byte] = 0xA5;
-        }
-
-        // Finally, we can write:
-        DEBUG_PRINT("Writing %d bytes to I2C",read_write.write_buf_len);
-
-        result = ioctl(this->m_fd, I2C_IOCTL_RDWR, &read_write);
-        if (result != read_write.read_buf_len) {
-            DEBUG_PRINT("I2C %d read/write error %d vs %d actual! %d: %s",
-                        this->m_fd, read_write.read_buf_len, result,
-                        errno,strerror(errno));
-            this->log_WARNING_HI_I2C_WriteError(this->m_device,errno);
+        if (((NULL == read_write.read_buf)  ||
+             (0 == read_write.read_buf_len))   &&
+            ((NULL == read_write.write_buf) ||
+             (0 == read_write.write_buf_len))) {
+            // nothing to read or write
+            this->log_WARNING_HI_I2C_BadReadWriteCall(this->m_device);
             return;
         }
 
-        this->m_bytes += writeBuffer.getsize();
-        this->tlmWrite_I2C_Bytes(this->m_bytes);
+        if ((NULL == read_write.read_buf) ||
+            (0 == read_write.read_buf_len)) {
+            // I2C write only
+            ssize_t writeBytes = write(this->m_fd,
+                                       read_write.write_buf,
+                                       read_write.write_buf_len);
+            if (writeBytes != read_write.write_buf_len) {
+                this->log_WARNING_HI_I2C_WriteError(this->m_device,
+                                                    this->m_addr,
+                                                    errno,
+                                                    writeBytes,
+                                                    read_write.write_buf_len);
+                DEBUG_PRINT("Tried to write %d bytes; wrote %d",
+                            read_write.write_buf_len,
+                            writeBytes);
+                return;
+            }
+            this->m_writeBytes += writeBytes;
+        }
+        else if ((NULL == read_write.write_buf) ||
+                 (0 == read_write.write_buf_len)) {
+            // I2C read only
+            for (U32 byte = 0; byte < read_write.read_buf_len; byte++) {
+                read_write.read_buf[byte] = 0xA5;
+            }
+            ssize_t readBytes = read(this->m_fd,
+                                     read_write.read_buf,
+                                     read_write.read_buf_len);
+            if (readBytes != read_write.read_buf_len) {
+                this->log_WARNING_HI_I2C_ReadError(this->m_device,
+                                                   this->m_addr,
+                                                   errno,
+                                                   readBytes,
+                                                   read_write.read_buf_len);
+                DEBUG_PRINT("Tried to write %d bytes; wrote %d",
+                            read_write.read_buf_len,
+                            readBytes);
+                return;
+            }
+            this->m_readBytes += readBytes;
+        }
+        else {
+            // Combined read-write
+            DEBUG_PRINT("Write %d bytes, read %d bytes to I2C",
+                        read_write.write_buf_len,
+                        read_write.read_buf_len);
+            for (U32 byte = 0; byte < read_write.read_buf_len; byte++) {
+                read_write.read_buf[byte] = 0xA5;
+            }
+            result = ioctl(this->m_fd, I2C_IOCTL_RDWR, &read_write);
+            if (result != read_write.read_buf_len) {
+                DEBUG_PRINT("I2C %d read/write error %d vs %d actual! %d: %s",
+                            this->m_fd, read_write.read_buf_len, result,
+                            errno,strerror(errno));
+                this->log_WARNING_HI_I2C_ReadWriteError(this->m_device,
+                                                        this->m_addr,
+                                                        errno,
+                                                        result,
+                                                        read_write.read_buf_len);
+                
+                return;
+            }
+            this->m_readBytes += readBuffer.getsize();
+            this->m_writeBytes += writeBuffer.getsize();
+        }
+       
+        this->tlmWrite_I2C_ReadBytes(this->m_readBytes);
+        this->tlmWrite_I2C_WriteBytes(this->m_writeBytes);
     }
 
     void LinuxI2CDriverComponentImpl::open(NATIVE_INT_TYPE device,

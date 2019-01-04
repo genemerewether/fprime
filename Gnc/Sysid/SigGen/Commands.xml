@@ -1,0 +1,66 @@
+<commands>
+    <command kind="sync" opcode="0" mnemonic="SIGGEN_SetChirp">
+        <args>
+            <arg name="omega_i" type="F64">
+            </arg>
+            <arg name="omega_f" type="F64">
+            </arg>
+            <arg name="amplitude" type="F64">
+            </arg>
+            <arg name="duration" type="F64">
+            </arg>
+            <arg name="offset" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="1" mnemonic="SIGGEN_SetAxis">
+        <args>
+            <arg name="x" type="F64">
+            </arg>
+            <arg name="y" type="F64">
+            </arg>
+            <arg name="z" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="2" mnemonic="SIGGEN_Start">
+        <args>
+            <arg name="outputMode" type="ENUM">
+                <enum name="OutputMode">
+                    <item name="ACTUATOR"/>
+                    <item name="THRUST"/>
+                    <item name="MOMENT"/>
+                    <item name="ATT_RATE"/>
+                </enum>
+            </arg>
+            <arg name="signalType" type="ENUM">
+                <enum name="SignalType">
+                    <item name="IDLE"/>
+                    <item name="CHIRP"/>
+                    <item name="RAMP"/>
+                    <item name="STEP"/>
+                </enum>
+            </arg>
+            <arg name="index" type="U8">
+            </arg>
+        </args>
+    </command>
+    <command kind="sync" opcode="3" mnemonic="SIGGEN_Cancel">
+        <args>
+        </args>
+    </command>
+    <command kind="sync" opcode="4" mnemonic="SIGGEN_InitParams">
+        <args>
+        </args>
+    </command>
+    <command kind="sync" opcode="5" mnemonic="SIGGEN_SetRamp">
+        <args>
+            <arg name="amplitude" type="F64">
+            </arg>
+            <arg name="halfDuration" type="F64">
+            </arg>
+            <arg name="offset" type="F64">
+            </arg>
+         </args>
+    </command>
+</commands>

@@ -15,6 +15,7 @@ void exitTasks(void);
 #include <HEXREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
+#include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 
@@ -26,6 +27,7 @@ void exitTasks(void);
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
+#include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
@@ -33,6 +35,7 @@ void exitTasks(void);
 #include <LLProc/LLTlmChan/LLTlmChanImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
+extern Svc::ActiveDecouplerComponentImpl* actDecouple_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
@@ -48,6 +51,7 @@ extern SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr;
 extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
 extern Gnc::BasicMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
+extern Gnc::SigGenComponentImpl* sigGen_ptr;
 extern Gnc::ImuIntegComponentImpl* imuInteg_ptr;
 extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;

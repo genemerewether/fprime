@@ -57,6 +57,7 @@ Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLoggerLL_ptr = 0;
 Svc::ActiveFileLoggerImpl* fileLogger_ptr = 0;
+Svc::SerLoggerComponentImpl* serLogger_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
@@ -71,11 +72,10 @@ SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
 HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
+Svc::UdpReceiverComponentImpl* udpReceiver_ptr = 0;
 
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
-
-Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 
 void allocComps() {
     // Component instance pointers
@@ -136,6 +136,12 @@ void allocComps() {
 #endif
 ;
 
+    serLogger_ptr = new Svc::SerLoggerComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SERLOG")
+#endif
+;
+    
     linuxTime_ptr = new Svc::LinuxTimeImpl
 #if FW_OBJECT_NAMES == 1
                         ("LTIME")
@@ -216,13 +222,6 @@ void allocComps() {
 #endif
 ;
 
-
-    actuatorAdapter_ptr = new Gnc::ActuatorAdapterComponentImpl
-#if FW_OBJECT_NAMES == 1
-                        ("ACTADAP")
-#endif
-;
-
     fatalAdapter_ptr = new Svc::AssertFatalAdapterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("fatalAdapter")
@@ -232,6 +231,12 @@ void allocComps() {
     fatalHandler_ptr = new Svc::FatalHandlerComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("fatalHandler")
+#endif
+;
+
+    udpReceiver_ptr = new Svc::UdpReceiverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("UDPRECV")
 #endif
 ;
 }
@@ -251,6 +256,8 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct() {
+    serLogger_ptr->set_LogOut_OutputPort(0, fileLogger_ptr->get_LogQueue_InputPort(0));
+  
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -261,16 +268,17 @@ void manualConstruct() {
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
     
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(2, hexRouter_ptr->get_Sched_InputPort(0));
     
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
-    // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
     sdRosIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
+    udpReceiver_ptr->set_PortsOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(7));
 #else
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
@@ -281,18 +289,19 @@ void manualConstruct() {
 
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
-
+    llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+    
     sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
-    // this actuator <-> PWM converter is for commanding from the Linux side
-    actuatorAdapter_ptr->set_pwmSetDuty_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
     sdRosIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
+    udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn__InputPort(7));
 #endif
 }
 
-void constructApp(int port_number, int ll_port_number, char* hostname) {
+void constructApp(int port_number, int ll_port_number, char* udp_string, char* hostname) {
     allocComps();
   
     localTargetInit();
@@ -315,6 +324,7 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
     eventLogger_ptr->init(10,0);
     eventLoggerLL_ptr->init(10,0);
     fileLogger_ptr->init(10);
+    serLogger_ptr->init(0);
 
     linuxTime_ptr->init(0);
 
@@ -340,12 +350,13 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 
     hexRouter_ptr->init(10, 1000); // message size
     sdRosIface_ptr->init(0);
-    actuatorAdapter_ptr->init(0);
     
     serialTextConv_ptr->init(20,0);
     llRouter_ptr->init(10,SERIAL_BUFFER_SIZE,0);
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
+
+    udpReceiver_ptr->init(0);
     
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
@@ -445,8 +456,17 @@ void constructApp(int port_number, int ll_port_number, char* hostname) {
 #endif
     
     // Initialize socket server
-    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
-    sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
+    if (port_number && hostname) {
+        sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
+    }
+    if (ll_port_number && hostname) {
+        sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
+    }
+
+    if (udp_string) {
+        udpReceiver_ptr->open(udp_string);
+        udpReceiver_ptr->startThread(85,20*1024);
+    }
     
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -503,7 +523,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
 }
 
 
@@ -533,16 +553,17 @@ int main(int argc, char* argv[]) {
     bool kraitCycle = false;
     bool hexCycle = true;
     int numKraitCycles = 0;
-    U32 port_number = 50000;
-    U32 ll_port_number = 50001;
+    U32 port_number = 0;
+    U32 ll_port_number = 0;
     I32 option = 0;
-    char *hostname = "localhost";
+    char *hostname = NULL;
+    char* udp_string = 0;
     bool local_cycle = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:x:a:o:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlp:x:a:u:o:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -559,6 +580,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'a':
                 hostname = optarg;
+                break;
+            case 'u':
+                udp_string = optarg;
                 break;
             case 'i':
                 noInit = true;
@@ -596,7 +620,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
     
-    constructApp(port_number, ll_port_number, hostname);
+    constructApp(port_number, ll_port_number, udp_string, hostname);
     //dumparch();
 
     ros::start();
