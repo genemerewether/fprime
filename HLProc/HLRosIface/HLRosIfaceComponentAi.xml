@@ -16,6 +16,7 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
 
     <import_dictionary>HLProc/HLRosIface/Telemetry.xml</import_dictionary>
     
@@ -24,6 +25,9 @@
         </port>
 
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="AccelCommand" data_type="ROS::geometry_msgs::AccelStamped"  kind="sync_input" max_number="1">
         </port>
 
         <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

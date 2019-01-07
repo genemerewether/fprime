@@ -308,6 +308,30 @@ namespace HLProc {
     }
 
     void HLRosIfaceComponentImpl ::
+      AccelCommand_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::geometry_msgs::AccelStamped &AccelStamped
+      )
+    {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ACCEL_CMD);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = AccelStamped.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+    }
+
+    void HLRosIfaceComponentImpl ::
       pingIn_handler(
           const NATIVE_INT_TYPE portNum,
           U32 key

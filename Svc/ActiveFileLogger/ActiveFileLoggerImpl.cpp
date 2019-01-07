@@ -158,6 +158,10 @@ namespace Svc {
                 return "ImuNoCov";
             case AFL_HLROSIFACE_ODOMNOCOV:
                 return "OdomNoCov";
+            case AFL_HLROSIFACE_ACCEL_CMD:
+                return "AccelCmd";
+            case AFL_ACTADAP_ESC:
+                return "ActAdapEsc";
             default:
                 return "Unknown";
         }

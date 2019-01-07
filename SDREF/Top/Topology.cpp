@@ -265,7 +265,7 @@ void manualConstruct() {
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
-
+    hexRouter_ptr->set_HexPortsOut_OutputPort(3, sdRosIface_ptr->get_AccelCommand_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
@@ -286,7 +286,7 @@ void manualConstruct() {
 
     llRouter_ptr->set_LLPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
-
+    llRouter_ptr->set_LLPortsOut_OutputPort(3, sdRosIface_ptr->get_AccelCommand_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
@@ -325,6 +325,7 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     eventLoggerLL_ptr->init(10,0);
     fileLogger_ptr->init(10);
     serLogger_ptr->init(0);
+    serLogger_ptr->setStreamId(AFL_ACTADAP_ESC);
 
     linuxTime_ptr->init(0);
 

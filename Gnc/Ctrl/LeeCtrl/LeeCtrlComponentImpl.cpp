@@ -383,6 +383,14 @@ namespace Gnc {
               this->controls_out(0, u_b__comm);
           }
 
+          ROS::geometry_msgs::AccelStamped accel__comm(h,
+            ROS::geometry_msgs::Accel(this->a_w__comm,
+                                      Vector3(alpha_b__comm(0), alpha_b__comm(1), alpha_b__comm(2))));
+          if (this->isConnected_accelCommand_OutputPort(0) &&
+              (CTRL_DISABLED != this->ctrlMode)) {
+              this->accelCommand_out(0, accel__comm);
+          }
+
           this->thrust_x_tlm = thrust_b__comm(0);
           this->thrust_y_tlm = thrust_b__comm(1);
 
