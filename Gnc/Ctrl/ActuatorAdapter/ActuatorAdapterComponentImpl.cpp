@@ -434,23 +434,30 @@ namespace Gnc {
                           F64 fbTimeFloat = (F64) this->outputInfo[i].feedback.fbSec +
                             (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
 
-                          /* if using the diff between readings (also change below)
-                          U32 countsDiff = 0u;
-                          //To account for the CSC rolling over at 0xFFFF = 2^16-1
-                          if (countsLast > this->outputInfo[i].feedback.counts) {
-                              countsDiff = 0xFFFF - countsLast + this->outputInfo[i].feedback.counts;
-                          }
-                          else{
-                              countsDiff = this->outputInfo[i].feedback.counts - countsLast;
-                          }
-                          */
-
                           // guard against bad parameter setting and small time increment
                           if ((this->outputInfo[i].i2cMeta.countsPerRev > 0) && 
                               (fbTimeFloat - fbTimeLast > 1e-4)) {
-                              this->outputInfo[i].feedback.angVel = 2.0 * M_PI
-                                * this->outputInfo[i].feedback.counts
-                                / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
+
+                              if (OUTPUT_I2C == this->outputInfo[i].type) {
+
+                                  this->outputInfo[i].feedback.angVel = 2.0 * M_PI
+                                    * this->outputInfo[i].feedback.counts
+                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
+                              }
+                              else {
+                                  U32 countsDiff = 0u;
+                                  //To account for the CSC rolling over at 0xFFFF = 2^16-1
+                                  if (countsLast > this->outputInfo[i].feedback.counts) {
+                                      countsDiff = 0xFFFF - countsLast + this->outputInfo[i].feedback.counts;
+                                  }
+                                  else {
+                                      countsDiff = this->outputInfo[i].feedback.counts - countsLast;
+                                  }
+
+                                  this->outputInfo[i].feedback.angVel = 2.0 * M_PI * countsDiff
+                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
+                              }
+
                               // TODO(mereweth) - run rate estimator here
 
                               switch (i) {
@@ -486,7 +493,9 @@ namespace Gnc {
                       
                       Fw::SerializeStatus status;
                       // sec, usec, motor id, command, response
-                      U8 buff[sizeof(U8) + 2 * sizeof(U32) + sizeof(U32) + 2 * sizeof(U32) + sizeof(readBuf) + sizeof(U32)];
+                      U8 buff[sizeof(U8) + 2 * sizeof(U32) + sizeof(U32)
+                              + 2 * sizeof(U32) + sizeof(F64)
+                              + sizeof(readBuf) + sizeof(U32)];
                       Fw::SerialBuffer buffObj(buff, FW_NUM_ARRAY_ELEMENTS(buff));
                       status = buffObj.serialize((U8) i);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
@@ -501,6 +510,8 @@ namespace Gnc {
                       status = buffObj.serialize(this->outputInfo[i].feedback.fbSec);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
                       status = buffObj.serialize(this->outputInfo[i].feedback.fbUsec);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(this->outputInfo[i].feedback.angVel);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
                       NATIVE_INT_TYPE size = FW_NUM_ARRAY_ELEMENTS(readBuf);
                       status = buffObj.serialize(readBuf, size, false); // serialize length
