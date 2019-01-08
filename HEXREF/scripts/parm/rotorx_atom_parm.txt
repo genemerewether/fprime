@@ -49,32 +49,37 @@ LCTRL_InitParams
 # K_OMEGA__X_PRM_SAVE
 # K_OMEGA__Y_PRM_SAVE
 # K_OMEGA__Z_PRM_SAVE
+
 NUMROTORS_PRM_SET, 4
 
 # thrust coefficient 6.5e-8 N / (rad/s)^2
 # moment coefficient 7e-10 N*m / (rad/s)^2
-# front_arm_x 0.03 m
-# front_arm_y 0.065 m
-# back_arm_x 0.05 m
-# back_arm_y 0.05 m
+# front_arm_x 0.029 m
+# front_arm_y 0.055 m
+# back_arm_x 0.045 m
+# back_arm_y 0.040 m
 
-M_X__1_PRM_SET, 4.2e-9
-M_Y__1_PRM_SET, 1.5e-9
+# front right
+M_X__1_PRM_SET, -3.575e-9
+M_Y__1_PRM_SET, -1.885e-9
 M_Z__1_PRM_SET, -7e-10
 T__1_PRM_SET, 6.5e-8
 
-M_X__2_PRM_SET, -3.3e-9
-M_Y__2_PRM_SET, -3.3e-9
+# back left
+M_X__2_PRM_SET, 2.60e-9
+M_Y__2_PRM_SET, 2.925e-9
 M_Z__2_PRM_SET, -7e-10
 T__2_PRM_SET, 6.5e-8
 
-M_X__3_PRM_SET, -4.2e-9
-M_Y__3_PRM_SET, 1.5e-9
+# front left
+M_X__3_PRM_SET, 3.575e-9
+M_Y__3_PRM_SET, -1.885e-9
 M_Z__3_PRM_SET, 7e-10
 T__3_PRM_SET, 6.5e-8
 
-M_X__4_PRM_SET, 3.3e-9
-M_Y__4_PRM_SET, -3.3e-9
+# back right
+M_X__4_PRM_SET, -2.60e-9
+M_Y__4_PRM_SET, 2.925e-9
 M_Z__4_PRM_SET, 7e-10
 T__4_PRM_SET, 6.5e-8
 
