@@ -95,6 +95,12 @@ Svc::SocketGndIfImpl sockGndIf
 #endif
 ;
 
+Svc::UdpReceiverComponentImpl udpReceiver
+#if FW_OBJECT_NAMES == 1
+                        ("UDPRECV")
+#endif
+;
+
 #if FW_ENABLE_TEXT_LOGGING
 Svc::ConsoleTextLoggerImpl textLogger
 #if FW_OBJECT_NAMES == 1
@@ -214,7 +220,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void constructApp(int port_number, char* hostname) {
+void constructApp(int port_number, char* udp_string, char* hostname) {
 
     localTargetInit();
 
@@ -263,9 +269,12 @@ void constructApp(int port_number, char* hostname) {
 
     fatalAdapter.init(0);
     fatalHandler.init(0);
+    udpReceiver.init(0);
 
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
+    
+    udpReceiver.set_PortsOut_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
 
     /* Register commands */
     cmdSeq.regCommands();
@@ -308,6 +317,11 @@ void constructApp(int port_number, char* hostname) {
     // Initialize socket server
     sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
 
+    if (udp_string) {
+        udpReceiver.open(udp_string);
+        udpReceiver.startThread(85,20*1024);
+    }
+
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -348,7 +362,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SIMREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
+    (void) printf("Usage: ./SIMREF [options]\n-p\tport_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
 }
 
 
@@ -369,12 +383,13 @@ int main(int argc, char* argv[]) {
     U32 port_number = 0;
     I32 option = 0;
     char *hostname = NULL;
+    char* udp_string = 0;
     bool local_cycle = false;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SIMREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "hlp:a:")) != -1){
+    while ((option = getopt(argc, argv, "hlp:a:u:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -389,6 +404,9 @@ int main(int argc, char* argv[]) {
             case 'a':
                 hostname = optarg;
                 break;
+            case 'u':
+                udp_string = optarg;
+                break;
             case '?':
                 return 1;
             default:
@@ -399,7 +417,7 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
-    constructApp(port_number, hostname);
+    constructApp(port_number, udp_string, hostname);
 
     if (!local_cycle) {
         rgGncDrv.set_CycleOut_OutputPort(2, rg.get_CycleIn_InputPort(0));

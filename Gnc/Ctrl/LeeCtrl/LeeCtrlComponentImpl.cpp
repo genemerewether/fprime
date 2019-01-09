@@ -23,6 +23,17 @@
 
 #include <stdio.h>
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -309,7 +320,9 @@ namespace Gnc {
                                                               this->a_w__des.getz()));
           }
 
-          this->leeControl.SetYawDes(this->yaw__des);
+          if (this->leeControl.SetYawDes(this->yaw__des)) {
+              DEBUG_PRINT("Failed setting yaw to %f\n", this->yaw__des);
+          }
 
           // set position feedback
           this->leeControl.SetPositionLinVel(Eigen::Vector3d(this->x_w.getx(),
