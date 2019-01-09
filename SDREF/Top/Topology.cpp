@@ -79,7 +79,7 @@ Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
 
 void allocComps() {
     // Component instance pointers
-    NATIVE_INT_TYPE rgDivs[] = {10, 1};
+    NATIVE_INT_TYPE rgDivs[] = {30, 1};
     rgDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
                         "RGDRV",
@@ -482,7 +482,7 @@ void run1cycle(void) {
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(100);
+    Os::Task::delay(33);
 }
 
 void runcycles(NATIVE_INT_TYPE cycles) {
