@@ -133,6 +133,7 @@ namespace Gnc {
           U32 cmdSec;
           U32 cmdUsec;
           U32 cmd;
+          F64 cmdIn;
           U32 fbSec;
           U32 fbUsec;
           U32 counts;

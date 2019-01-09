@@ -372,6 +372,7 @@ namespace Gnc {
                           this->escReadWrite_out(0, writeBufObj, readBufObj);
                       }
 
+                      this->outputInfo[i].feedback.cmdIn   = angVels[i];
                       this->outputInfo[i].feedback.cmd     = out;
                       this->outputInfo[i].feedback.cmdSec  = cmdTime.getSeconds();
                       this->outputInfo[i].feedback.cmdUsec = cmdTime.getUSeconds();
@@ -493,7 +494,7 @@ namespace Gnc {
                       
                       Fw::SerializeStatus status;
                       // sec, usec, motor id, command, response
-                      U8 buff[sizeof(U8) + 2 * sizeof(U32) + sizeof(U32)
+                      U8 buff[sizeof(U8) + 2 * sizeof(U32) + sizeof(U32) + sizeof(F64)
                               + 2 * sizeof(U32) + sizeof(F64)
                               + sizeof(readBuf) + sizeof(U32)];
                       Fw::SerialBuffer buffObj(buff, FW_NUM_ARRAY_ELEMENTS(buff));
@@ -505,6 +506,8 @@ namespace Gnc {
                       status = buffObj.serialize(this->outputInfo[i].feedback.cmdUsec);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
                       status = buffObj.serialize(this->outputInfo[i].feedback.cmd);
+                      FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
+                      status = buffObj.serialize(this->outputInfo[i].feedback.cmdIn);
                       FW_ASSERT(Fw::FW_SERIALIZE_OK == status,static_cast<AssertArg>(status));
 
                       status = buffObj.serialize(this->outputInfo[i].feedback.fbSec);
