@@ -175,6 +175,13 @@ namespace HLProc {
           ROS::nav_msgs::OdometryNoCov &Odometry
       );
 
+      //! Handler implementation for AccelCommand
+      //!
+      void AccelCommand_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::geometry_msgs::AccelStamped &AccelStamped
+      );
+
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(

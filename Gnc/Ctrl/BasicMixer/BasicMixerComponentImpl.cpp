@@ -72,6 +72,7 @@ namespace Gnc {
   void BasicMixerComponentImpl ::
     parametersLoaded()
   {
+      this->paramsInited = false;
       Fw::ParamValid valid[4];
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
@@ -79,6 +80,7 @@ namespace Gnc {
       Eigen::MatrixXd mixer;
       mixer.resize(4, this->numRotors);
 
+      // TODO(mereweth) - macro-ize the param get calls?
       for (U32 i = 0; i < mixer.cols(); i++) {
           switch (i) {
               case 0:
@@ -128,7 +130,7 @@ namespace Gnc {
 
       (void) basicMixer.SetMixer(mixer);
 
-      paramsInited = true;
+      this->paramsInited = true;
   }
 
   // ----------------------------------------------------------------------

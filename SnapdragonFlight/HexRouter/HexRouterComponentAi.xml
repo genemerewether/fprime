@@ -7,7 +7,7 @@
 
     <comment>Forwards port calls over FastRPC to the DSP</comment>
     <ports>
-        <port name="KraitPortsIn" data_type="Serial" kind="async_input" max_number="25">
+        <port name="KraitPortsIn" data_type="Serial" kind="async_input" max_number="25" full="drop">
             <comment>
                 Input ports from other Krait components, destination is Hexagon
             </comment>

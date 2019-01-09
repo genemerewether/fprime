@@ -3,7 +3,7 @@ GNU_COMMON := -Wall -Wextra \
                -fstrength-reduce \
                -Wno-unused-parameter \
                -Wno-long-long \
-	       -Wshadow
+			   -Wno-unused-local-typedefs
 
 DEPEND_FILE := -MMD -MP -MF
 

@@ -80,7 +80,9 @@ namespace Gnc {
   void LeeCtrlComponentImpl ::
     parametersLoaded()
   {
+      this->paramsInited = false;
       Fw::ParamValid valid[12];
+      int stat;
 
       quest_gnc::multirotor::MultirotorModel mrModel = {paramGet_mass(valid[0]),
                                                         paramGet_I_xx(valid[1]),
@@ -98,9 +100,10 @@ namespace Gnc {
       this->J_b << mrModel.Ixx, mrModel.Ixy, mrModel.Ixz,
                    mrModel.Ixy, mrModel.Iyy, mrModel.Iyz,
                    mrModel.Ixz, mrModel.Iyz, mrModel.Izz;
-      (void) leeControl.SetModel(mrModel);
+      stat = leeControl.SetModel(mrModel);
+      if (stat) {  return;  }
 
-      (void) leeControl.SetGains(Eigen::Vector3d(paramGet_k_x__x(valid[0]),
+      stat = leeControl.SetGains(Eigen::Vector3d(paramGet_k_x__x(valid[0]),
                                                  paramGet_k_x__y(valid[1]),
                                                  paramGet_k_x__z(valid[2])),
                                  Eigen::Vector3d(paramGet_k_v__x(valid[3]),
@@ -112,12 +115,13 @@ namespace Gnc {
                                  Eigen::Vector3d(paramGet_k_omega__x(valid[9]),
                                                  paramGet_k_omega__y(valid[10]),
                                                  paramGet_k_omega__z(valid[11])));
+      if (stat) {  return;  }
 
       for (U32 i = 0; i < 12; i++) {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
       }
 
-      paramsInited = true;
+      this->paramsInited = true;
   }
 
   void LeeCtrlComponentImpl ::
@@ -377,6 +381,14 @@ namespace Gnc {
           if (this->isConnected_controls_OutputPort(0) &&
               (CTRL_DISABLED != this->ctrlMode)) {
               this->controls_out(0, u_b__comm);
+          }
+
+          ROS::geometry_msgs::AccelStamped accel__comm(h,
+            ROS::geometry_msgs::Accel(this->a_w__comm,
+                                      Vector3(alpha_b__comm(0), alpha_b__comm(1), alpha_b__comm(2))));
+          if (this->isConnected_accelCommand_OutputPort(0) &&
+              (CTRL_DISABLED != this->ctrlMode)) {
+              this->accelCommand_out(0, accel__comm);
           }
 
           this->thrust_x_tlm = thrust_b__comm(0);

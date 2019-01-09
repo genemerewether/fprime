@@ -93,7 +93,7 @@ namespace HLProc {
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = m_rgNH->advertise<sensor_msgs::Imu>(buf, 5);
+            m_imuPub[i] = m_rgNH->advertise<sensor_msgs::Imu>(buf, 1000);
         }
 
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
@@ -308,6 +308,30 @@ namespace HLProc {
     }
 
     void HLRosIfaceComponentImpl ::
+      AccelCommand_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::geometry_msgs::AccelStamped &AccelStamped
+      )
+    {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ACCEL_CMD);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = AccelStamped.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+    }
+
+    void HLRosIfaceComponentImpl ::
       pingIn_handler(
           const NATIVE_INT_TYPE portNum,
           U32 key
@@ -343,13 +367,13 @@ namespace HLProc {
 
 
         ActuatorsHandler actuatorsHandler0(compPtr, 0);
-        ros::Subscriber actuatorsSub0 = n.subscribe("dsp_pwm_command", 10,
+        ros::Subscriber actuatorsSub0 = n.subscribe("flight_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler0,
                                             ros::TransportHints().tcpNoDelay());
         
         ActuatorsHandler actuatorsHandler1(compPtr, 1);
-        ros::Subscriber actuatorsSub1 = n.subscribe("dsp_i2c_command", 10,
+        ros::Subscriber actuatorsSub1 = n.subscribe("aux_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());

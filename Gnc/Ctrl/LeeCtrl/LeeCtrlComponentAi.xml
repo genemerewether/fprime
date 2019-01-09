@@ -14,6 +14,8 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
 
+    <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
+
     <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>
     <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
     <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionSerializableAi.xml</import_serializable_type>
@@ -31,6 +33,9 @@
         </port>
 
         <port name="attRateThrust" data_type="ROS::mav_msgs::AttitudeRateThrust"  kind="sync_input" max_number="1">
+        </port>
+
+        <port name="accelCommand" data_type="ROS::geometry_msgs::AccelStamped"  kind="output" max_number="1">
         </port>
 
         <port name="controls" data_type="ROS::mav_msgs::TorqueThrust"  kind="output" max_number="1">
