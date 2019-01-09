@@ -93,7 +93,7 @@ namespace HLProc {
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = m_rgNH->advertise<sensor_msgs::Imu>(buf, 5);
+            m_imuPub[i] = m_rgNH->advertise<sensor_msgs::Imu>(buf, 1000);
         }
 
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
@@ -305,6 +305,30 @@ namespace HLProc {
         msg.twist.twist.angular.z = vec.getz();
 
         m_odomPub[portNum].publish(msg);
+    }
+
+    void HLRosIfaceComponentImpl ::
+      AccelCommand_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::geometry_msgs::AccelStamped &AccelStamped
+      )
+    {
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ACCEL_CMD);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = AccelStamped.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
     }
 
     void HLRosIfaceComponentImpl ::
