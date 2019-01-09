@@ -92,7 +92,7 @@ namespace Gnc {
     parametersLoaded()
   {
       this->paramsInited = false;
-      Fw::ParamValid valid[12];
+      Fw::ParamValid valid[13];
       int stat;
 
       quest_gnc::multirotor::MultirotorModel mrModel = {paramGet_mass(valid[0]),
@@ -130,6 +130,28 @@ namespace Gnc {
 
       for (U32 i = 0; i < 12; i++) {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
+      }
+
+      stat = leeControl.SetSaturation(Eigen::Vector3d(paramGet_sat_x__x(valid[0]),
+                                                      paramGet_sat_x__y(valid[1]),
+                                                      paramGet_sat_x__z(valid[2])),
+                                      Eigen::Vector3d(paramGet_sat_v__x(valid[3]),
+                                                      paramGet_sat_v__y(valid[4]),
+                                                      paramGet_sat_v__z(valid[5])),
+                                      Eigen::Vector3d(paramGet_sat_R__x(valid[6]),
+                                                      paramGet_sat_R__y(valid[7]),
+                                                      paramGet_sat_R__z(valid[8])),
+                                      Eigen::Vector3d(paramGet_sat_omega__x(valid[9]),
+                                                      paramGet_sat_omega__y(valid[10]),
+                                                      paramGet_sat_omega__z(valid[11])),
+                                      paramGet_sat_yaw(valid[12]));
+      if (stat) {  return;  }
+
+      for (U32 i = 0; i < 13; i++) {
+          if ((Fw::PARAM_VALID != valid[i]) &&
+              (Fw::PARAM_DEFAULT != valid[i])) {
+              return;
+          }
       }
 
       this->paramsInited = true;
