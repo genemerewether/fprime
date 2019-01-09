@@ -199,18 +199,16 @@ namespace Gnc {
           if (this->isConnected_odometry_OutputPort(0)) {
               this->odometry_out(0, odom);
           }
-
-          if (context == IMUINTEG_SCHED_CONTEXT_POS) {
-              ROS::nav_msgs::OdometryNoCov odomNoCov(h, 0/*"body"*/,
-                                     Pose(Point(x_w(0), x_w(1), x_w(2)),
-                                          Quaternion(w_q_b.x(), w_q_b.y(),
-                                                     w_q_b.z(), w_q_b.w())),
-                                     Twist(Vector3(v_b(0), v_b(1), v_b(2)),
-                                            Vector3(omega_b(0), omega_b(1), omega_b(2)))
-                  );
-              if (this->isConnected_odomNoCov_OutputPort(0)) {
-                  this->odomNoCov_out(0, odomNoCov);
-              }
+          
+          ROS::nav_msgs::OdometryNoCov odomNoCov(h, 0/*"body"*/,
+              Pose(Point(x_w(0), x_w(1), x_w(2)),
+                   Quaternion(w_q_b.x(), w_q_b.y(),
+                              w_q_b.z(), w_q_b.w())),
+              Twist(Vector3(v_b(0), v_b(1), v_b(2)),
+                    Vector3(omega_b(0), omega_b(1), omega_b(2)))
+              );
+          if (this->isConnected_odomNoCov_OutputPort(0)) {
+              this->odomNoCov_out(0, odomNoCov);
           }
       }
       else if (context == IMUINTEG_SCHED_CONTEXT_TLM) {
