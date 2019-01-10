@@ -349,8 +349,15 @@ namespace Gnc {
 
                       I2CMetadata i2c = this->outputInfo[i].i2cMeta;
                       F64 inVal = angVels[i];
-                      if (inVal > i2c.maxIn) {  inVal = i2c.maxIn;  }
-                      if (inVal < i2c.minIn) {  inVal = i2c.minIn;  }
+                      // NOTE(Mereweth) - DSPAL has no isnan
+                      if (!(inVal < i2c.maxIn) && 
+                          !(inVal > i2c.minIn)) {
+                          // TODO(mereweth) - EVR about disarming due to NaN
+                          inVal = i2c.minIn;
+                          this->armedState = DISARMED;
+                      }
+                      else if (inVal > i2c.maxIn) {  inVal = i2c.maxIn;  }
+                      else if (inVal < i2c.minIn) {  inVal = i2c.minIn;  }
                       U32 out = (inVal - i2c.minIn) / (i2c.maxIn - i2c.minIn) * (i2c.maxOut - i2c.minOut) + i2c.minOut;
 
                       DEBUG_PRINT("esc addr %u, in %f, out %u\n", i2c.addr, angVels[i], out);
