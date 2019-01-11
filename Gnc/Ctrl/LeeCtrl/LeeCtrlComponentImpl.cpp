@@ -181,14 +181,7 @@ namespace Gnc {
         const U32 cmdSeq,
         CtrlMode mode
     )
-  {
-      // TODO(Mereweth) - these modes aren't fully working
-      if ((RPRATE_YAW_THRUST == this->ctrlMode) ||
-          (ATTRATE_THRUST == this->ctrlMode)) {
-          this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
-          return;
-      }
-      
+  {      
       if (!paramsInited &&
           mode != CTRL_DISABLED) {
           this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
