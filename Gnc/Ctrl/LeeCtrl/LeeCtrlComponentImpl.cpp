@@ -368,7 +368,10 @@ namespace Gnc {
 
           Eigen::Vector3d thrust_b__comm;
 
-          if (ATT_RATE_THRUST == this->ctrlMode) {
+          if ((ATT_ATTRATE_THRUST == this->ctrlMode) ||
+              (RPRATE_YAW_THRUST == this->ctrlMode) ||
+              (RP_YAWRATE_THRUST == this->ctrlMode) ||
+              (ATTRATE_THRUST == this->ctrlMode)) {
               Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
                                                                   this->w_q_b__des.getx(),
                                                                   this->w_q_b__des.gety(),
@@ -404,7 +407,18 @@ namespace Gnc {
           }
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
-          this->leeControl.GetAngAccelCommand(&alpha_b__comm);
+          if (RPRATE_YAW_THRUST == this->ctrlMode) {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, false);
+          }
+          else if (RP_YAWRATE_THRUST == this->ctrlMode) {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, false, true);
+          }
+          else if (ATTRATE_THRUST == this->ctrlMode) {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, true);
+          }
+          else {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm);
+          }
 
           Eigen::Vector3d moment_b__comm = this->J_b * alpha_b__comm;
 
