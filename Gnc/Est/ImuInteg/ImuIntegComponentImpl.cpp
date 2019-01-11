@@ -46,14 +46,9 @@ namespace Gnc {
       ImuIntegComponentBase(compName),
 #else
     ImuIntegComponentImpl(void) :
-      ImuIntegComponentImpl(void),
+      ImuIntegComponentBase(void),
 #endif
       seq(0u),
-      omega_b(0.0f, 0.0f, 0.0f),
-      a_b(0.0f, 0.0f, 0.0f),
-      x_w(0.0f, 0.0f, 0.0f),
-      w_q_b(0.0f, 0.0f, 0.0f, 1.0f),
-      v_b(0.0f, 0.0f, 0.0f),
       imuInteg(),
       paramsInited(false)
   {
@@ -109,15 +104,20 @@ namespace Gnc {
       this->seq = h.getseq();
       // TODO(mereweth) check h.getstamp()
 
-      this->omega_b = ImuNoCov.getangular_velocity();
-      this->a_b = ImuNoCov.getlinear_acceleration();
+      ROS::geometry_msgs::Vector3 omega_b = ImuNoCov.getangular_velocity();
+      ROS::geometry_msgs::Vector3 a_b = ImuNoCov.getlinear_acceleration();
+      
+      quest_gnc::ImuSample imu;
+      imu.t = h.getstamp().getSeconds() 
+        + h.getstamp().getUSeconds() / 1000.0 / 1000.0;
+      imu.omega_b = Eigen::Vector3d(omega_b.getx(),
+                                    omega_b.gety(),
+                                    omega_b.getz());
+      imu.a_b = Eigen::Vector3d(a_b.getx(),
+                                a_b.gety(),
+                                a_b.getz());
 
-      this->imuInteg.AddImu(Eigen::Vector3d(this->omega_b.getx(),
-                                            this->omega_b.gety(),
-                                            this->omega_b.getz()),
-                            Eigen::Vector3d(this->a_b.getx(),
-                                            this->a_b.gety(),
-                                            this->a_b.getz()));
+      this->imuInteg.AddImu(imu);
   }
 
 
@@ -130,38 +130,37 @@ namespace Gnc {
       DEBUG_PRINT("IMU state update\n");
     
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();
+      //TODO(mereweth) - convert time instead in HLRosIface using HLTimeConv
+      h.setstamp(this->getTime());
+      
       //this->seq = h.getseq();
-      // TODO(mereweth) convert h.getstamp()
 
-      this->x_w = ImuStateUpdate.getpose().getposition();
-      this->w_q_b = ImuStateUpdate.getpose().getorientation();
-
+      ROS::geometry_msgs::Point x_w = ImuStateUpdate.getpose().getposition();
+      ROS::geometry_msgs::Quaternion w_q_b = ImuStateUpdate.getpose().getorientation();
       ROS::geometry_msgs::Vector3 v_w = ImuStateUpdate.gettwist().getlinear();
-      this->omega_b = ImuStateUpdate.gettwist().getangular();
+      //this->omega_b = ImuStateUpdate.gettwist().getangular();
 
-      this->wBias = ImuStateUpdate.getangular_velocity_bias();
-      this->aBias = ImuStateUpdate.getlinear_acceleration_bias();
-
-      Eigen::Quaterniond w_q_b = Eigen::Quaterniond(this->w_q_b.getw(),
-                                                    this->w_q_b.getx(),
-                                                    this->w_q_b.gety(),
-                                                    this->w_q_b.getz());
+      ROS::geometry_msgs::Vector3 wBias = ImuStateUpdate.getangular_velocity_bias();
+      ROS::geometry_msgs::Vector3 aBias = ImuStateUpdate.getlinear_acceleration_bias();
 
       this->imuInteg.SetUpdate(h.getstamp().getSeconds()
                                + h.getstamp().getUSeconds() / 1000.0 / 1000.0,
-                               Eigen::Vector3d(this->x_w.getx(),
-                                               this->x_w.gety(),
-                                               this->x_w.getz()),
-                               w_q_b,
+                               Eigen::Vector3d(x_w.getx(),
+                                               x_w.gety(),
+                                               x_w.getz()),
+                               Eigen::Quaterniond(w_q_b.getw(),
+                                                  w_q_b.getx(),
+                                                  w_q_b.gety(),
+                                                  w_q_b.getz()),
                                Eigen::Vector3d(v_w.getx(),
                                                v_w.gety(),
                                                v_w.getz()),
-                               Eigen::Vector3d(this->wBias.getx(),
-                                               this->wBias.gety(),
-                                               this->wBias.getz()),
-                               Eigen::Vector3d(this->aBias.getx(),
-                                               this->aBias.gety(),
-                                               this->aBias.getz()));
+                               Eigen::Vector3d(wBias.getx(),
+                                               wBias.gety(),
+                                               wBias.getz()),
+                               Eigen::Vector3d(aBias.getx(),
+                                               aBias.gety(),
+                                               aBias.getz()));
   }
 
   void ImuIntegComponentImpl ::
