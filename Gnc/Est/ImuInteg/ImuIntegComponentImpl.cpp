@@ -130,8 +130,6 @@ namespace Gnc {
       DEBUG_PRINT("IMU state update\n");
     
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();
-      //TODO(mereweth) - convert time instead in HLRosIface using HLTimeConv
-      h.setstamp(this->getTime());
       
       //this->seq = h.getseq();
 

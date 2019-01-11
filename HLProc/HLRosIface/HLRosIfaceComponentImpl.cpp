@@ -25,6 +25,8 @@
 #include <Svc/ActiveFileLogger/ActiveFileLoggerPacket.hpp>
 #include <Svc/ActiveFileLogger/ActiveFileLoggerStreams.hpp>
 
+#include <Os/File.hpp>
+
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
@@ -51,7 +53,8 @@ namespace HLProc {
     m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
     m_actuatorsSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
-    m_attRateThrustSet() // zero-initialize instead of default-initializing
+    m_attRateThrustSet(), // zero-initialize instead of default-initializing
+    m_lastLLImuTime()
   {
       for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
           m_imuStateUpdateSet[i].fresh = false;
@@ -126,6 +129,12 @@ namespace HLProc {
           ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
+
+        ROS::std_msgs::Header header = Imu.getheader();
+        // TODO(mereweth) - time-translate from DSP & use message there
+        Fw::Time stamp = header.getstamp();
+        m_lastLLImuTime = stamp;
+
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -149,9 +158,7 @@ namespace HLProc {
       
         sensor_msgs::Imu msg;
 
-        ROS::std_msgs::Header header = Imu.getheader();
         // TODO(mereweth) - time-translate from DSP & use message there
-        Fw::Time stamp = header.getstamp();
         msg.header.stamp = ros::Time::now();
 
         msg.header.seq = header.getseq();
@@ -486,15 +493,52 @@ namespace HLProc {
 
         DEBUG_PRINT("imuStateUpdate port handler %d\n", this->portNum);
 
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        U32 usecRos = msg->header.stamp.sec * 1000 * 1000
+                      + msg->header.stamp.nsec / 1000;
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (walltimeDspLeadUs > usecRos + 10 * 1000 * 1000) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            // add 10-second buffer in case we get an old message
+            return;
+        }
+        U32 usecDsp = usecRos - walltimeDspLeadUs;
+        Fw::Time convTime(TB_ROS_TIME, 0,
+                          usecDsp / 1000 / 1000,
+                          usecDsp % (1000 * 1000));
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
+
             ImuStateUpdateNoCov imuStateUpdate(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
@@ -520,12 +564,17 @@ namespace HLProc {
             ); // end ImuStateUpdate constructor
 
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
-            if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
-                this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
-                DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+            if (convTime > this->compPtr->m_lastLLImuTime) {
+                // TODO(mereweth) - EVR; can't have state update newer than last IMU
             }
-            this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
-            this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+            else {
+                if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
+                    this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
+                    DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+                }
+                this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
+                this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+            }
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
         }
     }
