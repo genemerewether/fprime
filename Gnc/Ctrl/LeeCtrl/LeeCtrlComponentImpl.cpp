@@ -182,7 +182,13 @@ namespace Gnc {
         CtrlMode mode
     )
   {
-      // TODO(Mereweth) - bounds on discontinuity in commanded thrust/moment
+      // TODO(Mereweth) - these modes aren't fully working
+      if ((RPRATE_YAW_THRUST == this->ctrlMode) ||
+          (ATTRATE_THRUST == this->ctrlMode)) {
+          this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
+          return;
+      }
+      
       if (!paramsInited &&
           mode != CTRL_DISABLED) {
           this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
@@ -372,6 +378,22 @@ namespace Gnc {
               (RPRATE_YAW_THRUST == this->ctrlMode) ||
               (RP_YAWRATE_THRUST == this->ctrlMode) ||
               (ATTRATE_THRUST == this->ctrlMode)) {
+
+              bool rpVelOnly = false;
+              bool yawVelOnly = false;
+
+              if (RPRATE_YAW_THRUST == this->ctrlMode) {
+                  rpVelOnly = true;
+              }
+              if (RP_YAWRATE_THRUST == this->ctrlMode) {
+                  yawVelOnly = true;
+              }
+              
+              if (ATTRATE_THRUST == this->ctrlMode) {
+                  rpVelOnly = true;
+                  yawVelOnly = true;
+              }
+            
               Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
                                                                   this->w_q_b__des.getx(),
                                                                   this->w_q_b__des.gety(),
