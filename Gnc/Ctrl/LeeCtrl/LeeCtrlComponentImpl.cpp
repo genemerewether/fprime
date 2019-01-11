@@ -402,7 +402,8 @@ namespace Gnc {
                                               Eigen::Vector3d(
                                                   this->omega_b__des.getx(),
                                                   this->omega_b__des.gety(),
-                                                  this->omega_b__des.getz()));
+                                                  this->omega_b__des.getz()),
+                                              rpVelOnly, yawVelOnly);
               thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
                                                this->thrust_b__des.gety(),
                                                this->thrust_b__des.getz());
