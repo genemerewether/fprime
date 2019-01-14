@@ -4,6 +4,8 @@ include $(BUILD_ROOT)/mk/configs/compiler/cubemx-common.mk
 
 CUBEMX_STM32F4_COMMON_FLAGS :=	$(COMMON_DEFINES) \
 						$(CUBEMX_FLAGS_COMMON) \
+						-DUSE_HAL_DRIVER \
+						-DSTM32F405xx \
 						-mcpu=cortex-m4 -mthumb \
 						-mfpu=fpv4-sp-d16 -mfloat-abi=hard \
 						-DEIGEN_NO_DEBUG -D'EIGEN_ASM_COMMENT(X)=(X)' \
@@ -35,9 +37,6 @@ LINK_BIN :=  $(CC)
 LINK_BIN_FLAGS := -specs=nano.specs -T$(BUILD_ROOT)/STM32/CF2Hal/STM32F405RGTx_FLASH.ld \
 		  -Wl,-Map=CF2Bin.map,--cref -Wl,--gc-sections
 
-POST_LINK_BIN := arm-none-eabi-objcopy $@
-POST_LINK_POST_ARGS = $(subst .hex,.bin,$@)
-
 FILE_SIZE := $(LS) $(LS_SIZE)
 LOAD_SIZE := $(SIZE)
 
@@ -45,4 +44,3 @@ LOAD_SIZE := $(SIZE)
 DUMP = $(PYTHON_BIN) $(BUILD_ROOT)/mk/bin/empty.py
 SYMBOL_SIZES = $(PYTHON_BIN) $(BUILD_ROOT)/mk/bin/empty.py
 MUNCH := $(PYTHON_BIN) $(BUILD_ROOT)/mk/bin/empty.py
-												 

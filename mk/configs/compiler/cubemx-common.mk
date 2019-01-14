@@ -2,7 +2,7 @@ CUBEMX_COMMON :=
 
 DEPEND_FILE := -MMD -MP -MF
                
-CUBEMX_CFLAGS_COMMON := $(CUBEMX_COMMON) -std=c99
+CUBEMX_CFLAGS_COMMON := $(CUBEMX_COMMON) -std=c99 -fdata-sections -ffunction-sections
 
 CUBEMX_CXXFLAGS_COMMON := $(CUBEMX_COMMON)
 
