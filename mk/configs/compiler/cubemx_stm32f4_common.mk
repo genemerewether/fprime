@@ -28,7 +28,7 @@ CC :=  arm-none-eabi-gcc
 CXX := $(CC)
 
 LINK_LIB := arm-none-eabi-ar
-LINK_LIB_FLAGS := r
+LINK_LIB_FLAGS := rcs
 POST_LINK_LIB := $(PYTHON_BIN) $(BUILD_ROOT)/mk/bin/empty.py
 
 LINK_LIBS := -lc -lm -lnosys
