@@ -24,6 +24,9 @@ FW_GTEST_MODULES := \
 	Fw/FilePacket/GTest \
 	Fw/Types/GTest
 
+STM32_MODULES := \
+	STM32/CF2Hal
+
 R5_MODULES := \
 	R5/Ports \
 	\
@@ -447,6 +450,41 @@ TESTRPC_MODULES := \
 	\
 	LLProc/ShortLogQueue
 
+CF2REF_DEPLOYMENT_MODULES := 
+
+CF2REF_MODULES := \
+	$(ROS_TYPE_MODULES) \
+	$(ROS_PORT_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	\
+	$(LLPROC_MODULES) \
+	\
+	$(CF2REF_DEPLOYMENT_MODULES) \
+	\
+	$(STM32_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	\
+	Svc/PassiveRateGroup \
+	Svc/RateGroupDriver \
+	\
+	Svc/Sched \
+	Svc/Time \
+	Svc/Cycle \
+	\
+	Drv/PwmDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
+	\
+	Os \
+	\
+	$(FW_MODULES)
+
 R5REF_DEPLOYMENT_MODULES := \
 	R5REF/Top
 
@@ -563,7 +601,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF CF2REF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

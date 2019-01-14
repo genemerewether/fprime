@@ -33,6 +33,9 @@ typedef uint32_t NATIVE_UINT_TYPE;
 #elif defined BUILD_DSPAL
 typedef int32_t NATIVE_INT_TYPE;
 typedef uint32_t NATIVE_UINT_TYPE;
+#elif defined BUILD_CF2
+typedef int32_t NATIVE_INT_TYPE;
+typedef uint32_t NATIVE_UINT_TYPE;
 #else
 typedef int NATIVE_INT_TYPE; //!< native integer type declaration
 typedef unsigned int NATIVE_UINT_TYPE; //!< native unsigned integer type declaration
@@ -71,6 +74,8 @@ typedef unsigned int NATIVE_UINT_TYPE; //!< native unsigned integer type declara
 #elif defined __TMS470__
   #define POINTER_CAST U32
 #elif defined BUILD_TIR5
+  #define POINTER_CAST U32
+#elif defined BUILD_CF2
   #define POINTER_CAST U32
 #else
  #error Unsupported compiler!

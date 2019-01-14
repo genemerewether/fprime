@@ -4,5 +4,6 @@ BUILDS := \
 	CYGWIN \
 	SDFLIGHT \
 	DSPAL \
-	TIR5
+	TIR5 \
+	CF2
 
