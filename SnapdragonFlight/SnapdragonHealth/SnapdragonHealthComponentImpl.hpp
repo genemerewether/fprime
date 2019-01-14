@@ -327,6 +327,11 @@ namespace SnapdragonFlight {
 
             // Number of Sched calls - used for triggering switch into initial power state
             U32 m_schedCalls;
+
+            /*
+             * \brief Whether power-saving features are on
+             */
+            PowerSaverMode m_modeAfterCountdown;
     };
 }
 

@@ -61,7 +61,8 @@ extern "C" {
         fsw_version_sent(false),
         power_saver(SAVER_ON),
         m_boot_count(0u),
-        m_schedCalls(0u)
+        m_schedCalls(0u),
+        m_modeAfterCountdown(SAVER_ON)
     {
         memset(this->total_tick_old,0,sizeof(this->total_tick_old));
         memset(this->idle_old,0,sizeof(this->idle_old));
@@ -110,16 +111,16 @@ extern "C" {
     void SnapdragonHealthComponentImpl::setInitPowerState(SH_PowerSaverMode mode) {
         switch (mode) {
             case SH_SAVER_ON:
-                this->m_schedCalls = SAVER_ON;
+                this->m_modeAfterCountdown = SAVER_ON;
                 break;
             case SH_SAVER_DYNAMIC:
-                this->m_schedCalls = SAVER_DYNAMIC;
+                this->m_modeAfterCountdown = SAVER_DYNAMIC;
                 break;
             case SH_SAVER_OFF:
-                this->m_schedCalls = SAVER_OFF;
+                this->m_modeAfterCountdown = SAVER_OFF;
                 break;
             case SH_SAVER_RAPID:
-                this->m_schedCalls = SAVER_RAPID;
+                this->m_modeAfterCountdown = SAVER_RAPID;
                 break;
             default:
                 FW_ASSERT(0, mode);
@@ -551,6 +552,11 @@ extern "C" {
                             SH_ENOUGH_FREQ_SETPOINTS);
         #pragma GCC diagnostic pop
 
+        if (SH_SCHED_COUNTDOWN == m_schedCalls) {
+            this->power_saver = this->m_modeAfterCountdown;
+            m_schedCalls++;
+        }
+
         //Fw::PolyType polySetVal;
         switch (this->power_saver) {
             case SAVER_ON:
@@ -611,7 +617,7 @@ extern "C" {
                                   }*/
 
 
-        if (m_schedCalls > SH_SCHED_COUNTDOWN) {
+        if (m_schedCalls >= SH_SCHED_COUNTDOWN) {
             for (NATIVE_UINT_TYPE i = GOV_FILE_TYPE_MIN; i <= GOV_FILE_TYPE_MAX; i++) {
                 FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(this->gov_setpoint)
                           + GOV_FILE_TYPE_MIN > i,
