@@ -23,6 +23,8 @@ void exitTasks(void);
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 
+#include <SnapdragonFlight/SnapdragonHealth/SnapdragonHealthComponentImpl.hpp>
+
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 #include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
@@ -61,6 +63,7 @@ extern Svc::PrmDbImpl* prmDb_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
+extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
 extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
 extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
 

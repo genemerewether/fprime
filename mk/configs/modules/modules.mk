@@ -139,9 +139,8 @@ HLPROC_MODULES := \
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter \
-	SnapdragonFlight/DspRpcAllocator
-	#SnapdragonFlight/SnapdragonHealth \
-	#SnapdragonFlight/SnapdragonGpioTester
+	SnapdragonFlight/DspRpcAllocator \
+	SnapdragonFlight/SnapdragonHealth 
 
 HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \

@@ -69,6 +69,7 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 
 SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
+SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
 HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
@@ -180,6 +181,12 @@ void allocComps() {
 #endif
 ;
 
+    snapHealth_ptr = new SnapdragonFlight::SnapdragonHealthComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SDHEALTH")
+#endif
+;
+
     hexRouter_ptr = new SnapdragonFlight::HexRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HEXRTR")
@@ -255,9 +262,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct() {
-    serLogger_ptr->set_LogOut_OutputPort(0, fileLogger_ptr->get_LogQueue_InputPort(0));
-  
+void manualConstruct() {  
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -340,6 +345,9 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     cmdSeqLL_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
     prmDb_ptr->init(10,0);
+    snapHealth_ptr->init(10,0);
+    snapHealth_ptr->setBootCount(0 /*boot_count*/);
+    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_RAPID);
 
     sockGndIf_ptr->init(0);
     sockGndIfLL_ptr->init(0);
@@ -384,6 +392,7 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     eventLoggerLL_ptr->regCommands();
     fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
+    snapHealth_ptr->regCommands();
 
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
@@ -412,6 +421,8 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     eventLoggerLL_ptr->start(0,50,20*1024);
     chanTlm_ptr->start(0,60,20*1024);
     prmDb_ptr->start(0,50,20*1024);
+
+    snapHealth_ptr->start(0,40,20*1024);
 
     hexRouter_ptr->start(0, 90, 20*1024);//, CORE_RPC);
 
@@ -509,6 +520,7 @@ void exitTasks(void) {
     serialTextConv_ptr->exit();
     
     DEBUG_PRINT("After HexRouter read thread quit\n");
+    snapHealth_ptr->exit();
     rgTlm_ptr->exit();
     rgXfer_ptr->exit();
     cmdDisp_ptr->exit();
