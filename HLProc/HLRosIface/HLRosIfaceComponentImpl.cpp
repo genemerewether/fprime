@@ -495,8 +495,8 @@ namespace HLProc {
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
-        U32 usecRos = msg->header.stamp.sec * 1000 * 1000
-                      + msg->header.stamp.nsec / 1000;
+        U64 usecRos = (U64) msg->header.stamp.sec * 1000LU * 1000LU
+                      + (U64) msg->header.stamp.nsec / 1000LU;
         Os::File::Status stat = Os::File::OTHER_ERROR;
         Os::File file;
         stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -519,13 +519,15 @@ namespace HLProc {
         buff[sizeof(buff)-1] = 0;
         I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
-        if (walltimeDspLeadUs > usecRos + 10 * 1000 * 1000) {
+        if (walltimeDspLeadUs > usecRos) {
             // TODO(mereweth) - EVR; can't have difference greater than time
-            // add 10-second buffer in case we get an old message
+            printf("linux-dsp diff %lld greater than message time %lu\n",
+                   walltimeDspLeadUs, usecRos);
             return;
         }
-        U32 usecDsp = usecRos - walltimeDspLeadUs;
-        Fw::Time convTime(TB_ROS_TIME, 0,
+        U64 usecDsp = usecRos - walltimeDspLeadUs;
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
                           usecDsp / 1000 / 1000,
                           usecDsp % (1000 * 1000));
 
