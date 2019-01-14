@@ -25,9 +25,10 @@ load_test: settings_local.bash $(STARTUP_SRC)
 	$(info Copying working dir scripts to test dir)
 	@$(foreach FILE,$(filter-out $<,$^),cp $(FILE) test/ut/$(FILE);)
 	@cp settings_local.bash test/ut/settings.bash
+	@cp verbosity.bash test/ut/seq/verbosity.bash
 
 shell_test: load_test
-	cd test/ut; /bin/bash; cd ../../
+	cd test/ut; /bin/bash ./startup.bash; cd ../../
 
 test_%: load_test
 	cd test/ut; bats $@.bats; cd ../..
@@ -37,4 +38,8 @@ test: load_test
 		 															bats $(FILE); cd ../..; \
 																	echo;)
 
-.PHONY: load load_test test #$(foreach FILE,$(STARTUP_TEST),$(FILE:.bats=))
+load_sdref: load
+	@adb push deployment_sdref.bash /startup/deployment.bash
+	$(call VALIDATE,deployment_sdref.bash,/startup/deployment.bash)
+
+.PHONY: load load_sdref load_test test #$(foreach FILE,$(STARTUP_TEST),$(FILE:.bats=))

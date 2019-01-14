@@ -4,6 +4,9 @@
 
 . ./startup_helpers.bash
 
+# NOTE(mereweth) - not in settings.bash so we can run tests in test_logging.bats
+VERBOSITY=${LOCAL_DIR}/seq/verbosity.bash
+
 ############################# test startup helpers #############################
 
 @test "expand fsw args no arguments" {

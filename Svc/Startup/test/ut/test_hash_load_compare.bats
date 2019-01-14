@@ -5,7 +5,8 @@
 
 . ./hash_validation.bash
 
-DEBUG=true
+# NOTE(mereweth) - not in settings.bash so we can run tests in test_logging.bats
+VERBOSITY=${LOCAL_DIR}/seq/verbosity.bash
 
 ############################ get_valid_bin helpers ############################
 setup_get_valid_bin() {
