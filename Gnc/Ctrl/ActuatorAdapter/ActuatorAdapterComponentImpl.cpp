@@ -125,173 +125,85 @@ namespace Gnc {
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       if (this->numActuators >= AA_MAX_ACTUATORS) {  return;  }
 
+      // NOTE(mereweth) - start convenience defines
+#define I2C_FROM_PARM_IDX(XXX) \
+                              { \
+                                  i2c.minIn = paramGet_p ## XXX ## _minCmd(valid[0]); \
+                                  i2c.maxIn = paramGet_p ## XXX ## _maxCmd(valid[1]); \
+                                  i2c.minOut = (U32) paramGet_p ## XXX ## _minOut(valid[2]); \
+                                  i2c.maxOut = (U32) paramGet_p ## XXX ## _maxOut(valid[3]); \
+                                  i2c.countsPerRev = paramGet_p ## XXX ## _counts(valid[4]); \
+                                  for (U32 j = 0; j < 5; j++) { \
+                                      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+                                  } \
+                              }
+
+#define METADATA_FROM_ACT_IDX(XXX) \
+                  { \
+                      outType = (OutputType) paramGet_a ## XXX ## _type(valid[0]); \
+                      if ((Fw::PARAM_VALID != valid[0]) || \
+                          (outType < OUTPUT_VALID_MIN) || \
+                          (outType > OUTPUT_VALID_MAX)) { \
+                          return; \
+                      } \
+                      U8 parmSlot = paramGet_a ## XXX ## _parmSlot(valid[0]); \
+                      if (Fw::PARAM_VALID != valid[0]) {  return;  } \
+                      switch (outType) { \
+                          case OUTPUT_I2C: \
+                          case OUTPUT_I2C_SIMPLE: \
+                              i2c.addr = paramGet_a ## XXX ## _addr(valid[0]); \
+                              i2c.reverse = paramGet_a ## XXX ## _reverse(valid[1]); \
+                              for (U32 j = 0; j < 2; j++) { \
+                                  if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+                              } \
+                              \
+                              /* TODO(mereweth) - update when number of parm slots updates */ \
+                              switch (parmSlot) { \
+                                  case 0: \
+                                      return; \
+                                  case 1: \
+                                      I2C_FROM_PARM_IDX(1); \
+                                      break; \
+                                  default: \
+                                      return; \
+                              } \
+                              \
+                              if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) { \
+                                  return; \
+                              } \
+                              break; \
+                          default: \
+                              DEBUG_PRINT("Unhandled act adap type %u\n", outType); \
+                              FW_ASSERT(0, outType); \
+                              break; \
+                      } \
+                  }
+      // NOTE(mereweth) - end convenience defines
+
       OutputType outType = OUTPUT_UNSET;
       I2CMetadata i2c;
-      // TODO(mereweth) - macro-ize the param get calls
       for (U32 i = 0; i < this->numActuators; i++) {
           switch (i) {
               case 0:
-                  outType = (OutputType) paramGet_a1_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a1_addr(valid[0]);
-                          i2c.minIn = paramGet_a1_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a1_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a1_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a1_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a1_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a1_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(1);
                   break;
               case 1:
-                  outType = (OutputType) paramGet_a2_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a2_addr(valid[0]);
-                          i2c.minIn = paramGet_a2_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a2_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a2_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a2_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a2_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a2_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(2);
                   break;
               case 2:
-                  outType = (OutputType) paramGet_a3_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a3_addr(valid[0]);
-                          i2c.minIn = paramGet_a3_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a3_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a3_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a3_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a3_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a3_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(3);
                   break;
               case 3:
-                  outType = (OutputType) paramGet_a4_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a4_addr(valid[0]);
-                          i2c.minIn = paramGet_a4_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a4_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a4_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a4_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a4_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a4_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(4);
                   break;
               case 4:
-                  outType = (OutputType) paramGet_a5_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a5_addr(valid[0]);
-                          i2c.minIn = paramGet_a5_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a5_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a5_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a5_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a5_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a5_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(5);
                   break;
               case 5:
-                  outType = (OutputType) paramGet_a6_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a6_addr(valid[0]);
-                          i2c.minIn = paramGet_a6_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a6_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a6_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a6_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a6_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a6_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(6);
                   break;
               default:
                   FW_ASSERT(0, i);
-          }
-
-          for (U32 j = 0; j < FW_NUM_ARRAY_ELEMENTS(valid); j++) {
-              if (Fw::PARAM_VALID != valid[j]) {  return;  }
           }
       }
 
