@@ -55,22 +55,47 @@ namespace Gnc {
       //!
       ~ActuatorAdapterComponentImpl(void);
 
-      // TODO(mereweth) - check for near-zero and zero in this setter
-      struct PwmMetadata {
+      struct FeedbackMetadata {
+          U32 countsPerRev;
+      };
+
+      enum CmdOutputMapType {
+          CMD_OUTPUT_MAP_UNSET = 0,
+          CMD_OUTPUT_MAP_VALID_MIN = 1,
+          // simply scale between the min/max safety limits
+          CMD_OUTPUT_MAP_LIN_MINMAX = CMD_OUTPUT_MAP_VALID_MIN,
+          // piecewise linear, still using min/max safety limits
+          CMD_OUTPUT_MAP_LIN_0BRK = 2,
+          CMD_OUTPUT_MAP_LIN_1BRK = 3,
+          CMD_OUTPUT_MAP_LIN_2BRK = 4,
+          CMD_OUTPUT_MAP_VALID_MAX = CMD_OUTPUT_MAP_LIN_2BRK
+      };
+
+      struct CmdOutputMapMetadata {
           F64 minIn;
           F64 maxIn;
+          CmdOutputMapType type;
+          F64 x0;
+          F64 x1;
+          F64 k0;
+          F64 k1;
+          F64 k2;
+          F64 b;
+      };
+
+      struct PwmMetadata {
           F32 minOut;
           F32 maxOut;
+          CmdOutputMapMetadata cmdOutputMap;
       };
 
       struct I2CMetadata {
           U32 addr;
-          F64 minIn;
-          F64 maxIn;
           U32 minOut;
           U32 maxOut;
           bool reverse;
-          U32 countsPerRev;
+          FeedbackMetadata fbMeta;
+          CmdOutputMapMetadata cmdOutputMap;
       };
 
       bool setupI2C(U32 actuator, I2CMetadata meta, bool useSimple);

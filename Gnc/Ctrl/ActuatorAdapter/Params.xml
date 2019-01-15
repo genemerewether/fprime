@@ -96,4 +96,26 @@
     <parameter id="104" set_opcode="228" save_opcode="229" name="p1_counts" data_type="U32" >
       <comment>parm slot 1 counts per rev</comment>
     </parameter>
+
+    <parameter id="105" set_opcode="230" save_opcode="231" name="p1_mapType" data_type="U8" >
+      <comment>parm slot 1 mapping from command to output</comment>
+    </parameter>
+    <parameter id="106" set_opcode="232" save_opcode="233" name="p1_map_x0" data_type="F64" >
+      <comment>parm slot 1 first break in piecewise linear</comment>
+    </parameter>
+    <parameter id="107" set_opcode="234" save_opcode="235" name="p1_map_x1" data_type="F64" >
+      <comment>parm slot 1 second break in piecewise linear</comment>
+    </parameter>
+    <parameter id="108" set_opcode="236" save_opcode="237" name="p1_map_k0" data_type="F64" >
+      <comment>parm slot 1 first slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="109" set_opcode="238" save_opcode="239" name="p1_map_k1" data_type="F64" >
+      <comment>parm slot 1 second slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="110" set_opcode="240" save_opcode="241" name="p1_map_k2" data_type="F64" >
+      <comment>parm slot 1 third slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="111" set_opcode="242" save_opcode="243" name="p1_map_b" data_type="F64" >
+      <comment>parm slot 1 y intercept in piecewise linear</comment>
+    </parameter>
 </parameters>
