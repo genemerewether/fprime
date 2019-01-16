@@ -55,8 +55,18 @@ namespace Gnc {
       //!
       ~ActuatorAdapterComponentImpl(void);
 
+      enum FeedbackCtrlType {
+          FEEDBACK_CTRL_NONE = 0,
+          FEEDBACK_CTRL_VALID_MIN = FEEDBACK_CTRL_NONE,
+          FEEDBACK_CTRL_PROP = 1,
+          FEEDBACK_CTRL_VALID_MAX = FEEDBACK_CTRL_PROP
+      };
+
       struct FeedbackMetadata {
           U32 countsPerRev;
+          FeedbackCtrlType ctrlType;
+          F64 maxErr;
+          F64 kp;
       };
 
       enum CmdOutputMapType {

@@ -118,4 +118,14 @@
     <parameter id="111" set_opcode="242" save_opcode="243" name="p1_map_b" data_type="F64" >
       <comment>parm slot 1 y intercept in piecewise linear</comment>
     </parameter>
+
+    <parameter id="120" set_opcode="260" save_opcode="261" name="p1_ctrlType" data_type="U8" >
+      <comment>parm slot 1 error control type</comment>
+    </parameter>
+    <parameter id="121" set_opcode="262" save_opcode="263" name="p1_ctrl_maxErr" data_type="F64" >
+      <comment>parm slot 1 max delta from controller</comment>
+    </parameter>
+    <parameter id="122" set_opcode="264" save_opcode="265" name="p1_ctrl_kp" data_type="F64" >
+      <comment>parm slot 1 proportional gain on error</comment>
+    </parameter>
 </parameters>

@@ -97,6 +97,8 @@ namespace Gnc {
       if (0 == meta.fbMeta.countsPerRev) {
           return false;
       }
+      meta.fbMeta.kp = fabs(meta.fbMeta.kp);
+      meta.fbMeta.maxErr = fabs(meta.fbMeta.maxErr);
 
       if (useSimple) {
           this->outputInfo[actuator].type = OUTPUT_I2C_SIMPLE;
@@ -134,10 +136,29 @@ namespace Gnc {
           cmdOutputMap.minIn = paramGet_p ## XXX ## _minCmd(valid[0]); \
           cmdOutputMap.maxIn = paramGet_p ## XXX ## _maxCmd(valid[1]); \
           fb.countsPerRev = paramGet_p ## XXX ## _counts(valid[2]); \
-          for (U32 j = 0; j < 3; j++) { \
+          fb.maxErr = paramGet_p ## XXX ## _ctrl_maxErr(valid[3]); \
+          fb.ctrlType = (FeedbackCtrlType) paramGet_p ## XXX ## _ctrlType(valid[4]); \
+          for (U32 j = 0; j < 5; j++) { \
               if (Fw::PARAM_VALID != valid[j]) {  return;  } \
           } \
-          cmdOutputMap.type = (CmdOutputMapType) paramGet_a ## XXX ## _type(valid[0]); \
+          if ((fb.ctrlType < FEEDBACK_CTRL_VALID_MIN) || \
+              (fb.ctrlType > FEEDBACK_CTRL_VALID_MAX)) { \
+              return; \
+          } \
+          switch (fb.ctrlType) { \
+              case FEEDBACK_CTRL_NONE: \
+                  /* NOTE(mereweth) - nothing else to do*/ \
+                  break; \
+              case FEEDBACK_CTRL_PROP: \
+                  fb.kp = paramGet_p ## XXX ## _ctrl_kp(valid[0]); \
+                  if (Fw::PARAM_VALID != valid[0]) {  return;  } \
+                  break; \
+              default: \
+                  DEBUG_PRINT("Unhandled feedback ctrl type %u\n", fb.ctrlType); \
+                  return; \
+          } \
+          \
+          cmdOutputMap.type = (CmdOutputMapType) paramGet_p ## XXX ## _mapType(valid[0]); \
           if ((Fw::PARAM_VALID != valid[0]) || \
               (cmdOutputMap.type < CMD_OUTPUT_MAP_VALID_MIN) || \
               (cmdOutputMap.type > CMD_OUTPUT_MAP_VALID_MAX)) { \
@@ -172,7 +193,7 @@ namespace Gnc {
                   } \
                   break; \
               default: \
-                  DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
+                  DEBUG_PRINT("Unhandled mapping type %u\n", cmdOutputMap.type); \
                   return; \
           } \
       }
@@ -340,7 +361,8 @@ namespace Gnc {
                               break;
                           case CMD_OUTPUT_MAP_LIN_2BRK:
                               if (inVal < i2c.cmdOutputMap.x0) {
-                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b);
+                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal
+                                                     + i2c.cmdOutputMap.b);
                               }
                               else if (inVal < i2c.cmdOutputMap.x1) {
                                   out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
@@ -356,7 +378,8 @@ namespace Gnc {
                               break;
                           case CMD_OUTPUT_MAP_LIN_1BRK:
                               if (inVal < i2c.cmdOutputMap.x0) {
-                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b);
+                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal
+                                                     + i2c.cmdOutputMap.b);
                               }
                               else {
                                   out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
@@ -365,7 +388,8 @@ namespace Gnc {
                               }
                               break;
                           case CMD_OUTPUT_MAP_LIN_0BRK:
-                              out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b);
+                              out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal
+                                                 + i2c.cmdOutputMap.b);
                               break;
                           case CMD_OUTPUT_MAP_UNSET:
                           default:
@@ -374,7 +398,39 @@ namespace Gnc {
                               break;
                       }
 
-                      // TODO(mereweth) - run controller here
+                      // controller
+                      F64 delta = 0.0;
+                      switch (i2c.fbMeta.ctrlType) {
+                          case FEEDBACK_CTRL_PROP:
+                              delta = i2c.fbMeta.kp * (inVal - this->outputInfo[i].feedback.angVel);
+                              
+                              // NOTE(Mereweth) - fallthrough so this code runs for all control types except NONE
+
+                              // NOTE(Mereweth) - clamp the delta vs the open-loop mapping
+                              if (delta > 0.0) {
+                                delta = FW_MIN(delta, i2c.fbMeta.maxErr);
+                              }
+                              if (delta < 0.0) {
+                                delta = -1.0 * FW_MIN(-1.0 * delta, i2c.fbMeta.maxErr);
+                              }
+
+                              if (delta > 0.0) {
+                                  out += delta;
+                              }
+                              // have to be careful with signs
+                              // delta < 0; |delta| < out; out + delta > 0
+                              else if (fabs(delta) < (F64) out) {
+                                  out = (U32) ((F64) out + delta);
+                              }
+                              // delta < 0; |delta| > out; out + delta < 0; so would overflow
+                              else {
+                                  out = 0u;
+                              }
+                              break;
+                          case FEEDBACK_CTRL_NONE:
+                          default:
+                              break;
+                      }          
 
                       DEBUG_PRINT("esc addr %u, in %f, out %u\n", i2c.addr, angVels[i], out);
 
