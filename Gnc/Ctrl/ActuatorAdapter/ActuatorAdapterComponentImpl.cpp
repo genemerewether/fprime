@@ -330,9 +330,49 @@ namespace Gnc {
                       }
                       else if (inVal > i2c.cmdOutputMap.maxIn) {  inVal = i2c.cmdOutputMap.maxIn;  }
                       else if (inVal < i2c.cmdOutputMap.minIn) {  inVal = i2c.cmdOutputMap.minIn;  }
-                      U32 out = (inVal - i2c.cmdOutputMap.minIn) /
-                        (i2c.cmdOutputMap.maxIn - i2c.cmdOutputMap.minIn) * (i2c.maxOut - i2c.minOut)
-                        + i2c.minOut;
+                      U32 out = 0u;
+
+                      switch (i2c.cmdOutputMap.type) {
+                          case CMD_OUTPUT_MAP_LIN_MINMAX:
+                              out = (inVal - i2c.cmdOutputMap.minIn) /
+                                (i2c.cmdOutputMap.maxIn - i2c.cmdOutputMap.minIn) * (i2c.maxOut - i2c.minOut)
+                                + i2c.minOut;
+                              break;
+                          case CMD_OUTPUT_MAP_LIN_2BRK:
+                              if (inVal < i2c.cmdOutputMap.x0) {
+                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b);
+                              }
+                              else if (inVal < i2c.cmdOutputMap.x1) {
+                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
+                                                     + i2c.cmdOutputMap.b
+                                                     + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0));
+                              }
+                              else {
+                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
+                                                     + i2c.cmdOutputMap.b
+                                                     + i2c.cmdOutputMap.k1 * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
+                                                     + i2c.cmdOutputMap.k2 * (inVal - i2c.cmdOutputMap.x1));
+                              }
+                              break;
+                          case CMD_OUTPUT_MAP_LIN_1BRK:
+                              if (inVal < i2c.cmdOutputMap.x0) {
+                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b);
+                              }
+                              else {
+                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
+                                                     + i2c.cmdOutputMap.b
+                                                     + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0));
+                              }
+                              break;
+                          case CMD_OUTPUT_MAP_LIN_0BRK:
+                              out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b);
+                              break;
+                          case CMD_OUTPUT_MAP_UNSET:
+                          default:
+                              DEBUG_PRINT("Unhandled command output map slot %u\n", i2c.cmdOutputMap.type);
+                              FW_ASSERT(0, i2c.cmdOutputMap.type);
+                              break;
+                      }
 
                       // TODO(mereweth) - run controller here
 
