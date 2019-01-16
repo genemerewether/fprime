@@ -352,7 +352,9 @@ namespace Gnc {
                       else if (inVal > i2c.cmdOutputMap.maxIn) {  inVal = i2c.cmdOutputMap.maxIn;  }
                       else if (inVal < i2c.cmdOutputMap.minIn) {  inVal = i2c.cmdOutputMap.minIn;  }
                       U32 out = 0u;
+                      F64 des = 0.0;
 
+                      // TODO(mereweth) - share mapping among output types
                       switch (i2c.cmdOutputMap.type) {
                           case CMD_OUTPUT_MAP_LIN_MINMAX:
                               out = (inVal - i2c.cmdOutputMap.minIn) /
@@ -361,35 +363,35 @@ namespace Gnc {
                               break;
                           case CMD_OUTPUT_MAP_LIN_2BRK:
                               if (inVal < i2c.cmdOutputMap.x0) {
-                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal
-                                                     + i2c.cmdOutputMap.b);
+                                  des = i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b;
                               }
                               else if (inVal < i2c.cmdOutputMap.x1) {
-                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
-                                                     + i2c.cmdOutputMap.b
-                                                     + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0));
+                                  des = i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0 + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0);
                               }
                               else {
-                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
-                                                     + i2c.cmdOutputMap.b
-                                                     + i2c.cmdOutputMap.k1 * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
-                                                     + i2c.cmdOutputMap.k2 * (inVal - i2c.cmdOutputMap.x1));
+                                  des = i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0 + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1 * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
+                                    + i2c.cmdOutputMap.k2 * (inVal - i2c.cmdOutputMap.x1);
                               }
+                              if (des < 0.0) {  out = 0;  }
+                              else {  out = (U32) des;  }
                               break;
                           case CMD_OUTPUT_MAP_LIN_1BRK:
                               if (inVal < i2c.cmdOutputMap.x0) {
-                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal
-                                                     + i2c.cmdOutputMap.b);
+                                  des = i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b;
                               }
                               else {
-                                  out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0
-                                                     + i2c.cmdOutputMap.b
-                                                     + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0));
+                                  des = i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0 + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0);
                               }
+                              if (des < 0.0) {  out = 0;  }
+                              else {  out = (U32) des;  }
                               break;
                           case CMD_OUTPUT_MAP_LIN_0BRK:
-                              out = (U32) FW_MIN(0.0, i2c.cmdOutputMap.k0 * inVal
-                                                 + i2c.cmdOutputMap.b);
+                              des = i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b;
+                              if (des < 0.0) {  out = 0;  }
+                              else {  out = (U32) des;  }
                               break;
                           case CMD_OUTPUT_MAP_UNSET:
                           default:
@@ -398,7 +400,7 @@ namespace Gnc {
                               break;
                       }
 
-                      // controller
+                      // TODO(mereweth) - share controller among output types
                       F64 delta = 0.0;
                       switch (i2c.fbMeta.ctrlType) {
                           case FEEDBACK_CTRL_PROP:
@@ -545,26 +547,32 @@ namespace Gnc {
                                   case 0:
                                       this->tlmWrite_ACTADAP_Rot0(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd0(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel0(angVels[i]);
                                       break;
                                   case 1:
                                       this->tlmWrite_ACTADAP_Rot1(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd1(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel1(angVels[i]);
                                       break;
                                   case 2:
                                       this->tlmWrite_ACTADAP_Rot2(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd2(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel2(angVels[i]);
                                       break;
                                   case 3:
                                       this->tlmWrite_ACTADAP_Rot3(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd3(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel3(angVels[i]);
                                       break;
                                   case 4:
                                       this->tlmWrite_ACTADAP_Rot4(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd4(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel4(angVels[i]);
                                       break;
                                   case 5:
                                       this->tlmWrite_ACTADAP_Rot5(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd5(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel5(angVels[i]);
                                       break;
                                   default:
                                       break;

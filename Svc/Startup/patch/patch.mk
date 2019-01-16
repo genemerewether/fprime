@@ -63,11 +63,12 @@ screen:
 
 stop: screen
 	adb shell service startup stop
-	adb shell "screen -S RUN_ONCE -X stuff $\'\003\'"
+	adb shell "screen -S RUN_ONCE -X stuff "
+	adb shell "screen -S CURRENT -X stuff "
+	adb shell "screen -S GOLDEN -X stuff "
+	adb shell "sleep 10"
 	adb shell "screen -S RUN_ONCE -X quit"
-	adb shell "screen -S CURRENT -X stuff $\'\003\'"
 	adb shell "screen -S CURRENT -X quit"
-	adb shell "screen -S GOLDEN -X stuff $\'\003\'"
 	adb shell "screen -S GOLDEN -X quit"
 	adb shell 'for i in {0..3}; do echo performance > /sys/devices/system/cpu/cpu$${i}/cpufreq/scaling_governor; done'
 	adb shell "chronyc -m \"password 1234\" makestep"
