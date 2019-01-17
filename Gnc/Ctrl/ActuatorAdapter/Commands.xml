@@ -9,4 +9,12 @@
     <args>
     </args>
   </command>
+  <command kind="sync" opcode="2" mnemonic="ACTADAP_SetVoltAct">
+    <args>
+        <arg name="actIdx" type="U8">
+        </arg>
+        <arg name="voltage" type="F64">
+        </arg>
+    </args>
+  </command>
 </commands>

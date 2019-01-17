@@ -105,23 +105,6 @@ namespace Gnc {
 
       U32 seq;
 
-      // State update in
-      ROS::geometry_msgs::Vector3 wBias;
-
-      ROS::geometry_msgs::Vector3 aBias;
-
-      // IMU sample in
-      ROS::geometry_msgs::Vector3 omega_b;
-
-      ROS::geometry_msgs::Vector3 a_b;
-
-      // Odometry out
-      ROS::geometry_msgs::Point x_w;
-
-      ROS::geometry_msgs::Quaternion w_q_b;
-
-      ROS::geometry_msgs::Vector3 v_b;
-
       quest_gnc::estimation::ImuInteg imuInteg;
 
       bool paramsInited;

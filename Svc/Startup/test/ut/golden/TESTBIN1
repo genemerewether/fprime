@@ -3,4 +3,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 FILENAME=`basename "$0"`
 
 echo "I AM ${DIR}/$FILENAME, ARGS $@"
+echo "STDERR: I AM ${DIR}/$FILENAME, ARGS $@" >&2
 sleep 1

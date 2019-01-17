@@ -6,42 +6,18 @@
     <parameter id="10" set_opcode="40" save_opcode="41" name="a1_addr" data_type="U32" >
       <comment>actuator 1 address (I2C)</comment>
     </parameter>
-    <parameter id="11" set_opcode="42" save_opcode="43" name="a1_minCmd" data_type="F64" >
-      <comment>actuator 1 minimum command</comment>
-    </parameter>
-    <parameter id="12" set_opcode="44" save_opcode="45" name="a1_maxCmd" data_type="F64" >
-      <comment>actuator 1 maximum command</comment>
-    </parameter>
-    <parameter id="13" set_opcode="46" save_opcode="47" name="a1_minOut" data_type="U64" >
-      <comment>actuator 1 minimum output (interpret as float for some types)</comment>
-    </parameter>
-    <parameter id="14" set_opcode="48" save_opcode="49" name="a1_maxOut" data_type="U64" >
-      <comment>actuator 1 maximum output (interpret as float for some types)</comment>
-    </parameter>
     <parameter id="15" set_opcode="50" save_opcode="51" name="a1_reverse" data_type="bool" >
       <comment>actuator 1 reverse direction flag</comment>
     </parameter>
     <parameter id="16" set_opcode="52" save_opcode="53" name="a1_type" data_type="U8" >
       <comment>actuator 1 type</comment>
     </parameter>
-    <parameter id="17" set_opcode="54" save_opcode="55" name="a1_counts" data_type="U32" >
-      <comment>actuator 1 counts per rev</comment>
+    <parameter id="18" set_opcode="56" save_opcode="57" name="a1_parmSlot" data_type="U8" >
+      <comment>actuator 1 which param set</comment>
     </parameter>
 
     <parameter id="20" set_opcode="60" save_opcode="61" name="a2_addr" data_type="U32" >
       <comment>actuator 2 address (I2C)</comment>
-    </parameter>
-    <parameter id="21" set_opcode="62" save_opcode="63" name="a2_minCmd" data_type="F64" >
-      <comment>actuator 2 minimum command</comment>
-    </parameter>
-    <parameter id="22" set_opcode="64" save_opcode="65" name="a2_maxCmd" data_type="F64" >
-      <comment>actuator 2 maximum command</comment>
-    </parameter>
-    <parameter id="23" set_opcode="66" save_opcode="67" name="a2_minOut" data_type="U64" >
-      <comment>actuator 2 minimum output (interpret as float for some types)</comment>
-    </parameter>
-    <parameter id="24" set_opcode="68" save_opcode="69" name="a2_maxOut" data_type="U64" >
-      <comment>actuator 2 maximum output (interpret as float for some types)</comment>
     </parameter>
     <parameter id="25" set_opcode="70" save_opcode="71" name="a2_reverse" data_type="bool" >
       <comment>actuator 2 reverse direction flag</comment>
@@ -49,24 +25,12 @@
     <parameter id="26" set_opcode="72" save_opcode="73" name="a2_type" data_type="U8" >
       <comment>actuator 2 type</comment>
     </parameter>
-    <parameter id="27" set_opcode="74" save_opcode="75" name="a2_counts" data_type="U32" >
-      <comment>actuator 2 counts per rev</comment>
+    <parameter id="28" set_opcode="76" save_opcode="77" name="a2_parmSlot" data_type="U8" >
+      <comment>actuator 2 which param set</comment>
     </parameter>
 
     <parameter id="30" set_opcode="80" save_opcode="81" name="a3_addr" data_type="U32" >
       <comment>actuator 3 address (I2C)</comment>
-    </parameter>
-    <parameter id="31" set_opcode="82" save_opcode="83" name="a3_minCmd" data_type="F64" >
-      <comment>actuator 3 minimum command</comment>
-    </parameter>
-    <parameter id="32" set_opcode="84" save_opcode="85" name="a3_maxCmd" data_type="F64" >
-      <comment>actuator 3 maximum command</comment>
-    </parameter>
-    <parameter id="33" set_opcode="86" save_opcode="87" name="a3_minOut" data_type="U64" >
-      <comment>actuator 3 minimum output (interpret as float for some types)</comment>
-    </parameter>
-    <parameter id="34" set_opcode="88" save_opcode="89" name="a3_maxOut" data_type="U64" >
-      <comment>actuator 3 maximum output (interpret as float for some types)</comment>
     </parameter>
     <parameter id="35" set_opcode="90" save_opcode="91" name="a3_reverse" data_type="bool" >
       <comment>actuator 3 reverse direction flag</comment>
@@ -74,24 +38,12 @@
     <parameter id="36" set_opcode="92" save_opcode="93" name="a3_type" data_type="U8" >
       <comment>actuator 3 type</comment>
     </parameter>
-    <parameter id="37" set_opcode="94" save_opcode="95" name="a3_counts" data_type="U32" >
-      <comment>actuator 3 counts per rev</comment>
+    <parameter id="38" set_opcode="96" save_opcode="97" name="a3_parmSlot" data_type="U8" >
+      <comment>actuator 3 which param set</comment>
     </parameter>
 
     <parameter id="40" set_opcode="100" save_opcode="101" name="a4_addr" data_type="U32" >
       <comment>actuator 4 address (I2C)</comment>
-    </parameter>
-    <parameter id="41" set_opcode="102" save_opcode="103" name="a4_minCmd" data_type="F64" >
-      <comment>actuator 4 minimum command</comment>
-    </parameter>
-    <parameter id="42" set_opcode="104" save_opcode="105" name="a4_maxCmd" data_type="F64" >
-      <comment>actuator 4 maximum command</comment>
-    </parameter>
-    <parameter id="43" set_opcode="106" save_opcode="107" name="a4_minOut" data_type="U64" >
-      <comment>actuator 4 minimum output (interpret as float for some types)</comment>
-    </parameter>
-    <parameter id="44" set_opcode="108" save_opcode="109" name="a4_maxOut" data_type="U64" >
-      <comment>actuator 4 maximum output (interpret as float for some types)</comment>
     </parameter>
     <parameter id="45" set_opcode="110" save_opcode="111" name="a4_reverse" data_type="bool" >
       <comment>actuator 4 reverse direction flag</comment>
@@ -99,24 +51,12 @@
     <parameter id="46" set_opcode="112" save_opcode="113" name="a4_type" data_type="U8" >
       <comment>actuator 4 type</comment>
     </parameter>
-    <parameter id="47" set_opcode="114" save_opcode="115" name="a4_counts" data_type="U32" >
-      <comment>actuator 4 counts per rev</comment>
+    <parameter id="48" set_opcode="116" save_opcode="117" name="a4_parmSlot" data_type="U8" >
+      <comment>actuator 4 which param set</comment>
     </parameter>
 
     <parameter id="50" set_opcode="120" save_opcode="121" name="a5_addr" data_type="U32" >
       <comment>actuator 5 address (I2C)</comment>
-    </parameter>
-    <parameter id="51" set_opcode="122" save_opcode="123" name="a5_minCmd" data_type="F64" >
-      <comment>actuator 5 minimum command</comment>
-    </parameter>
-    <parameter id="52" set_opcode="124" save_opcode="125" name="a5_maxCmd" data_type="F64" >
-      <comment>actuator 5 maximum command</comment>
-    </parameter>
-    <parameter id="53" set_opcode="126" save_opcode="127" name="a5_minOut" data_type="U64" >
-      <comment>actuator 5 minimum output (interpret as float for some types)</comment>
-    </parameter>
-    <parameter id="54" set_opcode="128" save_opcode="129" name="a5_maxOut" data_type="U64" >
-      <comment>actuator 5 maximum output (interpret as float for some types)</comment>
     </parameter>
     <parameter id="55" set_opcode="130" save_opcode="131" name="a5_reverse" data_type="bool" >
       <comment>actuator 5 reverse direction flag</comment>
@@ -124,24 +64,12 @@
     <parameter id="56" set_opcode="132" save_opcode="133" name="a5_type" data_type="U8" >
       <comment>actuator 5 type</comment>
     </parameter>
-    <parameter id="57" set_opcode="134" save_opcode="135" name="a5_counts" data_type="U32" >
-      <comment>actuator 5 counts per rev</comment>
+    <parameter id="58" set_opcode="136" save_opcode="137" name="a5_parmSlot" data_type="U8" >
+      <comment>actuator 5 which param set</comment>
     </parameter>
 
     <parameter id="60" set_opcode="140" save_opcode="141" name="a6_addr" data_type="U32" >
       <comment>actuator 6 address (I2C)</comment>
-    </parameter>
-    <parameter id="61" set_opcode="142" save_opcode="143" name="a6_minCmd" data_type="F64" >
-      <comment>actuator 6 minimum command</comment>
-    </parameter>
-    <parameter id="62" set_opcode="144" save_opcode="145" name="a6_maxCmd" data_type="F64" >
-      <comment>actuator 6 maximum command</comment>
-    </parameter>
-    <parameter id="63" set_opcode="146" save_opcode="147" name="a6_minOut" data_type="U64" >
-      <comment>actuator 6 minimum output (interpret as float for some types)</comment>
-    </parameter>
-    <parameter id="64" set_opcode="148" save_opcode="149" name="a6_maxOut" data_type="U64" >
-      <comment>actuator 6 maximum output (interpret as float for some types)</comment>
     </parameter>
     <parameter id="65" set_opcode="150" save_opcode="151" name="a6_reverse" data_type="bool" >
       <comment>actuator 6 reverse direction flag</comment>
@@ -149,7 +77,58 @@
     <parameter id="66" set_opcode="152" save_opcode="153" name="a6_type" data_type="U8" >
       <comment>actuator 6 type</comment>
     </parameter>
-    <parameter id="67" set_opcode="154" save_opcode="155" name="a6_counts" data_type="U32" >
-      <comment>actuator 6 counts per rev</comment>
+    <parameter id="68" set_opcode="156" save_opcode="157" name="a6_parmSlot" data_type="U8" >
+      <comment>actuator 6 which param set</comment>
+    </parameter>
+
+    <parameter id="100" set_opcode="220" save_opcode="221" name="p1_minCmd" data_type="F64" >
+      <comment>parm slot 1 minimum command</comment>
+    </parameter>
+    <parameter id="101" set_opcode="222" save_opcode="223" name="p1_maxCmd" data_type="F64" >
+      <comment>parm slot 1 maximum command</comment>
+    </parameter>
+    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="U64" >
+      <comment>parm slot 1 minimum output (interpret as float for some types)</comment>
+    </parameter>
+    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="U64" >
+      <comment>parm slot 1 maximum output (interpret as float for some types)</comment>
+    </parameter>
+    <parameter id="104" set_opcode="228" save_opcode="229" name="p1_counts" data_type="U32" >
+      <comment>parm slot 1 counts per rev</comment>
+    </parameter>
+
+    <parameter id="105" set_opcode="230" save_opcode="231" name="p1_mapType" data_type="U8" >
+      <comment>parm slot 1 mapping from command to output</comment>
+    </parameter>
+    <parameter id="106" set_opcode="232" save_opcode="233" name="p1_map_x0" data_type="F64" >
+      <comment>parm slot 1 first break in piecewise linear</comment>
+    </parameter>
+    <parameter id="107" set_opcode="234" save_opcode="235" name="p1_map_x1" data_type="F64" >
+      <comment>parm slot 1 second break in piecewise linear</comment>
+    </parameter>
+    <parameter id="108" set_opcode="236" save_opcode="237" name="p1_map_k0" data_type="F64" >
+      <comment>parm slot 1 first slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="109" set_opcode="238" save_opcode="239" name="p1_map_k1" data_type="F64" >
+      <comment>parm slot 1 second slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="110" set_opcode="240" save_opcode="241" name="p1_map_k2" data_type="F64" >
+      <comment>parm slot 1 third slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="111" set_opcode="242" save_opcode="243" name="p1_map_b" data_type="F64" >
+      <comment>parm slot 1 y intercept in piecewise linear</comment>
+    </parameter>
+    <parameter id="112" set_opcode="244" save_opcode="245" name="p1_map_Vnom" data_type="F64" >
+      <comment>parm slot 1 voltage at which mapping was determined</comment>
+    </parameter>
+
+    <parameter id="120" set_opcode="260" save_opcode="261" name="p1_ctrlType" data_type="U8" >
+      <comment>parm slot 1 error control type</comment>
+    </parameter>
+    <parameter id="121" set_opcode="262" save_opcode="263" name="p1_ctrl_maxErr" data_type="F64" >
+      <comment>parm slot 1 max delta from controller</comment>
+    </parameter>
+    <parameter id="122" set_opcode="264" save_opcode="265" name="p1_ctrl_kp" data_type="F64" >
+      <comment>parm slot 1 proportional gain on error</comment>
     </parameter>
 </parameters>

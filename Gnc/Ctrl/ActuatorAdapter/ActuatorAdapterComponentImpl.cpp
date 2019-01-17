@@ -93,9 +93,14 @@ namespace Gnc {
       if (actuator >= AA_MAX_ACTUATORS) {
           return false;
       }
-      if (0 == meta.countsPerRev) {
+      // TODO(mereweth) - factor out FeedbackMetadata and CmdOutputMapMetadata checking
+      if (0 == meta.fbMeta.countsPerRev) {
           return false;
       }
+      meta.fbMeta.kp = fabs(meta.fbMeta.kp);
+      meta.fbMeta.maxErr = fabs(meta.fbMeta.maxErr);
+      meta.cmdOutputMap.Vnom = fabs(meta.cmdOutputMap.Vnom);
+      meta.cmdOutputMap.Vact = meta.cmdOutputMap.Vnom;
 
       if (useSimple) {
           this->outputInfo[actuator].type = OUTPUT_I2C_SIMPLE;
@@ -125,173 +130,166 @@ namespace Gnc {
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       if (this->numActuators >= AA_MAX_ACTUATORS) {  return;  }
 
+      // NOTE(mereweth) - start convenience defines
+#define MAP_AND_FB_FROM_PARM_IDX(XXX) \
+      { \
+          memset(&cmdOutputMap, 0, sizeof(cmdOutputMap)); \
+          memset(&fb, 0, sizeof(fb)); \
+          cmdOutputMap.minIn = paramGet_p ## XXX ## _minCmd(valid[0]); \
+          cmdOutputMap.maxIn = paramGet_p ## XXX ## _maxCmd(valid[1]); \
+          fb.countsPerRev = paramGet_p ## XXX ## _counts(valid[2]); \
+          fb.maxErr = paramGet_p ## XXX ## _ctrl_maxErr(valid[3]); \
+          fb.ctrlType = (FeedbackCtrlType) paramGet_p ## XXX ## _ctrlType(valid[4]); \
+          for (U32 j = 0; j < 5; j++) { \
+              if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+          } \
+          if ((fb.ctrlType < FEEDBACK_CTRL_VALID_MIN) || \
+              (fb.ctrlType > FEEDBACK_CTRL_VALID_MAX)) { \
+              return; \
+          } \
+          switch (fb.ctrlType) { \
+              case FEEDBACK_CTRL_NONE: \
+                  /* NOTE(mereweth) - nothing else to do*/ \
+                  break; \
+              case FEEDBACK_CTRL_PROP: \
+                  fb.kp = paramGet_p ## XXX ## _ctrl_kp(valid[0]); \
+                  if (Fw::PARAM_VALID != valid[0]) {  return;  } \
+                  break; \
+              default: \
+                  DEBUG_PRINT("Unhandled feedback ctrl type %u\n", fb.ctrlType); \
+                  return; \
+          } \
+          \
+          cmdOutputMap.type = (CmdOutputMapType) paramGet_p ## XXX ## _mapType(valid[0]); \
+          if ((Fw::PARAM_VALID != valid[0]) || \
+              (cmdOutputMap.type < CMD_OUTPUT_MAP_VALID_MIN) || \
+              (cmdOutputMap.type > CMD_OUTPUT_MAP_VALID_MAX)) { \
+              return; \
+          } \
+          cmdOutputMap.Vnom = paramGet_p ## XXX ## _map_Vnom(valid[0]); \
+          cmdOutputMap.Vact = cmdOutputMap.Vnom; \
+          if (Fw::PARAM_VALID != valid[0]) {  return;  } \
+          switch (cmdOutputMap.type) { \
+              case CMD_OUTPUT_MAP_UNSET: \
+                  DEBUG_PRINT("Command to output mapping type unset\n"); \
+                  return; \
+              case CMD_OUTPUT_MAP_LIN_MINMAX: \
+                  /* NOTE(mereweth) - nothing else to do*/ \
+                  break; \
+              case CMD_OUTPUT_MAP_LIN_2BRK: \
+                  cmdOutputMap.x1 = paramGet_p ## XXX ## _map_x1(valid[0]); \
+                  cmdOutputMap.k2 = paramGet_p ## XXX ## _map_k2(valid[1]); \
+                  for (U32 j = 0; j < 2; j++) { \
+                      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+                  } \
+                  /* NOTE(mereweth) - fallthrough intended*/ \
+              case CMD_OUTPUT_MAP_LIN_1BRK: \
+                  cmdOutputMap.x0 = paramGet_p ## XXX ## _map_x0(valid[0]); \
+                  cmdOutputMap.k1 = paramGet_p ## XXX ## _map_k1(valid[1]); \
+                  for (U32 j = 0; j < 2; j++) { \
+                      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+                  } \
+                  /* NOTE(mereweth) - fallthrough intended*/ \
+              case CMD_OUTPUT_MAP_LIN_0BRK: \
+                  cmdOutputMap.k0 = paramGet_p ## XXX ## _map_k0(valid[0]); \
+                  cmdOutputMap.b = paramGet_p ## XXX ## _map_b(valid[1]); \
+                  for (U32 j = 0; j < 2; j++) { \
+                      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+                  } \
+                  break; \
+              default: \
+                  DEBUG_PRINT("Unhandled mapping type %u\n", cmdOutputMap.type); \
+                  return; \
+          } \
+      }
+
+#define I2C_FROM_PARM_IDX(XXX) \
+      { \
+          i2c.minOut = (U32) paramGet_p ## XXX ## _minOut(valid[0]); \
+          i2c.maxOut = (U32) paramGet_p ## XXX ## _maxOut(valid[1]); \
+          for (U32 j = 0; j < 2; j++) { \
+              if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+          } \
+      }
+
+#define METADATA_FROM_ACT_IDX(XXX) \
+      { \
+          outType = (OutputType) paramGet_a ## XXX ## _type(valid[0]); \
+          if ((Fw::PARAM_VALID != valid[0]) || \
+              (outType < OUTPUT_VALID_MIN) || \
+              (outType > OUTPUT_VALID_MAX)) { \
+              return; \
+          } \
+          U8 parmSlot = paramGet_a ## XXX ## _parmSlot(valid[0]); \
+          if (Fw::PARAM_VALID != valid[0]) {  return;  } \
+          switch (outType) { \
+              case OUTPUT_UNSET: \
+                  DEBUG_PRINT("Actuator type unset\n"); \
+                  return; \
+              case OUTPUT_PWM: \
+                  DEBUG_PRINT("Unhandled act adap type %u\n", outType); \
+                  return; \
+              case OUTPUT_I2C: \
+              case OUTPUT_I2C_SIMPLE: \
+                  i2c.addr = paramGet_a ## XXX ## _addr(valid[0]); \
+                  i2c.reverse = paramGet_a ## XXX ## _reverse(valid[1]); \
+                  for (U32 j = 0; j < 2; j++) { \
+                      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+                  } \
+                  \
+                  /* TODO(mereweth) - update when number of parm slots updates */ \
+                  switch (parmSlot) { \
+                      case 0: \
+                          return; \
+                      case 1: \
+                          MAP_AND_FB_FROM_PARM_IDX(1); \
+                          I2C_FROM_PARM_IDX(1); \
+                          break; \
+                      default: \
+                          DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
+                          return; \
+                  } \
+                  i2c.cmdOutputMap = cmdOutputMap; \
+                  i2c.fbMeta = fb; \
+                  \
+                  if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) { \
+                      return; \
+                  } \
+                  break; \
+              default: \
+                  DEBUG_PRINT("Unknown act adap type %u\n", outType); \
+                  FW_ASSERT(0, outType); \
+                  return; \
+          } \
+      }
+      // NOTE(mereweth) - end convenience defines
+
       OutputType outType = OUTPUT_UNSET;
       I2CMetadata i2c;
-      // TODO(mereweth) - macro-ize the param get calls
+      FeedbackMetadata fb;
+      CmdOutputMapMetadata cmdOutputMap;
       for (U32 i = 0; i < this->numActuators; i++) {
           switch (i) {
               case 0:
-                  outType = (OutputType) paramGet_a1_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a1_addr(valid[0]);
-                          i2c.minIn = paramGet_a1_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a1_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a1_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a1_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a1_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a1_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(1);
                   break;
               case 1:
-                  outType = (OutputType) paramGet_a2_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a2_addr(valid[0]);
-                          i2c.minIn = paramGet_a2_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a2_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a2_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a2_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a2_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a2_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(2);
                   break;
               case 2:
-                  outType = (OutputType) paramGet_a3_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a3_addr(valid[0]);
-                          i2c.minIn = paramGet_a3_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a3_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a3_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a3_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a3_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a3_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(3);
                   break;
               case 3:
-                  outType = (OutputType) paramGet_a4_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a4_addr(valid[0]);
-                          i2c.minIn = paramGet_a4_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a4_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a4_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a4_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a4_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a4_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(4);
                   break;
               case 4:
-                  outType = (OutputType) paramGet_a5_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a5_addr(valid[0]);
-                          i2c.minIn = paramGet_a5_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a5_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a5_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a5_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a5_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a5_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(5);
                   break;
               case 5:
-                  outType = (OutputType) paramGet_a6_type(valid[0]);
-                  if ((outType < OUTPUT_VALID_MIN) || 
-                      (outType > OUTPUT_VALID_MAX)) {
-                      return;
-                  }
-                  switch (outType) {
-                      case OUTPUT_I2C:
-                      case OUTPUT_I2C_SIMPLE:
-                          i2c.addr = paramGet_a6_addr(valid[0]);
-                          i2c.minIn = paramGet_a6_minCmd(valid[1]);
-                          i2c.maxIn = paramGet_a6_maxCmd(valid[2]);
-                          i2c.minOut = (U32) paramGet_a6_minOut(valid[3]);
-                          i2c.maxOut = (U32) paramGet_a6_maxOut(valid[4]);
-                          i2c.reverse = paramGet_a6_reverse(valid[5]);
-                          i2c.countsPerRev = paramGet_a6_counts(valid[6]);
-                          if (!setupI2C(i, i2c, (OUTPUT_I2C_SIMPLE == outType))) {
-                              return;
-                          }
-                          break;
-                      default:
-                          DEBUG_PRINT("Unhandled act adap type %u\n", outType);
-                          FW_ASSERT(0, outType);
-                          break;
-                  }
+                  METADATA_FROM_ACT_IDX(6);
                   break;
               default:
                   FW_ASSERT(0, i);
-          }
-
-          for (U32 j = 0; j < FW_NUM_ARRAY_ELEMENTS(valid); j++) {
-              if (Fw::PARAM_VALID != valid[j]) {  return;  }
           }
       }
 
@@ -349,13 +347,118 @@ namespace Gnc {
 
                       I2CMetadata i2c = this->outputInfo[i].i2cMeta;
                       F64 inVal = angVels[i];
-                      if (inVal > i2c.maxIn) {  inVal = i2c.maxIn;  }
-                      if (inVal < i2c.minIn) {  inVal = i2c.minIn;  }
-                      U32 out = (inVal - i2c.minIn) / (i2c.maxIn - i2c.minIn) * (i2c.maxOut - i2c.minOut) + i2c.minOut;
+                      // NOTE(Mereweth) - DSPAL has no isnan
+                      if (!(inVal < i2c.cmdOutputMap.maxIn) && 
+                          !(inVal > i2c.cmdOutputMap.minIn)) {
+                          // TODO(mereweth) - EVR about disarming due to NaN
+                          inVal = i2c.cmdOutputMap.minIn;
+                          this->armedState = DISARMED;
+                      }
+                      else if (inVal > i2c.cmdOutputMap.maxIn) {  inVal = i2c.cmdOutputMap.maxIn;  }
+                      else if (inVal < i2c.cmdOutputMap.minIn) {  inVal = i2c.cmdOutputMap.minIn;  }
+                      U32 out = 0u;
+                      F64 des = 0.0;
+
+                      // TODO(mereweth) - share mapping among output types
+                      F64 Vnom_by_Vact = 1.0;
+                      if (i2c.cmdOutputMap.Vact > 1e-3) {
+                          Vnom_by_Vact = i2c.cmdOutputMap.Vnom / i2c.cmdOutputMap.Vact;
+                          if ((Vnom_by_Vact < 0.1) ||
+                              (Vnom_by_Vact > 10.0)) {
+                              // TODO(mereweth) - EVR!!
+                              Vnom_by_Vact = 1.0;
+                          }
+                      }
+                      else {
+                          // TODO(mereweth) - EVR!!
+                      }
+                      switch (i2c.cmdOutputMap.type) {
+                          case CMD_OUTPUT_MAP_LIN_MINMAX:
+                              out = (inVal - i2c.cmdOutputMap.minIn) /
+                                (i2c.cmdOutputMap.maxIn - i2c.cmdOutputMap.minIn) * (i2c.maxOut - i2c.minOut)
+                                + i2c.minOut;
+                              break;
+                          case CMD_OUTPUT_MAP_LIN_2BRK:
+                              if (inVal < i2c.cmdOutputMap.x0) {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              }
+                              else if (inVal < i2c.cmdOutputMap.x1) {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
+                                    + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
+                              }
+                              else {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
+                                    + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1  * Vnom_by_Vact
+                                                           * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
+                                    + i2c.cmdOutputMap.k2 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x1);
+                              }
+                              if (des < 0.0) {  out = 0;  }
+                              else {  out = (U32) des;  }
+                              break;
+                          case CMD_OUTPUT_MAP_LIN_1BRK:
+                              if (inVal < i2c.cmdOutputMap.x0) {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              }
+                              else {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
+                                    + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
+                              }
+                              if (des < 0.0) {  out = 0;  }
+                              else {  out = (U32) des;  }
+                              break;
+                          case CMD_OUTPUT_MAP_LIN_0BRK:
+                              des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              if (des < 0.0) {  out = 0;  }
+                              else {  out = (U32) des;  }
+                              break;
+                          case CMD_OUTPUT_MAP_UNSET:
+                          default:
+                              DEBUG_PRINT("Unhandled command output map slot %u\n", i2c.cmdOutputMap.type);
+                              FW_ASSERT(0, i2c.cmdOutputMap.type);
+                              break;
+                      }
+
+                      // TODO(mereweth) - share controller among output types
+                      F64 delta = 0.0;
+                      switch (i2c.fbMeta.ctrlType) {
+                          case FEEDBACK_CTRL_PROP:
+                              delta = i2c.fbMeta.kp * (inVal - this->outputInfo[i].feedback.angVel);
+                              
+                              // NOTE(Mereweth) - fallthrough so this code runs for all control types except NONE
+
+                              // NOTE(Mereweth) - clamp the delta vs the open-loop mapping
+                              if (delta > 0.0) {
+                                delta = FW_MIN(delta, i2c.fbMeta.maxErr);
+                              }
+                              if (delta < 0.0) {
+                                delta = -1.0 * FW_MIN(-1.0 * delta, i2c.fbMeta.maxErr);
+                              }
+
+                              if (delta > 0.0) {
+                                  out += delta;
+                              }
+                              // have to be careful with signs
+                              // delta < 0; |delta| < out; out + delta > 0
+                              else if (fabs(delta) < (F64) out) {
+                                  out = (U32) ((F64) out + delta);
+                              }
+                              // delta < 0; |delta| > out; out + delta < 0; so would overflow
+                              else {
+                                  out = 0u;
+                              }
+                              break;
+                          case FEEDBACK_CTRL_NONE:
+                          default:
+                              break;
+                      }          
 
                       DEBUG_PRINT("esc addr %u, in %f, out %u\n", i2c.addr, angVels[i], out);
 
-                      // TODO(mereweth) - run controller here
+                      if (out > i2c.maxOut) {  out = i2c.maxOut;  }
+                      if (out < i2c.minOut) {  out = i2c.minOut;  }
 
                       Fw::Buffer readBufObj(0, 0, 0, 0); // no read
                       if (OUTPUT_I2C == this->outputInfo[i].type) {
@@ -436,14 +539,14 @@ namespace Gnc {
                             (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
 
                           // guard against bad parameter setting and small time increment
-                          if ((this->outputInfo[i].i2cMeta.countsPerRev > 0) && 
+                          if ((this->outputInfo[i].i2cMeta.fbMeta.countsPerRev > 0) && 
                               (fbTimeFloat - fbTimeLast > 1e-4)) {
 
                               if (OUTPUT_I2C == this->outputInfo[i].type) {
 
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI
                                     * this->outputInfo[i].feedback.counts
-                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
+                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
                               }
                               else {
                                   U32 countsDiff = 0u;
@@ -456,7 +559,7 @@ namespace Gnc {
                                   }
 
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI * countsDiff
-                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.countsPerRev;
+                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
                               }
 
                               // TODO(mereweth) - run rate estimator here
@@ -465,26 +568,32 @@ namespace Gnc {
                                   case 0:
                                       this->tlmWrite_ACTADAP_Rot0(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd0(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel0(angVels[i]);
                                       break;
                                   case 1:
                                       this->tlmWrite_ACTADAP_Rot1(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd1(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel1(angVels[i]);
                                       break;
                                   case 2:
                                       this->tlmWrite_ACTADAP_Rot2(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd2(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel2(angVels[i]);
                                       break;
                                   case 3:
                                       this->tlmWrite_ACTADAP_Rot3(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd3(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel3(angVels[i]);
                                       break;
                                   case 4:
                                       this->tlmWrite_ACTADAP_Rot4(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd4(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel4(angVels[i]);
                                       break;
                                   case 5:
                                       this->tlmWrite_ACTADAP_Rot5(this->outputInfo[i].feedback.angVel);
                                       this->tlmWrite_ACTADAP_Cmd5(this->outputInfo[i].feedback.cmd);
+                                      this->tlmWrite_ACTADAP_CmdVel5(angVels[i]);
                                       break;
                                   default:
                                       break;
@@ -616,7 +725,7 @@ namespace Gnc {
         bool armState
     )
   {
-      if (!paramsInited) {
+      if (!this->paramsInited) {
           this->armedState = DISARMED;
           this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
           return;
@@ -660,4 +769,43 @@ namespace Gnc {
       }
   }
 
+  void ActuatorAdapterComponentImpl ::
+    ACTADAP_SetVoltAct_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        U8 actIdx,
+        F64 voltage
+    )
+  {
+      if ((!this->paramsInited) ||
+          (actIdx > this->numActuators) ||
+          (voltage < 0.0)) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+          return;
+      }
+
+      switch (this->outputInfo[actIdx].type) {
+          case OUTPUT_UNSET:
+          {
+              //TODO(mereweth) - EVR that this is unset
+          }
+              break;
+          case OUTPUT_PWM:
+          {
+              this->outputInfo[actIdx].pwmMeta.cmdOutputMap.Vact = voltage;
+          }
+              break;
+          case OUTPUT_I2C:
+          case OUTPUT_I2C_SIMPLE:
+          {
+              this->outputInfo[actIdx].i2cMeta.cmdOutputMap.Vact = voltage;
+          }
+              break;
+          default:
+              //TODO(mereweth) - DEBUG_PRINT
+              FW_ASSERT(0, this->outputInfo[actIdx].type);
+      }
+
+      this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+  }
 } // end namespace Gnc

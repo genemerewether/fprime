@@ -55,22 +55,59 @@ namespace Gnc {
       //!
       ~ActuatorAdapterComponentImpl(void);
 
-      // TODO(mereweth) - check for near-zero and zero in this setter
-      struct PwmMetadata {
+      enum FeedbackCtrlType {
+          FEEDBACK_CTRL_NONE = 0,
+          FEEDBACK_CTRL_VALID_MIN = FEEDBACK_CTRL_NONE,
+          FEEDBACK_CTRL_PROP = 1,
+          FEEDBACK_CTRL_VALID_MAX = FEEDBACK_CTRL_PROP
+      };
+
+      struct FeedbackMetadata {
+          U32 countsPerRev;
+          FeedbackCtrlType ctrlType;
+          F64 maxErr;
+          F64 kp;
+      };
+
+      enum CmdOutputMapType {
+          CMD_OUTPUT_MAP_UNSET = 0,
+          CMD_OUTPUT_MAP_VALID_MIN = 1,
+          // simply scale between the min/max safety limits
+          CMD_OUTPUT_MAP_LIN_MINMAX = CMD_OUTPUT_MAP_VALID_MIN,
+          // piecewise linear, still using min/max safety limits
+          CMD_OUTPUT_MAP_LIN_0BRK = 2,
+          CMD_OUTPUT_MAP_LIN_1BRK = 3,
+          CMD_OUTPUT_MAP_LIN_2BRK = 4,
+          CMD_OUTPUT_MAP_VALID_MAX = CMD_OUTPUT_MAP_LIN_2BRK
+      };
+
+      struct CmdOutputMapMetadata {
           F64 minIn;
           F64 maxIn;
+          CmdOutputMapType type;
+          F64 Vnom;
+          F64 Vact;
+          F64 x0;
+          F64 x1;
+          F64 k0;
+          F64 k1;
+          F64 k2;
+          F64 b;
+      };
+
+      struct PwmMetadata {
           F32 minOut;
           F32 maxOut;
+          CmdOutputMapMetadata cmdOutputMap;
       };
 
       struct I2CMetadata {
           U32 addr;
-          F64 minIn;
-          F64 maxIn;
           U32 minOut;
           U32 maxOut;
           bool reverse;
-          U32 countsPerRev;
+          FeedbackMetadata fbMeta;
+          CmdOutputMapMetadata cmdOutputMap;
       };
 
       bool setupI2C(U32 actuator, I2CMetadata meta, bool useSimple);
@@ -118,6 +155,15 @@ namespace Gnc {
       void ACTADAP_InitParams_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq /*!< The command sequence number*/
+      );
+
+      //! Implementation for ACTADAP_SetVoltAct command handler
+      //! 
+      void ACTADAP_SetVoltAct_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          U8 actIdx, 
+          F64 voltage 
       );
 
       enum OutputType {

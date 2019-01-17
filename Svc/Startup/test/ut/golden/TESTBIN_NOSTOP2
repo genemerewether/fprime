@@ -12,6 +12,7 @@ trap cleanup SIGINT SIGTERM
 
 while [ 1 ]; do
     echo "I AM ${DIR}/$FILENAME, ARGS $@"
+    echo "STDERR: I AM ${DIR}/$FILENAME, ARGS $@" >&2
     sleep 1 &
     wait $!
 done

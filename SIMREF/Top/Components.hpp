@@ -18,6 +18,7 @@ void exitTasks(void);
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
+#include <Svc/UdpReceiver/UdpReceiverComponentImpl.hpp>
 
 #include <SIMREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
@@ -44,6 +45,7 @@ extern Svc::LinuxTimeImpl linuxTime;
 extern Svc::TlmChanImpl chanTlm;
 extern Svc::CommandDispatcherImpl cmdDisp;
 extern Svc::PrmDbImpl prmDb;
+extern Svc::UdpReceiverComponentImpl udpReceiver;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern ROS::RosCycleComponentImpl rosCycle;

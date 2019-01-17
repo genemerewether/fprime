@@ -69,6 +69,7 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 
 SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
+SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
 HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
@@ -180,6 +181,12 @@ void allocComps() {
 #endif
 ;
 
+    snapHealth_ptr = new SnapdragonFlight::SnapdragonHealthComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SDHEALTH")
+#endif
+;
+
     hexRouter_ptr = new SnapdragonFlight::HexRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HEXRTR")
@@ -255,9 +262,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct() {
-    serLogger_ptr->set_LogOut_OutputPort(0, fileLogger_ptr->get_LogQueue_InputPort(0));
-  
+void manualConstruct() {  
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -301,7 +306,9 @@ void manualConstruct() {
 #endif
 }
 
-void constructApp(int port_number, int ll_port_number, char* udp_string, char* hostname) {
+void constructApp(unsigned int port_number, unsigned int ll_port_number,
+                  char* udp_string, char* hostname,
+                  unsigned int boot_count) {
     allocComps();
   
     localTargetInit();
@@ -340,6 +347,9 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     cmdSeqLL_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
     prmDb_ptr->init(10,0);
+    snapHealth_ptr->init(10,0);
+    snapHealth_ptr->setBootCount(boot_count);
+    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_RAPID);
 
     sockGndIf_ptr->init(0);
     sockGndIfLL_ptr->init(0);
@@ -384,6 +394,7 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     eventLoggerLL_ptr->regCommands();
     fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
+    snapHealth_ptr->regCommands();
 
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
@@ -395,7 +406,7 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     prmDb_ptr->readParamFile();
 
     char logFileName[256];
-    snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", 0); //boot_count % 10);
+    snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);
     serialTextConv_ptr->set_log_file(logFileName, 100*1024, 0);
     
     // Active component startup
@@ -412,6 +423,8 @@ void constructApp(int port_number, int ll_port_number, char* udp_string, char* h
     eventLoggerLL_ptr->start(0,50,20*1024);
     chanTlm_ptr->start(0,60,20*1024);
     prmDb_ptr->start(0,50,20*1024);
+
+    snapHealth_ptr->start(0,40,20*1024);
 
     hexRouter_ptr->start(0, 90, 20*1024);//, CORE_RPC);
 
@@ -509,6 +522,7 @@ void exitTasks(void) {
     serialTextConv_ptr->exit();
     
     DEBUG_PRINT("After HexRouter read thread quit\n");
+    snapHealth_ptr->exit();
     rgTlm_ptr->exit();
     rgXfer_ptr->exit();
     cmdDisp_ptr->exit();
@@ -524,7 +538,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n-b\tBoot count\n");
 }
 
 
@@ -560,19 +574,23 @@ int main(int argc, char* argv[]) {
     char *hostname = NULL;
     char* udp_string = 0;
     bool local_cycle = true;
+    U32 boot_count = 0;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:x:a:u:o:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlp:x:a:u:o:b:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
                 return 0;
                 break;
             case 'l':
-              local_cycle = true;
-              break;
+                local_cycle = true;
+                break;
+            case 'b':
+                boot_count = atoi(optarg);
+                break;
             case 'p':
                 port_number = atoi(optarg);
                 break;
@@ -612,6 +630,7 @@ int main(int argc, char* argv[]) {
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);
     signal(SIGKILL,sighandler);
+    signal(SIGPIPE, SIG_IGN);
 
     (void) printf("Hit Ctrl-C to quit\n");
 
@@ -621,7 +640,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
     
-    constructApp(port_number, ll_port_number, udp_string, hostname);
+    constructApp(port_number, ll_port_number, udp_string, hostname, boot_count);
     //dumparch();
 
     ros::start();

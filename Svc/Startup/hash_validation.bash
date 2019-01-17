@@ -15,14 +15,21 @@ crc_vote() {
     # This is the nominal condition, so is only level 4, ACTIVITY_LO
     evr 4 "1st and 2nd equal $2"
     eval ${1}=$2
+    # this check is so we can tell if the 3rd binary has gone bad
+    if (( $2 == $4 )); then
+      # This is the nominal condition, so is only level 4, ACTIVITY_LO
+      evr 4 "1st and 3rd equal $2"
+    else
+      evr 1 "1st and 3rd not equal"
+    fi
     return 0
   elif (( $2 == $4 )); then
     # This is off-nominal, so it is level 1, WARNING_HI
-    evr 1 "1st and 3rd equal $2"
+    evr 1 "1st and 2nd not equal; 1st and 3rd equal $2"
     eval ${1}=$2
     return 0
   elif (( $3 == $4 )); then
-    evr 1 "2nd and 3rd equal $3"
+    evr 1 "1st and 2nd / 1st and 3rd not equal; 2nd and 3rd equal $3"
     eval ${1}=$3
     return 0
   else
@@ -55,9 +62,17 @@ get_valid_bin() {
   fi
   evr 6 "dest_var is $1" # debug the destination variable name
 
+  evr 5 "version_folder is $2"
+
   # Test if version_folder is a symlink to a folder, or is a folder
   if ! [ -d "$2" ]; then
-    if [[ "$DEBUG" = true ]]; then $ECHO_BIN "DEBUG get_valid_bin: $2 is not a folder or symlink"; fi
+    if [ -e "$2" ]; then
+      evr 1 "$2 exists"
+    fi
+    if [ -L "$2" ]; then
+      evr 1 "$2 dangling symlink"
+    fi
+    evr 2 "$3 is missing";
     return 1
   fi
 
@@ -82,13 +97,13 @@ get_valid_bin() {
       get_crc32_from_cksum TMP_CMP $($CKSUM_BIN $BIN_FULL)
       if (( ${CHK[i]} == $TMP_CMP )); then
         eval ${1}=$BIN_FULL
-        if [[ "$DEBUG" = true ]]; then $ECHO_BIN "DEBUG get_valid_bin: $BIN_FULL is valid"; fi
+        evr 4 "${i}th try; $BIN_FULL is valid";
         return 0 # we are done - found a valid copy
       fi
     fi
   done
 
-  if [[ "$DEBUG" = true ]]; then $ECHO_BIN "DEBUG get_valid_bin: no binary found matching $consensus"; fi
+  evr 1 "no binary found matching $consensus";
   # Fall through if we didn't find a binary that matches the crc
   return 1
 }

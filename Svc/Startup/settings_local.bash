@@ -2,9 +2,6 @@
 
 ################## WARNING - settings for local testing only ##################
 
-# boot counter is filled in by expand_fsw_args in startup.bash
-FSW_ARGS="-p 50000 -a localhost -l -b"
-
 LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # leave the Hail Mary FSW run loop early
@@ -27,6 +24,11 @@ CURRENT_SYMLINK=${LOCAL_DIR}/fsw/CURRENT
 RUN_ONCE_SYMLINK=${LOCAL_DIR}/seq/RUN_ONCE
 
 STARTUP_LOG=${LOCAL_DIR}/eng/STARTUP_LOG
+STDOUT_LOG=${LOCAL_DIR}/eng/STDOUT_LOG
+STDERR_LOG=${LOCAL_DIR}/eng/STDERR_LOG
+
+# NOTE(mereweth) - we switched to one log for all three above
+# splitting stderr and stdout. These are not used
 RUN_ONCE_LOG=${LOCAL_DIR}/eng/RUN_ONCE_LOG
 CURRENT_LOG=${LOCAL_DIR}/eng/CURRENT_LOG
 GOLDEN_LOG=${LOCAL_DIR}/eng/GOLDEN_LOG

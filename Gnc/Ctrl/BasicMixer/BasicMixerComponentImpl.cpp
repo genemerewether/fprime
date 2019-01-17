@@ -164,7 +164,8 @@ namespace Gnc {
       this->basicMixer.GetRotorVelCommand(&rotorVel);
 
       FW_ASSERT(BM_MAX_ACTUATORS > this->numRotors, this->numRotors);
-      F64 angVel[BM_MAX_ACTUATORS], angles[0], normalized[0];
+      F64 angVel[BM_MAX_ACTUATORS] = { 0.0 };
+      F64 angles[0], normalized[0];
       for (U32 i = 0; i < this->numRotors; i ++) {
           angVel[i] = rotorVel(i);
           angVelTlm[i] = rotorVel(i);
