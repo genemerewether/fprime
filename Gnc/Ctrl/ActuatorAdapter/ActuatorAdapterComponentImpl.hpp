@@ -85,6 +85,8 @@ namespace Gnc {
           F64 minIn;
           F64 maxIn;
           CmdOutputMapType type;
+          F64 Vnom;
+          F64 Vact;
           F64 x0;
           F64 x1;
           F64 k0;
@@ -153,6 +155,15 @@ namespace Gnc {
       void ACTADAP_InitParams_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq /*!< The command sequence number*/
+      );
+
+      //! Implementation for ACTADAP_SetVoltAct command handler
+      //! 
+      void ACTADAP_SetVoltAct_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          U8 actIdx, 
+          F64 voltage 
       );
 
       enum OutputType {

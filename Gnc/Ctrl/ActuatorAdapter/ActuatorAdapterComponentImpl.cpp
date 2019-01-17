@@ -99,6 +99,8 @@ namespace Gnc {
       }
       meta.fbMeta.kp = fabs(meta.fbMeta.kp);
       meta.fbMeta.maxErr = fabs(meta.fbMeta.maxErr);
+      meta.cmdOutputMap.Vnom = fabs(meta.cmdOutputMap.Vnom);
+      meta.cmdOutputMap.Vact = meta.cmdOutputMap.Vnom;
 
       if (useSimple) {
           this->outputInfo[actuator].type = OUTPUT_I2C_SIMPLE;
@@ -164,6 +166,9 @@ namespace Gnc {
               (cmdOutputMap.type > CMD_OUTPUT_MAP_VALID_MAX)) { \
               return; \
           } \
+          cmdOutputMap.Vnom = paramGet_p ## XXX ## _map_Vnom(valid[0]); \
+          cmdOutputMap.Vact = cmdOutputMap.Vnom; \
+          if (Fw::PARAM_VALID != valid[0]) {  return;  } \
           switch (cmdOutputMap.type) { \
               case CMD_OUTPUT_MAP_UNSET: \
                   DEBUG_PRINT("Command to output mapping type unset\n"); \
@@ -355,6 +360,18 @@ namespace Gnc {
                       F64 des = 0.0;
 
                       // TODO(mereweth) - share mapping among output types
+                      F64 Vnom_by_Vact = 1.0;
+                      if (i2c.cmdOutputMap.Vact > 1e-3) {
+                          Vnom_by_Vact = i2c.cmdOutputMap.Vnom / i2c.cmdOutputMap.Vact;
+                          if ((Vnom_by_Vact < 0.1) ||
+                              (Vnom_by_Vact > 10.0)) {
+                              // TODO(mereweth) - EVR!!
+                              Vnom_by_Vact = 1.0;
+                          }
+                      }
+                      else {
+                          // TODO(mereweth) - EVR!!
+                      }
                       switch (i2c.cmdOutputMap.type) {
                           case CMD_OUTPUT_MAP_LIN_MINMAX:
                               out = (inVal - i2c.cmdOutputMap.minIn) /
@@ -363,33 +380,37 @@ namespace Gnc {
                               break;
                           case CMD_OUTPUT_MAP_LIN_2BRK:
                               if (inVal < i2c.cmdOutputMap.x0) {
-                                  des = i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b;
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
                               }
                               else if (inVal < i2c.cmdOutputMap.x1) {
-                                  des = i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0 + i2c.cmdOutputMap.b
-                                    + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0);
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
+                                    + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
                               }
                               else {
-                                  des = i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0 + i2c.cmdOutputMap.b
-                                    + i2c.cmdOutputMap.k1 * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
-                                    + i2c.cmdOutputMap.k2 * (inVal - i2c.cmdOutputMap.x1);
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
+                                    + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1  * Vnom_by_Vact
+                                                           * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
+                                    + i2c.cmdOutputMap.k2 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x1);
                               }
                               if (des < 0.0) {  out = 0;  }
                               else {  out = (U32) des;  }
                               break;
                           case CMD_OUTPUT_MAP_LIN_1BRK:
                               if (inVal < i2c.cmdOutputMap.x0) {
-                                  des = i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b;
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
                               }
                               else {
-                                  des = i2c.cmdOutputMap.k0 * i2c.cmdOutputMap.x0 + i2c.cmdOutputMap.b
-                                    + i2c.cmdOutputMap.k1 * (inVal - i2c.cmdOutputMap.x0);
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
+                                    + i2c.cmdOutputMap.b
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
                               }
                               if (des < 0.0) {  out = 0;  }
                               else {  out = (U32) des;  }
                               break;
                           case CMD_OUTPUT_MAP_LIN_0BRK:
-                              des = i2c.cmdOutputMap.k0 * inVal + i2c.cmdOutputMap.b;
+                              des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
                               if (des < 0.0) {  out = 0;  }
                               else {  out = (U32) des;  }
                               break;
@@ -704,7 +725,7 @@ namespace Gnc {
         bool armState
     )
   {
-      if (!paramsInited) {
+      if (!this->paramsInited) {
           this->armedState = DISARMED;
           this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
           return;
@@ -748,4 +769,43 @@ namespace Gnc {
       }
   }
 
+  void ActuatorAdapterComponentImpl ::
+    ACTADAP_SetVoltAct_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        U8 actIdx,
+        F64 voltage
+    )
+  {
+      if ((!this->paramsInited) ||
+          (actIdx > this->numActuators) ||
+          (voltage < 0.0)) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+          return;
+      }
+
+      switch (this->outputInfo[actIdx].type) {
+          case OUTPUT_UNSET:
+          {
+              //TODO(mereweth) - EVR that this is unset
+          }
+              break;
+          case OUTPUT_PWM:
+          {
+              this->outputInfo[actIdx].pwmMeta.cmdOutputMap.Vact = voltage;
+          }
+              break;
+          case OUTPUT_I2C:
+          case OUTPUT_I2C_SIMPLE:
+          {
+              this->outputInfo[actIdx].i2cMeta.cmdOutputMap.Vact = voltage;
+          }
+              break;
+          default:
+              //TODO(mereweth) - DEBUG_PRINT
+              FW_ASSERT(0, this->outputInfo[actIdx].type);
+      }
+
+      this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+  }
 } // end namespace Gnc

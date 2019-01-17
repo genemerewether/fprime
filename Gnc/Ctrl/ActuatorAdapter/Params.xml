@@ -118,6 +118,9 @@
     <parameter id="111" set_opcode="242" save_opcode="243" name="p1_map_b" data_type="F64" >
       <comment>parm slot 1 y intercept in piecewise linear</comment>
     </parameter>
+    <parameter id="112" set_opcode="244" save_opcode="245" name="p1_map_Vnom" data_type="F64" >
+      <comment>parm slot 1 voltage at which mapping was determined</comment>
+    </parameter>
 
     <parameter id="120" set_opcode="260" save_opcode="261" name="p1_ctrlType" data_type="U8" >
       <comment>parm slot 1 error control type</comment>

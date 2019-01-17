@@ -9,6 +9,9 @@
 |ACTADAP_Arm|0 (0x0)|| | |   
 | | | |armState|bool||                    
 |ACTADAP_InitParams|1 (0x1)|| | |   
+|ACTADAP_SetVoltAct|2 (0x2)|| | |   
+| | | |actIdx|U8||                    
+| | | |voltage|F64||                    
 
 ## Telemetry Channel List
 
