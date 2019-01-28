@@ -60,7 +60,7 @@ if [ -e ${QUEST_DEV_ROOT}/cross_toolchain ]; then
         #rm ${HEXAGON_ARM_SYSROOT}/lib/libc-2.17-2013.07-2.so
         rm -f ${TEMP_STAGE_SYSROOT}/etc/resolv.conf
         cp /etc/resolv.conf ${TEMP_STAGE_SYSROOT}/etc/
-        proot -0 -b ${QUEST_DEV_ROOT}:/home/linaro/tmp -b /tmp/ -b /dev/ -b /sys/ -b /proc/ -r ${TEMP_STAGE_SYSROOT} -q qemu-arm-static -w /home/linaro/tmp /bin/bash trusty_bootstrap.bash
+        proot -b ${QUEST_DEV_ROOT}:/home/linaro/tmp -S ${TEMP_STAGE_SYSROOT} -q qemu-arm-static -w /home/linaro/tmp /bin/bash trusty_bootstrap.bash
 
         #rsync -l -r ${TEMP_STAGE_SYSROOT}/ ${HEXAGON_ARM_SYSROOT}
         mkdir -p ${UBUNTU_SYSROOT}
