@@ -29,17 +29,17 @@ make clean
 cd ../RotorSDrv/
 make clean
 cd ..
-mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_16.04_kinetic
+#mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_16.04_kinetic
 make
 mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_18.04_melodic
+#mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_14.04_jade
 make dict_install
 cd ..
 touch Gse/generated/SIMREF/serializable/ROS/__init__.py
 tar -czvf SIMREF.tar.gz \
     Gse/generated/SIMREF \
     SIMREF/*PrmDb.dat \
-    SIMREF/linux-linux-x86-debug-gnu-bin_16.04_kinetic/SIMREF \
-    SIMREF/linux-linux-x86-debug-gnu-bin_18.04_melodic/SIMREF
+    SIMREF/linux-linux-x86-debug-gnu-bin_*_*/SIMREF
 
 cd R5REF/Top
 make clean
