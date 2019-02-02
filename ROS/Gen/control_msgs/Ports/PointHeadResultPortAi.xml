@@ -1,0 +1,6 @@
+<interface name="PointHeadResult" namespace="ROS::control_msgs">
+  <args>
+    <arg name="PointHeadResult" pass_by="reference" type="ROS::control_msgs::PointHeadResult"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/PointHeadResultSerializableAi.xml</import_serializable_type>
+</interface>

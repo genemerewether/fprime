@@ -1,0 +1,6 @@
+<serializable name="JointTrajectoryGoal" namespace="ROS::control_msgs">
+  <members>
+    <member name="trajectory" type="ROS::trajectory_msgs::JointTrajectory"/>
+  </members>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/JointTrajectorySerializableAi.xml</import_serializable_type>
+</serializable>

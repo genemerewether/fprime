@@ -1,0 +1,6 @@
+<interface name="GripperCommandGoal" namespace="ROS::control_msgs">
+  <args>
+    <arg name="GripperCommandGoal" pass_by="reference" type="ROS::control_msgs::GripperCommandGoal"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/GripperCommandGoalSerializableAi.xml</import_serializable_type>
+</interface>

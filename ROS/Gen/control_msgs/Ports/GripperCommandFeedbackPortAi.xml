@@ -1,0 +1,6 @@
+<interface name="GripperCommandFeedback" namespace="ROS::control_msgs">
+  <args>
+    <arg name="GripperCommandFeedback" pass_by="reference" type="ROS::control_msgs::GripperCommandFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/GripperCommandFeedbackSerializableAi.xml</import_serializable_type>
+</interface>

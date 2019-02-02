@@ -1,0 +1,10 @@
+<serializable name="PointHeadAction" namespace="ROS::control_msgs">
+  <members>
+    <member name="action_goal" type="PointHeadActionGoal"/>
+    <member name="action_result" type="PointHeadActionResult"/>
+    <member name="action_feedback" type="PointHeadActionFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/PointHeadActionGoalSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/PointHeadActionResultSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/PointHeadActionFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

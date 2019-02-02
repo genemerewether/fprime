@@ -1,0 +1,6 @@
+<interface name="PointHeadGoal" namespace="ROS::control_msgs">
+  <args>
+    <arg name="PointHeadGoal" pass_by="reference" type="ROS::control_msgs::PointHeadGoal"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/PointHeadGoalSerializableAi.xml</import_serializable_type>
+</interface>

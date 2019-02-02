@@ -1,0 +1,6 @@
+<interface name="PidState" namespace="ROS::control_msgs">
+  <args>
+    <arg name="PidState" pass_by="reference" type="ROS::control_msgs::PidState"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/PidStateSerializableAi.xml</import_serializable_type>
+</interface>

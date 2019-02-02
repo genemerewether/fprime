@@ -215,9 +215,7 @@ namespace SIMREF {
         //!
         Os::Task m_intTask;
 
-        //! NodeHandle pointer for use in RateGroup context
-        //!
-        ros::NodeHandle* m_rgNH;
+        bool m_rosInited;
 
         //! Publisher for motor speeds
         //!

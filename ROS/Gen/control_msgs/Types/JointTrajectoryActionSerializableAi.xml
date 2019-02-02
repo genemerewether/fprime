@@ -1,0 +1,10 @@
+<serializable name="JointTrajectoryAction" namespace="ROS::control_msgs">
+  <members>
+    <member name="action_goal" type="JointTrajectoryActionGoal"/>
+    <member name="action_result" type="JointTrajectoryActionResult"/>
+    <member name="action_feedback" type="JointTrajectoryActionFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointTrajectoryActionGoalSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointTrajectoryActionResultSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointTrajectoryActionFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

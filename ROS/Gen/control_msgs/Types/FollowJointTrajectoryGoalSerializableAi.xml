@@ -1,0 +1,14 @@
+<serializable name="FollowJointTrajectoryGoal" namespace="ROS::control_msgs">
+  <members>
+    <member name="trajectory" type="ROS::trajectory_msgs::JointTrajectory"/>
+    <member name="path_tolerance" size="100" type="JointTolerance"/>
+    <member name="path_tolerance_count" type="U32"/>
+    <member name="goal_tolerance" size="100" type="JointTolerance"/>
+    <member name="goal_tolerance_count" type="U32"/>
+    <member name="goal_time_tolerance" type="Fw::Time"/>
+  </members>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/JointTrajectorySerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointToleranceSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointToleranceSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="GazeboManipIf" kind="passive" namespace="SIMREF">
+
+
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/control_msgs/Ports/FollowJointTrajectoryGoalPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/control_msgs/Ports/FollowJointTrajectoryFeedbackPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/control_msgs/Ports/FollowJointTrajectoryResultPortAi.xml</import_port_type>
+
+    <import_dictionary>SIMREF/GazeboManipIf/Events.xml</import_dictionary>
+
+    <ports>
+        <port name="FileLogger" data_type="Svc::ActiveFileLogPort" kind="output">
+        </port>
+        
+        <port name="JointTrajGoal" data_type="ROS::control_msgs::FollowJointTrajectoryGoal"  kind="sync_input" max_number="1">
+        </port>
+
+        <port name="JointTrajFeedback" data_type="ROS::control_msgs::FollowJointTrajectoryFeedback"  kind="output" max_number="1">
+        </port>
+
+        <port name="JointTrajResult" data_type="ROS::control_msgs::FollowJointTrajectoryResult"  kind="output" max_number="1">
+        </port>
+
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">
+        </port>
+
+        <port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        </port>
+
+        <!--port name="log" data_type="Fw::Log"  kind="output"    max_number="1">
+        </port>
+
+        <port name="logText" data_type="Fw::LogText"  kind="output"    max_number="1">
+        </port>
+
+        <port name="time" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port-->
+
+        <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
+        </port>
+
+
+        <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">
+        </port>
+    </ports>
+
+</component>

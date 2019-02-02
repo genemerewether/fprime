@@ -49,7 +49,7 @@ namespace HLProc {
 #else
     HLRosIfaceImpl(void),
 #endif
-    m_rgNH(NULL),
+    m_rosInited(false),
     m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
     m_actuatorsSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
@@ -91,18 +91,19 @@ namespace HLProc {
     void HLRosIfaceComponentImpl ::
       startPub() {
         ros::NodeHandle n;
-        m_rgNH = &n;
 
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = m_rgNH->advertise<sensor_msgs::Imu>(buf, 1000);
+            m_imuPub[i] = n.advertise<sensor_msgs::Imu>(buf, 1000);
         }
 
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = m_rgNH->advertise<nav_msgs::Odometry>(buf, 5);
+            m_odomPub[i] = n.advertise<nav_msgs::Odometry>(buf, 5);
         }
+
+        m_rosInited = true;
     }
 
     Os::Task::TaskStatus HLRosIfaceComponentImpl ::
@@ -152,14 +153,48 @@ namespace HLProc {
             this->FileLogger_out(0,fileBuff);
         }
         
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
       
         sensor_msgs::Imu msg;
 
-        // TODO(mereweth) - time-translate from DSP & use message there
-        msg.header.stamp = ros::Time::now();
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        U64 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (-walltimeDspLeadUs > usecDsp) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
+                   walltimeDspLeadUs, usecDsp);
+            return;
+        }
+        U64 usecRos = usecDsp + walltimeDspLeadUs;
+        msg.header.stamp.sec = usecRos / 1000LU / 1000LU;
+        msg.header.stamp.nsec = (usecRos % (1000LU * 1000LU)) * 1000LU;
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
 
         msg.header.seq = header.getseq();
 
@@ -274,16 +309,51 @@ namespace HLProc {
             this->FileLogger_out(0,fileBuff);
         }
         
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
         
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
-        // TODO(mereweth) - time-translate from DSP & use message there
         Fw::Time stamp = header.getstamp();
-        msg.header.stamp = ros::Time::now();
+
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        U64 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (-walltimeDspLeadUs > usecDsp) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
+                   walltimeDspLeadUs, usecDsp);
+            return;
+        }
+        U64 usecRos = usecDsp + walltimeDspLeadUs;
+        msg.header.stamp.sec = usecRos / 1000LU / 1000LU;
+        msg.header.stamp.nsec = (usecRos % (1000LU * 1000LU)) * 1000LU;
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
 
         msg.header.seq = header.getseq();
 

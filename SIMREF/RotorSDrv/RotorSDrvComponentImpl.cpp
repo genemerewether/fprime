@@ -46,7 +46,7 @@ namespace SIMREF {
   #else
       RotorSDrvImpl(void),
   #endif
-      m_rgNH(NULL),
+      m_rosInited(false),
       m_imuSet(), // zero-initialize instead of default-initializing
       m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
       m_odomSet(), // zero-initialize instead of default-initializing
@@ -92,15 +92,16 @@ namespace SIMREF {
     void RotorSDrvComponentImpl ::
       startPub() {
         ros::NodeHandle n;
-        m_rgNH = &n;
 
         char buf[32];
-        m_motorPub = m_rgNH->advertise<mav_msgs::Actuators>("command/motor_speed", 5);
+        m_motorPub = n.advertise<mav_msgs::Actuators>("command/motor_speed", 5);
 
         for (int i = 0; i < NUM_ODOMLOG_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = m_rgNH->advertise<nav_msgs::Odometry>(buf, 5);
+            m_odomPub[i] = n.advertise<nav_msgs::Odometry>(buf, 5);
         }
+
+        m_rosInited = true;
     }
 
     Os::Task::TaskStatus RotorSDrvComponentImpl ::
@@ -146,7 +147,7 @@ namespace SIMREF {
         }
 
 
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
 
@@ -191,7 +192,7 @@ namespace SIMREF {
           ROS::mav_msgs::Actuators &actuator
       )
     {
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
 

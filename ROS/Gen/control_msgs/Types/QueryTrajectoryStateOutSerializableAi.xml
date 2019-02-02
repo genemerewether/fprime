@@ -1,0 +1,13 @@
+<serializable name="QueryTrajectoryStateResponse" namespace="ROS::control_msgs">
+  <members>
+    <member name="name" size="100" type="Fw::EightyCharString"/>
+    <member name="name_count" type="U32"/>
+    <member name="position" size="100" type="F64"/>
+    <member name="position_count" type="U32"/>
+    <member name="velocity" size="100" type="F64"/>
+    <member name="velocity_count" type="U32"/>
+    <member name="acceleration" size="100" type="F64"/>
+    <member name="acceleration_count" type="U32"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

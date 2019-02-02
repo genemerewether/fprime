@@ -1,0 +1,7 @@
+<serializable name="FollowJointTrajectoryResult" namespace="ROS::control_msgs">
+  <members>
+    <member name="error_code" type="I32"/>
+    <member name="error_string" type="Fw::EightyCharString"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

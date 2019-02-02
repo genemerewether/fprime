@@ -1,0 +1,6 @@
+<serializable name="GripperCommand" namespace="ROS::control_msgs">
+  <members>
+    <member name="position" type="F64"/>
+    <member name="max_effort" type="F64"/>
+  </members>
+</serializable>

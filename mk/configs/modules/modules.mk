@@ -188,23 +188,25 @@ ROS_TYPE_MODULES := \
 	ROS/Gen/mav_msgs/Types		 \
 	ROS/Gen/sensor_msgs/Types
 
-ROS_MODULES_ALL := \
+ROS_TYPE_PORT_MODULES_ALL := \
 	$(ROS_TYPE_MODULES) \
 	$(ROS_PORT_MODULES) \
 	\
 	ROS/Gen/diagnostic_msgs/Types    \
 	ROS/Gen/stereo_msgs/Types        \
 	ROS/Gen/trajectory_msgs/Types    \
-	ROS/Gen/planning_msgs/Types	 \
+	ROS/Gen/mav_planning_msgs/Types	 \
 	ROS/Gen/shape_msgs/Types         \
 	ROS/Gen/sensor_msgs/Types        \
+	ROS/Gen/control_msgs/Types       \
 	\
 	ROS/Gen/diagnostic_msgs/Ports    \
 	ROS/Gen/stereo_msgs/Ports        \
 	ROS/Gen/trajectory_msgs/Ports    \
-	ROS/Gen/planning_msgs/Ports	 \
+	ROS/Gen/mav_planning_msgs/Ports	 \
 	ROS/Gen/shape_msgs/Ports         \
-	ROS/Gen/sensor_msgs/Ports
+	ROS/Gen/sensor_msgs/Ports	 \
+	ROS/Gen/control_msgs/Ports
 #	ROS/Gen/visualization_msgs/Types \
 #	ROS/Gen/visualization_msgs/Ports \
 
@@ -294,6 +296,7 @@ BASEREF_MODULES := \
 
 SIMREF_DEPLOYMENT_MODULES := \
 	SIMREF/RotorSDrv \
+	SIMREF/GazeboManipIf \
 	SIMREF/Top
 
 SIMREF_MODULES := \
@@ -305,6 +308,8 @@ SIMREF_MODULES := \
 	$(SVC_MODULES) \
 	\
 	$(ROS_MODULES) \
+	\
+	$(ROS_TYPE_PORT_MODULES_ALL) \
 	\
 	$(FW_MODULES) \
 	\

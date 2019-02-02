@@ -193,9 +193,7 @@ namespace HLProc {
       // Member variables
       // ----------------------------------------------------------------------
 
-        //! NodeHandle pointer for use in RateGroup context
-        //!
-        ros::NodeHandle* m_rgNH;
+        bool m_rosInited;
 
         //! Publishers for IMU data
         //!
