@@ -108,7 +108,7 @@ namespace SIMREF {
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
-        Os::TaskString name("ROTORSDRV");
+        Os::TaskString name("ROTORSDRVROS");
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, RotorSDrvComponentImpl::intTaskEntry, this, cpuAffinity);
 

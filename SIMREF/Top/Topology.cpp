@@ -142,6 +142,12 @@ SIMREF::RotorSDrvComponentImpl rotorSDrv
 #endif
 ;
 
+SIMREF::GazeboManipIfComponentImpl gzManipIf
+#if FW_OBJECT_NAMES == 1
+                    ("GZMANIPIF")
+#endif
+;
+
 Gnc::LeeCtrlComponentImpl leeCtrl
 #if FW_OBJECT_NAMES == 1
                     ("LEECTRL")
@@ -253,6 +259,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     rosCycle.init(0);
 
     rotorSDrv.init(0);
+    gzManipIf.init(0);
 
     linuxTime.init(0);
 
@@ -288,6 +295,8 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     imuInteg.regCommands();
     mixer.regCommands();
     sigGen.regCommands();
+
+    gzManipIf.regCommands();
 
     // initialize file logs
     fileLogger.initLog("./log/");
@@ -431,6 +440,9 @@ int main(int argc, char* argv[]) {
 
     rotorSDrv.startPub();
     stat = rotorSDrv.startIntTask(70, 20*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    gzManipIf.startPub();
+    stat = gzManipIf.startIntTask(70, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     signal(SIGINT,sighandler);

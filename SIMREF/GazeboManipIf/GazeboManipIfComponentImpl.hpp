@@ -101,6 +101,37 @@ namespace SIMREF {
       void doneCb(const actionlib::SimpleClientGoalState& state,
                   const control_msgs::FollowJointTrajectoryResultConstPtr& result);
 
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations 
+      // ----------------------------------------------------------------------
+
+      //! Implementation for GZMANIPIF_TestMove command handler
+      //! test unprofiled sim actuator move
+      void GZMANIPIF_TestMove_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          F64 j1_pos, 
+          //const Fw::CmdStringArg& j1_name, 
+          F64 j2_pos, 
+          //const Fw::CmdStringArg& j2_name, 
+          F64 j3_pos, 
+          //const Fw::CmdStringArg& j3_name, 
+          F64 j4_pos, 
+          //const Fw::CmdStringArg& j4_name, 
+          F64 j5_pos, 
+          //const Fw::CmdStringArg& j5_name, 
+          F64 j6_pos, 
+          //const Fw::CmdStringArg& j6_name, 
+          F64 j7_pos, 
+          //const Fw::CmdStringArg& j7_name, 
+          U32 numJoints, 
+          F64 tol,
+          F64 goal_time, 
+          F64 goal_time_tol, 
+          F64 goal_tol 
+      );
+
       // ----------------------------------------------------------------------
       // Member variables
       // ----------------------------------------------------------------------
