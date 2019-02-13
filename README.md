@@ -24,11 +24,24 @@ sudo -H pip install -r Gse/bin/required.txt
 
 ## Using with ROS (needed for `SIMREF` and `SDREF`)
 
-Go to the ROS/fprime_ws folder, and build the workspace with your ROS environment sourced (tested with catkin):
+Dependencies:
+```
+ros-VERSION-trac-ik
+ros-VERSION-orocos-kdl
+```
+
+For Ubuntu 16.04 with Kinetic, or Ubuntu 18.04 with Melodic, there are pre-written `mod.mk` files here:
+https://github.com/genemerewether/quest-fw/blob/quest-master/ROS/fprime_modmk_linux_kinetic
+https://github.com/genemerewether/quest-fw/blob/quest-master/ROS/fprime_modmk_linux_melodic
+
+Copy the appropriate file to `ROS/fprime_ws/src/fprime/mod.mk`, and you are good to go.
+
+Otherwise, remove the `CATKIN_IGNORE` file from `ROS/fprime_ws/src/fprime` and `ROS/fprime_ws/src/genfprime`. Then, go to the ROS/fprime_ws folder, and build the workspace with your ROS environment sourced (tested with catkin):
 ```
 catkin init
-catkin build
+ROS_LANG_DISABLE=genfprime catkin build
 ```
+(omit the ROS_LANG_DISABLE if you want to generate F' ports / serializables from a new ROS package with messages and/or services)
 
 ## Using without ROS
 From the top directory of the repo, run:
