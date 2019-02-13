@@ -307,6 +307,8 @@ SIMREF_MODULES := \
 	\
 	$(SVC_MODULES) \
 	\
+	$(DRV_MODULES) \
+	\
 	$(ROS_MODULES) \
 	\
 	$(ROS_TYPE_PORT_MODULES_ALL) \
