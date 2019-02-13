@@ -305,6 +305,8 @@ SIMREF_MODULES := \
 	\
 	$(SVC_MODULES) \
 	\
+	$(DRV_MODULES) \
+	\
 	$(ROS_MODULES) \
 	\
 	$(FW_MODULES) \
