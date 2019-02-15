@@ -16,7 +16,7 @@ apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF
 apt-get update
 
 apt-get install -y ros-indigo-ros-base ros-indigo-image-transport \
-    ros-indigo-trac-ik \
+    ros-indigo-trac-ik ros-indigo-orocos-kdl \
     libeigen3-dev libopencv-dev \
     git software-properties-common python-pip \
     symlinks

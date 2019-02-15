@@ -4,6 +4,7 @@ BUILD_ROOT ?= $(subst /$(DEPLOYMENT),,$(CURDIR))
 
 export BUILD_ROOT
 
+FSW_RUN_SCRIPT = runSDREF.sh
 __DEFAULT_BUILD = SDFLIGHT_opt
 __DEFAULT_BUILD_OUT = linux-linaro-cross-arm-opt-gnu-bin
 

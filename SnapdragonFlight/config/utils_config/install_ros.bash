@@ -41,7 +41,8 @@ sudo apt-get install -y ros-indigo-ros-base python-rosdep \
     ros-indigo-urdf ros-indigo-tf libxslt1-dev ros-indigo-image-transport \
     ros-indigo-ros-comm ros-indigo-rosbash ros-indigo-dynamic-reconfigure \
     ros-indigo-camera-info-manager ros-indigo-camera-calibration \
-    ros-indigo-robot-state-publisher ros-indigo-tf2-geometry-msgs
+    ros-indigo-robot-state-publisher ros-indigo-tf2-geometry-msgs \
+    ros-indigo-trac-ik
 sudo rosdep init
 rosdep update
 echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
