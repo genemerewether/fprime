@@ -18,5 +18,8 @@ include $(BUILD_ROOT)/Svc/Startup/patch/patch.mk
 load_dsp: default_build
 	adb push ./$(__DEFAULT_BUILD_OUT)/HEXREF /usr/share/data/adsp/libhexref_skel.so
 
+only_load:
+	adb push ./$(__DEFAULT_BUILD_OUT)/HEXREF /usr/share/data/adsp/libhexref_skel.so
+
 rebuild_hex:
 	make gen_make DSPAL_opt_clean DSPAL_opt
