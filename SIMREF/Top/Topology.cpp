@@ -439,10 +439,10 @@ int main(int argc, char* argv[]) {
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     rotorSDrv.startPub();
-    stat = rotorSDrv.startIntTask(70, 20*1024);
+    stat = rotorSDrv.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
     gzManipIf.startPub();
-    stat = gzManipIf.startIntTask(70, 20*1024);
+    stat = gzManipIf.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     signal(SIGINT,sighandler);

@@ -161,7 +161,7 @@ namespace HLProc {
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
-        U64 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
+        U32 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
         Os::File::Status stat = Os::File::OTHER_ERROR;
         Os::File file;
         stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -190,7 +190,7 @@ namespace HLProc {
                    walltimeDspLeadUs, usecDsp);
             return;
         }
-        U64 usecRos = usecDsp + walltimeDspLeadUs;
+        U32 usecRos = usecDsp + walltimeDspLeadUs;
         msg.header.stamp.sec = usecRos / 1000LU / 1000LU;
         msg.header.stamp.nsec = (usecRos % (1000LU * 1000LU)) * 1000LU;
 
@@ -320,7 +320,7 @@ namespace HLProc {
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
-        U64 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
+        U32 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
         Os::File::Status stat = Os::File::OTHER_ERROR;
         Os::File file;
         stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -349,7 +349,7 @@ namespace HLProc {
                    walltimeDspLeadUs, usecDsp);
             return;
         }
-        U64 usecRos = usecDsp + walltimeDspLeadUs;
+        U32 usecRos = usecDsp + walltimeDspLeadUs;
         msg.header.stamp.sec = usecRos / 1000LU / 1000LU;
         msg.header.stamp.nsec = (usecRos % (1000LU * 1000LU)) * 1000LU;
 

@@ -646,7 +646,7 @@ int main(int argc, char* argv[]) {
     ros::start();
 
     sdRosIface_ptr->startPub();
-    sdRosIface_ptr->startIntTask(30, 20*1024);
+    sdRosIface_ptr->startIntTask(30, 5*1000*1024);
 
     Os::Task task;
     Os::Task waiter;
