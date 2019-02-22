@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<!--======================================================================
+
+  Svc
+  BufferLogger
+  Telemetry
+
+======================================================================-->
+
+<telemetry>
+
+  <channel
+    id="0"
+    name="BL_NumLoggedBuffers"
+    data_type="U32"
+  >
+    <comment>The number of buffers logged</comment>
+  </channel>
+
+  <channel
+    id="1"
+    name="BL_NumLoggedBytes"
+    data_type="U32"
+  >
+    <comment>The number of bytes logged</comment>
+  </channel>
+
+</telemetry>
