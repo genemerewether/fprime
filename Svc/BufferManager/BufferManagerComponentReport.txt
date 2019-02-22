@@ -1,0 +1,6 @@
+Input Ports: 2
+Output Ports: 4
+Channels: 2
+ ChanIds: 0x00,0x01
+Events: 3
+ EventIds: 0x00,0x01,0x02
