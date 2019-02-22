@@ -11,6 +11,10 @@ export MARKDOWN ?= $(PYTHON_BASE)/bin/markdown_py -x markdown.extensions.extra -
 
 JOBS := -j `nproc`
 
+export TURBOJPEG := /opt/tools/quest/turbojpeg
+export TURBOJPEG_LIB := $(TURBOJPEG)/lib/libturbojpeg.a
+export TURBOJPEG_INCLUDE := -I$(TURBOJPEG)/include
+
 TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
 export HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.0

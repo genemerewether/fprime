@@ -73,6 +73,7 @@ COVERAGE := -fprofile-arcs -ftest-coverage
 
 LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 						$(COMMON_INCLUDES) \
+						--sysroot=$(HEXAGON_ARM_SYSROOT) \
 						-I$(HEXAGON_SDK_ROOT)/incs \
 						-I$(HEXAGON_SDK_ROOT)/incs/stddef \
 						-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/inc \

@@ -63,6 +63,9 @@ CFDP_GTEST_MODULES := \
 UTILS_MODULES := \
 	Utils/Hash
 
+SVC_EXTRA_MODULES := \
+	Svc/ImgComp
+
 SVC_MODULES := \
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
@@ -256,6 +259,8 @@ SDREF_MODULES := \
 	$(SNAPDRAGON_MODULES) \
 	\
 	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
 	\
 	$(DRV_MODULES) \
 	\

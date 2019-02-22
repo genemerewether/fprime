@@ -1,0 +1,66 @@
+<events>
+    <event id="0" name="IMGCOMP_SoftCompError" severity="WARNING_HI" format_string = "Software compression error %d, code %d" >
+        <comment>
+        ImgComp had an error in software compression
+        </comment>
+        <args>
+            <arg name="error" type="ENUM">
+                <enum name="SoftCompErrorType">
+                    <item name="SOFTCOMP_INIT_ERR" comment="Init error"/>
+                    <item name="SOFTCOMP_OP_ERR" comment="Operation error"/>
+                </enum>
+                <comment>The error type</comment>
+            </arg>
+            <arg name="msg" type="string" size="40" />
+        </args>
+    </event>
+    <event id="1" name="IMGCOMP_BadBuffer" severity="WARNING_HI" format_string = "Buffer deserialize error" >
+        <comment>
+        Deserialization failed. This will cause leakage of a buffer
+        </comment>
+    </event>
+    <event id="2" name="IMGCOMP_BadSetting" severity="WARNING_HI" format_string = "Compression setting error port %d" >
+        <args>
+            <arg name="portNum" type="U32">
+            </arg>
+        </args>
+    </event>
+    <event id="3" name="IMGCOMP_NoBuffer" severity="WARNING_HI" format_string = "Failed to request buffer of size %d" >
+        <args>
+            <arg name="size" type="U32">
+            </arg>
+        </args>
+    </event>
+    <event id="4" name="IMGCOMP_BufferOffset" severity="WARNING_HI" format_string = "Buffer %d will be skipped in output %d while processing input buffer %d, port %d" >
+        <args>
+            <arg name="type" type="ENUM">
+                <enum name="BufferOffsetSkipType">
+                    <item name="SKIP_METADATA"/>
+                    <item name="SKIP_THUMB"/>
+                    <item name="SKIP_IMAGE"/>
+                </enum>
+                <comment>The error type</comment>
+            </arg>
+            <arg name="output" type="ENUM">
+                <enum name="BufferOffsetSkipOutput">
+                    <item name="OUTPUT_STORAGE"/>
+                    <item name="OUTPUT_XMIT"/>
+                </enum>
+                <comment>The error type</comment>
+            </arg>
+            <arg name="inBuffer" type="U32">
+            </arg>
+            <arg name="portNum" type="U32">
+            </arg>
+        </args>
+    </event>
+    <event id="5" name="IMGCOMP_NoRestartMarkers" severity="WARNING_HI" format_string = "Error %d setting restart marker environment variable" >
+        <comment>
+        ImgComp had an error using setenv
+        </comment>
+        <args>
+            <arg name="error" type="I32">
+            </arg>
+        </args>
+    </event>
+</events>

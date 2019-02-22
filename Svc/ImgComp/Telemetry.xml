@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="IMGCOMP_BuffersHandled" data_type="U32" update="on_change">
+        <comment>
+        Number of buffers handled
+        </comment>
+    </channel>
+</telemetry>
