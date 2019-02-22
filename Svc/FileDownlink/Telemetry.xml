@@ -9,33 +9,31 @@
 
 ======================================================================-->
 
-<telemetry
-  telemetry_base="$FileDownlinkIdBase"
->
+<telemetry>
 
   <channel
-    id="0"
+    id="0x00"
     name="FileDownlink_FilesSent"
     data_type="U32"
-    abbrev="T004-1000"
+    abbrev="FDWN-0000"
   >
     <comment>The total number of files sent</comment>
   </channel>
 
   <channel
-    id="1"
+    id="0x01"
     name="FileDownlink_PacketsSent"
     data_type="U32"
-    abbrev="T004-1100"
+    abbrev="FDWN-0001"
   >
     <comment>The total number of packets sent</comment>
   </channel>
 
   <channel
-    id="2"
+    id="0x02"
     name="FileDownlink_Warnings"
     data_type="U32"
-    abbrev="T004-1200"
+    abbrev="FDWN-0002"
   >
     <comment>The total number of warnings</comment>
   </channel>

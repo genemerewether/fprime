@@ -61,29 +61,32 @@ namespace Svc {
   void FileUplink ::
     bufferSendIn_handler(
         const NATIVE_INT_TYPE portNum,
-        Fw::Buffer buffer
+        Fw::Buffer& buffer
     )
   {
     Fw::FilePacket filePacket;
     const Fw::SerializeStatus status = filePacket.fromBuffer(buffer);
-    FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
-    const Fw::FilePacket::Header& header = filePacket.asHeader();
-    switch (header.type) {
-      case Fw::FilePacket::T_START:
-        this->handleStartPacket(filePacket.asStartPacket());
-        break;
-      case Fw::FilePacket::T_DATA:
-        this->handleDataPacket(filePacket.asDataPacket());
-        break;
-      case Fw::FilePacket::T_END:
-        this->handleEndPacket(filePacket.asEndPacket());
-        break;
-      case Fw::FilePacket::T_CANCEL:
-        this->handleCancelPacket();
-        break;
-      default:
-        FW_ASSERT(0);
-        break;
+    if (status != Fw::FW_SERIALIZE_OK) {
+        this->log_WARNING_HI_FileUplink_DecodeError(status);
+    } else {
+        const Fw::FilePacket::Header& header = filePacket.asHeader();
+        switch (header.type) {
+          case Fw::FilePacket::T_START:
+            this->handleStartPacket(filePacket.asStartPacket());
+            break;
+          case Fw::FilePacket::T_DATA:
+            this->handleDataPacket(filePacket.asDataPacket());
+            break;
+          case Fw::FilePacket::T_END:
+            this->handleEndPacket(filePacket.asEndPacket());
+            break;
+          case Fw::FilePacket::T_CANCEL:
+            this->handleCancelPacket();
+            break;
+          default:
+            FW_ASSERT(0);
+            break;
+        }
     }
     this->bufferSendOut_out(0, buffer);
   }
@@ -110,6 +113,11 @@ namespace Svc {
       this->file.osFile.close();
       this->warnings.invalidReceiveMode(Fw::FilePacket::T_START);
     }
+    //Clear throttles when activley attempting a new file upload
+    this->log_WARNING_HI_FileUplink_PacketOutOfBounds_ThrottleClear();
+    this->log_WARNING_HI_FileUplink_PacketOutOfOrder_ThrottleClear();
+    this->log_WARNING_HI_FileUplink_InvalidReceiveMode_ThrottleClear();
+
     const Os::File::Status status = this->file.open(startPacket);
     if (status == Os::File::OP_OK) {
       this->goToDataMode();

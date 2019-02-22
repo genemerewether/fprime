@@ -4,7 +4,7 @@
 // \brief  cpp file for FileDownlink component test harness base class
 //
 // \copyright
-// Copyright 2009-2016, by the California Institute of Technology.
+// Copyright 2009-2015, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
 // acknowledged. Any commercial use must be negotiated with the Office
 // of Technology Transfer at the California Institute of Technology.
@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "TesterBase.hpp"
+#include <TesterBase.hpp>
 
 namespace Svc {
 
@@ -63,11 +63,19 @@ namespace Svc {
       new History<EventEntry_FileDownlink_FileSent>(maxHistorySize);
     this->eventHistory_FileDownlink_DownlinkCanceled =
       new History<EventEntry_FileDownlink_DownlinkCanceled>(maxHistorySize);
+    this->eventHistory_FileDownlink_DownlinkTimeout =
+      new History<EventEntry_FileDownlink_DownlinkTimeout>(maxHistorySize);
+    this->eventHistory_FileDownlink_DownlinkPartialFail =
+      new History<EventEntry_FileDownlink_DownlinkPartialFail>(maxHistorySize);
     // Initialize histories for typed user output ports
+    this->fromPortHistory_buffSendOutReturn =
+      new History<FromPortEntry_buffSendOutReturn>(maxHistorySize);
     this->fromPortHistory_bufferGetCaller =
       new History<FromPortEntry_bufferGetCaller>(maxHistorySize);
     this->fromPortHistory_bufferSendOut =
       new History<FromPortEntry_bufferSendOut>(maxHistorySize);
+    this->fromPortHistory_faultOut =
+      new History<FromPortEntry_faultOut>(maxHistorySize);
     // Clear history
     this->clearHistory();
   }
@@ -89,43 +97,43 @@ namespace Svc {
     delete this->eventHistory_FileDownlink_FileReadError;
     delete this->eventHistory_FileDownlink_FileSent;
     delete this->eventHistory_FileDownlink_DownlinkCanceled;
+    delete this->eventHistory_FileDownlink_DownlinkTimeout;
+    delete this->eventHistory_FileDownlink_DownlinkPartialFail;
   }
 
   void FileDownlinkTesterBase ::
-    init(
-        const NATIVE_INT_TYPE instance
-    )
+    init(NATIVE_INT_TYPE instance)
   {
 
     // Initialize base class
 
 		Fw::PassiveComponentBase::init(instance);
 
-    // Attach input port bufferGetCaller
+    // Attach input port buffSendOutReturn
 
     for (
         NATIVE_INT_TYPE _port = 0;
-        _port < this->getNum_from_bufferGetCaller();
+        _port < this->getNum_from_buffSendOutReturn();
         ++_port
     ) {
 
-      this->m_from_bufferGetCaller[_port].init();
-      this->m_from_bufferGetCaller[_port].addCallComp(
+      this->m_from_buffSendOutReturn[_port].init();
+      this->m_from_buffSendOutReturn[_port].addCallComp(
           this,
-          from_bufferGetCaller_static
+          from_buffSendOutReturn_static
       );
-      this->m_from_bufferGetCaller[_port].setPortNum(_port);
+      this->m_from_buffSendOutReturn[_port].setPortNum(_port);
 
 #if FW_OBJECT_NAMES == 1
       char _portName[80];
       (void) snprintf(
           _portName,
           sizeof(_portName),
-          "%s_from_bufferGetCaller[%d]",
+          "%s_from_buffSendOutReturn[%d]",
           this->m_objName,
           _port
       );
-      this->m_from_bufferGetCaller[_port].setObjName(_portName);
+      this->m_from_buffSendOutReturn[_port].setObjName(_portName);
 #endif
 
     }
@@ -155,6 +163,93 @@ namespace Svc {
           _port
       );
       this->m_from_timeCaller[_port].setObjName(_portName);
+#endif
+
+    }
+
+    // Attach input port cmdRegOut
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_from_cmdRegOut();
+        ++_port
+    ) {
+
+      this->m_from_cmdRegOut[_port].init();
+      this->m_from_cmdRegOut[_port].addCallComp(
+          this,
+          from_cmdRegOut_static
+      );
+      this->m_from_cmdRegOut[_port].setPortNum(_port);
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      (void) snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_from_cmdRegOut[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_from_cmdRegOut[_port].setObjName(_portName);
+#endif
+
+    }
+
+    // Attach input port eventOut
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_from_eventOut();
+        ++_port
+    ) {
+
+      this->m_from_eventOut[_port].init();
+      this->m_from_eventOut[_port].addCallComp(
+          this,
+          from_eventOut_static
+      );
+      this->m_from_eventOut[_port].setPortNum(_port);
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      (void) snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_from_eventOut[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_from_eventOut[_port].setObjName(_portName);
+#endif
+
+    }
+
+    // Attach input port bufferGetCaller
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_from_bufferGetCaller();
+        ++_port
+    ) {
+
+      this->m_from_bufferGetCaller[_port].init();
+      this->m_from_bufferGetCaller[_port].addCallComp(
+          this,
+          from_bufferGetCaller_static
+      );
+      this->m_from_bufferGetCaller[_port].setPortNum(_port);
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      (void) snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_from_bufferGetCaller[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_from_bufferGetCaller[_port].setObjName(_portName);
 #endif
 
     }
@@ -246,60 +341,31 @@ namespace Svc {
 
     }
 
-    // Attach input port cmdRegOut
+    // Attach input port faultOut
 
     for (
         NATIVE_INT_TYPE _port = 0;
-        _port < this->getNum_from_cmdRegOut();
+        _port < this->getNum_from_faultOut();
         ++_port
     ) {
 
-      this->m_from_cmdRegOut[_port].init();
-      this->m_from_cmdRegOut[_port].addCallComp(
+      this->m_from_faultOut[_port].init();
+      this->m_from_faultOut[_port].addCallComp(
           this,
-          from_cmdRegOut_static
+          from_faultOut_static
       );
-      this->m_from_cmdRegOut[_port].setPortNum(_port);
+      this->m_from_faultOut[_port].setPortNum(_port);
 
 #if FW_OBJECT_NAMES == 1
       char _portName[80];
       (void) snprintf(
           _portName,
           sizeof(_portName),
-          "%s_from_cmdRegOut[%d]",
+          "%s_from_faultOut[%d]",
           this->m_objName,
           _port
       );
-      this->m_from_cmdRegOut[_port].setObjName(_portName);
-#endif
-
-    }
-
-    // Attach input port eventOut
-
-    for (
-        NATIVE_INT_TYPE _port = 0;
-        _port < this->getNum_from_eventOut();
-        ++_port
-    ) {
-
-      this->m_from_eventOut[_port].init();
-      this->m_from_eventOut[_port].addCallComp(
-          this,
-          from_eventOut_static
-      );
-      this->m_from_eventOut[_port].setPortNum(_port);
-
-#if FW_OBJECT_NAMES == 1
-      char _portName[80];
-      (void) snprintf(
-          _portName,
-          sizeof(_portName),
-          "%s_from_eventOut[%d]",
-          this->m_objName,
-          _port
-      );
-      this->m_from_eventOut[_port].setObjName(_portName);
+      this->m_from_faultOut[_port].setObjName(_portName);
 #endif
 
     }
@@ -335,6 +401,52 @@ namespace Svc {
     }
 #endif
 
+    // Initialize output port Run
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_to_Run();
+        ++_port
+    ) {
+      this->m_to_Run[_port].init();
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_to_Run[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_to_Run[_port].setObjName(_portName);
+#endif
+
+    }
+
+    // Initialize output port bufferReturn
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_to_bufferReturn();
+        ++_port
+    ) {
+      this->m_to_bufferReturn[_port].init();
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_to_bufferReturn[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_to_bufferReturn[_port].setObjName(_portName);
+#endif
+
+    }
+
   }
 
   // ----------------------------------------------------------------------
@@ -342,15 +454,33 @@ namespace Svc {
   // ----------------------------------------------------------------------
 
   NATIVE_INT_TYPE FileDownlinkTesterBase ::
-    getNum_from_bufferGetCaller(void) const
+    getNum_from_buffSendOutReturn(void) const
   {
-    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_bufferGetCaller);
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_buffSendOutReturn);
   }
 
   NATIVE_INT_TYPE FileDownlinkTesterBase ::
     getNum_from_timeCaller(void) const
   {
     return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_timeCaller);
+  }
+
+  NATIVE_INT_TYPE FileDownlinkTesterBase ::
+    getNum_from_cmdRegOut(void) const
+  {
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_cmdRegOut);
+  }
+
+  NATIVE_INT_TYPE FileDownlinkTesterBase ::
+    getNum_from_eventOut(void) const
+  {
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_eventOut);
+  }
+
+  NATIVE_INT_TYPE FileDownlinkTesterBase ::
+    getNum_from_bufferGetCaller(void) const
+  {
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_bufferGetCaller);
   }
 
   NATIVE_INT_TYPE FileDownlinkTesterBase ::
@@ -366,6 +496,18 @@ namespace Svc {
   }
 
   NATIVE_INT_TYPE FileDownlinkTesterBase ::
+    getNum_to_Run(void) const
+  {
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_to_Run);
+  }
+
+  NATIVE_INT_TYPE FileDownlinkTesterBase ::
+    getNum_to_bufferReturn(void) const
+  {
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_to_bufferReturn);
+  }
+
+  NATIVE_INT_TYPE FileDownlinkTesterBase ::
     getNum_from_tlmOut(void) const
   {
     return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_tlmOut);
@@ -378,15 +520,9 @@ namespace Svc {
   }
 
   NATIVE_INT_TYPE FileDownlinkTesterBase ::
-    getNum_from_cmdRegOut(void) const
+    getNum_from_faultOut(void) const
   {
-    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_cmdRegOut);
-  }
-
-  NATIVE_INT_TYPE FileDownlinkTesterBase ::
-    getNum_from_eventOut(void) const
-  {
-    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_eventOut);
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_faultOut);
   }
 
 #if FW_ENABLE_TEXT_LOGGING == 1
@@ -411,6 +547,56 @@ namespace Svc {
     this->m_to_cmdIn[portNum].addCallPort(cmdIn);
   }
 
+  void FileDownlinkTesterBase ::
+    connect_to_Run(
+        const NATIVE_INT_TYPE portNum,
+        Svc::InputSchedPort *const Run
+    ) 
+  {
+    FW_ASSERT(portNum < this->getNum_to_Run(),static_cast<AssertArg>(portNum));
+    this->m_to_Run[portNum].addCallPort(Run);
+  }
+
+  void FileDownlinkTesterBase ::
+    connect_to_bufferReturn(
+        const NATIVE_INT_TYPE portNum,
+        Fw::InputBufferSendPort *const bufferReturn
+    ) 
+  {
+    FW_ASSERT(portNum < this->getNum_to_bufferReturn(),static_cast<AssertArg>(portNum));
+    this->m_to_bufferReturn[portNum].addCallPort(bufferReturn);
+  }
+
+
+  // ----------------------------------------------------------------------
+  // Invocation functions for to ports
+  // ----------------------------------------------------------------------
+
+  void FileDownlinkTesterBase ::
+    invoke_to_Run(
+        const NATIVE_INT_TYPE portNum,
+        NATIVE_UINT_TYPE context
+    )
+  {
+    FW_ASSERT(portNum < this->getNum_to_Run(),static_cast<AssertArg>(portNum));
+    FW_ASSERT(portNum < this->getNum_to_Run(),static_cast<AssertArg>(portNum));
+    this->m_to_Run[portNum].invoke(
+        context
+    );
+  }
+
+  void FileDownlinkTesterBase ::
+    invoke_to_bufferReturn(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer fwBuffer
+    )
+  {
+    FW_ASSERT(portNum < this->getNum_to_bufferReturn(),static_cast<AssertArg>(portNum));
+    FW_ASSERT(portNum < this->getNum_to_bufferReturn(),static_cast<AssertArg>(portNum));
+    this->m_to_bufferReturn[portNum].invoke(
+        fwBuffer
+    );
+  }
 
   // ----------------------------------------------------------------------
   // Connection status for to ports
@@ -423,15 +609,29 @@ namespace Svc {
     return this->m_to_cmdIn[portNum].isConnected();
   }
 
+  bool FileDownlinkTesterBase ::
+    isConnected_to_Run(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_to_Run(), static_cast<AssertArg>(portNum));
+    return this->m_to_Run[portNum].isConnected();
+  }
+
+  bool FileDownlinkTesterBase ::
+    isConnected_to_bufferReturn(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_to_bufferReturn(), static_cast<AssertArg>(portNum));
+    return this->m_to_bufferReturn[portNum].isConnected();
+  }
+
   // ----------------------------------------------------------------------
   // Getters for from ports
   // ----------------------------------------------------------------------
  
-  Fw::InputBufferGetPort *FileDownlinkTesterBase ::
-    get_from_bufferGetCaller(const NATIVE_INT_TYPE portNum)
+  Fw::InputBufferSendPort *FileDownlinkTesterBase ::
+    get_from_buffSendOutReturn(const NATIVE_INT_TYPE portNum)
   {
-    FW_ASSERT(portNum < this->getNum_from_bufferGetCaller(),static_cast<AssertArg>(portNum));
-    return &this->m_from_bufferGetCaller[portNum];
+    FW_ASSERT(portNum < this->getNum_from_buffSendOutReturn(),static_cast<AssertArg>(portNum));
+    return &this->m_from_buffSendOutReturn[portNum];
   }
 
   Fw::InputTimePort *FileDownlinkTesterBase ::
@@ -439,6 +639,27 @@ namespace Svc {
   {
     FW_ASSERT(portNum < this->getNum_from_timeCaller(),static_cast<AssertArg>(portNum));
     return &this->m_from_timeCaller[portNum];
+  }
+
+  Fw::InputCmdRegPort *FileDownlinkTesterBase ::
+    get_from_cmdRegOut(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_from_cmdRegOut(),static_cast<AssertArg>(portNum));
+    return &this->m_from_cmdRegOut[portNum];
+  }
+
+  Fw::InputLogPort *FileDownlinkTesterBase ::
+    get_from_eventOut(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_from_eventOut(),static_cast<AssertArg>(portNum));
+    return &this->m_from_eventOut[portNum];
+  }
+
+  Fw::InputBufferGetPort *FileDownlinkTesterBase ::
+    get_from_bufferGetCaller(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_from_bufferGetCaller(),static_cast<AssertArg>(portNum));
+    return &this->m_from_bufferGetCaller[portNum];
   }
 
   Fw::InputBufferSendPort *FileDownlinkTesterBase ::
@@ -462,18 +683,11 @@ namespace Svc {
     return &this->m_from_cmdResponseOut[portNum];
   }
 
-  Fw::InputCmdRegPort *FileDownlinkTesterBase ::
-    get_from_cmdRegOut(const NATIVE_INT_TYPE portNum)
+  Svc::InputFPPort *FileDownlinkTesterBase ::
+    get_from_faultOut(const NATIVE_INT_TYPE portNum)
   {
-    FW_ASSERT(portNum < this->getNum_from_cmdRegOut(),static_cast<AssertArg>(portNum));
-    return &this->m_from_cmdRegOut[portNum];
-  }
-
-  Fw::InputLogPort *FileDownlinkTesterBase ::
-    get_from_eventOut(const NATIVE_INT_TYPE portNum)
-  {
-    FW_ASSERT(portNum < this->getNum_from_eventOut(),static_cast<AssertArg>(portNum));
-    return &this->m_from_eventOut[portNum];
+    FW_ASSERT(portNum < this->getNum_from_faultOut(),static_cast<AssertArg>(portNum));
+    return &this->m_from_faultOut[portNum];
   }
 
 #if FW_ENABLE_TEXT_LOGGING == 1
@@ -488,6 +702,22 @@ namespace Svc {
   // ----------------------------------------------------------------------
   // Static functions for from ports
   // ----------------------------------------------------------------------
+
+  void FileDownlinkTesterBase ::
+    from_buffSendOutReturn_static(
+        Fw::PassiveComponentBase *const callComp,
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer fwBuffer
+    )
+  {
+    FW_ASSERT(callComp);
+    FileDownlinkTesterBase* _testerBase = 
+      static_cast<FileDownlinkTesterBase*>(callComp);
+    _testerBase->from_buffSendOutReturn_handlerBase(
+        portNum,
+        fwBuffer
+    );
+  }
 
   Fw::Buffer FileDownlinkTesterBase ::
     from_bufferGetCaller_static(
@@ -518,6 +748,23 @@ namespace Svc {
     _testerBase->from_bufferSendOut_handlerBase(
         portNum,
         fwBuffer
+    );
+  }
+
+  void FileDownlinkTesterBase ::
+    from_faultOut_static(
+        Fw::PassiveComponentBase *const callComp,
+        const NATIVE_INT_TYPE portNum,
+        U32 FaultID,
+        U32 eventContext
+    )
+  {
+    FW_ASSERT(callComp);
+    FileDownlinkTesterBase* _testerBase = 
+      static_cast<FileDownlinkTesterBase*>(callComp);
+    _testerBase->from_faultOut_handlerBase(
+        portNum,
+        FaultID, eventContext
     );
   }
 
@@ -591,16 +838,15 @@ namespace Svc {
   }
 #endif
 
-  void FileDownlinkTesterBase ::
+  Fw::Time FileDownlinkTesterBase ::
     from_timeCaller_static(
         Fw::PassiveComponentBase *const component,
-        const NATIVE_INT_TYPE portNum,
-        Fw::Time& time
+        const NATIVE_INT_TYPE portNum
     )
   {
     FileDownlinkTesterBase* _testerBase =
       static_cast<FileDownlinkTesterBase*>(component);
-    time = _testerBase->m_testTime;
+    return _testerBase->m_testTime;
   }
 
   // ----------------------------------------------------------------------
@@ -611,8 +857,26 @@ namespace Svc {
     clearFromPortHistory(void)
   {
     this->fromPortHistorySize = 0;
+    this->fromPortHistory_buffSendOutReturn->clear();
     this->fromPortHistory_bufferGetCaller->clear();
     this->fromPortHistory_bufferSendOut->clear();
+    this->fromPortHistory_faultOut->clear();
+  }
+
+  // ---------------------------------------------------------------------- 
+  // From port: buffSendOutReturn
+  // ---------------------------------------------------------------------- 
+
+  void FileDownlinkTesterBase ::
+    pushFromPortEntry_buffSendOutReturn(
+        Fw::Buffer fwBuffer
+    )
+  {
+    FromPortEntry_buffSendOutReturn _e = {
+      fwBuffer
+    };
+    this->fromPortHistory_buffSendOutReturn->push_back(_e);
+    ++this->fromPortHistorySize;
   }
 
   // ---------------------------------------------------------------------- 
@@ -647,9 +911,39 @@ namespace Svc {
     ++this->fromPortHistorySize;
   }
 
+  // ---------------------------------------------------------------------- 
+  // From port: faultOut
+  // ---------------------------------------------------------------------- 
+
+  void FileDownlinkTesterBase ::
+    pushFromPortEntry_faultOut(
+        U32 FaultID,
+        U32 eventContext
+    )
+  {
+    FromPortEntry_faultOut _e = {
+      FaultID, eventContext
+    };
+    this->fromPortHistory_faultOut->push_back(_e);
+    ++this->fromPortHistorySize;
+  }
+
   // ----------------------------------------------------------------------
   // Handler base functions for from ports
   // ----------------------------------------------------------------------
+
+  void FileDownlinkTesterBase ::
+    from_buffSendOutReturn_handlerBase(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer fwBuffer
+    )
+  {
+    FW_ASSERT(portNum < this->getNum_from_buffSendOutReturn(),static_cast<AssertArg>(portNum));
+    this->from_buffSendOutReturn_handler(
+        portNum,
+        fwBuffer
+    );
+  }
 
   Fw::Buffer FileDownlinkTesterBase ::
     from_bufferGetCaller_handlerBase(
@@ -677,6 +971,20 @@ namespace Svc {
     );
   }
 
+  void FileDownlinkTesterBase ::
+    from_faultOut_handlerBase(
+        const NATIVE_INT_TYPE portNum,
+        U32 FaultID,
+        U32 eventContext
+    )
+  {
+    FW_ASSERT(portNum < this->getNum_from_faultOut(),static_cast<AssertArg>(portNum));
+    this->from_faultOut_handler(
+        portNum,
+        FaultID, eventContext
+    );
+  }
+
   // ----------------------------------------------------------------------
   // Command response handling
   // ----------------------------------------------------------------------
@@ -693,11 +1001,11 @@ namespace Svc {
   }
 
   // ---------------------------------------------------------------------- 
-  // Command: FileDownlink_SendFile
+  // Command: FILE_DWN_SEND_FILE
   // ---------------------------------------------------------------------- 
 
   void FileDownlinkTesterBase ::
-    sendCmd_FileDownlink_SendFile(
+    sendCmd_FILE_DWN_SEND_FILE(
         const NATIVE_INT_TYPE instance,
         const U32 cmdSeq,
         const Fw::CmdStringArg& sourceFileName,
@@ -717,8 +1025,7 @@ namespace Svc {
     // Call output command port
     
     FwOpcodeType _opcode;
-    const U32 idBase = this->getIdBase();
-    _opcode = FileDownlinkComponentBase::OPCODE_FILEDOWNLINK_SENDFILE + idBase;
+    _opcode = FileDownlinkComponentBase::OPCODE_FILE_DWN_SEND_FILE;
 
     if (this->m_to_cmdIn[0].isConnected()) {
       this->m_to_cmdIn[0].invoke(
@@ -734,11 +1041,11 @@ namespace Svc {
   }
 
   // ---------------------------------------------------------------------- 
-  // Command: FileDownlink_Cancel
+  // Command: FILE_DWN_CANCEL
   // ---------------------------------------------------------------------- 
 
   void FileDownlinkTesterBase ::
-    sendCmd_FileDownlink_Cancel(
+    sendCmd_FILE_DWN_CANCEL(
         const NATIVE_INT_TYPE instance,
         const U32 cmdSeq
     )
@@ -751,8 +1058,7 @@ namespace Svc {
     // Call output command port
     
     FwOpcodeType _opcode;
-    const U32 idBase = this->getIdBase();
-    _opcode = FileDownlinkComponentBase::OPCODE_FILEDOWNLINK_CANCEL + idBase;
+    _opcode = FileDownlinkComponentBase::OPCODE_FILE_DWN_CANCEL;
 
     if (this->m_to_cmdIn[0].isConnected()) {
       this->m_to_cmdIn[0].invoke(
@@ -767,25 +1073,52 @@ namespace Svc {
 
   }
 
-  
+  // ---------------------------------------------------------------------- 
+  // Command: FILE_DWN_SEND_PARTIAL
+  // ---------------------------------------------------------------------- 
+
   void FileDownlinkTesterBase ::
-    sendRawCmd(FwOpcodeType opcode, U32 cmdSeq, Fw::CmdArgBuffer& args) {
-       
-    const U32 idBase = this->getIdBase();   
-    FwOpcodeType _opcode = opcode + idBase;
+    sendCmd_FILE_DWN_SEND_PARTIAL(
+        const NATIVE_INT_TYPE instance,
+        const U32 cmdSeq,
+        const Fw::CmdStringArg& sourceFileName,
+        const Fw::CmdStringArg& destFileName,
+        U32 startOffset,
+        U32 length
+    )
+  {
+
+    // Serialize arguments
+
+    Fw::CmdArgBuffer buff;
+    Fw::SerializeStatus _status;
+    _status = buff.serialize(sourceFileName);
+    FW_ASSERT(_status == Fw::FW_SERIALIZE_OK,static_cast<AssertArg>(_status));
+    _status = buff.serialize(destFileName);
+    FW_ASSERT(_status == Fw::FW_SERIALIZE_OK,static_cast<AssertArg>(_status));
+    _status = buff.serialize(startOffset);
+    FW_ASSERT(_status == Fw::FW_SERIALIZE_OK,static_cast<AssertArg>(_status));
+    _status = buff.serialize(length);
+    FW_ASSERT(_status == Fw::FW_SERIALIZE_OK,static_cast<AssertArg>(_status));
+
+    // Call output command port
+    
+    FwOpcodeType _opcode;
+    _opcode = FileDownlinkComponentBase::OPCODE_FILE_DWN_SEND_PARTIAL;
+
     if (this->m_to_cmdIn[0].isConnected()) {
       this->m_to_cmdIn[0].invoke(
           _opcode,
           cmdSeq,
-          args
+          buff
       );
     }
     else {
       printf("Test Command Output port not connected!\n");
     }
-        
+
   }
-  
+
   // ----------------------------------------------------------------------
   // History 
   // ----------------------------------------------------------------------
@@ -824,10 +1157,7 @@ namespace Svc {
 
     val.resetDeser();
 
-    const U32 idBase = this->getIdBase();
-    FW_ASSERT(id >= idBase, id, idBase);
-
-    switch (id - idBase) {
+    switch (id) {
 
       case FileDownlinkComponentBase::CHANNELID_FILEDOWNLINK_FILESSENT:
       {
@@ -943,14 +1273,24 @@ namespace Svc {
 
     args.resetDeser();
 
-    const U32 idBase = this->getIdBase();
-    FW_ASSERT(id >= idBase, id, idBase);
-    switch (id - idBase) {
+    switch (id) {
 
       case FileDownlinkComponentBase::EVENTID_FILEDOWNLINK_FILEOPENERROR: 
       {
 
-        Fw::SerializeStatus _status;
+        Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_AMPCS_COMPATIBLE
+        // Deserialize the number of arguments.
+        U8 _numArgs;
+        _status = args.deserialize(_numArgs);
+        FW_ASSERT(
+          _status == Fw::FW_SERIALIZE_OK,
+          static_cast<AssertArg>(_status)
+        );
+        // verify they match expected.
+        FW_ASSERT(_numArgs == 1,_numArgs,1);
+        
+#endif    
         Fw::LogStringArg fileName;
         _status = args.deserialize(fileName);
         FW_ASSERT(
@@ -967,7 +1307,19 @@ namespace Svc {
       case FileDownlinkComponentBase::EVENTID_FILEDOWNLINK_FILEREADERROR: 
       {
 
-        Fw::SerializeStatus _status;
+        Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_AMPCS_COMPATIBLE
+        // Deserialize the number of arguments.
+        U8 _numArgs;
+        _status = args.deserialize(_numArgs);
+        FW_ASSERT(
+          _status == Fw::FW_SERIALIZE_OK,
+          static_cast<AssertArg>(_status)
+        );
+        // verify they match expected.
+        FW_ASSERT(_numArgs == 1,_numArgs,1);
+        
+#endif    
         Fw::LogStringArg fileName;
         _status = args.deserialize(fileName);
         FW_ASSERT(
@@ -984,7 +1336,19 @@ namespace Svc {
       case FileDownlinkComponentBase::EVENTID_FILEDOWNLINK_FILESENT: 
       {
 
-        Fw::SerializeStatus _status;
+        Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_AMPCS_COMPATIBLE
+        // Deserialize the number of arguments.
+        U8 _numArgs;
+        _status = args.deserialize(_numArgs);
+        FW_ASSERT(
+          _status == Fw::FW_SERIALIZE_OK,
+          static_cast<AssertArg>(_status)
+        );
+        // verify they match expected.
+        FW_ASSERT(_numArgs == 2,_numArgs,2);
+        
+#endif    
         Fw::LogStringArg sourceFileName;
         _status = args.deserialize(sourceFileName);
         FW_ASSERT(
@@ -1008,7 +1372,19 @@ namespace Svc {
       case FileDownlinkComponentBase::EVENTID_FILEDOWNLINK_DOWNLINKCANCELED: 
       {
 
-        Fw::SerializeStatus _status;
+        Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_AMPCS_COMPATIBLE
+        // Deserialize the number of arguments.
+        U8 _numArgs;
+        _status = args.deserialize(_numArgs);
+        FW_ASSERT(
+          _status == Fw::FW_SERIALIZE_OK,
+          static_cast<AssertArg>(_status)
+        );
+        // verify they match expected.
+        FW_ASSERT(_numArgs == 2,_numArgs,2);
+        
+#endif    
         Fw::LogStringArg sourceFileName;
         _status = args.deserialize(sourceFileName);
         FW_ASSERT(
@@ -1024,6 +1400,116 @@ namespace Svc {
         );
 
         this->logIn_ACTIVITY_HI_FileDownlink_DownlinkCanceled(sourceFileName, destFileName);
+
+        break;
+
+      }
+
+      case FileDownlinkComponentBase::EVENTID_FILEDOWNLINK_DOWNLINKTIMEOUT: 
+      {
+
+        Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_AMPCS_COMPATIBLE
+        // Deserialize the number of arguments.
+        U8 _numArgs;
+        _status = args.deserialize(_numArgs);
+        FW_ASSERT(
+          _status == Fw::FW_SERIALIZE_OK,
+          static_cast<AssertArg>(_status)
+        );
+        // verify they match expected.
+        FW_ASSERT(_numArgs == 2,_numArgs,2);
+        
+#endif    
+        Fw::LogStringArg sourceFileName;
+        _status = args.deserialize(sourceFileName);
+        FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+        );
+
+        Fw::LogStringArg destFileName;
+        _status = args.deserialize(destFileName);
+        FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+        );
+
+        this->logIn_WARNING_HI_FileDownlink_DownlinkTimeout(sourceFileName, destFileName);
+
+        break;
+
+      }
+
+      case FileDownlinkComponentBase::EVENTID_FILEDOWNLINK_DOWNLINKPARTIALFAIL: 
+      {
+
+        Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_AMPCS_COMPATIBLE
+        // Deserialize the number of arguments.
+        U8 _numArgs;
+        _status = args.deserialize(_numArgs);
+        FW_ASSERT(
+          _status == Fw::FW_SERIALIZE_OK,
+          static_cast<AssertArg>(_status)
+        );
+        // verify they match expected.
+        FW_ASSERT(_numArgs == 4,_numArgs,4);
+        
+#endif    
+        Fw::LogStringArg sourceFileName;
+        _status = args.deserialize(sourceFileName);
+        FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+        );
+
+        Fw::LogStringArg destFileName;
+        _status = args.deserialize(destFileName);
+        FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+        );
+
+        U32 startOffset;
+#if FW_AMPCS_COMPATIBLE
+        {
+          // Deserialize the argument size
+          U8 _argSize;
+          _status = args.deserialize(_argSize);
+          FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+          );
+          FW_ASSERT(_argSize == sizeof(U32),_argSize,sizeof(U32));
+        }
+#endif      
+        _status = args.deserialize(startOffset);
+        FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+        );
+
+        U32 length;
+#if FW_AMPCS_COMPATIBLE
+        {
+          // Deserialize the argument size
+          U8 _argSize;
+          _status = args.deserialize(_argSize);
+          FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+          );
+          FW_ASSERT(_argSize == sizeof(U32),_argSize,sizeof(U32));
+        }
+#endif      
+        _status = args.deserialize(length);
+        FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+        );
+
+        this->logIn_WARNING_LO_FileDownlink_DownlinkPartialFail(sourceFileName, destFileName, startOffset, length);
 
         break;
 
@@ -1046,6 +1532,8 @@ namespace Svc {
     this->eventHistory_FileDownlink_FileReadError->clear();
     this->eventHistory_FileDownlink_FileSent->clear();
     this->eventHistory_FileDownlink_DownlinkCanceled->clear();
+    this->eventHistory_FileDownlink_DownlinkTimeout->clear();
+    this->eventHistory_FileDownlink_DownlinkPartialFail->clear();
   }
 
 #if FW_ENABLE_TEXT_LOGGING
@@ -1189,6 +1677,42 @@ namespace Svc {
       sourceFileName, destFileName
     };
     eventHistory_FileDownlink_DownlinkCanceled->push_back(e);
+    ++this->eventsSize;
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: FileDownlink_DownlinkTimeout 
+  // ----------------------------------------------------------------------
+
+  void FileDownlinkTesterBase ::
+    logIn_WARNING_HI_FileDownlink_DownlinkTimeout(
+        Fw::LogStringArg& sourceFileName,
+        Fw::LogStringArg& destFileName
+    )
+  {
+    EventEntry_FileDownlink_DownlinkTimeout e = {
+      sourceFileName, destFileName
+    };
+    eventHistory_FileDownlink_DownlinkTimeout->push_back(e);
+    ++this->eventsSize;
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: FileDownlink_DownlinkPartialFail 
+  // ----------------------------------------------------------------------
+
+  void FileDownlinkTesterBase ::
+    logIn_WARNING_LO_FileDownlink_DownlinkPartialFail(
+        Fw::LogStringArg& sourceFileName,
+        Fw::LogStringArg& destFileName,
+        U32 startOffset,
+        U32 length
+    )
+  {
+    EventEntry_FileDownlink_DownlinkPartialFail e = {
+      sourceFileName, destFileName, startOffset, length
+    };
+    eventHistory_FileDownlink_DownlinkPartialFail->push_back(e);
     ++this->eventsSize;
   }
 
