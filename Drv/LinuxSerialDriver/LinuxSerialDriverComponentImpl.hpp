@@ -23,6 +23,7 @@
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentAc.hpp>
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImplCfg.hpp>
 #include <Os/Mutex.hpp>
+#include <Os/Task.hpp>
 
 namespace Drv {
 

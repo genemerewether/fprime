@@ -23,6 +23,8 @@
 #include "Svc/UdpReceiver/UdpReceiverComponentAc.hpp"
 #include "Svc/UdpReceiver/UdpReceiverComponentImplCfg.hpp"
 
+#include "Os/Task.hpp"
+
 namespace Svc {
 
   class UdpReceiverComponentImpl :
