@@ -121,6 +121,14 @@ class XmlComponentParser(object):
             namespace_name = component.attrib['namespace']
         else:
             namespace_name = None
+
+        if 'ipc' in component.attrib:
+            ipc = True
+            if component.attrib['ipc'] != "true":
+                PRINT.info("%s: Component %s: \"ipc\" attribute must be \"true\" or not present"%(xml_file,component_name))            
+                sys.exit(-1)
+        else:
+            ipc = False
             
         if 'modeler' in component.attrib:
             modeler = True
@@ -135,7 +143,7 @@ class XmlComponentParser(object):
             PRINT.info("%s: Component %s: \"kind\" attribute must be \"passive\",\"queued\", or \"active\""%(xml_file,component_name))            
             sys.exit(-1)
             
-        self.__component = Component(namespace_name,component_name,component.attrib['kind'],None,modeler)
+        self.__component = Component(namespace_name,component_name,component.attrib['kind'],None,ipc,modeler)
         
         for comp_tag in component:
             if comp_tag.tag == 'comment':
@@ -1037,7 +1045,7 @@ class Component(object):
     """
     Data container for a component.
     """
-    def __init__(self, namespace=None, name=None, kind=None, comment=None, modeler=False):
+    def __init__(self, namespace=None, name=None, kind=None, comment=None, ipc=False, modeler=False):
         """
         Constructor
         """
@@ -1045,6 +1053,7 @@ class Component(object):
         self.__name = name
         self.__kind = kind
         self.__comment = comment
+        self.__ipc = ipc
         self.__modeler = modeler
 
     def get_namespace(self):
@@ -1055,6 +1064,8 @@ class Component(object):
         return self.__kind
     def get_comment(self):
         return self.__comment
+    def get_ipc(self):
+        return self.__ipc
     def get_modeler(self):
         return self.__modeler
     def set_comment(self, comment):

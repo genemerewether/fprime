@@ -213,7 +213,7 @@ namespace Svc {
         unsigned long cbSize = 0u;
         unsigned long crSize = 0u;
         switch (camFrame.getformat()) {
-            case CAMFMT_IMG_RTE_YUV420SP:
+            case CAMFMT_IMG_HIRES_YUV420SP:
             {
                 tjSamp = TJSAMP_420;
                 ySize = tjPlaneSizeYUV(0, camFrame.getwidth(), strides[0],
@@ -229,7 +229,7 @@ namespace Svc {
                     // NOTE(mereweth) - interleaved anyway
                     //((U64) planes[2] <= (U64) planes[1])                ||
                     (ySize + cbSize + crSize > imgBufSize))             {
-                    DEBUG_PRINT("RTE_YUV420SP too big; planes: [%llu,%llu,%llu], imgBufData %llu, imgBufSize %llu\n",
+                    DEBUG_PRINT("HIRES_YUV420SP too big; planes: [%llu,%llu,%llu], imgBufData %llu, imgBufSize %llu\n",
                                 (U64) planes[0], (U64) planes[1], (U64) planes[2],
                                 (U64) imgBufData, (U64) imgBufSize);
                     this->log_WARNING_HI_IMGCOMP_BadSetting(portNum);
@@ -269,8 +269,8 @@ namespace Svc {
                 planes[1] = tempPlane;
             }
                 break;
-            case CAMFMT_IMG_NCAM_GRAY:
-            case CAMFMT_IMG_RTE_GRAY:
+            case CAMFMT_IMG_MVCAM_GRAY:
+            case CAMFMT_IMG_HIRES_GRAY:
                 tjFlags |= TJXOPT_GRAY;
                 tjSamp = TJSAMP_GRAY;
                 ySize = tjPlaneSizeYUV(0, camFrame.getwidth(), strides[0],
@@ -315,8 +315,8 @@ namespace Svc {
                 return;
             }
                 break;
-            case CAMFMT_IMG_NCAM_RAW:
-            case CAMFMT_IMG_RTE_RAW: // for debugging
+            case CAMFMT_IMG_MVCAM_RAW:
+            case CAMFMT_IMG_HIRES_RAW: // for debugging
                 DEBUG_PRINT("ImgComp got a raw format image\n");
                 this->log_WARNING_HI_IMGCOMP_BadSetting(portNum);
                 this->uncompressedReturn_out(portNum, imgBuffer);

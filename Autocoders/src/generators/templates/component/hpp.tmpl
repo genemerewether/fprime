@@ -23,7 +23,21 @@
 \#include <Fw/Cfg/Config.hpp>
 \#include <Fw/Port/InputSerializePort.hpp>
 \#include <Fw/Port/OutputSerializePort.hpp>
+#if $kind == "passive":
+\#include <Fw/Comp/PassiveComponentBase.hpp>
+#else if $kind == "queued":
+#if $ipc
+\#include <Fw/Comp/IPCQueuedComponentBase.hpp>
+#else
+\#include <Fw/Comp/QueuedComponentBase.hpp>
+#end if
+#else:
+#if $ipc
+\#include <Fw/Comp/IPCActiveComponentBase.hpp>
+#else
 \#include <Fw/Comp/ActiveComponentBase.hpp>
+#end if
+#end if
 #if $has_guarded_ports or $has_parameters
 \#include <Os/Mutex.hpp>
 #end if
@@ -77,9 +91,17 @@ namespace ${namespace} {
 #if $kind == "passive":
     public Fw::PassiveComponentBase
 #else if $kind == "queued":
+#if $ipc
+    public Fw::IPCQueuedComponentBase
+#else
     public Fw::QueuedComponentBase
+#end if
 #else:
+#if $ipc
+    public Fw::IPCActiveComponentBase
+#else
     public Fw::ActiveComponentBase
+#end if
 #end if
   {
 

@@ -18,6 +18,7 @@ enum {
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
+#include <Fw/Types/MmapAllocator.hpp>
 
 #if defined TGT_OS_TYPE_LINUX || TGT_OS_TYPE_DARWIN
 #include <getopt.h>
@@ -34,11 +35,7 @@ enum {
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
-/*#ifdef BUILD_SDFLIGHT
-#define PRM_PATH "/usr/share/data/adsp/PrmDb.dat"
-#else*/
 #define PRM_PATH "PrmDb.dat"
-//#endif
 
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
@@ -69,6 +66,8 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 
 SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
+SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;
+SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
@@ -77,6 +76,10 @@ Svc::UdpReceiverComponentImpl* udpReceiver_ptr = 0;
 
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
+Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
+
+Fw::MallocAllocator buffMallocator;
+Fw::MmapAllocator hiresMallocator;
 
 void allocComps() {
     // Component instance pointers
@@ -187,6 +190,18 @@ void allocComps() {
 #endif
 ;
 
+    mvCam_ptr = new SnapdragonFlight::MVCamComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("MVCAM")
+#endif
+;
+
+    hiresCam_ptr = new SnapdragonFlight::HiresCamComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("HIRESCAM")
+#endif
+;
+ 
     hexRouter_ptr = new SnapdragonFlight::HexRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HEXRTR")
@@ -304,11 +319,35 @@ void manualConstruct() {
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
     udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn__InputPort(7));
 #endif
+
+    hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
+    // doesn't matter which compCmdStat port # for cmdDisp
+    ipcRelay_ptr->set_proc2Out_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+
+    hiresCam_ptr->set_Tlm_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(1));
+    // doesn't matter which TlmRecv port # for pktTlm
+    ipcRelay_ptr->set_proc2Out_OutputPort(1, chanTlm_ptr->get_TlmRecv_InputPort(0));
+
+    hiresCam_ptr->set_Log_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(2));
+    // doesn't matter which LogRecv port # for eventLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(2, eventLogger_ptr->get_LogRecv_InputPort(0));
+
+    hiresCam_ptr->set_LogText_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(3));
+    // doesn't matter which TextLogger port # for textLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(3, textLogger_ptr->get_TextLogger_InputPort(0));
+
+    /*hiresCam_ptr->set_ProcSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(4));
+    ipcRelay_ptr->set_proc2Out_OutputPort(4, buffAccumPreCmpHires_ptr->get_bufferSendInFill_InputPort(0));
+
+    hiresCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(5));
+    ipcRelay_ptr->set_proc2Out_OutputPort(5, buffAccumHires_ptr->get_bufferSendInFill_InputPort(0));*/
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
                   char* udp_string, char* hostname,
-                  unsigned int boot_count) {
+                  unsigned int boot_count,
+		  bool &isChild,
+		  bool startSocketNow) {
     allocComps();
   
     localTargetInit();
@@ -359,6 +398,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
+    mvCam_ptr->init(60, 0);
+    hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size
     sdRosIface_ptr->init(0);
     
@@ -395,6 +436,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
     snapHealth_ptr->regCommands();
+    mvCam_ptr->regCommands();
+    hiresCam_ptr->regCommands();
 
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
@@ -408,6 +451,37 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);
     serialTextConv_ptr->set_log_file(logFileName, 100*1024, 0);
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+    COMPILE_TIME_ASSERT(200 <= SnapdragonFlight::MVCAM_IMG_LP_BUFFER_POOL_SIZE,
+                        NCAM_IMG_LP_BUFFER_ENOUGH);
+    COMPILE_TIME_ASSERT(10 <= SnapdragonFlight::HIRESCAM_MAX_NUM_BUFFERS,
+                        RCAM_BUFFER_ENOUGH);
+    #pragma GCC diagnostic pop
+
+    mvCam_ptr->allocateBuffers(0, buffMallocator,
+			       SnapdragonFlight::MVCAM_IMG_HP_BUFFER_POOL_SIZE,
+			       200);
+    hiresCam_ptr->allocateBuffers(0, hiresMallocator, 10);
+    
+    isChild = false;
+// fork works just fine on Darwin; just haven't got POSIX mq for IPC ports
+#if defined TGT_OS_TYPE_LINUX
+    int childPID = hiresCam_ptr->spawnChild();
+    if (childPID == 0) { // we are in the child process
+        isChild = true;
+#endif
+
+    hiresCam_ptr->start(0,40,20*1024);
+
+#if defined TGT_OS_TYPE_LINUX
+        return; // don't start any other threads in the child
+    }
+#endif
+    
+    // NOTE(mereweth) - putting this near the top in case we want to fork in ipcRelay instead
+    ipcRelay_ptr->start(0,30,20*1024);
     
     // Active component startup
     // start rate groups
@@ -426,6 +500,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     snapHealth_ptr->start(0,40,20*1024);
 
+    mvCam_ptr->start(0, 80, 20*1024);
     hexRouter_ptr->start(0, 90, 20*1024);//, CORE_RPC);
 
     llRouter_ptr->start(0, 85, 20*1024);
@@ -471,10 +546,18 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     
     // Initialize socket server
     if (port_number && hostname) {
-        sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
+        if (startSocketNow) {
+	    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
+        } else {
+	    sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname);
+        }
     }
     if (ll_port_number && hostname) {
-        sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
+        if (startSocketNow) {
+            sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
+        } else {
+	    sockGndIfLL_ptr->setSocketTaskProperties(40, 20*1024, ll_port_number, hostname);
+        }
     }
 
     if (udp_string) {
@@ -510,7 +593,23 @@ void runcycles(NATIVE_INT_TYPE cycles) {
     }
 }
 
-void exitTasks(void) {
+void exitTasks(bool isChild) {
+#if defined TGT_OS_TYPE_LINUX
+    if (isChild) {
+#endif
+        hiresCam_ptr->exit();
+        hiresCam_ptr->deallocateBuffers(hiresMallocator);
+        hiresCam_ptr->join(NULL);
+#if defined TGT_OS_TYPE_LINUX
+        return;
+    }
+#endif
+
+    ipcRelay_ptr->exit();
+
+    mvCam_ptr->exit();
+    mvCam_ptr->deallocateBuffers(buffMallocator);
+    mvCam_ptr->join(NULL);
     hexRouter_ptr->quitReadThreads();
     
 #ifdef LLROUTER_DEVICES
@@ -538,7 +637,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n-b\tBoot count\n");
+    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n-b\tBoot count\n-s\tStart socket immediately\n");
 }
 
 
@@ -574,12 +673,14 @@ int main(int argc, char* argv[]) {
     char *hostname = NULL;
     char* udp_string = 0;
     bool local_cycle = true;
+    bool isChild = false;
+    bool startSocketNow = false;
     U32 boot_count = 0;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlp:x:a:u:o:b:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlps:x:a:u:o:b:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -614,6 +715,9 @@ int main(int argc, char* argv[]) {
                 kraitCycle = true;
                 hexCycle = false;
                 break;
+            case 's':
+                startSocketNow = true;
+                break;
             case '?':
                 return 1;
             default:
@@ -640,7 +744,8 @@ int main(int argc, char* argv[]) {
     }
 #endif
     
-    constructApp(port_number, ll_port_number, udp_string, hostname, boot_count);
+    constructApp(port_number, ll_port_number, udp_string, hostname, boot_count,
+		 isChild, startSocketNow);
     //dumparch();
 
     ros::start();
@@ -697,7 +802,7 @@ int main(int argc, char* argv[]) {
     // stop tasks
     DEBUG_PRINT("Stopping tasks\n");
     ros::shutdown();
-    exitTasks();
+    exitTasks(isChild);
 
     if (hexCycle) {
         DEBUG_PRINT("Waiting for the runner to return\n");

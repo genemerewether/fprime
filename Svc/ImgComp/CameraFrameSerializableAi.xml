@@ -84,11 +84,11 @@
         </member>
         <member name="format" type="ENUM" comment="Detailed formatting info of frame">
             <enum name="CameraFormatType">
-                <item name="CAMFMT_IMG_NCAM_RAW" comment="10 bit Ncam"/>
-                <item name="CAMFMT_IMG_NCAM_GRAY" comment="8 bit Ncam, grayscale"/>
-                <item name="CAMFMT_IMG_RTE_RAW" comment="10 bit Rte"/>
-                <item name="CAMFMT_IMG_RTE_GRAY" comment="8 bit Rte, grayscale"/>
-                <item name="CAMFMT_IMG_RTE_YUV420SP" comment="8 bit Rte, 4:2:0, YUV"/>
+                <item name="CAMFMT_IMG_MVCAM_RAW" comment="10 bit MVCam"/>
+                <item name="CAMFMT_IMG_MVCAM_GRAY" comment="8 bit MVCam, grayscale"/>
+                <item name="CAMFMT_IMG_HIRES_RAW" comment="10 bit Hires"/>
+                <item name="CAMFMT_IMG_HIRES_GRAY" comment="8 bit Hires, grayscale"/>
+                <item name="CAMFMT_IMG_HIRES_YUV420SP" comment="8 bit Hires, 4:2:0, YUV"/>
                 <item name="CAMFMT_IMG_JPEG" comment="JPEG compressed"/>
                 <item name="CAMFMT_IMG_UNKNOWN" comment="unknown type"/>
             </enum>

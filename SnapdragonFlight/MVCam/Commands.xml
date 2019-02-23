@@ -1,0 +1,189 @@
+    <commands>
+        <command kind="async" opcode="0" mnemonic="MVCAM_SET_LOGGING" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="LogMode">
+                        <item name="LOGGING_ALL"/>
+                        <item name="LOGGING_UNPROC"/>
+                        <item name="LOGGING_PROC"/>
+                        <item name="LOGGING_WAYPT"/>
+                        <item name="LOGGING_OFF"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Turn on logging images to a file</comment>
+        </command>
+        <command kind="async" opcode="1" mnemonic="MVCAM_ADD_WAYPOINT" >
+            <args>
+                <arg name="waypoint" type="U32">
+                </arg>
+                <arg name="destination" type="ENUM">
+                    <enum name="WayptDestination">
+                        <item name="WAYPT_STORAGE"/>
+                        <item name="WAYPT_XMIT"/>
+                        <item name="WAYPT_STORAGE_XMIT"/>
+                        <item name="WAYPT_UNPROC"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+            <comment>Add a waypoint</comment>
+        </command>
+        <command kind="async" opcode="2" mnemonic="MVCAM_TAKE_IMG" >
+            <comment>Take a still image</comment>
+            <args>
+                <arg name="destination" type="ENUM">
+                    <enum name="TakeImgDestination">
+                        <item name="TAKE_IMG_STORAGE"/>
+                        <item name="TAKE_IMG_XMIT"/>
+                        <item name="TAKE_IMG_STORAGE_XMIT"/>
+                        <item name="TAKE_IMG_UNPROC"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="3" mnemonic="MVCAM_ACTIVATE" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="MVCamActive">
+                        <item name="IMAGING_ON"/>
+                        <item name="IMAGING_OFF"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Turn imaging on or off</comment>
+        </command>
+        <command kind="async" opcode="4" mnemonic="MVCAM_TOGGLE_FIXED_EXPOSURE" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="ExposureMode">
+                        <item name="EXPOSURE_AUTO"/>
+                        <item name="EXPOSURE_FIXED"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Switch between fixed- and auto-exposure</comment>
+        </command>
+        <command kind="async" opcode="5" mnemonic="MVCAM_SET_EXPOSURE_GAIN" >
+            <args>
+                <arg name="exposure" type="U32">
+                </arg>
+                <arg name="gain" type="U32">
+                </arg>
+            </args>
+            <comment>Set fixed exposure and gain values</comment>
+        </command>
+        <command kind="async" opcode="6" mnemonic="MVCAM_OVERRIDE_POSTPROC" >
+            <args>
+                <arg name="brightness" type="U32">
+                  <comment>min=0, max=6, step=1</comment>
+                </arg>
+                <arg name="contrast" type="U32">
+                  <comment>min=0, max=10, step=1</comment>
+                </arg>
+                <arg name="iso" type="ENUM">
+                    <enum name="PostProcISO">
+                        <item name="POSTPROC_ISO_AUTO"/>
+                        <item name="POSTPROC_ISO_HJR"/>
+                        <item name="POSTPROC_ISO100"/>
+                        <item name="POSTPROC_ISO200"/>
+                        <item name="POSTPROC_ISO400"/>
+                        <item name="POSTPROC_ISO800"/>
+                        <item name="POSTPROC_ISO1600"/>
+                        <item name="POSTPROC_ISO3200"/>
+                    </enum>
+                </arg>
+                <arg name="sharpness" type="U32">
+                  <comment>min=0, max=36, step=6</comment>
+                </arg>
+            </args>
+            <comment>Set camera pipeline postproc parameters</comment>
+        </command>
+        <command kind="async" opcode="7" mnemonic="MVCAM_WAYPOINT_TEST" >
+            <args>
+                <arg name="index" type="U32">
+                </arg>
+            </args>
+            <comment>Manually trigger a waypoint image like port call would</comment>
+        </command>
+        <command kind="async" opcode="8" mnemonic="MVCAM_TEST_IMG" >
+            <comment>Send a still image test pattern</comment>
+            <args>
+                <arg name="destination" type="ENUM">
+                    <comment>Manually keep in sync with CameraFrameSerializable</comment>
+                    <enum name="TestImgDestination">
+                        <item name="TEST_IMG_STORAGE"/>
+                        <item name="TEST_IMG_XMIT"/>
+                        <item name="TEST_IMG_STORAGE_XMIT"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="9" mnemonic="MVCAM_SET_EXP_PARMS" >
+            <comment>Set the MVCam MV CPA exposure parameters; defaults in Cfg.hpp</comment>
+            <args>
+                <arg name="max_change" type="U16">
+                    <comment>Max frame to frame exposure change; between 1 and 500, inclusive</comment>
+                </arg>
+                <arg name="exposure_cost" type="F32">
+                    <comment>MV CPA cost mode exposure cost</comment>
+                </arg>
+                <arg name="gain_cost" type="F32">
+                    <comment>MV CPA cost mode gain cost</comment>
+                </arg>
+                <arg name="max_exposure" type="U16">
+                    <comment>MV CPA max exposure</comment>
+                </arg>
+                <arg name="max_gain" type="U16">
+                    <comment>MV CPA max gain</comment>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="10" mnemonic="MVCAM_FLIGHT_MODE" >
+            <comment>Toggle delivery of images to GNC and frame-to-frame autoexposure clamp</comment>
+            <args>
+                <arg name="mode" type="ENUM">
+                    <enum name="MVCamFlightMode">
+                        <item name="MVCAM_MODE_PREFLIGHT"/>
+                        <item name="MVCAM_MODE_FLIGHT"/>
+                    </enum>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="11" mnemonic="MVCAM_IMG_TLM_MODE" >
+            <comment>Toggle image telemetry</comment>
+            <args>
+                <arg name="mode" type="ENUM">
+                    <enum name="MVCamImgTlmMode">
+                        <item name="MVCAM_IMG_TLM_OFF"/>
+                        <item name="MVCAM_IMG_TLM_ON"/>
+                    </enum>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="12" mnemonic="MVCAM_SET_CALLBACK" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="CallbackType">
+                        <item name="CALLBACK_8BIT"/>
+                        <item name="CALLBACK_10BIT"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Switch between 8-bit and 10-bit callbacks</comment>
+        </command>
+        <command kind="async" opcode="13" mnemonic="MVCAM_SET_LOG_SKIP" >
+            <args>
+                <arg name="skipCount" type="U32">
+                </arg>
+            </args>
+        </command>
+  </commands>

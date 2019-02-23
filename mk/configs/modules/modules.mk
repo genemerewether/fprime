@@ -106,7 +106,8 @@ SVC_MODULES := \
 	Svc/Tee \
 	Svc/ActiveDecoupler \
 	Svc/UdpSender \
-	Svc/UdpReceiver
+	Svc/UdpReceiver \
+	Svc/IPCRelay
 
 DRV_MODULES := \
 	Drv/DataTypes \
@@ -143,7 +144,9 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter \
 	SnapdragonFlight/DspRpcAllocator \
-	SnapdragonFlight/SnapdragonHealth 
+	SnapdragonFlight/SnapdragonHealth \
+	SnapdragonFlight/MVCam \
+	SnapdragonFlight/HiresCam
 
 HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \

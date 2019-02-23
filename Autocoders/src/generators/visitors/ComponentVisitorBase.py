@@ -738,6 +738,7 @@ class ComponentVisitorBase(AbstractVisitor.AbstractVisitor):
         c.date = d.strftime("%A, %d %B %Y")
         c.kind = obj.get_kind()
         c.modeler = obj.get_modeler()
+        c.ipc = obj.get_ipc()
         c.name = obj.get_name
         c.component_base = c.name() + "ComponentBase"
         if obj.get_namespace() == None:

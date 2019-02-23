@@ -7,6 +7,7 @@ typedef enum {
     AFL_HLROSIFACE_ODOMNOCOV, 
     AFL_HLROSIFACE_ACCEL_CMD,
     AFL_ACTADAP_ESC,
+    AFL_MVCAM_CALLBACK,
     NUM_AFL_STREAMS,
 } active_file_logger_stream_t;
 

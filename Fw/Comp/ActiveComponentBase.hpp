@@ -20,6 +20,7 @@ namespace Fw {
     class ActiveComponentBase : public QueuedComponentBase {
         public:
             void start(NATIVE_INT_TYPE identifier, NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize, NATIVE_INT_TYPE cpuAffinity = -1); //!< called by instantiator when task is to be started
+            Os::Task::TaskStatus join(void **value_ptr); //!< provide return value of thread if value_ptr is not NULL
 
         PROTECTED:
 #if FW_OBJECT_NAMES == 1
