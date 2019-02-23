@@ -448,8 +448,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
     snapHealth_ptr->regCommands();
-    //mvCam_ptr->regCommands();
-    //hiresCam_ptr->regCommands();
+    mvCam_ptr->regCommands();
+    hiresCam_ptr->regCommands();
 
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
