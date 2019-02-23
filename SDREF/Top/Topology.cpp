@@ -194,25 +194,25 @@ void allocComps() {
                         ("SDHEALTH")
 #endif
 ;
-
-    ipcRelay_ptr = new Svc::IPCRelayComponentImpl
-#if FW_OBJECT_NAMES == 1
-                        ("IPCRELAY")
-#endif
-;
     
     mvCam_ptr = new SnapdragonFlight::MVCamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("MVCAM")
 #endif
 ;
-
+    
+    ipcRelay_ptr = new Svc::IPCRelayComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("IPCRELAY")
+#endif
+;
+    
     hiresCam_ptr = new SnapdragonFlight::HiresCamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HIRESCAM")
 #endif
 ;
- 
+
     hexRouter_ptr = new SnapdragonFlight::HexRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HEXRTR")
@@ -330,7 +330,7 @@ void manualConstruct() {
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
     udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn__InputPort(7));
 #endif
-
+    
     hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
     // doesn't matter which compCmdStat port # for cmdDisp
     ipcRelay_ptr->set_proc2Out_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
@@ -409,8 +409,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
-    ipcRelay_ptr->init(60, 0);
     mvCam_ptr->init(60, 0);
+    ipcRelay_ptr->init(60, 0);
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size
     sdRosIface_ptr->init(0);
@@ -799,7 +799,12 @@ int main(int argc, char* argv[]) {
     int cycle = 0;
 
     while (!terminate) {
-	//DEBUG_PRINT("Cycle %d\n",cycle);
+        if (isChild) {
+	    //DEBUG_PRINT("Child Cycle %d\n",cycle);
+	}
+	else {
+	    //DEBUG_PRINT("Parent Cycle %d\n",cycle);
+	}
 	if (local_cycle && !isChild) {
 	    runcycles(1);
 	} else {
