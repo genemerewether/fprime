@@ -9,8 +9,9 @@ enum {
     CORE_2 = 2,
     CORE_3 = 3,
 
-    CORE_CDH = CORE_1,
-    CORE_RPC = CORE_2
+    CORE_CDH = CORE_0,
+    CORE_RPC = CORE_1,
+    CORE_CAM = CORE_2
 };
 
 #include <Fw/Types/Assert.hpp>
@@ -28,6 +29,10 @@ enum {
 
 #ifdef BUILD_SDFLIGHT
 #include <HEXREF/Rpc/hexref.h>
+#endif
+
+#if defined TGT_OS_TYPE_LINUX
+#include <sys/wait.h>
 #endif
 
 //#define LLROUTER_DEVICES
@@ -443,8 +448,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fileLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
     snapHealth_ptr->regCommands();
-    mvCam_ptr->regCommands();
-    hiresCam_ptr->regCommands();
+    //mvCam_ptr->regCommands();
+    //hiresCam_ptr->regCommands();
 
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
@@ -480,7 +485,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         isChild = true;
 #endif
 
-    hiresCam_ptr->start(0,40,20*1024);
+        hiresCam_ptr->start(0,40,20*1024, CORE_CAM);
 
 #if defined TGT_OS_TYPE_LINUX
         return; // don't start any other threads in the child
@@ -507,15 +512,15 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     snapHealth_ptr->start(0,40,20*1024);
 
-    mvCam_ptr->start(0, 80, 20*1024);
-    hexRouter_ptr->start(0, 90, 20*1024);//, CORE_RPC);
+    mvCam_ptr->start(0, 80, 20*1024, CORE_CAM);
+    hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
 
     fileLogger_ptr->start(0,50,20*1024);
     
-    hexRouter_ptr->startPortReadThread(90,20*1024); //, CORE_RPC);
+    hexRouter_ptr->startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_RPC);
 
 #ifdef LLROUTER_DEVICES
@@ -755,75 +760,89 @@ int main(int argc, char* argv[]) {
 		 isChild, startSocketNow);
     //dumparch();
 
-    ros::start();
-
-    sdRosIface_ptr->startPub();
-    sdRosIface_ptr->startIntTask(30, 5*1000*1024);
-
     Os::Task task;
     Os::Task waiter;
-    Os::TaskString waiter_task_name("WAITER");
+    
+    if (!isChild) {
+        ros::start();
+
+        sdRosIface_ptr->startPub();
+        sdRosIface_ptr->startIntTask(30, 5*1000*1024);
+
+        Os::TaskString waiter_task_name("WAITER");
 #ifdef BUILD_SDFLIGHT
-    // TODO(mereweth) - test that calling other functions before init has no effect
-    //hexref_rpc_relay_buff_allocate(10);
-    if (hexCycle) {
-        Os::TaskString task_name("HEXRPC");
-        DEBUG_PRINT("Starting cycler on hexagon\n");
-        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
-    }
-    waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
+        // TODO(mereweth) - test that calling other functions before init has no effect
+        //hexref_rpc_relay_buff_allocate(10);
+        if (hexCycle) {
+            Os::TaskString task_name("HEXRPC");
+            DEBUG_PRINT("Starting cycler on hexagon\n");
+            task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+        }
+        waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
 #else
-    if (hexCycle) {
-        Os::TaskString task_name("DUMMY");
-        task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
-    }
-    waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+        if (hexCycle) {
+            Os::TaskString task_name("DUMMY");
+            task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+        }
+        waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
 #endif //BUILD_SDFLIGHT
 
 #ifdef BUILD_SDFLIGHT
-    if (kraitCycle) {
-        DEBUG_PRINT("Cycling from Krait\n");
-        hexref_cycle(numKraitCycles);
-    }
+        if (kraitCycle) {
+            DEBUG_PRINT("Cycling from Krait\n");
+            hexref_cycle(numKraitCycles);
+        }
 #endif //BUILD_SDFLIGHT
+	
+    } //!isChild
 
     int cycle = 0;
 
     while (!terminate) {
-      //DEBUG_PRINT("Cycle %d\n",cycle);
-      if (local_cycle) {
-        runcycles(1);
-      } else {
-        Os::Task::delay(1000);
-      }
-      cycle++;
+	//DEBUG_PRINT("Cycle %d\n",cycle);
+	if (local_cycle && !isChild) {
+	    runcycles(1);
+	} else {
+	    Os::Task::delay(1000);
+	}
+	cycle++;
     }
 
+    if (!isChild) {
 #ifdef BUILD_SDFLIGHT
-    if (!noFini) {
-        DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
-        hexref_fini();
-    }
+	if (!noFini) {
+	    DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
+	    hexref_fini();
+	}
 #endif //BUILD_SDFLIGHT
 
-    // stop tasks
-    DEBUG_PRINT("Stopping tasks\n");
-    ros::shutdown();
+	// stop tasks
+	DEBUG_PRINT("Stopping tasks\n");
+	ros::shutdown();
+    } // !isChild
+    
     exitTasks(isChild);
 
-    if (hexCycle) {
-        DEBUG_PRINT("Waiting for the runner to return\n");
-        FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
-    }
+    if (!isChild) {
+	if (hexCycle) {
+	    DEBUG_PRINT("Waiting for the runner to return\n");
+	    FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+	}
 
-    DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
-    FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
+	DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
+	FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
+    } // !isChild
 
     // Give time for threads to exit
+#if defined TGT_OS_TYPE_LINUX
+    if (!isChild) {
+        (void) printf("Waiting for child...\n");
+        wait(NULL);
+#endif
     (void) printf("Waiting for threads...\n");
     Os::Task::delay(1000);
 
     (void) printf("Exiting...\n");
-
+    }
     return 0;
 }
