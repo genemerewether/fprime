@@ -30,6 +30,7 @@
 #include "mav_msgs/FlatOutput.h"
 #include "mav_msgs/ImuStateUpdate.h"
 
+#include "Os/Task.hpp"
 #include "Os/Mutex.hpp"
 
 namespace HLProc {

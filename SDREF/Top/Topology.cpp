@@ -485,7 +485,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         isChild = true;
 #endif
 
-        hiresCam_ptr->start(0,40,20*1024, CORE_CAM);
+        hiresCam_ptr->start(0,40,5*1000*1024, CORE_CAM);
 
 #if defined TGT_OS_TYPE_LINUX
         return; // don't start any other threads in the child
@@ -512,7 +512,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     snapHealth_ptr->start(0,40,20*1024);
 
-    mvCam_ptr->start(0, 80, 20*1024, CORE_CAM);
+    mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
     llRouter_ptr->start(0, 85, 20*1024);
@@ -692,7 +692,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlps:x:a:u:o:b:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlsp:x:a:u:o:b:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
