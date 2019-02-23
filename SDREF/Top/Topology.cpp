@@ -190,6 +190,12 @@ void allocComps() {
 #endif
 ;
 
+    ipcRelay_ptr = new Svc::IPCRelayComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("IPCRELAY")
+#endif
+;
+    
     mvCam_ptr = new SnapdragonFlight::MVCamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("MVCAM")
@@ -398,6 +404,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
+    ipcRelay_ptr->init(60, 0);
     mvCam_ptr->init(60, 0);
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size
