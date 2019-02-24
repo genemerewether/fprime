@@ -399,7 +399,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     prmDb_ptr->init(10,0);
     snapHealth_ptr->init(10,0);
     snapHealth_ptr->setBootCount(boot_count);
-    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_ON);
+    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_DYNAMIC);
 
     sockGndIf_ptr->init(0);
     sockGndIfLL_ptr->init(0);

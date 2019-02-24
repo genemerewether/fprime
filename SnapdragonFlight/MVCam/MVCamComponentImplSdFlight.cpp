@@ -708,15 +708,18 @@ namespace SnapdragonFlight {
               // Either: high priority always-send
               // Or, we are logging, or saving just next frame
               if (((i == MVCAM_GNC_OUT) &&
+		   //isConnected_Gnc_OutputPort(0) &&
                    (m_flightMode == MVCAM_MODE_FLIGHT))                    ||
 
                   ((i == MVCAM_UNPROC_OUT) && (m_logMode != LOGGING_OFF) &&
+		   isConnected_UnprocSend_OutputPort(0) &&
                    (((m_lpImageSkipCount >= m_lpImageSkip) &&
                      ((m_logMode == LOGGING_ALL) || (m_logMode == LOGGING_UNPROC)))
                      ||
                     m_saveNextFrameUnproc))                               ||
 
                   ((i == MVCAM_PROC_OUT) && (m_logMode != LOGGING_OFF) &&
+		   isConnected_ProcSend_OutputPort(0) &&
                    (((m_lpImageSkipCount >= m_lpImageSkip) &&
                      ((m_logMode == LOGGING_ALL) || (m_logMode == LOGGING_PROC)))
                      ||

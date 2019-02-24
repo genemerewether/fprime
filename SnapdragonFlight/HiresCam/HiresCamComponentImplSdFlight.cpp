@@ -446,11 +446,13 @@ namespace SnapdragonFlight {
 
         for(PortOutType i = HIRESCAM_OUT_MIN; i < HIRESCAM_OUT_MAX; i = (PortOutType) ((int) i+1)) {
             if (((i == HIRESCAM_UNPROC_OUT) && (m_logMode != LOGGING_OFF) &&
+		 isConnected_UnprocSend_OutputPort(0) &&
                  ((m_logMode == LOGGING_ALL)    ||
                   (m_logMode == LOGGING_UNPROC) ||
                   m_saveNextFrameUnproc))                   ||
 
                 ((i == HIRESCAM_PROC_OUT) && (m_logMode != LOGGING_OFF) &&
+		 isConnected_ProcSend_OutputPort(0) &&
                  ((m_logMode == LOGGING_ALL)  ||
                   (m_logMode == LOGGING_PROC) ||
                   m_saveNextFrameProc)))                    {
