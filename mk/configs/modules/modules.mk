@@ -146,7 +146,8 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/DspRpcAllocator \
 	SnapdragonFlight/SnapdragonHealth \
 	SnapdragonFlight/MVCam \
-	SnapdragonFlight/HiresCam
+	SnapdragonFlight/HiresCam \
+	SnapdragonFlight/MVVislam
 
 HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \

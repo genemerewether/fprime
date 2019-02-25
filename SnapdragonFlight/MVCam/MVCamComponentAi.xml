@@ -2,7 +2,7 @@
 <?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
 <component name="MVCam" kind="active" namespace="SnapdragonFlight" modeler="true">
-
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
@@ -26,6 +26,9 @@
             <comment>
             Log data to file
             </comment>
+        </port>
+
+        <port name="GncBufferSend" data_type="ROS::sensor_msgs::Image"  kind="output"    max_number="1">
         </port>
 
         <port name="WaypointRecv" data_type="U32Idx"  kind="async_input"    max_number="1">

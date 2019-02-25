@@ -624,7 +624,7 @@ namespace SnapdragonFlight {
               // Either: high priority always-send
               // Or, we are logging, or saving just next frame
               if (((i == MVCAM_GNC_OUT) &&
-		   //isConnected_Gnc_OutputPort(0) &&
+                   isConnected_GncBufferSend_OutputPort(0) &&
                    (m_flightMode == MVCAM_MODE_FLIGHT))                    ||
 
                   ((i == MVCAM_UNPROC_OUT) && (m_logMode != LOGGING_OFF) &&
@@ -682,29 +682,37 @@ namespace SnapdragonFlight {
                       memcpy((void*)ptr, frame->data,
                              static_cast<size_t>(MVCAM_IMAGE_SIZE));
 
+                      U32 tempSec = static_cast<U32>(timestamp_realtime);
+                      U32 tempUsec = static_cast<U32>((timestamp_realtime
+                                                       - tempSec)
+                                                      * 1000.0f * 1000.0f);
+                      Fw::Time hwTime(TB_WORKSTATION_TIME,
+                                      tempSec,
+                                      tempUsec);
                       switch (i) {
                           case MVCAM_GNC_OUT:
                               DEBUG_PRINT("\nMVCam Sending image out on GNC image port; i = %d\n", i);
-                              //TODO(mereweth) - send image out!!!!
+                              ROS::sensor_msgs::Image image;
+                              image.setdata(buff);
+                              image.setheight(MVCAM_IMAGE_HEIGHT);
+                              image.setwidth(MVCAM_IMAGE_WIDTH);
+                              image.setstep(MVCAM_IMAGE_STRIDE);
+                              image.setheader(ROS::std_msgs::Header(m_imagesAcquired,
+                                                                    hwTime, 2/*"optic"*/));
+                              GncBufferSend_out(0, image);
                               break;
                           case MVCAM_UNPROC_OUT:
                           case MVCAM_PROC_OUT:
                           {
                               const U32 offsets[3] = {0u, 0u, 0u};
                               const U32 strides[3] = {MVCAM_IMAGE_WIDTH, 0u, 0u};
-			      Svc::CameraFrame camFrame;
+                              Svc::CameraFrame camFrame;
                               camFrame.settype(Svc::CAMFRAME_STILL);
                               camFrame.setformat(Svc::CAMFMT_IMG_MVCAM_GRAY);
                               camFrame.setdestination(m_camFrameDest);
                               camFrame.setquality(m_compQuality);
                               camFrame.settimestamp(this->getTime());
-                              U32 tempSec = static_cast<U32>(timestamp_realtime);
-                              U32 tempUsec = static_cast<U32>((timestamp_realtime
-                                                               - tempSec)
-                                                               * 1000.0f * 1000.0f);
-                              camFrame.sethwTimestamp(Fw::Time(TB_WORKSTATION_TIME,
-                                                               tempSec,
-                                                               tempUsec));
+                              camFrame.sethwTimestamp(hwTime);
                               camFrame.setsize(MVCAM_IMAGE_SIZE);
                               camFrame.setwidth(MVCAM_IMAGE_WIDTH);
                               camFrame.setheight(MVCAM_IMAGE_HEIGHT);

@@ -71,8 +71,9 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 
 SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
-SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;
-SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
+SnapdragonFlight::MVCamComponentImpl* mvCam_ptr = 0;
+SnapdragonFlight::MVVislamComponentImpl* mvVislam_ptr = 0;
+SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
@@ -200,6 +201,12 @@ void allocComps() {
                         ("MVCAM")
 #endif
 ;
+
+    mvVislam_ptr = new SnapdragonFlight::MVVislamComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("MVVISLAM")
+#endif
+;
     
     ipcRelay_ptr = new Svc::IPCRelayComponentImpl
 #if FW_OBJECT_NAMES == 1
@@ -294,7 +301,7 @@ void manualConstruct() {
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
-    hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(3, sdRosIface_ptr->get_AccelCommand_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
@@ -303,7 +310,7 @@ void manualConstruct() {
     
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(2, hexRouter_ptr->get_Sched_InputPort(0));
     
-    sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
+    mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
@@ -315,14 +322,14 @@ void manualConstruct() {
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
-    llRouter_ptr->set_LLPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(3, sdRosIface_ptr->get_AccelCommand_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
     
-    sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
+    mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
@@ -410,6 +417,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fatalHandler_ptr->init(0);
 
     mvCam_ptr->init(60, 0);
+    mvVislam_ptr->init(60, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size
@@ -449,6 +457,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     prmDb_ptr->regCommands();
     snapHealth_ptr->regCommands();
     mvCam_ptr->regCommands();
+    mvVislam_ptr->regCommands();
     hiresCam_ptr->regCommands();
 
     llRouter_ptr->regCommands();
@@ -513,6 +522,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     snapHealth_ptr->start(0,40,20*1024);
 
     mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
+    mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
     llRouter_ptr->start(0, 85, 20*1024);
@@ -628,7 +638,8 @@ void exitTasks(bool isChild) {
     serialDriverLL_ptr->quitReadThread();
     serialDriverDebug_ptr->quitReadThread();
 #endif
-    
+
+    mvVislam_ptr->exit();    
     llRouter_ptr->exit();
     serialTextConv_ptr->exit();
     
