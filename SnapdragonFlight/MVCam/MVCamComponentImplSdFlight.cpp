@@ -155,14 +155,11 @@ namespace SnapdragonFlight {
       }
 
       // Except for Sharpness, these are the default values
-      m_params.setBrightness(static_cast<NATIVE_UINT_TYPE>
-                                                    (MVCAM_POSTPROC_BRIGHTNESS));
-      m_params.setContrast(static_cast<NATIVE_UINT_TYPE>
-                                                    (MVCAM_POSTPROC_CONTRAST));
-      m_params.setISO(MVCAM_POSTPROC_ISO);
+      m_params.setBrightness(m_brightness);
+      m_params.setContrast(m_contrast);
+      m_params.setISO(ISOToString(m_iso));
       //params_.setWhiteBalance("auto"); // no significant difference
-      m_params.setSharpness(static_cast<NATIVE_UINT_TYPE>
-                                                    (MVCAM_POSTPROC_SHARPNESS));
+      m_params.setSharpness(m_sharpness);
 
       // TODO(mereweth@jpl.nasa.gov) - this seems to have no effect
       const camera::Range fpsRange = camera::Range(30000, 30000, 0);
@@ -181,15 +178,9 @@ namespace SnapdragonFlight {
           return;
       }
 
-      m_mvCPAConfig.width         = static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_WIDTH);
-      m_mvCPAConfig.height        = static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_HEIGHT);
-      m_mvCPAConfig.cpaType       = static_cast<MVCPA_MODE>(MVCAM_CPA_TYPE);
-      m_mvCPAConfig.format        = MVCPA_FORMAT_GRAY8;
-      m_mvCPAConfig.legacyCost.startExposure = MVCAM_START_EXPOSURE;
-      m_mvCPAConfig.legacyCost.startGain     = MVCAM_START_GAIN;
-      m_mvCPAConfig.legacyCost.filterSize    = static_cast<NATIVE_UINT_TYPE>(MVCAM_CPA_FILTER_SIZE);
-      m_mvCPAConfig.legacyCost.gainCost      = MVCAM_GAIN_COST;
-      m_mvCPAConfig.legacyCost.exposureCost  = MVCAM_EXPOSURE_COST;
+      // rest of parameters set in parametersUpdated call
+      m_mvCPAConfig.width  = static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_WIDTH);
+      m_mvCPAConfig.height = static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_HEIGHT);
 
       m_mvCPAPtr = mvCPA_Initialize(&m_mvCPAConfig);
       if (m_mvCPAPtr == NULL) {
@@ -319,31 +310,9 @@ namespace SnapdragonFlight {
   }
 
   NATIVE_INT_TYPE MVCamComponentImpl ::
-    setExposureGain(NATIVE_UINT_TYPE exposure, NATIVE_UINT_TYPE gain)
-  {
-      if ((exposure > static_cast<NATIVE_UINT_TYPE>(MVCAM_MAX_EXPOSURE)) ||
-          (gain > static_cast<NATIVE_UINT_TYPE>(MVCAM_MAX_GAIN))) {
-          return -1;
-      }
-      m_captureParamsLock.lock();
-
-      m_exposureTargetTrunc = exposure;
-      m_gainTargetTrunc     = gain;
-      m_exposureTarget      = exposure;
-      m_gainTarget          = gain;
-
-      m_params.setManualExposure(static_cast<NATIVE_INT_TYPE>(exposure));
-      m_params.setManualGain(static_cast<NATIVE_INT_TYPE>(gain));
-      int stat = m_params.commit();
-
-      m_captureParamsLock.unLock();
-      return stat;
-  }
-
-  NATIVE_INT_TYPE MVCamComponentImpl ::
     setCallbackType(CallbackType type)
   {
-      switch (m_callbackType) {
+      switch (type) {
           case CALLBACK_8BIT:
               /* NOTE(mereweth@jpl.nasa.gov) - we only save MVCAM_IMAGE_SIZE bytes;
               * The numbers here indicate the size of the buffer we receive, which will
@@ -366,64 +335,11 @@ namespace SnapdragonFlight {
               m_params.set("raw-size", "640x480");
               break;
           default:
-              DEBUG_PRINT("Unhandled camera callback type %d\n", m_callbackType);
-              FW_ASSERT(0, m_callbackType);
+              DEBUG_PRINT("Unhandled camera callback type %d\n", type);
+              FW_ASSERT(0, type);
               return -1;
       }
-      int stat = m_params.commit();
-      if (!stat) {
-          m_callbackType = type;
-      }
-
-      return stat;
-  }
-
-  NATIVE_INT_TYPE MVCamComponentImpl ::
-    setPostprocParams(U32 brightness,
-                      U32 contrast,
-                      PostProcISO iso,
-                      U32 sharpness)
-  {
-      m_captureParamsLock.lock();
-
-      m_params.setBrightness(static_cast<NATIVE_INT_TYPE>(brightness));
-      m_params.setContrast(static_cast<NATIVE_INT_TYPE>(contrast));
-      m_params.setSharpness(static_cast<NATIVE_INT_TYPE>(sharpness));
-
-      switch (iso) {
-          case POSTPROC_ISO_AUTO:
-              m_params.setISO("auto");
-              break;
-          case POSTPROC_ISO_HJR:
-              m_params.setISO("ISO_HJR");
-              break;
-          case POSTPROC_ISO100:
-              m_params.setISO("ISO100");
-              break;
-          case POSTPROC_ISO200:
-              m_params.setISO("ISO200");
-              break;
-          case POSTPROC_ISO400:
-              m_params.setISO("ISO400");
-              break;
-          case POSTPROC_ISO800:
-              m_params.setISO("ISO800");
-              break;
-          case POSTPROC_ISO1600:
-              m_params.setISO("ISO1600");
-              break;
-          case POSTPROC_ISO3200:
-              m_params.setISO("ISO3200");
-              break;
-          default:
-              DEBUG_PRINT("Unknown ISO mode %d in setPostprocParams\n",
-                          iso);
-      }
-
-      int stat = m_params.commit();
-
-      m_captureParamsLock.unLock();
-      return stat;
+      return m_params.commit();
   }
 
   // ----------------------------------------------------------------------
@@ -505,60 +421,6 @@ namespace SnapdragonFlight {
       DEBUG_PRINT("\ncorrection %.9f, timestamp_realtime (s) %.9f\n",
                   0.0/*timestamp_ns*/, timestamp_realtime);
 
-      // Truncate (when using 10bit callback) before AOI test and exposure calculation in old autoexposure
-      if (m_callbackType == CALLBACK_10BIT) {
-          NATIVE_UINT_TYPE src = 0;
-          for (NATIVE_UINT_TYPE dst = 0; dst < MVCAM_IMAGE_SIZE; dst+=4) {
-#if MVCAM_TRUNC
-              frame->data[dst]   = frame->data[src];
-              frame->data[dst+1] = frame->data[src+1];
-              frame->data[dst+2] = frame->data[src+2];
-              frame->data[dst+3] = frame->data[src+3];
-#elif MVCAM_SCALE
-              NATIVE_UINT_TYPE pixel = 0;
-              // TODO(mereweth@jpl.nasa.gov) - truncate or round here?
-              pixel = (frame->data[src] << 2) + ((frame->data[src+4] & 0xc0) >> 6);
-              frame->data[dst] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
-
-              pixel = (frame->data[src+1] << 2) + ((frame->data[src+4] & 0x30) >> 4);
-              frame->data[dst+1] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
-
-              pixel = (frame->data[src+2] << 2) + ((frame->data[src+4] & 0x0c) >> 2);
-              frame->data[dst+2] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
-
-              pixel = (frame->data[src+3] << 2) + (frame->data[src+4] & 0x03);
-              frame->data[dst+3] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
-#endif // TRUNC
-
-              src += 5;
-          }
-      }
-
-#if MVCAM_TEST_NAV_AOI
-      {
-          FILE* filp = fopen("/home/linaro/TEST_NAV_AOI.raw", "wb");
-          if (filp == NULL) {
-              printf("Could not create AOI test file\n");
-          }
-          else {
-              uint8_t *ptr = static_cast<uint8_t *>(frame->data)
-                  + static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_START_ROW * MVCAM_IMAGE_WIDTH
-                  + MVCAM_AOI_START_COL);
-              for (int i = 0; i < MVCAM_AOI_HEIGHT; i++) {
-                  fwrite((const void*)ptr,
-                         1,
-                         static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_WIDTH),
-                         filp);
-                  ptr += static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_STRIDE);
-              }
-
-              fclose(filp);
-          }
-
-          filp = NULL;
-      }
-#endif //MVCAM_TEST_NAV_AOI
-
 #ifdef DEBUG_MODE
       gettimeofday(&tv,NULL);
       DEBUG_PRINT("\nTaking m_captureParamsLock in preview callback %d at time %f\n",
@@ -629,22 +491,21 @@ namespace SnapdragonFlight {
           mvCPA_AddFrame(m_mvCPAPtr,
                          static_cast<uint8_t *>(frame->data)
                          + static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_START_ROW * MVCAM_IMAGE_WIDTH
+                             * ((CALLBACK_10BIT == m_callbackType) ? 10 / 8 : 1)
                              + MVCAM_AOI_START_COL),
                          static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_STRIDE));
 
           mvCPA_GetValues(m_mvCPAPtr, &cpaExposure, &cpaGain);
-          cpaExposure = MVCAM_MIN_EXPOSURE +
-              cpaExposure * (m_maxExposureScale - MVCAM_MIN_EXPOSURE);
-          cpaGain     = MVCAM_MIN_GAIN +
-              cpaGain * (m_maxGainScale - MVCAM_MIN_GAIN);
+          cpaExposure = m_exposureMin + cpaExposure * m_exposureScale;
+          cpaGain     = m_gainMin + cpaGain * m_gainScale;
 
           /* MV autoexposure should never return negative values, and our
            * calculation should never scale them to become negative
            */
-          if ((cpaExposure < MVCAM_MIN_EXPOSURE)  ||
-              (cpaExposure > m_maxExposureScale) ||
-              (cpaGain < MVCAM_MIN_GAIN)          ||
-              (cpaGain > m_maxGainScale))         {
+          if ((cpaExposure < m_exposureMin)  ||
+              (cpaExposure > m_exposureMax) ||
+              (cpaGain < m_gainMin)          ||
+              (cpaGain > m_gainMax))         {
 
               this->log_WARNING_HI_MVCAM_CameraError(MVCAM_CPA_ERR);
               //TODO(mereweth) - set floating point telemetry here to see what went wrong?
@@ -653,7 +514,7 @@ namespace SnapdragonFlight {
               tempExposureTrunc = round(cpaExposure);
               tempGainTrunc     = round(cpaGain);
 
-              if (m_exposureMode == EXPOSURE_AUTO) {
+              if (m_exposureMode != EXPOSURE_FIXED) {
                   if (tempExposureTrunc > m_exposureTargetTrunc + m_maxExposureDelta) {
                       if (m_flightMode == MVCAM_MODE_FLIGHT) {
                           ++m_numMaxExposureDelta;
@@ -675,12 +536,12 @@ namespace SnapdragonFlight {
               }
 
               if ((abs(tempExposureTrunc - m_exposureTargetTrunc) >=
-                   static_cast<NATIVE_INT_TYPE>(MVCAM_CPA_EXPOSURE_CHANGE_THRESHOLD)) ||
+                   m_exposureChangeThreshold) ||
                   (abs(tempGainTrunc - m_gainTargetTrunc) >=
-                   static_cast<NATIVE_INT_TYPE>(MVCAM_CPA_GAIN_CHANGE_THRESHOLD))) {
+                   m_gainChangeThreshold)) {
 
                   DEBUG_PRINT("Exposure diff %d\n", abs(tempExposureTrunc - m_exposureTargetTrunc));
-                  if (m_exposureMode == EXPOSURE_AUTO) {
+                  if (m_exposureMode != EXPOSURE_FIXED) {
                       m_params.setManualExposure(static_cast<NATIVE_INT_TYPE>(tempExposureTrunc));
                       m_params.setManualGain(static_cast<NATIVE_INT_TYPE>(tempGainTrunc));
                       stat = m_params.commit();
@@ -698,6 +559,61 @@ namespace SnapdragonFlight {
               }
           }
       }
+
+      // Truncate (when using 10bit callback) before AOI test and image send on ports
+      if (m_callbackType == CALLBACK_10BIT) {
+          NATIVE_UINT_TYPE src = 0;
+          for (NATIVE_UINT_TYPE dst = 0; dst < MVCAM_IMAGE_SIZE; dst+=4) {
+#if MVCAM_TRUNC
+              frame->data[dst]   = frame->data[src];
+              frame->data[dst+1] = frame->data[src+1];
+              frame->data[dst+2] = frame->data[src+2];
+              frame->data[dst+3] = frame->data[src+3];
+#elif MVCAM_SCALE
+              NATIVE_UINT_TYPE pixel = 0;
+              // TODO(mereweth@jpl.nasa.gov) - truncate or round here?
+              pixel = (frame->data[src] << 2) + ((frame->data[src+4] & 0xc0) >> 6);
+              frame->data[dst] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
+
+              pixel = (frame->data[src+1] << 2) + ((frame->data[src+4] & 0x30) >> 4);
+              frame->data[dst+1] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
+
+              pixel = (frame->data[src+2] << 2) + ((frame->data[src+4] & 0x0c) >> 2);
+              frame->data[dst+2] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
+
+              pixel = (frame->data[src+3] << 2) + (frame->data[src+4] & 0x03);
+              frame->data[dst+3] = static_cast<NATIVE_UINT_TYPE>(round(255.0 * pixel / 1023.0));
+#endif // TRUNC
+
+              src += 5;
+          }
+      }
+
+#if MVCAM_TEST_NAV_AOI
+      {
+          FILE* filp = fopen("/home/linaro/TEST_NAV_AOI.raw", "wb");
+          if (filp == NULL) {
+              printf("Could not create AOI test file\n");
+          }
+          else {
+              uint8_t *ptr = static_cast<uint8_t *>(frame->data)
+                  + static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_START_ROW * MVCAM_IMAGE_WIDTH
+                      * ((CALLBACK_10BIT == m_callbackType) ? 10 / 8 : 1)
+                      + MVCAM_AOI_START_COL);
+              for (int i = 0; i < MVCAM_AOI_HEIGHT; i++) {
+                  fwrite((const void*)ptr,
+                         1,
+                         static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_WIDTH),
+                         filp);
+                  ptr += static_cast<NATIVE_UINT_TYPE>(MVCAM_AOI_STRIDE);
+              }
+
+              fclose(filp);
+          }
+
+          filp = NULL;
+      }
+#endif //MVCAM_TEST_NAV_AOI
 
       // m_frameSkip controls
       if (m_frameCounter >= m_frameSkip) {

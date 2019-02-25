@@ -18,6 +18,7 @@
     <import_dictionary>SnapdragonFlight/MVCam/Commands.xml</import_dictionary>
     <import_dictionary>SnapdragonFlight/MVCam/Telemetry.xml</import_dictionary>
     <import_dictionary>SnapdragonFlight/MVCam/Events.xml</import_dictionary>
+    <import_dictionary>SnapdragonFlight/MVCam/Params.xml</import_dictionary>
     <ports>
 
         <!-- File logger output port -->

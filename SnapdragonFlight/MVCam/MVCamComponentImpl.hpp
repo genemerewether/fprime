@@ -100,6 +100,9 @@ namespace SnapdragonFlight {
       void deallocateBuffers(Fw::MemAllocator& allocator);
 
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -183,34 +186,6 @@ namespace SnapdragonFlight {
           MVCamActive Mode
       );
 
-      //! Implementation for MVCAM_TOGGLE_FIXED_EXPOSURE command handler
-      //! Switch between fixed- and auto-exposure
-      void MVCAM_TOGGLE_FIXED_EXPOSURE_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          ExposureMode Mode
-      );
-
-      //! Implementation for MVCAM_SET_EXPOSURE_GAIN command handler
-      //! Set fixed exposure and gain values
-      void MVCAM_SET_EXPOSURE_GAIN_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          U32 exposure,
-          U32 gain
-      );
-
-      //! Implementation for MVCAM_OVERRIDE_POSTPROC command handler
-      //! Set camera pipeline postproc parameters
-      void MVCAM_OVERRIDE_POSTPROC_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          U32 brightness,
-          U32 contrast,
-          PostProcISO iso,
-          U32 sharpness
-      );
-
       //! Implementation for MVCAM_WAYPOINT_TEST command handler
       //! Manually trigger a waypoint image like port call would
       void MVCAM_WAYPOINT_TEST_cmdHandler(
@@ -228,18 +203,6 @@ namespace SnapdragonFlight {
           U8 quality /*!< Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough*/
       );
 
-      //! Implementation for MVCAM_SET_EXP_PARMS command handler
-      //! Set the MVCam MV CPA exposure parameters; defaults in Cfg.hpp
-      void MVCAM_SET_EXP_PARMS_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          U16 max_change, /*!< Max frame to frame exposure change; between 1 and 500, inclusive*/
-          F32 exposure_cost, /*!< MV CPA cost mode exposure cost*/
-          F32 gain_cost, /*!< MV CPA cost mode gain cost*/
-          U16 max_exposure,
-          U16 max_gain
-      );
-
       //! Implementation for MVCAM_FLIGHT_MODE command handler
       //! Toggle frame notifications to GNC
       void MVCAM_FLIGHT_MODE_cmdHandler(
@@ -254,14 +217,6 @@ namespace SnapdragonFlight {
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq, /*!< The command sequence number*/
           MVCamImgTlmMode mode
-      );
-
-      //! Implementation for MVCAM_SET_CALLBACK command handler
-      //! Switch between 8-bit and 10-bit callbacks
-      void MVCAM_SET_CALLBACK_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          CallbackType Mode
       );
 
       //! Implementation for MVCAM_SET_LOG_SKIP command handler
@@ -310,20 +265,11 @@ namespace SnapdragonFlight {
       //!
       NATIVE_INT_TYPE deactivate(void);
 
-      //! Set manual exposure and manual gain - only called if in FIXED exposure mode
-      //!
-      NATIVE_INT_TYPE setExposureGain(NATIVE_UINT_TYPE exposure, NATIVE_UINT_TYPE gain);
-
       //! Set callback type
       //!
       NATIVE_INT_TYPE setCallbackType(CallbackType type);
 
-      //! Set postproc parameters
-      //!
-      NATIVE_INT_TYPE setPostprocParams(U32 brightness,
-                                        U32 contrast,
-                                        PostProcISO iso,
-                                        U32 sharpness);
+      const char* ISOToString(PostProcISO iso);
 
     PRIVATE:
 
@@ -476,11 +422,23 @@ namespace SnapdragonFlight {
 
       //! Exposure setpoint after roundoff, for telemetry
       //!
-      NATIVE_UINT_TYPE m_exposureTargetTrunc;
+      U16 m_exposureTargetTrunc;
 
       //! Gain setpoint after roundoff, for telemetry
       //!
-      NATIVE_UINT_TYPE m_gainTargetTrunc;
+      U8 m_gainTargetTrunc;
+
+      U16 m_exposureChangeThreshold;
+      U8 m_gainChangeThreshold;
+      U16 m_exposureMin;
+      U16 m_exposureMax;
+      U8 m_gainMin;
+      U8 m_gainMax;
+
+      U8 m_brightness;
+      U8 m_contrast;
+      U8 m_sharpness;
+      PostProcISO m_iso;
 
       //! Mutex lock to protect save and cycle parameters
       //!
@@ -526,13 +484,13 @@ namespace SnapdragonFlight {
       //!
       U32 m_maxExposureDelta;
 
-      //! Max value for scaling exposure
+      //! range for scaling exposure
       //!
-      U32 m_maxExposureScale;
+      U32 m_exposureScale;
 
-      //! Max value for scaling gain
+      //! range Max value for scaling gain
       //!
-      U32 m_maxGainScale;
+      U32 m_gainScale;
 
       U32 m_numNoHPBuffers;
       U32 m_numNoLPBuffers;

@@ -88,25 +88,8 @@ namespace SnapdragonFlight {
         return 0;
     }
 
-
-    NATIVE_INT_TYPE MVCamComponentImpl ::
-      setExposureGain(NATIVE_UINT_TYPE exposure, NATIVE_UINT_TYPE gain)
-    {
-        return 0;
-    }
-
     NATIVE_INT_TYPE MVCamComponentImpl ::
       setCallbackType(CallbackType type)
-    {
-        m_callbackType = type;
-        return 0;
-    }
-
-    NATIVE_INT_TYPE MVCamComponentImpl ::
-      setPostprocParams(U32 brightness,
-                        U32 contrast,
-                        PostProcISO iso,
-                        U32 sharpness)
     {
         return 0;
     }

@@ -55,36 +55,7 @@ enum {
   MVCAM_8BIT_CALLBACK_SIZE = MVCAM_IMAGE_SIZE,
 };
 
-enum {
-  MVCAM_CPA_TYPE = 1,
-
-  MVCAM_CPA_FILTER_SIZE = 0,
-
-  MVCAM_CPA_EXPOSURE_CHANGE_THRESHOLD = 1, // desired change must be greater than or equal to threshold
-  MVCAM_CPA_GAIN_CHANGE_THRESHOLD = 1, // desired change must be greater than or equal to threshold
-
-  MVCAM_CPA_EXPOSURE_MAX_DELTA = 5, // maximum frame-to-frame exposure change
-
-  MVCAM_MIN_EXPOSURE = 0,   // MIN/MAX exposure value to normalize Exposure values.
-  MVCAM_MAX_EXPOSURE = 500, // MIN/MAX exposure value to normalize Exposure values.
-
-  MVCAM_MIN_GAIN = 0,  // MIN/MAX gain value to normalize Gain values.
-  MVCAM_MAX_GAIN = 200, // MIN/MAX gain value to normalize Gain values.
-
-  MVCAM_POSTPROC_BRIGHTNESS = 3, // Configure camera pipeline brightness
-  MVCAM_POSTPROC_SHARPNESS = 0, // Prevent oscillating unsharp / sharp
-  MVCAM_POSTPROC_CONTRAST = 5, // Configure camera pipeline contrast
-};
-
-const char* const MVCAM_POSTPROC_ISO = "ISO100";
-
-const float MVCAM_EXPOSURE_COST = 0.03f;
-const float MVCAM_GAIN_COST = 2.96f;
-
-const float MVCAM_START_EXPOSURE = 0.36f; // This is a normalized value between 0 and 1.0
-const float MVCAM_START_GAIN = 0.35f;     // This is a normalized value between 0 and 1.0.
 const float MVCAM_DEFAULT_ROW_PERIOD_US = 19.3333; // This is used to compute the total exposure time.
-
 
 } // end namespace SnapdragonFlight
 

@@ -17,34 +17,16 @@
 | | | |quality|U8|Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough|                    
 |MVCAM_ACTIVATE|3 (0x3)|Turn imaging on or off| | |   
 | | | |Mode|MVCamActive||                    
-|MVCAM_TOGGLE_FIXED_EXPOSURE|4 (0x4)|Switch between fixed- and auto-exposure| | |   
-| | | |Mode|ExposureMode||                    
-|MVCAM_SET_EXPOSURE_GAIN|5 (0x5)|Set fixed exposure and gain values| | |   
-| | | |exposure|U32||                    
-| | | |gain|U32||                    
-|MVCAM_OVERRIDE_POSTPROC|6 (0x6)|Set camera pipeline postproc parameters| | |   
-| | | |brightness|U32|min=0, max=6, step=1|                    
-| | | |contrast|U32|min=0, max=10, step=1|                    
-| | | |iso|PostProcISO||                    
-| | | |sharpness|U32|min=0, max=36, step=6|                    
-|MVCAM_WAYPOINT_TEST|7 (0x7)|Manually trigger a waypoint image like port call would| | |   
+|MVCAM_WAYPOINT_TEST|4 (0x4)|Manually trigger a waypoint image like port call would| | |   
 | | | |index|U32||                    
-|MVCAM_TEST_IMG|8 (0x8)|Send a still image test pattern| | |   
+|MVCAM_TEST_IMG|5 (0x5)|Send a still image test pattern| | |   
 | | | |destination|TestImgDestination|Manually keep in sync with CameraFrameSerializable|                    
 | | | |quality|U8|Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough|                    
-|MVCAM_SET_EXP_PARMS|9 (0x9)|Set the MVCam MV CPA exposure parameters; defaults in Cfg.hpp| | |   
-| | | |max_change|U16|Max frame to frame exposure change; between 1 and 500, inclusive|                    
-| | | |exposure_cost|F32|MV CPA cost mode exposure cost|                    
-| | | |gain_cost|F32|MV CPA cost mode gain cost|                    
-| | | |max_exposure|U16|MV CPA max exposure|                    
-| | | |max_gain|U16|MV CPA max gain|                    
-|MVCAM_FLIGHT_MODE|10 (0xa)|Toggle delivery of images to GNC and frame-to-frame autoexposure clamp| | |   
+|MVCAM_FLIGHT_MODE|6 (0x6)|Toggle delivery of images to GNC and frame-to-frame autoexposure clamp| | |   
 | | | |mode|MVCamFlightMode||                    
-|MVCAM_IMG_TLM_MODE|11 (0xb)|Toggle image telemetry| | |   
+|MVCAM_IMG_TLM_MODE|7 (0x7)|Toggle image telemetry| | |   
 | | | |mode|MVCamImgTlmMode||                    
-|MVCAM_SET_CALLBACK|12 (0xc)|Switch between 8-bit and 10-bit callbacks| | |   
-| | | |Mode|CallbackType||                    
-|MVCAM_SET_LOG_SKIP|13 (0xd)|| | |   
+|MVCAM_SET_LOG_SKIP|8 (0x8)|| | |   
 | | | |skipCount|U32||                    
 
 ## Telemetry Channel List

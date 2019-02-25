@@ -84,11 +84,21 @@ namespace SnapdragonFlight {
         m_frameSkip(0u),
         m_frameCounter(0u),
         m_callbackType(CALLBACK_8BIT),
-        m_exposureMode(EXPOSURE_AUTO),
+        m_exposureMode(EXPOSURE_AUTO_COST),
         m_exposureTarget(-1.0f),
         m_gainTarget(-1.0f),
         m_exposureTargetTrunc(0u),
         m_gainTargetTrunc(0u),
+        m_exposureChangeThreshold(0u),
+        m_gainChangeThreshold(0u),
+        m_exposureMin(0u),
+        m_exposureMax(0u),
+        m_gainMin(0u),
+        m_gainMax(0u),
+        m_brightness(0),
+        m_contrast(0),
+        m_sharpness(0),
+        m_iso(ISO100),
         m_captureParamsLock(),
         m_bufferLock(),
         m_wasActivated(true),
@@ -100,8 +110,8 @@ namespace SnapdragonFlight {
         m_imgTlmMode(MVCAM_IMG_TLM_OFF),
         m_flightMode(MVCAM_MODE_PREFLIGHT),
         m_maxExposureDelta(0u),
-        m_maxExposureScale(0u),
-        m_maxGainScale(0u),
+        m_exposureScale(0u),
+        m_gainScale(0u),
         m_numNoHPBuffers(0u),
         m_numNoLPBuffers(0u),
         m_numLoRate(0u),
@@ -114,10 +124,6 @@ namespace SnapdragonFlight {
     {
         m_frameSkip = static_cast<NATIVE_UINT_TYPE>(MVCAM_FRAME_SKIP);
         m_frameCounter = m_frameSkip;
-
-        m_maxExposureDelta = static_cast<NATIVE_UINT_TYPE>(MVCAM_CPA_EXPOSURE_MAX_DELTA);
-        m_maxExposureScale = static_cast<NATIVE_UINT_TYPE>(MVCAM_MAX_EXPOSURE);
-        m_maxGainScale = static_cast<NATIVE_UINT_TYPE>(MVCAM_MAX_GAIN);
 
         for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_waypointSet); i++) {
             m_waypointSet[i].index = 0;
@@ -208,6 +214,31 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
+
+    const char* MVCamComponentImpl ::
+      ISOToString(PostProcISO iso)
+    {
+        switch (iso) {
+            case ISO_AUTO:
+                return "auto";
+            case ISO_HJR:
+                return "ISO_HJR";
+            case ISO100:
+                return "ISO100";
+            case ISO200:
+                return "ISO200";
+            case ISO400:
+                return "ISO400";
+            case ISO800:
+                return "ISO800";
+            case ISO1600:
+                return "ISO1600";
+            case ISO3200:
+                return "ISO3200";
+           case PostProcISO_MAX:
+                return "";
+        }
+    }
 
     void MVCamComponentImpl ::
       pingIn_handler(NATIVE_INT_TYPE portNum, U32 key) {
@@ -403,6 +434,637 @@ namespace SnapdragonFlight {
         DEBUG_PRINT("\nReleasing m_bufferLock in ImageBufferIn_handler at time %f",
                     tv.tv_sec + tv.tv_usec / 1000000.0);
 #endif // DEBUG_MODE
+    }
+
+    void MVCamComponentImpl ::
+      parameterUpdated(FwPrmIdType id)
+    {
+        DEBUG_PRINT("prm %d updated\n", id);
+        Fw::ParamValid valid;
+
+#define LOCK_AND_REINIT_CPA \
+                    if (m_initialized) { \
+                        m_captureParamsLock.lock(); \
+                        /*TODO(mereweth) - deinitialize first?*/ \
+                        mvCPA_Deinitialize(m_mvCPAPtr); \
+                        m_mvCPAPtr = mvCPA_Initialize(&m_mvCPAConfig); \
+                        if (m_mvCPAPtr == NULL) { \
+                            DEBUG_PRINT("MV CPA init error\n"); \
+                            this->log_WARNING_HI_MVCAM_CameraError(MVCAM_CPA_ERR); \
+                            m_initialized = false; \
+                        } \
+                        m_captureParamsLock.unLock(); \
+                    }
+
+        switch (id) {
+            case PARAMID_EXPOSUREMODE:
+            {
+                ExposureMode temp = paramGet_exposureMode(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+                    if (m_initialized) {
+                        m_captureParamsLock.lock();
+                    }
+                    m_exposureMode = temp;
+#ifdef BUILD_SDFLIGHT
+                    if (EXPOSURE_AUTO_COST == m_exposureMode) {
+                        m_mvCPAConfig.cpaType = MVCPA_MODE_COST;
+                    }
+                    if (EXPOSURE_AUTO_HISTOGRAM == m_exposureMode) {
+                        m_mvCPAConfig.cpaType = MVCPA_MODE_HISTOGRAM;
+                    }
+#endif
+                    if (m_initialized) {
+#ifdef BUILD_SDFLIGHT
+                        mvCPA_Deinitialize(m_mvCPAPtr);
+                        m_mvCPAPtr = mvCPA_Initialize(&m_mvCPAConfig);
+                        if (m_mvCPAPtr == NULL) {
+                            DEBUG_PRINT("MV CPA init error\n");
+                            this->log_WARNING_HI_MVCAM_CameraError(MVCAM_CPA_ERR);
+                            m_initialized = false;
+                        }
+#endif
+                        m_captureParamsLock.unLock();
+                    }
+                    this->log_WARNING_HI_MVCAM_ExposureModeChange(
+                        static_cast<ExposureModeEVR>(m_exposureMode));
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_EXPOSUREFIXED:
+                if (EXPOSURE_FIXED == m_exposureMode) {
+                    U16 exposure = paramGet_exposureFixed(valid);
+                    if ((Fw::PARAM_VALID != valid) &&
+                        (Fw::PARAM_DEFAULT != valid)) {
+                        // TODO(mereweth) - issue EVR
+                        return;
+                    }
+                    if (m_initialized) {
+                        m_captureParamsLock.lock();
+                    }
+                    m_exposureTargetTrunc = exposure;
+                    m_exposureTarget      = exposure;
+                    if (m_initialized) {
+#ifdef BUILD_SDFLIGHT
+                        m_params.setManualExposure(exposure);
+                        int stat = m_params.commit();
+#endif
+                        m_captureParamsLock.unLock();
+                    }
+                }
+                break;
+            case PARAMID_GAINFIXED:
+                if (EXPOSURE_FIXED == m_exposureMode) {
+                    U8 gain = paramGet_gainFixed(valid);
+                    if ((Fw::PARAM_VALID != valid) &&
+                        (Fw::PARAM_DEFAULT != valid)) {
+                        // TODO(mereweth) - issue EVR
+                        return;
+                    }
+                    if (m_initialized) {
+                        m_captureParamsLock.lock();
+                    }
+                    m_gainTargetTrunc = gain;
+                    m_gainTarget      = gain;
+                    if (m_initialized) {
+#ifdef BUILD_SDFLIGHT
+                        m_params.setManualGain(gain);
+                        int stat = m_params.commit();
+#endif
+                        m_captureParamsLock.unLock();
+                    }
+                }
+                break;
+            case PARAMID_BRIGHTNESS:
+            {
+                U8 temp = paramGet_brightness(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                m_brightness = temp;
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+#ifdef BUILD_SDFLIGHT
+                    m_params.setBrightness(m_brightness);
+                    int stat = m_params.commit();
+#endif
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_CONTRAST:
+            {
+                U8 temp = paramGet_contrast(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                m_contrast = temp;
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+#ifdef BUILD_SDFLIGHT
+                    m_params.setContrast(m_contrast);
+                    int stat = m_params.commit();
+#endif
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_SHARPNESS:
+            {
+                U8 temp = paramGet_sharpness(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                m_sharpness = temp;
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+#ifdef BUILD_SDFLIGHT
+                    m_params.setSharpness(m_sharpness);
+                    int stat = m_params.commit();
+#endif
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_ISO:
+            {
+                PostProcISO temp = paramGet_ISO(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                m_iso = temp;
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+#ifdef BUILD_SDFLIGHT
+                    m_params.setISO(ISOToString(m_iso));
+                    int stat = m_params.commit();
+#endif
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_MAXDELTA:
+            {
+                U16 temp = paramGet_maxDelta(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+                }
+                m_maxExposureDelta = temp;
+                if (m_initialized) {
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_EXPOSURECHANGETHRESHOLD:
+            {
+                U16 temp = paramGet_exposureChangeThreshold(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+                }
+                m_exposureChangeThreshold = temp;
+                if (m_initialized) {
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_GAINCHANGETHRESHOLD:
+            {
+                U16 temp = paramGet_gainChangeThreshold(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+                }
+                m_gainChangeThreshold = temp;
+                if (m_initialized) {
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_EXPOSUREMIN:
+            {
+                U16 temp = paramGet_exposureMin(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+                }
+                m_exposureMin = temp;
+                if (m_exposureMax >= m_exposureMin) {
+                    m_exposureScale = m_exposureMax - m_exposureMin;
+                }
+                else {
+                    // TODO(mereweth) - issue error
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_EXPOSUREMAX:
+            {
+                U16 temp = paramGet_exposureMax(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+                }
+                m_exposureMax = temp;
+                if (m_exposureMax >= m_exposureMin) {
+                    m_exposureScale = m_exposureMax - m_exposureMin;
+                }
+                else {
+                    // TODO(mereweth) - issue error
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_GAINMIN:
+            {
+                U16 temp = paramGet_gainMin(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+                }
+                m_gainMin = temp;
+                if (m_gainMax >= m_gainMin) {
+                    m_gainScale = m_gainMax - m_gainMin;
+                }
+                else {
+                    // TODO(mereweth) - issue error
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_GAINMAX:
+            {
+                U16 temp = paramGet_gainMax(valid);
+                if ((Fw::PARAM_VALID != valid) &&
+                    (Fw::PARAM_DEFAULT != valid)) {
+                    // TODO(mereweth) - issue EVR
+                    return;
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.lock();
+                }
+                m_gainMax = temp;
+                if (m_gainMax >= m_gainMin) {
+                    m_gainScale = m_gainMax - m_gainMin;
+                }
+                else {
+                    // TODO(mereweth) - issue error
+                }
+                if (m_initialized) {
+                    m_captureParamsLock.unLock();
+                }
+            }
+                break;
+            case PARAMID_EXPOSURECOST:
+            {
+                F32 temp = paramGet_exposureCost(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.exposureCost = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_GAINCOST:
+            {
+                F32 temp = paramGet_gainCost(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.gainCost = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_FILTERSIZE:
+            {
+                U8 temp = paramGet_filterSize(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.filterSize = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_EXPOSURESTART:
+            {
+                F32 temp = paramGet_exposureStart(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.startExposure = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_GAINSTART:
+            {
+                F32 temp = paramGet_gainStart(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.startGain = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_ENABLEHISTOGRAMCOST:
+            {
+                bool temp = paramGet_enableHistogramCost(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.enableHistogramCost = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_THRESHOLDUNDERFLOWED:
+            {
+                U8 temp = paramGet_thresholdUnderflowed(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.thresholdUnderflowed = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_THRESHOLDSATURATED:
+            {
+                U8 temp = paramGet_thresholdSaturated(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.thresholdSaturated = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_SYSTEMBRIGHTNESSMARGIN:
+            {
+                F32 temp = paramGet_systemBrightnessMargin(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.legacyCost.systemBrightnessMargin = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_EXPOSUREMINHIST:
+            {
+                F32 temp = paramGet_exposureMinHist(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.exposureMin = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_EXPOSURESOFTMAXHIST:
+            {
+                F32 temp = paramGet_exposureSoftMaxHist(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.exposureSoftMax = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_EXPOSUREMAXHIST:
+            {
+                F32 temp = paramGet_exposureMaxHist(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.exposureMax = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_GAINMINHIST:
+            {
+                F32 temp = paramGet_gainMinHist(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.gainMin = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_GAINSOFTMAXHIST:
+            {
+                F32 temp = paramGet_gainSoftMaxHist(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.gainSoftMax = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_GAINMAXHIST:
+            {
+                F32 temp = paramGet_gainMaxHist(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.gainMax = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_LOGEGPSTEPSIZEMIN:
+            {
+                F32 temp = paramGet_logEGPStepSizeMin(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.logEGPStepSizeMin = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_LOGEGPSTEPSIZEMAX:
+            {
+                F32 temp = paramGet_logEGPStepSizeMax(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mvCPAConfig.histogram.logEGPStepSizeMax = temp;
+                    LOCK_AND_REINIT_CPA;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_CALLBACK:
+            {
+                CallbackType temp = paramGet_callback(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+                    if (m_waitingImage || m_activated) {
+                        //TODO(mereweth) - issue EVR
+                        return;
+                    }
+                    if (m_initialized) {
+                        m_captureParamsLock.lock();
+                    }
+                    m_callbackType = temp;
+#ifdef BUILD_SDFLIGHT
+                    if (CALLBACK_8BIT == m_callbackType) {
+                        m_mvCPAConfig.format = MVCPA_FORMAT_GRAY8;
+                    }
+                    if (CALLBACK_10BIT == m_callbackType) {
+                        m_mvCPAConfig.format = MVCPA_FORMAT_RAW10;
+                    }
+#endif
+                    if (m_initialized) {
+                        // TODO(mereweth) - check status and issue EVR
+                        setCallbackType(m_callbackType);
+#ifdef BUILD_SDFLIGHT
+                        mvCPA_Deinitialize(m_mvCPAPtr);
+                        m_mvCPAPtr = mvCPA_Initialize(&m_mvCPAConfig);
+                        if (m_mvCPAPtr == NULL) {
+                            DEBUG_PRINT("MV CPA init error\n");
+                            this->log_WARNING_HI_MVCAM_CameraError(MVCAM_CPA_ERR);
+                            m_initialized = false;
+                        }
+#endif
+                        m_captureParamsLock.unLock();
+                    }
+                    this->log_WARNING_HI_MVCAM_CallbackTypeChange(
+                        static_cast<CallbackTypeEVR>(m_callbackType));
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+        }
+
+#undef LOCK_AND_REINIT_CPA
+    }
+  
+    void MVCamComponentImpl ::
+      parametersLoaded()
+    {
+        for (U32 i = 0; i < __MAX_PARAMID; i++) {
+            parameterUpdated(i);
+        }
     }
 
   // ----------------------------------------------------------------------
@@ -620,74 +1282,6 @@ namespace SnapdragonFlight {
     }
 
     void MVCamComponentImpl ::
-      MVCAM_TOGGLE_FIXED_EXPOSURE_cmdHandler(
-          const FwOpcodeType opCode,
-          const U32 cmdSeq,
-          ExposureMode Mode
-      )
-    {
-        m_exposureMode = Mode;
-
-        this->log_WARNING_HI_MVCAM_ExposureModeChange(
-                                  static_cast<ExposureModeEVR>(m_exposureMode));
-
-        this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
-    }
-
-    void MVCamComponentImpl ::
-      MVCAM_SET_EXPOSURE_GAIN_cmdHandler(
-          const FwOpcodeType opCode,
-          const U32 cmdSeq,
-          U32 exposure,
-          U32 gain
-      )
-    {
-        if (!m_initialized) {
-            this->log_WARNING_HI_MVCAM_UninitializedError();
-            //DEBUG_PRINT("MVCam not initialized in MVCAM_SET_EXPOSURE_GAIN_cmdHandler");
-            this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        if (m_exposureMode == EXPOSURE_AUTO) {
-            this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        if (setExposureGain(exposure, gain)) {
-            this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
-        }
-        else {
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
-        }
-    }
-
-    void MVCamComponentImpl ::
-      MVCAM_OVERRIDE_POSTPROC_cmdHandler(
-          const FwOpcodeType opCode,
-          const U32 cmdSeq,
-          U32 brightness,
-          U32 contrast,
-          PostProcISO iso,
-          U32 sharpness
-      )
-    {
-        if (!m_initialized) {
-            this->log_WARNING_HI_MVCAM_UninitializedError();
-            //DEBUG_PRINT("MVCam not initialized in MVCAM_OVERRIDE_POSTPROC_cmdHandler");
-            this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        if (setPostprocParams(brightness, contrast, iso, sharpness)) {
-            this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
-        }
-        else {
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
-        }
-    }
-
-    void MVCamComponentImpl ::
       MVCAM_WAYPOINT_TEST_cmdHandler(
           const FwOpcodeType opCode,
           const U32 cmdSeq,
@@ -744,7 +1338,7 @@ namespace SnapdragonFlight {
             DEBUG_PRINT("\nMVCam Sending image out on image port in TEST_IMG handler\n");
             const U32 offsets[3] = {0u, 0u, 0u};
             const U32 strides[3] = {MVCAM_IMAGE_WIDTH, 0u, 0u};
-	    Svc::CameraFrame camFrame;
+            Svc::CameraFrame camFrame;
             camFrame.settype(Svc::CAMFRAME_STILL);
             camFrame.setformat(Svc::CAMFMT_IMG_MVCAM_GRAY);
             camFrame.setdestination(static_cast<Svc::FrameDestType>(destination));
@@ -781,49 +1375,6 @@ namespace SnapdragonFlight {
             this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
         }
         this->m_bufferLock.unLock();
-    }
-
-    void MVCamComponentImpl ::
-      MVCAM_SET_EXP_PARMS_cmdHandler(
-          const FwOpcodeType opCode,
-          const U32 cmdSeq,
-          U16 max_change,
-          F32 exposure_cost,
-          F32 gain_cost,
-          U16 max_exposure,
-          U16 max_gain
-      )
-    {
-        if (!m_initialized) {
-            this->log_WARNING_HI_MVCAM_UninitializedError();
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        if (m_waitingImage || m_activated) {
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        if ((exposure_cost <= 0) || (gain_cost <= 0)) {
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        m_captureParamsLock.lock();
-        m_maxExposureDelta = max_change;
-        m_maxExposureScale = max_exposure;
-        m_maxGainScale = max_gain;
-
-#ifdef BUILD_SDFLIGHT
-        // won't be NULL if we are initialized, and we check that above
-        FW_ASSERT(m_mvCPAPtr != NULL, 0);
-	// TODO(mereweth) - fix this!! probably have to call initialize again
-        // mvCPA_SetCosts(m_mvCPAPtr, exposure_cost, gain_cost);
-#endif // BUILD_SDFLIGHT
-        m_captureParamsLock.unLock();
-
-        this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
     }
 
     void MVCamComponentImpl ::
@@ -870,36 +1421,6 @@ namespace SnapdragonFlight {
 
         this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
     }
-
-    void MVCamComponentImpl ::
-      MVCAM_SET_CALLBACK_cmdHandler(
-          const FwOpcodeType opCode,
-          const U32 cmdSeq,
-          CallbackType Mode
-      )
-    {
-        if (!m_initialized) {
-            this->log_WARNING_HI_MVCAM_UninitializedError();
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        if (m_waitingImage || m_activated) {
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-            return;
-        }
-
-        if (setCallbackType(Mode)) {
-            this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
-        }
-        else {
-            this->log_WARNING_HI_MVCAM_CallbackTypeChange(
-                                      static_cast<CallbackTypeEVR>(m_callbackType));
-            this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
-        }
-    }
-
-
 
     void MVCamComponentImpl ::
       MVCAM_SET_LOG_SKIP_cmdHandler(

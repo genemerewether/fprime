@@ -104,8 +104,9 @@
             <args>
                 <arg name="Mode" type="ENUM">
                     <enum name="ExposureModeEVR">
-                        <item name="EXPOSURE_AUTO_EVR"/>
                         <item name="EXPOSURE_FIXED_EVR"/>
+                        <item name="EXPOSURE_AUTO_COST_EVR"/>
+                        <item name="EXPOSURE_AUTO_HISTOGRAM_EVR"/>
                     </enum>
                 </arg>
             </args>
