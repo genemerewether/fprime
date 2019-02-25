@@ -1,17 +1,6 @@
-SRC = MVVislamComponentAi.xml #MVVislamComponentImplCommon.cpp
+SRC = MVVislamComponentAi.xml MVVislamComponentImpl.cpp
 
-#SRC_SDFLIGHT = MVVislamComponentImplSdFlight.cpp
-
-#SRC_DARWIN = MVVislamComponentImplStub.cpp
-
-#SRC_LINUX = MVVislamComponentImplStub.cpp
-
-#SRC_CYGWIN = MVVislamComponentImplStub.cpp
-
-#HDR = MVVislamComponentImpl.hpp         \
+HDR = MVVislamComponentImpl.hpp
       #MVVislamComponentImplCfg.hpp
 
 #SUBDIRS = test
-
-
-#SRC_LINUXRT = MVVislamComponentImplStub.cpp

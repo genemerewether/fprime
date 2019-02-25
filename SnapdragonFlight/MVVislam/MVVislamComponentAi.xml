@@ -29,7 +29,7 @@
         <port name="ImuFwd" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="1">
         </port>
 
-        <port name="Image" data_type="ROS::sensor_msgs::Image"  kind="async_input"    max_number="1">
+        <port name="ImageIn" data_type="ROS::sensor_msgs::Image"  kind="async_input"    max_number="1">
         </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="async_input"    max_number="1">

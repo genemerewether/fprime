@@ -77,7 +77,7 @@ namespace SnapdragonFlight {
 
       //! Handler implementation for Image
       //!
-      void Image_handler(
+      void ImageIn_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::sensor_msgs::Image &Image 
       );

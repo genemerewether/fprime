@@ -691,15 +691,17 @@ namespace SnapdragonFlight {
                                       tempUsec);
                       switch (i) {
                           case MVCAM_GNC_OUT:
+			  {
                               DEBUG_PRINT("\nMVCam Sending image out on GNC image port; i = %d\n", i);
                               ROS::sensor_msgs::Image image;
                               image.setdata(buff);
                               image.setheight(MVCAM_IMAGE_HEIGHT);
                               image.setwidth(MVCAM_IMAGE_WIDTH);
-                              image.setstep(MVCAM_IMAGE_STRIDE);
+                              image.setstep(MVCAM_IMAGE_WIDTH);
                               image.setheader(ROS::std_msgs::Header(m_imagesAcquired,
                                                                     hwTime, 2/*"optic"*/));
                               GncBufferSend_out(0, image);
+			  }
                               break;
                           case MVCAM_UNPROC_OUT:
                           case MVCAM_PROC_OUT:

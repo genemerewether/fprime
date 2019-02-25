@@ -71,7 +71,7 @@ namespace SnapdragonFlight {
   }
 
   void MVVislamComponentImpl ::
-    Image_handler(
+    ImageIn_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::sensor_msgs::Image &Image
     )
