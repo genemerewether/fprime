@@ -36,6 +36,8 @@ void exitTasks(void);
 
 #include <Svc/UdpReceiver/UdpReceiverComponentImpl.hpp>
 
+#include <Svc/ImgTlm/ImgTlmComponentImpl.hpp>
+
 #include <Svc/IPCRelay/IPCRelayComponentImpl.hpp>
 #include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
@@ -75,5 +77,7 @@ extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
 extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
 extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
 extern Svc::IPCRelayComponentImpl* ipcRelay_ptr;
+
+extern Svc::ImgTlmComponentImpl* imgTlm_ptr;
 
 #endif
