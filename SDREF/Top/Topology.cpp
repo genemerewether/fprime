@@ -362,7 +362,9 @@ void manualConstruct() {
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
-                  char* udp_string, char* hostname,
+		  char* udp_recv_string, char* udp_send_string,
+		  unsigned int zmq_port,
+		  char* hostname,
                   unsigned int boot_count,
 		  bool &isChild,
 		  bool startSocketNow) {
@@ -584,8 +586,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         }
     }
 
-    if (udp_string) {
-        udpReceiver_ptr->open(udp_string);
+    if (udp_recv_string) {
+        udpReceiver_ptr->open(udp_recv_string);
         udpReceiver_ptr->startThread(85,20*1024);
     }
     
@@ -662,7 +664,19 @@ void exitTasks(bool isChild) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n-p\tport_number\n-x\tll_port_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n-i\tto disable init\n-f\tto disable fini\n-o to run # cycles instead of continuously\n-b\tBoot count\n-s\tStart socket immediately\n");
+    (void) printf("Usage: ./SDREF [options]\n"
+		  "-p\tport_number\n"
+		  "-x\tll_port_number\n"
+		  "-u\tUDP recv port string\n"
+		  "-t\tUDP transmit port string\n"
+		  "-z\tZMQ port number\n"
+		  "-a\thostname/IP address\n"
+		  "-l\tFor time-based cycles\n"
+		  "-i\tto disable init\n"
+		  "-f\tto disable fini\n"
+		  "-o to run # cycles instead of continuously\n"
+		  "-b\tBoot count\n"
+		  "-s\tStart socket immediately\n");
 }
 
 
@@ -696,7 +710,9 @@ int main(int argc, char* argv[]) {
     U32 ll_port_number = 0;
     I32 option = 0;
     char *hostname = NULL;
-    char* udp_string = 0;
+    char* udp_recv_string = 0;
+    char* udp_send_string = 0;
+    U32 zmq_port = 0;
     bool local_cycle = true;
     bool isChild = false;
     bool startSocketNow = false;
@@ -705,7 +721,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlsp:x:a:u:o:b:")) != -1){
+    while ((option = getopt(argc, argv, "ifhlsp:x:a:u:t:o:b:z:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -723,11 +739,17 @@ int main(int argc, char* argv[]) {
             case 'x':
                 ll_port_number = atoi(optarg);
                 break;
+            case 'z':
+                zmq_port = atoi(optarg);
+                break;
             case 'a':
                 hostname = optarg;
                 break;
             case 'u':
-                udp_string = optarg;
+                udp_recv_string = optarg;
+                break;
+            case 't':
+                udp_send_string = optarg;
                 break;
             case 'i':
                 noInit = true;
@@ -769,7 +791,9 @@ int main(int argc, char* argv[]) {
     }
 #endif
     
-    constructApp(port_number, ll_port_number, udp_string, hostname, boot_count,
+    constructApp(port_number, ll_port_number,
+		 udp_recv_string, udp_send_string, zmq_port,
+		 hostname, boot_count,
 		 isChild, startSocketNow);
     //dumparch();
 
