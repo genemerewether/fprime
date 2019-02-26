@@ -457,7 +457,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     prmDb_ptr->regCommands();
     snapHealth_ptr->regCommands();
     mvCam_ptr->regCommands();
-    //mvVislam_ptr->regCommands();
+    mvVislam_ptr->regCommands();
     hiresCam_ptr->regCommands();
 
     llRouter_ptr->regCommands();
@@ -468,6 +468,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     // read parameters
     prmDb_ptr->readParamFile();
+    mvCam_ptr->loadParameters();
+    mvVislam_ptr->loadParameters();
 
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);

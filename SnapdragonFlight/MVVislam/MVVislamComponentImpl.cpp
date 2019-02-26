@@ -76,7 +76,7 @@ namespace SnapdragonFlight {
         ROS::sensor_msgs::Image &Image
     )
   {
-    // TODO
+      ImageBufferReturn_out(0, Image.getdata());
   }
 
   void MVVislamComponentImpl ::
@@ -94,7 +94,7 @@ namespace SnapdragonFlight {
         U32 key
     )
   {
-    // TODO
+      pingOut_out(0, key);
   }
 
   // ----------------------------------------------------------------------

@@ -6,6 +6,7 @@
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdateNoCovPortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
@@ -30,6 +31,9 @@
         </port>
 
         <port name="ImageIn" data_type="ROS::sensor_msgs::Image"  kind="async_input"    max_number="1">
+        </port>
+
+        <port name="ImageBufferReturn" data_type="Fw::BufferSend"  kind="output"    max_number="1">
         </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="async_input"    max_number="1">
