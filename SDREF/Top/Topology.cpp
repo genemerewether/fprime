@@ -789,15 +789,29 @@ int main(int argc, char* argv[]) {
         if (hexCycle) {
             Os::TaskString task_name("HEXRPC");
             DEBUG_PRINT("Starting cycler on hexagon\n");
-            task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+	    if (Os::Task::TASK_OK !=
+		task.start(task_name, 0, 10, 20*1024,
+			   (Os::Task::taskRoutine) hexref_run, NULL)) {
+                DEBUG_PRINT("Error starting up DSP RUN task\n");
+		terminate = 1;
+	    }
         }
-        waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
+	if (Os::Task::TASK_OK !=
+	    waiter.start(waiter_task_name, 0, 10, 20*1024,
+			 (Os::Task::taskRoutine) hexref_wait, NULL)) {
+	    DEBUG_PRINT("Error starting up DSP WAIT task\n");
+	    terminate = 1;
+	}
 #else
         if (hexCycle) {
             Os::TaskString task_name("DUMMY");
-            task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+	    FW_ASSERT(Os::Task::TASK_OK ==
+		      task.start(task_name, 0, 10, 20*1024,
+				 (Os::Task::taskRoutine) dummy, NULL));
         }
-        waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) dummy, NULL);
+	FW_ASSERT(Os::Task::TASK_OK ==
+		  waiter.start(waiter_task_name, 0, 10, 20*1024,
+			       (Os::Task::taskRoutine) dummy, NULL));
 #endif //BUILD_SDFLIGHT
 
 #ifdef BUILD_SDFLIGHT

@@ -34,7 +34,10 @@ namespace SnapdragonFlight {
     ) :
       MVVislamComponentBase(compName)
 #else
-    MVVislamImpl(void)
+      MVVislamImpl(void)
+#endif
+#ifdef BUILD_SDFLIGHT
+      ,m_mvVISLAMPtr(NULL)
 #endif
   {
 
@@ -76,7 +79,8 @@ namespace SnapdragonFlight {
         ROS::sensor_msgs::Image &Image
     )
   {
-      ImageBufferReturn_out(0, Image.getdata());
+      Fw::Buffer data = Image.getdata();
+      ImageBufferReturn_out(0, data);
   }
 
   void MVVislamComponentImpl ::

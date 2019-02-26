@@ -22,6 +22,11 @@
 
 #include "SnapdragonFlight/MVVislam/MVVislamComponentAc.hpp"
 
+#ifdef BUILD_SDFLIGHT
+#include "mv.h"
+#include "mvVISLAM.h"
+#endif
+
 namespace SnapdragonFlight {
 
   class MVVislamComponentImpl :
@@ -109,6 +114,9 @@ namespace SnapdragonFlight {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
+#ifdef BUILD_SDFLIGHT
+      mvVISLAM* m_mvVISLAMPtr;
+#endif
 
     };
 
