@@ -100,7 +100,8 @@ namespace Fw {
           U32 sequenceIndex;
           
           //! Header size
-          enum { HEADERSIZE = sizeof(U8) + sizeof(sequenceIndex) };
+          // NOTE(mereweth) - manually keep in sync with sequenceIndex type
+          enum { HEADERSIZE = sizeof(U8) + sizeof(U32) };
 
         PRIVATE:
 
@@ -185,9 +186,10 @@ namespace Fw {
           const U8 *data;
 
           //! header size
+          // NOTE(mereweth) - manually keep in sync with byteOffset and dataSize types
           enum { HEADERSIZE = Header::HEADERSIZE +
-              sizeof(byteOffset) +
-              sizeof(dataSize) };
+              sizeof(U32) +
+              sizeof(U16) };
 
 
         public:

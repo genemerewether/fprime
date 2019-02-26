@@ -8,9 +8,19 @@ SRC = \
 	InternalInterfaceString.cpp \
 	BasicTypes.cpp \
 	MemAllocator.cpp \
-	MallocAllocator.cpp \
+	MallocAllocator.cpp
+
+SRC_LINUX = \
 	MmapAllocator.cpp
 
+SRC_LINUXRT = \
+	MmapAllocator.cpp
+
+SRC_SDFLIGHT = \
+	MmapAllocator.cpp
+
+SRC_DARWIN = \
+	MmapAllocator.cpp
 #	FwStructSerializable.cpp
 
 HDR = \

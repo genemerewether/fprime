@@ -90,6 +90,7 @@ SRC_DSPAL =  Pthreads/Queue.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
 				Dspal/FileStub.cpp \
+				Dspal/IPCQueueStub.cpp \
 				Dspal/Task.cpp \
 				LogPrintf.cpp \
 				Linux/InterruptLock.cpp \
