@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../../Autocoders/schema/default/component_schema.rnc" type="compact"?>
+
+<component name="ZmqAdapter" kind="active" namespace="Zmq">
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <comment>Sends and receives transactions via a ZMQ connection</comment>
+    <ports>
+        <port name="Sched" data_type="Svc::Sched" kind="async_input" >
+            <comment>
+            Input port to get called periodically for telemetry
+            </comment>
+        </port>
+        <port name="PortsIn" data_type="Serial" kind="async_input" max_number="10">
+            <comment>
+            Input ports from other components
+            </comment>
+        </port>
+        <port name="PortsOut" data_type="Serial" kind="output" max_number="10">
+            <comment>
+            Output ports to other components
+            </comment>
+        </port>
+    </ports>
+    <events>
+        <event id="0" name="ZA_ServerConnectionOpened" severity="ACTIVITY_HI" format_string = "ZeroMQ server connection opened">
+            <comment>
+            Connection opened
+            </comment>
+        </event>
+    </events>
+    <telemetry>
+        <channel id="0" name="ZA_BytesSent" data_type="U32">
+            <comment>
+            Number of bytes sent
+            </comment>
+        </channel>
+        <channel id="1" name="ZA_BytesReceived" data_type="U32">
+            <comment>
+            Number of bytes received
+            </comment>
+        </channel>
+    </telemetry>
+</component>
+
