@@ -24,6 +24,8 @@
 #include <fprime-zmq/zmq-pub/ZmqPubComponentImplCfg.hpp>
 #include <fprime-zmq/zmq/include/zmq.h>
 
+#include <Os/Task.hpp>
+
 namespace Zmq {
 
   class ZmqPubComponentImpl :

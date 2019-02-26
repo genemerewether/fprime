@@ -48,6 +48,12 @@ R5_MODULES := \
 	R5/TiHal \
 	R5/R5FlashApi
 
+ZMQ_MODULES := \
+	fprime-zmq/zmq \
+	fprime-zmq/zmq-adapter \
+	fprime-zmq/zmq-pub \
+	fprime-zmq/zmq-sub
+
 COMMON_MODULES := \
 	Common/Ports
 
@@ -254,6 +260,8 @@ SDREF_DEPLOYMENT_MODULES := \
 SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
+	\
+	$(ZMQ_MODULES) \
 	\
 	$(HLPROC_MODULES) \
 	\

@@ -32,6 +32,8 @@
 #include <fprime-zmq/zmq-radio/ZmqRadioCfg.hpp>
 #include <fprime-zmq/zmq/include/zmq.h>
 
+#include <Os/Task.hpp>
+
 namespace Zmq{
 
     class ZmqRadioComponentImpl : public ZmqRadioComponentBase{
