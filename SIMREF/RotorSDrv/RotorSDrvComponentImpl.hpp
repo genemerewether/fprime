@@ -29,6 +29,7 @@
 #include "mav_msgs/ImuStateUpdate.h"
 
 #include "Os/Mutex.hpp"
+#include "Os/Task.hpp"
 
 #include "SIMREF/RotorSDrv/RotorSDrvComponentAc.hpp"
 #include "SIMREF/RotorSDrv/RotorSDrvComponentImplCfg.hpp"
