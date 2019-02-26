@@ -222,7 +222,7 @@ void allocComps() {
 #endif
 ;
 
-    imgTlm_ptr = new Svc::ImgTlm
+    imgTlm_ptr = new Svc::ImgTlmComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("IMGTLM")
 #endif
@@ -371,7 +371,7 @@ void manualConstruct() {
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
 		  char* udp_recv_string, char* udp_send_string,
-		  unsigned int zmq_port,
+		  char* zmq_image_string,
 		  char* hostname,
                   unsigned int boot_count,
 		  bool &isChild,
@@ -478,8 +478,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     // initialize file logs
     fileLogger_ptr->initLog("/log/");
 
-    if (zmq_port && hostname) {
-        imgTlm_ptr->open(zmq_port, hostname);
+    if (zmq_image_string) {
+        imgTlm_ptr->open(zmq_image_string);
     }
 
     // read parameters
@@ -686,7 +686,7 @@ void print_usage() {
 		  "-x\tll_port_number\n"
 		  "-u\tUDP recv port string\n"
 		  "-t\tUDP transmit port string\n"
-		  "-z\tZMQ port number\n"
+		  "-z\tZMQ image send string\n"
 		  "-a\thostname/IP address\n"
 		  "-l\tFor time-based cycles\n"
 		  "-i\tto disable init\n"
@@ -729,7 +729,7 @@ int main(int argc, char* argv[]) {
     char *hostname = NULL;
     char* udp_recv_string = 0;
     char* udp_send_string = 0;
-    U32 zmq_port = 0;
+    char* zmq_image_string = 0;
     bool local_cycle = true;
     bool isChild = false;
     bool startSocketNow = false;
@@ -757,7 +757,7 @@ int main(int argc, char* argv[]) {
                 ll_port_number = atoi(optarg);
                 break;
             case 'z':
-                zmq_port = atoi(optarg);
+                zmq_image_string = optarg;
                 break;
             case 'a':
                 hostname = optarg;
@@ -809,7 +809,7 @@ int main(int argc, char* argv[]) {
 #endif
     
     constructApp(port_number, ll_port_number,
-		 udp_recv_string, udp_send_string, zmq_port,
+		 udp_recv_string, udp_send_string, zmq_image_string,
 		 hostname, boot_count,
 		 isChild, startSocketNow);
     //dumparch();

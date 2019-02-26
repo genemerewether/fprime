@@ -57,8 +57,7 @@ namespace Svc {
       //! Open the connection
       //!
       void open(
-              const char* port, /*!< port for connection */
-              const char* addr  /*!< the server address */
+              const char* endpoint
               );
 
       //! Destroy object ImgTlm

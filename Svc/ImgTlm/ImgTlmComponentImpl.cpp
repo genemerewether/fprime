@@ -116,12 +116,11 @@ namespace Svc {
   }
 
   void ImgTlmComponentImpl::open(
-              const char* port, /*!< port for connection */
-              const char* addr  /*!< the server address */
+              const char* endpoint
           ) {
 
       // store values for worker thread
-      (void)snprintf(m_endpoint,IMG_TLM_ENDPOINT_NAME_SIZE,"tcp://%s:%s",addr, port);
+      (void)snprintf(m_endpoint,IMG_TLM_ENDPOINT_NAME_SIZE,"tcp://%s",endpoint);
 
       // null terminate
       m_endpoint[IMG_TLM_ENDPOINT_NAME_SIZE-1] = 0;
