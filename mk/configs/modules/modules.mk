@@ -69,8 +69,10 @@ CFDP_GTEST_MODULES := \
 UTILS_MODULES := \
 	Utils/Hash
 
+# dependent on turbojpeg and zmq
 SVC_EXTRA_MODULES := \
-	Svc/ImgComp
+	Svc/ImgComp \
+	Svc/ImgTlm
 
 SVC_MODULES := \
 	Svc/BufferManager \

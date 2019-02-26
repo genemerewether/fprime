@@ -84,6 +84,8 @@ Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
 Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
 
+Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
+
 Fw::MallocAllocator buffMallocator;
 Fw::MmapAllocator hiresMallocator;
 
@@ -217,6 +219,12 @@ void allocComps() {
     hiresCam_ptr = new SnapdragonFlight::HiresCamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HIRESCAM")
+#endif
+;
+
+    imgTlm_ptr = new Svc::ImgTlm
+#if FW_OBJECT_NAMES == 1
+                        ("IMGTLM")
 #endif
 ;
 
@@ -418,6 +426,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
+    imgTlm_ptr->init(30, 0);
+
     mvCam_ptr->init(60, 0);
     mvVislam_ptr->init(60, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
@@ -467,6 +477,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     
     // initialize file logs
     fileLogger_ptr->initLog("/log/");
+
+    if (zmq_port && hostname) {
+        imgTlm_ptr->open(zmq_port, hostname);
+    }
 
     // read parameters
     prmDb_ptr->readParamFile();
@@ -528,6 +542,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
     mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
+
+    imgTlm_ptr->start(0, 20, 20*1024);
 
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
@@ -643,6 +659,7 @@ void exitTasks(bool isChild) {
     serialDriverDebug_ptr->quitReadThread();
 #endif
 
+    imgTlm_ptr->exit();
     mvVislam_ptr->exit();    
     llRouter_ptr->exit();
     serialTextConv_ptr->exit();
