@@ -161,7 +161,7 @@ namespace HLProc {
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
-        U32 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
+        I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
         Os::File::Status stat = Os::File::OTHER_ERROR;
         Os::File file;
         stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -190,9 +190,9 @@ namespace HLProc {
                    walltimeDspLeadUs, usecDsp);
             return;
         }
-        U32 usecRos = usecDsp + walltimeDspLeadUs;
-        msg.header.stamp.sec = usecRos / 1000LU / 1000LU;
-        msg.header.stamp.nsec = (usecRos % (1000LU * 1000LU)) * 1000LU;
+        I64 usecRos = usecDsp + walltimeDspLeadUs;
+        msg.header.stamp.sec = (U32) (usecRos / 1000LL / 1000LL);
+        msg.header.stamp.nsec = (usecRos % (1000LL * 1000LL)) * 1000LU;
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
@@ -320,7 +320,7 @@ namespace HLProc {
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
-        U32 usecDsp = stamp.getSeconds() * 1000LU * 1000LU + stamp.getUSeconds();
+        I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
         Os::File::Status stat = Os::File::OTHER_ERROR;
         Os::File file;
         stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -349,9 +349,9 @@ namespace HLProc {
                    walltimeDspLeadUs, usecDsp);
             return;
         }
-        U32 usecRos = usecDsp + walltimeDspLeadUs;
-        msg.header.stamp.sec = usecRos / 1000LU / 1000LU;
-        msg.header.stamp.nsec = (usecRos % (1000LU * 1000LU)) * 1000LU;
+        I64 usecRos = usecDsp + walltimeDspLeadUs;
+        msg.header.stamp.sec = (U32) (usecRos / 1000LL / 1000LL);
+        msg.header.stamp.nsec = (usecRos % (1000LL * 1000LL)) * 1000LU;
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
@@ -565,8 +565,8 @@ namespace HLProc {
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
-        U64 usecRos = (U64) msg->header.stamp.sec * 1000LU * 1000LU
-                      + (U64) msg->header.stamp.nsec / 1000LU;
+        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
+                      + (I64) msg->header.stamp.nsec / 1000LL;
         Os::File::Status stat = Os::File::OTHER_ERROR;
         Os::File file;
         stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -595,11 +595,11 @@ namespace HLProc {
                    walltimeDspLeadUs, usecRos);
             return;
         }
-        U64 usecDsp = usecRos - walltimeDspLeadUs;
+        I64 usecDsp = usecRos - walltimeDspLeadUs;
         Fw::Time convTime(TB_WORKSTATION_TIME,
                           0,
-                          usecDsp / 1000 / 1000,
-                          usecDsp % (1000 * 1000));
+                          (U32) (usecDsp / 1000 / 1000),
+                          (U32) (usecDsp % (1000 * 1000)));
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
