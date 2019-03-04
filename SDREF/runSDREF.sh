@@ -13,7 +13,7 @@ fi
 screen -S "SDREF" -d -m bash --norc
 screen -S "SDREF" -X logfile $(date +"/eng/SDREF_%F_%H-%M.log")
 screen -S "SDREF" -X log
-screen -r "SDREF" -X stuff "insmod /eng/load/dsp-offset.ko || true\n"
+screen -r "SDREF" -X stuff "insmod /golden/dsp-offset_taskset_cpustat_mqueue.ko || true\n"
 screen -r "SDREF" -X stuff "export ROS_HOME=/eng/ros\n"
 screen -r "SDREF" -X stuff ". /opt/ros/indigo/setup.bash || true\n"
 screen -r "SDREF" -X stuff "pgrep roscore || roscore &\n"
