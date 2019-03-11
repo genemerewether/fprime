@@ -511,6 +511,8 @@ __QAIC_STUB_EXPORT remote_handle _hexref_handle(void) {
 
 #endif //__qdsp6__
 
+int remote_register_dma_handle(int, uint32_t);
+
 __QAIC_STUB_EXPORT int __QAIC_STUB(hexref_skel_invoke)(uint32_t _sc, remote_arg* _pra) __QAIC_STUB_ATTRIBUTE {
    return __QAIC_REMOTE(remote_handle_invoke)(_hexref_handle(), _sc, _pra);
 }

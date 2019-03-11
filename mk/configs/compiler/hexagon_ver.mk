@@ -1,5 +1,4 @@
 HEXAGON_DSP_TYPE := ADSP
-HEXAGON_V_ARCH := v55
 
 HEXAGON_ARCH_LINK_FLAGS := -march=hexagon -mcpu=hexagon$(HEXAGON_V_ARCH)
 

@@ -11,17 +11,36 @@ export MARKDOWN ?= $(PYTHON_BASE)/bin/markdown_py -x markdown.extensions.extra -
 
 JOBS := -j `nproc`
 
-export TURBOJPEG := /opt/tools/quest/turbojpeg
-export TURBOJPEG_LIB := $(TURBOJPEG)/lib/libturbojpeg.a
-export TURBOJPEG_INCLUDE := -I$(TURBOJPEG)/include
+TURBOJPEG := /opt/tools/quest/turbojpeg
+TURBOJPEG_LIB := $(TURBOJPEG)/lib/libturbojpeg.a
+TURBOJPEG_INCLUDE := -I$(TURBOJPEG)/include
 
 TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
-export HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.0
-export HEXAGON_TOOLS_ROOT := /opt/tools/quest/Qualcomm/HEXAGON_Tools/7.2.12/Tools
-export HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/qrlinux_sysroot
 
-export INDIGO_ARM_SYSROOT :=  /opt/tools/quest/Qualcomm/indigo_sysroot
+ifneq ($(TARGET_8096),)
+HEXAGON_V_ARCH := v60
+HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.1
+INDIGO_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
+HEXAGON_ARM_SYSROOT := $(INDIGO_ARM_SYSROOT)
+ARM_CC_BASE := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/x86_64-oesdk-linux/usr/bin/arm-oemllib32-linux/arm-oemllib32-linux
+CC := $(ARM_CC_BASE)-gcc
+CXX := $(ARM_CC_BASE)-g++
+GCOV := $(ARM_CC_BASE)-gcov
+AR := $(ARM_CC_BASE)-ar
+HEXAGON_TOOLS_ROOT := $(HEXAGON_SDK_ROOT)/tools/HEXAGON_Tools/8.0.08/Tools
+else
+HEXAGON_V_ARCH := v55
+HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.0
+ARM_CC_BASE := $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin/arm-linux-gnueabihf
+CC :=  $(ARM_CC_BASE)-gcc
+CXX := $(ARM_CC_BASE)-g++
+GCOV := $(ARM_CC_BASE)-gcov
+AR := $(ARM_CC_BASE)-ar
+HEXAGON_TOOLS_ROOT := /opt/tools/quest/Qualcomm/HEXAGON_Tools/7.2.12/Tools
+HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/qrlinux_sysroot
+INDIGO_ARM_SYSROOT :=  /opt/tools/quest/Qualcomm/indigo_sysroot
+endif
 
 CRC := $(BUILD_ROOT)/mk/bin/run_file_crc.sh
 

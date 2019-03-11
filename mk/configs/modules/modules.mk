@@ -153,6 +153,9 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/HexRouter \
 	SnapdragonFlight/DspRpcAllocator \
 	SnapdragonFlight/DspRelay \
+	SnapdragonFlight/BlspSerialDriver \
+	SnapdragonFlight/BlspGpioDriver \
+	SnapdragonFlight/BlspSpiDriver \
 	SnapdragonFlight/SnapdragonHealth \
 	SnapdragonFlight/MVCam \
 	SnapdragonFlight/HiresCam \

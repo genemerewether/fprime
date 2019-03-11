@@ -4,15 +4,6 @@ include $(BUILD_ROOT)/mk/configs/compiler/linux_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/gnu-common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ut_flags.mk
 
-CC :=  $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin/arm-linux-gnueabihf-gcc
-CXX := $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin/arm-linux-gnueabihf-g++
-GCOV := $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin/arm-linux-gnueabihf-gcov
-AR := $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin/arm-linux-gnueabihf-ar
-#CC :=  $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc
-#CXX := $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-g++
-#GCOV := $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcov
-#AR := $(HEXAGON_SDK_ROOT)/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-ar
-
 BUILD_32BIT := -m32
 
 CC_MUNCH := $(BUILD_ROOT)/mk/bin/empty.sh
@@ -32,8 +23,7 @@ LOAD_SIZE := $(SIZE)
 
 LINK_LIBS := -ldl -lpthread -lm -lrt -lutil
 LINK_LIBS += 	-L$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
-				-ladsprpc \
-				$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/UbuntuARM_Debug/rpcmem.a
+				-ladsprpc
 
 OPT_SPEED := -O3 -funroll-loops
 DEBUG := -g3
@@ -58,7 +48,7 @@ LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 						-I$(HEXAGON_SDK_ROOT)/incs \
 						-I$(HEXAGON_SDK_ROOT)/incs/stddef \
 						-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/inc \
-						-I$(HEXAGON_SDK_ROOT)/libs/common/qurt/ADSPv5MP/include \
+						-I$(HEXAGON_SDK_ROOT)/libs/common/qurt/ADSP$(HEXAGON_V_ARCH)MP/include \
 						-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem \
 						-I$(HEXAGON_SDK_ROOT)/libs/common/adspmsgd/ship/UbuntuARM_Debug \
 						-I$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \

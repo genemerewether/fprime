@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="BlspSpiDriver" kind="passive" namespace="SnapdragonFlight">
+
+    <import_port_type>Drv/SpiDriverPorts/SpiReadWritePortAi.xml</import_port_type>
+    <import_dictionary>SnapdragonFlight/BlspSpiDriver/Events.xml</import_dictionary>
+    <import_dictionary>SnapdragonFlight/BlspSpiDriver/Telemetry.xml</import_dictionary>
+
+    <ports>
+    
+        <port name="SpiReadWrite" data_type="Drv::SpiReadWrite"  kind="sync_input">
+           <comment>Port to push serial data received from driver</comment>
+        </port>
+        
+    </ports>
+
+</component>

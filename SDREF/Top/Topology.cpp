@@ -318,7 +318,7 @@ void manualConstruct() {
     
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(2, hexRouter_ptr->get_Sched_InputPort(0));
     
-    mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
+    sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));

@@ -5,7 +5,7 @@ include $(BUILD_ROOT)/mk/configs/compiler/hexagon_clang_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/dspal_ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_sdk_common.mk
-include $(BUILD_ROOT)/mk/configs/compiler/hexagon_v55.mk
+include $(BUILD_ROOT)/mk/configs/compiler/hexagon_ver.mk
 
 CC := $(HEXAGON_BIN)/hexagon-clang
 CXX := $(HEXAGON_BIN)/hexagon-clang++
