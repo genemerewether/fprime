@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+
+<component name="LIDARLiteV3" kind="passive" namespace="Drv">
+
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CConfigPortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadStatusPortAi.xml</import_port_type>
+    <import_port_type>Drv/Altimeter/AltimeterPorts/AltimeterPortAi.xml</import_port_type>
+
+    <ports>
+
+        <!-- Rate group input port. -->
+        <port name="SchedIn" data_type="Svc::Sched" kind="sync_input">
+            <comment>
+            The rate group scheduler input to drive the sensor data collection.
+            </comment>
+        </port>
+
+        <!-- Ports to send EU data to GncFc -->
+        <port name="AltimeterSend" data_type="Drv::Altimeter"  kind="output">
+           <comment>Port to send Altimeter EU data to the GncFc component.</comment>
+        </port>
+
+        <port name="I2CConfig" data_type="Drv::I2CConfig" kind="output">
+            <comment>Configure the I2C interface to the LRF.</comment>
+        </port>
+
+        <port name="I2CWriteRead" data_type="Drv::I2CWriteRead" kind="output">
+            <comment>Write/Read data to the LRF.</comment>
+        </port>
+
+        <port name="I2CWriteReadStatus" data_type="Drv::I2CWriteReadStatus" kind="output">
+            <comment>Status of the latest Write/Read status.</comment>
+        </port>
+
+    </ports>
+
+</component>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../../../Autocoders/schema/ISF_Type_Schema.rnc" type="compact"?>
+
+<serializable name="Altimeter" namespace="Drv">
+    <comment>
+    Altimeter EU data.
+    </comment>
+    <members>
+        <member name="distance" type="F32" comment="Distance in m"/>
+        <member name="status" type="U32" comment=""/>
+        <member name="time_secs" type="U32" comment="Timestamp seconds"/>
+        <member name="time_nsecs" type="U32" comment="Timestamp nano-seconds"/>
+    </members>
+</serializable>
