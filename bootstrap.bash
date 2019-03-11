@@ -38,6 +38,8 @@ pushd .
 
 if [ -e ${QUEST_DEV_ROOT}/cross_toolchain ]; then
     cd ${QUEST_DEV_ROOT}/cross_toolchain
+    
+    ./installsdk.sh --APQ8096 ${SDFLIGHT_TOOLS_ROOT}
 
     export HEXAGON_SDK_ROOT=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/Hexagon_SDK/3.0
     ./installsdk.sh --APQ8074 --arm-gcc --qrlSDK --no-verify ${SDFLIGHT_TOOLS_ROOT}
