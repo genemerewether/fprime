@@ -27,7 +27,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_dsp_relay_test)(void) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_test)(void) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_open)(int gpio) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_close)(int fd) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_configure)(int fd, int type) __QAIC_HEADER_ATTRIBUTE;

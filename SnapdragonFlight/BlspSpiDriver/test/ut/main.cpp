@@ -4,7 +4,6 @@
 
 #include "Tester.hpp"
 #include <stdlib.h>
-#include <SnapdragonFlight/DspRpcAllocator/DspRpcAllocator.hpp>
 
 //TEST(Test, NominalTlm) {
 //  Svc::Tester tester;

@@ -414,6 +414,8 @@ HEXREF_MODULES := \
 	LLProc/LLTlmChan
 #Svc/ComLogger
 
+DSPRELAY_MODULES := SnapdragonFlight/DspRelay
+
 TESTRPC_MODULES := \
 	TESTRPC/Top \
 	HEXREF/Rpc \
@@ -592,7 +594,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

@@ -15,11 +15,17 @@ include $(BUILD_ROOT)/mk/makefiles/deployment_makefile.mk
 
 include $(BUILD_ROOT)/Svc/Startup/patch/patch.mk
 
-load_dsp: default_build
+load_8074: default_build
 	adb push ./$(__DEFAULT_BUILD_OUT)/HEXREF /usr/share/data/adsp/libhexref_skel.so
 
-only_load:
+only_load_8074:
 	adb push ./$(__DEFAULT_BUILD_OUT)/HEXREF /usr/share/data/adsp/libhexref_skel.so
+
+load_8096: default_build
+	adb push ./$(__DEFAULT_BUILD_OUT)/HEXREF /usr/lib/rfsa/adsp/libhexref_skel.so
+
+only_load_8096:
+	adb push ./$(__DEFAULT_BUILD_OUT)/HEXREF /usr/lib/rfsa/adsp/libhexref_skel.so
 
 rebuild_hex:
 	make gen_make DSPAL_opt_clean DSPAL_opt

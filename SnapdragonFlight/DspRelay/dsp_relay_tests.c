@@ -10,18 +10,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/ioctl.h>
-#include <test_status.h>
-#include <test_utils.h>
 
 #include "dsp_relay_local.h"
 #include "gpio_defs.h"
 
 #include <dev_fs_lib_serial.h>
 
+#include <dspal/test/include/dspal_log.h>
 
 unsigned char test_data[10];
 
-int dsp_relay_dsp_relay_test(void) {
+int dsp_relay_test(void) {
     LOG_INFO("Relay test");
 
 #if 0

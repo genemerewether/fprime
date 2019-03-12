@@ -18,7 +18,6 @@
 // ====================================================================== 
 
 #include "Tester.hpp"
-#include <SnapdragonFlight/DspRpcAllocator/DspRpcAllocator.hpp>
 
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 10
@@ -113,9 +112,6 @@ namespace SnapdragonFlight {
   void Tester::sendBuffer(BYTE* buffer, NATIVE_INT_TYPE size) {
       Fw::Buffer w;
 
-      DspRpcAllocator allocator;
-
-
       w.setdata((U64)buffer);
       w.setsize(size);
 
@@ -126,7 +122,7 @@ namespace SnapdragonFlight {
       printf("\n");
 
       BYTE* rb = 0;
-      rb = (BYTE*) allocator.allocate(0,size);
+      rb = (BYTE*) malloc(size);
 
 
       Fw::Buffer r(0,0,(U64)rb,size);
@@ -139,6 +135,8 @@ namespace SnapdragonFlight {
           printf("0x%02X ",d[byte]);
       }
       printf("\n");
+
+      free(rb);
   }
 
 } // end namespace SnapdragonFlight

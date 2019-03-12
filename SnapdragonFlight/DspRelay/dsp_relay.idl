@@ -22,7 +22,7 @@
 interface dsp_relay
 {
 
-   long dsp_relay_test();
+   long test();
 
     // GPIO interfaces
 

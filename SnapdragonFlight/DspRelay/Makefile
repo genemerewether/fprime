@@ -19,9 +19,3 @@ idl: dsp_relay_skel.c dsp_relay_stub.c dsp_relay.h
 
 dsp_relay_skel.c dsp_relay_stub.c dsp_relay.h: dsp_relay.idl
 	$(HEXAGON_SDK_ROOT)/tools/qaic/Ubuntu14/qaic -mdll -I $(HEXAGON_SDK_ROOT)/incs/stddef dsp_relay.idl
-
-load_8074: ut_DSPAL
-	adb push test/ut/dspal-hex-clang-cross-ut-nocov-dspal-bin/test_ut /usr/share/data/adsp/libdsp_relay_skel.so
-
-load_8096: ut_DSPAL
-	adb push test/ut/dspal-hex-clang-cross-ut-nocov-dspal-bin/test_ut /usr/lib/rfsa/adsp/libdsp_relay_skel.so

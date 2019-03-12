@@ -424,8 +424,8 @@ static const Parameter parameters[4] = {{0x4,{{(const uintptr_t)0,(const uintptr
 static const Parameter* const parameterArrays[14] = {(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[3])),(&(parameters[1])),(&(parameters[0])),(&(parameters[1])),(&(parameters[2]))};
 static const Method methods[7] = {{REMOTE_SCALARS_MAKEX(0,0,0x0,0x0,0x0,0x0),0x0,0x0,0,0,0,0x0,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x4,0x0,1,1,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x8,0x0,2,2,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x20,0x0,8,8,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x2,0x0,0x0),0x8,0x4,5,3,(&(parameterArrays[11])),0x4,0x4},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x0,0x0,0x0),0xc,0x0,4,3,(&(parameterArrays[7])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x1,0x0,0x0),0xc,0x0,6,3,(&(parameterArrays[8])),0x4,0x1}};
 static const Method* const methodArrays[20] = {&(methods[0]),&(methods[1]),&(methods[1]),&(methods[2]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[2]),&(methods[1]),&(methods[1]),&(methods[3]),&(methods[4]),&(methods[5]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[6]),&(methods[1])};
-static const char strings[466] = "uart_receive_allocate\0spi_relay_read_write\0uart_relay_configure\0gpio_relay_start_int\0gpio_relay_configure\0spi_relay_configure\0gpio_relay_isr_wait\0uart_relay_close\0uart_relay_write\0gpio_relay_write\0gpio_relay_close\0spi_relay_close\0uart_relay_quit\0uart_relay_read\0uart_relay_open\0gpio_relay_quit\0gpio_relay_read\0gpio_relay_open\0spi_relay_open\0dsp_relay_test\0flow_control\0write_data\0read_data\0stop_bits\0parity\0device\0clock\0bytes\0block\0value\0size\0buff\0baud\0type\0gpio\0fd\0";
-static const uint16_t methodStrings[59] = {43,463,407,448,400,395,390,356,426,22,463,369,380,163,463,407,443,246,407,443,420,106,463,414,0,407,438,146,463,407,126,458,463,64,458,463,180,463,432,85,463,453,214,463,326,407,230,407,262,407,278,458,294,463,197,463,310,458,341};
+static const char strings[456] = "uart_receive_allocate\0spi_relay_read_write\0uart_relay_configure\0gpio_relay_start_int\0gpio_relay_configure\0spi_relay_configure\0gpio_relay_isr_wait\0uart_relay_close\0uart_relay_write\0gpio_relay_write\0gpio_relay_close\0spi_relay_close\0uart_relay_quit\0uart_relay_read\0uart_relay_open\0gpio_relay_quit\0gpio_relay_read\0gpio_relay_open\0spi_relay_open\0flow_control\0write_data\0read_data\0stop_bits\0parity\0device\0clock\0bytes\0block\0value\0size\0buff\0baud\0type\0gpio\0test\0fd\0";
+static const uint16_t methodStrings[59] = {43,453,392,433,385,380,375,341,411,22,453,354,365,163,453,392,428,246,392,428,405,106,453,399,0,392,423,146,453,392,126,443,453,64,443,453,180,453,417,85,453,438,214,453,326,392,230,392,262,392,278,443,294,453,197,453,310,443,448};
 static const uint16_t methodStringsArrays[20] = {58,56,54,39,36,52,33,30,50,48,0,17,13,27,46,24,44,21,9,42};
 __QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(dsp_relay_slim) = {20,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
 #endif //_DSP_RELAY_SLIM_H
@@ -511,6 +511,8 @@ __QAIC_STUB_EXPORT remote_handle _dsp_relay_handle(void) {
 
 #endif //__qdsp6__
 
+int remote_register_dma_handle(int, uint32_t);
+
 __QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_skel_invoke)(uint32_t _sc, remote_arg* _pra) __QAIC_STUB_ATTRIBUTE {
    return __QAIC_REMOTE(remote_handle_invoke)(_dsp_relay_handle(), _sc, _pra);
 }
@@ -530,7 +532,7 @@ static __inline int _stub_method(remote_handle _handle, uint32_t _mid) {
    _CATCH(_nErr) {}
    return _nErr;
 }
-__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_dsp_relay_test)(void) __QAIC_STUB_ATTRIBUTE {
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_test)(void) __QAIC_STUB_ATTRIBUTE {
    uint32_t _mid = 0;
    return _stub_method(_dsp_relay_handle(), _mid);
 }
