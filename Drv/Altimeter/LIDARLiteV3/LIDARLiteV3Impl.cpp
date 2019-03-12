@@ -35,10 +35,17 @@ namespace Drv {
     LIDARLiteV3ComponentImpl(
         const char *const compName
     ) :
-      LIDARLiteV3ComponentBase(compName)
+      LIDARLiteV3ComponentBase(compName),
 #else
     LIDARLiteV3Impl(void)
+      :
 #endif
+      init_state(LLV3_INIT_CONFIG),
+      init_registers_idx(0),
+      i2c_state(LLV3_I2C_WAITING),
+      i2cWriteBuffer(),
+      i2cReadBuffer(),
+      altimeter_eu()
   {
 
   }
@@ -57,7 +64,7 @@ namespace Drv {
 
   }
 
-  const LIDARLiteV3ComponentImpl::LLV3InitReg init_registers[] = {
+  const LIDARLiteV3ComponentImpl::LLV3InitReg LIDARLiteV3ComponentImpl::init_registers[] = {
       {LLV3_SIG_COUNT_VAL_REG, LLV3_SIG_COUNT_VAL},
       {LLV3_ACQ_CONFIG_REG, LLV3_ACQ_CONFIG_VAL},
       {LLV3_THRESHOLD_BYPASS_REG, LLV3_THRESHOLD_BYPASS_VAL}
@@ -88,15 +95,17 @@ namespace Drv {
 
         case LLV3_INIT_CONFIG:
 
-            this->I2CConfig_out(0, 100000, 0x62, 0);
+            this->I2CConfig_out(0, 100000, LLV3_ADDR, 0);
+
+            this->init_state = LLV3_INIT_WRITE_REG;
             break;
 
         case LLV3_INIT_WRITE_REG:
         {
             this->reset_i2c_buffers();
 
-            I2CWriteSingleRegisterHelper(init_registers[init_registers_idx].reg,
-                                         init_registers[init_registers_idx].value,
+            I2CWriteSingleRegisterHelper(LIDARLiteV3ComponentImpl::init_registers[init_registers_idx].reg,
+                                         LIDARLiteV3ComponentImpl::init_registers[init_registers_idx].value,
                                          this->i2cWriteBuffer,
                                          this->i2cReadBuffer);
 
@@ -122,7 +131,7 @@ namespace Drv {
                     // Continue with initialization
                     this->init_registers_idx++;
 
-                    if (this->init_registers_idx >= FW_NUM_ARRAY_ELEMENTS(this->init_registers))
+                    if (this->init_registers_idx >= FW_NUM_ARRAY_ELEMENTS(LIDARLiteV3ComponentImpl::init_registers))
                     {
                         this->init_state = LLV3_INIT_COMPLETE;
                     } else {
@@ -190,8 +199,9 @@ namespace Drv {
     verify_status()
   {
     U8 status = i2cReadBufferArr[0];
+    U8 exp_mask_val = LLV3_STATUS_HEALTH_OK;
 
-    return ((status & LLV3_STATUS_ERR_MASK) == 0) ? true : false;
+    return ((status & LLV3_STATUS_ERR_MASK) == exp_mask_val) ? true : false;
   }
 
   void LIDARLiteV3ComponentImpl ::
@@ -202,7 +212,7 @@ namespace Drv {
   {
     Drv::I2CStatus i2cStatus;
 
-    if (portNum == LLV3_RG_FAST) {
+    if (context == LLV3_RG_FAST) {
         if (this->init_state != LLV3_INIT_COMPLETE)
         {
             this->initialize_sm();
@@ -334,7 +344,7 @@ namespace Drv {
 
             }
         }
-    } else if (portNum == LLV3_RG_SLOW) {
+    } else if (context == LLV3_RG_SLOW) {
 
         if (this->init_state == LLV3_INIT_COMPLETE) {
             if (this->i2c_state == LLV3_I2C_WAITING) {

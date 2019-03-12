@@ -19,7 +19,7 @@
 #define LLV3_READ_SEQ (1 << 7)
 
 #define LLV3_STATUS_PROC_ERR (1 << 6)
-#define LLV3_STATUS_HEALTH_ERR (1 << 5)
+#define LLV3_STATUS_HEALTH_OK (1 << 5)
 #define LLV3_STATUS_2ND_RETURN_ERR (1 << 4)
 #define LLV3_STATUS_SIGNAL_ERR (1 << 3)
 #define LLV3_STATUS_OVF_ERR (1 << 2)
@@ -39,6 +39,8 @@
 
 namespace Drv {
 
+    static const U8 LLV3_ADDR = 0x62;
+
     static const U32 LLV3_WRITE_BUFF_LEN = 8;
     static const U32 LLV3_READ_BUFF_LEN = 8;
 
@@ -51,7 +53,7 @@ namespace Drv {
     static const U8 LLV3_ACQ_CMD = 0x4;
 
     static const U8 LLV3_STATUS_ERR_MASK = LLV3_STATUS_PROC_ERR |
-                                           LLV3_STATUS_HEALTH_ERR |
+                                           LLV3_STATUS_HEALTH_OK |
                                            LLV3_STATUS_2ND_RETURN_ERR |
                                            LLV3_STATUS_SIGNAL_ERR |
                                            LLV3_STATUS_OVF_ERR;

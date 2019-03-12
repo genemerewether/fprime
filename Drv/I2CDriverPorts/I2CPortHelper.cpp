@@ -53,6 +53,7 @@ namespace Drv {
 
       writeBuffer[0] = reg;
 
+      i2cWriteBuffer.setsize(1);
       i2cReadBuffer.setsize(read_bytes);
   }
 
