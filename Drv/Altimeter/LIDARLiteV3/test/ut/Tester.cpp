@@ -152,7 +152,7 @@ namespace Drv {
 
     // Confirm that a slow sched call doesn't interrupt initialization
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_SLOW);
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(0);
@@ -198,9 +198,9 @@ namespace Drv {
 
     int i;
     for (i = 0; i < 5; i++) {
-        // Trigger a read with a SLOW sched call
+        // Trigger a read with a MEASURE sched call
         this->clearHistory();
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_SLOW);
+        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
 
 
@@ -368,19 +368,462 @@ namespace Drv {
   void Tester ::
     status_err_test(void) 
   {
-    ASSERT_TRUE(false);
+    U8* i2c_read_data;
+
+    // Fake initialization
+    this->component.init_state = LIDARLiteV3ComponentImpl::LLV3_INIT_COMPLETE;
+    this->component.init_registers_idx = FW_NUM_ARRAY_ELEMENTS(LIDARLiteV3ComponentImpl::init_registers);
+
+    // Trigger a read with a MEASURE sched call
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
+
+
+    // Start the I2C transaction. Send the ACQ Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(2, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(0, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                exp_acq_cmd,
+                sizeof(exp_acq_cmd)));
+
+
+    // Get ACQ Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Send Status Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(1, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(1, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                exp_status_cmd,
+                sizeof(exp_status_cmd)));
+
+
+    // Get Status Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
+    i2c_read_data[0] = LLV3_STATUS_HEALTH_OK | LLV3_STATUS_PROC_ERR;
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Should be 1 once we add EVRs
+    //ASSERT_EVENTS_SIZE(0);
   }
 
   void Tester ::
     nack_test(void) 
   {
-    ASSERT_TRUE(false);
+    U8* i2c_read_data;
+
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_CONFIG, this->component.init_state);
+
+    // Send a Config port message
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
+
+    ASSERT_from_I2CConfig_SIZE(1);
+    ASSERT_from_I2CConfig(0, 100000, LLV3_ADDR, 0);
+
+
+    // Send a write to SIG_COUNT_VAL
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(2, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(0, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_init_sig_count,
+                        sizeof(exp_init_sig_count)));
+
+
+    // Get the status of the SIG_COUNT_VAL write
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Send a write to ACQ_CONFIG_REG
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(2, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(0, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_init_acq_config,
+                        sizeof(exp_init_acq_config)));
+
+    // Get the status of the ACQ_CONFIG_REG busy
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_TX_NACK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+
+
+    // Fake initialization
+    this->component.init_state = LIDARLiteV3ComponentImpl::LLV3_INIT_COMPLETE;
+    this->component.init_registers_idx = FW_NUM_ARRAY_ELEMENTS(LIDARLiteV3ComponentImpl::init_registers);
+
+    // Attempt 1
+
+    // Trigger a read with a MEASURE sched call
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
+
+
+    // Start the I2C transaction. Send the ACQ Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(2, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(0, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_acq_cmd,
+                        sizeof(exp_acq_cmd)));
+
+
+    // Get ACQ Cmd Status. Not ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_TX_NACK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // TODO: Check for EVRs
+    
+
+    // Attempt 2
+
+    // Trigger a read with a MEASURE sched call
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
+
+
+    // Start the I2C transaction. Send the ACQ Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(2, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(0, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_acq_cmd,
+                        sizeof(exp_acq_cmd)));
+
+
+    // Get ACQ Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Send Status Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(1, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(1, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_status_cmd,
+                        sizeof(exp_status_cmd)));
+
+
+    // Get Status Cmd Status. Not ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_TX_NACK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // TODO: Check for EVR
+
+    // Attempt 3
+
+    // Trigger a read with a MEASURE sched call
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
+
+
+    // Start the I2C transaction. Send the ACQ Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(2, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(0, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_acq_cmd,
+                        sizeof(exp_acq_cmd)));
+
+
+    // Get ACQ Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Send Status Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(1, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(1, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_status_cmd,
+                        sizeof(exp_status_cmd)));
+
+
+    // Get Status Cmd Status. Not ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_BUSY;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+
+    // Get Status Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
+    i2c_read_data[0] = LLV3_STATUS_HEALTH_OK;
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Send Measure Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(1, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(2, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_measure_cmd,
+                        sizeof(exp_measure_cmd)));
+
+
+    // Get Measure Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_TX_NACK;
+    i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
+
+    // Send 1316 cm, or 13.16m
+    i2c_read_data[0] = 0x5;
+    i2c_read_data[1] = 0x24;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // TODO: Check for EVR
+
   }
 
   void Tester ::
     early_rg_test(void)
   {
-    ASSERT_TRUE(false);
+    U8* i2c_read_data;
+
+    // Fake initialization
+    this->component.init_state = LIDARLiteV3ComponentImpl::LLV3_INIT_COMPLETE;
+    this->component.init_registers_idx = FW_NUM_ARRAY_ELEMENTS(LIDARLiteV3ComponentImpl::init_registers);
+
+    // Trigger a read with a MEASURE sched call
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
+
+
+    // Start the I2C transaction. Send the ACQ Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(2, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(0, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_acq_cmd,
+                        sizeof(exp_acq_cmd)));
+
+
+    // Get ACQ Cmd Status. Not ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_BUSY;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Get ACQ Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Send Status Cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(1, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(1, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_status_cmd,
+                        sizeof(exp_status_cmd)));
+
+
+    // Get Status Cmd Status. Not ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_BUSY;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+
+    // Get Status Cmd Status. Ready, but busy
+    this->clearHistory();
+    i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
+    i2c_read_data[0] = LLV3_STATUS_BUSY | LLV3_STATUS_HEALTH_OK;
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+
+    // Send Status cmd
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteRead_SIZE(1);
+
+    ASSERT_EQ(1, this->writeBuffer_ptr->getsize());
+    ASSERT_EQ(1, this->readBuffer_ptr->getsize());
+
+    ASSERT_EQ(0, memcmp(reinterpret_cast<U8*>(this->writeBuffer_ptr->getdata()),
+                        exp_status_cmd,
+                        sizeof(exp_status_cmd)));
+
+    // Get Status Cmd Status. Not ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_BUSY;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Get Status Cmd Status. Ready
+    this->clearHistory();
+    this->ret_i2c_status = I2C_STATUS_OK;
+    i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
+    i2c_read_data[0] = LLV3_STATUS_HEALTH_OK;
+    this->ret_i2c_status = I2C_STATUS_OK;
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD, this->component.i2c_state);
+
+    ASSERT_from_I2CWriteReadStatus_SIZE(1);
+    ASSERT_from_I2CWriteReadStatus(0, false);
+
+    // Send a measurement sched call to trigger EVR
+    this->clearHistory();
+    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+
+    // TODO: Check for EVR
   }
 
   // ----------------------------------------------------------------------

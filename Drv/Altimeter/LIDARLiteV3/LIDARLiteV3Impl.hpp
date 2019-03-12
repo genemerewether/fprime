@@ -85,7 +85,7 @@ namespace Drv {
 
       enum LLV3RateGroup {
           LLV3_RG_FAST = 0,
-          LLV3_RG_SLOW = 1
+          LLV3_RG_MEASURE = 1
       };
 
       enum LLV3InitState {

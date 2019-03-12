@@ -246,7 +246,8 @@ namespace Drv {
                             this->i2c_state = LLV3_I2C_STATUS_CMD;
                             break;
                         case I2C_STATUS_TX_NACK:
-                            this->i2c_state = LLV3_I2C_ACQ_CMD;
+                            // EVR
+                            this->i2c_state = LLV3_I2C_WAITING;
                             break;
                         case I2C_STATUS_RX_NACK:
                             FW_ASSERT(false);
@@ -296,7 +297,8 @@ namespace Drv {
                             break;
                         case I2C_STATUS_TX_NACK:
                         case I2C_STATUS_RX_NACK:
-                            this->i2c_state = LLV3_I2C_STATUS_CMD;
+                            // EVR
+                            this->i2c_state = LLV3_I2C_WAITING;
                             break;
                         default:
                             FW_ASSERT(false);
@@ -332,7 +334,7 @@ namespace Drv {
                             break;
                         case I2C_STATUS_TX_NACK:
                         case I2C_STATUS_RX_NACK:
-                            // At this point, just start over
+                            // EVR
                             this->i2c_state = LLV3_I2C_WAITING;
                             break;
                         default:
@@ -344,7 +346,7 @@ namespace Drv {
 
             }
         }
-    } else if (context == LLV3_RG_SLOW) {
+    } else if (context == LLV3_RG_MEASURE) {
 
         if (this->init_state == LLV3_INIT_COMPLETE) {
             if (this->i2c_state == LLV3_I2C_WAITING) {
