@@ -26,6 +26,7 @@ void block_indefinite(void)
   sem_wait(&forever);
 }
 
+#ifndef TARGET_8096
 void _Read_uleb(void)
 {
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
@@ -62,12 +63,6 @@ void _Parse_lsda(void)
   block_indefinite();
 }
 
-void __cxa_guard_release(void)
-{
-  DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
-  block_indefinite();
-}
-
 void _Read_enc_ptr(void)
 {
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
@@ -80,6 +75,12 @@ void _Read_sleb(void)
   block_indefinite();
 }
 
+void __cxa_guard_release(void)
+{
+  DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
+  block_indefinite();
+}
+  
 void __cxa_guard_acquire(void)
 {
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
@@ -91,5 +92,6 @@ void __cxa_pure_virtual()
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
   block_indefinite();
 }
+#endif // TARGET_8096
 
 }; //extern "C"
