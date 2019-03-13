@@ -10,6 +10,9 @@ COV_BUILD: DSPAL_bin_clean DSPAL
 
 include $(BUILD_ROOT)/mk/makefiles/deployment_makefile.mk
 
+load: SDFLIGHT_opt
+	adb push linux-linaro-cross-arm-opt-gnu-bin/DSPRELAY /eng/load/DSPRELAY
+
 load_8074: default_build
 	adb push ./dspal-hex-clang-cross-opt-dspal-bin/DSPRELAY /usr/share/data/adsp/libdsp_relay_skel.so
 

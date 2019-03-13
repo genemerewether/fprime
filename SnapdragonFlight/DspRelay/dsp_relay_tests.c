@@ -53,7 +53,7 @@ int dsp_relay_test(void) {
 
 #endif
 
-#if 1
+#if 0
 
     LOG_INFO("UART Test");
 

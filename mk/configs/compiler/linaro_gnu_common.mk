@@ -24,7 +24,7 @@ LOAD_SIZE := $(SIZE)
 LINK_LIBS := -ldl -lpthread -lm -lrt -lutil
 LINK_LIBS +=    --sysroot=$(HEXAGON_ARM_SYSROOT) \
 		-L$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
-		-ladsprpc
+		-l$(TARGET_DSP)rpc
 
 OPT_SPEED := -O3 -funroll-loops
 DEBUG := -g3

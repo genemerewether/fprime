@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 {
 
 #if 1 // flow control
-    int device = 2;
+    int device = 5;
     int toggles = 6;
 
     printf("Opening UART device %d\n",device);

@@ -93,7 +93,6 @@ SRC_DSPAL =  Pthreads/Queue.cpp \
 				Dspal/IPCQueueStub.cpp \
 				Dspal/Task.cpp \
 				LogPrintf.cpp \
-				Linux/InterruptLock.cpp \
 				Linux/WatchdogTimer.cpp \
 				X86/IntervalTimer.cpp \
 				Dspal/IntervalTimer.cpp \

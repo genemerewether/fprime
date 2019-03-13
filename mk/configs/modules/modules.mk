@@ -416,11 +416,26 @@ HEXREF_MODULES := \
 	LLProc/LLTlmChan
 #Svc/ComLogger
 
-DSPRELAY_MODULES := SnapdragonFlight/DspRelay
+DSPRELAY_MODULES := SnapdragonFlight/DspRelay \
+	SnapdragonFlight/RpcCommon
 
 MINRPC_MODULES := \
 	MINRPC/Top \
-	HEXREF/Rpc
+	HEXREF/Rpc \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(UTILS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	Svc/Sched \
+	\
+	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/KraitRouter \
+	SnapdragonFlight/RpcCommon
 
 TESTRPC_MODULES := \
 	TESTRPC/Top \
