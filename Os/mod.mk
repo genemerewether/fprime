@@ -5,6 +5,7 @@ SRC = 			TaskCommon.cpp \
 				IPCQueueCommon.cpp \
 				SimpleQueueRegistry.cpp \
 				MemCommon.cpp \
+				ValidatedFile.cpp \
 				ValidateFileCommon.cpp 
 
 HDR = 			Queue.hpp \
@@ -19,6 +20,7 @@ HDR = 			Queue.hpp \
 				Mutex.hpp \
 				File.hpp \
 				ValidateFile.hpp \
+				ValidatedFile.hpp \
 				FileSystem.hpp \
 				LocklessQueue.hpp
 
