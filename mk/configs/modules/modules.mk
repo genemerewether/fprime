@@ -76,6 +76,8 @@ SVC_EXTRA_MODULES := \
 
 SVC_MODULES := \
 	Svc/BufferManager \
+	Svc/BufferAccumulator \
+	Svc/BufferLogger \
 	Svc/CmdDispatcher \
 	Svc/CmdSequencer \
 	Svc/Seq \
@@ -416,6 +418,10 @@ HEXREF_MODULES := \
 
 DSPRELAY_MODULES := SnapdragonFlight/DspRelay
 
+MINRPC_MODULES := \
+	MINRPC/Top \
+	HEXREF/Rpc
+
 TESTRPC_MODULES := \
 	TESTRPC/Top \
 	HEXREF/Rpc \
@@ -594,7 +600,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

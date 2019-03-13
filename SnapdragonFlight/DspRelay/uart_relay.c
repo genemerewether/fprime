@@ -398,9 +398,6 @@ int dsp_relay_uart_relay_configure(int fd, int device, int baud, int parity,
 
     // set flow control
     if (flow_control) {
-#ifdef TARGET_8096 // TODO(mereweth)
-        return -1;
-#else
         struct termios t;
         int stat = tcgetattr(fd, &t);
         if (-1 == stat) {
@@ -415,7 +412,6 @@ int dsp_relay_uart_relay_configure(int fd, int device, int baud, int parity,
             LOG_ERR("tcsetattr UART fd %d failed", fd);
             return -1;
         }
-#endif
     }
 
     // save bit time in usec

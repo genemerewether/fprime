@@ -13,23 +13,21 @@ LINK_LIB_FLAGS := rcs
 LIBRARY_TO :=
 POST_LINK_LIB := ranlib
 
+FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
+
 LINK_BIN := $(CXX)
-LINK_BIN_FLAGS := -rdynamic -z muldefs $(LIBS) #$(BUILD_32BIT)
+LINK_BIN_FLAGS := $(FP_FLAGS) -rdynamic -z muldefs $(LIBS)
 
 FILE_SIZE := $(LS) $(LS_SIZE)
 LOAD_SIZE := $(SIZE)
 
 LINK_LIBS := -ldl -lpthread -lm -lrt -lutil
-LINK_LIBS += 	--sysroot=$(HEXAGON_ARM_SYSROOT) \
+LINK_LIBS +=    --sysroot=$(HEXAGON_ARM_SYSROOT) \
+		-L$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
 		-ladsprpc
-ifeq ($(TARGET_8096),)
-LINK_LIBS += -L$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug
-endif
 
 OPT_SPEED := -O3 -funroll-loops
 DEBUG := -g3
-
-FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -march=armv7-a -mfloat-abi=softfp
 
 LINUX_GNU_CFLAGS := $(LINUX_FLAGS_COMMON) \
 			$(COMMON_DEFINES) \
@@ -46,7 +44,6 @@ COVERAGE := -fprofile-arcs -ftest-coverage
 
 LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 			$(COMMON_INCLUDES) \
-			--sysroot=$(HEXAGON_ARM_SYSROOT) \
 			-I$(HEXAGON_SDK_ROOT)/incs \
 			-I$(HEXAGON_SDK_ROOT)/incs/stddef \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/inc \

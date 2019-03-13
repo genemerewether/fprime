@@ -21,9 +21,10 @@ TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 ifneq ($(TARGET_8096),)
 HEXAGON_V_ARCH := v60
 HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.1
-INDIGO_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
+#INDIGO_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
+INDIGO_ARM_SYSROOT := /opt/tools/quest/Qualcomm/ARM_Tools/gcc-4.9-2014.11/libc
 HEXAGON_ARM_SYSROOT := $(INDIGO_ARM_SYSROOT)
-ARM_CC_BASE := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/x86_64-oesdk-linux/usr/bin/arm-oemllib32-linux/arm-oemllib32-linux
+ARM_CC_BASE := /opt/tools/quest/Qualcomm/ARM_Tools/gcc-4.9-2014.11/bin/arm-linux-gnueabihf
 CC := $(ARM_CC_BASE)-gcc
 CXX := $(ARM_CC_BASE)-g++
 GCOV := $(ARM_CC_BASE)-gcov

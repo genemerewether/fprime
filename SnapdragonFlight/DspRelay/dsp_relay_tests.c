@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <sys/ioctl.h>
 
-#include "dsp_relay_local.h"
+#include "dsp_relay.h"
 #include "gpio_defs.h"
 
 #include <dev_fs_lib_serial.h>
