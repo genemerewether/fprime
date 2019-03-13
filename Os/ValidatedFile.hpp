@@ -24,6 +24,8 @@
 #include "Fw/Types/BasicTypes.hpp"
 #include "Os/ValidateFile.hpp"
 
+#include "HashBuffer.hpp"
+
 namespace Os {
 
   //! A validated file
