@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<assembly name = "R5RELAY">
+	<import_component_type>Drv/LinuxSerialDriver/LinuxSerialDriverComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>HLProc/LLRouter/LLRouterComponentAi.xml</import_component_type>
+
+   <instance namespace="Drv" name="serialDrv" type="LinuxSerialDriver"/>
+
+   <instance namespace="Svc" name="rg" type="PassiveRateGroup"/>
+
+   <instance namespace="HLProc" name="llRouter" type="LLRouter"/>
+
+
+<connection name = "Connection1">
+	 <source component = "serialDrv" port = "serialRecv" type = "SerialRead" num = "0"/>
+ 	 <target component = "llRouter" port = "SerReadPort" type = "SerialRead" num = "0"/>
+</connection>
+<connection name = "Connection2">
+	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+ 	 <target component = "llRouter" port = "Sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection3">
+	 <source component = "llRouter" port = "SerWritePort" type = "SerialWrite" num = "0"/>
+ 	 <target component = "serialDrv" port = "serialSend" type = "SerialWrite" num = "0"/>
+</connection>
+<connection name = "Connection4">
+	 <source component = "llRouter" port = "SerialBufferSend" type = "BufferSend" num = "0"/>
+ 	 <target component = "serialDrv" port = "readBufferSend" type = "BufferSend" num = "0"/>
+</connection>
+<connection name = "Connection5">
+	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+ 	 <target component = "llRouter" port = "CycleDone" type = "Sched" num = "0"/>
+</connection>
+</assembly>

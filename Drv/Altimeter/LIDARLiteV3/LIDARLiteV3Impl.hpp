@@ -60,6 +60,11 @@ namespace Drv {
           U8 reg, value;
       };
 
+      enum LLV3RateGroup {
+          LLV3_RG_FAST = 0,
+          LLV3_RG_MEASURE = 1
+      };
+
     PRIVATE:
 
       void reset_i2c_buffers();
@@ -82,11 +87,6 @@ namespace Drv {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
       );
-
-      enum LLV3RateGroup {
-          LLV3_RG_FAST = 0,
-          LLV3_RG_MEASURE = 1
-      };
 
       enum LLV3InitState {
           LLV3_INIT_WAITING,

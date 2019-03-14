@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/event_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<!--===== Svc CmdSequencer Events =========== -->
+
+<events>
+    <event id="0" name="LLV3_Dummy" severity="ACTIVITY_LO"
+        format_string="LLV3_Active">
+        <comment>Sequence file was successfully loaded.</comment>
+    </event>
+    <event id="1" name="LLV3_Distance" severity="ACTIVITY_HI"
+        format_string="Current distance %f">
+        <comment>Current Distance</comment>
+        <args>
+            <arg name="distance" type="F32">
+                <comment>Current Distnace</comment>
+            </arg>
+        </args>
+    </event>
+</events>

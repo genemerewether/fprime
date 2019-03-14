@@ -24,6 +24,8 @@
 #include <Drv/I2CDriverPorts/I2CPortHelper.hpp>
 #include <Drv/Altimeter/LIDARLiteV3/LIDARLiteV3ImplCfg.hpp>
 
+#include <stdio.h>
+
 namespace Drv {
 
   // ----------------------------------------------------------------------
@@ -94,6 +96,8 @@ namespace Drv {
             break;
 
         case LLV3_INIT_CONFIG:
+
+            this->log_ACTIVITY_LO_LLV3_Dummy();
 
             this->I2CConfig_out(0, 100000, LLV3_ADDR, 0);
 
@@ -192,7 +196,9 @@ namespace Drv {
     altimeter_eu.settime_secs(0);
     altimeter_eu.settime_nsecs(0);
 
-    this->AltimeterSend_out(0, altimeter_eu);
+    //this->AltimeterSend_out(0, altimeter_eu);
+    this->log_ACTIVITY_HI_LLV3_Distance(measurement_m);
+    this->tlmWrite_LLV3_Distance(measurement_m);
   }
 
   bool LIDARLiteV3ComponentImpl ::
@@ -348,9 +354,11 @@ namespace Drv {
         }
     } else if (context == LLV3_RG_MEASURE) {
 
+        printf("Got Measure sched\r\n");
         if (this->init_state == LLV3_INIT_COMPLETE) {
             if (this->i2c_state == LLV3_I2C_WAITING) {
 
+                printf("Starting Measurement\r\n");
                 this->i2c_state = LLV3_I2C_ACQ_CMD;
             } else {
                 // EVR here

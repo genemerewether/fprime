@@ -44,6 +44,7 @@ R5_MODULES := \
 	R5/SpiMasterDrv \
 	R5/SpiSlaveDrv \
 	R5/UartDrv \
+	R5/I2CDrv \
 	\
 	R5/TiHal \
 	R5/R5FlashApi
@@ -117,7 +118,9 @@ DRV_MODULES := \
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
-	Drv/I2CDriverPorts
+	Drv/I2CDriverPorts \
+	Drv/Altimeter/AltimeterPorts \
+	Drv/Altimeter/AltimeterTypes
 
 LLPROC_MODULES := \
 	LLProc/HLRouter \
@@ -466,6 +469,7 @@ R5REF_MODULES := \
 	\
 	Drv/IMU/MPU9250 \
 	Drv/Mavlink/ActuatorControls \
+	Drv/Altimeter/LIDARLiteV3 \
 	\
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
@@ -478,10 +482,39 @@ R5REF_MODULES := \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
 	Drv/I2CDriverPorts \
+	Drv/Altimeter/AltimeterPorts \
+	Drv/Altimeter/AltimeterTypes \
 	\
 	Os \
 	\
 	$(FW_MODULES)
+
+R5RELAY_MODULES := \
+	$(COMMON_MODULES) \
+	\
+	Drv/LinuxSerialDriver \
+	Drv/SerialDriverPorts\
+	\
+	Svc/PassiveRateGroup \
+	Svc/GndIf \
+	Svc/SocketGndIf \
+	\
+	Svc/Sched \
+	Svc/Cycle \
+	Svc/Ping \
+	Svc/PolyIf \
+	Svc/PolyDb \
+	\
+	HLProc/LLRouter \
+	\
+	Os \
+	\
+	R5RELAY/Top \
+	\
+	$(FW_MODULES) \
+	\
+	$(UTILS_MODULES)
+
 
 ACDEVTEST_MODULES := \
 	Autocoders/test/active_tester \
@@ -562,7 +595,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF R5RELAY
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

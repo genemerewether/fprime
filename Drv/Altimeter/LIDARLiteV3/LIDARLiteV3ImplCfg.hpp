@@ -55,8 +55,8 @@ namespace Drv {
     static const U8 LLV3_STATUS_ERR_MASK = LLV3_STATUS_PROC_ERR |
                                            LLV3_STATUS_HEALTH_OK |
                                            LLV3_STATUS_2ND_RETURN_ERR |
-                                           LLV3_STATUS_SIGNAL_ERR |
-                                           LLV3_STATUS_OVF_ERR;
+                                           LLV3_STATUS_SIGNAL_ERR;
+                                           //LLV3_STATUS_OVF_ERR;
 
 
 } // namespace Drv

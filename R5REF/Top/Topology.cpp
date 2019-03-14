@@ -31,6 +31,7 @@ Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
+Drv::LIDARLiteV3ComponentImpl* lidarLiteV3_ptr = 0;
 
 R5::R5GpioDriverComponentImpl* gpio_ptr = 0;
 R5::R5SpiMasterDriverComponentImpl* spiMaster_ptr = 0;
@@ -39,6 +40,7 @@ R5::R5UartDriverComponentImpl* debugUart_ptr = 0;
 R5::R5TimeComponentImpl* r5Time_ptr = 0;
 R5::R5A2DDriverComponentImpl* a2dDrv_ptr = 0;
 R5::R5PrmComponentImpl* prm_ptr = 0;
+R5::R5I2CDriverComponentImpl* i2c1Drv_ptr = 0;
 
 R5::R5GpioAdapterComponentImpl* rtiGpio_ptr = 0;
 R5::R5GpioAdapterComponentImpl* faultGpio_ptr = 0;
@@ -49,6 +51,7 @@ LLProc::LLCycleComponentImpl* llCycle_ptr = 0;
 LLProc::HLRouterComponentImpl* hlRouter_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
+
 
 static R5DmaAllocator alloc;
 
@@ -61,6 +64,7 @@ void allocComps() {
         0, // logQueue
         0, // chanTlm
         LLProc::HLRTR_SCHED_UART_SEND,
+        Drv::LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE
     };
 
     rgTlm_ptr = new Svc::PassiveRateGroupImpl(
@@ -85,6 +89,8 @@ void allocComps() {
         0, //logQueue
         LLProc::HLRTR_SCHED_UART_SEND,
         LLProc::HLRTR_SCHED_UART_RECEIVE,
+        0,
+        Drv::LIDARLiteV3ComponentImpl::LLV3_RG_FAST
     };
     rgAtt_ptr = new Svc::PassiveRateGroupImpl(
     #if FW_OBJECT_NAMES == 1
@@ -229,6 +235,19 @@ void allocComps() {
                         ("TLMCHAN")
 #endif
 ;
+
+    lidarLiteV3_ptr = new Drv::LIDARLiteV3ComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("LLV3")
+#endif
+;
+
+    i2c1Drv_ptr = new R5::R5I2CDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("I2C1")
+#endif
+;
+
 }
 
 void manualConstruct() {
@@ -251,6 +270,10 @@ void manualConstruct() {
     hlRouter_ptr->set_HLPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+
+    llDebug_ptr->set_SerWritePort_OutputPort(0, debugUart_ptr->get_serialSend_InputPort(0));
+
+    //lidarLiteV3_ptr->set_LogText_OutputPort(0, reinterpret_cast<Fw::InputLogTextPort*>(debugUart_ptr->get_serialSend_InputPort(0)));
 }
 
 void constructApp() {
@@ -309,6 +332,11 @@ void constructApp() {
 
     llDebug_ptr->init(0);
     llCycle_ptr->init(0);
+
+    lidarLiteV3_ptr->init(0);
+
+    i2c1Drv_ptr->init(0);
+    i2c1Drv_ptr->initDriver(128, 128, alloc);
 
     // Connect rate groups to rate group driver
     constructR5REFArchitecture();
