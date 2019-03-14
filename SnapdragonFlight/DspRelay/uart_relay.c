@@ -40,7 +40,7 @@
 #include <assert.h>
 
 // A message queue per potential UART - indexed by device number
-#define NUM_UARTS (6)
+#define NUM_UARTS (10)
 
 // double buffers for received data
 static struct UartRecvBufferEntry {
@@ -385,6 +385,11 @@ int dsp_relay_uart_check_devs(void) {
 
 int dsp_relay_uart_relay_configure(int fd, int device, int baud, int parity,
         int bits, int stop_bits, int flow_control, int block) {
+  
+    if (device >= NUM_UARTS) {
+        LOG_ERR("Requested device id %d too large", device);
+        return -10;
+    }
 
     struct dspal_serial_ioctl_data_rate rate = { .bit_rate = baud };
 
