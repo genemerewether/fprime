@@ -21,8 +21,10 @@ LINK_BIN_FLAGS := $(FP_FLAGS) -rdynamic -z muldefs $(LIBS)
 FILE_SIZE := $(LS) $(LS_SIZE)
 LOAD_SIZE := $(SIZE)
 
-LINK_LIBS := -ldl -lpthread -lm -lrt -lutil
-LINK_LIBS +=    --sysroot=$(HEXAGON_ARM_SYSROOT) \
+SYSLIBS := dl pthread m rt util
+LINK_LIBS :=    --sysroot=$(HEXAGON_ARM_SYSROOT) \
+		$(foreach LIB,$(SYSLIBS),$(HEXAGON_ARM_SYSROOT)/usr/lib/lib$(LIB).so) \
+		$(RPATH_SYSROOT_CMD) \
 		-L$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
 		-l$(TARGET_DSP)rpc
 
@@ -52,7 +54,7 @@ LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/adspmsgd/ship/UbuntuARM_Debug \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
 			-I$(HEXAGON_SDK_ROOT)/incs/stddef \
-			$(INCLUDE_ARM_SYSROOT)
+			$(INCLUDE_ARM_SYSROOT_CMD)
 
 DUMP = $(BUILD_ROOT)/mk/bin/empty.sh
 

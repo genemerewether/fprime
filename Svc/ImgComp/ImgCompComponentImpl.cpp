@@ -21,7 +21,7 @@
 #include <Svc/ImgComp/ImgCompComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
-#include <Svc/ImgComp/CameraFrameSerializableAc.hpp>
+#include <Svc/CameraFrame/CameraFrameSerializableAc.hpp>
 
 #include <stdlib.h>
 #include <sys/time.h>

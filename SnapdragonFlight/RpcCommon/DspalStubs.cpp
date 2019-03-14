@@ -25,8 +25,17 @@ void block_indefinite(void)
   sem_init(&forever, 0, 0);
   sem_wait(&forever);
 }
+  
+#ifdef TARGET_8096
 
-#ifndef TARGET_8096
+void __cxa_atexit(void)
+{
+  DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
+  //block_indefinite();
+}
+  
+#else
+  
 void _Read_uleb(void)
 {
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);

@@ -117,6 +117,7 @@ SVC_MODULES := \
 	Svc/ActiveDecoupler \
 	Svc/UdpSender \
 	Svc/UdpReceiver \
+	Svc/CameraFrame \
 	Svc/IPCRelay
 
 DRV_MODULES := \
