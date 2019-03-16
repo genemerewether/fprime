@@ -24,7 +24,13 @@ TARGET_DSP := sdsp
 HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.1
 INDIGO_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
 HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/ARM_Tools/gcc-4.9-2014.11/libc
-INCLUDE_ARM_SYSROOT := # --sysroot=$(INDIGO_ARM_SYSROOT)
+
+RPATH_SYSROOT_CMD := -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib
+# arbitrary convention - for use in inc.mk
+INCLUDE_ARM_SYSROOTS := $(INDIGO_ARM_SYSROOT)
+# arbitrary convention - for use in linaro_gnu_common.mk
+INCLUDE_ARM_SYSROOT_CMD := -I$(INDIGO_ARM_SYSROOT)/usr/include/
+
 ARM_CC_BASE := /opt/tools/quest/Qualcomm/ARM_Tools/gcc-4.9-2014.11/bin/arm-linux-gnueabihf
 CC := $(ARM_CC_BASE)-gcc
 CXX := $(ARM_CC_BASE)-g++
@@ -42,8 +48,13 @@ GCOV := $(ARM_CC_BASE)-gcov
 AR := $(ARM_CC_BASE)-ar
 HEXAGON_TOOLS_ROOT := /opt/tools/quest/Qualcomm/HEXAGON_Tools/7.2.12/Tools
 HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/qrlinux_sysroot
-INCLUDE_ARM_SYSROOT := --sysroot=$(HEXAGON_ARM_SYSROOT)
 INDIGO_ARM_SYSROOT :=  /opt/tools/quest/Qualcomm/indigo_sysroot
+
+RPATH_SYSROOT_CMD := -L$(HEXAGON_ARM_SYSROOT)/usr/lib/ -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/
+# arbitrary convention - for use in inc.mk
+INCLUDE_ARM_SYSROOTS := $(INDIGO_ARM_SYSROOT)
+# arbitrary convention - for use in linaro_gnu_common.mk
+INCLUDE_ARM_SYSROOT_CMD := --sysroot=$(HEXAGON_ARM_SYSROOT)
 endif
 
 CRC := $(BUILD_ROOT)/mk/bin/run_file_crc.sh

@@ -41,6 +41,21 @@ if [ -e ${QUEST_DEV_ROOT}/cross_toolchain ]; then
     
     ./installsdk.sh --APQ8096 --arm-gcc ${SDFLIGHT_TOOLS_ROOT}
 
+    PTHREAD_FILE=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/ARM_Tools/gcc-4.9-2014.11/libc/usr/lib/libpthread.so
+    echo "/* GNU ld script" > ${PTHREAD_FILE}
+    echo "Use the shared library, but some functions are only in" >> ${PTHREAD_FILE}
+    echo "the static library, so try that secondarily.  */" >> ${PTHREAD_FILE}
+    echo "OUTPUT_FORMAT(elf32-littlearm)" >> ${PTHREAD_FILE}
+    echo "GROUP ( libpthread.so.0 libpthread_nonshared.a )" >> ${PTHREAD_FILE}
+
+    LIBC_FILE=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/ARM_Tools/gcc-4.9-2014.11/libc/usr/lib/libc.so
+    echo "/* GNU ld script" > ${LIBC_FILE}
+    echo "Use the shared library, but some functions are only in" >> ${LIBC_FILE}
+    echo "the static library, so try that secondarily.  */" >> ${LIBC_FILE}
+    echo "OUTPUT_FORMAT(elf32-littlearm)" >> ${LIBC_FILE}
+    echo "GROUP ( ../../lib/libc.so.6 ../../usr/lib/libc_nonshared.a" >> ${LIBC_FILE}
+    echo "AS_NEEDED ( ../../lib/ld-linux-armhf.so.3 ))" >> ${LIBC_FILE}
+
     export HEXAGON_SDK_ROOT=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/Hexagon_SDK/3.0
     ./installsdk.sh --APQ8074 --arm-gcc --qrlSDK --no-verify ${SDFLIGHT_TOOLS_ROOT}
     mv ${SDFLIGHT_TOOLS_ROOT}/Qualcomm/ARM_Tools/gcc-4.9-2014.11 ${SDFLIGHT_TOOLS_ROOT}/Qualcomm/Hexagon_SDK/3.0/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux || true

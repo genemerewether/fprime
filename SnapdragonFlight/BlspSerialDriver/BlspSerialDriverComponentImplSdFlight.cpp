@@ -26,6 +26,9 @@
 #include <unistd.h>
 #include <time.h>
 
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace SnapdragonFlight {
 
     // ----------------------------------------------------------------------
@@ -84,6 +87,8 @@ namespace SnapdragonFlight {
 
     void BlspSerialDriverComponentImpl::serialSend_handler(
             const NATIVE_INT_TYPE portNum, Fw::Buffer &serBuffer) {
+        DEBUG_PRINT("serialSend_handler\n");
+	
         if (this->m_fd == -1) {
             return;
         }
@@ -97,6 +102,11 @@ namespace SnapdragonFlight {
 
             NATIVE_INT_TYPE thisSize = FW_MIN(WRITE_BUFF_SIZE,
                     xferSize - chunk);
+	    
+	    timespec stime;
+	    (void)clock_gettime(CLOCK_REALTIME,&stime);
+	    DEBUG_PRINT("<<< Calling dsp_relay_uart_relay_write() at %d %d\n", stime.tv_sec, stime.tv_nsec);
+	    
             NATIVE_INT_TYPE stat = dsp_relay_uart_relay_write(this->m_fd,
                     this->m_device, data + chunk, thisSize);
             if (-1 == stat) {
@@ -152,9 +162,9 @@ namespace SnapdragonFlight {
                 continue;
             }
 
-//          timespec stime;
-//          (void)clock_gettime(CLOCK_REALTIME,&stime);
-//          printf("<<< Calling dsp_relay_uart_relay_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
+	    timespec stime;
+	    (void)clock_gettime(CLOCK_REALTIME,&stime);
+	    DEBUG_PRINT("<<< Calling dsp_relay_uart_relay_read() at %d %d\n", stime.tv_sec, stime.tv_nsec);
 
             bool waiting = true;
             int stat = 0;
@@ -188,8 +198,8 @@ namespace SnapdragonFlight {
                 serReadStat = Drv::SER_OTHER_ERR; // added by m.chase 03.06.2017
                 //comp->serialRecv_out(0,buff,Drv::SER_OTHER_ERR);
             } else {
-//              (void)clock_gettime(CLOCK_REALTIME,&stime);
-//              printf("<!<! Sending data to RceAdapter %u at %d %d\n", buff.getsize(), stime.tv_sec, stime.tv_nsec);
+                (void)clock_gettime(CLOCK_REALTIME,&stime);
+                DEBUG_PRINT("<!<! Sending data to RceAdapter %u at %d %d\n", buff.getsize(), stime.tv_sec, stime.tv_nsec);
                 buff.setsize(sizeRead);
                 serReadStat = Drv::SER_OK; // added by m.chase 03.06.2017
                 //comp->serialRecv_out(0,buff,Drv::SER_OK);

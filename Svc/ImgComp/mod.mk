@@ -1,4 +1,4 @@
-SRC = ImgCompComponentAi.xml ImgCompComponentImpl.cpp CameraFrameSerializableAi.xml CameraFramePortAi.xml
+SRC = ImgCompComponentAi.xml ImgCompComponentImpl.cpp
 
 HDR = ImgCompComponentImpl.hpp ImgCompComponentImplCfg.hpp
 

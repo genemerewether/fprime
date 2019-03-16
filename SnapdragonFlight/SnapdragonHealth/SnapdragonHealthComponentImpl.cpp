@@ -651,11 +651,11 @@ extern "C" {
         for (NATIVE_UINT_TYPE i = TEMP_FILE_TYPE_MIN; i <= TEMP_FILE_TYPE_MAX; i++) {
             this->load_from_file(static_cast<HealthFileType>(i));
         }
-
+	/*
         for (NATIVE_UINT_TYPE i = TEMP_MODE_FILE_TYPE_MIN; i <= TEMP_MODE_FILE_TYPE_MAX; i++) {
             this->load_from_file(static_cast<HealthFileType>(i));
         }
-
+	*/
         for (NATIVE_UINT_TYPE i = FREQ_FILE_TYPE_MIN; i <= FREQ_FILE_TYPE_MAX; i++) {
             this->load_from_file(static_cast<HealthFileType>(i));
         }
