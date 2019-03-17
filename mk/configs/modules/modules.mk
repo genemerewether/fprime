@@ -172,6 +172,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
 	Gnc/Ctrl/BasicMixer \
 	Gnc/Est/ImuInteg \
+	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \

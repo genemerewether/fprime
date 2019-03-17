@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="ATTFILTER_Dummy" data_type="F32" format_string="%.3fN">
+        <comment>
+            AttFilter dummy
+        </comment>
+    </channel>
+</telemetry>
