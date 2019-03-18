@@ -59,7 +59,7 @@ Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 Gnc::SigGenComponentImpl* sigGen_ptr = 0;
-Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
+Gnc::AttFilterComponentImpl* attFilter_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
 Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr = 0;
@@ -83,7 +83,7 @@ void allocComps() {
 
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
-        Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+        Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
@@ -109,7 +109,7 @@ void allocComps() {
 
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-        Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+        Gnc::ATTFILTER_SCHED_CONTEXT_ATT, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_ATT, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
         0, // mixer
@@ -127,7 +127,7 @@ void allocComps() {
 
     NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         0, //TODO(mereweth) - IMU?
-        Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+        Gnc::ATTFILTER_SCHED_CONTEXT_POS, // attFilter
         0, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
         0, // mixer
@@ -215,9 +215,9 @@ void allocComps() {
 #endif
 ;
 
-    imuInteg_ptr = new Gnc::ImuIntegComponentImpl
+    attFilter_ptr = new Gnc::AttFilterComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("IMUINTEG")
+                        ("ATTFILTER")
 #endif
 ;
 
@@ -274,13 +274,13 @@ void manualConstruct(void) {
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
     mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
-    imuInteg_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
+    attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
     actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, attFilter_ptr->get_ImuStateUpdate_InputPort(0));
 #ifdef DECOUPLE_ACTUATORS
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actDecouple_ptr->get_DataIn_InputPort(3));
     actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
@@ -332,7 +332,7 @@ void constructApp() {
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
     sigGen_ptr->init(0);
-    imuInteg_ptr->init(0);
+    attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
 
     spiDrv_ptr->init(0);
@@ -366,7 +366,7 @@ void constructApp() {
     fatalHandler_ptr->regCommands();
 
     leeCtrl_ptr->regCommands();
-    imuInteg_ptr->regCommands();
+    attFilter_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
