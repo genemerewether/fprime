@@ -24,6 +24,8 @@
 #include "control_msgs/FollowJointTrajectoryAction.h"
 #include <actionlib/client/simple_action_client.h>
 
+#include <Os/Task.hpp>
+
 #include "SIMREF/GazeboManipIf/GazeboManipIfComponentAc.hpp"
 
 namespace SIMREF {

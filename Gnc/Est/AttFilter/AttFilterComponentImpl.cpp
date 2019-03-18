@@ -83,7 +83,7 @@ namespace Gnc {
     parametersLoaded()
   {
       this->paramsInited = false;
-      Fw::ParamValid valid[1];
+      Fw::ParamValid valid[3];
       attFilter.SetTimeStep(paramGet_dt(valid[0]));
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
 
@@ -95,7 +95,13 @@ namespace Gnc {
       if ((Fw::PARAM_VALID != valid[0]) &&
           (Fw::PARAM_DEFAULT != valid[0])) {  return;  }
 
-      attFilter.SetSteadyStateThresh(0.1, 0.01, 0.2);
+      attFilter.SetSteadyStateThresh(paramGet_accelThresh(valid[0]),
+                                     paramGet_angVelThresh(valid[1]),
+                                     paramGet_angVelDeltaThresh(valid[2]));
+      for (int i = 0; i < 3; i++) {
+          if ((Fw::PARAM_VALID != valid[i]) &&
+              (Fw::PARAM_DEFAULT != valid[i])) {  return;  }
+      }
       
       this->paramsInited = true;
   }

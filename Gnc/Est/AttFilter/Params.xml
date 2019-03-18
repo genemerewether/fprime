@@ -11,4 +11,13 @@
     <parameter id="3" set_opcode="26" save_opcode="27" name="magGain" default="0.01" data_type="F64" >
       <comment>Magnetometer gain</comment>
     </parameter>
+    <parameter id="4" set_opcode="28" save_opcode="29" name="accelThresh" default="0.5" data_type="F64" >
+      <comment>Acceleration static threshold</comment>
+    </parameter>
+    <parameter id="5" set_opcode="30" save_opcode="31" name="angVelThresh" default="0.2" data_type="F64" >
+      <comment>Angular velocity static threshold</comment>
+    </parameter>
+    <parameter id="6" set_opcode="32" save_opcode="33" name="angVelDeltaThresh" default="0.01" data_type="F64" >
+      <comment>Angular velocity delta static threshold</comment>
+    </parameter>
 </parameters>

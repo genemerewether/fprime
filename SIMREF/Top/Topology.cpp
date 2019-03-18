@@ -32,7 +32,7 @@ static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     0, // chanTlm
     0, // rosCycle
     SIMREF::RSDRV_SCHED_CONTEXT_TLM, // rotorSDrv
-    Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+    Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
     0, // mixer
@@ -63,7 +63,7 @@ Svc::RateGroupDriverImpl rgGncDrv(
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_ATT,
-    Gnc::IMUINTEG_SCHED_CONTEXT_ATT,
+    Gnc::ATTFILTER_SCHED_CONTEXT_ATT,
     Gnc::SIGGEN_SCHED_CONTEXT_ATT,
     Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
@@ -77,7 +77,7 @@ Svc::PassiveRateGroupImpl rgAtt(
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_POS,
-    Gnc::IMUINTEG_SCHED_CONTEXT_POS,
+    Gnc::ATTFILTER_SCHED_CONTEXT_POS,
     Gnc::SIGGEN_SCHED_CONTEXT_POS,
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
@@ -160,9 +160,9 @@ Gnc::BasicMixerComponentImpl mixer
 #endif
 ;
 
-Gnc::ImuIntegComponentImpl imuInteg
+Gnc::AttFilterComponentImpl attFilter
 #if FW_OBJECT_NAMES == 1
-                    ("IMUINTEG")
+                    ("ATTFILTER")
 #endif
 ;
 
@@ -246,7 +246,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     // Initialize the GNC components
     leeCtrl.init(0);
     mixer.init(0);
-    imuInteg.init(0);
+    attFilter.init(0);
     sigGen.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
@@ -292,7 +292,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     fatalHandler.regCommands();
 
     leeCtrl.regCommands();
-    imuInteg.regCommands();
+    attFilter.regCommands();
     mixer.regCommands();
     sigGen.regCommands();
 
@@ -304,7 +304,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     // read parameters
     prmDb.readParamFile();
     leeCtrl.loadParameters();
-    imuInteg.loadParameters();
+    attFilter.loadParameters();
     mixer.loadParameters();
     sigGen.loadParameters();
 

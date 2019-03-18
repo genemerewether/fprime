@@ -30,7 +30,7 @@ void exitTasks(void);
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
-#include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
+#include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
@@ -55,6 +55,6 @@ extern SIMREF::GazeboManipIfComponentImpl gzManipIf;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;
 extern Gnc::SigGenComponentImpl sigGen;
-extern Gnc::ImuIntegComponentImpl imuInteg;
+extern Gnc::AttFilterComponentImpl attFilter;
 
 #endif

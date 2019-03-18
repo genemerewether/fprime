@@ -3,7 +3,7 @@
 <assembly name = "SIMREF">
 	<import_component_type>Svc/FatalHandler/FatalHandlerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
-	<import_component_type>Gnc/Est/ImuInteg/ImuIntegComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Est/AttFilter/AttFilterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/TlmChan/TlmChanComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveFileLogger/ActiveFileLoggerComponentAi.xml</import_component_type>
@@ -29,7 +29,7 @@
 
    <instance namespace="Svc" name="fatalAdapter" type="AssertFatalAdapter" base_id="341"  base_id_window="20" />
 
-   <instance namespace="Gnc" name="imuInteg" type="ImuInteg"/>
+   <instance namespace="Gnc" name="attFilter" type="AttFilter"/>
 
    <instance namespace="Svc" name="chanTlm" type="TlmChan" base_id="61"  base_id_window="20" />
 
@@ -81,7 +81,7 @@
  	 <target component = "cmdSeq" port = "schedIn" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection3">
-	 <source component = "imuInteg" port = "ParamSet" type = "PrmSet" num = "0"/>
+	 <source component = "attFilter" port = "ParamSet" type = "PrmSet" num = "0"/>
  	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>
 </connection>
 <connection name = "Connection4">
@@ -94,7 +94,7 @@
 </connection>
 <connection name = "Connection6">
 	 <source component = "rotorSDrv" port = "SimImu" type = "ImuNoCov" num = "0"/>
- 	 <target component = "imuInteg" port = "Imu" type = "ImuNoCov" num = "0"/>
+ 	 <target component = "attFilter" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
 <connection name = "Connection7">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
@@ -105,7 +105,7 @@
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection9">
-	 <source component = "imuInteg" port = "Tlm" type = "Tlm" num = "0"/>
+	 <source component = "attFilter" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection10">
@@ -137,12 +137,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection17">
-	 <source component = "imuInteg" port = "LogText" type = "LogText" num = "0"/>
+	 <source component = "attFilter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection18">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
+ 	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection19">
 	 <source component = "sigGen" port = "controls" type = "TorqueThrust" num = "0"/>
@@ -161,7 +161,7 @@
  	 <target component = "rgGncDrv" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection23">
-	 <source component = "imuInteg" port = "odometry" type = "Odometry" num = "0"/>
+	 <source component = "attFilter" port = "odometry" type = "Odometry" num = "0"/>
  	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
 </connection>
 <connection name = "Connection24">
@@ -209,7 +209,7 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection35">
-	 <source component = "imuInteg" port = "odomNoCov" type = "OdometryNoCov" num = "0"/>
+	 <source component = "attFilter" port = "odomNoCov" type = "OdometryNoCov" num = "0"/>
  	 <target component = "rotorSDrv" port = "OdomLog" type = "OdometryNoCov" num = "0"/>
 </connection>
 <connection name = "Connection36">
@@ -305,7 +305,7 @@
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection59">
-	 <source component = "imuInteg" port = "Time" type = "Time" num = "0"/>
+	 <source component = "attFilter" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection60">
@@ -313,7 +313,7 @@
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection61">
-	 <source component = "imuInteg" port = "Log" type = "Log" num = "0"/>
+	 <source component = "attFilter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection62">
@@ -382,7 +382,7 @@
 </connection>
 <connection name = "Connection78">
 	 <source component = "rotorSDrv" port = "ImuStateUpdate" type = "ImuStateUpdate" num = "0"/>
- 	 <target component = "imuInteg" port = "ImuStateUpdate" type = "ImuStateUpdate" num = "0"/>
+ 	 <target component = "attFilter" port = "ImuStateUpdate" type = "ImuStateUpdate" num = "0"/>
 </connection>
 <connection name = "Connection79">
 	 <source component = "eventLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
@@ -417,7 +417,7 @@
  	 <target component = "leeCtrl" port = "flatOutput" type = "FlatOutput" num = "0"/>
 </connection>
 <connection name = "Connection87">
-	 <source component = "imuInteg" port = "ParamGet" type = "PrmGet" num = "0"/>
+	 <source component = "attFilter" port = "ParamGet" type = "PrmGet" num = "0"/>
  	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
 </connection>
 <connection name = "Connection88">
@@ -429,7 +429,7 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection90">
-	 <source component = "imuInteg" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+	 <source component = "attFilter" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection91">
@@ -490,7 +490,7 @@
 </connection>
 <connection name = "Connection105">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
+ 	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection106">
 	 <source component = "cmdSeq" port = "LogText" type = "LogText" num = "0"/>
@@ -530,7 +530,7 @@
 </connection>
 <connection name = "Connection115">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
- 	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
+ 	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection116">
 	 <source component = "rotorSDrv" port = "LogText" type = "LogText" num = "0"/>
@@ -609,12 +609,12 @@
  	 <target component = "cmdDisp" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
 <connection name = "Connection135">
-	 <source component = "imuInteg" port = "CmdReg" type = "CmdReg" num = "0"/>
+	 <source component = "attFilter" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "6"/>
 </connection>
 <connection name = "Connection136">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "6"/>
- 	 <target component = "imuInteg" port = "CmdDisp" type = "Cmd" num = "0"/>
+ 	 <target component = "attFilter" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
 <connection name = "Connection137">
 	 <source component = "cmdSeq" port = "cmdRegOut" type = "CmdReg" num = "0"/>
