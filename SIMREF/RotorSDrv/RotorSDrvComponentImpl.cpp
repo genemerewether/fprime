@@ -161,9 +161,9 @@ namespace SIMREF {
 
         // TODO(mereweth) - convert frame ID
         U32 frame_id = header.getframe_id();
-        msg.header.frame_id = "odom";
+        msg.header.frame_id = "world";
 
-        msg.child_frame_id = "body";
+        msg.child_frame_id = "odom";
 
         ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
         msg.pose.pose.position.x = p.getx();
