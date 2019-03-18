@@ -64,7 +64,7 @@ void allocComps() {
         0, // logQueue
         0, // chanTlm
         LLProc::HLRTR_SCHED_UART_SEND,
-        Drv::LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE
+        Drv::LLV3_RG_MEASURE
     };
 
     rgTlm_ptr = new Svc::PassiveRateGroupImpl(
@@ -90,7 +90,7 @@ void allocComps() {
         LLProc::HLRTR_SCHED_UART_SEND,
         LLProc::HLRTR_SCHED_UART_RECEIVE,
         0,
-        Drv::LIDARLiteV3ComponentImpl::LLV3_RG_FAST
+        Drv::LLV3_RG_FAST
     };
     rgAtt_ptr = new Svc::PassiveRateGroupImpl(
     #if FW_OBJECT_NAMES == 1

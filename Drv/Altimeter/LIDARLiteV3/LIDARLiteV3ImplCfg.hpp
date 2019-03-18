@@ -56,8 +56,12 @@ namespace Drv {
                                            LLV3_STATUS_HEALTH_OK |
                                            LLV3_STATUS_2ND_RETURN_ERR |
                                            LLV3_STATUS_SIGNAL_ERR;
-                                           //LLV3_STATUS_OVF_ERR;
 
+
+    enum LLV3RateGroup {
+        LLV3_RG_FAST = 0,
+        LLV3_RG_MEASURE = 1
+    };
 
 } // namespace Drv
 

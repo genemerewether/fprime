@@ -60,11 +60,6 @@ namespace Drv {
           U8 reg, value;
       };
 
-      enum LLV3RateGroup {
-          LLV3_RG_FAST = 0,
-          LLV3_RG_MEASURE = 1
-      };
-
     PRIVATE:
 
       void reset_i2c_buffers();
