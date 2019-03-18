@@ -97,8 +97,6 @@ namespace Drv {
 
         case LLV3_INIT_CONFIG:
 
-            this->log_ACTIVITY_LO_LLV3_Dummy();
-
             this->I2CConfig_out(0, 100000, LLV3_ADDR, 0);
 
             this->init_state = LLV3_INIT_WRITE_REG;
@@ -137,6 +135,7 @@ namespace Drv {
 
                     if (this->init_registers_idx >= FW_NUM_ARRAY_ELEMENTS(LIDARLiteV3ComponentImpl::init_registers))
                     {
+                        this->log_ACTIVITY_LO_LLV3_InitComplete();
                         this->init_state = LLV3_INIT_COMPLETE;
                     } else {
                         this->init_state = LLV3_INIT_WRITE_REG;
@@ -182,23 +181,24 @@ namespace Drv {
     send_measurement()
   {
     U32 measurement_dn;
-    F32 measurement_m;
+    U32 measurement_mm;
 
     measurement_dn = static_cast<U32>(i2cReadBufferArr[0]) << 8 |
                      static_cast<U32>(i2cReadBufferArr[1]);
 
 
-    // Convert cm to m
-    measurement_m = measurement_dn / 100.;
+    // Convert cm to mm
+    measurement_mm = measurement_dn * 10;
 
-    altimeter_eu.setdistance(measurement_m);
+    altimeter_eu.setdistance(measurement_mm);
     altimeter_eu.setstatus(0);
     altimeter_eu.settime_secs(0);
     altimeter_eu.settime_nsecs(0);
 
-    //this->AltimeterSend_out(0, altimeter_eu);
-    this->log_ACTIVITY_HI_LLV3_Distance(measurement_m);
-    this->tlmWrite_LLV3_Distance(measurement_m);
+    if (this->isConnected_AltimeterSend_OutputPort(0)) {
+        this->AltimeterSend_out(0, altimeter_eu);
+    }
+    this->tlmWrite_LLV3_Distance(measurement_mm / 1000.);
   }
 
   bool LIDARLiteV3ComponentImpl ::
@@ -354,11 +354,9 @@ namespace Drv {
         }
     } else if (context == LLV3_RG_MEASURE) {
 
-        printf("Got Measure sched\r\n");
         if (this->init_state == LLV3_INIT_COMPLETE) {
             if (this->i2c_state == LLV3_I2C_WAITING) {
 
-                printf("Starting Measurement\r\n");
                 this->i2c_state = LLV3_I2C_ACQ_CMD;
             } else {
                 // EVR here

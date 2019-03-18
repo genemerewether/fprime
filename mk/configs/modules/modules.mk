@@ -504,8 +504,13 @@ R5RELAY_MODULES := \
 	Svc/Ping \
 	Svc/PolyIf \
 	Svc/PolyDb \
+	Svc/Time \
+	Svc/LinuxTime \
+	Svc/ActiveLogger \
+	Svc/Fatal \
 	\
 	HLProc/LLRouter \
+	HLProc/EventExpander \
 	\
 	Os \
 	\

@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <assembly name = "R5RELAY">
+	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxSerialDriver/LinuxSerialDriverComponentAi.xml</import_component_type>
+	<import_component_type>HLProc/EventExpander/EventExpanderComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>HLProc/LLRouter/LLRouterComponentAi.xml</import_component_type>
+	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
+
+   <instance namespace="Svc" name="activeLogger" type="ActiveLogger"/>
 
    <instance namespace="Drv" name="serialDrv" type="LinuxSerialDriver"/>
+
+   <instance namespace="HLProc" name="eventExpander" type="EventExpander"/>
 
    <instance namespace="Svc" name="rg" type="PassiveRateGroup"/>
 
    <instance namespace="HLProc" name="llRouter" type="LLRouter"/>
+
+   <instance namespace="Svc" name="sockGndIf" type="GndIf"/>
 
 
 <connection name = "Connection1">
@@ -17,19 +26,39 @@
  	 <target component = "llRouter" port = "SerReadPort" type = "SerialRead" num = "0"/>
 </connection>
 <connection name = "Connection2">
+	 <source component = "eventExpander" port = "LogSend" type = "Log" num = "0"/>
+ 	 <target component = "activeLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection3">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "llRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection3">
+<connection name = "Connection4">
 	 <source component = "llRouter" port = "SerWritePort" type = "SerialWrite" num = "0"/>
  	 <target component = "serialDrv" port = "serialSend" type = "SerialWrite" num = "0"/>
 </connection>
-<connection name = "Connection4">
+<connection name = "Connection5">
+	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection6">
+	 <source component = "activeLogger" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection7">
+	 <source component = "activeLogger" port = "PktSend" type = "Com" num = "0"/>
+ 	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
+</connection>
+<connection name = "Connection8">
 	 <source component = "llRouter" port = "SerialBufferSend" type = "BufferSend" num = "0"/>
  	 <target component = "serialDrv" port = "readBufferSend" type = "BufferSend" num = "0"/>
 </connection>
-<connection name = "Connection5">
+<connection name = "Connection9">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "llRouter" port = "CycleDone" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection10">
+	 <source component = "eventExpander" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 </assembly>

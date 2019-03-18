@@ -12,6 +12,4 @@
 
 |Event Name|ID|Description|Arg Name|Arg Type|Arg Size|Description
 |---|---|---|---|---|---|---|
-|LLV3_Dummy|0 (0x0)|Sequence file was successfully loaded.| | | | |
-|LLV3_Distance|1 (0x1)|Current Distance| | | | |
-| | | |distance|F32||Current Distnace|    
+|LLV3_InitComplete|0 (0x0)|LIDARLiteV3 initialization complete| | | | |

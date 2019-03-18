@@ -4,7 +4,7 @@
 <!--====== Svc/CmdSequencer Telemetry =====-->
 
 <telemetry>
-  <channel id="0" name="LLV3_Distance" data_type="F32">
+  <channel id="0" name="LLV3_Distance" data_type="F32" format_string="%.2fm">
     <comment>Distance</comment>
   </channel>
 </telemetry>

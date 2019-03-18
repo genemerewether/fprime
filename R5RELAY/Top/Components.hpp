@@ -24,9 +24,14 @@ void exitTasks(void);
 
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
 #include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
+#include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
 
 extern Drv::LinuxSerialDriverComponentImpl serialDrv;
 extern Svc::PassiveRateGroupImpl rg;
 extern HLProc::LLRouterComponentImpl llRouter;
+extern Svc::LinuxTimeImpl linuxTime;
+extern HLProc::EventExpanderComponentImpl eventExpander;
+extern Svc::SocketGndIfImpl sockGndIf;
+extern Svc::ActiveLoggerImpl activeLogger;
 
 #endif

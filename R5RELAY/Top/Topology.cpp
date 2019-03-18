@@ -52,6 +52,24 @@ Drv::LinuxSerialDriverComponentImpl serialDrv
 #endif
 ;
 
+HLProc::EventExpanderComponentImpl eventExpander
+#if FW_OBJECT_NAMES == 1
+                    ("EVREXP")
+#endif
+;
+
+Svc::LinuxTimeImpl linuxTime
+#if FW_OBJECT_NAMES == 1
+                    ("TIME")
+#endif
+;
+
+Svc::ActiveLoggerImpl activeLogger
+#if FW_OBJECT_NAMES == 1
+                    ("ACTIVELOGGER")
+#endif
+;
+
 //Svc::AssertFatalAdapterComponentImpl fatalAdapter
 //#if FW_OBJECT_NAMES == 1
 //("fatalAdapter")
@@ -81,7 +99,7 @@ void dumpobj(const char* objName) {
 
 void manualConstruct() {
 
-    llRouter.set_LLPortsOut_OutputPort(4, sockGndIf.get_downlinkPort_InputPort(0));
+    llRouter.set_LLPortsOut_OutputPort(4, eventExpander.get_LogRecv_InputPort(0));
     llRouter.set_LLPortsOut_OutputPort(5, sockGndIf.get_downlinkPort_InputPort(0));
 
     //sockGndIf.set_uplinkPort_OutputPorts(0, llRouter.get_LLPortsIn_InputPort(4));
@@ -99,6 +117,10 @@ void constructApp(int port_number, char* udp_string, char* hostname, char* seria
     serialDrv.init(0);
     sockGndIf.init(0);
     llRouter.init(100, 1000, 0);
+    linuxTime.init(0);
+    eventExpander.init(0);
+    activeLogger.init(100, 0);
+
 
     // Connect rate groups to rate group driver
     constructR5RELAYArchitecture();
@@ -111,6 +133,7 @@ void constructApp(int port_number, char* udp_string, char* hostname, char* seria
     sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
 
     llRouter.start(0, 40, 8192);
+    activeLogger.start(0, 40, 8192);
 
     serialDrv.open(serial_port,
                    Drv::LinuxSerialDriverComponentImpl::BAUD_921K,

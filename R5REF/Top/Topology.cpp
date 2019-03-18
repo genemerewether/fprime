@@ -265,15 +265,12 @@ void manualConstruct() {
     hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
     // aux actuator command
-    // hlRouter_ptr->set_HLPortsOut_OutputPort(3, );
     hlRouter_ptr->set_HLPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     hlRouter_ptr->set_HLPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 
     llDebug_ptr->set_SerWritePort_OutputPort(0, debugUart_ptr->get_serialSend_InputPort(0));
-
-    //lidarLiteV3_ptr->set_LogText_OutputPort(0, reinterpret_cast<Fw::InputLogTextPort*>(debugUart_ptr->get_serialSend_InputPort(0)));
 }
 
 void constructApp() {
