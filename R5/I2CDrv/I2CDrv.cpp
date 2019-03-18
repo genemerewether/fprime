@@ -31,9 +31,7 @@
 #define I2C_NUM  2 // number of I2C peripherals
 #define I2C_MAX_NUM_PORTS 16
 
-#define I2C_BUFF_PADDING 4 // See DMA Oddities
-
-#define I2C_MIN_TX_BUFF_SIZE (32 + I2C_BUFF_PADDING) // See DMA Oddities
+#define I2C_MIN_TX_BUFF_SIZE (32)
 #define I2C_MIN_RX_BUFF_SIZE (32 * 4) // See DMA Oddities
 
 
@@ -99,18 +97,61 @@
  * Executing a transaction *
  * *********************** *
  *
- * 
+ * There are three phases of transactions, Tx, Rx and Nack. Each is executed with
+ * a call to I2CDrvExecuteTxn.
+ *
+ * A Tx transaction addresses the write address of the specified slave. If the slaves
+ * acks then the entire txDmaBuffer is sent across the wire byte by byte. This process
+ * is entirely autonomous using the DMA to grab bytes from the I2C peripheral and store
+ * them in the drivers allocated DMA memory. Calls to I2CService check on the status of
+ * the DMA to determine when the transaction has completed.
+ *
+ * An Rx transaction addresses the read address of the specified slave and reads the
+ * requested number of bytes into the supplied receive buffer. This is done in two
+ * stages. First, the DMA receives data directly from the I2C peripheral into a DMA
+ * memory buffer. When the transaction completes the memory is then transfered
+ * and packed into the supplied user buffer.
+ *
+ * A Nack transaction is a special state to handle I2C slave nacks. The Nack flag is
+ * first cleared then a STOP_CONDITION command is sent to the I2C peripheral. Subsequent
+ * calls to I2CService poll the status of the Stop Condition Detect (SCD) flag. This
+ * guarentees that a Nack condition is properly cleared in the I2C peripheral.
+ */
+
+/* 
  * ************ *
  * DMA Oddities *
  * ************ *
  *
+ * Transmit:
+ * It seems as though the transmit address is sensitive to endianness issues. An offset
+ * of 3 bytes is added to the address of the I2C DXR register to compensate for this.
+ *
+ *
+ * Receive:
+ * It seems as though I2C data can only be read through 32-bit reads from the I2C
+ * peripheral. This means that the DMA Rx buffer needs room to store four times the
+ * number of necessary bytes. This data then needs to be packed before sending it
+ * back to the user.
+ */
+
+/*
  * ********************** *
  * TI Undocument Behavior *
  * ********************** *
  *
  * * DMA port writes
+ *   * If seems as though normal 8-bit reads/writes to the I2C Tx and Rx registers
+ *     does not work as expected. See DMA Oddities
+ *
  * * Must clear NACK flag before writing Stop bit
+ *   * The NACK status flag must be cleared after an address NACK before a stop
+ *     condition can be sent. Failure to do so will leave the I2C SCL line low
+ *     and the bus busy indefinately
+ *
  * * Arduino-like pinout on launchpad documentation incorrect about I2C pin placement
+ *   * Do not use the provided pinout for connecting an I2C peripheral to the TI Hercules
+ *     Launchpad XL board. Use the provided schematics on TI's website instead.
  */
 
 static void setupI2CDrvDmaReceive(uint32_t rx_addr, U8* rx_ptr, U32 rx_size, dmaChannel_t channel)
@@ -145,19 +186,19 @@ static void setupI2CDrvDmaTransmit(uint32_t tx_addr, const U8* tx_ptr, const U32
 
     // Configure control packet for transmit channel
     g_dmaCTRLPKT.SADD      = (uint32_t)tx_ptr;       // Initial source address
-    g_dmaCTRLPKT.DADD      = tx_addr;           // Initial destination address
+    g_dmaCTRLPKT.DADD      = tx_addr + 3;            // Initial destination address
     g_dmaCTRLPKT.CHCTRL    = 0;                      // Next channel to be triggered + 1
     g_dmaCTRLPKT.FRCNT     = tx_size;                // Frame   count
-    g_dmaCTRLPKT.ELCNT     = 4;                      // Element count
+    g_dmaCTRLPKT.ELCNT     = 1;                      // Element count
     g_dmaCTRLPKT.ELDOFFSET = 0;                      // Element destination offset
     g_dmaCTRLPKT.ELSOFFSET = 0;                      // Element source offset
     g_dmaCTRLPKT.FRDOFFSET = 0;                      // Frame destination offset
-    g_dmaCTRLPKT.FRSOFFSET = 1;                      // Frame source offset
+    g_dmaCTRLPKT.FRSOFFSET = 4;                      // Frame source offset
     g_dmaCTRLPKT.PORTASGN  = PORTA_READ_PORTB_WRITE; // DMA port
     g_dmaCTRLPKT.RDSIZE    = ACCESS_8_BIT;           // Read element size
-    g_dmaCTRLPKT.WRSIZE    = ACCESS_32_BIT;           // Write element size
+    g_dmaCTRLPKT.WRSIZE    = ACCESS_8_BIT;           // Write element size
     g_dmaCTRLPKT.TTYPE     = FRAME_TRANSFER;         // Trigger type - frame/block
-    g_dmaCTRLPKT.ADDMODERD = ADDR_OFFSET;              // Addressing mode for source
+    g_dmaCTRLPKT.ADDMODERD = ADDR_OFFSET;            // Addressing mode for source
     g_dmaCTRLPKT.ADDMODEWR = ADDR_FIXED;             // Addressing mode for destination
     g_dmaCTRLPKT.AUTOINIT  = AUTOINIT_OFF;           // Auto-init mode
 
@@ -287,9 +328,8 @@ void I2CDrvAddTxn(const NATIVE_INT_TYPE instance,
     }
 
     txn_p->txnStatus = TXN_STATUS_BUSY;
-    // TODO: Execute a transaction if possible
-    // This is causing a bug with my test program. Should investigate
-    //I2CDrvService(instance);
+
+    I2CDrvService(instance);
 }
 
 static void I2CDrvExecuteTxn(const NATIVE_INT_TYPE instance, const NATIVE_INT_TYPE port)
@@ -388,13 +428,7 @@ static void I2CDrvExecuteTxn(const NATIVE_INT_TYPE instance, const NATIVE_INT_TY
 
         // Send a Stop bit after all bytes have been sent
         i2cReg->MDR |= I2C_STOP_COND;
-
-        //volatile int i;
-        //for (i = 0; i < 500; i++) {
-        //}
     }
-
-    I2CDrvService(instance);
 }
 
 static void I2CDrvEndTxn(const NATIVE_INT_TYPE instance, const NATIVE_INT_TYPE port)
