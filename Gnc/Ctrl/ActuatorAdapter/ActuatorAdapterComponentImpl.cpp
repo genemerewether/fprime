@@ -23,6 +23,7 @@
 #include "Fw/Types/SerialBuffer.hpp"
 
 #include <math.h>
+#include <string.h>
 
 #ifndef M_PI
 #ifdef BUILD_DSPAL
