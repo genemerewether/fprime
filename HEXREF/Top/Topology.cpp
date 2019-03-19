@@ -395,6 +395,10 @@ void constructApp() {
     rgDecouple_ptr->start(0, 90, 20*1024);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
     actDecouple_ptr->start(0, 89, 20*1024);
+    
+#ifdef BUILD_DSPAL
+    imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+#endif
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -550,6 +554,7 @@ int hexref_run(void) {
         return -1;
     }
     
+    rgDecouple_ptr->setEnabled(true);
     while (!mpu9250_ptr->isReady()) {
         Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
@@ -559,9 +564,6 @@ int hexref_run(void) {
     }
 
     int backupCycle = 0;
-#ifdef BUILD_DSPAL
-    imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
-#endif
 
     while (!terminate) {
         run1backupCycle();
@@ -569,9 +571,7 @@ int hexref_run(void) {
     }
 
     // stop tasks
-#ifdef BUILD_DSPAL
-    imuDRInt_ptr->exitThread();
-#endif
+    rgDecouple_ptr->setEnabled(false);
     exitTasks();
     // Give time for threads to exit
     DEBUG_PRINT("Waiting for threads...\n");
@@ -589,6 +589,7 @@ int hexref_cycle(unsigned int backupCycles) {
         return -1;
     }
     
+    rgDecouple_ptr->setEnabled(true);
     while (!mpu9250_ptr->isReady()) {
         Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
@@ -597,16 +598,11 @@ int hexref_cycle(unsigned int backupCycles) {
         Os::Task::delay(10);
     }
 
-#ifdef BUILD_DSPAL
-    imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
-#endif
     for (unsigned int i = 0; i < backupCycles; i++) {
         if (terminate) break;
         run1backupCycle();
     }
-#ifdef BUILD_DSPAL
-    imuDRInt_ptr->exitThread();
-#endif
+    rgDecouple_ptr->setEnabled(false);
     DEBUG_PRINT("hexref_cycle returning\n");
 
     return 0;

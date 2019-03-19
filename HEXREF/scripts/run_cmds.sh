@@ -8,4 +8,4 @@ if !($?BUILD_ROOT) then
     cd ${curdir}
 endif
 
-${BUILD_ROOT}/Gse/bin/run_cmds.sh --addr 192.168.2.1 --port 50010 --dictionary ${BUILD_ROOT}/Gse/generated/HEXREF $*
+${BUILD_ROOT}/Gse/bin/run_cmds.sh --addr localhost --port 50010 --dictionary ${BUILD_ROOT}/Gse/generated/HEXREF $*

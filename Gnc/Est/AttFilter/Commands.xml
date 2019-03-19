@@ -3,4 +3,8 @@
       <args>
       </args>
     </command>
+    <command kind="sync" opcode="1" mnemonic="ATTFILTER_Reinit">
+      <args>
+      </args>
+    </command>
 </commands>

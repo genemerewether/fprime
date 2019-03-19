@@ -251,4 +251,18 @@ namespace Gnc {
       }
   }
 
+  void AttFilterComponentImpl ::
+    ATTFILTER_Reinit_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      if (0 == this->attFilter.Reinit()) {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+      }
+  }
+
 } // end namespace Gnc

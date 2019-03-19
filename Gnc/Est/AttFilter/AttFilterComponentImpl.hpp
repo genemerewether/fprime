@@ -103,6 +103,13 @@ namespace Gnc {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
+      //! Implementation for ATTFILTER_Reinit command handler
+      //! 
+      void ATTFILTER_Reinit_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
+
       U32 seq;
 
       quest_gnc::estimation::AttFilter attFilter;

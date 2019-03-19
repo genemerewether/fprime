@@ -589,16 +589,16 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     // Initialize socket server
     if (port_number && hostname) {
         if (startSocketNow) {
-	    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname);
+	    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-	    sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname);
+	    sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
     if (ll_port_number && hostname) {
         if (startSocketNow) {
-            sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname);
+  	    sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-	    sockGndIfLL_ptr->setSocketTaskProperties(40, 20*1024, ll_port_number, hostname);
+  	    sockGndIfLL_ptr->setSocketTaskProperties(40, 20*1024, ll_port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
 

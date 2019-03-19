@@ -118,9 +118,9 @@ int main(int argc, char* argv[]) {
         Os::TaskString task_name("HEXRPC");
         DEBUG_PRINT("Starting cycler on hexagon\n");
         task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
+	waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
     }
-
-    waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
+    
 #else
     if (hexCycle) {
         Os::TaskString task_name("DUMMY");
@@ -171,10 +171,10 @@ int main(int argc, char* argv[]) {
     if (hexCycle) {
         DEBUG_PRINT("Waiting for the runner to return\n");
         FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+	FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
     }
 
     DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
-    FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
 
     return 0;
 }
