@@ -2,10 +2,10 @@
     <parameter id="0" set_opcode="20" save_opcode="21" name="dt" data_type="F64" >
       <comment>Nominal timestep</comment>
     </parameter>
-    <parameter id="1" set_opcode="22" save_opcode="23" name="accelGain" default="0.01" data_type="F64" >
+    <parameter id="1" set_opcode="22" save_opcode="23" name="accelGain" default="0.1" data_type="F64" >
       <comment>Accelerometer gain</comment>
     </parameter>
-    <parameter id="2" set_opcode="24" save_opcode="25" name="biasAlpha" default="0.01" data_type="F64" >
+    <parameter id="2" set_opcode="24" save_opcode="25" name="biasAlpha" default="0.1" data_type="F64" >
       <comment>Bias alpha</comment>
     </parameter>
     <parameter id="3" set_opcode="26" save_opcode="27" name="magGain" default="0.01" data_type="F64" >
