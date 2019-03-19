@@ -24,3 +24,5 @@ apt-get install -y ros-indigo-ros-base ros-indigo-image-transport \
 pip install catkin-tools
 
 dpkg -i --ignore-depends=libz1,libgcc-s1 cross_toolchain/downloads/$(ls cross_toolchain/downloads/mv_*.deb | tail -1)
+
+#TODO(mereweth) - edit /var/lib/dpkg/status to remove mv dep on libz1,libgcc-s1

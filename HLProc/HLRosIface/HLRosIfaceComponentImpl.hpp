@@ -29,6 +29,7 @@
 #include "mav_msgs/AttitudeRateThrust.h"
 #include "mav_msgs/FlatOutput.h"
 #include "mav_msgs/ImuStateUpdate.h"
+#include <image_transport/image_transport.h>
 
 #include "Os/Task.hpp"
 #include "Os/Mutex.hpp"
@@ -190,6 +191,13 @@ namespace HLProc {
           U32 key /*!< Value to return to pinger*/
       );
 
+      //! Handler implementation for ImageRecv
+      //!
+      void ImageRecv_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+	  ROS::sensor_msgs::Image &Image
+      );
+
       // ----------------------------------------------------------------------
       // Member variables
       // ----------------------------------------------------------------------
@@ -203,6 +211,9 @@ namespace HLProc {
         //! Publishers for Odometry data
         //!
         ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
+
+        image_transport::ImageTransport* m_imageXport;
+        image_transport::Publisher m_imagePub;
 
         //! Entry point for task waiting for interrupt
         static void intTaskEntry(void * ptr);

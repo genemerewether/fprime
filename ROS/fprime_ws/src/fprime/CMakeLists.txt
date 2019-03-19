@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   mav_msgs mav_planning_msgs
   actionlib_msgs actionlib
   trac_ik_lib
+  image_transport
   )
 find_package(orocos_kdl)
 
@@ -22,6 +23,7 @@ catkin_package(
   mav_msgs mav_planning_msgs
   actionlib_msgs
   trac_ik_lib
+  image_transport
   roscpp
 )
 

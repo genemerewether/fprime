@@ -17,6 +17,8 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
 
     <import_dictionary>HLProc/HLRosIface/Telemetry.xml</import_dictionary>
     
@@ -64,6 +66,12 @@
         </port>
 
         <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="ImageRecv" data_type="ROS::sensor_msgs::Image"  kind="sync_input"  max_number="1" >
+        </port>
+
+        <port name="ImageForward" data_type="Fw::BufferSend"  kind="output"    max_number="1">	
         </port>
     </ports>
 

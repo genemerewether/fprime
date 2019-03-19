@@ -30,6 +30,8 @@
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/fill_image.h> 
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -90,7 +92,9 @@ namespace HLProc {
 
     void HLRosIfaceComponentImpl ::
       startPub() {
+        // TODO(mereweth) - prevent calling twice; free imageXport
         ros::NodeHandle n;
+	m_imageXport = new image_transport::ImageTransport(n);
 
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
@@ -102,6 +106,8 @@ namespace HLProc {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
             m_odomPub[i] = n.advertise<nav_msgs::Odometry>(buf, 5);
         }
+
+	m_imagePub = m_imageXport->advertise("image_raw", 1);
 
         m_rosInited = true;
     }
@@ -417,6 +423,33 @@ namespace HLProc {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
     }
+  
+    void HLRosIfaceComponentImpl ::
+      ImageRecv_handler(
+	  const NATIVE_INT_TYPE portNum,
+	  ROS::sensor_msgs::Image &Image
+      )
+    {
+        sensor_msgs::Image msg;
+	const U8* ptr = (const U8*) Image.getdata().getdata();
+	sensor_msgs::fillImage(
+	    msg,
+	    sensor_msgs::image_encodings::MONO8,
+	    Image.getheight(),
+            Image.getwidth(),
+	    Image.getstep(),
+	    ptr
+	);
+	msg.header.frame_id = "dfc";
+	msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
+	msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
+	msg.is_bigendian = 0;
+	m_imagePub.publish(msg);
+
+	Fw::Buffer temp = Image.getdata();
+        this->ImageForward_out(0, temp);
+    }
+  
 
     // ----------------------------------------------------------------------
     // Member function definitions
