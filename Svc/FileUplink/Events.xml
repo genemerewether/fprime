@@ -9,9 +9,7 @@
 
 ======================================================================-->
 
-<events
-  event_base="$FileUplinkIdBase"
->
+<events>
 
   <event
     id="0"
@@ -104,6 +102,7 @@
     name="FileUplink_InvalidReceiveMode"
     severity="WARNING_HI"
     format_string="Packet type %u received in mode %u"
+    throttle="5"
   >
     <comment>The File Uplink component received a packet with a type that was invalid for the current receive mode</comment>
     <args>
@@ -129,6 +128,7 @@
     name="FileUplink_PacketOutOfBounds"
     severity="WARNING_HI"
     format_string="Packet %u out of bounds for file %s"
+    throttle="5"
   >
     <comment>During receipt of a file, the File Uplink component encountered a packet with offset and size out of bounds for the current file</comment>
     <args>
@@ -154,6 +154,7 @@
     name="FileUplink_PacketOutOfOrder"
     severity="WARNING_HI"
     format_string="Received packet %u after packet %u"
+    throttle="5"
   >
     <comment>The File Uplink component encountered an out-of-order packet during file receipt</comment>
     <args>
@@ -182,5 +183,23 @@
   >
     <comment>The File Uplink component received a CANCEL packet</comment>
   </event>
+
+  <event id="8"
+    name="FileUplink_DecodeError"
+    severity="WARNING_HI"
+    format_string="Unable to decode file packet. Status: %d"
+  >
+    <comment>Error decoding file packet</comment>
+    <args>
+      <arg
+        name="status"
+        type="I32"
+      >
+        <comment>The sequence index of the out-of-order packet</comment>
+      </arg>
+    </args>
+  </event>
+
+
 
 </events>

@@ -44,7 +44,7 @@ namespace Svc {
       //! Initialize object FileDownlinkTesterBase
       //!
       virtual void init(
-          const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
+          const NATIVE_INT_TYPE instance = 0 //!< The instance number
       );
 
     public:
@@ -57,8 +57,22 @@ namespace Svc {
       //! Connect cmdIn to to_cmdIn[portNum]
       //!
       void connect_to_cmdIn(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::InputCmdPort *const cmdIn /*!< The port*/
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::InputCmdPort *const cmdIn //!< The port
+      );
+
+      //! Connect Run to to_Run[portNum]
+      //!
+      void connect_to_Run(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Svc::InputSchedPort *const Run //!< The port
+      );
+
+      //! Connect bufferReturn to to_bufferReturn[portNum]
+      //!
+      void connect_to_bufferReturn(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::InputBufferSendPort *const bufferReturn //!< The port
       );
 
     public:
@@ -68,12 +82,12 @@ namespace Svc {
       // Connect these input ports to the output ports under test
       // ----------------------------------------------------------------------
 
-      //! Get the port that receives input from bufferGetCaller
+      //! Get the port that receives input from buffSendOutReturn
       //!
-      //! \return from_bufferGetCaller[portNum]
+      //! \return from_buffSendOutReturn[portNum]
       //!
-      Fw::InputBufferGetPort* get_from_bufferGetCaller(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
+      Fw::InputBufferSendPort* get_from_buffSendOutReturn(
+          const NATIVE_INT_TYPE portNum //!< The port number
       );
 
       //! Get the port that receives input from timeCaller
@@ -81,31 +95,7 @@ namespace Svc {
       //! \return from_timeCaller[portNum]
       //!
       Fw::InputTimePort* get_from_timeCaller(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
-      );
-
-      //! Get the port that receives input from bufferSendOut
-      //!
-      //! \return from_bufferSendOut[portNum]
-      //!
-      Fw::InputBufferSendPort* get_from_bufferSendOut(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
-      );
-
-      //! Get the port that receives input from tlmOut
-      //!
-      //! \return from_tlmOut[portNum]
-      //!
-      Fw::InputTlmPort* get_from_tlmOut(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
-      );
-
-      //! Get the port that receives input from cmdResponseOut
-      //!
-      //! \return from_cmdResponseOut[portNum]
-      //!
-      Fw::InputCmdResponsePort* get_from_cmdResponseOut(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
+          const NATIVE_INT_TYPE portNum //!< The port number
       );
 
       //! Get the port that receives input from cmdRegOut
@@ -113,7 +103,7 @@ namespace Svc {
       //! \return from_cmdRegOut[portNum]
       //!
       Fw::InputCmdRegPort* get_from_cmdRegOut(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
+          const NATIVE_INT_TYPE portNum //!< The port number
       );
 
       //! Get the port that receives input from eventOut
@@ -121,7 +111,47 @@ namespace Svc {
       //! \return from_eventOut[portNum]
       //!
       Fw::InputLogPort* get_from_eventOut(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Get the port that receives input from bufferGetCaller
+      //!
+      //! \return from_bufferGetCaller[portNum]
+      //!
+      Fw::InputBufferGetPort* get_from_bufferGetCaller(
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Get the port that receives input from bufferSendOut
+      //!
+      //! \return from_bufferSendOut[portNum]
+      //!
+      Fw::InputBufferSendPort* get_from_bufferSendOut(
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Get the port that receives input from tlmOut
+      //!
+      //! \return from_tlmOut[portNum]
+      //!
+      Fw::InputTlmPort* get_from_tlmOut(
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Get the port that receives input from cmdResponseOut
+      //!
+      //! \return from_cmdResponseOut[portNum]
+      //!
+      Fw::InputCmdResponsePort* get_from_cmdResponseOut(
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Get the port that receives input from faultOut
+      //!
+      //! \return from_faultOut[portNum]
+      //!
+      Svc::InputFPPort* get_from_faultOut(
+          const NATIVE_INT_TYPE portNum //!< The port number
       );
 
 #if FW_ENABLE_TEXT_LOGGING == 1
@@ -130,7 +160,7 @@ namespace Svc {
       //! \return from_LogText[portNum]
       //!
       Fw::InputLogTextPort* get_from_LogText(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
+          const NATIVE_INT_TYPE portNum //!< The port number
       );
 #endif
 
@@ -144,10 +174,10 @@ namespace Svc {
       //!
       FileDownlinkTesterBase(
 #if FW_OBJECT_NAMES == 1
-          const char *const compName, /*!< The component name*/
-          const U32 maxHistorySize /*!< The maximum size of each history*/
+          const char *const compName, //!< The component name
+          const U32 maxHistorySize //!< The maximum size of each history
 #else
-          const U32 maxHistorySize /*!< The maximum size of each history*/
+          const U32 maxHistorySize //!< The maximum size of each history
 #endif
       );
 
@@ -171,7 +201,7 @@ namespace Svc {
           //! Create a History
           //!
           History(
-              const U32 maxSize /*!< The maximum history size*/
+              const U32 maxSize //!< The maximum history size
           ) : 
               numEntries(0), 
               maxSize(maxSize) 
@@ -192,7 +222,7 @@ namespace Svc {
           //! Push an item onto the history
           //!
           void push_back(
-              T entry /*!< The item*/
+              T entry //!< The item
           ) {
             FW_ASSERT(this->numEntries < this->maxSize);
             entries[this->numEntries++] = entry;
@@ -203,7 +233,7 @@ namespace Svc {
           //! \return The item at index i
           //!
           T at(
-              const U32 i /*!< The index*/
+              const U32 i //!< The index
           ) const {
             FW_ASSERT(i < this->numEntries);
             return entries[i];
@@ -241,32 +271,62 @@ namespace Svc {
       // Handler prototypes for typed from ports
       // ----------------------------------------------------------------------
 
+      //! Handler prototype for from_buffSendOutReturn
+      //!
+      virtual void from_buffSendOutReturn_handler(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::Buffer fwBuffer 
+      ) = 0;
+
+      //! Handler base function for from_buffSendOutReturn
+      //!
+      void from_buffSendOutReturn_handlerBase(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::Buffer fwBuffer 
+      );
+
       //! Handler prototype for from_bufferGetCaller
       //!
       virtual Fw::Buffer from_bufferGetCaller_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, //!< The port number
           U32 size 
       ) = 0;
 
       //! Handler base function for from_bufferGetCaller
       //!
       Fw::Buffer from_bufferGetCaller_handlerBase(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, //!< The port number
           U32 size 
       );
 
       //! Handler prototype for from_bufferSendOut
       //!
       virtual void from_bufferSendOut_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, //!< The port number
           Fw::Buffer fwBuffer 
       ) = 0;
 
       //! Handler base function for from_bufferSendOut
       //!
       void from_bufferSendOut_handlerBase(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, //!< The port number
           Fw::Buffer fwBuffer 
+      );
+
+      //! Handler prototype for from_faultOut
+      //!
+      virtual void from_faultOut_handler(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          U32 FaultID, //!<  Some comment here 
+          U32 eventContext //!<  Some comment here 
+      ) = 0;
+
+      //! Handler base function for from_faultOut
+      //!
+      void from_faultOut_handlerBase(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          U32 FaultID, //!<  Some comment here 
+          U32 eventContext //!<  Some comment here 
       );
 
     protected:
@@ -282,6 +342,22 @@ namespace Svc {
       //! The total number of from port entries
       //!
       U32 fromPortHistorySize;
+
+      //! Push an entry on the history for from_buffSendOutReturn
+      void pushFromPortEntry_buffSendOutReturn(
+          Fw::Buffer fwBuffer 
+      );
+
+      //! A history entry for from_buffSendOutReturn
+      //!
+      typedef struct {
+        Fw::Buffer fwBuffer;
+      } FromPortEntry_buffSendOutReturn;
+
+      //! The history for from_buffSendOutReturn
+      //!
+      History<FromPortEntry_buffSendOutReturn> 
+        *fromPortHistory_buffSendOutReturn;
 
       //! Push an entry on the history for from_bufferGetCaller
       void pushFromPortEntry_bufferGetCaller(
@@ -315,23 +391,79 @@ namespace Svc {
       History<FromPortEntry_bufferSendOut> 
         *fromPortHistory_bufferSendOut;
 
+      //! Push an entry on the history for from_faultOut
+      void pushFromPortEntry_faultOut(
+          U32 FaultID, //!<  Some comment here 
+          U32 eventContext //!<  Some comment here 
+      );
+
+      //! A history entry for from_faultOut
+      //!
+      typedef struct {
+        U32 FaultID;
+        U32 eventContext;
+      } FromPortEntry_faultOut;
+
+      //! The history for from_faultOut
+      //!
+      History<FromPortEntry_faultOut> 
+        *fromPortHistory_faultOut;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Invocation functions for to ports
+      // ----------------------------------------------------------------------
+
+      //! Invoke the to port connected to Run
+      //!
+      void invoke_to_Run(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          NATIVE_UINT_TYPE context //!< The call order
+      );
+
+      //! Invoke the to port connected to bufferReturn
+      //!
+      void invoke_to_bufferReturn(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::Buffer fwBuffer 
+      );
+
     public:
 
       // ----------------------------------------------------------------------
       // Getters for port counts
       // ----------------------------------------------------------------------
 
-      //! Get the number of from_bufferGetCaller ports
+      //! Get the number of from_buffSendOutReturn ports
       //!
-      //! \return The number of from_bufferGetCaller ports
+      //! \return The number of from_buffSendOutReturn ports
       //!
-      NATIVE_INT_TYPE getNum_from_bufferGetCaller(void) const;
+      NATIVE_INT_TYPE getNum_from_buffSendOutReturn(void) const;
 
       //! Get the number of from_timeCaller ports
       //!
       //! \return The number of from_timeCaller ports
       //!
       NATIVE_INT_TYPE getNum_from_timeCaller(void) const;
+
+      //! Get the number of from_cmdRegOut ports
+      //!
+      //! \return The number of from_cmdRegOut ports
+      //!
+      NATIVE_INT_TYPE getNum_from_cmdRegOut(void) const;
+
+      //! Get the number of from_eventOut ports
+      //!
+      //! \return The number of from_eventOut ports
+      //!
+      NATIVE_INT_TYPE getNum_from_eventOut(void) const;
+
+      //! Get the number of from_bufferGetCaller ports
+      //!
+      //! \return The number of from_bufferGetCaller ports
+      //!
+      NATIVE_INT_TYPE getNum_from_bufferGetCaller(void) const;
 
       //! Get the number of to_cmdIn ports
       //!
@@ -345,6 +477,18 @@ namespace Svc {
       //!
       NATIVE_INT_TYPE getNum_from_bufferSendOut(void) const;
 
+      //! Get the number of to_Run ports
+      //!
+      //! \return The number of to_Run ports
+      //!
+      NATIVE_INT_TYPE getNum_to_Run(void) const;
+
+      //! Get the number of to_bufferReturn ports
+      //!
+      //! \return The number of to_bufferReturn ports
+      //!
+      NATIVE_INT_TYPE getNum_to_bufferReturn(void) const;
+
       //! Get the number of from_tlmOut ports
       //!
       //! \return The number of from_tlmOut ports
@@ -357,17 +501,11 @@ namespace Svc {
       //!
       NATIVE_INT_TYPE getNum_from_cmdResponseOut(void) const;
 
-      //! Get the number of from_cmdRegOut ports
+      //! Get the number of from_faultOut ports
       //!
-      //! \return The number of from_cmdRegOut ports
+      //! \return The number of from_faultOut ports
       //!
-      NATIVE_INT_TYPE getNum_from_cmdRegOut(void) const;
-
-      //! Get the number of from_eventOut ports
-      //!
-      //! \return The number of from_eventOut ports
-      //!
-      NATIVE_INT_TYPE getNum_from_eventOut(void) const;
+      NATIVE_INT_TYPE getNum_from_faultOut(void) const;
 
 #if FW_ENABLE_TEXT_LOGGING == 1
       //! Get the number of from_LogText ports
@@ -388,7 +526,23 @@ namespace Svc {
       //! Whether to_cmdIn[portNum] is connected
       //!
       bool isConnected_to_cmdIn(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Check whether port is connected
+      //!
+      //! Whether to_Run[portNum] is connected
+      //!
+      bool isConnected_to_Run(
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Check whether port is connected
+      //!
+      //! Whether to_bufferReturn[portNum] is connected
+      //!
+      bool isConnected_to_bufferReturn(
+          const NATIVE_INT_TYPE portNum //!< The port number
       );
 
       // ----------------------------------------------------------------------
@@ -396,24 +550,32 @@ namespace Svc {
       // ----------------------------------------------------------------------
 
     protected:
-    
-      // send command buffers directly - used for intentional command encoding errors
-      void sendRawCmd(FwOpcodeType opcode, U32 cmdSeq, Fw::CmdArgBuffer& args); 
 
-      //! Send a FileDownlink_SendFile command
+      //! Send a FILE_DWN_SEND_FILE command
       //!
-      void sendCmd_FileDownlink_SendFile(
-          const NATIVE_INT_TYPE instance, /*!< The instance number*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          const Fw::CmdStringArg& sourceFileName, /*!< The name of the on-board file to send*/
-          const Fw::CmdStringArg& destFileName /*!< The name of the destination file on the ground*/
+      void sendCmd_FILE_DWN_SEND_FILE(
+          const NATIVE_INT_TYPE instance, //!< The instance number
+          const U32 cmdSeq, //!< The command sequence number
+          const Fw::CmdStringArg& sourceFileName, //!< The name of the on-board file to send
+          const Fw::CmdStringArg& destFileName //!< The name of the destination file on the ground
       );
 
-      //! Send a FileDownlink_Cancel command
+      //! Send a FILE_DWN_CANCEL command
       //!
-      void sendCmd_FileDownlink_Cancel(
-          const NATIVE_INT_TYPE instance, /*!< The instance number*/
-          const U32 cmdSeq /*!< The command sequence number*/
+      void sendCmd_FILE_DWN_CANCEL(
+          const NATIVE_INT_TYPE instance, //!< The instance number
+          const U32 cmdSeq //!< The command sequence number
+      );
+
+      //! Send a FILE_DWN_SEND_PARTIAL command
+      //!
+      void sendCmd_FILE_DWN_SEND_PARTIAL(
+          const NATIVE_INT_TYPE instance, //!< The instance number
+          const U32 cmdSeq, //!< The command sequence number
+          const Fw::CmdStringArg& sourceFileName, //!< The name of the on-board file to send
+          const Fw::CmdStringArg& destFileName, //!< The name of the destination file on the ground
+          U32 startOffset, //!< Starting offset of the source file
+          U32 length //!< Number of bytes to send from starting offset. Length of 0 implies until the end of the file
       );
 
     protected:
@@ -425,9 +587,9 @@ namespace Svc {
       //! Handle a command response
       //!
       virtual void cmdResponseIn(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          const Fw::CommandResponse response /*!< The command response*/
+          const FwOpcodeType opCode, //!< The opcode
+          const U32 cmdSeq, //!< The command sequence number
+          const Fw::CommandResponse response //!< The command response
       );
 
       //! A type representing a command response
@@ -451,10 +613,10 @@ namespace Svc {
       //! Dispatch an event
       //!
       void dispatchEvents(
-          const FwEventIdType id, /*!< The event ID*/
-          Fw::Time& timeTag, /*!< The time*/
-          const Fw::LogSeverity severity, /*!< The severity*/
-          Fw::LogBuffer& args /*!< The serialized arguments*/
+          const FwEventIdType id, //!< The event ID
+          Fw::Time& timeTag, //!< The time
+          const Fw::LogSeverity severity, //!< The severity
+          Fw::LogBuffer& args //!< The serialized arguments
       );
 
       //! Clear event history
@@ -476,10 +638,10 @@ namespace Svc {
       //! Handle a text event
       //!
       virtual void textLogIn(
-          const FwEventIdType id, /*!< The event ID*/
-          Fw::Time& timeTag, /*!< The time*/
-          const Fw::TextLogSeverity severity, /*!< The severity*/
-          const Fw::TextLogString& text /*!< The event string*/
+          const FwEventIdType id, //!< The event ID
+          Fw::Time& timeTag, //!< The time
+          const Fw::TextLogSeverity severity, //!< The severity
+          const Fw::TextLogString& text //!< The event string
       );
 
       //! A history entry for the text log
@@ -517,7 +679,7 @@ namespace Svc {
       //! Handle event FileDownlink_FileOpenError
       //!
       virtual void logIn_WARNING_HI_FileDownlink_FileOpenError(
-          Fw::LogStringArg& fileName /*!< The name of the file*/
+          Fw::LogStringArg& fileName //!< The name of the file
       );
 
       //! A history entry for event FileDownlink_FileOpenError
@@ -540,7 +702,7 @@ namespace Svc {
       //! Handle event FileDownlink_FileReadError
       //!
       virtual void logIn_WARNING_HI_FileDownlink_FileReadError(
-          Fw::LogStringArg& fileName /*!< The name of the file*/
+          Fw::LogStringArg& fileName //!< The name of the file
       );
 
       //! A history entry for event FileDownlink_FileReadError
@@ -563,8 +725,8 @@ namespace Svc {
       //! Handle event FileDownlink_FileSent
       //!
       virtual void logIn_ACTIVITY_HI_FileDownlink_FileSent(
-          Fw::LogStringArg& sourceFileName, /*!< The source file name*/
-          Fw::LogStringArg& destFileName /*!< The destination file name*/
+          Fw::LogStringArg& sourceFileName, //!< The source file name
+          Fw::LogStringArg& destFileName //!< The destination file name
       );
 
       //! A history entry for event FileDownlink_FileSent
@@ -588,8 +750,8 @@ namespace Svc {
       //! Handle event FileDownlink_DownlinkCanceled
       //!
       virtual void logIn_ACTIVITY_HI_FileDownlink_DownlinkCanceled(
-          Fw::LogStringArg& sourceFileName, /*!< The source file name*/
-          Fw::LogStringArg& destFileName /*!< The destination file name*/
+          Fw::LogStringArg& sourceFileName, //!< The source file name
+          Fw::LogStringArg& destFileName //!< The destination file name
       );
 
       //! A history entry for event FileDownlink_DownlinkCanceled
@@ -607,15 +769,69 @@ namespace Svc {
     protected:
 
       // ----------------------------------------------------------------------
+      // Event: FileDownlink_DownlinkTimeout
+      // ----------------------------------------------------------------------
+
+      //! Handle event FileDownlink_DownlinkTimeout
+      //!
+      virtual void logIn_WARNING_HI_FileDownlink_DownlinkTimeout(
+          Fw::LogStringArg& sourceFileName, //!< The source filename
+          Fw::LogStringArg& destFileName //!< The destination file name
+      );
+
+      //! A history entry for event FileDownlink_DownlinkTimeout
+      //!
+      typedef struct {
+        Fw::LogStringArg sourceFileName;
+        Fw::LogStringArg destFileName;
+      } EventEntry_FileDownlink_DownlinkTimeout;
+
+      //! The history of FileDownlink_DownlinkTimeout events
+      //!
+      History<EventEntry_FileDownlink_DownlinkTimeout> 
+        *eventHistory_FileDownlink_DownlinkTimeout;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event: FileDownlink_DownlinkPartialFail
+      // ----------------------------------------------------------------------
+
+      //! Handle event FileDownlink_DownlinkPartialFail
+      //!
+      virtual void logIn_WARNING_LO_FileDownlink_DownlinkPartialFail(
+          Fw::LogStringArg& sourceFileName, //!< The source filename
+          Fw::LogStringArg& destFileName, //!< The destination file name
+          U32 startOffset, //!< Starting file offset in bytes
+          U32 length //!< Number of bytes to downlink
+      );
+
+      //! A history entry for event FileDownlink_DownlinkPartialFail
+      //!
+      typedef struct {
+        Fw::LogStringArg sourceFileName;
+        Fw::LogStringArg destFileName;
+        U32 startOffset;
+        U32 length;
+      } EventEntry_FileDownlink_DownlinkPartialFail;
+
+      //! The history of FileDownlink_DownlinkPartialFail events
+      //!
+      History<EventEntry_FileDownlink_DownlinkPartialFail> 
+        *eventHistory_FileDownlink_DownlinkPartialFail;
+
+    protected:
+
+      // ----------------------------------------------------------------------
       // Telemetry dispatch
       // ----------------------------------------------------------------------
 
       //! Dispatch telemetry
       //!
       void dispatchTlm(
-          const FwChanIdType id, /*!< The channel ID*/
-          const Fw::Time& timeTag, /*!< The time*/
-          Fw::TlmBuffer& val /*!< The channel value*/
+          const FwChanIdType id, //!< The channel ID
+          const Fw::Time& timeTag, //!< The time
+          Fw::TlmBuffer& val //!< The channel value
       );
 
       //! Clear telemetry history
@@ -635,8 +851,8 @@ namespace Svc {
       //! Handle channel FileDownlink_FilesSent
       //!
       virtual void tlmInput_FileDownlink_FilesSent(
-          const Fw::Time& timeTag, /*!< The time*/
-          const U32& val /*!< The channel value*/
+          const Fw::Time& timeTag, //!< The time
+          const U32& val //!< The channel value
       );
 
       //! A telemetry entry for channel FileDownlink_FilesSent
@@ -660,8 +876,8 @@ namespace Svc {
       //! Handle channel FileDownlink_PacketsSent
       //!
       virtual void tlmInput_FileDownlink_PacketsSent(
-          const Fw::Time& timeTag, /*!< The time*/
-          const U32& val /*!< The channel value*/
+          const Fw::Time& timeTag, //!< The time
+          const U32& val //!< The channel value
       );
 
       //! A telemetry entry for channel FileDownlink_PacketsSent
@@ -685,8 +901,8 @@ namespace Svc {
       //! Handle channel FileDownlink_Warnings
       //!
       virtual void tlmInput_FileDownlink_Warnings(
-          const Fw::Time& timeTag, /*!< The time*/
-          const U32& val /*!< The channel value*/
+          const Fw::Time& timeTag, //!< The time
+          const U32& val //!< The channel value
       );
 
       //! A telemetry entry for channel FileDownlink_Warnings
@@ -710,7 +926,7 @@ namespace Svc {
       //! Set the test time for events and telemetry
       //!
       void setTestTime(
-          const Fw::Time& timeTag /*!< The time*/
+          const Fw::Time& timeTag //!< The time
       );
 
     private:
@@ -723,19 +939,39 @@ namespace Svc {
       //!
       Fw::OutputCmdPort m_to_cmdIn[1];
 
+      //! To port connected to Run
+      //!
+      Svc::OutputSchedPort m_to_Run[1];
+
+      //! To port connected to bufferReturn
+      //!
+      Fw::OutputBufferSendPort m_to_bufferReturn[1];
+
     private:
 
       // ----------------------------------------------------------------------
       // From ports
       // ----------------------------------------------------------------------
 
-      //! From port connected to bufferGetCaller
+      //! From port connected to buffSendOutReturn
       //!
-      Fw::InputBufferGetPort m_from_bufferGetCaller[1];
+      Fw::InputBufferSendPort m_from_buffSendOutReturn[1];
 
       //! From port connected to timeCaller
       //!
       Fw::InputTimePort m_from_timeCaller[1];
+
+      //! From port connected to cmdRegOut
+      //!
+      Fw::InputCmdRegPort m_from_cmdRegOut[1];
+
+      //! From port connected to eventOut
+      //!
+      Fw::InputLogPort m_from_eventOut[1];
+
+      //! From port connected to bufferGetCaller
+      //!
+      Fw::InputBufferGetPort m_from_bufferGetCaller[1];
 
       //! From port connected to bufferSendOut
       //!
@@ -749,13 +985,9 @@ namespace Svc {
       //!
       Fw::InputCmdResponsePort m_from_cmdResponseOut[1];
 
-      //! From port connected to cmdRegOut
+      //! From port connected to faultOut
       //!
-      Fw::InputCmdRegPort m_from_cmdRegOut[1];
-
-      //! From port connected to eventOut
-      //!
-      Fw::InputLogPort m_from_eventOut[1];
+      Svc::InputFPPort m_from_faultOut[1];
 
 #if FW_ENABLE_TEXT_LOGGING == 1
       //! From port connected to LogText
@@ -769,79 +1001,95 @@ namespace Svc {
       // Static functions for output ports
       // ----------------------------------------------------------------------
 
-      //! Static function for port from_bufferGetCaller
+      //! Static function for port from_buffSendOutReturn
       //!
-      static Fw::Buffer from_bufferGetCaller_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          U32 size 
+      static void from_buffSendOutReturn_static(
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::Buffer fwBuffer 
       );
 
       //! Static function for port from_timeCaller
       //!
-      static void from_timeCaller_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Time &time /*!< The U32 cmd argument*/
+      static Fw::Time from_timeCaller_static(
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum //!< The port number
+      );
+
+      //! Static function for port from_cmdRegOut
+      //!
+      static void from_cmdRegOut_static(
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          FwOpcodeType opCode //!< Command Op Code
+      );
+
+      //! Static function for port from_eventOut
+      //!
+      static void from_eventOut_static(
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          FwEventIdType id, //!< Log ID
+          Fw::Time &timeTag, //!< Time Tag
+          Fw::LogSeverity severity, //!< The severity argument
+          Fw::LogBuffer &args //!< Buffer containing serialized log entry
+      );
+
+      //! Static function for port from_bufferGetCaller
+      //!
+      static Fw::Buffer from_bufferGetCaller_static(
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          U32 size 
       );
 
       //! Static function for port from_bufferSendOut
       //!
       static void from_bufferSendOut_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
           Fw::Buffer fwBuffer 
       );
 
       //! Static function for port from_tlmOut
       //!
       static void from_tlmOut_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          FwChanIdType id, /*!< Telemetry Channel ID*/
-          Fw::Time &timeTag, /*!< Time Tag*/
-          Fw::TlmBuffer &val /*!< Buffer containing serialized telemetry value*/
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          FwChanIdType id, //!< Telemetry Channel ID
+          Fw::Time &timeTag, //!< Time Tag
+          Fw::TlmBuffer &val //!< Buffer containing serialized telemetry value
       );
 
       //! Static function for port from_cmdResponseOut
       //!
       static void from_cmdResponseOut_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          FwOpcodeType opCode, /*!< Command Op Code*/
-          U32 cmdSeq, /*!< Command Sequence*/
-          Fw::CommandResponse response /*!< The command response argument*/
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          FwOpcodeType opCode, //!< Command Op Code
+          U32 cmdSeq, //!< Command Sequence
+          Fw::CommandResponse response //!< The command response argument
       );
 
-      //! Static function for port from_cmdRegOut
+      //! Static function for port from_faultOut
       //!
-      static void from_cmdRegOut_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          FwOpcodeType opCode /*!< Command Op Code*/
-      );
-
-      //! Static function for port from_eventOut
-      //!
-      static void from_eventOut_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          FwEventIdType id, /*!< Log ID*/
-          Fw::Time &timeTag, /*!< Time Tag*/
-          Fw::LogSeverity severity, /*!< The severity argument*/
-          Fw::LogBuffer &args /*!< Buffer containing serialized log entry*/
+      static void from_faultOut_static(
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          U32 FaultID, //!<  Some comment here 
+          U32 eventContext //!<  Some comment here 
       );
 
 #if FW_ENABLE_TEXT_LOGGING == 1
       //! Static function for port from_LogText
       //!
       static void from_LogText_static(
-          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          FwEventIdType id, /*!< Log ID*/
-          Fw::Time &timeTag, /*!< Time Tag*/
-          Fw::TextLogSeverity severity, /*!< The severity argument*/
-          Fw::TextLogString &text /*!< Text of log message*/
+          Fw::PassiveComponentBase *const callComp, //!< The component instance
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          FwEventIdType id, //!< Log ID
+          Fw::Time &timeTag, //!< Time Tag
+          Fw::TextLogSeverity severity, //!< The severity argument
+          Fw::TextLogString &text //!< Text of log message
       );
 #endif
 

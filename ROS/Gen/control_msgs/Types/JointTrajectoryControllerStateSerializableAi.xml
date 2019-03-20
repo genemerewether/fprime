@@ -1,0 +1,15 @@
+<serializable name="JointTrajectoryControllerState" namespace="ROS::control_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="joint_names" size="100" type="Fw::EightyCharString"/>
+    <member name="joint_names_count" type="U32"/>
+    <member name="desired" type="ROS::trajectory_msgs::JointTrajectoryPoint"/>
+    <member name="actual" type="ROS::trajectory_msgs::JointTrajectoryPoint"/>
+    <member name="error" type="ROS::trajectory_msgs::JointTrajectoryPoint"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/JointTrajectoryPointSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/JointTrajectoryPointSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/trajectory_msgs/Types/JointTrajectoryPointSerializableAi.xml</import_serializable_type>
+</serializable>

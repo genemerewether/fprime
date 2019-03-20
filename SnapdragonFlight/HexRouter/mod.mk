@@ -1,14 +1,12 @@
-SRC = HexRouterComponentAi.xml HexRouterComponentImpl.cpp
+SRC = HexRouterComponentAi.xml 
 
-SRC_SDFLIGHT =
+SRC_SDFLIGHT = HexRouterComponentImpl.cpp
 
-# TODO stub to get it to compile?
-SRC_DSPAL =
+SRC_DSPAL = HexRouterComponentImplStub.cpp
 
-# TODO alternate data flow for test
-SRC_DARWIN =
-SRC_LINUX =
-SRC_CYGWIN =
+SRC_DARWIN = HexRouterComponentImpl.cpp
+SRC_LINUX = HexRouterComponentImpl.cpp
+SRC_CYGWIN = HexRouterComponentImpl.cpp
 
 HDR = HexRouterComponentImpl.hpp HexRouterComponentImplCfg.hpp
 

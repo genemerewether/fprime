@@ -35,3 +35,6 @@
 [submodule "Drv/Mavlink/c_library_v2"]
 	path = Drv/Mavlink/c_library_v2
 	url = https://github.com/mavlink/c_library_v2.git
+[submodule "ROS/fprime_ws/src/control_msgs"]
+	path = ROS/fprime_ws/src/control_msgs
+	url = https://github.com/ros-controls/control_msgs.git

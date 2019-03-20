@@ -87,7 +87,7 @@ namespace SnapdragonFlight {
       //!
       void readBufferRecv_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer Buffer
+          Fw::Buffer& Buffer
       );
 
       //! Handler implementation for Sched

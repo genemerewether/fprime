@@ -1,0 +1,6 @@
+<interface name="JointTrajectoryFeedback" namespace="ROS::control_msgs">
+  <args>
+    <arg name="JointTrajectoryFeedback" pass_by="reference" type="ROS::control_msgs::JointTrajectoryFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointTrajectoryFeedbackSerializableAi.xml</import_serializable_type>
+</interface>

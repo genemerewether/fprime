@@ -162,6 +162,8 @@ namespace Svc {
                 return "AccelCmd";
             case AFL_ACTADAP_ESC:
                 return "ActAdapEsc";
+            case AFL_MVCAM_CALLBACK:
+                return "MVCamCallback";
             default:
                 return "Unknown";
         }

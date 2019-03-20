@@ -121,6 +121,14 @@ class XmlComponentParser(object):
             namespace_name = component.attrib['namespace']
         else:
             namespace_name = None
+
+        if 'ipc' in component.attrib:
+            ipc = True
+            if component.attrib['ipc'] != "true":
+                PRINT.info("%s: Component %s: \"ipc\" attribute must be \"true\" or not present"%(xml_file,component_name))            
+                sys.exit(-1)
+        else:
+            ipc = False
             
         if 'modeler' in component.attrib:
             modeler = True
@@ -135,7 +143,7 @@ class XmlComponentParser(object):
             PRINT.info("%s: Component %s: \"kind\" attribute must be \"passive\",\"queued\", or \"active\""%(xml_file,component_name))            
             sys.exit(-1)
             
-        self.__component = Component(namespace_name,component_name,component.attrib['kind'],None,modeler)
+        self.__component = Component(namespace_name,component_name,component.attrib['kind'],None,ipc,modeler)
         
         for comp_tag in component:
             if comp_tag.tag == 'comment':
@@ -444,6 +452,15 @@ class XmlComponentParser(object):
                                     mc = None
                                 enum_members.append((mn,v,mc))
                             channel_obj.set_type(((d,en),enum_members))
+                        elif channel_tag.tag == "units":
+                            #print "******************Found: %s" % channel_tag.tag
+                            name = channel_tag.attrib['name']
+                            #print "Name: %s" % name
+                            gain = channel_tag.attrib['gain']
+                            #print "Gain: %s" % gain
+                            offset = channel_tag.attrib['offset']
+                            #print "Offset: %s" % offset
+                            channel_obj.set_units(name, gain, offset)
                         else:
                             PRINT.info("%s: Invalid tag %s in channel %s"%(xml_file,channel_tag.tag,n))            
                             sys.exit(-1)
@@ -1028,7 +1045,7 @@ class Component(object):
     """
     Data container for a component.
     """
-    def __init__(self, namespace=None, name=None, kind=None, comment=None, modeler=False):
+    def __init__(self, namespace=None, name=None, kind=None, comment=None, ipc=False, modeler=False):
         """
         Constructor
         """
@@ -1036,6 +1053,7 @@ class Component(object):
         self.__name = name
         self.__kind = kind
         self.__comment = comment
+        self.__ipc = ipc
         self.__modeler = modeler
 
     def get_namespace(self):
@@ -1046,6 +1064,8 @@ class Component(object):
         return self.__kind
     def get_comment(self):
         return self.__comment
+    def get_ipc(self):
+        return self.__ipc
     def get_modeler(self):
         return self.__modeler
     def set_comment(self, comment):
@@ -1255,6 +1275,8 @@ class Channel(object):
         self.__update = update
         self.__limits = limits
         self.__comment = comment
+        # A list of unit conversions for each channel
+        self.__units = list()
     
     def get_ids(self):
         return self.__ids
@@ -1280,6 +1302,10 @@ class Channel(object):
         return self.__limits
     def set_comment(self, comment):
         self.__comment = comment
+    def get_units(self):
+        return self.__units
+    def set_units(self, name, gain, offset):
+        self.__units.append((name, gain, offset))
 
 class Parameter(object):
     """

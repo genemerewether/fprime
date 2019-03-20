@@ -1,0 +1,10 @@
+<serializable name="SingleJointPositionAction" namespace="ROS::control_msgs">
+  <members>
+    <member name="action_goal" type="SingleJointPositionActionGoal"/>
+    <member name="action_result" type="SingleJointPositionActionResult"/>
+    <member name="action_feedback" type="SingleJointPositionActionFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/SingleJointPositionActionGoalSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/SingleJointPositionActionResultSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/SingleJointPositionActionFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

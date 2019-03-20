@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="MVVISLAM_Dummy" data_type="F32" format_string="%.3fm/s">
+        <comment>
+            MVVislam dummy channel
+        </comment>
+    </channel>
+</telemetry>

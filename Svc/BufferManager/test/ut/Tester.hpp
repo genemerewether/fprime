@@ -1,6 +1,6 @@
-// ====================================================================== 
+// ======================================================================
 // \title  BufferManager/test/ut/Tester.hpp
-// \author bocchino
+// \author mstarch
 // \brief  hpp file for BufferManager test harness implementation class
 //
 // \copyright
@@ -8,14 +8,14 @@
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
 // acknowledged. Any commercial use must be negotiated with the Office
 // of Technology Transfer at the California Institute of Technology.
-// 
+//
 // This software may be subject to U.S. export control laws and
 // regulations.  By accepting this document, the user agrees to comply
 // with all U.S. export laws and regulations.  User has the
 // responsibility to obtain export licenses, or other export authority
 // as may be required before exporting such information to foreign
 // countries or providing access to foreign persons.
-// ====================================================================== 
+// ======================================================================
 
 #ifndef TESTER_HPP
 #define TESTER_HPP
@@ -29,32 +29,31 @@ namespace Svc {
     public BufferManagerGTestBase
   {
 
+      // ----------------------------------------------------------------------
+      // Construction and destruction
+      // ----------------------------------------------------------------------
+
     public:
 
+      //! Construct object Tester
+      //!
       Tester(void);
 
+      //! Destroy object Tester
+      //!
       ~Tester(void);
 
     public:
 
-      // ---------------------------------------------------------------------- 
+      // ----------------------------------------------------------------------
       // Tests
-      // ---------------------------------------------------------------------- 
+      // ----------------------------------------------------------------------
 
-      // Allocate and free one buffer
-      void allocateAndFreeOne(void);
+      void three_buffer_problem(void);
 
-      // Error: Free request with empty allocation queue
-      void allocationQueueEmpty(void);
+      void empty_buffers(void);
 
-      // Error: Allocation request with full allocation queue
-      void allocationQueueFull(void);
-
-      // Error: Mismatched buffer ID
-      void idMismatch(void);
-
-      // Error: Store size exceeded
-      void storeSizeExceeded(void);
+      void too_many_buffers(void);
 
     private:
 
@@ -62,20 +61,26 @@ namespace Svc {
       // Helper methods
       // ----------------------------------------------------------------------
 
+      //! Connect ports
+      //!
       void connectPorts(void);
 
+      //! Initialize components
+      //!
       void initComponents(void);
 
     private:
 
       // ----------------------------------------------------------------------
-      // The component under test 
+      // Variables
       // ----------------------------------------------------------------------
 
-      BufferManager bufferManager;
+      //! The component under test
+      //!
+      BufferManager component;
 
   };
 
-};
+} // end namespace Svc
 
 #endif

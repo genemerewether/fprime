@@ -1,6 +1,6 @@
 // ====================================================================== 
 // \title  FileDownlink.hpp
-// \author bocchino
+// \author bocchino, mstarch
 // \brief  hpp file for FileDownlink component implementation class
 //
 // \copyright
@@ -22,8 +22,12 @@
 
 #include <Svc/FileDownlink/FileDownlinkComponentAc.hpp>
 #include <Fw/FilePacket/FilePacket.hpp>
+#include <Svc/FileDownlink/FileDownlinkCfg.hpp>
 #include <Os/File.hpp>
 #include <Os/Mutex.hpp>
+#if FW_AMPCS_COMPATIBLE
+#include <Utils/Hash/Hash.hpp>
+#endif
 
 namespace Svc {
 
@@ -43,7 +47,7 @@ namespace Svc {
         public:
 
           //! The Mode type
-          typedef enum { IDLE, DOWNLINK, CANCEL } Type;
+          typedef enum { IDLE, DOWNLINK, CANCEL, WAIT } Type;
 
         public:
 
@@ -74,7 +78,6 @@ namespace Svc {
 
           //! The Mode mutex
           Os::Mutex mutex;
-
       };
 
       //! Class representing an outgoing file
@@ -102,7 +105,11 @@ namespace Svc {
         PRIVATE:
 
           //! The checksum for the file
+#if FW_AMPCS_COMPATIBLE
+          Utils::Hash checksum;
+#else
           ::CFDP::Checksum checksum;
+#endif
 
         public:
 
@@ -120,10 +127,15 @@ namespace Svc {
           );
 
           //! Get the checksum
+#if FW_AMPCS_COMPATIBLE
+          void getChecksum(U32 &checksum) {
+            this->checksum.final(checksum);
+          }
+#else
           void getChecksum(::CFDP::Checksum& checksum) {
             checksum = this->checksum;
           }
-
+#endif
       };
 
       //! Class to record files sent
@@ -198,7 +210,7 @@ namespace Svc {
           void fileOpenError(void);
 
           //! Issue a File Read Error warning
-          void fileRead(void);
+          void fileRead(const Os::File::Status sttatus);
 
         PRIVATE:
 
@@ -217,6 +229,13 @@ namespace Svc {
           FileDownlink *const fileDownlink;
 
       };
+      //! Enumeration for packet types
+      //! Each type has a buffer to store it.
+      enum PacketType {
+          FILE_PACKET,
+          CANCEL_PACKET,
+          COUNT_PACKET_TYPE
+      };
 
     public:
 
@@ -228,7 +247,8 @@ namespace Svc {
       //!
       FileDownlink(
           const char *const compName, //!< The component name
-          const U16 downlinkPacketSize //!< The size of a downlink packet
+          const U32 timeout, //! Timeout threshold (milliseconds) while in WAIT state
+          const U32 cycleTime //! Rate at which we are running
       );
 
       //! Initialize object FileDownlink
@@ -245,23 +265,21 @@ namespace Svc {
     PRIVATE:
 
       // ----------------------------------------------------------------------
-      // Command handler implementations 
+      // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
-      //! Implementation for FileDownlink_SendFile command handler
+      //! Handler implementation for Run
       //!
-      void FileDownlink_SendFile_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& sourceFileName, //!< The name of the on-board file to send
-          const Fw::CmdStringArg& destFileName //!< The name of the destination file on the ground
+      void Run_handler(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          NATIVE_UINT_TYPE context //!< The call order
       );
 
-      //! Implementation for FileDownlink_Cancel command handler
+      //! Handler implementation for bufferReturn
       //!
-      void FileDownlink_Cancel_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq //!< The command sequence number
+      void bufferReturn_handler(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::Buffer &fwBuffer
       );
 
       //! Handler implementation for pingIn
@@ -272,23 +290,64 @@ namespace Svc {
       );
 
 
+
+    PRIVATE:
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations 
+      // ----------------------------------------------------------------------
+
+      //! Implementation for FileDownlink_SendFile command handler
+      //!
+      void FILE_DWN_SEND_FILE_cmdHandler(
+          const FwOpcodeType opCode, //!< The opcode
+          const U32 cmdSeq, //!< The command sequence number
+          const Fw::CmdStringArg& sourceFileName, //!< The name of the on-board file to send
+          const Fw::CmdStringArg& destFileName //!< The name of the destination file on the ground
+      );
+
+      //! Implementation for FileDownlink_Cancel command handler
+      //!
+      void FILE_DWN_CANCEL_cmdHandler(
+          const FwOpcodeType opCode, //!< The opcode
+          const U32 cmdSeq //!< The command sequence number
+      );
+
+      //! Implementation for FILE_DWN_SEND_PARTIAL command handler
+      //!
+      void FILE_DWN_SEND_PARTIAL_cmdHandler(
+          FwOpcodeType opCode, //!< The opcode
+          U32 cmdSeq, //!< The command sequence number
+          const Fw::CmdStringArg& sourceFileName, //!< The name of the on-board file to send
+          const Fw::CmdStringArg& destFileName, //!< The name of the destination file on the ground
+          U32 startOffset, //!< Starting offset of the source file
+          U32 length //!< Number of bytes to send from starting offset. Length of 0 implies until the end of the file
+      );
+
+
     PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private helper methods 
       // ----------------------------------------------------------------------
 
-      Os::File::Status sendDataPacket(const U32 byteOffset);
-
-      Os::File::Status sendDataPackets(void);
-
+      //Individual packet transfer functions
+      Os::File::Status sendDataPacket(U32 &byteOffset);
       void sendCancelPacket(void);
-
       void sendEndPacket(void);
-
       void sendStartPacket(void);
-
       void sendFilePacket(const Fw::FilePacket& filePacket);
+
+      //State-helper functions
+      void exitFileTransfer(void);
+      void enterIdle(void);
+
+      //Function to acquire a buffer internally
+      void getBuffer(Fw::Buffer& buffer, PacketType type);
+      //Downlink the "next" packet
+      void downlinkPacket();
+      //Finish the file transfer
+      void finishHelper(bool is_cancel);
 
     PRIVATE:
 
@@ -296,8 +355,11 @@ namespace Svc {
       // Member variables 
       // ----------------------------------------------------------------------
 
+      //Buffer's memory backing
+      char memoryStore[COUNT_PACKET_TYPE][FILEDOWNLINK_INTERNAL_BUFFER_SIZE];
+
       //! The size of a downlink packet
-      const U32 downlinkPacketSize;
+      //const U32 downlinkPacketSize;
 
       //! The mode
       Mode mode;
@@ -317,6 +379,37 @@ namespace Svc {
       //! The current sequence index
       U32 sequenceIndex;
 
+      //! Timeout threshold (milliseconds) while in WAIT state
+      U32 timeout;
+      
+      //! current time residing in WAIT state
+      U32 curTimer;
+      
+      //! rate (milliseconds) at which we are running
+      U32 cycleTime;
+
+      //! Current opcode being processed
+      FwOpcodeType curOpCode;
+
+      //! Current opcode being processed
+      U32 curCmdSeq;
+         
+      ////! Buffer for sending file data
+      Fw::Buffer buffer;
+
+      //! Buffer size for file data
+      U32 bufferSize;
+
+      //! Current byte offset in file
+      U32 byteOffset;
+
+      //! Amount of bytes left to read
+      U32 endOffset;
+
+      //! Set to true when all data packets have been sent
+      Fw::FilePacket::Type lastCompletedType;
+
+      U32 lastBufferId;
     };
 
 } // end namespace Svc

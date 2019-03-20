@@ -38,6 +38,23 @@ pushd .
 
 if [ -e ${QUEST_DEV_ROOT}/cross_toolchain ]; then
     cd ${QUEST_DEV_ROOT}/cross_toolchain
+    
+    ./installsdk.sh --APQ8096 --arm-gcc ${SDFLIGHT_TOOLS_ROOT}
+
+    PTHREAD_FILE=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/ARM_Tools/gcc-4.9-2014.11/libc/usr/lib/libpthread.so
+    echo "/* GNU ld script" > ${PTHREAD_FILE}
+    echo "Use the shared library, but some functions are only in" >> ${PTHREAD_FILE}
+    echo "the static library, so try that secondarily.  */" >> ${PTHREAD_FILE}
+    echo "OUTPUT_FORMAT(elf32-littlearm)" >> ${PTHREAD_FILE}
+    echo "GROUP ( libpthread.so.0 libpthread_nonshared.a )" >> ${PTHREAD_FILE}
+
+    LIBC_FILE=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/ARM_Tools/gcc-4.9-2014.11/libc/usr/lib/libc.so
+    echo "/* GNU ld script" > ${LIBC_FILE}
+    echo "Use the shared library, but some functions are only in" >> ${LIBC_FILE}
+    echo "the static library, so try that secondarily.  */" >> ${LIBC_FILE}
+    echo "OUTPUT_FORMAT(elf32-littlearm)" >> ${LIBC_FILE}
+    echo "GROUP ( ../../lib/libc.so.6 ../../usr/lib/libc_nonshared.a" >> ${LIBC_FILE}
+    echo "AS_NEEDED ( ../../lib/ld-linux-armhf.so.3 ))" >> ${LIBC_FILE}
 
     export HEXAGON_SDK_ROOT=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/Hexagon_SDK/3.0
     ./installsdk.sh --APQ8074 --arm-gcc --qrlSDK --no-verify ${SDFLIGHT_TOOLS_ROOT}
@@ -60,7 +77,7 @@ if [ -e ${QUEST_DEV_ROOT}/cross_toolchain ]; then
         #rm ${HEXAGON_ARM_SYSROOT}/lib/libc-2.17-2013.07-2.so
         rm -f ${TEMP_STAGE_SYSROOT}/etc/resolv.conf
         cp /etc/resolv.conf ${TEMP_STAGE_SYSROOT}/etc/
-        proot -0 -b ${QUEST_DEV_ROOT}:/home/linaro/tmp -b /tmp/ -b /dev/ -b /sys/ -b /proc/ -r ${TEMP_STAGE_SYSROOT} -q qemu-arm-static -w /home/linaro/tmp /bin/bash trusty_bootstrap.bash
+        proot -b ${QUEST_DEV_ROOT}:/home/linaro/tmp -S ${TEMP_STAGE_SYSROOT} -q qemu-arm-static -w /home/linaro/tmp /bin/bash trusty_bootstrap.bash
 
         #rsync -l -r ${TEMP_STAGE_SYSROOT}/ ${HEXAGON_ARM_SYSROOT}
         mkdir -p ${UBUNTU_SYSROOT}

@@ -1,0 +1,6 @@
+<interface name="PointHeadActionFeedback" namespace="ROS::control_msgs">
+  <args>
+    <arg name="PointHeadActionFeedback" pass_by="reference" type="ROS::control_msgs::PointHeadActionFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/PointHeadActionFeedbackSerializableAi.xml</import_serializable_type>
+</interface>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Type_Schema.rnc" type="compact"?>
+
+<interface name="CameraFrameData" namespace="Svc">
+    <import_serializable_type>Svc/CameraFrame/CameraFrameSerializableAi.xml</import_serializable_type>
+
+    <comment>
+    Image metadata and buffer port.
+    </comment>
+    <args>
+        <arg name="frame" type="Svc::CameraFrame" pass_by="reference">
+            <comment>camera frame, which has buffer inside</comment>
+        </arg>
+    </args>
+</interface>

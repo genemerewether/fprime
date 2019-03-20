@@ -29,6 +29,7 @@
 #include "mav_msgs/ImuStateUpdate.h"
 
 #include "Os/Mutex.hpp"
+#include "Os/Task.hpp"
 
 #include "SIMREF/RotorSDrv/RotorSDrvComponentAc.hpp"
 #include "SIMREF/RotorSDrv/RotorSDrvComponentImplCfg.hpp"
@@ -215,9 +216,7 @@ namespace SIMREF {
         //!
         Os::Task m_intTask;
 
-        //! NodeHandle pointer for use in RateGroup context
-        //!
-        ros::NodeHandle* m_rgNH;
+        bool m_rosInited;
 
         //! Publisher for motor speeds
         //!

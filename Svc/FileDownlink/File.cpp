@@ -48,7 +48,11 @@ namespace Svc {
     this->size = size;
 
     // Initialize checksum
+#if FW_AMPCS_COMPATIBLE
+    Utils::Hash checksum;
+#else
     CFDP::Checksum checksum;
+#endif
     this->checksum = checksum;
 
     // Open osFile for reading
@@ -75,7 +79,11 @@ namespace Svc {
       return status;
     FW_ASSERT(static_cast<U32>(intSize) == size);
 
+#if FW_AMPCS_COMPATIBLE
+    this->checksum.update(data, size);
+#else
     this->checksum.update(data, byteOffset, size);
+#endif
 
     return Os::File::OP_OK;
 

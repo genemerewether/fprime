@@ -161,6 +161,7 @@
                 <item name="SAVER_DYNAMIC_TLM"/>
                 <item name="SAVER_OFF_TLM"/>
                 <item name="SAVER_RAPID_TLM"/>
+                <item name="SAVER_UNSET_TLM"/>
             </enum>
         </channel>
         <channel id="32" name="SnapdragonBootCount" data_type="U32">

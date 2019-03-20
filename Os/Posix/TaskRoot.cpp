@@ -51,12 +51,12 @@ namespace Os {
         stat = pthread_attr_setschedpolicy(&att,SCHED_RR);
 
         if (stat != 0) {
-            printf("pthread_attr_setschedpolicy: %s\n",strerror(errno));
+            printf("pthread_attr_setschedpolicy: %s\n",strerror(stat));
             return TASK_INVALID_PARAMS;
         }
         stat = pthread_attr_setinheritsched(&att,PTHREAD_EXPLICIT_SCHED); // may not need this
         if (stat != 0) {
-            printf("pthread_attr_setinheritsched: %s\n",strerror(errno));
+            printf("pthread_attr_setinheritsched: %s\n",strerror(stat));
              return TASK_INVALID_PARAMS;
         }
         sched_param schedParam;
@@ -64,7 +64,7 @@ namespace Os {
         schedParam.sched_priority = priority;
         stat = pthread_attr_setschedparam(&att,&schedParam);
         if (stat != 0) {
-            printf("pthread_attr_setschedparam: %s\n",strerror(errno));
+            printf("pthread_attr_setschedparam: %s\n",strerror(stat));
             return TASK_INVALID_PARAMS;
         }
 
@@ -98,11 +98,12 @@ namespace Os {
                 break;
             case EINVAL:
                 delete tid;
-                printf("pthread_create: %s\n",strerror(errno));
+                printf("pthread_create: %s\n",strerror(stat));
                 tStat = TASK_INVALID_PARAMS;
                 break;
             default:
                 delete tid;
+                printf("pthread_create: %s\n",strerror(stat));
                 tStat = TASK_UNKNOWN_ERROR;
                 break;
         }
@@ -191,7 +192,7 @@ namespace Os {
         stat = pthread_join(*((pthread_t*) this->m_handle), value_ptr);
 
         if (stat != 0) {
-            DEBUG_PRINT("join: %s\n", strerror(errno));
+            DEBUG_PRINT("join: %s\n", strerror(stat));
             return TASK_JOIN_ERROR;
         }
         else {

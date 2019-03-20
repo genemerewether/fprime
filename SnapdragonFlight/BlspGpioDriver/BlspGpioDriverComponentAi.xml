@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="BlspGpioDriver" kind="passive" namespace="SnapdragonFlight">
+
+    <import_port_type>Drv/GpioDriverPorts/GpioWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioReadPortAi.xml</import_port_type>
+    <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
+    <import_dictionary>SnapdragonFlight/BlspGpioDriver/Events.xml</import_dictionary>
+
+    <ports>
+    
+        <port name="gpioRead" data_type="Drv::GpioRead"  kind="sync_input">
+           <comment>Port to read GPIO state</comment>
+        </port>
+        <port name="gpioWrite" data_type="Drv::GpioWrite"  kind="sync_input">
+           <comment>Port to write GPIO state</comment>
+        </port>
+        <port name="intOut" data_type="Svc::Cycle"  kind="output" max_number="2">
+           <comment>Port to send interrupt</comment>
+        </port>
+        
+    </ports>
+
+</component>

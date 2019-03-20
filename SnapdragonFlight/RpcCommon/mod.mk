@@ -1,5 +1,7 @@
 SRC = 
 
+SRC_SDFLIGHT = rpcmem.c
+
 SRC_DARWIN = wrap_rpc_stub.c
 SRC_CYGWIN = wrap_rpc_stub.c
 SRC_LINUX = wrap_rpc_stub.c

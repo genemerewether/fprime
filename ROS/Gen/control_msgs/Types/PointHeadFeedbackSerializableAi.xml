@@ -1,0 +1,5 @@
+<serializable name="PointHeadFeedback" namespace="ROS::control_msgs">
+  <members>
+    <member name="pointing_angle_error" type="F64"/>
+  </members>
+</serializable>

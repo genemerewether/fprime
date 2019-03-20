@@ -34,3 +34,5 @@
 | | | |packetIndex|U32||The sequence index of the out-of-order packet|    
 | | | |lastPacketIndex|U32||The sequence index of the last packet received before the out-of-order packet|    
 |FileUplink_UplinkCanceled|7 (0x7)|The File Uplink component received a CANCEL packet| | | | |
+|FileUplink_DecodeError|8 (0x8)|Error decoding file packet| | | | |
+| | | |status|I32||The sequence index of the out-of-order packet|    

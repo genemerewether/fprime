@@ -45,6 +45,12 @@
         </optional>
         
         <optional>
+            <attribute name = "ipc">
+                <data type = "boolean"/>
+            </attribute>
+        </optional>
+	
+        <optional>
             <attribute name = "modeler">
                 <data type = "boolean"/>
             </attribute>

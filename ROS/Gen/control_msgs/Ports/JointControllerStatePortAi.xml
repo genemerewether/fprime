@@ -1,0 +1,6 @@
+<interface name="JointControllerState" namespace="ROS::control_msgs">
+  <args>
+    <arg name="JointControllerState" pass_by="reference" type="ROS::control_msgs::JointControllerState"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointControllerStateSerializableAi.xml</import_serializable_type>
+</interface>

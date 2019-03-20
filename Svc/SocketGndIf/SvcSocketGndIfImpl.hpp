@@ -38,7 +38,7 @@ namespace Svc {
             //
             void fileDownlinkBufferSendIn_handler(
                 NATIVE_INT_TYPE portNum, /*!< The port number*/
-                Fw::Buffer fwBuffer
+                Fw::Buffer& fwBuffer
             );
 
             //! Implementation for GNDIF_ENABLE_INTERFACE command handler

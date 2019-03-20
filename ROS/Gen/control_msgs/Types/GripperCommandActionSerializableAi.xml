@@ -1,0 +1,10 @@
+<serializable name="GripperCommandAction" namespace="ROS::control_msgs">
+  <members>
+    <member name="action_goal" type="GripperCommandActionGoal"/>
+    <member name="action_result" type="GripperCommandActionResult"/>
+    <member name="action_feedback" type="GripperCommandActionFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/GripperCommandActionGoalSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/GripperCommandActionResultSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/GripperCommandActionFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

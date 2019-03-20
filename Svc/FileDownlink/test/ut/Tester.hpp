@@ -22,8 +22,10 @@
 
 #include <Svc/FileDownlink/FileDownlink.hpp>
 #include <Fw/Types/Assert.hpp>
+#include <Fw/Test/UnitTest.hpp>
 #include "GTestBase.hpp"
 
+#define MAX_HISTORY_SIZE 10
 #define FILE_BUFFER_CAPACITY 100
 
 namespace Svc {
@@ -126,12 +128,25 @@ namespace Svc {
       //!
       void cancelInIdleMode(void);
 
+      //! Create a file F
+      //! Downlink partial F
+      //! Verify that the downlinked file matches F
+      //!
+      void downlinkPartial(void);
+
     private:
 
       // ----------------------------------------------------------------------
       // Handlers for from ports
       // ----------------------------------------------------------------------
 
+      //! Handler for from_buffSendOutReturn
+      //!
+      void from_buffSendOutReturn_handler(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          Fw::Buffer fwBuffer 
+      );
+      
       //! Handler for from_bufferGetCaller
       //!
       Fw::Buffer from_bufferGetCaller_handler(
@@ -144,6 +159,14 @@ namespace Svc {
       void from_bufferSendOut_handler(
           const NATIVE_INT_TYPE portNum, //!< The port number
           Fw::Buffer buffer 
+      );
+
+      //! Handler for from_faultOut
+      //!
+      void from_faultOut_handler(
+          const NATIVE_INT_TYPE portNum, //!< The port number
+          U32 FaultID, //!<  Some comment here 
+          U32 eventContext //!<  Some comment here 
       );
 
     private:
@@ -167,6 +190,17 @@ namespace Svc {
           const char *const sourceFileName, //!< The source file name
           const char *const destFileName, //!< The destination file name
           const Fw::CommandResponse response //!< The expected command response
+      );
+
+      //! Command the FileDownlink component to send a file
+      //! Assert a command response
+      //!
+      void sendFilePartial(
+          const char *const sourceFileName, //!< The source file name
+          const char *const destFileName, //!< The destination file name
+          const Fw::CommandResponse response, //!< The expected command response
+          U32 startIndex, //!< The starting index
+          U32 length //!< The amount of bytes to downlink
       );
 
       //! Command the FileDownlink component to cancel a file downlink
@@ -193,7 +227,8 @@ namespace Svc {
         History<Fw::FilePacket::DataPacket>& historyOut, //!< The outgoing history
         const Fw::FilePacket::Type endPacketType, //!< The expected ending packet type
         const size_t numPackets, //!< The expected number of packets
-        const CFDP::Checksum& checksum //!< The expected checksum
+        const CFDP::Checksum& checksum, //!< The expected checksum,
+        U32 startOffset //!< Starting byte offset
       );
 
       //! Validate a file packet buffer and convert it to a file packet
@@ -251,7 +286,8 @@ namespace Svc {
       //! The current sequence index
       //!
       U32 sequenceIndex;
-
+   
+      bool buff_returned;
   };
 
 } // end namespace Svc

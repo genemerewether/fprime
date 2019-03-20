@@ -1,0 +1,6 @@
+<interface name="SingleJointPositionGoal" namespace="ROS::control_msgs">
+  <args>
+    <arg name="SingleJointPositionGoal" pass_by="reference" type="ROS::control_msgs::SingleJointPositionGoal"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/SingleJointPositionGoalSerializableAi.xml</import_serializable_type>
+</interface>

@@ -429,6 +429,7 @@ static const uint16_t methodStrings[19] = {42,101,106,89,0,101,106,62,106,89,21,
 static const uint16_t methodStringsArrays[10] = {18,12,17,16,15,14,7,0,10,4};
 __QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(hexref_slim) = {10,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
 #endif //_HEXREF_SLIM_H
+extern int adsp_mmap_fd_getinfo(int, uint32_t *);
 #ifdef __cplusplus
 extern "C" {
 #endif

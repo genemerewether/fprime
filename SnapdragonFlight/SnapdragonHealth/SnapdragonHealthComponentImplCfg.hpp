@@ -24,7 +24,7 @@
 namespace SnapdragonFlight {
 
   enum {
-    SH_SCHED_COUNTDOWN = 1
+    SH_SCHED_COUNTDOWN = 10
   };
 
   enum SH_PowerSaverMode {

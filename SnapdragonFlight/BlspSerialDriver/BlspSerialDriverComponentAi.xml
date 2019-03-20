@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="BlspSerialDriver" kind="passive" namespace="SnapdragonFlight">
+
+    <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
+    <import_dictionary>SnapdragonFlight/BlspSerialDriver/Events.xml</import_dictionary>
+    <import_dictionary>SnapdragonFlight/BlspSerialDriver/Telemetry.xml</import_dictionary>
+
+    <ports>
+    
+        <port name="serialRecv" data_type="Drv::SerialRead"  kind="output">
+           <comment>Port to push serial data received from driver</comment>
+        </port>
+        <port name="serialSend" data_type="Drv::SerialWrite"  kind="sync_input">
+           <comment>Port to send serial data to serial driver</comment>
+        </port>
+        <port name="readBufferSend" data_type="Fw::BufferSend"  kind="sync_input">
+           <comment>Port to give buffers to the driver for reads</comment>
+        </port>
+        
+    </ports>
+
+</component>

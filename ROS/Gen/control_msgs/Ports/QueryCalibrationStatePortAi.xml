@@ -1,0 +1,8 @@
+<interface name="QueryCalibrationState" namespace="ROS::control_msgs">
+  <args>
+    <arg name="QueryCalibrationStateRequest" pass_by="reference" type="ROS::control_msgs::QueryCalibrationStateRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/QueryCalibrationStateInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/QueryCalibrationStateOutSerializableAi.xml</import_serializable_type>
+  <return name="QueryCalibrationStateResponse" pass_by="reference" type="ROS::control_msgs::QueryCalibrationStateResponse"/>
+</interface>

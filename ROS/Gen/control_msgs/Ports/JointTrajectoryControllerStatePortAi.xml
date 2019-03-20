@@ -1,0 +1,6 @@
+<interface name="JointTrajectoryControllerState" namespace="ROS::control_msgs">
+  <args>
+    <arg name="JointTrajectoryControllerState" pass_by="reference" type="ROS::control_msgs::JointTrajectoryControllerState"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointTrajectoryControllerStateSerializableAi.xml</import_serializable_type>
+</interface>

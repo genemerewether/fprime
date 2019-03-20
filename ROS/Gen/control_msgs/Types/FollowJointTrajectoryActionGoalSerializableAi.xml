@@ -1,0 +1,10 @@
+<serializable name="FollowJointTrajectoryActionGoal" namespace="ROS::control_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="goal_id" type="ROS::actionlib_msgs::GoalID"/>
+    <member name="goal" type="FollowJointTrajectoryGoal"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/actionlib_msgs/Types/GoalIDSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/FollowJointTrajectoryGoalSerializableAi.xml</import_serializable_type>
+</serializable>

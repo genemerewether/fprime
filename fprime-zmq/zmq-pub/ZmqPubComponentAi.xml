@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../../Autocoders/schema/default/component_schema.rnc" type="compact"?>
+
+<component name="ZmqPub" kind="active" namespace="Zmq">
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <comment>Publishes port calls over ZMQ</comment>
+    <ports>
+        <port name="Sched" data_type="Svc::Sched" kind="async_input" >
+            <comment>
+            Input port to get called periodically for telemetry
+            </comment>
+        </port>
+        <port name="PortsIn" data_type="Serial" kind="async_input" max_number="10">
+            <comment>
+            Input ports from other components
+            </comment>
+        </port>
+    </ports>
+    <events>
+        <event id="0" name="ZP_PublishConnectionOpened" severity="ACTIVITY_HI" format_string = "ZeroMQ publish connection opened">
+            <comment>
+            Connection opened
+            </comment>
+        </event>
+        <event id="1" name="ZP_ContextError" severity="WARNING_HI" format_string = "ZeroMQ publisher context error: %s">
+            <comment>
+            Zmq publisher context open error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+        <event id="2" name="ZP_SocketError" severity="WARNING_HI" format_string = "ZeroMQ publisher socket error: %s">
+            <comment>
+            Zmq publisher socket error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+        <event id="3" name="ZP_BindError" severity="WARNING_HI" format_string = "ZeroMQ publisher bind error: %s">
+            <comment>
+            Zmq publisher bind error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+        <event id="4" name="ZP_SendError" severity="WARNING_HI" format_string = "ZeroMQ publisher send error: %s" throttle="10">
+            <comment>
+            Zmq publisher send error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+    </events>
+    <telemetry>
+        <channel id="0" name="ZP_PacketsSent" data_type="U32">
+            <comment>
+            Number of packets sent
+            </comment>
+        </channel>
+    </telemetry>
+</component>
+

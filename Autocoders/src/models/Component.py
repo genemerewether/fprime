@@ -40,7 +40,7 @@ class Component(object):
     This is a very simple component meta-model class.
     Note: associations to Port instances as needed.
     """
-    def __init__(self, namespace, name, kind, comment=None, modeler=False, port_obj_list=None, command_obj_list=None, channel_obj_list=None, parameter_obj_list=None, event_obj_list=None, internal_interface_obj_list=None, serializable_obj_list=None, xml_filename=None, kind2=None, base_id=None, base_id_window=None):
+    def __init__(self, namespace, name, kind, comment=None, ipc=False, modeler=False, port_obj_list=None, command_obj_list=None, channel_obj_list=None, parameter_obj_list=None, event_obj_list=None, internal_interface_obj_list=None, serializable_obj_list=None, xml_filename=None, kind2=None, base_id=None, base_id_window=None):
         """
         Constructor
         """
@@ -48,6 +48,7 @@ class Component(object):
         self.__name = name
         self.__kind = kind
         self.__comment = comment
+        self.__ipc = ipc
         self.__modeler = modeler
         self.__port_obj_list = port_obj_list
         self.__command_obj_list = command_obj_list
@@ -79,6 +80,8 @@ class Component(object):
         self.__kind = kind
     def get_comment(self):
         return self.__comment
+    def get_ipc(self):
+        return self.__ipc
     def get_modeler(self):
         return self.__modeler
     def get_ports(self):

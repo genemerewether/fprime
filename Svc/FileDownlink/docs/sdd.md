@@ -11,7 +11,8 @@ It manages downlink of files from the spacecraft.
 
 Requirement | Description | Rationale | Verification Method
 ---- | ---- | ---- | ----
-FD-001 | Upon command, `FileDownlink` shall read a file from non-volatile storage, partition the file into packets, and send out the packets. | This requirement provides the capability to downlink files from the spacecraft. | Test
+ISF-FD-001 | Upon command, `FileDownlink` shall read a file from non-volatile storage, partition the file into packets, and send out the packets. | This requirement provides the capability to downlink files from the spacecraft. | Test
+
 
 ## 3 Design
 
@@ -34,19 +35,22 @@ of type [`Fw::FilePacket`](../../../Fw/FilePacket/docs/sdd.html).
 
 Name | Type | Role
 -----| ---- | ----
-`timeCaller` | `Fw::Time` | TimeGet
+`timeCaller` | [`Fw::Time`](../../../Fw/Time/docs/sdd.html) | TimeGet
 `cmdIn` | [`Fw::Cmd`](../../../Fw/Cmd/docs/sdd.html) | Cmd
 `cmdRegOut` | [`Fw::CmdReg`](../../../Fw/Cmd/docs/sdd.html) | CmdReg
 `cmdResponseOut` | [`Fw::CmdResponse`](../../../Fw/Cmd/docs/sdd.html) | CmdResponse
 `tlmOut` | [`Fw::Tlm`](../../../Fw/Tlm/docs/sdd.html) | Telemetry
 `eventOut` | [`Fw::LogEvent`](../../../Fw/Log/docs/sdd.html) | LogEvent
+`Run` | [`Svc::Sched`](../../../Svc/Sched/docs/sdd.html) | Sched
 
 #### 3.3.2 Component-Specific Ports
 
 Name | Type | Kind | Purpose
 ---- | ---- | ---- | ----
-<a name="bufferGet">`bufferGet`</a> | [`Fw::BufferGet`](../../../Fw/Buffer/docs/sdd.html) | output (caller) | Requests buffers for sending file packets.
+<a name="bufferGet">`bufferGetCaller`</a> | [`Fw::BufferGet`](../../../Fw/Buffer/docs/sdd.html) | output (caller) | Requests buffers for sending file packets.
 <a name="bufferSendOut">`bufferSendOut`</a> | [`Fw::BufferSend`](../../../Fw/Buffer/docs/sdd.html) | output | Sends buffers containing file packets.
+<a name="bufferSendOut">`bufferReturn`</a> | [`Fw::BufferSend`](../../../Fw/Buffer/docs/sdd.html) | input | Reuse buffer provided and continue downlinking data.
+<a name="bufferSendOut">`buffSendOutReturn`</a> | [`Fw::BufferSend`](../../../Fw/Buffer/docs/sdd.html) | output | Returns buffer to manager when downlink has completed. 
 
 ### 3.4 Constants
 
@@ -55,6 +59,8 @@ at component instantiation time:
 
 * *downlinkPacketSize*:
 The size of the packets to use on downlink.
+* *timeout*: Timeout threshold (milliseconds) while in the WAIT state.
+* *cycleTime*: Rate at which the component is running. 
 
 ### 3.5 State
 
@@ -67,15 +73,17 @@ one of the following values:
 
 * CANCEL (2): `FileDownlink` is canceling a file downlink.
 
+* WAIT (3): `FileDownlink` is waiting for a buffer to continue file downlink.
+
 The initial value is IDLE.
 
 ### 3.6 Commands
 
 `FileDownlink` recognizes the commands described in the following sections.
 
-#### 3.6.1 SendFile
+#### 3.6.1 Send File
 
-SendFile is an asynchronous command.
+Send File is an asynchronous command.
 It has two arguments:
 
 1. *sourceFileName*:
@@ -84,7 +92,7 @@ The name of the on-board file to send.
 2. *destFileName*:
 The name of the destination file on the ground.
 
-When `File Downlink` receives this command, it carries
+When `FileDownlink` receives this command, it carries
 out the following steps:
 
 1. If *mode* = CANCEL, then 
@@ -100,44 +108,51 @@ If there is any problem opening the file, then issue a
 *FileOpenError* warning and abort the command execution.
 
 4. Invoke *bufferGetCaller*
-to request a buffer whose size is the size of a START packet.
-Fill the buffer and send it out on *bufferSendOut*.
+to request a buffer whose size is *downlinkPacketSize*.
+Fill the buffer with the START packet and send it out on *bufferSendOut*.
 
-5. Set a remainder *r* to the size of the file with descriptor *d*.
+5. Set *mode = WAIT*.
 
-6. While *r > 0* and *mode = DOWNLINK* do:
+6. When the buffer has been returned via the *bufferReturn* port, set *mode = DOWNLINK*, and
+send the first DATA packet.
 
-    a. Let *n* be the smaller of *downlinkPacketSize* and *r*.
+7. Set *mode = WAIT*.
 
-    b. Invoke *bufferGetCaller* to request a buffer *B* whose size is 
-the size of a DATA packet with a data payload of *n* bytes.
+8. When the buffer has been returned via the *bufferReturn* port, set *mode = DOWNLINK*, and
+continue sending DATA packets.
 
-    c. Read the next *n* bytes out of the file with descriptor *d*.
-If there is any problem reading the file, then issue a
-*FileReadError* warning, close the file, and abort the command execution.
+9. If there is any problem reading the file, then issue a
+*FileReadError* warning event, close the file, and abort the command execution.
 
-    d. Fill *B* with (i) the data read the previous step and (ii) the appropriate
-metadata. Send *B* out on *bufferSendOut*.
+10. Repeat steps 7 and 8 until we have sent every DATA packet. Once completed and we have the buffer,
+send the END packet and issue a *FileSent* event.
 
-    e. Reduce *r* by *n*.
-
-7. Close the file with descriptor *d*.
-
-8. If *mode* = CANCEL, then
-
-    a. Invoke *bufferGetCaller* to request a buffer whose size 
-is the size of a CANCEL packet.
-Fill the packet and send it out on *bufferSendOut*.
-
-    b. Issue a *DownlinkCanceled* event.
-
-9. Otherwise invoke *bufferGetCaller* to request a buffer whose 
-size is the size of an END packet.
-Fill the buffer and send it out on *bufferSendOut*.
+7. Close the file.
 
 10. Set *mode = IDLE*.
 
-#### 3.6.2 Cancel
+#### 3.6.2 Send Partial File
+
+Send Partial File is an asynchronous command. It has four arguments:
+
+1. *sourceFileName*:
+The name of the on-board file to send.
+
+2. *destFileName*:
+The name of the destination file on the ground.
+
+3. *startOffset*:
+The starting offset of the source file.
+
+4. *length*:
+The number of bytes to downlink from the start offset.
+
+The method of sending data packets is identical to the *Send File* command with the exception of the 
+starting offset and length. In the *Send File* command, the *startOffet* is 0 and *length* is the 
+file size.
+
+
+#### 3.6.3 Cancel
 
 Cancel is a synchronous command.
 If *mode* = DOWNLINK, it sets *mode* to CANCEL.
@@ -145,7 +160,7 @@ Otherwise it does nothing.
 
 ## 4 Dictionary
 
-Dictionaries: [HTML](FileDownlink.html) [MD](FileDownlink.md)
+[Link](FileDownlink.html)
 
 ## 5 Checklists
 
