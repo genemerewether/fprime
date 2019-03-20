@@ -105,6 +105,7 @@ int main(void)
     spiInit();
     gioInit();
     adcInit();
+    i2cInit();
 
     // calibrate ADCs
     adcCalibration(adcREG1);

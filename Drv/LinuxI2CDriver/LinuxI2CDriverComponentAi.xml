@@ -5,7 +5,7 @@
 
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
-    <import_port_type>Drv/I2CDriverPorts/I2CReadWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadPortAi.xml</import_port_type>
     <import_port_type>Drv/I2CDriverPorts/I2CConfigPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
@@ -20,7 +20,7 @@
         <port name="Log" data_type="Fw::Log"  kind="output" role="LogEvent"    max_number="1">
         </port>
 
-        <port name="I2CReadWrite" data_type="Drv::I2CReadWrite"  kind="sync_input"    max_number="1">
+        <port name="I2CReadWrite" data_type="Drv::I2CWriteRead"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="I2CConfig" data_type="Drv::I2CConfig"  kind="sync_input"    max_number="1">

@@ -18,6 +18,7 @@ SRC_TIR5 =	source/HL_adc.c \
 		source/HL_sci.c \
 		source/HL_sys_dma.c \
 		source/HL_spi.c \
+		source/HL_i2c.c \
 		\
 		source/HL_sys_core.asm \
 		source/HL_sys_intvecs.asm \

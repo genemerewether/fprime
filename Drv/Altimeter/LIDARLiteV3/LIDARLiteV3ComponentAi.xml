@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="LIDARLiteV3" kind="passive" namespace="Drv" modeler="true">
+
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadStatusPortAi.xml</import_port_type>
+    <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CConfigPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Drv/Altimeter/AltimeterPorts/AltimeterPortAi.xml</import_port_type>
+
+    <import_dictionary>Drv/Altimeter/LIDARLiteV3/Events.xml</import_dictionary>
+    <import_dictionary>Drv/Altimeter/LIDARLiteV3/Telemetry.xml</import_dictionary>
+
+    <ports>
+    
+
+        <port name="SchedIn" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="I2CWriteRead" data_type="I2CWriteRead"  kind="output"    max_number="1">
+        </port>
+
+        <port name="I2CWriteReadStatus" data_type="I2CWriteReadStatus"  kind="output"    max_number="1">
+        </port>
+
+        <port name="I2CConfig" data_type="I2CConfig"  kind="output"    max_number="1">
+        </port>
+
+        <port name="AltimeterSend" data_type="Altimeter"  kind="output"    max_number="1">
+        </port>
+
+    </ports>
+
+</component>

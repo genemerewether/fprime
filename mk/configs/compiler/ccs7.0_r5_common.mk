@@ -12,7 +12,9 @@ CCS_R5_COMMON_FLAGS :=	$(COMMON_DEFINES) \
 						-DEIGEN_NO_MALLOC \
 						-D'EIGEN_ALIGN_TO_BOUNDARY(n)=__attribute__((aligned(n)))' \
 						-D'EIGEN_ALIGNOF(x)=__alignof(x)' \
-						-D'EIGEN_HAS_CXX11_ATOMIC=0'
+						-D'EIGEN_HAS_CXX11_ATOMIC=0' \
+						-D__BSD_VISIBLE \
+						-DFW_ENABLE_TEXT_LOGGING=1
 
 CCS_R5_COMMON_INCLUDES := 	$(COMMON_INCLUDES) \
 							$(CCS_INCLUDES_COMMON) \

@@ -9,6 +9,7 @@
 #include <Fw/Cmd/CmdPacket.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <stdio.h>
+#include <string.h>
 
 namespace LLProc {
 #if FW_OBJECT_NAMES == 1

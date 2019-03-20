@@ -55,6 +55,7 @@
 #include "HL_spi.h"
 #include "HL_het.h"
 #include "HL_rti.h"
+#include "HL_i2c.h"
 #include "HL_epc.h"
 #include "HL_sys_dma.h"
 
@@ -141,6 +142,16 @@ void gioNotification(gioPORT_t *port, uint32 bit)
 }
 
 /* USER CODE BEGIN (23) */
+/* USER CODE END */
+#pragma WEAK(i2cNotification)
+void i2cNotification(i2cBASE_t *i2c, uint32 flags)      
+{
+/*  enter user code between the USER CODE BEGIN and USER CODE END. */
+/* USER CODE BEGIN (24) */
+/* USER CODE END */
+}
+
+/* USER CODE BEGIN (25) */
 /* USER CODE END */
 
 #pragma WEAK(sciNotification)

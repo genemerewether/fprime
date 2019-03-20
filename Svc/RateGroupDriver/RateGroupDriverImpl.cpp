@@ -3,6 +3,7 @@
 #include <cstring>
 #include <Fw/Types/Assert.hpp>
 #include <stdio.h>
+#include <string.h>
 
 namespace Svc {
 

@@ -29,7 +29,10 @@
 #include <Fw/Types/MemAllocator.hpp>
 #include <limits.h>
 
+
 namespace HLProc {
+
+  const char* BOOTLOADER_MAGIC_STRING = "LeoBoot!";
 
   class LLRouterComponentImpl :
     public LLRouterComponentBase
@@ -53,8 +56,6 @@ namespace HLProc {
       static const U32 MAX_DATA_PACKET_LENGTH = 32;
 
       static const U32 MAX_TOTAL_PACKET_LENGTH = 1 + HEADER_LENGTH + MAX_DATA_PACKET_LENGTH + 1;
-
-      const char* BOOTLOADER_MAGIC_STRING = "LeoBoot!";
 
       static const U32 METADATA_FLAGS_FORCEBOOT = (1 << 0);
 
