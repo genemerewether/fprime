@@ -37,6 +37,8 @@ CXX := $(ARM_CC_BASE)-g++
 GCOV := $(ARM_CC_BASE)-gcov
 AR := $(ARM_CC_BASE)-ar
 HEXAGON_TOOLS_ROOT := $(HEXAGON_SDK_ROOT)/tools/HEXAGON_Tools/8.0.08/Tools
+
+CHECK_LINK_BIN_LINKER := -Wl,-z=muldefs
 else
 HEXAGON_V_ARCH := v55
 TARGET_DSP := adsp
@@ -55,6 +57,8 @@ RPATH_SYSROOT_CMD := -L$(HEXAGON_ARM_SYSROOT)/usr/lib/ -L$(INDIGO_ARM_SYSROOT)/u
 INCLUDE_ARM_SYSROOTS := $(INDIGO_ARM_SYSROOT)
 # arbitrary convention - for use in linaro_gnu_common.mk
 INCLUDE_ARM_SYSROOT_CMD := --sysroot=$(HEXAGON_ARM_SYSROOT)
+
+CHECK_LINK_BIN_LINKER := -Xlinker,-z,muldefs
 endif
 
 CRC := $(BUILD_ROOT)/mk/bin/run_file_crc.sh

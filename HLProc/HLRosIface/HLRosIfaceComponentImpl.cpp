@@ -27,6 +27,7 @@
 
 #include <Os/File.hpp>
 
+#include <math.h>
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
@@ -532,6 +533,12 @@ namespace HLProc {
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
+
+	    if (!std::isfinite(msg->header.stamp.sec) ||
+		!std::isfinite(msg->header.stamp.nsec)) {
+  	        //TODO(mereweth) - EVR
+	        return;
+	    }
             Header head(msg->header.seq,
                         Fw::Time(TB_ROS_TIME, 0,
                                  msg->header.stamp.sec,
@@ -546,14 +553,32 @@ namespace HLProc {
              * ROS value or the min of that and the allocated size
              */
             size = msg->angles.size();
+	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+	        if (!std::isfinite(msg->angles[i])) {
+  	            //TODO(mereweth) - EVR
+		    return;
+		}
+	    }
             actuators.setangles(msg->angles.data(), size);
             actuators.setangles_count(msg->angles.size());
             
             size = msg->angular_velocities.size();
+	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+	        if (!std::isfinite(msg->angular_velocities[i])) {
+  	            //TODO(mereweth) - EVR
+		    return;
+		}
+	    }
             actuators.setangular_velocities(msg->angular_velocities.data(), size);
             actuators.setangular_velocities_count(msg->angular_velocities.size());
 
             size = msg->normalized.size();
+	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+	        if (!std::isfinite(msg->normalized[i])) {
+  	            //TODO(mereweth) - EVR
+		    return;
+		}
+	    }
             actuators.setnormalized(msg->normalized.data(), size);
             actuators.setnormalized_count(msg->normalized.size());
 
@@ -596,6 +621,12 @@ namespace HLProc {
 
         DEBUG_PRINT("imuStateUpdate port handler %d\n", this->portNum);
 
+	if (!std::isfinite(msg->header.stamp.sec) ||
+	    !std::isfinite(msg->header.stamp.nsec)) {
+	    //TODO(mereweth) - EVR
+	    return;
+	}
+	    
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
         I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
@@ -636,6 +667,34 @@ namespace HLProc {
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
+	if (!std::isfinite(msg->pose.pose.position.x) ||
+	    !std::isfinite(msg->pose.pose.position.y) ||
+	    !std::isfinite(msg->pose.pose.position.z) ||
+	    
+	    !std::isfinite(msg->pose.pose.orientation.x) ||
+            !std::isfinite(msg->pose.pose.orientation.y) ||
+	    !std::isfinite(msg->pose.pose.orientation.z) ||
+	    !std::isfinite(msg->pose.pose.orientation.w) ||
+	    
+            !std::isfinite(msg->twist.twist.linear.x) ||
+	    !std::isfinite(msg->twist.twist.linear.y) ||
+	    !std::isfinite(msg->twist.twist.linear.z) ||
+	    
+	    !std::isfinite(msg->twist.twist.angular.x) ||
+	    !std::isfinite(msg->twist.twist.angular.y) ||
+	    !std::isfinite(msg->twist.twist.angular.z) ||
+	    
+	    !std::isfinite(msg->angular_velocity_bias.x) ||
+	    !std::isfinite(msg->angular_velocity_bias.y) ||
+	    !std::isfinite(msg->angular_velocity_bias.z) ||
+	    
+	    !std::isfinite(msg->linear_acceleration_bias.x) ||
+	    !std::isfinite(msg->linear_acceleration_bias.y) ||
+	    !std::isfinite(msg->linear_acceleration_bias.z)) {
+	  //TODO(mereweth) - EVR
+	  return;
+	}
+	
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
@@ -708,6 +767,29 @@ namespace HLProc {
 
         DEBUG_PRINT("Flat output port handler %d\n", this->portNum);
 
+	if (!std::isfinite(msg->header.stamp.sec) ||
+	    !std::isfinite(msg->header.stamp.nsec)) {
+	    //TODO(mereweth) - EVR
+	    return;
+	}
+	
+	if (!std::isfinite(msg->position.x) ||
+	    !std::isfinite(msg->position.y) ||
+	    !std::isfinite(msg->position.z) ||
+	    
+	    !std::isfinite(msg->velocity.x) ||
+            !std::isfinite(msg->velocity.y) ||
+	    !std::isfinite(msg->velocity.z) ||
+	    
+            !std::isfinite(msg->acceleration.x) ||
+	    !std::isfinite(msg->acceleration.y) ||
+	    !std::isfinite(msg->acceleration.z) ||
+	    
+	    !std::isfinite(msg->yaw)) {
+	  //TODO(mereweth) - EVR
+	  return;
+	}
+	
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
@@ -762,6 +844,28 @@ namespace HLProc {
 
         DEBUG_PRINT("Attitude rate thrust output port handler %d\n", this->portNum);
 
+	if (!std::isfinite(msg->header.stamp.sec) ||
+	    !std::isfinite(msg->header.stamp.nsec)) {
+	    //TODO(mereweth) - EVR
+	    return;
+	}
+
+	if (!std::isfinite(msg->attitude.x) ||
+	    !std::isfinite(msg->attitude.y) ||
+	    !std::isfinite(msg->attitude.z) ||
+	    !std::isfinite(msg->attitude.w) ||
+	    
+	    !std::isfinite(msg->angular_rates.x) ||
+            !std::isfinite(msg->angular_rates.y) ||
+	    !std::isfinite(msg->angular_rates.z) ||
+	    
+            !std::isfinite(msg->thrust.x) ||
+	    !std::isfinite(msg->thrust.y) ||
+	    !std::isfinite(msg->thrust.z)) {
+	  //TODO(mereweth) - EVR
+	  return;
+	}
+	
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
