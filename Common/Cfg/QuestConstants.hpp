@@ -13,6 +13,7 @@
 namespace Cfg {
 
     static const BYTE UART_SYNC_BYTE = 0xA5; //!< Byte that starts each UART frame
+    static const U32 DIRECT_CHUNK_SIZE = 512;
 
 }
 

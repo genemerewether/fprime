@@ -49,6 +49,12 @@ R5_MODULES := \
 	R5/TiHal \
 	R5/R5FlashApi
 
+ZMQ_MODULES := \
+	fprime-zmq/zmq \
+	fprime-zmq/zmq-adapter \
+	fprime-zmq/zmq-pub \
+	fprime-zmq/zmq-sub
+
 COMMON_MODULES := \
 	Common/Ports
 
@@ -64,8 +70,15 @@ CFDP_GTEST_MODULES := \
 UTILS_MODULES := \
 	Utils/Hash
 
+# dependent on turbojpeg and zmq
+SVC_EXTRA_MODULES := \
+	Svc/ImgComp \
+	Svc/ImgTlm
+
 SVC_MODULES := \
 	Svc/BufferManager \
+	Svc/BufferAccumulator \
+	Svc/BufferLogger \
 	Svc/CmdDispatcher \
 	Svc/CmdSequencer \
 	Svc/Seq \
@@ -104,7 +117,9 @@ SVC_MODULES := \
 	Svc/Tee \
 	Svc/ActiveDecoupler \
 	Svc/UdpSender \
-	Svc/UdpReceiver
+	Svc/UdpReceiver \
+	Svc/CameraFrame \
+	Svc/IPCRelay
 
 DRV_MODULES := \
 	Drv/DataTypes \
@@ -143,7 +158,14 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter \
 	SnapdragonFlight/DspRpcAllocator \
-	SnapdragonFlight/SnapdragonHealth 
+	SnapdragonFlight/DspRelay \
+	SnapdragonFlight/BlspSerialDriver \
+	SnapdragonFlight/BlspGpioDriver \
+	SnapdragonFlight/BlspSpiDriver \
+	SnapdragonFlight/SnapdragonHealth \
+	SnapdragonFlight/MVCam \
+	SnapdragonFlight/HiresCam \
+	SnapdragonFlight/MVVislam
 
 HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
@@ -153,6 +175,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
 	Gnc/Ctrl/BasicMixer \
 	Gnc/Est/ImuInteg \
+	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
@@ -191,23 +214,25 @@ ROS_TYPE_MODULES := \
 	ROS/Gen/mav_msgs/Types		 \
 	ROS/Gen/sensor_msgs/Types
 
-ROS_MODULES_ALL := \
+ROS_TYPE_PORT_MODULES_ALL := \
 	$(ROS_TYPE_MODULES) \
 	$(ROS_PORT_MODULES) \
 	\
 	ROS/Gen/diagnostic_msgs/Types    \
 	ROS/Gen/stereo_msgs/Types        \
 	ROS/Gen/trajectory_msgs/Types    \
-	ROS/Gen/planning_msgs/Types	 \
+	ROS/Gen/mav_planning_msgs/Types	 \
 	ROS/Gen/shape_msgs/Types         \
 	ROS/Gen/sensor_msgs/Types        \
+	ROS/Gen/control_msgs/Types       \
 	\
 	ROS/Gen/diagnostic_msgs/Ports    \
 	ROS/Gen/stereo_msgs/Ports        \
 	ROS/Gen/trajectory_msgs/Ports    \
-	ROS/Gen/planning_msgs/Ports	 \
+	ROS/Gen/mav_planning_msgs/Ports	 \
 	ROS/Gen/shape_msgs/Ports         \
-	ROS/Gen/sensor_msgs/Ports
+	ROS/Gen/sensor_msgs/Ports	 \
+	ROS/Gen/control_msgs/Ports
 #	ROS/Gen/visualization_msgs/Types \
 #	ROS/Gen/visualization_msgs/Ports \
 
@@ -247,6 +272,8 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	$(ZMQ_MODULES) \
+	\
 	$(HLPROC_MODULES) \
 	\
 	$(COMMON_MODULES) \
@@ -257,6 +284,8 @@ SDREF_MODULES := \
 	$(SNAPDRAGON_MODULES) \
 	\
 	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
 	\
 	$(DRV_MODULES) \
 	\
@@ -297,6 +326,7 @@ BASEREF_MODULES := \
 
 SIMREF_DEPLOYMENT_MODULES := \
 	SIMREF/RotorSDrv \
+	SIMREF/GazeboManipIf \
 	SIMREF/Top
 
 SIMREF_MODULES := \
@@ -307,7 +337,11 @@ SIMREF_MODULES := \
 	\
 	$(SVC_MODULES) \
 	\
+	$(DRV_MODULES) \
+	\
 	$(ROS_MODULES) \
+	\
+	$(ROS_TYPE_PORT_MODULES_ALL) \
 	\
 	$(FW_MODULES) \
 	\
@@ -386,6 +420,27 @@ HEXREF_MODULES := \
 	LLProc/LLCmdDispatcher \
 	LLProc/LLTlmChan
 #Svc/ComLogger
+
+DSPRELAY_MODULES := SnapdragonFlight/DspRelay \
+	SnapdragonFlight/RpcCommon
+
+MINRPC_MODULES := \
+	MINRPC/Top \
+	HEXREF/Rpc \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(UTILS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	Svc/Sched \
+	\
+	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/KraitRouter \
+	SnapdragonFlight/RpcCommon
 
 TESTRPC_MODULES := \
 	TESTRPC/Top \
@@ -600,7 +655,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF R5RELAY
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

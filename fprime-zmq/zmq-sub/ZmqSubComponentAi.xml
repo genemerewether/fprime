@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../../Autocoders/schema/default/component_schema.rnc" type="compact"?>
+
+<component name="ZmqSub" kind="passive" namespace="Zmq">
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <comment>Sends and receives transactions via a ZMQ connection</comment>
+    <ports>
+        <port name="Sched" data_type="Svc::Sched" kind="sync_input" >
+            <comment>
+            Input port to get called periodically for telemetry
+            </comment>
+        </port>
+        <port name="PortsOut" data_type="Serial" kind="output" max_number="10">
+            <comment>
+            Output ports to other components
+            </comment>
+        </port>
+    </ports>
+    <events>
+        <event id="0" name="ZS_SubscribeConnectionOpened" severity="ACTIVITY_HI" format_string = "ZeroMQ subscribe connection opened">
+            <comment>
+            Connection opened
+            </comment>
+        </event>
+        <event id="1" name="ZS_ContextError" severity="WARNING_HI" format_string = "ZeroMQ subscriber context error: %s">
+            <comment>
+            Zmq subscriber context open error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+        <event id="2" name="ZS_SocketError" severity="WARNING_HI" format_string = "ZeroMQ subscriber socket error: %s">
+            <comment>
+            Zmq subscriber socket error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+        <event id="3" name="ZS_ConnectError" severity="WARNING_HI" format_string = "ZeroMQ subscriber connect error: %s">
+            <comment>
+            Zmq subscriber connect error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+        <event id="4" name="ZS_ReceiveError" severity="WARNING_HI" format_string = "ZeroMQ subscriber receive error: %s" throttle="10">
+            <comment>
+            Zmq subscriber receive error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+        <event id="5" name="ZS_SockOptsError" severity="WARNING_HI" format_string = "ZeroMQ subscriber socket options error: %s" throttle="10">
+            <comment>
+            Zmq subscriber socket options error
+            </comment>
+            <args>
+                <arg name = "error" type = "string" size="80"/>
+            </args>
+        </event>
+    </events>
+    <telemetry>
+        <channel id="0" name="ZS_PacketsReceived" data_type="U32">
+            <comment>
+            Number of packets received
+            </comment>
+        </channel>
+    </telemetry>
+</component>
+

@@ -1,0 +1,9 @@
+<serializable name="JointTolerance" namespace="ROS::control_msgs">
+  <members>
+    <member name="name" type="Fw::EightyCharString"/>
+    <member name="position" type="F64"/>
+    <member name="velocity" type="F64"/>
+    <member name="acceleration" type="F64"/>
+  </members>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+</serializable>

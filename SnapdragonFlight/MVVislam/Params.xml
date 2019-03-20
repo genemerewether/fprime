@@ -1,0 +1,6 @@
+<parameters>
+    <parameter id="0" set_opcode="20" save_opcode="21" name="initWhenMoving"
+               data_type="U8" default="1">
+      <comment>whether to allow initialization when moving</comment>
+    </parameter>
+</parameters>

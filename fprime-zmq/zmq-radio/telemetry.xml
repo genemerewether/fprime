@@ -1,0 +1,29 @@
+<telemetry>
+
+    <channel id="1" name="ZR_NumDisconnects" data_type="U32">
+        <comment>
+        Number of times ZmqRadio has transitioned to disconnected state 
+        </comment>
+    </channel>
+    <channel id="2" name="ZR_NumConnects" data_type="U32">
+        <comment>
+        Number of times ZmqRadio has transitioned to connected state 
+        </comment>
+    </channel>
+    <channel id="3" name="ZR_NumDisconnectRetries" data_type="U32">
+        <comment>
+        Number of times ZmqRadio has tried to reconnect. 
+        </comment>
+    </channel>
+    <channel id="4" name="ZR_PktsSent" data_type="U32">
+        <comment>
+        Number of packets sent 
+        </comment>
+    </channel>
+    <channel id="5" name="ZR_PktsRecv" data_type="U32">
+        <comment>
+        Number of packets received 
+        </comment>
+    </channel>
+
+</telemetry>

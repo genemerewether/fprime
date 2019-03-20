@@ -1,0 +1,174 @@
+    <commands>
+        <command kind="async" opcode="0" mnemonic="HIRESCAM_SET_LOGGING" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="LogMode">
+                        <item name="LOGGING_ALL"/>
+                        <item name="LOGGING_UNPROC"/>
+                        <item name="LOGGING_PROC"/>
+                        <item name="LOGGING_WAYPT"/>
+                        <item name="LOGGING_OFF"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Turn on logging images to a file</comment>
+        </command>
+        <command kind="async" opcode="1" mnemonic="HIRESCAM_ADD_WAYPOINT" >
+            <args>
+                <arg name="waypoint" type="U32">
+                </arg>
+                <arg name="destination" type="ENUM">
+                    <enum name="WayptDestination">
+                        <item name="WAYPT_STORAGE"/>
+                        <item name="WAYPT_XMIT"/>
+                        <item name="WAYPT_STORAGE_XMIT"/>
+                        <item name="WAYPT_UNPROC"/>
+                    </enum>
+                </arg>
+                <arg name="action" type="ENUM">
+                    <enum name="WayptAction">
+                        <item name="WPACT_STILL"/>
+                        <item name="WPACT_VIDEO_START"/>
+                        <item name="WPACT_VIDEO_END"/>
+                    </enum>
+                </arg>
+                <arg name="type" type="ENUM">
+                    <enum name="WayptCaptureType">
+                        <item name="WP_IMG_13MP"/>
+                        <item name="WP_IMG_13MP_HDR"/>
+                        <item name="WP_IMG_13MP_JPG"/>
+                        <item name="WP_IMG_13MP_HDR_JPG"/>
+                        <item name="WP_IMG_2MP"/>
+                        <item name="WP_IMG_2MP_HDR"/>
+                        <item name="WP_IMG_2MP_JPG"/>
+                        <item name="WP_IMG_2MP_HDR_JPG"/>
+                        <item name="WP_IMG_VGA"/>
+                        <item name="WP_IMG_VGA_HDR"/>
+                        <item name="WP_IMG_VGA_JPG"/>
+                        <item name="WP_IMG_VGA_HDR_JPG"/>
+                        <item name="WP_VID_4K"/>
+                        <item name="WP_VID_MAX_HDR"/>
+                        <item name="WP_VID_1080P"/>
+                        <item name="WP_VID_1080P_HDR"/>
+                        <item name="WP_VID_720P"/>
+                        <item name="WP_VID_720P_HDR"/>
+                        <item name="WP_VID_480P"/>
+                        <item name="WP_VID_480P_HDR"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+            <comment>Add a waypoint</comment>
+        </command>
+        <command kind="async" opcode="2" mnemonic="HIRESCAM_TAKE_IMG" >
+            <comment>Take a still image</comment>
+            <args>
+                <arg name="destination" type="ENUM">
+                    <enum name="TakeImgDestination">
+                        <item name="TAKE_IMG_STORAGE"/>
+                        <item name="TAKE_IMG_XMIT"/>
+                        <item name="TAKE_IMG_STORAGE_XMIT"/>
+                        <item name="TAKE_IMG_UNPROC"/>
+                    </enum>
+                </arg>
+                <arg name="type" type="ENUM">
+                    <enum name="ImgType">
+                        <item name="IMG_13MP"/>
+                        <item name="IMG_13MP_HDR"/>
+                        <item name="IMG_13MP_JPG"/>
+                        <item name="IMG_13MP_HDR_JPG"/>
+                        <item name="IMG_2MP"/>
+                        <item name="IMG_2MP_HDR"/>
+                        <item name="IMG_2MP_JPG"/>
+                        <item name="IMG_2MP_HDR_JPG"/>
+                        <item name="IMG_VGA"/>
+                        <item name="IMG_VGA_HDR"/>
+                        <item name="IMG_VGA_JPG"/>
+                        <item name="IMG_VGA_HDR_JPG"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="3" mnemonic="HIRESCAM_TAKE_VIDEO" >
+            <args>
+                <arg name="setting" type="ENUM">
+                    <enum name="VidType">
+                        <item name="VID_4K"/>
+                        <item name="VID_MAX_HDR"/>
+                        <item name="VID_1080P"/>
+                        <item name="VID_1080P_HDR"/>
+                        <item name="VID_720P"/>
+                        <item name="VID_720P_HDR"/>
+                        <item name="VID_480P"/>
+                        <item name="VID_480P_HDR"/>
+                    </enum>
+                </arg>
+                <arg name="frames" type="U32">
+                </arg>
+            </args>
+            <comment>Take a video</comment>
+        </command>
+        <command kind="async" opcode="4" mnemonic="HIRESCAM_WAYPOINT_TEST" >
+            <args>
+                <arg name="index" type="U32">
+                </arg>
+            </args>
+            <comment>Manually trigger a waypoint image like port call would</comment>
+        </command>
+        <command kind="async" opcode="5" mnemonic="HIRESCAM_SET_VID_TIMEOUTS" >
+            <args>
+                <arg name="frames" type="U32">
+                </arg>
+                <arg name="sched" type="U32">
+                </arg>
+            </args>
+            <comment>Set frame count and elapsed time timeouts for video</comment>
+        </command>
+        <command kind="async" opcode="6" mnemonic="HIRESCAM_TEST_IMG" >
+            <comment>Send a still image test pattern</comment>
+            <args>
+                <arg name="destination" type="ENUM">
+                    <comment>Manually keep in sync with CameraFrameSerializable</comment>
+                    <enum name="TestImgDestination">
+                        <item name="TEST_IMG_STORAGE"/>
+                        <item name="TEST_IMG_XMIT"/>
+                        <item name="TEST_IMG_STORAGE_XMIT"/>
+                    </enum>
+                </arg>
+                <arg name="type" type="ENUM">
+                    <enum name="TestImgType">
+                        <item name="TEST_IMG_13MP"/>
+                        <item name="TEST_IMG_2MP"/>
+                        <item name="TEST_IMG_VGA"/>
+                        <item name="TEST_IMG_JPG"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="7" mnemonic="HIRESCAM_SET_VID_SKIP" >
+            <args>
+                <arg name="skip" type="U32">
+                </arg>
+            </args>
+            <comment>Set frame skip count for video, e.g. 2 delivers every 3rd frame</comment>
+        </command>
+        <command kind="async" opcode="8" mnemonic="HIRESCAM_ACTIVATE" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="HiresCamActive">
+                        <item name="IMAGING_ON"/>
+                        <item name="IMAGING_OFF"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Turn imaging on or off</comment>
+        </command>
+  </commands>

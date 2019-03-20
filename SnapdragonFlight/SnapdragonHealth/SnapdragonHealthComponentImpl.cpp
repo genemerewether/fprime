@@ -61,8 +61,7 @@ extern "C" {
         fsw_version_sent(false),
         power_saver(SAVER_ON),
         m_boot_count(0u),
-        m_schedCalls(0u),
-        m_modeAfterCountdown(SAVER_ON)
+        m_schedCalls(0u)
     {
         memset(this->total_tick_old,0,sizeof(this->total_tick_old));
         memset(this->idle_old,0,sizeof(this->idle_old));
@@ -111,16 +110,16 @@ extern "C" {
     void SnapdragonHealthComponentImpl::setInitPowerState(SH_PowerSaverMode mode) {
         switch (mode) {
             case SH_SAVER_ON:
-                this->m_modeAfterCountdown = SAVER_ON;
+                this->power_saver = SAVER_ON;
                 break;
             case SH_SAVER_DYNAMIC:
-                this->m_modeAfterCountdown = SAVER_DYNAMIC;
+                this->power_saver = SAVER_DYNAMIC;
                 break;
             case SH_SAVER_OFF:
-                this->m_modeAfterCountdown = SAVER_OFF;
+                this->power_saver = SAVER_OFF;
                 break;
             case SH_SAVER_RAPID:
-                this->m_modeAfterCountdown = SAVER_RAPID;
+                this->power_saver = SAVER_RAPID;
                 break;
             default:
                 FW_ASSERT(0, mode);
@@ -553,14 +552,14 @@ extern "C" {
         #pragma GCC diagnostic pop
 
         if (SH_SCHED_COUNTDOWN == m_schedCalls) {
-            this->power_saver = this->m_modeAfterCountdown;
             m_schedCalls++;
         }
 
         //Fw::PolyType polySetVal;
+        PowerSaverModeTlm saverModeTlm;
         switch (this->power_saver) {
             case SAVER_ON:
-                this->tlmWrite_SnapdragonPowerSaver(SAVER_ON_TLM);
+                saverModeTlm = SAVER_ON_TLM;
                 //polySetVal = Common::COMMON_POLYDB_SAVER_ON;
                 this->gov_setpoint[0] = GOVERNOR_TYPE_CONSERVATIVE;
                 this->gov_setpoint[1] = GOVERNOR_TYPE_POWERSAVE;
@@ -570,7 +569,7 @@ extern "C" {
                 this->l2_power_setpoint = L2_POWER_TYPE_4;
                 break;
             case SAVER_DYNAMIC:
-                this->tlmWrite_SnapdragonPowerSaver(SAVER_DYNAMIC_TLM);
+                saverModeTlm = SAVER_DYNAMIC_TLM;
                 //polySetVal = Common::COMMON_POLYDB_SAVER_DYNAMIC;
                 this->gov_setpoint[0] = GOVERNOR_TYPE_CONSERVATIVE;
                 this->gov_setpoint[1] = GOVERNOR_TYPE_CONSERVATIVE;
@@ -580,7 +579,7 @@ extern "C" {
                 this->l2_power_setpoint = L2_POWER_TYPE_0;
                 break;
             case SAVER_OFF:
-                this->tlmWrite_SnapdragonPowerSaver(SAVER_OFF_TLM);
+                saverModeTlm = SAVER_OFF_TLM;
                 //polySetVal = Common::COMMON_POLYDB_SAVER_OFF;
                 this->gov_setpoint[0] = GOVERNOR_TYPE_USERSPACE;
                 this->gov_setpoint[1] = GOVERNOR_TYPE_USERSPACE;
@@ -595,6 +594,7 @@ extern "C" {
                 this->l2_power_setpoint = L2_POWER_TYPE_0;
                 break;
             case SAVER_RAPID:
+                saverModeTlm = SAVER_RAPID_TLM;
                 this->tlmWrite_SnapdragonPowerSaver(SAVER_RAPID_TLM);
                 //polySetVal = Common::COMMON_POLYDB_SAVER_OFF;
                 this->gov_setpoint[0] = GOVERNOR_TYPE_ONDEMAND;
@@ -618,6 +618,8 @@ extern "C" {
 
 
         if (m_schedCalls >= SH_SCHED_COUNTDOWN) {
+            this->tlmWrite_SnapdragonPowerSaver(saverModeTlm);
+
             for (NATIVE_UINT_TYPE i = GOV_FILE_TYPE_MIN; i <= GOV_FILE_TYPE_MAX; i++) {
                 FW_ASSERT(FW_NUM_ARRAY_ELEMENTS(this->gov_setpoint)
                           + GOV_FILE_TYPE_MIN > i,
@@ -638,6 +640,7 @@ extern "C" {
                                 l2_power_string(this->l2_power_setpoint));
         }
         else {
+            this->tlmWrite_SnapdragonPowerSaver(SAVER_UNSET_TLM);
             m_schedCalls++;
         }
 
@@ -648,11 +651,11 @@ extern "C" {
         for (NATIVE_UINT_TYPE i = TEMP_FILE_TYPE_MIN; i <= TEMP_FILE_TYPE_MAX; i++) {
             this->load_from_file(static_cast<HealthFileType>(i));
         }
-
+	/*
         for (NATIVE_UINT_TYPE i = TEMP_MODE_FILE_TYPE_MIN; i <= TEMP_MODE_FILE_TYPE_MAX; i++) {
             this->load_from_file(static_cast<HealthFileType>(i));
         }
-
+	*/
         for (NATIVE_UINT_TYPE i = FREQ_FILE_TYPE_MIN; i <= FREQ_FILE_TYPE_MAX; i++) {
             this->load_from_file(static_cast<HealthFileType>(i));
         }

@@ -41,7 +41,11 @@ namespace ${namespace} {
   namespace {
 
     typedef enum {
+#if $ipc
+      ${name.upper()}_COMPONENT_EXIT = Fw::IPCQueuedComponentBase::IPCQUEUED_COMPONENT_EXIT,
+#else
       ${name.upper()}_COMPONENT_EXIT = Fw::QueuedComponentBase::QUEUED_COMPONENT_EXIT,
+#end if
   #for $msg_type in $msg_types[0:-1]
       ${msg_type},
   #end for
@@ -391,20 +395,36 @@ namespace ${namespace} {
 #else if $kind == "queued":
 \#if FW_OBJECT_NAMES == 1
     ${class_name}(const char* compName) :
+#if $ipc
+      Fw::IPCQueuedComponentBase(compName)
+#else
       Fw::QueuedComponentBase(compName)
+#end if
 \#else
     ${class_name}() :
+#if $ipc
+      Fw::IPCQueuedComponentBase()
+#else
       Fw::QueuedComponentBase()
+#end if
 \#endif
   {
 
 #else:
 \#if FW_OBJECT_NAMES == 1
     ${class_name}(const char* compName) :
+#if $ipc
+      Fw::IPCActiveComponentBase(compName)
+#else
       Fw::ActiveComponentBase(compName)
+#end if
 \#else
     ${class_name}() :
+#if $ipc
+      Fw::IPCActiveComponentBase()
+#else
       Fw::ActiveComponentBase()
+#end if
 \#endif
   {
 #end if
@@ -453,9 +473,17 @@ namespace ${namespace} {
 #if $kind == "passive":
     Fw::PassiveComponentBase::init(instance);
 #else if $kind == "queued":
+#if $ipc
+    Fw::IPCQueuedComponentBase::init(instance);
+#else
     Fw::QueuedComponentBase::init(instance);
+#end if
 #else if $kind == "active":
+#if $ipc
+    Fw::IPCActiveComponentBase::init(instance);
+#else
     Fw::ActiveComponentBase::init(instance);
+#end if
 #end if
 
 #for $instance, $type, $sync, $priority, $full, $role, $max_num in $input_ports:
@@ -1761,8 +1789,12 @@ namespace ${namespace} {
   // Message dispatch method for active and queued components. Called
   // by active component thread or implementation code for queued components
   // ----------------------------------------------------------------------
-
+  
+#if $ipc
+  Fw::IPCQueuedComponentBase::MsgDispatchStatus ${class_name} ::
+#else
   Fw::QueuedComponentBase::MsgDispatchStatus ${class_name} ::
+#end if
     doDispatch(void)
   {
 #if $needs_msg_size:

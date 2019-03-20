@@ -1,0 +1,27 @@
+/*
+ * ImgCompComponentImplCfg.hpp
+ *
+ *  Created on: April 3, 2018
+ *      Author: mereweth
+ */
+
+#ifndef IMGCOMP_IMGCOMPCOMPONENTIMPLCFG_HPP
+#define IMGCOMP_IMGCOMPCOMPONENTIMPLCFG_HPP
+
+#include <SnapdragonFlight/HiresCam/HiresCamComponentImplCfg.hpp>
+
+namespace Svc {
+
+enum {
+    IMGCOMP_TJ_MIN_QUALITY = 1,
+    IMGCOMP_TJ_MAX_QUALITY = 100,
+    IMGCOMP_TJ_MAX_WIDTH = SnapdragonFlight::HIRESCAM_13MP_IMAGE_CALLBACK_WIDTH,
+    IMGCOMP_TJ_MAX_HEIGHT = SnapdragonFlight::HIRESCAM_13MP_IMAGE_HEIGHT,
+    IMGCOMP_TJ_THUMB_WIDTH = 64,
+    IMGCOMP_TJ_THUMB_HEIGHT = 48,
+    IMGCOMP_TJ_THUMB_BUFFER_SIZE = IMGCOMP_TJ_THUMB_WIDTH * IMGCOMP_TJ_THUMB_HEIGHT
+};
+
+} // namespace Svc
+
+#endif // IMGCOMP_IMGCOMPCOMPONENTIMPLCFG_HPP

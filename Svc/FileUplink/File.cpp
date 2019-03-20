@@ -51,7 +51,8 @@ namespace Svc {
       return status;
 
     NATIVE_INT_TYPE intLength = length;
-    status = this->osFile.write(data, intLength);
+    // NOTE(mereweth) - don't sync file range
+    status = this->osFile.write(data, intLength, false);
     if (status != Os::File::OP_OK)
       return status;
 

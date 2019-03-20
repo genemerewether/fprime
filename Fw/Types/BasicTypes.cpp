@@ -37,6 +37,7 @@ NATIVE_INT_TYPE strnlen(const char *s, NATIVE_INT_TYPE maxlen) {
 #endif
 
 #ifdef BUILD_DSPAL
+#ifndef TARGET_8096
 int fputc(int c, FILE *stream)
 {
   FARF(ALWAYS, "fputc called with %d", c);
@@ -48,4 +49,5 @@ int fprintf(FILE *stream, const char *format, ...)
   FARF(ALWAYS, "fprintf called with format string %s", format);
   return 0;
 }
+#endif
 #endif

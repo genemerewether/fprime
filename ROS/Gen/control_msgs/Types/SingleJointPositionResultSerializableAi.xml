@@ -1,0 +1,5 @@
+<serializable name="SingleJointPositionResult" namespace="ROS::control_msgs">
+  <members>
+    <member name="unused" type="U8"/>
+  </members>
+</serializable>

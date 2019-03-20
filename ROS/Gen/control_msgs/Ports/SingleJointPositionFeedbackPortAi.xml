@@ -1,0 +1,6 @@
+<interface name="SingleJointPositionFeedback" namespace="ROS::control_msgs">
+  <args>
+    <arg name="SingleJointPositionFeedback" pass_by="reference" type="ROS::control_msgs::SingleJointPositionFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/SingleJointPositionFeedbackSerializableAi.xml</import_serializable_type>
+</interface>

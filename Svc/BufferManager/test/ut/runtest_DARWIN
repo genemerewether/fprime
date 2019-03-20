@@ -1,9 +1,10 @@
 #!/bin/sh
 
-# ---------------------------------------------------------------------- 
+# ----------------------------------------------------------------------
 # runtest_DARWIN
-# ---------------------------------------------------------------------- 
+# ----------------------------------------------------------------------
 
 cd ${BUILD_ROOT}/Svc/BufferManager/test/ut
+rm darwin-darwin-x86-ut-llvm-bin/*.gcda
 echo "Running ${BUILD_ROOT}/Svc/BufferManager/test/ut/$1/test_ut"
 ${BUILD_ROOT}/Svc/BufferManager/test/ut/$1/test_ut

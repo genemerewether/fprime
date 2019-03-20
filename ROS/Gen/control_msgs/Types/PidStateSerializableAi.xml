@@ -1,0 +1,19 @@
+<serializable name="PidState" namespace="ROS::control_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="timestep" type="Fw::Time"/>
+    <member name="error" type="F64"/>
+    <member name="error_dot" type="F64"/>
+    <member name="p_error" type="F64"/>
+    <member name="i_error" type="F64"/>
+    <member name="d_error" type="F64"/>
+    <member name="p_term" type="F64"/>
+    <member name="i_term" type="F64"/>
+    <member name="d_term" type="F64"/>
+    <member name="i_max" type="F64"/>
+    <member name="i_min" type="F64"/>
+    <member name="output" type="F64"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

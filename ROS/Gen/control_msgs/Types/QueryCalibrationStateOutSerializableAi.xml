@@ -1,0 +1,5 @@
+<serializable name="QueryCalibrationStateResponse" namespace="ROS::control_msgs">
+  <members>
+    <member name="is_calibrated" type="U8"/>
+  </members>
+</serializable>

@@ -1,0 +1,6 @@
+    <commands>
+        <command kind="async" opcode="0" mnemonic="IMGCOMP_NoOp" >
+            <args>
+            </args>
+        </command>
+  </commands>

@@ -5,7 +5,7 @@ include $(BUILD_ROOT)/mk/configs/compiler/hexagon_clang_common.mk
 include $(BUILD_ROOT)/mk/configs/compiler/dspal_ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/ut_flags.mk
 include $(BUILD_ROOT)/mk/configs/compiler/hexagon_sdk_common.mk
-include $(BUILD_ROOT)/mk/configs/compiler/hexagon_v55.mk
+include $(BUILD_ROOT)/mk/configs/compiler/hexagon_ver.mk
 
 CC := $(HEXAGON_BIN)/hexagon-clang
 CXX := $(HEXAGON_BIN)/hexagon-clang++
@@ -47,15 +47,12 @@ DSPAL_HEX_CLANG_CFLAGS := $(DSPAL_FLAGS_COMMON) \
 		    $(HEXAGON_ARCH_CPU_FLAGS) \
 		    $(DSPAL_HEX_COMMON)
 
-#$(BUILD_32BIT) # Quantum framework won't build 32-bit
-
 DSPAL_HEX_CLANG_CXXFLAGS :=	$(DSPAL_FLAGS_COMMON) \
 				$(COMMON_DEFINES) \
 				$(HEX_CLANG_CXXFLAGS_COMMON) \
 				$(HEXAGON_ARCH_CPU_FLAGS) \
 				$(DSPAL_HEX_COMMON) \
 				-DCONFIG_WCHAR_BUILTIN
-#$(BUILD_32BIT)
 
 COVERAGE := -fprofile-arcs -ftest-coverage
 
@@ -64,9 +61,7 @@ DSPAL_HEX_CLANG_INCLUDES := 	$(DSPAL_INCLUDES_COMMON) \
 				$(HEXAGON_SDK_INCLUDES) \
 				$(HEXAGON_ARCH_INCLUDES)
 
-#-I$(HEXAGON_TOOLS_ROOT)
-
-CHECK_LINK_BIN = $(CXX) $(DSPAL_HEX_CLANG_CXXFLAGS) $(DSPAL_HEX_CLANG_INCLUDES) -Wl,-whole-archive
+CHECK_LINK_BIN = $(CXX) $(DSPAL_HEX_CLANG_CXXFLAGS) $(DSPAL_HEX_CLANG_INCLUDES) -Wl,-whole-archive -Xlinker,-z,muldefs
 CHECK_LINK_BIN_NAME := _CHECK_LINK
 CHECK_LINK_BIN_SRC := $(BUILD_ROOT)/SnapdragonFlight/RpcCommon/DspalSymCheck.cpp
 

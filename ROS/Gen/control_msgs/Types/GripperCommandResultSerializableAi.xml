@@ -1,0 +1,8 @@
+<serializable name="GripperCommandResult" namespace="ROS::control_msgs">
+  <members>
+    <member name="position" type="F64"/>
+    <member name="effort" type="F64"/>
+    <member name="stalled" type="U8"/>
+    <member name="reached_goal" type="U8"/>
+  </members>
+</serializable>

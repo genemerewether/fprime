@@ -1,0 +1,7 @@
+<events>
+    <event id="0" name="MVVISLAM_Reinitialized" severity="ACTIVITY_HI" format_string = "MVVISLAM reinitialized" >
+        <comment>
+          MVVislam reinit
+        </comment>
+    </event>
+</events>

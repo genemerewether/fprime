@@ -1,0 +1,48 @@
+<commands>
+    <command kind="sync" opcode="0" mnemonic="GZMANIPIF_TestMove">
+        <comment>
+          test unprofiled sim actuator move
+        </comment>
+        <args>
+            <arg name="j1_pos" type="F64">
+            </arg>
+            <!--arg name="j1_name" type="string" size="40">
+            </arg-->
+            <arg name="j2_pos" type="F64">
+            </arg>
+            <!--arg name="j2_name" type="string" size="40">
+            </arg-->
+            <arg name="j3_pos" type="F64">
+            </arg>
+            <!--arg name="j3_name" type="string" size="40">
+            </arg-->
+            <arg name="j4_pos" type="F64">
+            </arg>
+            <!--arg name="j4_name" type="string" size="40">
+            </arg-->
+            <arg name="j5_pos" type="F64">
+            </arg>
+            <!--arg name="j5_name" type="string" size="40">
+            </arg-->
+            <arg name="j6_pos" type="F64">
+            </arg>
+            <!--arg name="j6_name" type="string" size="40">
+            </arg-->
+            <arg name="j7_pos" type="F64">
+            </arg>
+            <!--arg name="j7_name" type="string" size="40">
+            </arg-->
+            <arg name="numJoints" type="U32">
+            </arg>
+
+            <arg name="tol" type="F64">
+            </arg>
+            <arg name="goal_time" type="F64">
+            </arg>
+            <arg name="goal_time_tol" type="F64">
+            </arg>
+            <arg name="goal_tol" type="F64">
+            </arg>
+         </args>
+    </command>
+</commands>

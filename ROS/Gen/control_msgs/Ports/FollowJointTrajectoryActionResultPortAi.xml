@@ -1,0 +1,6 @@
+<interface name="FollowJointTrajectoryActionResult" namespace="ROS::control_msgs">
+  <args>
+    <arg name="FollowJointTrajectoryActionResult" pass_by="reference" type="ROS::control_msgs::FollowJointTrajectoryActionResult"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/FollowJointTrajectoryActionResultSerializableAi.xml</import_serializable_type>
+</interface>

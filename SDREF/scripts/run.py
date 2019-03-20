@@ -23,9 +23,14 @@ def main(argv=None):
 
     python_bin = os.environ["PYTHON_BASE"] + "/bin/python"
     
+    found_port = False
     for port in range(start_port,end_port):
-        if not PortFinder.IsPortUsed(port):
+        if not found_port and not PortFinder.IsPortUsed(port):
             used_port = port
+            found_port = True
+            continue;
+        if not PortFinder.IsPortUsed(port):
+            used_stream_port = port
             break;
         
     if (used_port == None):
@@ -36,12 +41,16 @@ def main(argv=None):
     
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="port", action="store", type="int", help="Set the threaded TCP socket server port [default: %default]", default=used_port)
+    parser.add_option("-s", "--stream_port", dest="stream_port", action="store", type="int", help="Set the streaming server port [default: %default]", default=used_stream_port)
     parser.add_option("-a", "--addr", dest="addr", action="store", type="string", help="set the threaded TCP socket server address [default: %default]", default=addr)
     parser.add_option("-n", "--nobin", dest="nobin", action="store_true", help="Disables the binary app from starting [default: %default]", default=False)
     parser.add_option("-t", "--twin", dest="twin", action="store_true", help="Runs Threaed TCP Server in window, otherwise backgrounds [default: %default]", default=False)
 
     (opts, args) = parser.parse_args(argv)
     used_port = opts.port
+    print("Using port %d"%used_port)
+    used_stream_port = opts.stream_port
+    print("Using stream port %d"%used_stream_port)
     nobin = opts.nobin
     addr = opts.addr
     twin = opts.twin
@@ -65,7 +74,7 @@ def main(argv=None):
     time.sleep(2)
     
     # run Gse GUI
-    GUI_args = [python_bin,"%s/Gse/bin/gse.py"%build_root,"--port","%d"%used_port,"--dictionary","%s/Gse/generated/SDREF"%build_root,"--connect","--addr",addr,"-L","%s/SDREF/logs"%build_root]
+    GUI_args = [python_bin,"%s/Gse/bin/gse.py"%build_root,"--port","%d"%used_port,"--stream_port","%d"%used_stream_port,"--dictionary","%s/Gse/generated/SDREF"%build_root,"--connect","--addr",addr,"-L","%s/SDREF/logs"%build_root]
     #print ("GUI: %s"%" ".join(GUI_args))
     GUI = subprocess.Popen(GUI_args)
     

@@ -21,7 +21,7 @@ TEST_MODS = \
 TEST_MODS_LINUX = SnapdragonFlight/HexRouter gtest
 TEST_MODS_DARWIN = SnapdragonFlight/HexRouter gtest
 TEST_MODS_CYGWIN = SnapdragonFlight/HexRouter gtest
-TEST_MODS_SDFLIGHT = SnapdragonFlight/HexRouter gtest
+TEST_MODS_SDFLIGHT = SnapdragonFlight/HexRouter SnapdragonFlight/RpcCommon gtest
 
 TEST_MODS_DSPAL = SnapdragonFlight/KraitRouter SnapdragonFlight/RpcCommon
 TEST_SRC_DSPAL = ut_hexrtr_skel.c dspal.cpp

@@ -1,0 +1,6 @@
+<serializable name="QueryTrajectoryStateRequest" namespace="ROS::control_msgs">
+  <members>
+    <member name="time" type="Fw::Time"/>
+  </members>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

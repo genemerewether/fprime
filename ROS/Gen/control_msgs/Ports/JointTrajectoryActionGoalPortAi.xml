@@ -1,0 +1,6 @@
+<interface name="JointTrajectoryActionGoal" namespace="ROS::control_msgs">
+  <args>
+    <arg name="JointTrajectoryActionGoal" pass_by="reference" type="ROS::control_msgs::JointTrajectoryActionGoal"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointTrajectoryActionGoalSerializableAi.xml</import_serializable_type>
+</interface>

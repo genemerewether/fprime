@@ -1,0 +1,179 @@
+    <events>
+        <event id="0" name="HIRESCAM_UninitializedError" severity="WARNING_HI" format_string = "HiresCam not initialized" >
+            <comment>
+            HiresCam received a command while the component was unitialized
+            </comment>
+        </event>
+        <event id="1" name="HIRESCAM_AlreadyInitializedError" severity="WARNING_HI" format_string = "HiresCam already initialized" >
+            <comment>
+            HiresCam asked to initialize while already initialized
+            </comment>
+        </event>
+        <event id="2" name="HIRESCAM_DeactivatedError" severity="WARNING_HI" format_string = "HiresCam not activated" >
+            <comment>
+            HiresCam tried to wait for an image callback while deactivated
+            </comment>
+        </event>
+        <event id="3" name="HIRESCAM_ExtraCallbackError" severity="WARNING_LO" format_string = "HiresCam received callback %d while (de)activating" >
+            <comment>
+            HiresCam received a callback while (de)activating
+            </comment>
+            <args>
+                <arg name="error" type="ENUM">
+                    <enum name="HIRESCAM_ExtraCallbackType">
+                        <item name="HIRESCAM_EXTRA_PICTURE" comment="Extra picture callback"/>
+                        <item name="HIRESCAM_EXTRA_VIDEO" comment="Extra video callback"/>
+                    </enum>
+                    <comment>The error code</comment>
+                </arg>
+            </args>
+        </event>
+        <event id="4" name="HIRESCAM_CameraError" severity="WARNING_HI" format_string = "HiresCam camera error %d" >
+            <comment>
+            HiresCam error with Snapdragon Linux Camera API
+            </comment>
+            <args>
+                <arg name="error" type="ENUM">
+                    <enum name="HIRESCAM_CameraErrorType">
+                        <item name="HIRESCAM_IMG_TIMEOUT" comment="Timed out waiting for image callback"/>
+                        <item name="HIRESCAM_VID_TIMEOUT" comment="Timed out waiting for first video callback"/>
+                        <item name="HIRESCAM_IMG_EMPTY" comment="Empty image in callback"/>
+                        <item name="HIRESCAM_VID_EMPTY" comment="Empty video frame in callback"/>
+                        <item name="HIRESCAM_CPA_ERR" comment="Machine Vision SDK CPA error"/>
+                        <item name="HIRESCAM_NO_CAMERA" comment="Could not connect to IMX135"/>
+                        <item name="HIRESCAM_PARAM_ERR" comment="Error in setting camera parameters"/>
+                        <item name="HIRESCAM_ACTIVATE_ERR" comment="Linux Camera API failed to activate"/>
+                        <item name="HIRESCAM_DEACTIVATE_ERR" comment="Linux Camera API failed to deactivate"/>
+                        <item name="HIRESCAM_UNKNOWN_ERR" comment="Linux Camera API onError"/>
+                    </enum>
+                    <comment>The error code</comment>
+                </arg>
+            </args>
+        </event>
+        <event id="5" name="HIRESCAM_TookImg" severity="ACTIVITY_HI" format_string = "HiresCam took image" >
+            <comment>
+            HiresCam took an image using the HIRESCAM_TAKE_IMG command
+            </comment>
+        </event>
+        <event id="6" name="HIRESCAM_Activated" severity="ACTIVITY_HI" format_string = "HiresCam image cycling started" >
+            <comment>
+            HiresCam began dispatching images
+            </comment>
+        </event>
+        <event id="7" name="HIRESCAM_Deactivated" severity="ACTIVITY_HI" format_string = "HiresCam image cycling stopped" >
+            <comment>
+            HiresCam stopped dispatching images
+            </comment>
+        </event>
+        <event id="8" name="HIRESCAM_NoBuffers" severity="WARNING_LO" throttle="5" format_string = "HiresCam ran out of buffers on port %d" >
+            <comment>
+            HiresCam ran out of buffers on the specified port
+            </comment>
+            <args>
+                <arg name="port" type="U32">
+                </arg>
+            </args>
+        </event>
+        <event id="9" name="HIRESCAM_LoggingModeChange" severity="ACTIVITY_HI" format_string = "HiresCam image log mode changed to %d" >
+            <comment>
+              HiresCam logging mode changed
+            </comment>
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="LoggingModeEVR">
+                        <item name="LOGGING_ALL_EVR"/>
+                        <item name="LOGGING_UNPROC_EVR"/>
+                        <item name="LOGGING_PROC_EVR"/>
+                        <item name="LOGGING_WAYPT_EVR"/>
+                        <item name="LOGGING_OFF_EVR"/>
+                    </enum>
+                </arg>
+            </args>
+        </event>
+        <event id="10" name="HIRESCAM_LoRate" severity="WARNING_LO" throttle="5" format_string = "HiresCam only captured %d frames in 1 second" >
+            <comment>
+            HiresCam captured less than HIRESCAM_MIN_RATE_WARN images since last Sched call
+            </comment>
+            <args>
+                <arg name="numImages" type="U32">
+                </arg>
+            </args>
+        </event>
+        <event id="11" name="HIRESCAM_BusyWaiting" severity="WARNING_HI" format_string = "HiresCam busy - asked to do operation at waypoint %d" >
+            <comment>
+            HiresCam busy waiting for previous operation to complete
+            </comment>
+            <args>
+                <arg name="waypoint" type="I32">
+                    <comment>
+                    -1 for the waypoint value means HiresCam was asked for a manual action
+                    </comment>
+                </arg>
+            </args>
+        </event>
+        <event id="12" name="HIRESCAM_WaypointError" severity="WARNING_HI" format_string = "HiresCam waypoint %d, dest %d, action %d, stillType %d, vidType %d had spec error" >
+            <comment>
+            HiresCam waypoint had spec error
+            </comment>
+            <args>
+                <arg name="waypoint" type="U32">
+                </arg>
+                <arg name="dest" type="U32">
+                </arg>
+                <arg name="action" type="U32">
+                </arg>
+                <arg name="stillType" type="U32">
+                </arg>
+                <arg name="vidType" type="U32">
+                </arg>
+            </args>
+        </event>
+        <event id="13" name="HIRESCAM_NoWaypointsLeft" severity="WARNING_HI" format_string = "HiresCam ran out of waypoint slots" >
+            <comment>
+            HiresCam used all the waypoint slots
+            </comment>
+        </event>
+        <event id="14" name="HIRESCAM_WaypointAdded" severity="ACTIVITY_LO" format_string = "HiresCam added waypoint index %d, dest %d, action %d, type %d, quality %d" >
+            <comment>
+            HiresCam added a waypoint
+            </comment>
+            <args>
+                <arg name="waypoint" type="U32">
+                </arg>
+                <arg name="dest" type="U32">
+                </arg>
+                <arg name="action" type="U32">
+                </arg>
+                <arg name="type" type="U32">
+                </arg>
+                <arg name="quality" type="U8">
+                </arg>
+            </args>
+        </event>
+        <event id="15" name="HIRESCAM_NoWaypointSpec" severity="ACTIVITY_HI" format_string = "HiresCam waypoint %d not found in list" >
+            <comment>
+            HiresCam did nothing at waypoint - not found in list
+            </comment>
+            <args>
+                <arg name="waypoint" type="U32">
+                </arg>
+            </args>
+        </event>
+        <event id="16" name="HIRESCAM_WaypointRecv" severity="ACTIVITY_HI" format_string = "HiresCam waypoint %d" >
+            <comment>
+            HiresCam received a waypoint notification
+            </comment>
+            <args>
+                <arg name="waypoint" type="U32">
+                </arg>
+            </args>
+        </event>
+        <event id="17" name="HIRESCAM_OverrodeQuality" severity="ACTIVITY_HI" format_string = "HiresCam overrode bad compression quality of %d with %d" >
+            <args>
+                <arg name="oldQual" type="U32">
+                </arg>
+                <arg name="newQual" type="U32">
+                </arg>
+            </args>
+        </event>
+    </events>

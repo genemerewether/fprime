@@ -1,3 +1,4 @@
 SRC = 	\
 		ShortLogPortAi.xml \
-		EnablePortAi.xml
+		EnablePortAi.xml \
+		U32IdxPortAi.xml

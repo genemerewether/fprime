@@ -131,7 +131,7 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
     void HexRouterComponentImpl ::
       readBufferRecv_handler(const NATIVE_INT_TYPE portNum,
-                             Fw::Buffer Buffer)
+                             Fw::Buffer& Buffer)
     {
         this->m_readBuffMutex.lock();
         bool found = false;

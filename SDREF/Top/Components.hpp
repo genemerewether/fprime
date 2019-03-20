@@ -25,6 +25,10 @@ void exitTasks(void);
 
 #include <SnapdragonFlight/SnapdragonHealth/SnapdragonHealthComponentImpl.hpp>
 
+#include <SnapdragonFlight/MVCam/MVCamComponentImpl.hpp>
+#include <SnapdragonFlight/MVVislam/MVVislamComponentImpl.hpp>
+#include <SnapdragonFlight/HiresCam/HiresCamComponentImpl.hpp>
+
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 #include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
@@ -32,6 +36,9 @@ void exitTasks(void);
 
 #include <Svc/UdpReceiver/UdpReceiverComponentImpl.hpp>
 
+#include <Svc/ImgTlm/ImgTlmComponentImpl.hpp>
+
+#include <Svc/IPCRelay/IPCRelayComponentImpl.hpp>
 #include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
@@ -62,9 +69,15 @@ extern Svc::CommandDispatcherImpl* cmdDisp_ptr;
 extern Svc::PrmDbImpl* prmDb_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
+extern SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;
+extern SnapdragonFlight::MVVislamComponentImpl* mvVislam_ptr;
+extern SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
 extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
 extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
 extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
+extern Svc::IPCRelayComponentImpl* ipcRelay_ptr;
+
+extern Svc::ImgTlmComponentImpl* imgTlm_ptr;
 
 #endif

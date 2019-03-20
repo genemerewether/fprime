@@ -1,32 +1,22 @@
 // ----------------------------------------------------------------------
-// Main.cpp 
+// Main.cpp
 // ----------------------------------------------------------------------
 
 #include "Tester.hpp"
 
-TEST(Test, allocateAndFreeOne) {
+TEST(Test, ThreeBufferProblem) {
   Svc::Tester tester;
-  tester.allocateAndFreeOne();
+  tester.three_buffer_problem();
 }
 
-TEST(Test, allocationQueueEmpty) {
+TEST(Test, EmptyBuffers) {
   Svc::Tester tester;
-  tester.allocationQueueEmpty();
+  tester.empty_buffers();
 }
 
-TEST(Test, allocationQueueFull) {
+TEST(Test, TooManyBuffers) {
   Svc::Tester tester;
-  tester.allocationQueueFull();
-}
-
-TEST(Test, idMismatch) {
-  Svc::Tester tester;
-  tester.idMismatch();
-}
-
-TEST(Test, storeSizeExceeded) {
-  Svc::Tester tester;
-  tester.storeSizeExceeded();
+  tester.too_many_buffers();
 }
 
 int main(int argc, char **argv) {

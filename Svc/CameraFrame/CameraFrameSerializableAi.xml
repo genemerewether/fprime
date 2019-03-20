@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<serializable namespace="Svc" name="CameraFrame">
+    <include_header>Fw/Time/Time.hpp</include_header>
+    <import_serializable_type>Fw/Buffer/BufferSerializableAi.xml</import_serializable_type>
+
+    <comment>
+        Camera frame metadata and buffer
+    </comment>
+    <members>
+        <member
+            name="seq"
+            type="U32"
+            comment="The number of this frame in a sequence - GNC id for NavCam; frame idx for video">
+        </member>
+        <member
+            name="hwTimestamp"
+            type="Fw::Time"
+            comment="The timestamp of this frame from hardware">
+        </member>
+        <member
+            name="exposure_target"
+            type="F32"
+            comment="Exposure time for this frame (seconds)">
+        </member>
+        <member
+            name="gain_target"
+            type="F32"
+            comment="Analog gain for this frame (unitless)">
+        </member>
+        <member
+            name="exposure"
+            type="U32"
+            comment="Exposure time for this frame (raw value)">
+        </member>
+        <member
+            name="gain"
+            type="U32"
+            comment="Analog gain for this frame (raw value)">
+        </member>
+        <member
+            name="timestamp"
+            type="Fw::Time"
+            comment="The timestamp of this frame - only approximate">
+        </member>
+        <member
+            name="size"
+            type="U32"
+            comment="The size in bytes of this frame, including padding">
+        </member>
+        <member
+            name="width"
+            type="U32"
+            comment="The width of this frame">
+        </member>
+        <member
+            name="height"
+            type="U32"
+            comment="The height of this frame">
+        </member>
+        <member
+            name="offsets"
+            type="U32"
+            size="3"
+            comment="The offsets from beginning of buffer to each plane (YUV)">
+        </member>
+        <member
+            name="strides"
+            type="U32"
+            size="3"
+            comment="The strides of each plane (YUV) - equals width if no padding">
+        </member>
+        <member
+            name="quality"
+            type="U8"
+            comment="1 to 100, inclusive - JPEG compression factor">
+        </member>
+        <member name="type" type="ENUM" comment="Frame type">
+            <enum name="CameraFrameType">
+                <item name="CAMFRAME_STILL" comment="Still image"/>
+                <item name="CAMFRAME_VIDEO" comment="Video frame"/>
+            </enum>
+        </member>
+        <member name="format" type="ENUM" comment="Detailed formatting info of frame">
+            <enum name="CameraFormatType">
+                <item name="CAMFMT_IMG_MVCAM_RAW" comment="10 bit MVCam"/>
+                <item name="CAMFMT_IMG_MVCAM_GRAY" comment="8 bit MVCam, grayscale"/>
+                <item name="CAMFMT_IMG_HIRES_RAW" comment="10 bit Hires"/>
+                <item name="CAMFMT_IMG_HIRES_GRAY" comment="8 bit Hires, grayscale"/>
+                <item name="CAMFMT_IMG_HIRES_YUV420SP" comment="8 bit Hires, 4:2:0, YUV"/>
+                <item name="CAMFMT_IMG_JPEG" comment="JPEG compressed"/>
+                <item name="CAMFMT_IMG_UNKNOWN" comment="unknown type"/>
+            </enum>
+        </member>
+        <member name="destination" type="ENUM" comment="Destination of frame after ImgComp">
+            <enum name="FrameDestType">
+                <item name="FRAMEDEST_STORAGE" />
+                <item name="FRAMEDEST_XMIT" />
+                <item name="FRAMEDEST_STORAGE_XMIT" />
+            </enum>
+        </member>
+        <member
+            name="frame"
+            type="Fw::Buffer"
+            comment="The frame data; also may hold the CameraFrame itself">
+        </member>
+    </members>
+</serializable>

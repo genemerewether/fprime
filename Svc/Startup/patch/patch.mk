@@ -81,6 +81,9 @@ power:
 
 restart: stop start
 
+date:
+	$(STARTUP_DIR)/patch/adb_set_date.sh
+
 # Create directory for new FSW version
 mkver:
 ifneq ($(VER_UNSET),)

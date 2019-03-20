@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="ImgTlm" kind="active" namespace="Svc" modeler="true">
+
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
+    <ports>
+
+
+        <port name="ImageRecv" data_type="Fw::BufferSend"  kind="async_input"  max_number="1" full="drop">
+        </port>
+
+        <port name="ImageForward" data_type="Fw::BufferSend"  kind="output"    max_number="1">
+        </port>
+    </ports>
+
+</component>

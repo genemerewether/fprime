@@ -1,0 +1,27 @@
+    <telemetry>
+        <channel id="0" name="HIRESCAM_ImagesAcquired" data_type="U32" update="on_change">
+            <comment>
+            Number of images acquired
+            </comment>
+        </channel>
+        <channel id="1" name="HIRESCAM_FramesAcquired" data_type="U32" update="on_change">
+            <comment>
+            Number of video frames acquired total
+            </comment>
+        </channel>
+        <channel id="2" name="HIRESCAM_FrameRate" data_type="U32" update="on_change" format_string="%dFPS">
+            <comment>
+            Number of frames per second
+            </comment>
+        </channel>
+        <channel id="3" name="HIRESCAM_FramesAcquiredThisTime" data_type="U32" update="on_change">
+            <comment>
+            Number of video frames acquired for current capture command
+            </comment>
+        </channel>
+        <channel id="4" name="HIRESCAM_TimeoutLeft" data_type="U32" update="on_change" format_string="%ds">
+            <comment>
+            Number of seconds remaining on image / video timeout
+            </comment>
+        </channel>
+    </telemetry>

@@ -36,10 +36,11 @@ namespace Svc {
   }
 
   void FileDownlink::Warnings ::
-    fileRead(void)
+    fileRead(const Os::File::Status status)
   {
     this->fileDownlink->log_WARNING_HI_FileDownlink_FileReadError(
-        this->fileDownlink->file.sourceName
+        this->fileDownlink->file.sourceName,
+		status
     );
     this->warning();
   }
