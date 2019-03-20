@@ -414,7 +414,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     cmdSeqLL_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
     prmDb_ptr->init(10,0);
-    snapHealth_ptr->init(10,0);
+    snapHealth_ptr->init(50,0);
     snapHealth_ptr->setBootCount(boot_count);
     snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_DYNAMIC);
 
