@@ -256,7 +256,7 @@ void manualConstruct() {
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(0));
 
     mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
-    imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
+    //imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(5));
