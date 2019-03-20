@@ -102,7 +102,7 @@ void manualConstruct() {
     llRouter.set_LLPortsOut_OutputPort(4, eventExpander.get_LogRecv_InputPort(0));
     llRouter.set_LLPortsOut_OutputPort(5, sockGndIf.get_downlinkPort_InputPort(0));
 
-    //sockGndIf.set_uplinkPort_OutputPorts(0, llRouter.get_LLPortsIn_InputPort(4));
+    sockGndIf.set_uplinkPort_OutputPort(0, llRouter.get_HLPortsIn_InputPort(4));
 }
 
 void constructApp(int port_number, char* udp_string, char* hostname, char* serial_port) {
