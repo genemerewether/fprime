@@ -11,7 +11,7 @@
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Drv/PwmDriverPorts/PwmSetDutyCyclePortAi.xml</import_port_type>
     <import_port_type>Drv/I2CDriverPorts/I2CConfigPortAi.xml</import_port_type>
-    <import_port_type>Drv/I2CDriverPorts/I2CReadWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
 
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Telemetry.xml</import_dictionary>
@@ -27,7 +27,7 @@
         <port name="escConfig" data_type="Drv::I2CConfig"  kind="output"    max_number="1">
         </port>
 
-        <port name="escReadWrite" data_type="Drv::I2CReadWrite"  kind="output"    max_number="1">
+        <port name="escReadWrite" data_type="Drv::I2CWriteRead"  kind="output"    max_number="1">
         </port>
 
         <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="2">
