@@ -11,7 +11,8 @@ enum {
 
     CORE_CDH = CORE_0,
     CORE_RPC = CORE_1,
-    CORE_CAM = CORE_2
+    CORE_CAM = CORE_2,
+    CORE_GNC = CORE_3
 };
 
 #include <Fw/Types/Assert.hpp>
@@ -543,7 +544,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
-    imgTlm_ptr->start(0, 20, 20*1024);
+    imgTlm_ptr->start(0, 20, 20*1024, CORE_GNC);
 
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
