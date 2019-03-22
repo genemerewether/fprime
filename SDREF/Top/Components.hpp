@@ -55,7 +55,7 @@ extern Svc::RateGroupDriverImpl* rgDrv_ptr;
 extern Svc::ActiveRateGroupImpl* rgTlm_ptr;
 extern Svc::ActiveRateGroupImpl* rgXfer_ptr;
 extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
-extern Svc::CmdSequencerComponentImpl* cmdSeqLL_ptr;
+extern Svc::CmdSequencerComponentImpl* cmdSeq2_ptr;
 extern Svc::SocketGndIfImpl* sockGndIf_ptr;
 extern Svc::SocketGndIfImpl* sockGndIfLL_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;

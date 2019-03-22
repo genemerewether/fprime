@@ -65,7 +65,7 @@ Svc::LinuxTimeImpl* linuxTime_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
 Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
-Svc::CmdSequencerComponentImpl* cmdSeqLL_ptr = 0;
+Svc::CmdSequencerComponentImpl* cmdSeq2_ptr = 0;
 Svc::PrmDbImpl* prmDb_ptr = 0;
 Svc::SerialTextConverterComponentImpl* serialTextConv_ptr = 0;
 Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
@@ -179,9 +179,9 @@ void allocComps() {
 #endif
 ;
 
-    cmdSeqLL_ptr = new Svc::CmdSequencerComponentImpl
+    cmdSeq2_ptr = new Svc::CmdSequencerComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("CMDSEQLL")
+                        ("CMDSEQ2")
 #endif
 ;
 
@@ -326,6 +326,9 @@ void manualConstruct() {
     sdRosIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
     udpReceiver_ptr->set_PortsOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(7));
+
+    cmdSeq2_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(8));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 #else
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
@@ -345,6 +348,9 @@ void manualConstruct() {
     sdRosIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
     sdRosIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
     udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(7));
+
+    cmdSeq2_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(8));
+    llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 #endif
     
     hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
@@ -411,8 +417,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     cmdSeq_ptr->init(10,0);
     cmdSeq_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
-    cmdSeqLL_ptr->init(10,0);
-    cmdSeqLL_ptr->allocateBuffer(0,seqMallocator,5*1024);
+    cmdSeq2_ptr->init(10,0);
+    cmdSeq2_ptr->allocateBuffer(0,seqMallocator,5*1024);
 
     prmDb_ptr->init(10,0);
     snapHealth_ptr->init(50,0);
@@ -449,20 +455,21 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     manualConstruct();
 
     const U32 tempPortNum[2] = {0, 1};
-    const FwOpcodeType tempMinOpcode[2] = {0, 10000};
-    const FwOpcodeType tempMaxOpcode[2] = {9999, 19999};
+    const FwOpcodeType tempMinOpcode[2] = {0, 20000};
+    const FwOpcodeType tempMaxOpcode[2] = {19999, 39999};
     cmdSeq_ptr->setOpCodeRanges(2,
                                 tempPortNum,
                                 tempMinOpcode,
                                 tempMaxOpcode);
-    /*cmdSeq1_ptr->setOpCodeRanges(2,
+    // TODO(mereweth) - connect cmdSeq2 to llrouter
+    /*cmdSeq2_ptr->setOpCodeRanges(2,
                                   tempPortNum,
                                   tempMinOpcode,
                                   tempMaxOpcode);*/
 
     /* Register commands */
     cmdSeq_ptr->regCommands();
-    cmdSeqLL_ptr->regCommands();
+    cmdSeq2_ptr->regCommands();
     cmdDisp_ptr->regCommands();
     eventLogger_ptr->regCommands();
     eventLoggerLL_ptr->regCommands();
@@ -531,7 +538,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     cmdDisp_ptr->start(0,60,20*1024);
     // start sequencer
     cmdSeq_ptr->start(0,50,20*1024);
-    cmdSeqLL_ptr->start(0,50,20*1024);
+    cmdSeq2_ptr->start(0,50,20*1024);
     // start telemetry
     eventLogger_ptr->start(0,50,20*1024);
     eventLoggerLL_ptr->start(0,50,20*1024);
@@ -676,7 +683,7 @@ void exitTasks(bool isChild) {
     prmDb_ptr->exit();
     fileLogger_ptr->exit();
     cmdSeq_ptr->exit();
-    cmdSeqLL_ptr->exit();
+    cmdSeq2_ptr->exit();
     hexRouter_ptr->exit();
     DEBUG_PRINT("After HexRouter quit\n");
 }
