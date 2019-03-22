@@ -8,4 +8,4 @@ if !($?BUILD_ROOT) then
     cd ${curdir}
 endif
 
-${BUILD_ROOT}/Gse/bin/run_cmds.sh --addr 10.211.55.2 --port 50000 --dictionary ${BUILD_ROOT}/Gse/generated/SIMREF $*
+${BUILD_ROOT}/Gse/bin/run_cmds.sh --addr localhost --port 50050 --dictionary ${BUILD_ROOT}/Gse/generated/SIMREF $*

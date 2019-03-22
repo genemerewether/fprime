@@ -18,11 +18,11 @@ UR_BytesReceived
 UR_DecodeErrors
 UR_PacketsDropped
 UR_PacketsReceived
-cmdSeqLL_CS_CancelCommands
-cmdSeqLL_CS_CommandsExecuted
-cmdSeqLL_CS_Errors
-cmdSeqLL_CS_LoadCommands
-cmdSeqLL_CS_SequencesCompleted
+cmdSeq2_CS_CancelCommands
+cmdSeq2_CS_CommandsExecuted
+cmdSeq2_CS_Errors
+cmdSeq2_CS_LoadCommands
+cmdSeq2_CS_SequencesCompleted
 cmdSeq_CS_CancelCommands
 cmdSeq_CS_CommandsExecuted
 cmdSeq_CS_Errors
