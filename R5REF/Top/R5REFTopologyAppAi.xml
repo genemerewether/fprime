@@ -1,48 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <assembly name = "R5REF" generate_pointer="true">
-	<import_component_type>R5/UartDrv/R5UartDriverComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Est/ImuInteg/ImuIntegComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Sysid/SigGen/SigGenComponentAi.xml</import_component_type>
+	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
+	<import_component_type>R5/GpioAdapter/R5GpioAdapterComponentAi.xml</import_component_type>
+	<import_component_type>R5/SpiMasterDrv/R5SpiMasterDriverComponentAi.xml</import_component_type>
+	<import_component_type>LLProc/LLCycle/LLCycleComponentAi.xml</import_component_type>
+	<import_component_type>LLProc/LLCmdDispatcher/LLCmdDispatcherComponentAi.xml</import_component_type>
+	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
+	<import_component_type>LLProc/LLTlmChan/LLTlmChanComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>R5/I2CDrv/R5I2CDriverComponentAi.xml</import_component_type>
+	<import_component_type>R5/UartDrv/R5UartDriverComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>LLProc/LLDebug/LLDebugComponentAi.xml</import_component_type>
 	<import_component_type>R5/R5Time/R5TimeComponentAi.xml</import_component_type>
 	<import_component_type>LLProc/ShortLogQueue/ShortLogQueueComponentAi.xml</import_component_type>
-	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
 	<import_component_type>R5/UartDrv/R5UartDriverComponentAi.xml</import_component_type>
 	<import_component_type>R5/GpioAdapter/R5GpioAdapterComponentAi.xml</import_component_type>
-	<import_component_type>R5/SpiMasterDrv/R5SpiMasterDriverComponentAi.xml</import_component_type>
-	<import_component_type>LLProc/LLCycle/LLCycleComponentAi.xml</import_component_type>
-	<import_component_type>R5/GpioAdapter/R5GpioAdapterComponentAi.xml</import_component_type>
 	<import_component_type>LLProc/HLRouter/HLRouterComponentAi.xml</import_component_type>
-	<import_component_type>LLProc/LLCmdDispatcher/LLCmdDispatcherComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
-	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/BasicMixer/BasicMixerComponentAi.xml</import_component_type>
-	<import_component_type>LLProc/LLTlmChan/LLTlmChanComponentAi.xml</import_component_type>
-	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
-	<import_component_type>R5/I2CDrv/R5I2CDriverComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/LeeCtrl/LeeCtrlComponentAi.xml</import_component_type>
 	<import_component_type>R5/GpioDrv/R5GpioDriverComponentAi.xml</import_component_type>
 	<import_component_type>Drv/Altimeter/LIDARLiteV3/LIDARLiteV3ComponentAi.xml</import_component_type>
 
-   <instance namespace="R5" name="hlUart" type="R5UartDriver"/>
+   <instance namespace="Gnc" name="imuInteg" type="ImuInteg" base_id="3000"  base_id_window="500" />
 
-   <instance namespace="Gnc" name="imuInteg" type="ImuInteg"/>
+   <instance namespace="Gnc" name="sigGen" type="SigGen" base_id="1000"  base_id_window="500" />
 
-   <instance namespace="Gnc" name="actuatorAdapter" type="ActuatorAdapter"/>
-
-   <instance namespace="Svc" name="rgPos" type="PassiveRateGroup" base_id="61"  base_id_window="20" />
-
-   <instance namespace="LLProc" name="llDebug" type="LLDebug"/>
-
-   <instance namespace="R5" name="r5Time" type="R5Time"/>
-
-   <instance namespace="LLProc" name="logQueue" type="ShortLogQueue"/>
-
-   <instance namespace="Svc" name="rgGncDrv" type="RateGroupDriver" base_id="461"  base_id_window="20" />
-
-   <instance namespace="R5" name="debugUart" type="R5UartDriver"/>
+   <instance namespace="Svc" name="rgGncDrv" type="RateGroupDriver"/>
 
    <instance namespace="R5" name="faultGpio" type="R5GpioAdapter"/>
 
@@ -50,25 +39,39 @@
 
    <instance namespace="LLProc" name="llCycle" type="LLCycle"/>
 
+   <instance namespace="LLProc" name="cmdDisp" type="LLCmdDispatcher"/>
+
+   <instance namespace="Drv" name="mpu9250" type="MPU9250"/>
+
+   <instance namespace="LLProc" name="tlmChan" type="LLTlmChan"/>
+
+   <instance namespace="Svc" name="rgAtt" type="PassiveRateGroup"/>
+
+   <instance namespace="R5" name="i2c1Drv" type="R5I2CDriver"/>
+
+   <instance namespace="R5" name="hlUart" type="R5UartDriver"/>
+
+   <instance namespace="Gnc" name="actuatorAdapter" type="ActuatorAdapter" base_id="3500"  base_id_window="500" />
+
+   <instance namespace="Svc" name="rgPos" type="PassiveRateGroup"/>
+
+   <instance namespace="LLProc" name="llDebug" type="LLDebug"/>
+
+   <instance namespace="R5" name="r5Time" type="R5Time"/>
+
+   <instance namespace="LLProc" name="logQueue" type="ShortLogQueue"/>
+
+   <instance namespace="R5" name="debugUart" type="R5UartDriver"/>
+
    <instance namespace="R5" name="rtiGpio" type="R5GpioAdapter"/>
 
    <instance namespace="LLProc" name="hlRouter" type="HLRouter"/>
 
-   <instance namespace="LLProc" name="cmdDisp" type="LLCmdDispatcher"/>
-
    <instance namespace="Svc" name="rgTlm" type="PassiveRateGroup"/>
 
-   <instance namespace="Drv" name="mpu9250" type="MPU9250"/>
+   <instance namespace="Gnc" name="mixer" type="BasicMixer" base_id="2500"  base_id_window="500" />
 
-   <instance namespace="Gnc" name="mixer" type="BasicMixer"/>
-
-   <instance namespace="LLProc" name="tlmChan" type="LLTlmChan"/>
-
-   <instance namespace="Svc" name="rgAtt" type="PassiveRateGroup" base_id="41"  base_id_window="20" />
-
-   <instance namespace="R5" name="i2c1Drv" type="R5I2CDriver"/>
-
-   <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl"/>
+   <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl" base_id="2000"  base_id_window="500" />
 
    <instance namespace="R5" name="gpio" type="R5GpioDriver"/>
 
@@ -88,12 +91,12 @@
  	 <target component = "hlRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection4">
-	 <source component = "imuInteg" port = "Tlm" type = "Tlm" num = "0"/>
- 	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
-</connection>
-<connection name = "Connection5">
 	 <source component = "lidarLiteV3" port = "I2CWriteRead" type = "I2CWriteRead" num = "0"/>
  	 <target component = "i2c1Drv" port = "writeRead" type = "I2CWriteRead" num = "0"/>
+</connection>
+<connection name = "Connection5">
+	 <source component = "imuInteg" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection6">
 	 <source component = "mpu9250" port = "Tlm" type = "Tlm" num = "0"/>
@@ -128,12 +131,12 @@
  	 <target component = "spiMaster" port = "spiConfig" type = "SpiConfig" num = "0"/>
 </connection>
 <connection name = "Connection14">
-	 <source component = "leeCtrl" port = "Tlm" type = "Tlm" num = "0"/>
- 	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
-</connection>
-<connection name = "Connection15">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
  	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection15">
+	 <source component = "leeCtrl" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection16">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
@@ -208,24 +211,24 @@
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection34">
-	 <source component = "mpu9250" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
- 	 <target component = "spiMaster" port = "spiSendRecv" type = "SpiReadWrite" num = "0"/>
-</connection>
-<connection name = "Connection35">
-	 <source component = "actuatorAdapter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection36">
 	 <source component = "hlRouter" port = "DebugOut" type = "DebugString" num = "0"/>
  	 <target component = "llDebug" port = "DebugStringIn" type = "DebugString" num = "0"/>
 </connection>
-<connection name = "Connection37">
-	 <source component = "rtiGpio" port = "waitOut" type = "GpioWait" num = "0"/>
- 	 <target component = "gpio" port = "wait" type = "GpioWait" num = "0"/>
+<connection name = "Connection35">
+	 <source component = "mpu9250" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
+ 	 <target component = "spiMaster" port = "spiSendRecv" type = "SpiReadWrite" num = "0"/>
 </connection>
-<connection name = "Connection38">
+<connection name = "Connection36">
+	 <source component = "actuatorAdapter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection37">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection38">
+	 <source component = "rtiGpio" port = "waitOut" type = "GpioWait" num = "0"/>
+ 	 <target component = "gpio" port = "wait" type = "GpioWait" num = "0"/>
 </connection>
 <connection name = "Connection39">
 	 <source component = "actuatorAdapter" port = "Tlm" type = "Tlm" num = "0"/>
@@ -240,139 +243,187 @@
  	 <target component = "rtiGpio" port = "waitIn" type = "GpioPoll" num = "0"/>
 </connection>
 <connection name = "Connection42">
-	 <source component = "lidarLiteV3" port = "I2CWriteReadStatus" type = "I2CWriteReadStatus" num = "0"/>
- 	 <target component = "i2c1Drv" port = "status" type = "I2CWriteReadStatus" num = "0"/>
+	 <source component = "actuatorAdapter" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection43">
+	 <source component = "sigGen" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection44">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "mpu9250" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection44">
+<connection name = "Connection45">
+	 <source component = "lidarLiteV3" port = "I2CWriteReadStatus" type = "I2CWriteReadStatus" num = "0"/>
+ 	 <target component = "i2c1Drv" port = "status" type = "I2CWriteReadStatus" num = "0"/>
+</connection>
+<connection name = "Connection46">
+	 <source component = "sigGen" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
+</connection>
+<connection name = "Connection47">
 	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection45">
+<connection name = "Connection48">
 	 <source component = "lidarLiteV3" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection46">
+<connection name = "Connection49">
+	 <source component = "sigGen" port = "controls" type = "TorqueThrust" num = "0"/>
+ 	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
+</connection>
+<connection name = "Connection50">
 	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection47">
+<connection name = "Connection51">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
  	 <target component = "hlRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection48">
+<connection name = "Connection52">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection49">
+<connection name = "Connection53">
 	 <source component = "lidarLiteV3" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection50">
+<connection name = "Connection54">
+	 <source component = "sigGen" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
+ 	 <target component = "leeCtrl" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
+</connection>
+<connection name = "Connection55">
 	 <source component = "cmdDisp" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection51">
+<connection name = "Connection56">
 	 <source component = "leeCtrl" port = "controls" type = "TorqueThrust" num = "0"/>
  	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
 </connection>
-<connection name = "Connection52">
+<connection name = "Connection57">
+	 <source component = "sigGen" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection58">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
  	 <target component = "hlRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection53">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection54">
+<connection name = "Connection59">
 	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection55">
+<connection name = "Connection60">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+ 	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection61">
 	 <source component = "imuInteg" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection56">
+<connection name = "Connection62">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
  	 <target component = "i2c1Drv" port = "service" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection57">
+<connection name = "Connection63">
 	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection58">
+<connection name = "Connection64">
 	 <source component = "mixer" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection59">
+<connection name = "Connection65">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "logQueue" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection60">
+<connection name = "Connection66">
+	 <source component = "sigGen" port = "motor" type = "Actuators" num = "0"/>
+ 	 <target component = "actuatorAdapter" port = "motor" type = "Actuators" num = "0"/>
+</connection>
+<connection name = "Connection67">
 	 <source component = "leeCtrl" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection61">
+<connection name = "Connection68">
+	 <source component = "sigGen" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection69">
 	 <source component = "mixer" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection62">
+<connection name = "Connection70">
 	 <source component = "imuInteg" port = "odometry" type = "Odometry" num = "0"/>
  	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
 </connection>
-<connection name = "Connection63">
+<connection name = "Connection71">
 	 <source component = "mpu9250" port = "Imu" type = "ImuNoCov" num = "0"/>
  	 <target component = "imuInteg" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
-<connection name = "Connection64">
+<connection name = "Connection72">
 	 <source component = "lidarLiteV3" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection65">
+<connection name = "Connection73">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
  	 <target component = "tlmChan" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection66">
+<connection name = "Connection74">
 	 <source component = "mixer" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection67">
+<connection name = "Connection75">
 	 <source component = "llCycle" port = "TimeGetPort" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection68">
+<connection name = "Connection76">
 	 <source component = "imuInteg" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "0"/>
 </connection>
-<connection name = "Connection69">
+<connection name = "Connection77">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "0"/>
  	 <target component = "imuInteg" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection70">
+<connection name = "Connection78">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "1"/>
- 	 <target component = "cmdDisp" port = "CmdDisp" type = "Cmd" num = "0"/>
+ 	 <target component = "actuatorAdapter" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection71">
-	 <source component = "cmdDisp" port = "CmdReg" type = "CmdReg" num = "0"/>
+<connection name = "Connection79">
+	 <source component = "actuatorAdapter" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "1"/>
 </connection>
-<connection name = "Connection72">
+<connection name = "Connection80">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "2"/>
- 	 <target component = "leeCtrl" port = "CmdDisp" type = "Cmd" num = "0"/>
+ 	 <target component = "cmdDisp" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection73">
-	 <source component = "leeCtrl" port = "CmdReg" type = "CmdReg" num = "0"/>
+<connection name = "Connection81">
+	 <source component = "cmdDisp" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "2"/>
 </connection>
-<connection name = "Connection74">
-	 <source component = "mixer" port = "CmdReg" type = "CmdReg" num = "0"/>
+<connection name = "Connection82">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "3"/>
+ 	 <target component = "leeCtrl" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection83">
+	 <source component = "leeCtrl" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "3"/>
 </connection>
-<connection name = "Connection75">
-	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "3"/>
+<connection name = "Connection84">
+	 <source component = "sigGen" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "4"/>
+</connection>
+<connection name = "Connection85">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "4"/>
+ 	 <target component = "sigGen" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection86">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "5"/>
  	 <target component = "mixer" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection87">
+	 <source component = "mixer" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "5"/>
 </connection>
 </assembly>

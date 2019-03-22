@@ -13,6 +13,7 @@ void exitTasks();
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
+#include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 
 #include <R5/A2DDrv/R5A2DDriverComponentImpl.hpp>
 #include <R5/GpioDrv/R5GpioDriverComponentImpl.hpp>
@@ -39,6 +40,7 @@ extern Svc::PassiveRateGroupImpl* rgTlm_ptr;
 extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
 extern Gnc::BasicMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
+extern Gnc::SigGenComponentImpl* sigGen_ptr;
 extern Gnc::ImuIntegComponentImpl* imuInteg_ptr;
 extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 extern Drv::LIDARLiteV3ComponentImpl* lidarLiteV3_ptr;
