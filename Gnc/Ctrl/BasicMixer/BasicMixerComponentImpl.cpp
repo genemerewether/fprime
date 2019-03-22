@@ -138,7 +138,7 @@ namespace Gnc {
           }
       }
 
-      (void) basicMixer.SetMixer(mixer);
+      (void) basicMixer.SetMixer(mixer, this->numRotors);
 
       this->paramsInited = true;
   }
