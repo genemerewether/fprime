@@ -272,15 +272,15 @@ void manualConstruct() {
     hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
     // aux actuator command
-    hlRouter_ptr->set_HLPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
     hlRouter_ptr->set_HLPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 
     llDebug_ptr->set_SerWritePort_OutputPort(0, debugUart_ptr->get_serialSend_InputPort(0));
 
-    hlRouter_ptr->set_HLPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
-    cmdDisp_ptr->set_seqCmdStatus_OutputPort(2, hlRouter_ptr->get_LLPortsIn_InputPort(8));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
+    cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(8));
 }
 
 void constructApp() {
