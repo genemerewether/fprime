@@ -62,6 +62,11 @@ namespace SnapdragonFlight {
 
     PRIVATE:
 
+      //! Preamble override
+      void preamble(void);
+      //! Finalizer override
+      void finalizer(void);
+    
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------

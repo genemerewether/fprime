@@ -58,6 +58,46 @@ namespace SnapdragonFlight {
 
   }
 
+  void MVVislamComponentImpl ::
+    preamble(void)
+  {
+    float32_t tbc[] = {
+    
+#ifdef BUILD_SDFLIGHT
+    this->m_mvVISLAMPtr = 
+      mvVISLAM_Initialize(&camCfg,
+			  0.0f, //readoutTime
+			  tbc,
+			  ombc,
+			  0.002f, //delta
+			  std0Tbc,
+			  std0Ombc,
+			  0.001f, //std0Delta
+			  156.0f, //accelMeasRange
+			  34.0f, //gyroMeasRange
+			  0.316f, //stdAccelMeasNoise
+			  1e-2f, //stdGyroMeasNoise
+			  100.0f, //stdCamNoise
+			  0.5f, //minStdPixelNoise
+			  1.6651f, //failHighPixelNoiseScaleFactor
+			  0.0f, //logDepthBootstrap
+			  false, //useLogCameraHeight
+			  -3.22f, //logCameraHeightBootstrap
+			  false, //noInitWhenMoving
+			  200.0f, //limitedIMUbWtrigger
+			  "na", //staticMaskFilename
+			  0.0f, //gpsImuTimeAlignment
+			  tba,
+			  false //mapping
+			  );
+#endif //BUILD_SDFLIGHT
+  }
+  
+  void MVVislamComponentImpl ::
+    finalizer(void)
+  {
+  }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
