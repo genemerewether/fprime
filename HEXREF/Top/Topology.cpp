@@ -294,8 +294,8 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
-    cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(8));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
+    cmdDisp_ptr->set_seqCmdStatus_OutputPort(2, kraitRouter_ptr->get_HexPortsIn_InputPort(8));
 
     // other serial ports
 #ifdef DECOUPLE_ACTUATORS

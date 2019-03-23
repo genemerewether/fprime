@@ -100,7 +100,7 @@ namespace HLProc {
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = n.advertise<sensor_msgs::Imu>(buf, 1000);
+            m_imuPub[i] = n.advertise<sensor_msgs::Imu>(buf, 10000);
         }
 
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {

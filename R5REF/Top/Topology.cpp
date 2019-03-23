@@ -279,8 +279,8 @@ void manualConstruct() {
 
     llDebug_ptr->set_SerWritePort_OutputPort(0, debugUart_ptr->get_serialSend_InputPort(0));
 
-    hlRouter_ptr->set_HLPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
-    cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(8));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
+    cmdDisp_ptr->set_seqCmdStatus_OutputPort(2, hlRouter_ptr->get_LLPortsIn_InputPort(8));
 }
 
 void constructApp() {
