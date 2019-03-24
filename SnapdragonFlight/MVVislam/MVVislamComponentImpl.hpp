@@ -75,14 +75,7 @@ namespace SnapdragonFlight {
       //!
       void Imu_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::sensor_msgs::ImuNoCov &ImuNoCov 
-      );
-
-      //! Handler implementation for ImuFwd
-      //!
-      void ImuFwd_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::sensor_msgs::ImuNoCov &ImuNoCov 
+          ROS::sensor_msgs::ImuNoCov &imu
       );
 
       //! Handler implementation for Image
@@ -119,9 +112,23 @@ namespace SnapdragonFlight {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
+      //! Implementation for MVVISLAM_Activate command handler
+      //! 
+      void MVVISLAM_Activate_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          bool enable 
+      );
+      
+      void initHelper();
+
 #ifdef BUILD_SDFLIGHT
       mvVISLAM* m_mvVISLAMPtr;
 #endif
+
+      bool m_initialized;
+      
+      bool m_activated;
 
     };
 

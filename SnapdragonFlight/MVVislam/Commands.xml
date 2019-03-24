@@ -1,3 +1,9 @@
 <commands>
     <command kind="async" opcode="0" mnemonic="MVVISLAM_Reinit" />
+    
+    <command kind="async" opcode="1" mnemonic="MVVISLAM_Activate" >
+        <args>
+            <arg type="bool" name="enable" />
+        </args>
+    </command>
 </commands>
