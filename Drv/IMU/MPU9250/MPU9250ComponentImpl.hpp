@@ -56,6 +56,18 @@ namespace Drv {
 
       bool isReady(void);
 
+      enum OutputMode {
+          OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ,
+          OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ
+      };
+
+      void setOutputMode(OutputMode mode);
+
+      enum OperationMode {
+          OPMODE_INTERRUPT,
+          OPMODE_FIFO,
+      };
+
     PRIVATE:
 
     // ----------------------------------------------------------------------
@@ -93,14 +105,12 @@ namespace Drv {
         INIT_ERROR,
     } m_initState;
 
-    enum OperationMode {
-        OPMODE_INTERRUPT,
-        OPMODE_FIFO,
-    } m_opMode;
-
     // ----------------------------------------------------------------------
     // Member variables
     // ----------------------------------------------------------------------
+    OutputMode m_outMode;
+
+    OperationMode m_opMode;
 
     float m_gyroRawToRadS;
     float m_accelRawToMS2;

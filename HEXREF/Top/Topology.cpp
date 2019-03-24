@@ -337,6 +337,8 @@ void constructApp() {
     sigGen_ptr->init(0);
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
+    mpu9250_ptr->setOutputMode(
+        Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
 
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
