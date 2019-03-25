@@ -436,7 +436,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     imgTlm_ptr->init(30, 0);
 
     mvCam_ptr->init(60, 0);
-    mvVislam_ptr->init(200, 0);
+    mvVislam_ptr->init(1000, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size

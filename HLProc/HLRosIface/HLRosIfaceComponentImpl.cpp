@@ -162,6 +162,8 @@ namespace HLProc {
         }
       
         sensor_msgs::Imu msg;
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
 
         msg.header.seq = header.getseq();
 

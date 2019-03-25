@@ -26,6 +26,9 @@
 
 #include <Os/File.hpp>
 
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace SnapdragonFlight {
 
   // ----------------------------------------------------------------------
@@ -228,9 +231,8 @@ namespace SnapdragonFlight {
       if (m_initialized && m_activated) {
 #ifdef BUILD_SDFLIGHT
           Fw::Time t = Image.getheader().getstamp();
-          I64 usecRos = t.getSeconds() * 1000LL * 1000LL * 1000LL
-                                 + t.getUSeconds() * 1000LL;
-          mvVISLAM_AddImage(m_mvVISLAMPtr, usecRos, (U8*) (data.getdata()));
+          I64 usecRos = t.getSeconds() * 1000LL * 1000LL + t.getUSeconds();
+          mvVISLAM_AddImage(m_mvVISLAMPtr, usecRos * 1000LL, (U8*) (data.getdata()));
           mvVISLAMPose vio_pose = mvVISLAM_GetPose(m_mvVISLAMPtr);
 	  
 	  /*
@@ -321,6 +323,12 @@ namespace SnapdragonFlight {
 				0,
 				(U32) (usecDsp / 1000 / 1000),
 				(U32) (usecDsp % (1000 * 1000)));
+
+	      DEBUG_PRINT("usecRos %lld, lead %lld, convTime %u.%06u\n",
+			  usecRos,
+			  walltimeDspLeadUs,
+			  convTime.getSeconds(),
+			  convTime.getUSeconds());
 
 	      //TODO(mereweth) - END convert time instead using HLTimeConv
 	      
