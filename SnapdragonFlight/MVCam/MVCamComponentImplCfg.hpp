@@ -29,7 +29,7 @@ enum {
   MVCAM_PARAMS_APPLY_SKIP = 1, // Skip # frames before update gain and exposure due to delay in parameter propagation
   MVCAM_MAX_NUM_WAYPOINTS = 100,
   MVCAM_IMG_MAX_NUM_BUFFERS = 2000, // Sized for NAVOUTDOOR
-  MVCAM_IMG_HP_BUFFER_POOL_SIZE = 5,
+  MVCAM_IMG_HP_BUFFER_POOL_SIZE = 20,
   MVCAM_IMG_LP_BUFFER_POOL_SIZE = MVCAM_IMG_MAX_NUM_BUFFERS,
   MVCAM_IMG_TLM_SKIP = 10,
 };
