@@ -319,7 +319,7 @@ void manualConstruct() {
     
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(2, hexRouter_ptr->get_Sched_InputPort(0));
     
-    sdRosIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
+    mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
@@ -436,7 +436,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     imgTlm_ptr->init(30, 0);
 
     mvCam_ptr->init(60, 0);
-    mvVislam_ptr->init(60, 0);
+    mvVislam_ptr->init(200, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size
@@ -548,7 +548,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     snapHealth_ptr->start(0,40,20*1024);
 
     mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
-    mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
+    mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_GNC);
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
     imgTlm_ptr->start(0, 20, 20*1024, CORE_GNC);

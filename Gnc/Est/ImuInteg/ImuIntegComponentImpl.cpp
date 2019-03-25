@@ -130,6 +130,10 @@ namespace Gnc {
       DEBUG_PRINT("IMU state update\n");
     
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();
+      // TODO(mereweth) - EVR about state update from future
+      if (h.getstamp() > this->getTime()) {
+  	  return;
+      }
       
       //this->seq = h.getseq();
 
