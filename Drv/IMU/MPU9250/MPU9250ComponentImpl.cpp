@@ -136,7 +136,8 @@ namespace Drv {
                     // Offset returned data by one half-word
                     readBufOffset = readBuf + 2;
 #endif
-                    //DEBUG_PRINT("MPU9250 before read\n");
+                    DEBUG_PRINT("MPU9250 before read at %u.%06u\n",
+                                ImuNow.getSeconds(), ImuNow.getUSeconds());
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     timer.stop();
                     DEBUG_PRINT("reg read %d bytes in %u usec\n",

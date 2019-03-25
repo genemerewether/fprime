@@ -436,7 +436,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     imgTlm_ptr->init(30, 0);
 
     mvCam_ptr->init(60, 0);
-    mvVislam_ptr->init(60, 0);
+    mvVislam_ptr->init(200, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size
@@ -548,7 +548,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     snapHealth_ptr->start(0,40,20*1024);
 
     mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
-    mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
+    mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_GNC);
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
     imgTlm_ptr->start(0, 20, 20*1024, CORE_GNC);
