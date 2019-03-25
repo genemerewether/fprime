@@ -6,4 +6,6 @@
             <arg type="bool" name="enable" />
         </args>
     </command>
+    
+    <command kind="async" opcode="2" mnemonic="MVVISLAM_Reset" />
 </commands>

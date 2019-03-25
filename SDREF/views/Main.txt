@@ -56,3 +56,4 @@ MVCAM_NumLoRate
 MVCAM_NumMaxExpDelta
 MVCAM_NumNoHPBuffers
 MVCAM_NumNoLPBuffers
+MVVISLAM_ErrorCode

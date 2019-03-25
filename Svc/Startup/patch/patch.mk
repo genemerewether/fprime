@@ -36,6 +36,10 @@ else
 FULLVER := $(shell $(STARTUP_DIR)/patch/mkver.bash -d $(DEPLOYMENT) -v $(VER))
 endif
 
+# TODO(mereweth) - remove once nested namespace serializable Gse is working
+rosser:
+	touch $(BUILD_ROOT)/Gse/generated/$(DEPLOYMENT)/serializable/ROS/__init__.py
+
 # For switching fsw partition between read-only and read-write
 rwfsw:
 	$(BUILD_ROOT)/Svc/Startup/patch/remount_fsw_rw.sh
