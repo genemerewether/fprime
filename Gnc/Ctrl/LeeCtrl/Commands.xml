@@ -14,6 +14,9 @@
                     <item name="RP_YAWRATE_THRUST"/>
                     <item name="ATTRATE_THRUST"/>
                     <item name="CTRL_DISABLED"/>
+                    <item name="ROLL_ONLY"/>
+                    <item name="PITCH_ONLY"/>
+                    <item name="YAW_ONLY"/>
                 </enum>
             </arg>
          </args>

@@ -368,12 +368,16 @@ namespace Gnc {
           Eigen::Vector3d thrust_b__comm;
 
           if ((ATT_ATTRATE_THRUST == this->ctrlMode) ||
-              (RPRATE_YAW_THRUST == this->ctrlMode) ||
-              (RP_YAWRATE_THRUST == this->ctrlMode) ||
-              (ATTRATE_THRUST == this->ctrlMode)) {
+              (RPRATE_YAW_THRUST == this->ctrlMode)  ||
+              (RP_YAWRATE_THRUST == this->ctrlMode)  ||
+              (ATTRATE_THRUST == this->ctrlMode)     ||
+              (ROLL_ONLY == this->ctrlMode)          ||
+              (PITCH_ONLY == this->ctrlMode)         ||
+              (YAW_ONLY == this->ctrlMode))          {
 
               bool rpVelOnly = false;
               bool yawVelOnly = false;
+	      bool doSaturation = true;
 
               if (RPRATE_YAW_THRUST == this->ctrlMode) {
                   rpVelOnly = true;
@@ -386,6 +390,12 @@ namespace Gnc {
                   rpVelOnly = true;
                   yawVelOnly = true;
               }
+
+	      if ((ROLL_ONLY == this->ctrlMode)  ||
+		  (PITCH_ONLY == this->ctrlMode) ||
+		  (YAW_ONLY == this->ctrlMode))  {
+		  doSaturation = false;
+	      }
             
               Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
                                                                   this->w_q_b__des.getx(),
@@ -396,7 +406,8 @@ namespace Gnc {
                                                   this->omega_b__des.getx(),
                                                   this->omega_b__des.gety(),
                                                   this->omega_b__des.getz()),
-                                              rpVelOnly, yawVelOnly);
+                                              rpVelOnly, yawVelOnly,
+					      doSaturation);
               thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
                                                this->thrust_b__des.gety(),
                                                this->thrust_b__des.getz());
@@ -431,6 +442,15 @@ namespace Gnc {
           }
           else if (ATTRATE_THRUST == this->ctrlMode) {
               this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, true);
+          }
+          else if (ROLL_ONLY == this->ctrlMode) {
+  	      this->leeControl.GetAngAxisByAxisCommand(&alpha_b__comm, 1<<0);
+          }
+          else if (PITCH_ONLY == this->ctrlMode) {
+	      this->leeControl.GetAngAxisByAxisCommand(&alpha_b__comm, 1<<1);
+          }
+          else if (YAW_ONLY == this->ctrlMode) {
+	      this->leeControl.GetAngAxisByAxisCommand(&alpha_b__comm, 1<<2);
           }
           else {
               this->leeControl.GetAngAccelCommand(&alpha_b__comm);
