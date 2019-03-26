@@ -181,7 +181,7 @@ namespace Gnc {
         const U32 cmdSeq,
         CtrlMode mode
     )
-  {      
+  {    
       if (!paramsInited &&
           mode != CTRL_DISABLED) {
           this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
@@ -373,7 +373,8 @@ namespace Gnc {
               (ATTRATE_THRUST == this->ctrlMode)     ||
               (ROLL_ONLY == this->ctrlMode)          ||
               (PITCH_ONLY == this->ctrlMode)         ||
-              (YAW_ONLY == this->ctrlMode))          {
+              (YAW_ONLY == this->ctrlMode)           ||
+              (RP_ONLY == this->ctrlMode))           {
 
               bool rpVelOnly = false;
               bool yawVelOnly = false;
@@ -393,7 +394,8 @@ namespace Gnc {
 
 	      if ((ROLL_ONLY == this->ctrlMode)  ||
 		  (PITCH_ONLY == this->ctrlMode) ||
-		  (YAW_ONLY == this->ctrlMode))  {
+		  (YAW_ONLY == this->ctrlMode)   ||
+		  (RP_ONLY == this->ctrlMode))   {
 		  doSaturation = false;
 	      }
             
@@ -444,13 +446,16 @@ namespace Gnc {
               this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, true);
           }
           else if (ROLL_ONLY == this->ctrlMode) {
-  	      this->leeControl.GetAngAxisByAxisCommand(&alpha_b__comm, 1<<0);
+  	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<0);
           }
           else if (PITCH_ONLY == this->ctrlMode) {
-	      this->leeControl.GetAngAxisByAxisCommand(&alpha_b__comm, 1<<1);
+	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<1);
           }
           else if (YAW_ONLY == this->ctrlMode) {
-	      this->leeControl.GetAngAxisByAxisCommand(&alpha_b__comm, 1<<2);
+	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<2);
+          }
+          else if (RP_ONLY == this->ctrlMode) {
+	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, (1<<0) | (1<<1));
           }
           else {
               this->leeControl.GetAngAccelCommand(&alpha_b__comm);

@@ -17,6 +17,7 @@
                     <item name="ROLL_ONLY"/>
                     <item name="PITCH_ONLY"/>
                     <item name="YAW_ONLY"/>
+                    <item name="RP_ONLY"/>
                 </enum>
             </arg>
          </args>
