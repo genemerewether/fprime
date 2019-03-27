@@ -56,8 +56,7 @@ namespace HLProc {
     m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
     m_actuatorsSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
-    m_attRateThrustSet(), // zero-initialize instead of default-initializing
-    m_lastLLImuTime()
+    m_attRateThrustSet() // zero-initialize instead of default-initializing
   {
       for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
           m_imuStateUpdateSet[i].fresh = false;
@@ -100,7 +99,7 @@ namespace HLProc {
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = n.advertise<sensor_msgs::Imu>(buf, 1000);
+            m_imuPub[i] = n.advertise<sensor_msgs::Imu>(buf, 10000);
         }
 
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
@@ -139,9 +138,7 @@ namespace HLProc {
     {
 
         ROS::std_msgs::Header header = Imu.getheader();
-        // TODO(mereweth) - time-translate from DSP & use message there
         Fw::Time stamp = header.getstamp();
-        m_lastLLImuTime = stamp;
 
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
@@ -165,43 +162,8 @@ namespace HLProc {
         }
       
         sensor_msgs::Imu msg;
-
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-
-        I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
-
-        if (-walltimeDspLeadUs > usecDsp) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
-                   walltimeDspLeadUs, usecDsp);
-            return;
-        }
-        I64 usecRos = usecDsp + walltimeDspLeadUs;
-        msg.header.stamp.sec = (U32) (usecRos / 1000LL / 1000LL);
-        msg.header.stamp.nsec = (usecRos % (1000LL * 1000LL)) * 1000LU;
-
-        //TODO(mereweth) - END convert time instead using HLTimeConv
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
 
         msg.header.seq = header.getseq();
 
@@ -728,19 +690,14 @@ namespace HLProc {
             ); // end ImuStateUpdate constructor
 
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
-            if (convTime > this->compPtr->m_lastLLImuTime) {
-                // TODO(mereweth) - EVR; can't have state update newer than last IMU
-            }
-            else {
-                if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
-                    this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
-                    DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
-                }
-                this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
-                this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
-            }
-            this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
-        }
+	    if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
+		this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
+		DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+	    }
+	    this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
+	    this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+	}
+	this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
     }
 
     // Flat output constructor/destructor/callback

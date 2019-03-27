@@ -61,6 +61,7 @@ namespace Drv {
 #endif
                              ),
         m_initState(INIT_RESET),
+        m_outMode(OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ),
         m_opMode(OPMODE_INTERRUPT),
         m_gyroRawToRadS(0.0f),
         m_accelRawToMS2(0.0f),
@@ -88,6 +89,11 @@ namespace Drv {
       isReady()
     {
         return (INIT_COMPLETE == m_initState) ? true : false;
+    }
+
+    void MPU9250ComponentImpl ::
+      setOutputMode(OutputMode mode) {
+        m_outMode = mode;
     }
 
   // ----------------------------------------------------------------------
@@ -130,7 +136,8 @@ namespace Drv {
                     // Offset returned data by one half-word
                     readBufOffset = readBuf + 2;
 #endif
-                    //DEBUG_PRINT("MPU9250 before read\n");
+                    DEBUG_PRINT("MPU9250 before read at %u.%06u\n",
+                                ImuNow.getSeconds(), ImuNow.getUSeconds());
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     timer.stop();
                     DEBUG_PRINT("reg read %d bytes in %u usec\n",
@@ -345,9 +352,15 @@ namespace Drv {
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_CONFIG | SPI_BITS_WRITE;
                     // temperature & gyro DLPF, FIFO mode
-                    // 184Hz low-pass gives data output at 1 kHz
-                    writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_184HZ | //MPU9250_BITS_GYRO_DLPF_CFG_250HZ |
-                                  MPU9250_BITS_CONFIG_FIFO_MODE_STOP; // MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
+                    if (OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ == m_outMode) {
+                        // 184Hz low-pass gives data output at 1 kHz
+                        writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_184HZ | //MPU9250_BITS_GYRO_DLPF_CFG_250HZ |
+                                      MPU9250_BITS_CONFIG_FIFO_MODE_STOP; // MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
+                    }
+                    if (OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ == m_outMode) {
+                        writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_3600HZ | //MPU9250_BITS_GYRO_DLPF_CFG_250HZ |
+                                      MPU9250_BITS_CONFIG_FIFO_MODE_STOP; // MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
+                    }
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
                     m_initState = INIT_GYRO_CONFIG;
                     break;
@@ -376,11 +389,17 @@ namespace Drv {
                     DEBUG_PRINT("MPU9250 enter INIT_ACCEL_CONFIG_2\n");
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_ACCEL_CONFIG2 | SPI_BITS_WRITE;
-                    // TODO(mereweth) - better performance with DLPF?
-                    // 184Hz low-pass gives data output at 1 kHz
-                    writeBuf[1] = MPU9250_BITS_ACCEL_BW_LTE_460HZ |
-                                  MPU9250_BITS_ACCEL_DLPF_CFG_460HZ;
-                    //writeBuf[1] = MPU9250_BITS_ACCEL_BW_1130HZ;
+
+                    if (OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ == m_outMode) {
+                        // TODO(mereweth) - better performance with DLPF?
+                        // 460Hz low-pass gives data output at 1 kHz
+                        writeBuf[1] = MPU9250_BITS_ACCEL_BW_LTE_460HZ |
+                                      MPU9250_BITS_ACCEL_DLPF_CFG_460HZ;
+                    }
+                    if (OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ == m_outMode) {
+                        // NOTE(mereweth) - dlpf cfg ignored with this bandwidth
+                        writeBuf[1] = MPU9250_BITS_ACCEL_BW_1130HZ;
+                    }
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
                     m_initState = INIT_MAG_CONFIG;
                     break;

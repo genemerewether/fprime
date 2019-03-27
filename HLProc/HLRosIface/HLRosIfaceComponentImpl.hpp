@@ -249,8 +249,7 @@ namespace HLProc {
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_attRateThrustSet[NUM_ATTRATETHRUST_OUTPUT_PORTS];
-
-        Fw::Time m_lastLLImuTime;
+    
     };
 
 } // end namespace

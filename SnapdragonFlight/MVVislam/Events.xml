@@ -1,5 +1,10 @@
 <events>
-    <event id="0" name="MVVISLAM_Reinitialized" severity="ACTIVITY_HI" format_string = "MVVISLAM reinitialized" >
+    <event id="0" name="MVVISLAM_Reinitialized" severity="WARNING_HI" format_string = "MVVISLAM reinitialized" >
+        <comment>
+          MVVislam reinit
+        </comment>
+    </event>
+    <event id="1" name="MVVISLAM_Reset" severity="WARNING_HI" format_string = "MVVISLAM reset" >
         <comment>
           MVVislam reinit
         </comment>
