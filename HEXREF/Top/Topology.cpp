@@ -382,7 +382,7 @@ void constructApp() {
     imuDRInt_ptr->open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
 
     // J9, BLSP2
-    i2cDrv_ptr->open(2, Drv::I2C_FREQUENCY_400KHZ);
+    i2cDrv_ptr->open(9, Drv::I2C_FREQUENCY_400KHZ);
 
     // J15, BLSP9
     // TODO(mereweth) - Spektrum UART and binding GPIO
