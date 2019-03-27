@@ -2,6 +2,9 @@
 
 . ./boot_counter.bash
 
+# NOTE(mereweth) - not in settings.bash so we can run tests in test_logging.bats
+VERBOSITY=${LOCAL_DIR}/seq/verbosity.bash
+
 ################################### increment ###################################
 @test "missing boot counter file" {
   rm $BOOT_COUNTER_FILE 2> /dev/null || true

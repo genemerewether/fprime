@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5I2CDriver" kind="passive" namespace="R5">
+
+    <import_port_type>Drv/I2CDriverPorts/I2CConfigPortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/I2CDriverPorts/I2CWriteReadStatusPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+
+    <ports>
+    
+        <port name="config" data_type="Drv::I2CConfig"  kind="sync_input">
+           <comment>Configure the I2C settings for a specific port</comment>
+        </port>
+        <port name="writeRead" data_type="Drv::I2CWriteRead"  kind="sync_input">
+           <comment>Schedule a WriteRead transaction</comment>
+        </port>
+        <port name="status" data_type="Drv::I2CWriteReadStatus" kind="sync_input">
+            <comment>Get the status of a WriteRead</comment>
+        </port>
+        <port name="service" data_type="Svc::Sched" kind="sync_input">
+            <comment>Service the driver</comment>
+        </port>
+        
+    </ports>
+
+</component>

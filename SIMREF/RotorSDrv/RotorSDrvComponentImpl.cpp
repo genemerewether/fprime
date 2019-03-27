@@ -46,7 +46,7 @@ namespace SIMREF {
   #else
       RotorSDrvImpl(void),
   #endif
-      m_rgNH(NULL),
+      m_rosInited(false),
       m_imuSet(), // zero-initialize instead of default-initializing
       m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
       m_odomSet(), // zero-initialize instead of default-initializing
@@ -92,22 +92,23 @@ namespace SIMREF {
     void RotorSDrvComponentImpl ::
       startPub() {
         ros::NodeHandle n;
-        m_rgNH = &n;
 
         char buf[32];
-        m_motorPub = m_rgNH->advertise<mav_msgs::Actuators>("command/motor_speed", 5);
+        m_motorPub = n.advertise<mav_msgs::Actuators>("command/motor_speed", 5);
 
         for (int i = 0; i < NUM_ODOMLOG_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = m_rgNH->advertise<nav_msgs::Odometry>(buf, 5);
+            m_odomPub[i] = n.advertise<nav_msgs::Odometry>(buf, 5);
         }
+
+        m_rosInited = true;
     }
 
     Os::Task::TaskStatus RotorSDrvComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
-        Os::TaskString name("ROTORSDRV");
+        Os::TaskString name("ROTORSDRVROS");
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, RotorSDrvComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -146,7 +147,7 @@ namespace SIMREF {
         }
 
 
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
 
@@ -160,9 +161,9 @@ namespace SIMREF {
 
         // TODO(mereweth) - convert frame ID
         U32 frame_id = header.getframe_id();
-        msg.header.frame_id = "odom";
+        msg.header.frame_id = "world";
 
-        msg.child_frame_id = "body";
+        msg.child_frame_id = "odom";
 
         ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
         msg.pose.pose.position.x = p.getx();
@@ -191,7 +192,7 @@ namespace SIMREF {
           ROS::mav_msgs::Actuators &actuator
       )
     {
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
 

@@ -1,0 +1,52 @@
+<events>
+    <event id="1" name="ZR_ContextError" severity="WARNING_HI" format_string = "ZmqRadio context error: %s">
+        <comment>
+        ZmqRadio context open error
+        </comment>
+        <args>
+            <arg name = "error" type = "string" size="80"/>
+        </args>
+    </event>
+    <event id="2" name="ZR_SocketError" severity="WARNING_HI" format_string = "ZmqRadio socket error: %s">
+        <comment>
+        ZmqRadio socket error
+        </comment>
+        <args>
+            <arg name = "error" type = "string" size="80"/>
+        </args>
+    </event>
+    <event id="3" name="ZR_BindError" severity="WARNING_HI" format_string = "ZmqRadio bind error: %s">
+        <comment>
+        ZmqRadio bind error
+        </comment>
+        <args>
+            <arg name = "error" type = "string" size="80"/>
+        </args>
+    </event>
+    <event id="5" name="ZR_Disconnection" severity="WARNING_HI" format_string = "ZmqRadio disconnection from server.">
+        <comment>
+	ZmqRadio component disconnected 
+        </comment>
+    </event>
+    <event id="6" name="ZR_Connection" severity="ACTIVITY_HI" format_string = "ZmqRadio connected to server.">
+        <comment>
+	ZmqRadio component connected to server 
+        </comment>
+    </event>
+    <event id="8" name="ZR_SendError" severity="WARNING_HI" format_string = "ZmqRadio send error: %s" throttle="10">
+        <comment>
+        ZmqRadio send error
+        </comment>
+        <args>
+            <arg name = "error" type = "string" size="80"/>
+        </args>
+    </event>
+    <event id="9" name="ZR_ReceiveError" severity="WARNING_HI" format_string = "ZmqRadio receive error: %s" throttle="10">
+        <comment>
+        ZmqRadio receive error
+        </comment>
+        <args>
+            <arg name = "error" type = "string" size="80"/>
+        </args>
+    </event>
+</events>

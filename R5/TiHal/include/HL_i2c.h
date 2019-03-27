@@ -158,6 +158,84 @@ typedef struct i2c_config_reg
 } i2c_config_reg_t;
 
 
+/* Configuration registers initial value for I2C*/
+#define I2C1_OAR_CONFIGVALUE       0x00000000U
+#define I2C1_IMR_CONFIGVALUE       ((uint32)((uint32)0U << 6U) \
+                                 | (uint32)((uint32)0U << 5U) \
+                                 | (uint32)((uint32)0U << 4U) \
+                                 | (uint32)((uint32)0U << 3U) \
+                                 | (uint32)((uint32)0U << 2U) \
+                                 | (uint32)((uint32)0U << 1U) \
+                                 | ((uint32)0U))
+
+#define I2C1_CLKL_CONFIGVALUE      37U
+#define I2C1_CLKH_CONFIGVALUE      37U
+#define I2C1_CNT_CONFIGVALUE       8U
+#define I2C1_SAR_CONFIGVALUE       0x000003FFU
+#define I2C1_MDR_CONFIGVALUE       (0x00000000U \
+                                 | (uint32)((uint32)1U <<11U) \
+                                 | (uint32)((uint32)1U <<10U) \
+                                 | ((uint32)I2C_TRANSMITTER) \
+                                 | ((uint32)I2C_7BIT_AMODE) \
+                                 | (uint32)((uint32)0 << 7U) \
+                                 | ((uint32)0U) \
+                                 | ((uint32)I2C_8_BIT) \
+                                 | (uint32)I2C_RESET_OUT)
+
+#define I2C1_EMDR_CONFIGVALUE      ((uint32)((uint32)0U << 1U) \
+                                |  (uint32)((uint32)0U))
+#define I2C1_PSC_CONFIGVALUE       8U
+#define I2C1_DMAC_CONFIGVALUE      0x00000000U
+#define I2C1_FUN_CONFIGVALUE       0U
+#define I2C1_DIR_CONFIGVALUE       ((uint32)((uint32)1U << 1U) \
+                                 | (uint32)((uint32)1U))
+#define I2C1_ODR_CONFIGVALUE       ((uint32)((uint32)1U << 1U) \
+                                 | (uint32)((uint32)1U))
+#define I2C1_PD_CONFIGVALUE        ((uint32)((uint32)0U << 1U) \
+                                 | (uint32)((uint32)0U))
+#define I2C1_PSL_CONFIGVALUE       ((uint32)((uint32)1U << 1U) \
+                                 | (uint32)((uint32)1U))
+
+
+
+
+/* Configuration registers initial value for I2C*/
+#define I2C2_OAR_CONFIGVALUE       0x00000000U
+#define I2C2_IMR_CONFIGVALUE       ((uint32)((uint32)0U << 6U) \
+                                 | (uint32)((uint32)0U << 5U) \
+                                 | (uint32)((uint32)0U << 4U) \
+                                 | (uint32)((uint32)0U << 3U) \
+                                 | (uint32)((uint32)0U << 2U) \
+                                 | (uint32)((uint32)0U << 1U) \
+                                 | ((uint32)0U))
+
+#define I2C2_CLKL_CONFIGVALUE      37U
+#define I2C2_CLKH_CONFIGVALUE      37U
+#define I2C2_CNT_CONFIGVALUE       8U
+#define I2C2_SAR_CONFIGVALUE       0x000003FFU
+#define I2C2_MDR_CONFIGVALUE       ((uint32)0x00000000U \
+                                 | (uint32)((uint32)1U <<11U) \
+                                 | (uint32)((uint32)1U <<10U) \
+                                 | (uint32)((uint32)I2C_TRANSMITTER) \
+                                 | (uint32)((uint32)I2C_7BIT_AMODE) \
+                                 | (uint32)((uint32)0 << 7U) \
+                                 | (uint32)((uint32)0U) \
+                                 | (uint32)((uint32)I2C_8_BIT) \
+                                 | (uint32)I2C_RESET_OUT)
+
+#define I2C2_EMDR_CONFIGVALUE      ((uint32)((uint32)0U << 1U) \
+                                 | (uint32)((uint32)0U))
+#define I2C2_PSC_CONFIGVALUE       8U
+#define I2C2_DMAC_CONFIGVALUE      0x00000000U
+#define I2C2_FUN_CONFIGVALUE       0U
+#define I2C2_DIR_CONFIGVALUE       ((uint32)((uint32)0U << 1U) \
+                                 | (uint32)((uint32)0U))
+#define I2C2_ODR_CONFIGVALUE       ((uint32)((uint32)0U << 1U) \
+                                 | (uint32)((uint32)0U))
+#define I2C2_PD_CONFIGVALUE        ((uint32)((uint32)0U << 1U) \
+                                 | (uint32)((uint32)0U))
+#define I2C2_PSL_CONFIGVALUE       ((uint32)((uint32)1U << 1U) \
+                                 | (uint32)((uint32)1U))
 
 
 /**
@@ -201,6 +279,8 @@ void i2cSetMode(i2cBASE_t *i2c, uint32 mode);
 void i2cSetDirection(i2cBASE_t *i2c, uint32 dir);
 bool i2cIsMasterReady(i2cBASE_t *i2c);
 bool i2cIsBusBusy(i2cBASE_t *i2c);
+void i2c1GetConfigValue(i2c_config_reg_t *config_reg, config_value_type_t type);
+void i2c2GetConfigValue(i2c_config_reg_t *config_reg, config_value_type_t type);
 
 /** @fn void i2cNotification(i2cBASE_t *i2c, uint32 flags)
 *   @brief Interrupt callback

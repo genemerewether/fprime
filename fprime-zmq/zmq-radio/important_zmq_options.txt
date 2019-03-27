@@ -1,0 +1,46 @@
+ZMQ Socket Options
+ZMQ 3.2.6
+
+ZMQ_RCVTIMEO: Set receive timeout
+ZMQ_SNDTIMEO: Set send timeout
+
+
+
+
+ZMQ_SNDHWM: Set high water mark for outbound messages
+ZMQ_RCVHWM: Set high water mark for inbound messages
+
+"The high water mark is a hard limit on the maximum number of outstanding 
+messages ØMQ shall queue in memory"
+
+
+ZMQ_IDENTITY: Set socket identity
+
+"The ZMQ_IDENTITY option shall set the identity of the specified socket when 
+connecting to a ROUTER socket. The identity should be from 1 to 255 bytes 
+long and MAY NOT start with binary zero."
+
+
+ZMQ_SNDBUF: Set kernel transmit buffer size
+ZMQ_RCVBUF: Set kernel receive buffer size
+
+"Set the underlying kernel transmit/receive buffer size for the socket to the specified 
+size in bytes. A value of zero means leave the OS default unchanged. For details please 
+refer to your operating system documentation for the SO_SNDBUF socket option."
+Socket shutdown linger period
+
+ZMQ_LINGER
+
+"The ZMQ_LINGER option shall set the linger period for the specified socket. The linger period 
+determines how long pending messages which have yet to be sent to a peer shall linger in memory 
+after a socket is closed with zmq_close(3)"
+
+"The default value of -1 specifies an infinite linger period. Pending messages shall not be discarded 
+after a call to zmq_close(); attempting to terminate the socket's context with zmq_term() shall block 
+until all pending messages have been sent to a peer.
+
+The value of 0 specifies no linger period. Pending messages shall be discarded immediately when the 
+socket is closed with zmq_close(). Positive values specify an upper bound for the linger period in 
+milliseconds." 
+
+

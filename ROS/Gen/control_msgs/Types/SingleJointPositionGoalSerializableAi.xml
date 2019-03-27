@@ -1,0 +1,8 @@
+<serializable name="SingleJointPositionGoal" namespace="ROS::control_msgs">
+  <members>
+    <member name="position" type="F64"/>
+    <member name="min_duration" type="Fw::Time"/>
+    <member name="max_velocity" type="F64"/>
+  </members>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

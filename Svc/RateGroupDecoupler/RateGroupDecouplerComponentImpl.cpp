@@ -47,7 +47,8 @@ namespace Svc {
         m_cycleStarted(false),
         m_cycleSlips(0u),
         m_backupCycles(0u),
-        m_droppedCyclesError(droppedCyclesError)
+        m_droppedCyclesError(droppedCyclesError),
+	m_enabled(true)
     {
 
     }
@@ -65,6 +66,12 @@ namespace Svc {
       ~RateGroupDecouplerComponentImpl(void)
     {
 
+    }
+  
+    void RateGroupDecouplerComponentImpl ::
+      setEnabled(volatile bool enabled)
+    {
+        this->m_enabled = enabled;
     }
 
   // ----------------------------------------------------------------------
@@ -98,6 +105,10 @@ namespace Svc {
           Svc::TimerVal &cycleStart
       )
     {
+	if (!this->m_enabled) {
+	    return;
+	}
+      
         TimerVal end;
 
         this->m_cycleStarted = false;

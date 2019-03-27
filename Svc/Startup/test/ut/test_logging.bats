@@ -9,6 +9,9 @@
 @test "missing VERBOSITY var" {
   OLD_VERBOSITY=$VERBOSITY
   unset VERBOSITY
+  unset VERBOSE_LOG
+  unset VERBOSE_PRINT
+
   . ./logging.bash
   [ $VERBOSE_LOG -eq 10 ]
   [ $VERBOSE_PRINT -eq 10 ]
@@ -19,6 +22,9 @@
 @test "missing VERBOSITY file" {
   OLD_VERBOSITY=$VERBOSITY
   VERBOSITY="DOES_NOT_EXIST"
+  unset VERBOSE_LOG
+  unset VERBOSE_PRINT
+
   . ./logging.bash
   [ $VERBOSE_LOG -eq 10 ]
   [ $VERBOSE_PRINT -eq 10 ]

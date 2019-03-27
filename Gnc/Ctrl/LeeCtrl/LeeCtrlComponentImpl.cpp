@@ -23,6 +23,17 @@
 
 #include <stdio.h>
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -81,7 +92,7 @@ namespace Gnc {
     parametersLoaded()
   {
       this->paramsInited = false;
-      Fw::ParamValid valid[12];
+      Fw::ParamValid valid[13];
       int stat;
 
       quest_gnc::multirotor::MultirotorModel mrModel = {paramGet_mass(valid[0]),
@@ -121,6 +132,28 @@ namespace Gnc {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
       }
 
+      stat = leeControl.SetSaturation(Eigen::Vector3d(paramGet_sat_x__x(valid[0]),
+                                                      paramGet_sat_x__y(valid[1]),
+                                                      paramGet_sat_x__z(valid[2])),
+                                      Eigen::Vector3d(paramGet_sat_v__x(valid[3]),
+                                                      paramGet_sat_v__y(valid[4]),
+                                                      paramGet_sat_v__z(valid[5])),
+                                      Eigen::Vector3d(paramGet_sat_R__x(valid[6]),
+                                                      paramGet_sat_R__y(valid[7]),
+                                                      paramGet_sat_R__z(valid[8])),
+                                      Eigen::Vector3d(paramGet_sat_omega__x(valid[9]),
+                                                      paramGet_sat_omega__y(valid[10]),
+                                                      paramGet_sat_omega__z(valid[11])),
+                                      paramGet_sat_yaw(valid[12]));
+      if (stat) {  return;  }
+
+      for (U32 i = 0; i < 13; i++) {
+          if ((Fw::PARAM_VALID != valid[i]) &&
+              (Fw::PARAM_DEFAULT != valid[i])) {
+              return;
+          }
+      }
+
       this->paramsInited = true;
   }
 
@@ -148,8 +181,7 @@ namespace Gnc {
         const U32 cmdSeq,
         CtrlMode mode
     )
-  {
-      // TODO(Mereweth) - bounds on discontinuity in commanded thrust/moment
+  {      
       if (!paramsInited &&
           mode != CTRL_DISABLED) {
           this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
@@ -309,7 +341,9 @@ namespace Gnc {
                                                               this->a_w__des.getz()));
           }
 
-          this->leeControl.SetYawDes(this->yaw__des);
+          if (this->leeControl.SetYawDes(this->yaw__des)) {
+              DEBUG_PRINT("Failed setting yaw to %f\n", this->yaw__des);
+          }
 
           // set position feedback
           this->leeControl.SetPositionLinVel(Eigen::Vector3d(this->x_w.getx(),
@@ -333,7 +367,26 @@ namespace Gnc {
 
           Eigen::Vector3d thrust_b__comm;
 
-          if (ATT_RATE_THRUST == this->ctrlMode) {
+          if ((ATT_ATTRATE_THRUST == this->ctrlMode) ||
+              (RPRATE_YAW_THRUST == this->ctrlMode) ||
+              (RP_YAWRATE_THRUST == this->ctrlMode) ||
+              (ATTRATE_THRUST == this->ctrlMode)) {
+
+              bool rpVelOnly = false;
+              bool yawVelOnly = false;
+
+              if (RPRATE_YAW_THRUST == this->ctrlMode) {
+                  rpVelOnly = true;
+              }
+              if (RP_YAWRATE_THRUST == this->ctrlMode) {
+                  yawVelOnly = true;
+              }
+              
+              if (ATTRATE_THRUST == this->ctrlMode) {
+                  rpVelOnly = true;
+                  yawVelOnly = true;
+              }
+            
               Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
                                                                   this->w_q_b__des.getx(),
                                                                   this->w_q_b__des.gety(),
@@ -342,7 +395,8 @@ namespace Gnc {
                                               Eigen::Vector3d(
                                                   this->omega_b__des.getx(),
                                                   this->omega_b__des.gety(),
-                                                  this->omega_b__des.getz()));
+                                                  this->omega_b__des.getz()),
+                                              rpVelOnly, yawVelOnly);
               thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
                                                this->thrust_b__des.gety(),
                                                this->thrust_b__des.getz());
@@ -369,7 +423,18 @@ namespace Gnc {
           }
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
-          this->leeControl.GetAngAccelCommand(&alpha_b__comm);
+          if (RPRATE_YAW_THRUST == this->ctrlMode) {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, false);
+          }
+          else if (RP_YAWRATE_THRUST == this->ctrlMode) {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, false, true);
+          }
+          else if (ATTRATE_THRUST == this->ctrlMode) {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, true);
+          }
+          else {
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm);
+          }
 
           Eigen::Vector3d moment_b__comm = this->J_b * alpha_b__comm;
 

@@ -342,7 +342,7 @@ void constructApp(int port_number, char* hostname) {
     pingRcvr.start(ACTIVE_COMP_PING_RECEIVER, 100, 10*1024);
 
     // Initialize socket server
-    sockGndIf.startSocketTask(100, port_number, hostname);
+    sockGndIf.startSocketTask(100, 20*1024, port_number, hostname);
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();

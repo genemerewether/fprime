@@ -1,0 +1,9 @@
+<serializable name="SingleJointPositionFeedback" namespace="ROS::control_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="position" type="F64"/>
+    <member name="velocity" type="F64"/>
+    <member name="error" type="F64"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+</serializable>

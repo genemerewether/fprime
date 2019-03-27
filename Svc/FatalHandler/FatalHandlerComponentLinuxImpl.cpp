@@ -31,6 +31,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include <Os/Task.hpp>
+
 namespace Svc
 {
 

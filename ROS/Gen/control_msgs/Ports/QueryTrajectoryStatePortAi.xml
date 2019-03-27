@@ -1,0 +1,8 @@
+<interface name="QueryTrajectoryState" namespace="ROS::control_msgs">
+  <args>
+    <arg name="QueryTrajectoryStateRequest" pass_by="reference" type="ROS::control_msgs::QueryTrajectoryStateRequest"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/QueryTrajectoryStateInSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/QueryTrajectoryStateOutSerializableAi.xml</import_serializable_type>
+  <return name="QueryTrajectoryStateResponse" pass_by="reference" type="ROS::control_msgs::QueryTrajectoryStateResponse"/>
+</interface>

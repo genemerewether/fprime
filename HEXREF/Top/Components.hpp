@@ -28,7 +28,7 @@ void exitTasks(void);
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
-#include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
+#include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
 #include <LLProc/LLCmdDispatcher/LLCmdDispatcherComponentImpl.hpp>
@@ -52,7 +52,7 @@ extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
 extern Gnc::BasicMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 extern Gnc::SigGenComponentImpl* sigGen_ptr;
-extern Gnc::ImuIntegComponentImpl* imuInteg_ptr;
+extern Gnc::AttFilterComponentImpl* attFilter_ptr;
 extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
 extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;

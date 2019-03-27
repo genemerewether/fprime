@@ -48,6 +48,10 @@ namespace Fw {
     	FW_ASSERT(status == Os::Task::TASK_OK,(NATIVE_INT_TYPE)status);
     }
 
+    Os::Task::TaskStatus ActiveComponentBase::join(void **value_ptr) {
+        return this->m_task.join(value_ptr);
+    }
+  
     void ActiveComponentBase::s_baseTask(void* ptr) {
         // cast void* back to active component
         ActiveComponentBase* comp = static_cast<ActiveComponentBase*> (ptr);

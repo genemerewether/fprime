@@ -1,0 +1,10 @@
+<serializable name="GripperCommandActionFeedback" namespace="ROS::control_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="status" type="ROS::actionlib_msgs::GoalStatus"/>
+    <member name="feedback" type="GripperCommandFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/actionlib_msgs/Types/GoalStatusSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/GripperCommandFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

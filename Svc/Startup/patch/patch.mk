@@ -58,16 +58,17 @@ edmrofsw:
 start:
 	adb shell service startup start
 
-screen: 
+screen:
 	adb shell 'kill -CHLD `pgrep screen`'
 
 stop: screen
 	adb shell service startup stop
-	adb shell "screen -S RUN_ONCE -X stuff $\'\003\'"
+	adb shell "screen -S RUN_ONCE -X stuff "
+	adb shell "screen -S CURRENT -X stuff "
+	adb shell "screen -S GOLDEN -X stuff "
+	adb shell "sleep 10"
 	adb shell "screen -S RUN_ONCE -X quit"
-	adb shell "screen -S CURRENT -X stuff $\'\003\'"
 	adb shell "screen -S CURRENT -X quit"
-	adb shell "screen -S GOLDEN -X stuff $\'\003\'"
 	adb shell "screen -S GOLDEN -X quit"
 	adb shell 'for i in {0..3}; do echo performance > /sys/devices/system/cpu/cpu$${i}/cpufreq/scaling_governor; done'
 	adb shell "chronyc -m \"password 1234\" makestep"
@@ -79,6 +80,9 @@ power:
 	adb shell 'for i in {0..3}; do echo performance > /sys/devices/system/cpu/cpu$${i}/cpufreq/scaling_governor; done'
 
 restart: stop start
+
+date:
+	$(STARTUP_DIR)/patch/adb_set_date.sh
 
 # Create directory for new FSW version
 mkver:
@@ -112,8 +116,14 @@ setcur: check-env
 	$(STARTUP_DIR)/patch/setup_folder.bash -d $(DEPLOYMENT) -f $(FULLVER) -t setcur
 
 # Only load a new FSW version
-release: mkver $(__DEFAULT_BUILD) gseload
+release: mkver $(__DEFAULT_BUILD)
+
+ifdef NOLOAD
+	$(STARTUP_DIR)/patch/setup_folder.bash -i ./$(__DEFAULT_BUILD_OUT) -d $(DEPLOYMENT) -f $(FULLVER) -t load -n
+else
 	$(STARTUP_DIR)/patch/setup_folder.bash -i ./$(__DEFAULT_BUILD_OUT) -d $(DEPLOYMENT) -f $(FULLVER) -t load
+endif
+
 ifneq ($(FSW_RUN_SCRIPT),)
 	adb push $(FSW_RUN_SCRIPT) $(FULLVER)/$(FSW_RUN_SCRIPT)
 endif
@@ -123,6 +133,8 @@ endif
 ifneq ($(PACKET_XML),)
 	adb push $(PACKET_XML) $(FULLVER)/$(PACKET_XML_FILENAME)
 endif
+
+	adb shell sync
 
 load: $(__DEFAULT_BUILD)
 	adb shell mkdir -p /eng/load
@@ -140,6 +152,8 @@ ifneq ($(FSW_RUN_SCRIPT_AUX),)
 	adb push $(FSW_RUN_SCRIPT_AUX) /eng/load/$(FSW_RUN_SCRIPT_AUX)
 endif
 
+	adb shell sync
+
 # Load new FSW version and update appropriate symlink
 once: release
 	$(STARTUP_DIR)/patch/setup_folder.bash -d $(DEPLOYMENT) -f $(FULLVER) -t setonce
@@ -148,7 +162,7 @@ cur: release
 	$(STARTUP_DIR)/patch/setup_folder.bash -d $(DEPLOYMENT) -f $(FULLVER) -t setcur
 
 # Load the golden FSW version
-gold: $(__DEFAULT_BUILD) gsegold
+gold: $(__DEFAULT_BUILD)
 	$(STARTUP_DIR)/patch/setup_folder.bash -i ./$(__DEFAULT_BUILD_OUT) -d $(DEPLOYMENT) -t gold
 
 ifneq ($(FSW_RUN_SCRIPT),)
@@ -161,7 +175,9 @@ ifneq ($(PACKET_XML),)
 	adb push $(PACKET_XML) /golden/$(PACKET_XML_FILENAME)
 endif
 
-rebuild_$(DEPLOYMENT):
+	adb shell sync
+
+rebuild_$(DEPLOYMENT): check_platform
 	make gen_make $(__DEFAULT_BUILD)_clean $(__DEFAULT_BUILD) dict_install
 
 .PHONY: rwfsw ecmrwfsw rofsw ecmrofsw cur once gold rebuild_$(DEPLOYMENT) setcur setonce check-env mkver gsetar gseload gsegold stop screen start restart power makestep

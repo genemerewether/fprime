@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>zmqRadio:ZmqRadio Component Dictionary</title>
+</head>
+<body>
+
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+}
+th {
+    text-align: left;
+}
+html {
+    font-family: Arial, sans-serif ;
+    font-size: 90% ;
+}
+</style>
+
+<h1><b>Events: zmqRadio:ZmqRadio</b></h1>
+
+<table>
+	<thead>
+		<tr style = "border-right: 2px solid black; border-left: 2px solid black; border-top: 2px solid black;">
+			<th rowspan = "2">Event Name</th>
+			<th rowspan = "2">ID</th>
+			<th rowspan = "2">Description</th>
+			<th rowspan = "1" colspan = "4">Arguments</th>
+		</tr>
+		<tr style = "border-right: 2px solid black; ">
+			<th>Argument</th>
+			<th>Type</th>
+			<th>Size</th>
+			<th>Description</th>
+		<tr>
+	</thead>
+	<tbody>
+	
+		<tr style = "border: 2px solid black;">
+			<td rowspan="2">ZR_ContextError</td>
+			<td rowspan="2">382 (0x17e)</td>
+			<td rowspan="2">ZmqRadio context open error</td>
+					<tr style = "border-right: 2px solid black;border-top: 2px solid black;border-bottom: 2px solid black;">					
+						<td>error</td>
+						<td>Fw::LogStringArg&</td>
+						<td>80</td>
+						<td></td>
+					</tr>
+		</tr>
+		<tr style = "border: 2px solid black;">
+			<td rowspan="2">ZR_SocketError</td>
+			<td rowspan="2">383 (0x17f)</td>
+			<td rowspan="2">ZmqRadio socket error</td>
+					<tr style = "border-right: 2px solid black;border-top: 2px solid black;border-bottom: 2px solid black;">					
+						<td>error</td>
+						<td>Fw::LogStringArg&</td>
+						<td>80</td>
+						<td></td>
+					</tr>
+		</tr>
+		<tr style = "border: 2px solid black;">
+			<td rowspan="2">ZR_BindError</td>
+			<td rowspan="2">384 (0x180)</td>
+			<td rowspan="2">ZmqRadio bind error</td>
+					<tr style = "border-right: 2px solid black;border-top: 2px solid black;border-bottom: 2px solid black;">					
+						<td>error</td>
+						<td>Fw::LogStringArg&</td>
+						<td>80</td>
+						<td></td>
+					</tr>
+		</tr>
+		<tr style = "border: 2px solid black;">
+			<td rowspan="1">ZR_Disconnection</td>
+			<td rowspan="1">386 (0x182)</td>
+			<td rowspan="1">ZmqRadio component disconnected</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+		</tr>
+		<tr style = "border: 2px solid black;">
+			<td rowspan="1">ZR_Connection</td>
+			<td rowspan="1">387 (0x183)</td>
+			<td rowspan="1">ZmqRadio component connected to server</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+		</tr>
+		<tr style = "border: 2px solid black;">
+			<td rowspan="2">ZR_SendError</td>
+			<td rowspan="2">389 (0x185)</td>
+			<td rowspan="2">ZmqRadio send error</td>
+					<tr style = "border-right: 2px solid black;border-top: 2px solid black;border-bottom: 2px solid black;">					
+						<td>error</td>
+						<td>Fw::LogStringArg&</td>
+						<td>80</td>
+						<td></td>
+					</tr>
+		</tr>
+		<tr style = "border: 2px solid black;">
+			<td rowspan="2">ZR_ReceiveError</td>
+			<td rowspan="2">390 (0x186)</td>
+			<td rowspan="2">ZmqRadio receive error</td>
+					<tr style = "border-right: 2px solid black;border-top: 2px solid black;border-bottom: 2px solid black;">					
+						<td>error</td>
+						<td>Fw::LogStringArg&</td>
+						<td>80</td>
+						<td></td>
+					</tr>
+		</tr>
+	</tbody>
+</table> 
+
+</body>
+</html>

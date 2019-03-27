@@ -54,6 +54,8 @@ namespace Svc {
       //!
       ~RateGroupDecouplerComponentImpl(void);
 
+      void setEnabled(volatile bool enabled);
+
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -91,6 +93,7 @@ namespace Svc {
       U32 m_cycleSlips; //!< tracks number of cycle slips
       volatile U32 m_backupCycles; //!< tracks number of missing regular cycles
       U32 m_droppedCyclesError; //!< Number of missing regular cycles before error
+      volatile bool m_enabled; //!< whether to pass along regular cycles
   };
 
 } // end namespace Svc

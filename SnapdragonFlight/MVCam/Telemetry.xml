@@ -1,0 +1,46 @@
+    <telemetry>
+        <channel id="0" name="MVCAM_ImagesAcquired" data_type="U32">
+            <comment>
+            Number of images acquired
+            </comment>
+        </channel>
+        <channel id="1" name="MVCAM_Exposure" data_type="U32" update="on_change">
+            <comment>
+            Exposure time setting
+            </comment>
+        </channel>
+        <channel id="2" name="MVCAM_Gain" data_type="U32" update="on_change">
+            <comment>
+            Gain setting
+            </comment>
+        </channel>
+        <channel id="3" name="MVCAM_ExposureCalc" data_type="F32" update="on_change">
+            <comment>
+            Calculated exposure time setting (before int cast)
+            </comment>
+        </channel>
+        <channel id="4" name="MVCAM_GainCalc" data_type="F32" update="on_change">
+            <comment>
+            Calculated gain setting (before int cast)
+            </comment>
+        </channel>
+        <channel id="5" name="MVCAM_ImageRate" data_type="U32" update="on_change" format_string="%dFPS">
+            <comment>
+            Number of frames per second
+            </comment>
+        </channel>
+        <channel id="6" name="MVCAM_ImageTimeoutLeft" data_type="U32" update="on_change" format_string="%ds">
+            <comment>
+            Number of seconds remaining on image timeout
+            </comment>
+        </channel>
+        <channel id="7" name="MVCAM_NumNoHPBuffers" data_type="U32" update="on_change">
+        </channel>
+        <channel id="8" name="MVCAM_NumNoLPBuffers" data_type="U32" update="on_change">
+        </channel>
+        <channel id="9" name="MVCAM_NumLoRate" data_type="U32" update="on_change">
+        </channel>
+        <channel id="10" name="MVCAM_NumGncBufferReturnQueueErrs" data_type="U32"/>
+        <channel id="11" name="MVCAM_NumMaxExpDelta" data_type="U32" update="on_change">
+        </channel>
+    </telemetry>

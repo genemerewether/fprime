@@ -1,0 +1,6 @@
+<interface name="JointTolerance" namespace="ROS::control_msgs">
+  <args>
+    <arg name="JointTolerance" pass_by="reference" type="ROS::control_msgs::JointTolerance"/>
+  </args>
+  <import_serializable_type>ROS/Gen/control_msgs/Types/JointToleranceSerializableAi.xml</import_serializable_type>
+</interface>

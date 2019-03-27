@@ -25,9 +25,14 @@
 #include <Svc/ActiveFileLogger/ActiveFileLoggerPacket.hpp>
 #include <Svc/ActiveFileLogger/ActiveFileLoggerStreams.hpp>
 
+#include <Os/File.hpp>
+
+#include <math.h>
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/fill_image.h> 
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -47,11 +52,12 @@ namespace HLProc {
 #else
     HLRosIfaceImpl(void),
 #endif
-    m_rgNH(NULL),
+    m_rosInited(false),
     m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
     m_actuatorsSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
-    m_attRateThrustSet() // zero-initialize instead of default-initializing
+    m_attRateThrustSet(), // zero-initialize instead of default-initializing
+    m_lastLLImuTime()
   {
       for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
           m_imuStateUpdateSet[i].fresh = false;
@@ -87,19 +93,24 @@ namespace HLProc {
 
     void HLRosIfaceComponentImpl ::
       startPub() {
+        // TODO(mereweth) - prevent calling twice; free imageXport
         ros::NodeHandle n;
-        m_rgNH = &n;
+	m_imageXport = new image_transport::ImageTransport(n);
 
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = m_rgNH->advertise<sensor_msgs::Imu>(buf, 1000);
+            m_imuPub[i] = n.advertise<sensor_msgs::Imu>(buf, 1000);
         }
 
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = m_rgNH->advertise<nav_msgs::Odometry>(buf, 5);
+            m_odomPub[i] = n.advertise<nav_msgs::Odometry>(buf, 5);
         }
+
+	m_imagePub = m_imageXport->advertise("image_raw", 1);
+
+        m_rosInited = true;
     }
 
     Os::Task::TaskStatus HLRosIfaceComponentImpl ::
@@ -126,6 +137,12 @@ namespace HLProc {
           ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
+
+        ROS::std_msgs::Header header = Imu.getheader();
+        // TODO(mereweth) - time-translate from DSP & use message there
+        Fw::Time stamp = header.getstamp();
+        m_lastLLImuTime = stamp;
+
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -143,16 +160,48 @@ namespace HLProc {
             this->FileLogger_out(0,fileBuff);
         }
         
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
       
         sensor_msgs::Imu msg;
 
-        ROS::std_msgs::Header header = Imu.getheader();
-        // TODO(mereweth) - time-translate from DSP & use message there
-        Fw::Time stamp = header.getstamp();
-        msg.header.stamp = ros::Time::now();
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (-walltimeDspLeadUs > usecDsp) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
+                   walltimeDspLeadUs, usecDsp);
+            return;
+        }
+        I64 usecRos = usecDsp + walltimeDspLeadUs;
+        msg.header.stamp.sec = (U32) (usecRos / 1000LL / 1000LL);
+        msg.header.stamp.nsec = (usecRos % (1000LL * 1000LL)) * 1000LU;
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
 
         msg.header.seq = header.getseq();
 
@@ -267,16 +316,51 @@ namespace HLProc {
             this->FileLogger_out(0,fileBuff);
         }
         
-        if (NULL == m_rgNH) {
+        if (!m_rosInited) {
             return;
         }
         
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
-        // TODO(mereweth) - time-translate from DSP & use message there
         Fw::Time stamp = header.getstamp();
-        msg.header.stamp = ros::Time::now();
+
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (-walltimeDspLeadUs > usecDsp) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
+                   walltimeDspLeadUs, usecDsp);
+            return;
+        }
+        I64 usecRos = usecDsp + walltimeDspLeadUs;
+        msg.header.stamp.sec = (U32) (usecRos / 1000LL / 1000LL);
+        msg.header.stamp.nsec = (usecRos % (1000LL * 1000LL)) * 1000LU;
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
 
         msg.header.seq = header.getseq();
 
@@ -340,6 +424,33 @@ namespace HLProc {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
     }
+  
+    void HLRosIfaceComponentImpl ::
+      ImageRecv_handler(
+	  const NATIVE_INT_TYPE portNum,
+	  ROS::sensor_msgs::Image &Image
+      )
+    {
+        sensor_msgs::Image msg;
+	const U8* ptr = (const U8*) Image.getdata().getdata();
+	sensor_msgs::fillImage(
+	    msg,
+	    sensor_msgs::image_encodings::MONO8,
+	    Image.getheight(),
+            Image.getwidth(),
+	    Image.getstep(),
+	    ptr
+	);
+	msg.header.frame_id = "dfc";
+	msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
+	msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
+	msg.is_bigendian = 0;
+	m_imagePub.publish(msg);
+
+	Fw::Buffer temp = Image.getdata();
+        this->ImageForward_out(0, temp);
+    }
+  
 
     // ----------------------------------------------------------------------
     // Member function definitions
@@ -422,6 +533,12 @@ namespace HLProc {
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
+
+	    if (!std::isfinite(msg->header.stamp.sec) ||
+		!std::isfinite(msg->header.stamp.nsec)) {
+  	        //TODO(mereweth) - EVR
+	        return;
+	    }
             Header head(msg->header.seq,
                         Fw::Time(TB_ROS_TIME, 0,
                                  msg->header.stamp.sec,
@@ -436,14 +553,32 @@ namespace HLProc {
              * ROS value or the min of that and the allocated size
              */
             size = msg->angles.size();
+	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+	        if (!std::isfinite(msg->angles[i])) {
+  	            //TODO(mereweth) - EVR
+		    return;
+		}
+	    }
             actuators.setangles(msg->angles.data(), size);
             actuators.setangles_count(msg->angles.size());
             
             size = msg->angular_velocities.size();
+	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+	        if (!std::isfinite(msg->angular_velocities[i])) {
+  	            //TODO(mereweth) - EVR
+		    return;
+		}
+	    }
             actuators.setangular_velocities(msg->angular_velocities.data(), size);
             actuators.setangular_velocities_count(msg->angular_velocities.size());
 
             size = msg->normalized.size();
+	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+	        if (!std::isfinite(msg->normalized[i])) {
+  	            //TODO(mereweth) - EVR
+		    return;
+		}
+	    }
             actuators.setnormalized(msg->normalized.data(), size);
             actuators.setnormalized_count(msg->normalized.size());
 
@@ -486,15 +621,88 @@ namespace HLProc {
 
         DEBUG_PRINT("imuStateUpdate port handler %d\n", this->portNum);
 
+	if (!std::isfinite(msg->header.stamp.sec) ||
+	    !std::isfinite(msg->header.stamp.nsec)) {
+	    //TODO(mereweth) - EVR
+	    return;
+	}
+	    
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
+                      + (I64) msg->header.stamp.nsec / 1000LL;
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (walltimeDspLeadUs > usecRos) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld greater than message time %lu\n",
+                   walltimeDspLeadUs, usecRos);
+            return;
+        }
+        I64 usecDsp = usecRos - walltimeDspLeadUs;
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (usecDsp / 1000 / 1000),
+                          (U32) (usecDsp % (1000 * 1000)));
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
+
+	if (!std::isfinite(msg->pose.pose.position.x) ||
+	    !std::isfinite(msg->pose.pose.position.y) ||
+	    !std::isfinite(msg->pose.pose.position.z) ||
+	    
+	    !std::isfinite(msg->pose.pose.orientation.x) ||
+            !std::isfinite(msg->pose.pose.orientation.y) ||
+	    !std::isfinite(msg->pose.pose.orientation.z) ||
+	    !std::isfinite(msg->pose.pose.orientation.w) ||
+	    
+            !std::isfinite(msg->twist.twist.linear.x) ||
+	    !std::isfinite(msg->twist.twist.linear.y) ||
+	    !std::isfinite(msg->twist.twist.linear.z) ||
+	    
+	    !std::isfinite(msg->twist.twist.angular.x) ||
+	    !std::isfinite(msg->twist.twist.angular.y) ||
+	    !std::isfinite(msg->twist.twist.angular.z) ||
+	    
+	    !std::isfinite(msg->angular_velocity_bias.x) ||
+	    !std::isfinite(msg->angular_velocity_bias.y) ||
+	    !std::isfinite(msg->angular_velocity_bias.z) ||
+	    
+	    !std::isfinite(msg->linear_acceleration_bias.x) ||
+	    !std::isfinite(msg->linear_acceleration_bias.y) ||
+	    !std::isfinite(msg->linear_acceleration_bias.z)) {
+	  //TODO(mereweth) - EVR
+	  return;
+	}
+	
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
+
             ImuStateUpdateNoCov imuStateUpdate(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
@@ -520,12 +728,17 @@ namespace HLProc {
             ); // end ImuStateUpdate constructor
 
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
-            if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
-                this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
-                DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+            if (convTime > this->compPtr->m_lastLLImuTime) {
+                // TODO(mereweth) - EVR; can't have state update newer than last IMU
             }
-            this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
-            this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+            else {
+                if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
+                    this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
+                    DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+                }
+                this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
+                this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+            }
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
         }
     }
@@ -554,6 +767,29 @@ namespace HLProc {
 
         DEBUG_PRINT("Flat output port handler %d\n", this->portNum);
 
+	if (!std::isfinite(msg->header.stamp.sec) ||
+	    !std::isfinite(msg->header.stamp.nsec)) {
+	    //TODO(mereweth) - EVR
+	    return;
+	}
+	
+	if (!std::isfinite(msg->position.x) ||
+	    !std::isfinite(msg->position.y) ||
+	    !std::isfinite(msg->position.z) ||
+	    
+	    !std::isfinite(msg->velocity.x) ||
+            !std::isfinite(msg->velocity.y) ||
+	    !std::isfinite(msg->velocity.z) ||
+	    
+            !std::isfinite(msg->acceleration.x) ||
+	    !std::isfinite(msg->acceleration.y) ||
+	    !std::isfinite(msg->acceleration.z) ||
+	    
+	    !std::isfinite(msg->yaw)) {
+	  //TODO(mereweth) - EVR
+	  return;
+	}
+	
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
@@ -608,6 +844,28 @@ namespace HLProc {
 
         DEBUG_PRINT("Attitude rate thrust output port handler %d\n", this->portNum);
 
+	if (!std::isfinite(msg->header.stamp.sec) ||
+	    !std::isfinite(msg->header.stamp.nsec)) {
+	    //TODO(mereweth) - EVR
+	    return;
+	}
+
+	if (!std::isfinite(msg->attitude.x) ||
+	    !std::isfinite(msg->attitude.y) ||
+	    !std::isfinite(msg->attitude.z) ||
+	    !std::isfinite(msg->attitude.w) ||
+	    
+	    !std::isfinite(msg->angular_rates.x) ||
+            !std::isfinite(msg->angular_rates.y) ||
+	    !std::isfinite(msg->angular_rates.z) ||
+	    
+            !std::isfinite(msg->thrust.x) ||
+	    !std::isfinite(msg->thrust.y) ||
+	    !std::isfinite(msg->thrust.z)) {
+	  //TODO(mereweth) - EVR
+	  return;
+	}
+	
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;

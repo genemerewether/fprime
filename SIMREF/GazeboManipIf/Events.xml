@@ -1,0 +1,7 @@
+<events>
+    <event id="0" name="GZMANIPIF_IntTaskStarted" severity="ACTIVITY_LO" format_string = "GazeboManipIf subscriber task started" >
+        <comment>
+            ROS message subscriber task started
+        </comment>
+    </event>
+</events>

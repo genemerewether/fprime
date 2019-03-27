@@ -1,0 +1,13 @@
+<serializable name="PointHeadGoal" namespace="ROS::control_msgs">
+  <members>
+    <member name="target" type="ROS::geometry_msgs::PointStamped"/>
+    <member name="pointing_axis" type="ROS::geometry_msgs::Vector3"/>
+    <member name="pointing_frame" type="Fw::EightyCharString"/>
+    <member name="min_duration" type="Fw::Time"/>
+    <member name="max_velocity" type="F64"/>
+  </members>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointStampedSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
+  <include_header>Fw/Time/Time.hpp</include_header>
+</serializable>

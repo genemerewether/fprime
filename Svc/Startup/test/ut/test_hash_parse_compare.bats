@@ -2,6 +2,9 @@
 
 . ./hash_validation.bash
 
+# NOTE(mereweth) - not in settings.bash so we can run tests in test_logging.bats
+VERBOSITY=${LOCAL_DIR}/seq/verbosity.bash
+
 ############################# get_crc32_from_cksum #############################
 @test "parse cksum output" {
   get_crc32_from_cksum dest_var 1714674347 518 settings.bash

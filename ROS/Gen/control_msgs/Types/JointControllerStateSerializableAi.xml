@@ -1,0 +1,17 @@
+<serializable name="JointControllerState" namespace="ROS::control_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="set_point" type="F64"/>
+    <member name="process_value" type="F64"/>
+    <member name="process_value_dot" type="F64"/>
+    <member name="error" type="F64"/>
+    <member name="time_step" type="F64"/>
+    <member name="command" type="F64"/>
+    <member name="p" type="F64"/>
+    <member name="i" type="F64"/>
+    <member name="d" type="F64"/>
+    <member name="i_clamp" type="F64"/>
+    <member name="antiwindup" type="U8"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+</serializable>

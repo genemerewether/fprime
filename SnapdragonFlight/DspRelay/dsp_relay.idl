@@ -1,0 +1,58 @@
+// ======================================================================
+// \title  dsp_relay.idl
+// \author tcanham
+// \brief  interface def for dsp_relay
+//
+// \copyright
+// Copyright 2009-2015, by the California Institute of Technology.
+// ALL RIGHTS RESERVED.  United States Government Sponsorship
+// acknowledged. Any commercial use must be negotiated with the Office
+// of Technology Transfer at the California Institute of Technology.
+//
+// This software may be subject to U.S. export control laws and
+// regulations.  By accepting this document, the user agrees to comply
+// with all U.S. export laws and regulations.  User has the
+// responsibility to obtain export licenses, or other export authority
+// as may be required before exporting such information to foreign
+// countries or providing access to foreign persons.
+// ======================================================================
+
+#include "AEEStdDef.idl"
+
+interface dsp_relay
+{
+
+   long test();
+
+    // GPIO interfaces
+
+   long gpio_relay_open(in long gpio);
+   long gpio_relay_close(in long fd);
+   long gpio_relay_configure(in long fd, in long type);
+   long gpio_relay_write(in long fd, in long value);
+   long gpio_relay_read(in long fd);
+   long gpio_relay_start_int(in long gpio, in long fd);
+   long gpio_relay_isr_wait(in long gpio, in long fd);
+   long gpio_relay_quit(in long gpio);
+   
+   // UART interfaces
+   
+   typedef sequence<octet, 1024> dataBuffer;
+   
+   long uart_relay_open(in long device);
+   long uart_relay_configure(in long fd, in long device, in long baud, in long parity, in long bits, in long stop_bits, in long flow_control, in long block);
+   long uart_relay_read(in long device, rout dataBuffer buff, rout long bytes);
+   long uart_relay_write(in long fd, in long device, in dataBuffer buff);
+   long uart_relay_close(in long fd, in long device);
+   long uart_relay_quit(in long device);
+   long uart_receive_allocate(in long device, in long size);
+   
+   // SPI interfaces
+   
+   long spi_relay_open(in long device);
+   long spi_relay_configure(in long fd, in long clock);
+   long spi_relay_read_write(in long fd, in dataBuffer write_data, rout dataBuffer read_data);
+   long spi_relay_close(in long fd);
+   
+};
+

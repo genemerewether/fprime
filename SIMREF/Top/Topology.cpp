@@ -32,7 +32,7 @@ static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     0, // chanTlm
     0, // rosCycle
     SIMREF::RSDRV_SCHED_CONTEXT_TLM, // rotorSDrv
-    Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
+    Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
     0, // mixer
@@ -63,7 +63,7 @@ Svc::RateGroupDriverImpl rgGncDrv(
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_ATT,
-    Gnc::IMUINTEG_SCHED_CONTEXT_ATT,
+    Gnc::ATTFILTER_SCHED_CONTEXT_ATT,
     Gnc::SIGGEN_SCHED_CONTEXT_ATT,
     Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
@@ -77,7 +77,7 @@ Svc::PassiveRateGroupImpl rgAtt(
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_POS,
-    Gnc::IMUINTEG_SCHED_CONTEXT_POS,
+    Gnc::ATTFILTER_SCHED_CONTEXT_POS,
     Gnc::SIGGEN_SCHED_CONTEXT_POS,
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
@@ -92,6 +92,12 @@ Svc::PassiveRateGroupImpl rgPos(
 Svc::SocketGndIfImpl sockGndIf
 #if FW_OBJECT_NAMES == 1
                     ("SGIF")
+#endif
+;
+
+Svc::UdpReceiverComponentImpl udpReceiver
+#if FW_OBJECT_NAMES == 1
+                        ("UDPRECV")
 #endif
 ;
 
@@ -136,6 +142,12 @@ SIMREF::RotorSDrvComponentImpl rotorSDrv
 #endif
 ;
 
+SIMREF::GazeboManipIfComponentImpl gzManipIf
+#if FW_OBJECT_NAMES == 1
+                    ("GZMANIPIF")
+#endif
+;
+
 Gnc::LeeCtrlComponentImpl leeCtrl
 #if FW_OBJECT_NAMES == 1
                     ("LEECTRL")
@@ -148,9 +160,9 @@ Gnc::BasicMixerComponentImpl mixer
 #endif
 ;
 
-Gnc::ImuIntegComponentImpl imuInteg
+Gnc::AttFilterComponentImpl attFilter
 #if FW_OBJECT_NAMES == 1
-                    ("IMUINTEG")
+                    ("ATTFILTER")
 #endif
 ;
 
@@ -214,7 +226,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void constructApp(int port_number, char* hostname) {
+void constructApp(int port_number, char* udp_string, char* hostname) {
 
     localTargetInit();
 
@@ -234,7 +246,7 @@ void constructApp(int port_number, char* hostname) {
     // Initialize the GNC components
     leeCtrl.init(0);
     mixer.init(0);
-    imuInteg.init(0);
+    attFilter.init(0);
     sigGen.init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
@@ -247,6 +259,7 @@ void constructApp(int port_number, char* hostname) {
     rosCycle.init(0);
 
     rotorSDrv.init(0);
+    gzManipIf.init(0);
 
     linuxTime.init(0);
 
@@ -263,9 +276,12 @@ void constructApp(int port_number, char* hostname) {
 
     fatalAdapter.init(0);
     fatalHandler.init(0);
+    udpReceiver.init(0);
 
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
+    
+    udpReceiver.set_PortsOut_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
 
     /* Register commands */
     cmdSeq.regCommands();
@@ -276,9 +292,11 @@ void constructApp(int port_number, char* hostname) {
     fatalHandler.regCommands();
 
     leeCtrl.regCommands();
-    imuInteg.regCommands();
+    attFilter.regCommands();
     mixer.regCommands();
     sigGen.regCommands();
+
+    gzManipIf.regCommands();
 
     // initialize file logs
     fileLogger.initLog("./log/");
@@ -286,7 +304,7 @@ void constructApp(int port_number, char* hostname) {
     // read parameters
     prmDb.readParamFile();
     leeCtrl.loadParameters();
-    imuInteg.loadParameters();
+    attFilter.loadParameters();
     mixer.loadParameters();
     sigGen.loadParameters();
 
@@ -307,6 +325,11 @@ void constructApp(int port_number, char* hostname) {
     
     // Initialize socket server
     sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
+
+    if (udp_string) {
+        udpReceiver.open(udp_string);
+        udpReceiver.startThread(85,20*1024);
+    }
 
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
@@ -348,7 +371,7 @@ void exitTasks(void) {
 }
 
 void print_usage() {
-    (void) printf("Usage: ./SIMREF [options]\n-p\tport_number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
+    (void) printf("Usage: ./SIMREF [options]\n-p\tport_number\n-u\tUDP port number\n-a\thostname/IP address\n-l\tFor time-based cycles\n");
 }
 
 
@@ -369,12 +392,13 @@ int main(int argc, char* argv[]) {
     U32 port_number = 0;
     I32 option = 0;
     char *hostname = NULL;
+    char* udp_string = 0;
     bool local_cycle = false;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SIMREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "hlp:a:")) != -1){
+    while ((option = getopt(argc, argv, "hlp:a:u:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -389,6 +413,9 @@ int main(int argc, char* argv[]) {
             case 'a':
                 hostname = optarg;
                 break;
+            case 'u':
+                udp_string = optarg;
+                break;
             case '?':
                 return 1;
             default:
@@ -399,7 +426,7 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
-    constructApp(port_number, hostname);
+    constructApp(port_number, udp_string, hostname);
 
     if (!local_cycle) {
         rgGncDrv.set_CycleOut_OutputPort(2, rg.get_CycleIn_InputPort(0));
@@ -412,7 +439,10 @@ int main(int argc, char* argv[]) {
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     rotorSDrv.startPub();
-    stat = rotorSDrv.startIntTask(70, 20*1024);
+    stat = rotorSDrv.startIntTask(70, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    gzManipIf.startPub();
+    stat = gzManipIf.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     signal(SIGINT,sighandler);

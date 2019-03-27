@@ -9,7 +9,10 @@
                     <item name="FLAT_OUTPUT_LIN_ACC_FF"/>
                     <item name="FLAT_OUTPUT_ANG_ACC_FF"/>
                     <item name="LIN_VEL"/>
-                    <item name="ATT_RATE_THRUST"/>
+                    <item name="ATT_ATTRATE_THRUST"/>
+                    <item name="RPRATE_YAW_THRUST"/>
+                    <item name="RP_YAWRATE_THRUST"/>
+                    <item name="ATTRATE_THRUST"/>
                     <item name="CTRL_DISABLED"/>
                 </enum>
             </arg>

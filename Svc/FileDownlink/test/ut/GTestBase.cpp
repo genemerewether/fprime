@@ -526,6 +526,144 @@ namespace Svc {
   }
 
   // ----------------------------------------------------------------------
+  // Event: FileDownlink_DownlinkTimeout
+  // ----------------------------------------------------------------------
+
+  void FileDownlinkGTestBase ::
+    assertEvents_FileDownlink_DownlinkTimeout_size(
+        const char *const __ISF_callSiteFileName,
+        const U32 __ISF_callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->eventHistory_FileDownlink_DownlinkTimeout->size())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Size of history for event FileDownlink_DownlinkTimeout\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->eventHistory_FileDownlink_DownlinkTimeout->size() << "\n";
+  }
+
+  void FileDownlinkGTestBase ::
+    assertEvents_FileDownlink_DownlinkTimeout(
+        const char *const __ISF_callSiteFileName,
+        const U32 __ISF_callSiteLineNumber,
+        const U32 index,
+        const char *const sourceFileName,
+        const char *const destFileName
+    ) const
+  {
+    ASSERT_GT(this->eventHistory_FileDownlink_DownlinkTimeout->size(), index)
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Index into history of event FileDownlink_DownlinkTimeout\n"
+      << "  Expected: Less than size of history (" 
+      << this->eventHistory_FileDownlink_DownlinkTimeout->size() << ")\n"
+      << "  Actual:   " << index << "\n";
+    const EventEntry_FileDownlink_DownlinkTimeout& e =
+      this->eventHistory_FileDownlink_DownlinkTimeout->at(index);
+    ASSERT_STREQ(sourceFileName, e.sourceFileName.toChar())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Value of argument sourceFileName at index "
+      << index
+      << " in history of event FileDownlink_DownlinkTimeout\n"
+      << "  Expected: " << sourceFileName << "\n"
+      << "  Actual:   " << e.sourceFileName.toChar() << "\n";
+    ASSERT_STREQ(destFileName, e.destFileName.toChar())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Value of argument destFileName at index "
+      << index
+      << " in history of event FileDownlink_DownlinkTimeout\n"
+      << "  Expected: " << destFileName << "\n"
+      << "  Actual:   " << e.destFileName.toChar() << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: FileDownlink_DownlinkPartialFail
+  // ----------------------------------------------------------------------
+
+  void FileDownlinkGTestBase ::
+    assertEvents_FileDownlink_DownlinkPartialFail_size(
+        const char *const __ISF_callSiteFileName,
+        const U32 __ISF_callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->eventHistory_FileDownlink_DownlinkPartialFail->size())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Size of history for event FileDownlink_DownlinkPartialFail\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->eventHistory_FileDownlink_DownlinkPartialFail->size() << "\n";
+  }
+
+  void FileDownlinkGTestBase ::
+    assertEvents_FileDownlink_DownlinkPartialFail(
+        const char *const __ISF_callSiteFileName,
+        const U32 __ISF_callSiteLineNumber,
+        const U32 index,
+        const char *const sourceFileName,
+        const char *const destFileName,
+        const U32 startOffset,
+        const U32 length
+    ) const
+  {
+    ASSERT_GT(this->eventHistory_FileDownlink_DownlinkPartialFail->size(), index)
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Index into history of event FileDownlink_DownlinkPartialFail\n"
+      << "  Expected: Less than size of history (" 
+      << this->eventHistory_FileDownlink_DownlinkPartialFail->size() << ")\n"
+      << "  Actual:   " << index << "\n";
+    const EventEntry_FileDownlink_DownlinkPartialFail& e =
+      this->eventHistory_FileDownlink_DownlinkPartialFail->at(index);
+    ASSERT_STREQ(sourceFileName, e.sourceFileName.toChar())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Value of argument sourceFileName at index "
+      << index
+      << " in history of event FileDownlink_DownlinkPartialFail\n"
+      << "  Expected: " << sourceFileName << "\n"
+      << "  Actual:   " << e.sourceFileName.toChar() << "\n";
+    ASSERT_STREQ(destFileName, e.destFileName.toChar())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Value of argument destFileName at index "
+      << index
+      << " in history of event FileDownlink_DownlinkPartialFail\n"
+      << "  Expected: " << destFileName << "\n"
+      << "  Actual:   " << e.destFileName.toChar() << "\n";
+    ASSERT_EQ(startOffset, e.startOffset)
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Value of argument startOffset at index "
+      << index
+      << " in history of event FileDownlink_DownlinkPartialFail\n"
+      << "  Expected: " << startOffset << "\n"
+      << "  Actual:   " << e.startOffset << "\n";
+    ASSERT_EQ(length, e.length)
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Value of argument length at index "
+      << index
+      << " in history of event FileDownlink_DownlinkPartialFail\n"
+      << "  Expected: " << length << "\n"
+      << "  Actual:   " << e.length << "\n";
+  }
+
+  // ----------------------------------------------------------------------
   // From ports
   // ----------------------------------------------------------------------
 
@@ -543,6 +681,26 @@ namespace Svc {
       << "  Value:    Total size of all from port histories\n"
       << "  Expected: " << size << "\n"
       << "  Actual:   " << this->fromPortHistorySize << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // From port: buffSendOutReturn
+  // ----------------------------------------------------------------------
+
+  void FileDownlinkGTestBase ::
+    assert_from_buffSendOutReturn_size(
+        const char *const __ISF_callSiteFileName,
+        const U32 __ISF_callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->fromPortHistory_buffSendOutReturn->size())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Size of history for from_buffSendOutReturn\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->fromPortHistory_buffSendOutReturn->size() << "\n";
   }
 
   // ----------------------------------------------------------------------
@@ -583,6 +741,26 @@ namespace Svc {
       << "  Value:    Size of history for from_bufferSendOut\n"
       << "  Expected: " << size << "\n"
       << "  Actual:   " << this->fromPortHistory_bufferSendOut->size() << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // From port: faultOut
+  // ----------------------------------------------------------------------
+
+  void FileDownlinkGTestBase ::
+    assert_from_faultOut_size(
+        const char *const __ISF_callSiteFileName,
+        const U32 __ISF_callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->fromPortHistory_faultOut->size())
+      << "\n"
+      << "  File:     " << __ISF_callSiteFileName << "\n"
+      << "  Line:     " << __ISF_callSiteLineNumber << "\n"
+      << "  Value:    Size of history for from_faultOut\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->fromPortHistory_faultOut->size() << "\n";
   }
 
 } // end namespace Svc

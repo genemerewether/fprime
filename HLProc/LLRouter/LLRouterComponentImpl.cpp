@@ -81,7 +81,7 @@ namespace HLProc {
 //	,m_numMissedPktSeqNums(0)
 //	,m_numRetries(0)
 	,m_cycleTime(0)
-    ,m_schedSerial(false)
+    ,m_schedSerial(true)
     ,m_patchFileSize(0)
     ,m_patchTimeoutCounter(0)
     ,m_LLRMode(LLR_NORMAL)

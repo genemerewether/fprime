@@ -62,4 +62,48 @@
       <comment>Mass</comment>
     </parameter>
 
+    <parameter id="20" set_opcode="60" save_opcode="61" name="sat_x__x" data_type="F64" default="1.0">
+      <comment>Position feedback saturation</comment>
+    </parameter>
+    <parameter id="21" set_opcode="62" save_opcode="63" name="sat_x__y" data_type="F64" default="1.0">
+      <comment>Position feedback saturation</comment>
+    </parameter>
+    <parameter id="22" set_opcode="64" save_opcode="65" name="sat_x__z" data_type="F64" default="1.0">
+      <comment>Position feedback saturation</comment>
+    </parameter>
+
+    <parameter id="23" set_opcode="66" save_opcode="67" name="sat_v__x" data_type="F64" default="100.0">
+      <comment>Velocity feedback saturation</comment>
+    </parameter>
+    <parameter id="24" set_opcode="68" save_opcode="69" name="sat_v__y" data_type="F64" default="100.0">
+      <comment>Velocity feedback saturation</comment>
+    </parameter>
+    <parameter id="25" set_opcode="70" save_opcode="71" name="sat_v__z" data_type="F64" default="100.0">
+      <comment>Velocity feedback saturation</comment>
+    </parameter>
+
+    <parameter id="26" set_opcode="72" save_opcode="73" name="sat_R__x" data_type="F64" default="0.5">
+      <comment>Rotation feedback saturation</comment>
+    </parameter>
+    <parameter id="27" set_opcode="74" save_opcode="75" name="sat_R__y" data_type="F64" default="0.5">
+      <comment>Rotation feedback saturation</comment>
+    </parameter>
+    <parameter id="28" set_opcode="76" save_opcode="77" name="sat_R__z" data_type="F64" default="0.5">
+      <comment>Rotation feedback saturation</comment>
+    </parameter>
+
+    <parameter id="29" set_opcode="78" save_opcode="79" name="sat_omega__x" data_type="F64" default="9.0">
+      <comment>Angular velocity feedback saturation</comment>
+    </parameter>
+    <parameter id="30" set_opcode="80" save_opcode="81" name="sat_omega__y" data_type="F64" default="9.0">
+      <comment>Angular velocity feedback saturation</comment>
+    </parameter>
+    <parameter id="31" set_opcode="82" save_opcode="83" name="sat_omega__z" data_type="F64" default="9.0">
+      <comment>Angular velocity feedback saturation</comment>
+    </parameter>
+    
+    <parameter id="32" set_opcode="84" save_opcode="85" name="sat_yaw" data_type="F64" default="1.7">
+      <comment>yaw feedback saturation</comment>
+    </parameter>
+
 </parameters>

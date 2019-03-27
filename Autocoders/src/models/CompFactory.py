@@ -94,7 +94,8 @@ class CompFactory:
         comp_name      = comp_obj.get_name()
         comp_kind      = comp_obj.get_kind()
         comp_comment   = comp_obj.get_comment()
-        comp_modeler  = comp_obj.get_modeler()
+        comp_ipc       = comp_obj.get_ipc()
+        comp_modeler   = comp_obj.get_modeler()
         if comp_namespace == None:
             comp_full_name = comp_name
         else:
@@ -316,7 +317,7 @@ class CompFactory:
         #
         # Instance the component here...
         #
-        the_component = Component.Component(comp_namespace, comp_name, comp_kind, comp_comment, comp_modeler, port_obj_list, command_obj_list, channel_obj_list, parameter_obj_list, event_obj_list, internal_interface_obj_list, serializable_obj_list, comp_xml_filename)
+        the_component = Component.Component(comp_namespace, comp_name, comp_kind, comp_comment, comp_ipc, comp_modeler, port_obj_list, command_obj_list, channel_obj_list, parameter_obj_list, event_obj_list, internal_interface_obj_list, serializable_obj_list, comp_xml_filename)
         the_component.set_xml_port_files(comp_xml_port_files)
         the_component.set_c_header_files(comp_c_header_files)
         if (has_guarded_ports):

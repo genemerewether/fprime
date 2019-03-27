@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="AttFilter" kind="passive" namespace="Gnc" modeler="true">
+
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdateNoCovPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
+    <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_dictionary>Gnc/Est/AttFilter/Telemetry.xml</import_dictionary>
+    <import_dictionary>Gnc/Est/AttFilter/Events.xml</import_dictionary>
+    <import_dictionary>Gnc/Est/AttFilter/Commands.xml</import_dictionary>
+    <import_dictionary>Gnc/Est/AttFilter/Params.xml</import_dictionary>
+    <ports>
+
+
+        <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="output"    max_number="1">
+        </port>
+
+        <port name="odomNoCov" data_type="ROS::nav_msgs::OdometryNoCov"  kind="output"    max_number="1">
+        </port>
+
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">
+        </port>
+
+        <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        </port>
+
+        <port name="Log" data_type="Fw::Log"  kind="output"    max_number="1">
+        </port>
+
+        <port name="LogText" data_type="Fw::LogText"  kind="output"    max_number="1">
+        </port>
+
+        <port name="Time" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port-->
+    </ports>
+
+</component>
