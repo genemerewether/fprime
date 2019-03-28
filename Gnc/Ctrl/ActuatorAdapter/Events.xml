@@ -3,4 +3,18 @@
         <comment>
         </comment>
     </event>
+    <event id="1" name="ACTADAP_Error" severity="WARNING_HI" format_string = "ActAdap error %d" >
+        <comment>
+        </comment>
+	<args>
+	    <arg name="error" type="ENUM">
+		<enum name="ACTADAP_ErrorType">
+		    <item name="HWEnableLow" comment="HW enable pin low"/>
+		    <item name="ParamsUninit" comment="Params not inited"/>
+		    <item name="NaNCmd" comment="Got NaN cmd"/>
+		</enum>
+		<comment>The error code</comment>
+	    </arg>
+	</args>
+    </event>
 </events>

@@ -150,6 +150,10 @@
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "mixer" port = "sched" type = "Sched" num = "0"/>
 </connection>
+<connection name = "Connection17a">
+	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
+ 	 <target component = "actuatorAdapter" port = "sched" type = "Sched" num = "0"/>
+</connection>
 <connection name = "Connection18">
 	 <source component = "mpu9250" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>

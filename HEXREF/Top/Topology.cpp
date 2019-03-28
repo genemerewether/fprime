@@ -88,7 +88,7 @@ void allocComps() {
         Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
-        0, // adapter
+        Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
         0, // logQueue
         0, // chanTlm
     };
@@ -132,7 +132,7 @@ void allocComps() {
         0, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
         0, // mixer
-        0, // adapter - for arming
+        Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter - for arming
         0, // logQueue
         0, // kraitRouter
     };
