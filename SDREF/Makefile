@@ -20,4 +20,4 @@ rebuild_sd:
 	make gen_make SDFLIGHT_opt_clean SDFLIGHT_opt dict_install
 
 only_load:
-	adb push ./$(__DEFAULT_BUILD_OUT)/SDREF /eng/load/SDREF
+	adb push ./$(__DEFAULT_BUILD_OUT)/$(DEPLOYMENT) /eng/load/$(DEPLOYMENT)

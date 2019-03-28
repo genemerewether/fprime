@@ -168,7 +168,11 @@ namespace Drv {
 
         // Open:
         char devName[256];
-        snprintf(devName,sizeof(devName),"/dev/iic-%d",device);
+#ifdef DSPAL_sdsp
+        snprintf(devName,sizeof(devName), DEV_FS_I2C_SSC_DEVICE_TYPE_STRING "%d",device);
+#else
+        snprintf(devName,sizeof(devName), DEV_FS_I2C_DEVICE_TYPE_STRING "%d",device);
+#endif
         // null terminate
         devName[sizeof(devName)-1] = 0;
         DEBUG_PRINT("Opening I2C device %s\n",devName);

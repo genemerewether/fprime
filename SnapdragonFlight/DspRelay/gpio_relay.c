@@ -58,7 +58,12 @@ int dsp_relay_gpio_relay_open(int gpio) {
     int fd;
 
     char devName[256];
-    snprintf(devName,sizeof(devName),"/dev/gpio-%d",gpio);
+#ifdef DSPAL_sdsp
+    snprintf(devName, sizeof(devName), DEV_FS_GPIO_SSC_DEVICE_TYPE_STRING "%d",
+#else
+    snprintf(devName, sizeof(devName), DEV_FS_GPIO_DEVICE_TYPE_STRING "%d",
+#endif
+	     gpio);
     // null terminate
     devName[sizeof(devName)-1] = 0;
     LOG_INFO("Opening GPIO device %s",devName);

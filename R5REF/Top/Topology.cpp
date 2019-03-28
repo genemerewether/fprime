@@ -29,6 +29,7 @@ Svc::PassiveRateGroupImpl* rgTlm_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
+Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 Drv::LIDARLiteV3ComponentImpl* lidarLiteV3_ptr = 0;
@@ -132,8 +133,14 @@ void allocComps() {
                         ("ACTADAP")
     #endif
     ;
+ 
+    sigGen_ptr = new Gnc::SigGenComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SIGGEN")
+#endif
+;
 
-   imuInteg_ptr = new Gnc::ImuIntegComponentImpl
+    imuInteg_ptr = new Gnc::ImuIntegComponentImpl
     #if FW_OBJECT_NAMES == 1
                         ("IMUINTEG")
     #endif
@@ -265,12 +272,15 @@ void manualConstruct() {
     hlRouter_ptr->set_HLPortsOut_OutputPort(1, imuInteg_ptr->get_ImuStateUpdate_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
     // aux actuator command
-    hlRouter_ptr->set_HLPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
+    hlRouter_ptr->set_HLPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
     hlRouter_ptr->set_HLPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
     hlRouter_ptr->set_HLPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 
     llDebug_ptr->set_SerWritePort_OutputPort(0, debugUart_ptr->get_serialSend_InputPort(0));
+
+    hlRouter_ptr->set_HLPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
+    cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(8));
 }
 
 void constructApp() {
@@ -287,6 +297,7 @@ void constructApp() {
     leeCtrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
+    sigGen_ptr->init(0);
     imuInteg_ptr->init(0);
     mpu9250_ptr->init(0);
 
@@ -346,6 +357,8 @@ void constructApp() {
     leeCtrl_ptr->regCommands();
     imuInteg_ptr->regCommands();
     mixer_ptr->regCommands();
+    actuatorAdapter_ptr->regCommands();
+    sigGen_ptr->regCommands();
 
     rtiGpio_ptr->waitMapping(R5::GPIO_WAIT_BANK_A, 2);
     faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);
