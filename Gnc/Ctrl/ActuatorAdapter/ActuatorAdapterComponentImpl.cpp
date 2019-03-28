@@ -742,7 +742,12 @@ namespace Gnc {
       }
       if (!this->paramsInited || !hwEnabled) {
           this->armedState = DISARMED;
-          this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+	  if (armState) {
+              this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+	  }
+	  else {
+              this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+	  }
           return;
       }
       // can only arm if disarmed

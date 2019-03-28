@@ -31,9 +31,9 @@
 
 #include "termios.h"
 
-#include "dsp_relay.h"
+#include "SnapdragonFlight/DspRelay/dsp_relay.h"
 
-#include "uart_defs.h"
+#include "SnapdragonFlight/DspRelay/uart_defs.h"
 
 int main(int argc, char *argv[])
 {

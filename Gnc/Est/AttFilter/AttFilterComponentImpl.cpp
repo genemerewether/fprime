@@ -202,6 +202,7 @@ namespace Gnc {
           Eigen::Quaterniond w_q_b(1, 0, 0, 0);
           Eigen::Vector3d v_b(0, 0, 0);
           Eigen::Vector3d omega_b(0, 0, 0);
+	  // TODO(mereweth) - get time of latest state and fill header with that
           this->attFilter.GetState(&x_w,
                                   &w_q_b,
                                   &v_b,
