@@ -70,6 +70,8 @@
    <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl" base_id="2000"  base_id_window="500" />
 
    <instance namespace="Drv" name="imuDRInt" type="LinuxGpioDriver"/>
+   
+   <instance namespace="Drv" name="hwEnablePin" type="LinuxGpioDriver"/>
 
 
 <connection name = "Connection1">
@@ -100,6 +102,10 @@
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
  	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
+<connection name = "Connection8a">
+	 <source component = "hwEnablePin" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
 <connection name = "Connection8">
 	 <source component = "imuDRInt" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
@@ -111,6 +117,10 @@
 <connection name = "Connection10">
 	 <source component = "spiDrv" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection11a">
+	 <source component = "actuatorAdapter" port = "outputEnable" type = "GpioRead" num = "0"/>
+ 	 <target component = "hwEnablePin" port = "gpioRead" type = "GpioRead" num = "0"/>
 </connection>
 <connection name = "Connection11">
 	 <source component = "actuatorAdapter" port = "Time" type = "Time" num = "0"/>
@@ -196,6 +206,10 @@
 	 <source component = "imuDRInt" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
+<connection name = "Connection31a">
+	 <source component = "hwEnablePin" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
 <connection name = "Connection32">
 	 <source component = "actuatorAdapter" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
@@ -258,6 +272,10 @@
 </connection>
 <connection name = "Connection47">
 	 <source component = "imuDRInt" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection47a">
+	 <source component = "hwEnablePin" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection48">

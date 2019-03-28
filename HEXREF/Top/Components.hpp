@@ -57,6 +57,7 @@ extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
 extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr;
+extern Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr;
 extern Drv::LinuxPwmDriverComponentImpl* escPwm_ptr;
 
 #endif
