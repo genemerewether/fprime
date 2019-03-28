@@ -307,7 +307,13 @@ namespace Gnc {
         ROS::mav_msgs::Actuators &Actuators
     )
   {
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
+      }
+    
       if ((ARMED != this->armedState) ||
+	  !hwEnabled ||
           !paramsInited) {
           return;
       }
@@ -654,7 +660,11 @@ namespace Gnc {
     )
   {
       if (ARMING == this->armedState) {
-          if (!paramsInited) {
+  	  bool hwEnabled = true;
+	  if (this->isConnected_outputEnable_OutputPort(0)) {
+	      this->outputEnable_out(0, hwEnabled);
+	  }
+          if (!paramsInited || !hwEnabled) {
               this->armedState = DISARMED;
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
               return;
@@ -726,7 +736,11 @@ namespace Gnc {
         bool armState
     )
   {
-      if (!this->paramsInited) {
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
+      }
+      if (!this->paramsInited || !hwEnabled) {
           this->armedState = DISARMED;
           this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
           return;
