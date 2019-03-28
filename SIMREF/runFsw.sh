@@ -1,4 +1,4 @@
 #!/bin/sh
 
 #pgrep roscore || roscore &
-./linux-linux-x86-debug-gnu-bin/SIMREF -p 50000 -a 10.211.55.2 -u 50020
+./linux-linux-x86-debug-gnu-bin/SIMREF -p 50050 -a localhost -u 50020
