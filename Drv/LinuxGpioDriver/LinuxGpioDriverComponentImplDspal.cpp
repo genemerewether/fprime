@@ -97,8 +97,8 @@ namespace Drv {
 	   * read value was large number, odd or even to indicate state.
 	   * even is low, odd is high
 	   */
-  	  state = ((val % 2) == DSPAL_GPIO_HIGH_VALUE)?true:false;
-	  DEBUG_PRINT("GPIO %u value %u read",this->m_fd,val);
+	state = (val % 2);
+	DEBUG_PRINT("GPIO %u value %u read; state %u",this->m_fd, val, state);
       }
   }
 

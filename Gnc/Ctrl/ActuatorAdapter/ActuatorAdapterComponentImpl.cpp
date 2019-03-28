@@ -316,6 +316,7 @@ namespace Gnc {
   	  return;
       }
       if (!paramsInited || !hwEnabled) {
+	  // TODO(mereweth) - send out min cmd here before disarming?
 	  this->armedState = DISARMED;
 	  if (!this->paramsInited) {
 	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
@@ -673,6 +674,23 @@ namespace Gnc {
       if (this->isConnected_outputEnable_OutputPort(0)) {
 	  this->outputEnable_out(0, hwEnabled);
       }
+
+      if ((DISARMED != this->armedState)  &&
+	  (!paramsInited || !hwEnabled)) {
+	
+  	  if (ARMING == this->armedState) {
+              this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+ 	  }
+	  // TODO(mereweth) - send out min cmd here before disarming?
+	  this->armedState = DISARMED;
+	  if (!this->paramsInited) {
+	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+	  }
+	  if (!hwEnabled) {
+	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  return;
+      }
       
       if (ACTADAP_SCHED_CONTEXT_TLM == context) {
   	  this->tlmWrite_ACTADAP_ArmState(static_cast<ArmStateTlm>(this->armedState));
@@ -680,17 +698,6 @@ namespace Gnc {
       }
       else if ((ACTADAP_SCHED_CONTEXT_POS == context) &&
 	       (ARMING == this->armedState)) {
-          if (!paramsInited || !hwEnabled) {
-              this->armedState = DISARMED;
-	      if (!this->paramsInited) {
-		  this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
-	      }
-	      if (!hwEnabled) {
-		  this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
-	      }
-              this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-              return;
-          }
           if (++this->armCount > ACTADAP_ARM_COUNT) {
               this->armedState = ARMED;
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_OK);
