@@ -73,4 +73,18 @@
       <comment>
       </comment>
     </channel>
+    
+    <channel id="30" name="ACTADAP_ArmState" data_type="ENUM">
+        <enum name="ArmStateTlm">
+            <item name="DISARMED"/>
+            <item name="ARMING"/>
+            <item name="ARMED"/>
+	</enum>
+        <comment>
+        </comment>
+    </channel>
+    <channel id="31" name="ACTADAP_HwEnabled" data_type="bool">
+        <comment>
+        </comment>
+    </channel>
 </telemetry>

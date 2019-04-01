@@ -35,9 +35,13 @@
 |ACTADAP_CmdVel3|23 (0x17)|F32||
 |ACTADAP_CmdVel4|24 (0x18)|F32||
 |ACTADAP_CmdVel5|25 (0x19)|F32||
+|ACTADAP_ArmState|30 (0x1e)|ArmStateTlm||
+|ACTADAP_HwEnabled|31 (0x1f)|bool||
 
 ## Event List
 
 |Event Name|ID|Description|Arg Name|Arg Type|Arg Size|Description
 |---|---|---|---|---|---|---|
 |ACTADAP_AlreadyArmed|0 (0x0)|| | | | |
+|ACTADAP_Error|1 (0x1)|| | | | |
+| | | |error|ACTADAP_ErrorType||The error code|    

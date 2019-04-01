@@ -423,7 +423,8 @@ HEXREF_MODULES := \
 #Svc/ComLogger
 
 DSPRELAY_MODULES := SnapdragonFlight/DspRelay \
-	SnapdragonFlight/RpcCommon
+	SnapdragonFlight/RpcCommon \
+	DSPRELAY/Top
 
 MINRPC_MODULES := \
 	MINRPC/Top \

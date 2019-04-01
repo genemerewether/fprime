@@ -196,7 +196,7 @@ namespace Gnc {
               I2CMetadata i2cMeta;
           };
           Feedback feedback;
-      } outputInfo[AA_MAX_ACTUATORS];
+      } outputInfo[ACTADAP_MAX_ACTUATORS];
 
       enum ArmingState {
           DISARMED,

@@ -65,6 +65,7 @@ Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
 Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr = 0;
+Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr = 0;
 Drv::LinuxPwmDriverComponentImpl* escPwm_ptr = 0;
 
 void allocComps() {
@@ -88,7 +89,7 @@ void allocComps() {
         Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
-        0, // adapter
+        Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
         0, // logQueue
         0, // chanTlm
     };
@@ -132,7 +133,7 @@ void allocComps() {
         0, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
         0, // mixer
-        0, // adapter - for arming
+        Gnc::ACTADAP_SCHED_CONTEXT_POS, // adapter - for arming
         0, // logQueue
         0, // kraitRouter
     };
@@ -253,6 +254,12 @@ void allocComps() {
 #endif
 ;
 
+    hwEnablePin_ptr = new Drv::LinuxGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("HWENPIN")
+#endif
+;
+
     escPwm_ptr = new Drv::LinuxPwmDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("ESCPWM")
@@ -348,6 +355,7 @@ void constructApp() {
 
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
+    hwEnablePin_ptr->init(1);
     imuDRInt_ptr->init(0);
     escPwm_ptr->init(0);
 
@@ -389,17 +397,20 @@ void constructApp() {
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv_ptr->open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt_ptr->open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    
+    // J13-3, 5V level
+    hwEnablePin_ptr->open(28, Drv::LinuxGpioDriverComponentImpl::GPIO_IN);
 
-    // J9, BLSP2
+    // J15, BLSP9
     i2cDrv_ptr->open(9, Drv::I2C_FREQUENCY_400KHZ);
 
     // J15, BLSP9
     // TODO(mereweth) - Spektrum UART and binding GPIO
 
     // J13 is already at 5V, so use for 4 of the ESCs
-    NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
+    //NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
     // /dev/pwm-1 on QuRT
-    escPwm_ptr->open(1, pwmPins, 4, 20 * 1000);
+    //escPwm_ptr->open(1, pwmPins, 4, 20 * 1000);
 #endif
 
     // Active component startup

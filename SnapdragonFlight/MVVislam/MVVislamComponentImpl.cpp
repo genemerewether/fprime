@@ -165,7 +165,7 @@ namespace SnapdragonFlight {
 
       ROS::std_msgs::Header h = imu.getheader();
       Fw::Time stamp = h.getstamp();
-      I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
+      const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
       Os::File::Status stat = Os::File::OTHER_ERROR;
       Os::File file;
       stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -186,7 +186,7 @@ namespace SnapdragonFlight {
       }
       // Make sure buffer is null-terminated:
       buff[sizeof(buff)-1] = 0;
-      I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+      const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
       if (-walltimeDspLeadUs > usecDsp) {
 	  // TODO(mereweth) - EVR; can't have difference greater than time
@@ -194,10 +194,9 @@ namespace SnapdragonFlight {
 		 walltimeDspLeadUs, usecDsp);
 	  return;
       }
-      I64 usecRos = usecDsp + walltimeDspLeadUs;
-
+      const I64 usecRos = usecDsp + walltimeDspLeadUs;
       stamp.set((U32) (usecRos / 1000LL / 1000LL),
-		(usecRos % (1000LL * 1000LL)) * 1000LU);
+		(U32) (usecRos % (1000LL * 1000LL)));
       h.setstamp(stamp);
       imu.setheader(h);
 

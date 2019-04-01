@@ -65,7 +65,7 @@ namespace Gnc {
     numActuators(0u),
     paramsInited(false)
   {
-      for (U32 i = 0; i < AA_MAX_ACTUATORS; i++) {
+      for (U32 i = 0; i < ACTADAP_MAX_ACTUATORS; i++) {
           this->outputInfo[i].type = OUTPUT_UNSET;
       }
   }
@@ -91,7 +91,7 @@ namespace Gnc {
              bool useSimple
     )
   {
-      if (actuator >= AA_MAX_ACTUATORS) {
+      if (actuator >= ACTADAP_MAX_ACTUATORS) {
           return false;
       }
       // TODO(mereweth) - factor out FeedbackMetadata and CmdOutputMapMetadata checking
@@ -129,7 +129,7 @@ namespace Gnc {
       Fw::ParamValid valid[7];
       this->numActuators = paramGet_numActuators(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-      if (this->numActuators >= AA_MAX_ACTUATORS) {  return;  }
+      if (this->numActuators >= ACTADAP_MAX_ACTUATORS) {  return;  }
 
       // NOTE(mereweth) - start convenience defines
 #define MAP_AND_FB_FROM_PARM_IDX(XXX) \
@@ -307,13 +307,28 @@ namespace Gnc {
         ROS::mav_msgs::Actuators &Actuators
     )
   {
-      if ((ARMED != this->armedState) ||
-          !paramsInited) {
-          return;
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
+      }
+    
+      if (ARMED != this->armedState) {
+  	  return;
+      }
+      if (!paramsInited || !hwEnabled) {
+	  // TODO(mereweth) - send out min cmd here before disarming?
+	  this->armedState = DISARMED;
+	  if (!this->paramsInited) {
+	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+	  }
+	  if (!hwEnabled) {
+	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  return;
       }
 
       U32 angVelCount = FW_MIN(Actuators.getangular_velocities_count(),
-                               FW_MIN(AA_MAX_ACTUATORS,
+                               FW_MIN(ACTADAP_MAX_ACTUATORS,
                                       this->numActuators));
       NATIVE_INT_TYPE angVelSize = 0;
       const F64* angVels = Actuators.getangular_velocities(angVelSize);
@@ -354,6 +369,8 @@ namespace Gnc {
                           // TODO(mereweth) - EVR about disarming due to NaN
                           inVal = i2c.cmdOutputMap.minIn;
                           this->armedState = DISARMED;
+			  
+			  this->log_WARNING_HI_ACTADAP_Error(NaNCmd);
                       }
                       else if (inVal > i2c.cmdOutputMap.maxIn) {  inVal = i2c.cmdOutputMap.maxIn;  }
                       else if (inVal < i2c.cmdOutputMap.minIn) {  inVal = i2c.cmdOutputMap.minIn;  }
@@ -653,18 +670,40 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-      if (ARMING == this->armedState) {
-          if (!paramsInited) {
-              this->armedState = DISARMED;
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
+      }
+
+      if ((DISARMED != this->armedState)  &&
+	  (!paramsInited || !hwEnabled)) {
+	
+  	  if (ARMING == this->armedState) {
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-              return;
-          }
-          if (++this->armCount > AA_ARM_COUNT) {
+ 	  }
+	  // TODO(mereweth) - send out min cmd here before disarming?
+	  this->armedState = DISARMED;
+	  if (!this->paramsInited) {
+	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+	  }
+	  if (!hwEnabled) {
+	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  return;
+      }
+      
+      if (ACTADAP_SCHED_CONTEXT_TLM == context) {
+  	  this->tlmWrite_ACTADAP_ArmState(static_cast<ArmStateTlm>(this->armedState));
+	  this->tlmWrite_ACTADAP_HwEnabled(hwEnabled);
+      }
+      else if ((ACTADAP_SCHED_CONTEXT_POS == context) &&
+	       (ARMING == this->armedState)) {
+          if (++this->armCount > ACTADAP_ARM_COUNT) {
               this->armedState = ARMED;
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_OK);
               return;
           }
-          for (U32 i = 0; i < FW_MIN(this->numActuators, AA_MAX_ACTUATORS); i++) {
+          for (U32 i = 0; i < FW_MIN(this->numActuators, ACTADAP_MAX_ACTUATORS); i++) {
               switch (this->outputInfo[i].type) {
                   case OUTPUT_UNSET:
                   {
@@ -726,20 +765,10 @@ namespace Gnc {
         bool armState
     )
   {
-      if (!this->paramsInited) {
-          this->armedState = DISARMED;
-          this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-          return;
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
       }
-      // can only arm if disarmed
-      if ((DISARMED != this->armedState) && armState) {
-          this->log_WARNING_LO_ACTADAP_AlreadyArmed();
-          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-          return;
-      }
-
-      // if we get here, either we are disarmed now, or about to disarm
-      this->armCount = 0u;
 
       // can disarm immediately - change this if hardware changes
       if (!armState) {
@@ -747,6 +776,28 @@ namespace Gnc {
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
           return;
       }
+      // after this point, we are trying to arm
+
+      if (!this->paramsInited || !hwEnabled) {
+  	  this->armedState = DISARMED;
+	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+	  if (!this->paramsInited) {
+	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+	  }
+	  if (!hwEnabled) {
+	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  return;
+      }
+      // can only arm if disarmed
+      if (DISARMED != this->armedState) {
+          this->log_WARNING_LO_ACTADAP_AlreadyArmed();
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+          return;
+      }
+
+      // if we get here, either we are disarmed now, or about to disarm
+      this->armCount = 0u;
 
       // if we get here, we are disarmed, and want to arm
       this->armedState = ARMING;
