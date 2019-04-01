@@ -23,6 +23,7 @@
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveTextLogger/PassiveTextLoggerComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/LeeCtrl/LeeCtrlComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Utils/FrameTransform/FrameTransformComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxGpioDriver/LinuxGpioDriverComponentAi.xml</import_component_type>
 
    <instance namespace="Svc" name="fatalHandler" type="FatalHandler"/>
@@ -69,11 +70,17 @@
 
    <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl" base_id="2000"  base_id_window="500" />
 
+   <instance namespace="Gnc" name="ctrlXest" type="FrameTransform" />
+
    <instance namespace="Drv" name="imuDRInt" type="LinuxGpioDriver"/>
 
 
 <connection name = "Connection1">
 	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection1a">
+	 <source component = "ctrlXest" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection2">
@@ -176,6 +183,10 @@
 	 <source component = "leeCtrl" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
+<connection name = "Connection26a">
+	 <source component = "ctrlXest" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
 <connection name = "Connection27">
 	 <source component = "sigGen" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
@@ -226,6 +237,10 @@
 </connection>
 <connection name = "Connection39">
 	 <source component = "leeCtrl" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection39a">
+	 <source component = "ctrlXest" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection40">
@@ -364,6 +379,10 @@
 	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
+<connection name = "Connection73a">
+	 <source component = "ctrlXest" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
 <connection name = "Connection74">
 	 <source component = "cmdDisp" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
@@ -406,6 +425,10 @@
 </connection>
 <connection name = "Connection84">
 	 <source component = "attFilter" port = "odometry" type = "Odometry" num = "0"/>
+ 	 <target component = "ctrlXest" port = "odomInB" type = "Odometry" num = "0"/>
+</connection>
+<connection name = "Connection84a">
+	 <source component = "ctrlXest" port = "odomOutA" type = "Odometry" num = "0"/>
  	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
 </connection>
 <connection name = "Connection85">
@@ -523,5 +546,13 @@
 <connection name = "Connection113">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "6"/>
  	 <target component = "fatalHandler" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection106a">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "7"/>
+ 	 <target component = "ctrlXest" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection107a">
+	 <source component = "ctrlXest" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "7"/>
 </connection>
 </assembly>

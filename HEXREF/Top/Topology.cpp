@@ -55,6 +55,7 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
+Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
@@ -191,6 +192,12 @@ void allocComps() {
 #endif
 ;
 
+    ctrlXest_ptr = new Gnc::FrameTransformComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CTRLXEST")
+#endif
+;
+ 
     leeCtrl_ptr = new Gnc::LeeCtrlComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("LEECTRL")
@@ -331,6 +338,7 @@ void constructApp() {
     rgTlm_ptr->init(2);
 
     // Initialize the GNC components
+    ctrlXest_ptr->init(0);
     leeCtrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
@@ -368,6 +376,7 @@ void constructApp() {
     cmdDisp_ptr->regCommands();
     fatalHandler_ptr->regCommands();
 
+    ctrlXest_ptr->regCommands();
     leeCtrl_ptr->regCommands();
     attFilter_ptr->regCommands();
     mixer_ptr->regCommands();

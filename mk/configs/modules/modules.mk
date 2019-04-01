@@ -177,6 +177,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Est/ImuInteg \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
+	Gnc/Utils/FrameTransform \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
