@@ -41,6 +41,12 @@ void _Read_uleb(void)
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
   block_indefinite();
 }
+ 
+void _Dbl(void)
+{
+  DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
+  block_indefinite();
+}
 
 void _Parse_fde_instr(void)
 {
