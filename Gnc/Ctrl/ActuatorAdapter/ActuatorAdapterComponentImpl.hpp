@@ -103,8 +103,8 @@ namespace Gnc {
 
       struct I2CMetadata {
           U32 addr;
-          U32 minOut;
-          U32 maxOut;
+          I32 minOut;
+          I32 maxOut;
           bool reverse;
           FeedbackMetadata fbMeta;
           CmdOutputMapMetadata cmdOutputMap;
@@ -178,7 +178,7 @@ namespace Gnc {
       struct Feedback {
           U32 cmdSec;
           U32 cmdUsec;
-          U32 cmd;
+          I32 cmd;
           F64 cmdIn;
           U32 fbSec;
           U32 fbUsec;
