@@ -87,10 +87,10 @@
     <parameter id="101" set_opcode="222" save_opcode="223" name="p1_maxCmd" data_type="F64" >
       <comment>parm slot 1 maximum command</comment>
     </parameter>
-    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="U64" >
+    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="I64" >
       <comment>parm slot 1 minimum output (interpret as float for some types)</comment>
     </parameter>
-    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="U64" >
+    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="I64" >
       <comment>parm slot 1 maximum output (interpret as float for some types)</comment>
     </parameter>
     <parameter id="104" set_opcode="228" save_opcode="229" name="p1_counts" data_type="U32" >

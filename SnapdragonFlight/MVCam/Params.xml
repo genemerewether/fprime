@@ -11,13 +11,13 @@
         </comment>
     </parameter>
     <parameter id="1" set_opcode="52" save_opcode="53" name="exposureFixed"
-        data_type="U16" default="0">
+        data_type="U32" default="0">
         <comment>
             fixed exposure setpoint
         </comment>
     </parameter>
     <parameter id="2" set_opcode="54" save_opcode="55" name="gainFixed"
-        data_type="U8" default="0">
+        data_type="U32" default="0">
         <comment>
             fixed gain setpoint
         </comment>
@@ -57,43 +57,43 @@
         </comment>
     </parameter>
     <parameter id="7" set_opcode="64" save_opcode="65" name="maxDelta"
-        data_type="U16" default="5">
+        data_type="U32" default="5">
         <comment>
             max frame-to-frame delta for autoexposure
         </comment>
     </parameter>
     <parameter id="8" set_opcode="66" save_opcode="67" name="exposureChangeThreshold"
-        data_type="U16" default="1">
+        data_type="U32" default="1">
         <comment>
             desired change before parameter set command is issued
         </comment>
     </parameter>
     <parameter id="9" set_opcode="68" save_opcode="69" name="gainChangeThreshold"
-        data_type="U8" default="1">
+        data_type="U32" default="1">
         <comment>
             desired change before parameter set command is issued
         </comment>
     </parameter>
     <parameter id="10" set_opcode="70" save_opcode="71" name="exposureMin"
-        data_type="U16" default="0">
+        data_type="U32" default="0">
         <comment>
             min value for exposure range
         </comment>
     </parameter>
     <parameter id="11" set_opcode="72" save_opcode="73" name="exposureMax"
-        data_type="U16" default="500">
+        data_type="U32" default="500">
         <comment>
             max value for exposure range
         </comment>
     </parameter>
     <parameter id="12" set_opcode="74" save_opcode="75" name="gainMin"
-        data_type="U8" default="0">
+        data_type="U32" default="0">
         <comment>
             min value for gain range
         </comment>
     </parameter>
     <parameter id="13" set_opcode="76" save_opcode="77" name="gainMax"
-        data_type="U8" default="200">
+        data_type="U32" default="200">
         <comment>
             max value for gain range
         </comment>

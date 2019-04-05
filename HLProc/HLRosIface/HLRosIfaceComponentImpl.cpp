@@ -260,28 +260,7 @@ namespace HLProc {
           const NATIVE_INT_TYPE portNum,
           ROS::nav_msgs::OdometryNoCov &Odometry
       )
-    {
-        if (this->isConnected_FileLogger_OutputPort(0)) {
-            Svc::ActiveFileLoggerPacket fileBuff;
-            Fw::SerializeStatus stat;
-            Fw::Time recvTime = this->getTime();
-            fileBuff.resetSer();
-            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ODOMNOCOV);
-            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
-            stat = fileBuff.serialize(recvTime.getSeconds());
-            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
-            stat = fileBuff.serialize(recvTime.getUSeconds());
-            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
-            stat = Odometry.serialize(fileBuff);
-            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
-
-            this->FileLogger_out(0,fileBuff);
-        }
-        
-        if (!m_rosInited) {
-            return;
-        }
-        
+    {        
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
@@ -289,7 +268,7 @@ namespace HLProc {
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
-        I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
+        const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
         Os::File::Status stat = Os::File::OTHER_ERROR;
         Os::File file;
         stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
@@ -310,7 +289,7 @@ namespace HLProc {
         }
         // Make sure buffer is null-terminated:
         buff[sizeof(buff)-1] = 0;
-        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+        const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
         if (-walltimeDspLeadUs > usecDsp) {
             // TODO(mereweth) - EVR; can't have difference greater than time
@@ -318,19 +297,44 @@ namespace HLProc {
                    walltimeDspLeadUs, usecDsp);
             return;
         }
-        I64 usecRos = usecDsp + walltimeDspLeadUs;
+        const I64 usecRos = usecDsp + walltimeDspLeadUs;
         msg.header.stamp.sec = (U32) (usecRos / 1000LL / 1000LL);
         msg.header.stamp.nsec = (usecRos % (1000LL * 1000LL)) * 1000LU;
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
+	stamp.set((U32) (usecRos / 1000LL / 1000LL),
+	 	  (U32) (usecRos % (1000LL * 1000LL)));
+	header.setstamp(stamp);
+        Odometry.setheader(header);
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_ODOMNOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Odometry.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+	
+        if (!m_rosInited) {
+            return;
+        }
+	
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
         U32 frame_id = header.getframe_id();
         msg.header.frame_id = "odom";
 
-        msg.child_frame_id = "body";
+        msg.child_frame_id = "base_link";
 
         ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
         msg.pose.pose.position.x = p.getx();
@@ -349,7 +353,7 @@ namespace HLProc {
         msg.twist.twist.angular.x = vec.getx();
         msg.twist.twist.angular.y = vec.gety();
         msg.twist.twist.angular.z = vec.getz();
-
+	
         m_odomPub[portNum].publish(msg);
     }
 
@@ -359,6 +363,49 @@ namespace HLProc {
           ROS::geometry_msgs::AccelStamped &AccelStamped
       )
     {
+        ROS::std_msgs::Header header = AccelStamped.getheader();
+        Fw::Time stamp = header.getstamp();
+
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (-walltimeDspLeadUs > usecDsp) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
+                   walltimeDspLeadUs, usecDsp);
+            return;
+        }
+        const I64 usecRos = usecDsp + walltimeDspLeadUs;
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
+
+	stamp.set((U32) (usecRos / 1000LL / 1000LL),
+	 	  (U32) (usecRos % (1000LL * 1000LL)));
+	header.setstamp(stamp);
+        AccelStamped.setheader(header);
+	
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;

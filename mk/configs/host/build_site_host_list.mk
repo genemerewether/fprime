@@ -2,7 +2,7 @@
 
 # get the hostname
 
-QUEST_HOST_LIST := genotype genie eneg
+QUEST_HOST_LIST := genotype genie eneg dronezz
 
 QUESTHOST := $(findstring $(HOSTNAME),$(QUEST_HOST_LIST))
 

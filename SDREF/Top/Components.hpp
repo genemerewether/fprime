@@ -44,7 +44,9 @@ void exitTasks(void);
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
+#include <Drv/ForceTorque/ATINetbox/ATINetboxComponentImpl.hpp>
 
+extern Drv::ATINetboxComponentImpl* atiNetbox_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
 extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;

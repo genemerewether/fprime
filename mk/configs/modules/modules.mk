@@ -177,6 +177,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Est/ImuInteg \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
+	Gnc/Utils/FrameTransform \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
@@ -271,6 +272,8 @@ SDREF_DEPLOYMENT_MODULES := \
 SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
 	\
 	$(ZMQ_MODULES) \
 	\
@@ -422,7 +425,8 @@ HEXREF_MODULES := \
 #Svc/ComLogger
 
 DSPRELAY_MODULES := SnapdragonFlight/DspRelay \
-	SnapdragonFlight/RpcCommon
+	SnapdragonFlight/RpcCommon \
+	DSPRELAY/Top
 
 MINRPC_MODULES := \
 	MINRPC/Top \

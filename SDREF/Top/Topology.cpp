@@ -81,6 +81,8 @@ HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
 HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
 Svc::UdpReceiverComponentImpl* udpReceiver_ptr = 0;
 
+Drv::ATINetboxComponentImpl* atiNetbox_ptr = 0;
+
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
 Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
@@ -241,6 +243,12 @@ void allocComps() {
 #endif
 ;
 
+    atiNetbox_ptr = new Drv::ATINetboxComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ATINETBOX")
+#endif
+;
+    
     serialDriverLL_ptr = new Drv::LinuxSerialDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SERIALDRVLL")
@@ -425,8 +433,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     snapHealth_ptr->setBootCount(boot_count);
     snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_DYNAMIC);
 
+    atiNetbox_ptr->init();
+    
     sockGndIf_ptr->init(0);
-    sockGndIfLL_ptr->init(0);
+    sockGndIfLL_ptr->init(1);
 
     eventExp_ptr->init(0);
 
@@ -479,7 +489,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvCam_ptr->regCommands();
     mvVislam_ptr->regCommands();
     hiresCam_ptr->regCommands();
-
+    atiNetbox_ptr->regCommands();
+    
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
     
@@ -494,7 +505,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     prmDb_ptr->readParamFile();
     mvCam_ptr->loadParameters();
     mvVislam_ptr->loadParameters();
-
+    atiNetbox_ptr->loadParameters();
+    
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);
     serialTextConv_ptr->set_log_file(logFileName, 100*1024, 0);
@@ -594,6 +606,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     serialDriverDebug_ptr->startReadThread(40, 20*1024);
 #endif
     
+    atiNetbox_ptr->set_thread_attr(0, 30, 20*1024, true, CORE_GNC);
+    atiNetbox_ptr->open("192.168.2.20", "192.168.2.10",
+			Drv::ATINetboxComponentImpl::ATINETBOX_RDP_PORT);
+    
     // Initialize socket server
     if (port_number && hostname) {
         if (startSocketNow) {
@@ -666,7 +682,8 @@ void exitTasks(bool isChild) {
     serialDriverLL_ptr->quitReadThread();
     serialDriverDebug_ptr->quitReadThread();
 #endif
-
+    atiNetbox_ptr->stop();
+		    
     imgTlm_ptr->exit();
     mvVislam_ptr->exit();    
     llRouter_ptr->exit();

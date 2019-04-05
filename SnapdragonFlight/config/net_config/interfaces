@@ -1,0 +1,17 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+# Include files from /etc/network/interfaces.d:
+#source-directory /etc/network/interfaces.d
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+
+iface eth0 inet static
+   address 192.168.2.20
+   netmask 255.255.255.0
+
+iface gene inet static
+   address 192.168.2.40
+   netmask 255.255.255.0
+
+iface iot inet dhcp

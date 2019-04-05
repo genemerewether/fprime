@@ -24,6 +24,7 @@ void exitTasks(void);
 #include <Drv/LinuxI2CDriver/LinuxI2CDriverComponentImpl.hpp>
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
+#include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
@@ -48,6 +49,7 @@ extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr;
+extern Gnc::FrameTransformComponentImpl* ctrlXest_ptr;
 extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
 extern Gnc::BasicMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
@@ -57,6 +59,7 @@ extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
 extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr;
+extern Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr;
 extern Drv::LinuxPwmDriverComponentImpl* escPwm_ptr;
 
 #endif

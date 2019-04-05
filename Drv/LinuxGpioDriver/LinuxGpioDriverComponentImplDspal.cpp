@@ -93,7 +93,12 @@ namespace Drv {
           this->log_WARNING_HI_GP_WriteError(this->m_gpio,bytes);
           return;
       } else {
-          state = (val == DSPAL_GPIO_HIGH_VALUE)?true:false;
+	  /* NOTE(mereweth) - observed weird case on 801 where DSP gpio
+	   * read value was large number, odd or even to indicate state.
+	   * even is low, odd is high
+	   */
+	state = (val % 2);
+	DEBUG_PRINT("GPIO %u value %u read; state %u",this->m_fd, val, state);
       }
   }
 

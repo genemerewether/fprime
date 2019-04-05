@@ -12,6 +12,7 @@
     <import_port_type>Drv/PwmDriverPorts/PwmSetDutyCyclePortAi.xml</import_port_type>
     <import_port_type>Drv/I2CDriverPorts/I2CConfigPortAi.xml</import_port_type>
     <import_port_type>Drv/I2CDriverPorts/I2CWriteReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioReadPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
 
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Telemetry.xml</import_dictionary>
@@ -21,6 +22,9 @@
 
     <ports>
 
+        <port name="outputEnable" data_type="Drv::GpioRead"  kind="output"    max_number="1">
+        </port>
+	
         <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycleData"  kind="output"    max_number="1">
         </port>
 
