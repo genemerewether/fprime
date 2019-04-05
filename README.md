@@ -89,6 +89,12 @@ When you start the RotorS (https://github.com/ethz-asl/rotors_simulator) firefly
 
 Works out of the box with https://github.com/genemerewether/ethzasl_sensor_fusion for testing high-level filter updates, but can be easily adapted to simulated sensors in Gazebo. Just run additional ROS nodes as necessary, and remap the pose or position sensor topics of the sensor fusion packages. Or, publish the `mav_msgs/ImuStateUpdate` message (see the `mav_msgs` submodule of this repo) from an appropriate filter.
 
+## Supported Hardware:
+
+* ATI Netbox force-torque sensor
+* MPU9250
+* SimonK ESC firmware over I2C, two different protocols: https://github.com/genemerewether/tgy
+
 # fprime
 
 F' Release Notes
