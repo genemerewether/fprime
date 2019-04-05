@@ -13,7 +13,7 @@ LINK_LIB_FLAGS := rcs
 LIBRARY_TO :=
 POST_LINK_LIB := ranlib
 
-FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
+FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=softfp
 
 LINK_BIN := $(CXX)
 LINK_BIN_FLAGS := $(FP_FLAGS) -rdynamic -z muldefs $(LIBS)
@@ -46,6 +46,7 @@ COVERAGE := -fprofile-arcs -ftest-coverage
 
 LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 			$(COMMON_INCLUDES) \
+			--sysroot=$(HEXAGON_ARM_SYSROOT) \
 			-I$(HEXAGON_SDK_ROOT)/incs \
 			-I$(HEXAGON_SDK_ROOT)/incs/stddef \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/inc \
@@ -53,8 +54,7 @@ LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/adspmsgd/ship/UbuntuARM_Debug \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
-			-I$(HEXAGON_SDK_ROOT)/incs/stddef \
-			$(INCLUDE_ARM_SYSROOT_CMD)
+			-I$(HEXAGON_SDK_ROOT)/incs/stddef
 
 DUMP = $(BUILD_ROOT)/mk/bin/empty.sh
 

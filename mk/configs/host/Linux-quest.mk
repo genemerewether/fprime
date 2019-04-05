@@ -22,16 +22,14 @@ ifneq ($(TARGET_8096),)
 HEXAGON_V_ARCH := v60
 TARGET_DSP := sdsp
 HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.1
-INDIGO_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
-HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/ARM_Tools/gcc-4.9-2014.11/libc
+HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
+INDIGO_ARM_SYSROOT := $(HEXAGON_ARM_SYSROOT)
 
 RPATH_SYSROOT_CMD := -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib
 # arbitrary convention - for use in inc.mk
 INCLUDE_ARM_SYSROOTS := $(INDIGO_ARM_SYSROOT)
-# arbitrary convention - for use in linaro_gnu_common.mk
-INCLUDE_ARM_SYSROOT_CMD := -I$(INDIGO_ARM_SYSROOT)/usr/include/
 
-ARM_CC_BASE := /opt/tools/quest/Qualcomm/ARM_Tools/gcc-4.9-2014.11/bin/arm-linux-gnueabihf
+ARM_CC_BASE := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi/arm-oe-linux-gnueabi
 CC := $(ARM_CC_BASE)-gcc
 CXX := $(ARM_CC_BASE)-g++
 GCOV := $(ARM_CC_BASE)-gcov
@@ -55,8 +53,6 @@ INDIGO_ARM_SYSROOT :=  /opt/tools/quest/Qualcomm/indigo_sysroot
 RPATH_SYSROOT_CMD := -L$(HEXAGON_ARM_SYSROOT)/usr/lib/ -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/
 # arbitrary convention - for use in inc.mk
 INCLUDE_ARM_SYSROOTS := $(INDIGO_ARM_SYSROOT)
-# arbitrary convention - for use in linaro_gnu_common.mk
-INCLUDE_ARM_SYSROOT_CMD := --sysroot=$(HEXAGON_ARM_SYSROOT)
 
 CHECK_LINK_BIN_LINKER := -Xlinker,-z,muldefs
 endif
