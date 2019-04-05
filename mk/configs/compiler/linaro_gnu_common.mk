@@ -13,8 +13,6 @@ LINK_LIB_FLAGS := rcs
 LIBRARY_TO :=
 POST_LINK_LIB := ranlib
 
-FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=softfp
-
 LINK_BIN := $(CXX)
 LINK_BIN_FLAGS := $(FP_FLAGS) -rdynamic -z muldefs $(LIBS)
 

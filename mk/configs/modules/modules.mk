@@ -273,6 +273,8 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	Drv/ForceTorque/ATINetbox \
+	\
 	$(ZMQ_MODULES) \
 	\
 	$(HLPROC_MODULES) \
