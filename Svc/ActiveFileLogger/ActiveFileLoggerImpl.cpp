@@ -164,6 +164,10 @@ namespace Svc {
                 return "ActAdapEsc";
             case AFL_MVCAM_CALLBACK:
                 return "MVCamCallback";
+  	    case AFL_ATINETBOX_WRENCH:
+	        return "ATINetboxWrench";
+  	    case AFL_ATINETBOX_WRENCH_AA:
+	        return "ATINetboxWrenchAA";
             default:
                 return "Unknown";
         }
