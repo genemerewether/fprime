@@ -261,7 +261,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     rotorSDrv.init(0);
     gzManipIf.init(0);
 
-    linuxTime.init(0);
+    rosTime.init(0);
 
     chanTlm.init(10,0);
 
