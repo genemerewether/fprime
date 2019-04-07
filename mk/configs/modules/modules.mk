@@ -245,6 +245,8 @@ ROS_MODULES := \
 	\
 	ROS/RosTime \
 	\
+	ROS/RosSeq \
+	\
 	$(ROS_TYPE_MODULES) \
 	\
 	$(ROS_PORT_MODULES)
