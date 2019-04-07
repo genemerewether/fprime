@@ -131,7 +131,12 @@ namespace Gnc {
       vec.setz(vec_b(2));
       twist.setlinear(vec);
 
-      // NOTE(mereweth) - angular velocity always in body axes
+      ROS::geometry_msgs::Vector3 ang = twist.getangular();
+      const Vector3d ang_b = this->b_X_a * Vector3d(ang.getx(), ang.gety(), ang.getz());
+      ang.setx(ang_b(0));
+      ang.sety(ang_b(1));
+      ang.setz(ang_b(2));
+      twist.setangular(ang);
       twistCov.settwist(twist);
       Odometry.settwist(twistCov);
 
@@ -174,7 +179,12 @@ namespace Gnc {
       vec.setz(vec_b(2));
       twist.setlinear(vec);
 
-      // NOTE(mereweth) - angular velocity always in body axes
+      ROS::geometry_msgs::Vector3 ang = twist.getangular();
+      const Vector3d ang_b = this->a_X_b * Vector3d(ang.getx(), ang.gety(), ang.getz());
+      ang.setx(ang_b(0));
+      ang.sety(ang_b(1));
+      ang.setz(ang_b(2));
+      twist.setangular(ang);
       twistCov.settwist(twist);
       Odometry.settwist(twistCov);
 
