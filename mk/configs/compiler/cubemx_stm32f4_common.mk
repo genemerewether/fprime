@@ -29,13 +29,15 @@ CXX := $(CC)
 
 LINK_LIB := arm-none-eabi-ar
 LINK_LIB_FLAGS := rcs
-POST_LINK_LIB := $(PYTHON_BIN) $(BUILD_ROOT)/mk/bin/empty.py
+POST_LINK_LIB := arm-none-eabi-ranlib
 
 LINK_LIBS := -lc -lm -lnosys
 
 LINK_BIN :=  $(CC)
 LINK_BIN_FLAGS := -specs=nano.specs -T$(BUILD_ROOT)/STM32/CF2Hal/STM32F405RGTx_FLASH.ld \
-		  -Wl,-Map=CF2Bin.map,--cref -Wl,--gc-sections
+						-mcpu=cortex-m4 -mthumb \
+						-mfpu=fpv4-sp-d16 -mfloat-abi=hard \
+		  -Wl,-Map=CF2Bin.map,--cref #-Wl,--gc-sections
 
 FILE_SIZE := $(LS) $(LS_SIZE)
 LOAD_SIZE := $(SIZE)

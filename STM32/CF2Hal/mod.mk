@@ -1,4 +1,4 @@
-SRC_TIR5 =	Src/main.c \
+SRC_CF2 =	Src/main.c \
 	Src/stm32f4xx_it.c \
 	Src/stm32f4xx_hal_msp.c \
 	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
@@ -21,6 +21,6 @@ SRC_TIR5 =	Src/main.c \
 	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 	Src/system_stm32f4xx.c \
 	\
-	startup_stm32f405xx.asm
+	startup_stm32f405xx.s
 
 #SUBDIRS = test
