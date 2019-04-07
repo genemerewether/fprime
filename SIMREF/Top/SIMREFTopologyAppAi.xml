@@ -49,7 +49,7 @@
 
    <instance namespace="Gnc" name="attFilter" type="AttFilter" base_id="1500"  base_id_window="500" />
 
-   <instance namespace="Svc" name="linuxTime" type="Time"/>
+   <instance namespace="ROS" name="rosTime" type="Time"/>
 
    <instance namespace="Svc" name="rgDecouple" type="RateGroupDecoupler"/>
 
@@ -134,7 +134,7 @@
 </connection>
 <connection name = "Connection16">
 	 <source component = "eventLogger" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection17">
 	 <source component = "sigGen" port = "controls" type = "TorqueThrust" num = "0"/>
@@ -178,7 +178,7 @@
 </connection>
 <connection name = "Connection27">
 	 <source component = "rg" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection28">
 	 <source component = "mixer" port = "Tlm" type = "Tlm" num = "0"/>
@@ -198,11 +198,11 @@
 </connection>
 <connection name = "Connection32">
 	 <source component = "sigGen" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection33">
 	 <source component = "gzManipIf" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection34">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
@@ -234,15 +234,15 @@
 </connection>
 <connection name = "Connection41">
 	 <source component = "fileLogger" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection42">
 	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection43">
 	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection44">
 	 <source component = "gzManipIf" port = "Tlm" type = "Tlm" num = "0"/>
@@ -262,7 +262,7 @@
 </connection>
 <connection name = "Connection48">
 	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection49">
 	 <source component = "eventLogger" port = "PktSend" type = "Com" num = "0"/>
@@ -274,7 +274,7 @@
 </connection>
 <connection name = "Connection51">
 	 <source component = "rotorSDrv" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection52">
 	 <source component = "sigGen" port = "ParamSet" type = "PrmSet" num = "0"/>
@@ -290,7 +290,7 @@
 </connection>
 <connection name = "Connection55">
 	 <source component = "attFilter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection56">
 	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
@@ -342,7 +342,7 @@
 </connection>
 <connection name = "Connection68">
 	 <source component = "rgDecouple" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection69">
 	 <source component = "leeCtrl" port = "LogText" type = "LogText" num = "0"/>
@@ -358,11 +358,11 @@
 </connection>
 <connection name = "Connection72">
 	 <source component = "mixer" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection73">
 	 <source component = "prmDb" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection74">
 	 <source component = "sigGen" port = "CmdStatus" type = "CmdResponse" num = "0"/>
@@ -398,7 +398,7 @@
 </connection>
 <connection name = "Connection82">
 	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection83">
 	 <source component = "sockGndIf" port = "Log" type = "Log" num = "0"/>
@@ -414,7 +414,7 @@
 </connection>
 <connection name = "Connection86">
 	 <source component = "rgAtt" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection87">
 	 <source component = "rotorSDrv" port = "flatOutput" type = "FlatOutput" num = "0"/>
@@ -426,7 +426,7 @@
 </connection>
 <connection name = "Connection89">
 	 <source component = "rosCycle" port = "time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection90">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
@@ -442,7 +442,7 @@
 </connection>
 <connection name = "Connection93">
 	 <source component = "rgPos" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection94">
 	 <source component = "rgPos" port = "Tlm" type = "Tlm" num = "0"/>
@@ -526,7 +526,7 @@
 </connection>
 <connection name = "Connection114">
 	 <source component = "cmdSeq" port = "timeCaller" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection115">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "1"/>

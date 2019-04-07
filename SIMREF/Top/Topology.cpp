@@ -121,9 +121,9 @@ Svc::ActiveFileLoggerImpl fileLogger
 #endif
 ;
 
-Svc::LinuxTimeImpl linuxTime
+ROS::RosTimeImpl rosTime
 #if FW_OBJECT_NAMES == 1
-                    ("LTIME")
+                    ("ROSTIME")
 #endif
 ;
 
@@ -426,14 +426,15 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
+    // needs to be before constructApp so RosTime is ready
+    ros::start();
+
     constructApp(port_number, udp_string, hostname);
 
     if (!local_cycle) {
         rgGncDrv.set_CycleOut_OutputPort(2, rg.get_CycleIn_InputPort(0));
     }
     //dumparch();
-
-    ros::start();
 
     Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
