@@ -479,11 +479,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                                 tempPortNum,
                                 tempMinOpcode,
                                 tempMaxOpcode);
-    // TODO(mereweth) - connect cmdSeq2 to llrouter
-    /*cmdSeq2_ptr->setOpCodeRanges(2,
-                                  tempPortNum,
-                                  tempMinOpcode,
-                                  tempMaxOpcode);*/
+    cmdSeq2_ptr->setOpCodeRanges(2,
+				 tempPortNum,
+				 tempMinOpcode,
+				 tempMaxOpcode);
 
     /* Register commands */
     cmdSeq_ptr->regCommands();
