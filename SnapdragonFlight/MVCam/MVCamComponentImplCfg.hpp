@@ -9,7 +9,7 @@
 #define MVCAM_MVCAMCOMPONENTIMPLCFG_HPP
 
 // for serializable size
-#include <Svc/ImgComp/CameraFrameSerializableAc.hpp>
+#include <Svc/CameraFrame/CameraFrameSerializableAc.hpp>
 
 #include "Common/Cfg/QuestConstants.hpp"
 
