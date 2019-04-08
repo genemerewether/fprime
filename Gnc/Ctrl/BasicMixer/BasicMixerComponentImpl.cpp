@@ -88,7 +88,7 @@ namespace Gnc {
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       if (this->numRotors >= quest_gnc::multirotor::kBasicMixerMaxActuators) {  return;  }
-      quest_gnc::multirotor::MixMatrix mixer;
+      quest_gnc::multirotor::BasicMixer::MixMatrix mixer;
 
       // TODO(mereweth) - macro-ize the param get calls?
       for (U32 i = 0; i < this->numRotors; i++) {
@@ -170,7 +170,7 @@ namespace Gnc {
                                             thrust_b.getx(),
                                             thrust_b.gety(),
                                             thrust_b.getz()));
-      quest_gnc::multirotor::MixOutput rotorVel;
+      quest_gnc::multirotor::BasicMixer::MixOutput rotorVel;
       this->basicMixer.GetRotorVelCommand(&rotorVel);
 
       FW_ASSERT(quest_gnc::multirotor::kBasicMixerMaxActuators > this->numRotors, this->numRotors);
