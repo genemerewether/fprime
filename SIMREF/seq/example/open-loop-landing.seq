@@ -1,0 +1,13 @@
+; should be clear of ground, so start moving downward, control on velocity
+; NOTE(mereweth) - position setpoint doesn't take effect after this point
+R00:00:00 LCTRL_SetCtrlMode, LIN_VEL
+R00:00:00 LCTRL_FlatOutputSetpoint, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0
+
+; continue controlling on attitude
+R00:00:00.5 LCTRL_AttThrustSetpoint, 12.0, 0.0, 0.0, 0.0, 1.0
+R00:00:00 LCTRL_SetCtrlMode, ATT_ATTRATE_THRUST
+
+; TODO(mereweth) - wait for ground detection
+
+; disable rotors
+R00:00:03 LCTRL_SetCtrlMode, CTRL_DISABLED
