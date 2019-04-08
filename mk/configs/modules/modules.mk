@@ -174,6 +174,7 @@ HEXAGON_MODULES := \
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
 	Gnc/Ctrl/BasicMixer \
+	Gnc/Ctrl/WrenchMixer \
 	Gnc/Est/ImuInteg \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \

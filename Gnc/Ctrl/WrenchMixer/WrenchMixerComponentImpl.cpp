@@ -84,7 +84,7 @@ namespace Gnc {
     parametersLoaded()
   {
       this->paramsInited = false;
-      Fw::ParamValid valid[4];
+      Fw::ParamValid valid[6];
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       if (this->numRotors >= quest_gnc::multirotor::kWrenchMixerMaxActuators) {  return;  }
@@ -94,58 +94,74 @@ namespace Gnc {
       for (U32 i = 0; i < this->numRotors; i++) {
           switch (i) {
               case 0:
-                  mixer.col(i) << paramGet_m_x__1(valid[0]),
-                                  paramGet_m_y__1(valid[1]),
-                                  paramGet_m_z__1(valid[2]),
-                                  paramGet_t__1(valid[3]);
+                  mixer.col(i) << paramGet_t_x__1(valid[0]),
+                                  paramGet_t_y__1(valid[1]),
+                                  paramGet_t_z__1(valid[2]),
+                                  paramGet_m_x__1(valid[3]),
+                                  paramGet_m_y__1(valid[4]),
+                                  paramGet_m_z__1(valid[5]);
                   break;
               case 1:
-                  mixer.col(i) << paramGet_m_x__2(valid[0]),
-                                  paramGet_m_y__2(valid[1]),
-                                  paramGet_m_z__2(valid[2]),
-                                  paramGet_t__2(valid[3]);
+                  mixer.col(i) << paramGet_t_x__2(valid[0]),
+                                  paramGet_t_y__2(valid[1]),
+                                  paramGet_t_z__2(valid[2]),
+                                  paramGet_m_x__2(valid[3]),
+                                  paramGet_m_y__2(valid[4]),
+                                  paramGet_m_z__2(valid[5]);
                   break;
               case 2:
-                  mixer.col(i) << paramGet_m_x__3(valid[0]),
-                                  paramGet_m_y__3(valid[1]),
-                                  paramGet_m_z__3(valid[2]),
-                                  paramGet_t__3(valid[3]);
+                  mixer.col(i) << paramGet_t_x__3(valid[0]),
+                                  paramGet_t_y__3(valid[1]),
+                                  paramGet_t_z__3(valid[2]),
+                                  paramGet_m_x__3(valid[3]),
+                                  paramGet_m_y__3(valid[4]),
+                                  paramGet_m_z__3(valid[5]);
                   break;
               case 3:
-                  mixer.col(i) << paramGet_m_x__4(valid[0]),
-                                  paramGet_m_y__4(valid[1]),
-                                  paramGet_m_z__4(valid[2]),
-                                  paramGet_t__4(valid[3]);
+                  mixer.col(i) << paramGet_t_x__4(valid[0]),
+                                  paramGet_t_y__4(valid[1]),
+                                  paramGet_t_z__4(valid[2]),
+                                  paramGet_m_x__4(valid[3]),
+                                  paramGet_m_y__4(valid[4]),
+                                  paramGet_m_z__4(valid[5]);
                   break;
               case 4:
-                  mixer.col(i) << paramGet_m_x__5(valid[0]),
-                                  paramGet_m_y__5(valid[1]),
-                                  paramGet_m_z__5(valid[2]),
-                                  paramGet_t__5(valid[3]);
+                  mixer.col(i) << paramGet_t_x__5(valid[0]),
+                                  paramGet_t_y__5(valid[1]),
+                                  paramGet_t_z__5(valid[2]),
+                                  paramGet_m_x__5(valid[3]),
+                                  paramGet_m_y__5(valid[4]),
+                                  paramGet_m_z__5(valid[5]);
                   break;
               case 5:
-                  mixer.col(i) << paramGet_m_x__6(valid[0]),
-                                  paramGet_m_y__6(valid[1]),
-                                  paramGet_m_z__6(valid[2]),
-                                  paramGet_t__6(valid[3]);
+                  mixer.col(i) << paramGet_t_x__6(valid[0]),
+                                  paramGet_t_y__6(valid[1]),
+                                  paramGet_t_z__6(valid[2]),
+                                  paramGet_m_x__6(valid[3]),
+                                  paramGet_m_y__6(valid[4]),
+                                  paramGet_m_z__6(valid[5]);
                   break;
               case 6:
-                  mixer.col(i) << paramGet_m_x__7(valid[0]),
-                                  paramGet_m_y__7(valid[1]),
-                                  paramGet_m_z__7(valid[2]),
-                                  paramGet_t__7(valid[3]);
+                  mixer.col(i) << paramGet_t_x__7(valid[0]),
+                                  paramGet_t_y__7(valid[1]),
+                                  paramGet_t_z__7(valid[2]),
+                                  paramGet_m_x__7(valid[3]),
+                                  paramGet_m_y__7(valid[4]),
+                                  paramGet_m_z__7(valid[5]);
                   break;
               case 7:
-                  mixer.col(i) << paramGet_m_x__8(valid[0]),
-                                  paramGet_m_y__8(valid[1]),
-                                  paramGet_m_z__8(valid[2]),
-                                  paramGet_t__8(valid[3]);
+                  mixer.col(i) << paramGet_t_x__8(valid[0]),
+                                  paramGet_t_y__8(valid[1]),
+                                  paramGet_t_z__8(valid[2]),
+                                  paramGet_m_x__8(valid[3]),
+                                  paramGet_m_y__8(valid[4]),
+                                  paramGet_m_z__8(valid[5]);
                   break;
               default:
                   FW_ASSERT(0, i);
           }
 
-          for (U32 j = 0; j < 4; j++) {
+          for (U32 j = 0; j < 5; j++) {
               if (Fw::PARAM_VALID != valid[j]) {  return;  }
           }
       }
