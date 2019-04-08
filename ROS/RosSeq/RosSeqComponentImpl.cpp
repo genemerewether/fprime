@@ -140,8 +140,10 @@ namespace ROS {
 	        // TODO(mereweth) - EVR or ros message
 	        this->m_actionServer->setAborted();
 	    }
-	    Fw::EightyCharString seqName(pathToSeq);
-	    this->seqRunOut_out(0, seqName);
+	    else {
+		Fw::EightyCharString seqName(pathToSeq);
+		this->seqRunOut_out(0, seqName);
+	    }
 	}
 	else {
             // TODO(mereweth) - EVR or ros message
