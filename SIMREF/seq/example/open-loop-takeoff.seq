@@ -1,0 +1,13 @@
+; command zero rates and takeoff thrust
+R00:00:00 LCTRL_AttThrustSetpoint, 16.0, 0.0, 0.0, 0.0, 1.0
+R00:00:00 LCTRL_SetCtrlMode, ATTRATE_THRUST
+
+; should be free of ground contact, so begin controlling on attitude
+R00:00:00.1 LCTRL_SetCtrlMode, ATT_ATTRATE_THRUST
+
+; should be clear of ground, so continue moving upward at 0.1 m/s
+; NOTE(mereweth) - position setpoint doesn't take effect yet
+R00:00:00.1 LCTRL_FlatOutputSetpoint, 0.0, 0.0, 0.5, 0.0, 0.0, 0.1, 0.0
+R00:00:00 LCTRL_SetCtrlMode, LIN_VEL
+
+R00:00:01 LCTRL_SetCtrlMode, FLAT_OUTPUT_LIN_ACC_FF
