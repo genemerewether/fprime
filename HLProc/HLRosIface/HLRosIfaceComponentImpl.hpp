@@ -212,6 +212,7 @@ namespace HLProc {
         //!
         ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
 
+        ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;
         image_transport::Publisher m_imagePub;
 

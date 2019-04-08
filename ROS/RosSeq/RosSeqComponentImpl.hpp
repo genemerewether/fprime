@@ -20,7 +20,12 @@
 #ifndef RosSeq_HPP
 #define RosSeq_HPP
 
+#include <ros/ros.h>
+#include <actionlib/server/simple_action_server.h>
+#include <fprime_msgs/RunSeqAction.h>
+
 #include "ROS/RosSeq/RosSeqComponentAc.hpp"
+#include <Os/Task.hpp>
 
 namespace ROS {
 
@@ -54,6 +59,13 @@ namespace ROS {
       //!
       ~RosSeqComponentImpl(void);
 
+      void startPub();
+
+      //! Start interrupt task
+      Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
+                                        NATIVE_INT_TYPE stackSize,
+                                        NATIVE_INT_TYPE cpuAffinity = -1);
+
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -83,7 +95,24 @@ namespace ROS {
           Fw::CommandResponse response /*!< The command response argument*/
       );
 
+      // ----------------------------------------------------------------------
+      // Member variables
+      // ----------------------------------------------------------------------
 
+      void goalCB();
+      void preemptCB();
+
+      bool m_rosInited;
+
+      //! Entry point for task serving action requests
+      static void intTaskEntry(void * ptr);
+
+      //! Task object for action server task
+      //!
+      Os::Task m_intTask;
+
+      ros::NodeHandle* m_nodeHandle;
+      actionlib::SimpleActionServer<fprime_msgs::RunSeqAction>* m_actionServer;
     };
 
 } // end namespace ROS

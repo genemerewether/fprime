@@ -53,6 +53,8 @@ namespace HLProc {
     HLRosIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_nodeHandle(NULL),
+    m_imageXport(NULL),
     m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
     m_actuatorsSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
@@ -93,8 +95,8 @@ namespace HLProc {
     void HLRosIfaceComponentImpl ::
       startPub() {
         // TODO(mereweth) - prevent calling twice; free imageXport
-        ros::NodeHandle n;
-	m_imageXport = new image_transport::ImageTransport(n);
+        FW_ASSERT(m_nodeHandle);
+	m_imageXport = new image_transport::ImageTransport(this->m_nodeHandle);
 
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
@@ -117,6 +119,7 @@ namespace HLProc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("HLROSIFACE");
+	this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, HLRosIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -468,44 +471,46 @@ namespace HLProc {
     //! Entry point for task waiting for messages
     void HLRosIfaceComponentImpl ::
       intTaskEntry(void * ptr) {
+        // TODO(mereweth) - prevent calling twice; free m_nodeHandle
         DEBUG_PRINT("HLRosIface task entry\n");
 
         FW_ASSERT(ptr);
         HLRosIfaceComponentImpl* compPtr = (HLRosIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
-        ros::NodeHandle n;
+        ros::NodeHandle* n = compPtr->m_nodeHandle;
+	FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
-        n.setCallbackQueue(&localCallbacks);
+        n->setCallbackQueue(&localCallbacks);
 
         ImuStateUpdateHandler updateHandler(compPtr, 0);
 
-        ros::Subscriber updateSub = n.subscribe("imu_state_update", 10,
+        ros::Subscriber updateSub = n->subscribe("imu_state_update", 10,
                                                 &ImuStateUpdateHandler::imuStateUpdateCallback,
                                                 &updateHandler,
                                                 ros::TransportHints().tcpNoDelay());
 
 
         ActuatorsHandler actuatorsHandler0(compPtr, 0);
-        ros::Subscriber actuatorsSub0 = n.subscribe("flight_actuators_command", 10,
+        ros::Subscriber actuatorsSub0 = n->subscribe("flight_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler0,
                                             ros::TransportHints().tcpNoDelay());
         
         ActuatorsHandler actuatorsHandler1(compPtr, 1);
-        ros::Subscriber actuatorsSub1 = n.subscribe("aux_actuators_command", 10,
+        ros::Subscriber actuatorsSub1 = n->subscribe("aux_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());
 
         FlatOutputHandler flatoutHandler(compPtr, 0);
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
-        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 1,
+        ros::Subscriber flatoutSub = n->subscribe("flat_output_setpoint", 1,
                                                  &FlatOutputHandler::flatOutputCallback,
                                                  &flatoutHandler,
                                                  ros::TransportHints().tcpNoDelay());
 
-        ros::Subscriber attRateThrustSub = n.subscribe("attitude_rate_thrust_setpoint", 10,
+        ros::Subscriber attRateThrustSub = n->subscribe("attitude_rate_thrust_setpoint", 10,
                                                        &AttitudeRateThrustHandler::attitudeRateThrustCallback,
                                                        &attRateThrustHandler,
                                                        ros::TransportHints().tcpNoDelay());

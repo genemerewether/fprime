@@ -11,6 +11,7 @@
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
 
     <import_port_type>Svc/Seq/CmdSeqInPortAi.xml</import_port_type>
+    <import_port_type>Svc/Seq/CmdSeqCancelPortAi.xml</import_port_type>
     <import_port_type>Fw/Cmd/CmdResponsePortAi.xml</import_port_type>
     
     <ports>
@@ -35,10 +36,13 @@
         <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="seqRunOut" data_type="Svc::CmdSeqIn"  kind="output"    max_number="4">
+        <port name="seqRunOut" data_type="Svc::CmdSeqIn"  kind="output"    max_number="1">
         </port>
 
-        <port name="seqDoneIn" data_type="Fw::CmdResponse"  kind="sync_input"    max_number="4">
+        <port name="seqCancelOut" data_type="Svc::CmdSeqCancel"  kind="output"    max_number="1">
+        </port>
+
+        <port name="seqDoneIn" data_type="Fw::CmdResponse"  kind="sync_input"    max_number="1">
         </port>
     </ports>
 

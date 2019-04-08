@@ -12,6 +12,7 @@
 	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
 	<import_component_type>ROS/RosCycle/RosCycleComponentAi.xml</import_component_type>
+	<import_component_type>ROS/RosSeq/RosSeqComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Est/AttFilter/AttFilterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
 	<import_component_type>Svc/RateGroupDecoupler/RateGroupDecouplerComponentAi.xml</import_component_type>
@@ -47,6 +48,8 @@
 
    <instance namespace="ROS" name="rosCycle" type="RosCycle"/>
 
+   <instance namespace="ROS" name="rosSeq" type="RosSeq"/>
+
    <instance namespace="Gnc" name="attFilter" type="AttFilter" base_id="1500"  base_id_window="500" />
 
    <instance namespace="ROS" name="rosTime" type="Time"/>
@@ -71,6 +74,19 @@
 
    <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl" base_id="2000"  base_id_window="500" />
 
+
+<connection name = "Manual1">
+	 <source component = "rosSeq" port = "seqRunOut" type = "CmdSeqIn" num = "0"/>
+ 	 <target component = "cmdSeq" port = "seqRunIn" type = "CmdSeqIn" num = "0"/>
+</connection>
+<connection name = "Manual2">
+	 <source component = "rosSeq" port = "seqCancelOut" type = "CmdSeqCancel" num = "0"/>
+ 	 <target component = "cmdSeq" port = "seqCancelIn" type = "CmdSeqCancel" num = "0"/>
+</connection>
+<connection name = "Manual3">
+ 	 <source component = "cmdSeq" port = "seqDone" type = "CmdResponse" num = "0"/>
+	 <target component = "rosSeq" port = "seqDoneIn" type = "CmdResponse" num = "0"/>
+</connection>
 
 <connection name = "Connection1">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "0"/>

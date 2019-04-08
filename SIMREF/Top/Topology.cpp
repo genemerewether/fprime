@@ -127,6 +127,12 @@ ROS::RosTimeImpl rosTime
 #endif
 ;
 
+ROS::RosSeqComponentImpl rosSeq
+#if FW_OBJECT_NAMES == 1
+                    ("ROSSEQ")
+#endif
+;
+
 ROS::RosCycleComponentImpl rosCycle
 #if FW_OBJECT_NAMES == 1
                     ("ROSCYCLE",
@@ -262,6 +268,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     gzManipIf.init(0);
 
     rosTime.init(0);
+    rosSeq.init(0);
 
     chanTlm.init(10,0);
 
@@ -439,12 +446,16 @@ int main(int argc, char* argv[]) {
     Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
-    rotorSDrv.startPub();
     stat = rotorSDrv.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
-    gzManipIf.startPub();
     stat = gzManipIf.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    stat = rosSeq.startIntTask(70, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+
+    rotorSDrv.startPub();
+    gzManipIf.startPub();
+    rosSeq.startPub();
 
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);

@@ -218,6 +218,8 @@ namespace SIMREF {
 
         bool m_rosInited;
 
+        ros::NodeHandle* m_nodeHandle;
+
         //! Publisher for motor speeds
         //!
         ros::Publisher m_motorPub;

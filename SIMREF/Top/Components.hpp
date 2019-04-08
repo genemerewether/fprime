@@ -25,6 +25,7 @@ void exitTasks(void);
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 #include <ROS/RosCycle/RosCycleComponentImpl.hpp>
+#include <ROS/RosSeq/RosSeqComponentImpl.hpp>
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
 #include <SIMREF/GazeboManipIf/GazeboManipIfComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
@@ -50,6 +51,7 @@ extern Svc::UdpReceiverComponentImpl udpReceiver;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern ROS::RosCycleComponentImpl rosCycle;
+extern ROS::RosSeqComponentImpl rosSeq;
 extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
 extern SIMREF::GazeboManipIfComponentImpl gzManipIf;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;

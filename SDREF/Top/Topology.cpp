@@ -423,10 +423,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     cmdDisp_ptr->init(20,0);
 
     cmdSeq_ptr->init(10,0);
-    cmdSeq_ptr->allocateBuffer(0,seqMallocator,5*1024);
+    cmdSeq_ptr->allocateBuffer(0,seqMallocator,100*1024);
 
     cmdSeq2_ptr->init(10,0);
-    cmdSeq2_ptr->allocateBuffer(0,seqMallocator,5*1024);
+    cmdSeq2_ptr->allocateBuffer(0,seqMallocator,100*1024);
 
     prmDb_ptr->init(10,0);
     snapHealth_ptr->init(50,0);

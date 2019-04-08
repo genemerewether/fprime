@@ -17,6 +17,7 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
+#include <ros/callback_queue.h>
 
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
@@ -32,10 +33,13 @@ namespace ROS {
     RosSeqComponentImpl(
         const char *const compName
     ) :
-      RosSeqComponentBase(compName)
+      RosSeqComponentBase(compName),
 #else
-    RosSeqImpl(void)
+      RosSeqImpl(void),
 #endif
+      m_rosInited(false),
+      m_nodeHandle(NULL),
+      m_actionServer(NULL)
   {
 
   }
@@ -53,6 +57,36 @@ namespace ROS {
   {
 
   }
+
+    void RosSeqComponentImpl ::
+      startPub() {
+        // TODO(mereweth) - prevent calling twice; free ActionServer
+        FW_ASSERT(m_nodeHandle);
+	m_actionServer = new actionlib::SimpleActionServer<fprime_msgs::RunSeqAction>(*m_nodeHandle,
+										      "ROSSEQ",
+										      false);
+	m_actionServer->registerGoalCallback(boost::bind(&RosSeqComponentImpl::goalCB, this));
+	m_actionServer->registerPreemptCallback(boost::bind(&RosSeqComponentImpl::preemptCB, this));
+	
+	m_actionServer->start();
+
+        m_rosInited = true;
+    }
+
+    Os::Task::TaskStatus RosSeqComponentImpl ::
+      startIntTask(NATIVE_INT_TYPE priority,
+		   NATIVE_INT_TYPE stackSize,
+		   NATIVE_INT_TYPE cpuAffinity) {
+	Os::TaskString name("ROSSEQ");
+	Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
+	  stackSize, RosSeqComponentImpl::intTaskEntry, this, cpuAffinity);
+
+	if (stat != Os::Task::TASK_OK) {
+	  //DEBUG_PRINT("Task start error: %d\n",stat);
+	}
+
+	return stat;
+    }
 
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
@@ -76,15 +110,73 @@ namespace ROS {
     // TODO
   }
 
-  void RosSeqComponentImpl ::
-    seqDoneIn_handler(
-        const NATIVE_INT_TYPE portNum,
-        FwOpcodeType opCode,
-        U32 cmdSeq,
-        Fw::CommandResponse response
-    )
-  {
-    // TODO
-  }
+    void RosSeqComponentImpl ::
+      seqDoneIn_handler(
+	  const NATIVE_INT_TYPE portNum,
+	  FwOpcodeType opCode,
+	  U32 cmdSeq,
+	  Fw::CommandResponse response
+      )
+    {
+        FW_ASSERT(this->m_actionServer);
+	if (Fw::COMMAND_OK == response) {
+	    this->m_actionServer->setSucceeded();
+	}
+	else {
+	    this->m_actionServer->setAborted();
+	}
+    }
+
+    // ----------------------------------------------------------------------
+    // Member function definitions
+    // ----------------------------------------------------------------------
+
+    void RosSeqComponentImpl ::
+      goalCB() {
+        FW_ASSERT(this->m_actionServer);
+	if (this->isConnected_seqRunOut_OutputPort(0)) {
+	    const char* const pathToSeq = this->m_actionServer->acceptNewGoal()->pathToSeq.data.c_str();
+	    if (strlen(pathToSeq) > 79) { // max size of string
+	        // TODO(mereweth) - EVR or ros message
+	        this->m_actionServer->setAborted();
+	    }
+	    Fw::EightyCharString seqName(pathToSeq);
+	    this->seqRunOut_out(0, seqName);
+	}
+	else {
+            // TODO(mereweth) - EVR or ros message
+	    this->m_actionServer->acceptNewGoal();
+	    this->m_actionServer->setAborted();
+	}
+    }
+
+    void RosSeqComponentImpl ::
+      preemptCB() {
+        FW_ASSERT(this->m_actionServer);
+	if (this->isConnected_seqCancelOut_OutputPort(0)) {
+  	    this->seqCancelOut_out(0);
+	}
+	this->m_actionServer->setPreempted();
+    }
+
+    //! Entry point for task waiting for messages
+    void RosSeqComponentImpl ::
+      intTaskEntry(void * ptr) {
+      //DEBUG_PRINT("RosSeq task entry\n");
+
+        FW_ASSERT(ptr);
+        RosSeqComponentImpl* compPtr = (RosSeqComponentImpl*) ptr;
+        //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
+
+	compPtr->m_nodeHandle = new ros::NodeHandle();
+        ros::NodeHandle* const n = compPtr->m_nodeHandle;
+        ros::CallbackQueue localCallbacks;
+        n->setCallbackQueue(&localCallbacks);
+        
+        while (1) {
+            // TODO(mereweth) - check for and respond to ping
+            localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
+        }
+    }
 
 } // end namespace ROS

@@ -47,6 +47,7 @@ namespace SIMREF {
       RotorSDrvImpl(void),
   #endif
       m_rosInited(false),
+      m_nodeHandle(NULL),
       m_imuSet(), // zero-initialize instead of default-initializing
       m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
       m_odomSet(), // zero-initialize instead of default-initializing
@@ -91,14 +92,16 @@ namespace SIMREF {
 
     void RotorSDrvComponentImpl ::
       startPub() {
-        ros::NodeHandle n;
+        FW_ASSERT(m_nodeHandle);
+        ros::NodeHandle* n = this->m_nodeHandle;
+	FW_ASSERT(n);
 
         char buf[32];
-        m_motorPub = n.advertise<mav_msgs::Actuators>("command/motor_speed", 5);
+        m_motorPub = n->advertise<mav_msgs::Actuators>("command/motor_speed", 5);
 
         for (int i = 0; i < NUM_ODOMLOG_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = n.advertise<nav_msgs::Odometry>(buf, 5);
+            m_odomPub[i] = n->advertise<nav_msgs::Odometry>(buf, 5);
         }
 
         m_rosInited = true;
@@ -109,6 +112,7 @@ namespace SIMREF {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("ROTORSDRVROS");
+	this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, RotorSDrvComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -326,12 +330,13 @@ namespace SIMREF {
         RotorSDrvComponentImpl* compPtr = (RotorSDrvComponentImpl*) ptr;
         compPtr->log_ACTIVITY_LO_RSDRV_IntTaskStarted();
 
-        ros::NodeHandle n;
+        ros::NodeHandle* n = compPtr->m_nodeHandle;
+	FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
-        n.setCallbackQueue(&localCallbacks);
+        n->setCallbackQueue(&localCallbacks);
 
         ImuStateUpdateHandler updateHandler(compPtr, 0);
-        ros::Subscriber updateSub = n.subscribe("imu_state_update", 10,
+        ros::Subscriber updateSub = n->subscribe("imu_state_update", 10,
                                                 &ImuStateUpdateHandler::imuStateUpdateCallback,
                                                 &updateHandler,
                                                 ros::TransportHints().tcpNoDelay());
@@ -342,28 +347,28 @@ namespace SIMREF {
         FlatOutputHandler flatoutHandler(compPtr, 0);
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
 
-        ros::Subscriber gtSub = n.subscribe("ground_truth/odometry", 10,
+        ros::Subscriber gtSub = n->subscribe("ground_truth/odometry", 10,
                                             &OdometryHandler::odometryCallback,
                                             &gtHandler,
                                             ros::TransportHints().tcpNoDelay());
 
-        ros::Subscriber odomSub = n.subscribe("odometry_sensor1/odometry", 10,
+        ros::Subscriber odomSub = n->subscribe("odometry_sensor1/odometry", 10,
                                               &OdometryHandler::odometryCallback,
                                               &odomHandler,
                                               ros::TransportHints().tcpNoDelay());
 
-        ros::Subscriber imuSub = n.subscribe("imu", 10,
+        ros::Subscriber imuSub = n->subscribe("imu", 10,
                                               &ImuHandler::imuCallback,
                                               &imuHandler,
                                               ros::TransportHints().tcpNoDelay());
 
         // TODO(mgardine) - what should the queue size be?
-        ros::Subscriber flatoutSub = n.subscribe("flat_output_setpoint", 1,
+        ros::Subscriber flatoutSub = n->subscribe("flat_output_setpoint", 1,
                                                  &FlatOutputHandler::flatOutputCallback,
                                                  &flatoutHandler,
                                                  ros::TransportHints().tcpNoDelay());
 
-        ros::Subscriber attRateThrustSub = n.subscribe("attitude_rate_thrust_setpoint", 10,
+        ros::Subscriber attRateThrustSub = n->subscribe("attitude_rate_thrust_setpoint", 10,
                                                        &AttitudeRateThrustHandler::attitudeRateThrustCallback,
                                                        &attRateThrustHandler,
                                                        ros::TransportHints().tcpNoDelay());
