@@ -279,7 +279,7 @@
  	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
 </connection>
 <connection name = "Connection42">
-	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
+	 <source component = "rgXfer" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "cmdSeq" port = "schedIn" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection43">
@@ -663,7 +663,7 @@
  	 <target component = "serialDriverLL" port = "readBufferSend" type = "BufferSend" num = "0"/>
 </connection>
 <connection name = "Connection138">
-	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+	 <source component = "rgXfer" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
  	 <target component = "cmdSeq2" port = "schedIn" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection139">
