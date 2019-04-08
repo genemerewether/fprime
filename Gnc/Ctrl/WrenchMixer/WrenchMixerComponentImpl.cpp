@@ -178,7 +178,7 @@ namespace Gnc {
   void WrenchMixerComponentImpl ::
     controls_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::mav_msgs::TorqueThrust &TorqueThrust
+        ROS::geometry_msgs::WrenchStamped &WrenchStamped
     )
   {
       if (!paramsInited) {
@@ -187,13 +187,13 @@ namespace Gnc {
 
       using ROS::geometry_msgs::Vector3;
 
-      Vector3 moment_b = TorqueThrust.gettorque();
-      Vector3 thrust_b = TorqueThrust.getthrust();
+      Vector3 moment_b = WrenchStamped.getwrench().gettorque();
+      Vector3 force_b = WrenchStamped.getwrench().getforce();
 
       this->wrenchMixer.SetWrenchDes(Eigen::Vector3d(
-                                            thrust_b.getx(),
-                                            thrust_b.gety(),
-                                            thrust_b.getz()),
+                                            force_b.getx(),
+                                            force_b.gety(),
+                                            force_b.getz()),
 				     Eigen::Vector3d(
                                             moment_b.getx(),
                                             moment_b.gety(),
@@ -209,7 +209,7 @@ namespace Gnc {
           angVelTlm[i] = rotorVel(i);
       }
 
-      ROS::std_msgs::Header h = TorqueThrust.getheader();
+      ROS::std_msgs::Header h = WrenchStamped.getheader();
       ROS::mav_msgs::Actuators rotorVel__comm(h,
                                               angles, 0, 0,
                                               angVel, quest_gnc::multirotor::kWrenchMixerMaxActuators, this->numRotors,

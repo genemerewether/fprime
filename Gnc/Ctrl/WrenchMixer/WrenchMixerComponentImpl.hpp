@@ -71,7 +71,7 @@ namespace Gnc {
       //!
       void controls_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::mav_msgs::TorqueThrust &TorqueThrust
+          ROS::geometry_msgs::WrenchStamped &WrenchStamped 
       );
 
       //! Handler implementation for sched

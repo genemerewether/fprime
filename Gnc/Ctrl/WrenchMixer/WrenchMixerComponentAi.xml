@@ -9,7 +9,7 @@
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/geometry_msgs/Ports/WrenchStampedPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
 
     <import_serializable_type>ROS/Gen/geometry_msgs/Types/WrenchSerializableAi.xml</import_serializable_type>
@@ -20,7 +20,7 @@
     <import_dictionary>Gnc/Ctrl/WrenchMixer/Params.xml</import_dictionary>
 
     <ports>
-        <port name="controls" data_type="ROS::mav_msgs::TorqueThrust"  kind="sync_input" max_number="1">
+        <port name="controls" data_type="ROS::geometry_msgs::WrenchStamped"  kind="sync_input" max_number="1">
         </port>
 
         <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="1">
