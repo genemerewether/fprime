@@ -410,33 +410,33 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     rgDrv_ptr->init();
 
     // Initialize the rate groups
-    rgTlm_ptr->init(10,0);
-    rgXfer_ptr->init(10,0);
+    rgTlm_ptr->init(60,0);
+    rgXfer_ptr->init(60,0);
 
 #if FW_ENABLE_TEXT_LOGGING
     textLogger_ptr->init();
 #endif
 
-    eventLogger_ptr->init(10,0);
-    eventLoggerLL_ptr->init(10,0);
-    fileLogger_ptr->init(10);
+    eventLogger_ptr->init(60,0);
+    eventLoggerLL_ptr->init(60,0);
+    fileLogger_ptr->init(60);
     serLogger_ptr->init(0);
     serLogger_ptr->setStreamId(AFL_ACTADAP_ESC);
 
     linuxTime_ptr->init(0);
 
-    chanTlm_ptr->init(10,0);
+    chanTlm_ptr->init(60,0);
 
-    cmdDisp_ptr->init(20,0);
+    cmdDisp_ptr->init(60,0);
 
-    cmdSeq_ptr->init(10,0);
+    cmdSeq_ptr->init(60,0);
     cmdSeq_ptr->allocateBuffer(0,seqMallocator,100*1024);
 
-    cmdSeq2_ptr->init(10,0);
+    cmdSeq2_ptr->init(60,0);
     cmdSeq2_ptr->allocateBuffer(0,seqMallocator,100*1024);
 
-    prmDb_ptr->init(10,0);
-    snapHealth_ptr->init(50,0);
+    prmDb_ptr->init(60,0);
+    snapHealth_ptr->init(60,0);
     snapHealth_ptr->setBootCount(boot_count);
     snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_DYNAMIC);
 
@@ -450,18 +450,18 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
-    imgTlm_ptr->init(30, 0);
+    imgTlm_ptr->init(60, 0);
 
     mvCam_ptr->init(60, 0);
     mvVislam_ptr->init(2000, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
-    hexRouter_ptr->init(10, 1000); // message size
+    hexRouter_ptr->init(60, 1000); // message size
     sdRosIface_ptr->init(0);
     rosSeq_ptr->init(0);
     
-    serialTextConv_ptr->init(20,0);
-    llRouter_ptr->init(10,SERIAL_BUFFER_SIZE,0);
+    serialTextConv_ptr->init(60,0);
+    llRouter_ptr->init(60,SERIAL_BUFFER_SIZE,0);
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
 
