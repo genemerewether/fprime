@@ -122,7 +122,7 @@ namespace ROS {
 	if (Fw::COMMAND_OK == response) {
 	    this->m_actionServer->setSucceeded();
 	}
-	else {
+	else if (!this->m_actionServer->isActive()) {
 	    this->m_actionServer->setAborted();
 	}
     }
@@ -147,6 +147,20 @@ namespace ROS {
             // TODO(mereweth) - EVR or ros message
 	    this->m_actionServer->acceptNewGoal();
 	    this->m_actionServer->setAborted();
+	}
+
+	// NOTE(Mereweth) - from SimpleActionServer docs:
+	/* Preempts received for the new goal between checking if 
+	 * isNewGoalAvailable or invokation of a goal callback and
+	 * the acceptNewGoal call will not trigger a preempt callback.
+	 * This means, isPreemptReqauested should be called after
+	 * accepting the goal even for callback-based implementations
+	 * to make sure the new goal does not have a pending preempt 
+	 * request.
+	 */
+
+	if (this->m_actionServer->isPreemptRequested() || !ros::ok()) {
+	    this->m_actionServer->setPreempted();
 	}
     }
 
