@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  BasicMixerImpl.cpp
+// \title  WrenchMixerImpl.cpp
 // \author mereweth
-// \brief  cpp file for BasicMixer component implementation class
+// \brief  cpp file for WrenchMixer component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -18,7 +18,7 @@
 // ======================================================================
 
 
-#include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
+#include <Gnc/Ctrl/WrenchMixer/WrenchMixerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
 #include <stdio.h>
@@ -40,17 +40,17 @@ namespace Gnc {
   // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
-  BasicMixerComponentImpl ::
+  WrenchMixerComponentImpl ::
 #if FW_OBJECT_NAMES == 1
-    BasicMixerComponentImpl(
+    WrenchMixerComponentImpl(
         const char *const compName
     ) :
-      BasicMixerComponentBase(compName),
+      WrenchMixerComponentBase(compName),
 #else
-    BasicMixerImpl(void) :
-      BasicMixerImpl(void),
+    WrenchMixerImpl(void) :
+      WrenchMixerImpl(void),
 #endif
-      basicMixer(),
+      wrenchMixer(),
       paramsInited(false),
       numRotors(0u),
       angVelTlm()
@@ -58,21 +58,21 @@ namespace Gnc {
 
   }
 
-  void BasicMixerComponentImpl ::
+  void WrenchMixerComponentImpl ::
     init(
         const NATIVE_INT_TYPE instance
     )
   {
-    BasicMixerComponentBase::init(instance);
+    WrenchMixerComponentBase::init(instance);
   }
 
-  BasicMixerComponentImpl ::
-    ~BasicMixerComponentImpl(void)
+  WrenchMixerComponentImpl ::
+    ~WrenchMixerComponentImpl(void)
   {
 
   }
 
-  void BasicMixerComponentImpl ::
+  void WrenchMixerComponentImpl ::
     parameterUpdated(FwPrmIdType id)
   {
 #ifndef BUILD_TIR5
@@ -80,15 +80,15 @@ namespace Gnc {
 #endif
   }
 
-  void BasicMixerComponentImpl ::
+  void WrenchMixerComponentImpl ::
     parametersLoaded()
   {
       this->paramsInited = false;
       Fw::ParamValid valid[4];
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-      if (this->numRotors >= quest_gnc::multirotor::kBasicMixerMaxActuators) {  return;  }
-      quest_gnc::multirotor::BasicMixer::MixMatrix mixer;
+      if (this->numRotors >= quest_gnc::multirotor::kWrenchMixerMaxActuators) {  return;  }
+      quest_gnc::multirotor::WrenchMixer::MixMatrix mixer;
 
       // TODO(mereweth) - macro-ize the param get calls?
       for (U32 i = 0; i < this->numRotors; i++) {
@@ -150,7 +150,7 @@ namespace Gnc {
           }
       }
 
-      (void) basicMixer.SetMixer(mixer, this->numRotors);
+      (void) wrenchMixer.SetMixer(mixer, this->numRotors);
 
       this->paramsInited = true;
   }
@@ -159,7 +159,7 @@ namespace Gnc {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void BasicMixerComponentImpl ::
+  void WrenchMixerComponentImpl ::
     controls_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::mav_msgs::TorqueThrust &TorqueThrust
@@ -174,19 +174,19 @@ namespace Gnc {
       Vector3 moment_b = TorqueThrust.gettorque();
       Vector3 thrust_b = TorqueThrust.getthrust();
 
-      this->basicMixer.SetTorqueThrustDes(Eigen::Vector3d(
-                                            moment_b.getx(),
-                                            moment_b.gety(),
-                                            moment_b.getz()),
-                                          Eigen::Vector3d(
+      this->wrenchMixer.SetWrenchDes(Eigen::Vector3d(
                                             thrust_b.getx(),
                                             thrust_b.gety(),
-                                            thrust_b.getz()));
-      quest_gnc::multirotor::BasicMixer::MixOutput rotorVel;
-      this->basicMixer.GetRotorVelCommand(&rotorVel);
+                                            thrust_b.getz()),
+				     Eigen::Vector3d(
+                                            moment_b.getx(),
+                                            moment_b.gety(),
+                                            moment_b.getz()));
+      quest_gnc::multirotor::WrenchMixer::MixOutput rotorVel;
+      this->wrenchMixer.GetRotorVelCommand(&rotorVel);
 
-      FW_ASSERT(quest_gnc::multirotor::kBasicMixerMaxActuators > this->numRotors, this->numRotors);
-      F64 angVel[quest_gnc::multirotor::kBasicMixerMaxActuators] = { 0.0 };
+      FW_ASSERT(quest_gnc::multirotor::kWrenchMixerMaxActuators > this->numRotors, this->numRotors);
+      F64 angVel[quest_gnc::multirotor::kWrenchMixerMaxActuators] = { 0.0 };
       F64 angles[0], normalized[0];
       for (U32 i = 0; i < this->numRotors; i ++) {
           angVel[i] = rotorVel(i);
@@ -196,36 +196,36 @@ namespace Gnc {
       ROS::std_msgs::Header h = TorqueThrust.getheader();
       ROS::mav_msgs::Actuators rotorVel__comm(h,
                                               angles, 0, 0,
-                                              angVel, quest_gnc::multirotor::kBasicMixerMaxActuators, this->numRotors,
+                                              angVel, quest_gnc::multirotor::kWrenchMixerMaxActuators, this->numRotors,
                                               normalized, 0, 0);
       if (this->isConnected_motor_OutputPort(0)) {
           this->motor_out(0, rotorVel__comm);
       }
   }
 
-  void BasicMixerComponentImpl ::
+  void WrenchMixerComponentImpl ::
     sched_handler(
         const NATIVE_INT_TYPE portNum,
         NATIVE_UINT_TYPE context
     )
   {
-      COMPILE_TIME_ASSERT(quest_gnc::multirotor::kBasicMixerMaxActuators >= 8, BM_MAX_ACT_VS_TLM);
-      this->tlmWrite_BMIX_Rot0(angVelTlm[0]);
-      this->tlmWrite_BMIX_Rot1(angVelTlm[1]);
-      this->tlmWrite_BMIX_Rot2(angVelTlm[2]);
-      this->tlmWrite_BMIX_Rot3(angVelTlm[3]);
-      this->tlmWrite_BMIX_Rot4(angVelTlm[4]);
-      this->tlmWrite_BMIX_Rot5(angVelTlm[5]);
-      this->tlmWrite_BMIX_Rot6(angVelTlm[6]);
-      this->tlmWrite_BMIX_Rot7(angVelTlm[7]);
+      COMPILE_TIME_ASSERT(quest_gnc::multirotor::kWrenchMixerMaxActuators >= 8, BM_MAX_ACT_VS_TLM);
+      this->tlmWrite_WMIX_Rot0(angVelTlm[0]);
+      this->tlmWrite_WMIX_Rot1(angVelTlm[1]);
+      this->tlmWrite_WMIX_Rot2(angVelTlm[2]);
+      this->tlmWrite_WMIX_Rot3(angVelTlm[3]);
+      this->tlmWrite_WMIX_Rot4(angVelTlm[4]);
+      this->tlmWrite_WMIX_Rot5(angVelTlm[5]);
+      this->tlmWrite_WMIX_Rot6(angVelTlm[6]);
+      this->tlmWrite_WMIX_Rot7(angVelTlm[7]);
   }
 
   // ----------------------------------------------------------------------
   // Command handler implementations
   // ----------------------------------------------------------------------
 
-  void BasicMixerComponentImpl ::
-    BMIX_InitParams_cmdHandler(
+  void WrenchMixerComponentImpl ::
+    WMIX_InitParams_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq
     )

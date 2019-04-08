@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="WrenchMixer" kind="passive" namespace="Gnc">
+
+
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
+
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/WrenchSerializableAi.xml</import_serializable_type>
+
+    <import_dictionary>Gnc/Ctrl/WrenchMixer/Telemetry.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/WrenchMixer/Events.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/WrenchMixer/Commands.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/WrenchMixer/Params.xml</import_dictionary>
+
+    <ports>
+        <port name="controls" data_type="ROS::mav_msgs::TorqueThrust"  kind="sync_input" max_number="1">
+        </port>
+
+        <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="1">
+        </port>
+
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="3">
+        </port>
+
+        <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        </port>
+
+        <port name="log" data_type="Fw::Log"  kind="output"    max_number="1">
+        </port>
+
+        <port name="logText" data_type="Fw::LogText"  kind="output"    max_number="1">
+        </port>
+
+        <port name="time" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port-->
+    </ports>
+
+</component>
