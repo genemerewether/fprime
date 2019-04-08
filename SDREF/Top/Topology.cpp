@@ -78,6 +78,7 @@ SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
+ROS::RosSeqComponentImpl* rosSeq_ptr = 0;
 HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
 Svc::UdpReceiverComponentImpl* udpReceiver_ptr = 0;
 
@@ -267,6 +268,12 @@ void allocComps() {
 #endif
 ;
 
+    rosSeq_ptr = new ROS::RosSeqComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ROSSEQ")
+#endif
+;
+
     sdRosIface_ptr = new HLProc::HLRosIfaceComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SDROSIFACE")
@@ -451,6 +458,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(10, 1000); // message size
     sdRosIface_ptr->init(0);
+    rosSeq_ptr->init(0);
     
     serialTextConv_ptr->init(20,0);
     llRouter_ptr->init(10,SERIAL_BUFFER_SIZE,0);
@@ -845,8 +853,11 @@ int main(int argc, char* argv[]) {
     if (!isChild) {
         ros::start();
 
-        sdRosIface_ptr->startPub();
         sdRosIface_ptr->startIntTask(30, 5*1000*1024);
+        rosSeq_ptr->startIntTask(30, 5*1000*1024);
+
+        sdRosIface_ptr->startPub();
+        rosSeq_ptr->startPub();
 
         Os::TaskString waiter_task_name("WAITER");
 #ifdef BUILD_SDFLIGHT
@@ -937,10 +948,12 @@ int main(int argc, char* argv[]) {
         (void) printf("Waiting for child...\n");
         wait(NULL);
 #endif
-    (void) printf("Waiting for threads...\n");
-    Os::Task::delay(1000);
+	(void) printf("Waiting for threads...\n");
+	Os::Task::delay(1000);
 
-    (void) printf("Exiting...\n");
+	(void) printf("Exiting...\n");
+#if defined TGT_OS_TYPE_LINUX
     }
+#endif
     return 0;
 }

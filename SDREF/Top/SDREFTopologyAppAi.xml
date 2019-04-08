@@ -17,6 +17,7 @@
 	<import_component_type>Drv/LinuxSerialDriver/LinuxSerialDriverComponentAi.xml</import_component_type>
 	<import_component_type>Svc/UdpReceiver/UdpReceiverComponentAi.xml</import_component_type>
 	<import_component_type>HLProc/HLRosIface/HLRosIfaceComponentAi.xml</import_component_type>
+	<import_component_type>ROS/RosSeq/RosSeqComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
 	<import_component_type>SnapdragonFlight/HiresCam/HiresCamComponentAi.xml</import_component_type>
@@ -98,6 +99,20 @@
 
    <instance namespace="Svc" name="textLogger" type="PassiveTextLogger" base_id="20600"  base_id_window="25" />
 
+   <instance namespace="ROS" name="rosSeq" type="RosSeq"/>
+
+<connection name = "Manual1">
+	 <source component = "rosSeq" port = "seqRunOut" type = "CmdSeqIn" num = "0"/>
+ 	 <target component = "cmdSeq" port = "seqRunIn" type = "CmdSeqIn" num = "0"/>
+</connection>
+<connection name = "Manual2">
+	 <source component = "rosSeq" port = "seqCancelOut" type = "CmdSeqCancel" num = "0"/>
+ 	 <target component = "cmdSeq" port = "seqCancelIn" type = "CmdSeqCancel" num = "0"/>
+</connection>
+<connection name = "Manual3">
+ 	 <source component = "cmdSeq" port = "seqDone" type = "CmdResponse" num = "0"/>
+	 <target component = "rosSeq" port = "seqDoneIn" type = "CmdResponse" num = "0"/>
+</connection>
 
 <connection name = "Connection1">
 	 <source component = "mvCam" port = "CmdStatus" type = "CmdResponse" num = "0"/>

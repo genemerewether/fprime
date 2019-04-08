@@ -96,17 +96,18 @@ namespace HLProc {
       startPub() {
         // TODO(mereweth) - prevent calling twice; free imageXport
         FW_ASSERT(m_nodeHandle);
-	m_imageXport = new image_transport::ImageTransport(this->m_nodeHandle);
+        ros::NodeHandle* n = this->m_nodeHandle;
+	m_imageXport = new image_transport::ImageTransport(*n);
 
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = n.advertise<sensor_msgs::Imu>(buf, 10000);
+            m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
         }
 
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = n.advertise<nav_msgs::Odometry>(buf, 5);
+            m_odomPub[i] = n->advertise<nav_msgs::Odometry>(buf, 5);
         }
 
 	m_imagePub = m_imageXport->advertise("image_raw", 1);

@@ -31,6 +31,7 @@ void exitTasks(void);
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <ROS/RosSeq/RosSeqComponentImpl.hpp>
 #include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
 #include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 
@@ -77,6 +78,7 @@ extern SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
 extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
 extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
+extern ROS::RosSeqComponentImpl* rosSeq_ptr;
 extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
 extern Svc::IPCRelayComponentImpl* ipcRelay_ptr;
 
