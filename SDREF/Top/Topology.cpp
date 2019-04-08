@@ -472,7 +472,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     manualConstruct();
 
-    const U32 tempPortNum[2] = {0, 1};
+    const U32 tempPortNum[2] = {1, 0};
     const FwOpcodeType tempMinOpcode[2] = {0, 20000};
     const FwOpcodeType tempMaxOpcode[2] = {19999, 39999};
     cmdSeq_ptr->setOpCodeRanges(2,

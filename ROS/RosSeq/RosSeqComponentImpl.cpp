@@ -22,6 +22,9 @@
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace ROS {
 
   // ----------------------------------------------------------------------
@@ -82,7 +85,7 @@ namespace ROS {
 	  stackSize, RosSeqComponentImpl::intTaskEntry, this, cpuAffinity);
 
 	if (stat != Os::Task::TASK_OK) {
-	  //DEBUG_PRINT("Task start error: %d\n",stat);
+	    DEBUG_PRINT("Task start error: %d\n",stat);
 	}
 
 	return stat;
@@ -136,7 +139,9 @@ namespace ROS {
         FW_ASSERT(this->m_actionServer);
 	if (this->isConnected_seqRunOut_OutputPort(0)) {
 	    const char* const pathToSeq = this->m_actionServer->acceptNewGoal()->pathToSeq.data.c_str();
-	    if (strlen(pathToSeq) > 79) { // max size of string
+	    DEBUG_PRINT("Received goal, run sequence %s, len %d\n",
+			pathToSeq, strlen(pathToSeq));
+	    if (strlen(pathToSeq) >= FW_CMD_STRING_MAX_SIZE) { // max size of string
 	        // TODO(mereweth) - EVR or ros message
 	        this->m_actionServer->setAborted();
 	    }
@@ -178,7 +183,7 @@ namespace ROS {
     //! Entry point for task waiting for messages
     void RosSeqComponentImpl ::
       intTaskEntry(void * ptr) {
-      //DEBUG_PRINT("RosSeq task entry\n");
+        DEBUG_PRINT("RosSeq task entry\n");
 
         FW_ASSERT(ptr);
         RosSeqComponentImpl* compPtr = (RosSeqComponentImpl*) ptr;
