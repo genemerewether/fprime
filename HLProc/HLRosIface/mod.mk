@@ -1,5 +1,5 @@
 SRC = HLRosIfaceComponentAi.xml HLRosIfaceComponentImpl.cpp
 
-HDR = HLRosIfaceComponentImpl.hpp HLRosIfaceComponentImplCfg.hpp
+HDR = HLRosIfaceComponentImpl.hpp 
 
-SUBDIRS = test
+#SUBDIRS = test

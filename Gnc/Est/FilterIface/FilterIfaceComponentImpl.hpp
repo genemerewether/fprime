@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  HLRosIfaceImpl.hpp
+// \title  FilterIfaceImpl.hpp
 // \author mereweth
-// \brief  hpp file for HLRosIface component implementation class
+// \brief  hpp file for FilterIface component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,23 +17,22 @@
 // countries or providing access to foreign persons.
 // ======================================================================
 
-#ifndef HLRosIface_HPP
-#define HLRosIface_HPP
+#ifndef FilterIface_HPP
+#define FilterIface_HPP
 
-#include "HLProc/HLRosIface/HLRosIfaceComponentAc.hpp"
+#include "Gnc/Est/FilterIface/FilterIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
-#include "sensor_msgs/Imu.h"
-#include "mav_msgs/Actuators.h"
-#include <image_transport/image_transport.h>
+#include "nav_msgs/Odometry.h"
+#include "mav_msgs/ImuStateUpdate.h"
 
 #include "Os/Task.hpp"
 #include "Os/Mutex.hpp"
 
-namespace HLProc {
+namespace Gnc {
 
-  class HLRosIfaceComponentImpl :
-    public HLRosIfaceComponentBase
+  class FilterIfaceComponentImpl :
+    public FilterIfaceComponentBase
   {
 
     public:
@@ -42,9 +41,9 @@ namespace HLProc {
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
 
-      //! Construct object HLRosIface
+      //! Construct object FilterIface
       //!
-      HLRosIfaceComponentImpl(
+      FilterIfaceComponentImpl(
 #if FW_OBJECT_NAMES == 1
           const char *const compName /*!< The component name*/
 #else
@@ -52,15 +51,15 @@ namespace HLProc {
 #endif
       );
 
-      //! Initialize object HLRosIface
+      //! Initialize object FilterIface
       //!
       void init(
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
-      //! Destroy object HLRosIface
+      //! Destroy object FilterIface
       //!
-      ~HLRosIfaceComponentImpl(void);
+      ~FilterIfaceComponentImpl(void);
 
       void startPub();
 
@@ -75,40 +74,40 @@ namespace HLProc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class ActuatorsHandler
+        class ImuStateUpdateHandler
         {
           public:
-              ActuatorsHandler(HLRosIfaceComponentImpl* compPtr,
-                             int portNum);
+              ImuStateUpdateHandler(FilterIfaceComponentImpl* compPtr,
+                              int portNum);
 
-              ~ActuatorsHandler();
+              ~ImuStateUpdateHandler();
 
-              void actuatorsCallback(const mav_msgs::Actuators::ConstPtr& msg);
+              void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
 
           PRIVATE:
 
-              HLRosIfaceComponentImpl* compPtr;
+              FilterIfaceComponentImpl* compPtr;
 
               const unsigned int portNum;
 
-        }; // end class ActuatorsHandler
+        }; // end class ImuStateUpdateHandler
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
-
-      //! Handler implementation for Imu
-      //!
-      void Imu_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::sensor_msgs::ImuNoCov &Imu
-      );
 
       //! Handler implementation for sched
       //!
       void sched_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
+      );
+
+      //! Handler implementation for Odometry
+      //!
+      void Odometry_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::nav_msgs::OdometryNoCov &Odometry
       );
 
       //! Handler implementation for pingIn
@@ -118,26 +117,17 @@ namespace HLProc {
           U32 key /*!< Value to return to pinger*/
       );
 
-      //! Handler implementation for ImageRecv
-      //!
-      void ImageRecv_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-	  ROS::sensor_msgs::Image &Image
-      );
-
       // ----------------------------------------------------------------------
       // Member variables
       // ----------------------------------------------------------------------
 
         bool m_rosInited;
 
-        //! Publishers for IMU data
+        //! Publishers for Odometry data
         //!
-        ros::Publisher m_imuPub[NUM_IMU_INPUT_PORTS];
+        ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
 
         ros::NodeHandle* m_nodeHandle;
-        image_transport::ImageTransport* m_imageXport;
-        image_transport::Publisher m_imagePub;
 
         //! Entry point for task waiting for interrupt
         static void intTaskEntry(void * ptr);
@@ -146,12 +136,12 @@ namespace HLProc {
         //!
         Os::Task m_intTask;
 
-        struct ActuatorsSet {
+        struct ImuStateUpdateSet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::mav_msgs::Actuators actuators; //! message object
+            ROS::mav_msgs::ImuStateUpdateNoCov imuStateUpdate; //! message object
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_actuatorsSet[NUM_ACTUATORSDATA_OUTPUT_PORTS];
+        } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
     
     };
 

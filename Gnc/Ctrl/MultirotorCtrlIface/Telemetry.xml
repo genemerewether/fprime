@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="MRCTRLIFACE_Dummy" data_type="U32">
+        <comment>
+            MRCTRLIFACE dummy channel
+        </comment>
+    </channel>
+</telemetry>

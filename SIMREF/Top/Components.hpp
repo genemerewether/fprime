@@ -27,6 +27,8 @@ void exitTasks(void);
 #include <ROS/RosCycle/RosCycleComponentImpl.hpp>
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
 #include <SIMREF/RotorSDrv/RotorSDrvComponentImpl.hpp>
+#include <Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentImpl.hpp>
+#include <Gnc/Est/FilterIface/FilterIfaceComponentImpl.hpp>
 #include <SIMREF/GazeboManipIf/GazeboManipIfComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
@@ -53,6 +55,8 @@ extern Svc::FatalHandlerComponentImpl fatalHandler;
 extern ROS::RosCycleComponentImpl rosCycle;
 extern ROS::RosSeqComponentImpl rosSeq;
 extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
+extern Gnc::MultirotorCtrlIfaceComponentImpl mrCtrlIface;
+extern Gnc::FilterIfaceComponentImpl filterIface;
 extern SIMREF::GazeboManipIfComponentImpl gzManipIf;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;

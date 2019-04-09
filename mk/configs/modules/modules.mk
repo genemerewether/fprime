@@ -171,6 +171,10 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/KraitRouter
 
+QUEST_GNC_ROSIFACE_MODULES := \
+	Gnc/Ctrl/MultirotorCtrlIface \
+	Gnc/Est/FilterIface
+
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
 	Gnc/Ctrl/BasicMixer \
@@ -286,6 +290,7 @@ SDREF_MODULES := \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
 	\
 	$(SNAPDRAGON_MODULES) \
 	\
@@ -335,6 +340,7 @@ SIMREF_GENERAL_MODULES := \
 	SIMREF/GazeboManipIf \
 	\
 	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
 	\
 	$(SVC_MODULES) \
 	\

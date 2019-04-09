@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<component name="HLRosIface" kind="passive" namespace="HLProc" modeler="true">
+<component name="FilterIface" kind="passive" namespace="Gnc" modeler="true">
 
-    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdateNoCovPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
@@ -11,17 +11,13 @@
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
 
-    <import_dictionary>HLProc/HLRosIface/Telemetry.xml</import_dictionary>
+    <import_dictionary>Gnc/Est/FilterIface/Telemetry.xml</import_dictionary>
     
     <ports>
         <port name="FileLogger" data_type="Svc::ActiveFileLogPort" kind="output">
-        </port>
-
-        <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
         </port>
 
         <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
@@ -42,17 +38,15 @@
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
         </port>
 
-        <port name="ActuatorsData" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="2">
+        <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">
         </port>
 
         <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="ImageRecv" data_type="ROS::sensor_msgs::Image"  kind="sync_input"  max_number="1" >
-        </port>
-
-        <port name="ImageForward" data_type="Fw::BufferSend"  kind="output"    max_number="1">	
-        </port>
     </ports>
 
 </component>

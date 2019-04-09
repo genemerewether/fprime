@@ -30,6 +30,8 @@ void exitTasks(void);
 #include <SnapdragonFlight/HiresCam/HiresCamComponentImpl.hpp>
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
+#include <Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentImpl.hpp>
+#include <Gnc/Est/FilterIface/FilterIfaceComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
 #include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
@@ -78,6 +80,8 @@ extern SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
 extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
 extern HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr;
+extern Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr;
+extern Gnc::FilterIfaceComponentImpl* filterIface_ptr;
 extern ROS::RosSeqComponentImpl* rosSeq_ptr;
 extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
 extern Svc::IPCRelayComponentImpl* ipcRelay_ptr;

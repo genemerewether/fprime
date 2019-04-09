@@ -78,6 +78,8 @@ SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
+Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr = 0;
+Gnc::FilterIfaceComponentImpl* filterIface_ptr = 0;
 ROS::RosSeqComponentImpl* rosSeq_ptr = 0;
 HLProc::EventExpanderComponentImpl* eventExp_ptr = 0;
 Svc::UdpReceiverComponentImpl* udpReceiver_ptr = 0;
@@ -280,6 +282,18 @@ void allocComps() {
 #endif
 ;
 
+    mrCtrlIface_ptr = new Gnc::MultirotorCtrlIfaceComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("MRCTRLIFACE")
+#endif
+;
+
+    filterIface_ptr = new Gnc::FilterIfaceComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("FILTIFACE")
+#endif
+;
+
     eventExp_ptr = new HLProc::EventExpanderComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("EVEXP")
@@ -326,8 +340,8 @@ void manualConstruct() {
     hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
     hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(3, sdRosIface_ptr->get_AccelCommand_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
@@ -338,8 +352,8 @@ void manualConstruct() {
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
-    sdRosIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
-    sdRosIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
+    mrCtrlIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
+    mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
     udpReceiver_ptr->set_PortsOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(7));
 
     cmdSeq2_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(8));
@@ -350,8 +364,8 @@ void manualConstruct() {
     llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
     llRouter_ptr->set_LLPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(2, sdRosIface_ptr->get_Odometry_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(3, sdRosIface_ptr->get_AccelCommand_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
@@ -360,8 +374,8 @@ void manualConstruct() {
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
     sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
-    sdRosIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
-    sdRosIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
+    mrCtrlIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
+    mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
     udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(7));
 
     cmdSeq2_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(8));
@@ -458,6 +472,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     hiresCam_ptr->init(60, 0);
     hexRouter_ptr->init(60, 1000); // message size
     sdRosIface_ptr->init(0);
+    mrCtrlIface_ptr->init(0);
+    filterIface_ptr->init(0);
     rosSeq_ptr->init(0);
     
     serialTextConv_ptr->init(60,0);
@@ -853,9 +869,13 @@ int main(int argc, char* argv[]) {
         ros::start();
 
         sdRosIface_ptr->startIntTask(30, 5*1000*1024);
+        mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
+        filterIface_ptr->startIntTask(30, 5*1000*1024);
         rosSeq_ptr->startIntTask(30, 5*1000*1024);
 
         sdRosIface_ptr->startPub();
+        mrCtrlIface_ptr->startPub();
+        filterIface_ptr->startPub();
         rosSeq_ptr->startPub();
 
         Os::TaskString waiter_task_name("WAITER");

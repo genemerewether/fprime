@@ -148,6 +148,18 @@ SIMREF::RotorSDrvComponentImpl rotorSDrv
 #endif
 ;
 
+Gnc::MultirotorCtrlIfaceComponentImpl mrCtrlIface
+#if FW_OBJECT_NAMES == 1
+                        ("MRCTRLIFACE")
+#endif
+;
+
+Gnc::FilterIfaceComponentImpl filterIface
+#if FW_OBJECT_NAMES == 1
+                        ("FILTIFACE")
+#endif
+;
+
 SIMREF::GazeboManipIfComponentImpl gzManipIf
 #if FW_OBJECT_NAMES == 1
                     ("GZMANIPIF")
@@ -265,6 +277,8 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     rosCycle.init(0);
 
     rotorSDrv.init(0);
+    mrCtrlIface.init(0);
+    filterIface.init(0);
     gzManipIf.init(0);
 
     rosTime.init(0);
@@ -448,12 +462,18 @@ int main(int argc, char* argv[]) {
 
     stat = rotorSDrv.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    stat = mrCtrlIface.startIntTask(50, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    stat = filterIface.startIntTask(50, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
     stat = gzManipIf.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
     stat = rosSeq.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     rotorSDrv.startPub();
+    mrCtrlIface.startPub();
+    filterIface.startPub();
     gzManipIf.startPub();
     rosSeq.startPub();
 

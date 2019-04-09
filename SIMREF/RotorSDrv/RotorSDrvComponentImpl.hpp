@@ -21,12 +21,8 @@
 #define RotorSDrv_HPP
 
 #include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
 #include "mav_msgs/Actuators.h"
-#include "mav_msgs/AttitudeRateThrust.h"
-#include "mav_msgs/FlatOutput.h"
-#include "mav_msgs/ImuStateUpdate.h"
 
 #include "Os/Mutex.hpp"
 #include "Os/Task.hpp"
@@ -97,92 +93,11 @@ namespace SIMREF {
 
         }; // end class ImuHandler
 
-        class ImuStateUpdateHandler
-        {
-          public:
-              ImuStateUpdateHandler(RotorSDrvComponentImpl* compPtr,
-                              int portNum);
-
-              ~ImuStateUpdateHandler();
-
-              void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
-
-          PRIVATE:
-
-              RotorSDrvComponentImpl* compPtr;
-
-              const unsigned int portNum;
-
-        }; // end class ImuStateUpdateHandler
-
-        class OdometryHandler
-        {
-          public:
-              OdometryHandler(RotorSDrvComponentImpl* compPtr,
-                              int portNum);
-
-              ~OdometryHandler();
-
-              void odometryCallback(const nav_msgs::Odometry::ConstPtr& msg);
-
-          PRIVATE:
-
-              RotorSDrvComponentImpl* compPtr;
-
-              const unsigned int portNum;
-
-        }; // end class OdometryHandler
-
-        class FlatOutputHandler
-        {
-          public:
-              FlatOutputHandler(RotorSDrvComponentImpl* compPtr,
-                              int portNum);
-
-              ~FlatOutputHandler();
-
-              void flatOutputCallback(const mav_msgs::FlatOutput::ConstPtr& msg);
-
-          PRIVATE:
-
-              RotorSDrvComponentImpl* compPtr;
-
-              const unsigned int portNum;
-
-        }; // end class FlatOutputHandler
-
-
-        class AttitudeRateThrustHandler
-        {
-          public:
-              AttitudeRateThrustHandler(RotorSDrvComponentImpl* compPtr,
-                                        int portNum);
-
-              ~AttitudeRateThrustHandler();
-
-              void attitudeRateThrustCallback(const mav_msgs::AttitudeRateThrust::ConstPtr& msg);
-
-          PRIVATE:
-
-              RotorSDrvComponentImpl* compPtr;
-
-              const unsigned int portNum;
-
-        }; // end class AttitudeRateThrustHandler
-
     PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
-
-
-        //! Handler implementation for Odometry
-        //!
-        void OdomLog_handler(
-            const NATIVE_INT_TYPE portNum, /*!< The port number*/
-            ROS::nav_msgs::OdometryNoCov &Odometry
-        );
     
         //! Handler implementation for motor
         //!
@@ -224,44 +139,12 @@ namespace SIMREF {
         //!
         ros::Publisher m_motorPub;
 
-        //! Publishers for Odometry data
-        //!
-        ros::Publisher m_odomPub[NUM_ODOMLOG_INPUT_PORTS];
-
         struct ImuSet {
             Os::Mutex mutex; //! Mutex lock to guard imu object
             ROS::sensor_msgs::ImuNoCov imu; //! imu object
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_imuSet[NUM_SIMIMU_OUTPUT_PORTS];
-
-        struct ImuStateUpdateSet {
-            Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::mav_msgs::ImuStateUpdateNoCov imuStateUpdate; //! message object
-            bool fresh; //! Whether object has been updated
-            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
-
-        struct OdomSet {
-            Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::nav_msgs::Odometry odom; //! odometry object
-            bool fresh; //! Whether object has been updated
-            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_odomSet[NUM_ODOMETRY_OUTPUT_PORTS];
-
-        struct FlatOutSet {
-            Os::Mutex mutex; //! Mutex lock to guard flat output object
-            ROS::mav_msgs::FlatOutput flatOutput; //! flat output object
-            bool fresh; //! Whether object has been updated
-            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_flatOutSet[NUM_FLATOUTPUT_OUTPUT_PORTS];
-
-        struct AttRateThrustSet {
-            Os::Mutex mutex; //! Mutex lock to guard object
-            ROS::mav_msgs::AttitudeRateThrust attRateThrust; //! Attitude, rate, and thrust object
-            bool fresh; //! Whether object has been updated
-            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_attRateThrustSet[NUM_ATTRATETHRUST_OUTPUT_PORTS];
     };
 
 } // end namespace SIMREF
