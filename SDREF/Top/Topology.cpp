@@ -501,6 +501,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 				 tempMaxOpcode);
 
     /* Register commands */
+    sockGndIf_ptr->regCommands();
+    sockGndIfLL_ptr->regCommands();
     cmdSeq_ptr->regCommands();
     cmdSeq2_ptr->regCommands();
     cmdDisp_ptr->regCommands();
