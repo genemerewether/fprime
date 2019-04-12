@@ -49,6 +49,8 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 Fw::MallocAllocator seqMallocator;
+Fw::MallocAllocator buffMallocator;
+Fw::MmapAllocator hiresMallocator;
 
 Svc::RateGroupDriverImpl* rgDrv_ptr = 0;
 Svc::ActiveRateGroupImpl* rgTlm_ptr = 0;
@@ -92,8 +94,10 @@ Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
 
 Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
 
-Fw::MallocAllocator buffMallocator;
-Fw::MmapAllocator hiresMallocator;
+Svc::BufferLogger* buffLogMVCamUnproc_ptr = 0;
+Svc::BufferLogger* buffLogHiresCamUnproc_ptr = 0;
+Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr = 0;
+Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr = 0;
 
 void allocComps() {
     // Component instance pointers
@@ -233,6 +237,30 @@ void allocComps() {
                         ("IMGTLM")
 #endif
 ;
+
+    buffLogMVCamUnproc_ptr = new Svc::BufferLogger
+#if FW_OBJECT_NAMES == 1
+                        ("BUFLOGMVUNPROC")
+#endif
+;
+
+    buffLogHiresCamUnproc_ptr = new Svc::BufferLogger
+#if FW_OBJECT_NAMES == 1
+                        ("BUFLOGHIRESUNPROC")
+#endif
+;
+
+    buffAccumMVCamUnproc_ptr = new Svc::BufferAccumulator
+#if FW_OBJECT_NAMES == 1
+                        ("BUFACCMVUNPROC")
+#endif
+;
+    buffAccumHiresCamUnproc_ptr = new Svc::BufferAccumulator
+#if FW_OBJECT_NAMES == 1
+                        ("BUFACCHIRESUNPROC")
+#endif
+;
+
 
     hexRouter_ptr = new SnapdragonFlight::HexRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
@@ -399,10 +427,10 @@ void manualConstruct() {
     ipcRelay_ptr->set_proc2Out_OutputPort(3, textLogger_ptr->get_TextLogger_InputPort(0));
 
     /*hiresCam_ptr->set_ProcSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(4));
-    ipcRelay_ptr->set_proc2Out_OutputPort(4, buffAccumPreCmpHires_ptr->get_bufferSendInFill_InputPort(0));
+      ipcRelay_ptr->set_proc2Out_OutputPort(4, buffAccumHiresCamProc_ptr->get_bufferSendInFill_InputPort(0));*/
 
     hiresCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(5));
-    ipcRelay_ptr->set_proc2Out_OutputPort(5, buffAccumHires_ptr->get_bufferSendInFill_InputPort(0));*/
+    ipcRelay_ptr->set_proc2Out_OutputPort(5, buffAccumHiresCamUnproc_ptr->get_bufferSendInFill_InputPort(0));
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
@@ -466,6 +494,11 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     fatalHandler_ptr->init(0);
 
     imgTlm_ptr->init(60, 0);
+
+    buffLogMVCamUnproc_ptr->init(60, 0);
+    buffLogHiresCamUnproc_ptr->init(60, 0);
+    buffAccumMVCamUnproc_ptr->init(60, 0);
+    buffAccumHiresCamUnproc_ptr->init(60, 0);
 
     mvCam_ptr->init(60, 0);
     mvVislam_ptr->init(2000, 0);
@@ -553,7 +586,23 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 			       SnapdragonFlight::MVCAM_IMG_HP_BUFFER_POOL_SIZE,
 			       200);
     hiresCam_ptr->allocateBuffers(0, hiresMallocator, 10);
-    
+
+    // buffAccum doesn't own the buffers, so it's not the limiting factor
+    buffAccumMVCamUnproc_ptr->allocateQueue(0,buffMallocator,
+                                            SnapdragonFlight::MVCAM_IMG_MAX_NUM_BUFFERS);
+    buffAccumHiresCamUnproc_ptr->allocateQueue(0,buffMallocator,
+                                               SnapdragonFlight::HIRESCAM_MAX_NUM_BUFFERS);
+
+    static const NATIVE_UINT_TYPE maxLogSize = 25U * 1000U * 1000U;
+    buffLogMVCamUnproc_ptr->initLog("/img/mvcam_", ".upbin", maxLogSize, sizeof(U32),
+                                    0, // 0 means unlimited number of buffers per file
+                                    Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+    buffLogHiresCamUnproc_ptr->initLog("/img/hirescam_",".upbin", maxLogSize, sizeof(U32),
+                                       0, // 0 means unlimited number of buffers
+                                       Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+    buffLogMVCamUnproc_ptr->setBaseName("");
+    buffLogHiresCamUnproc_ptr->setBaseName("");
+
     isChild = false;
 // fork works just fine on Darwin; just haven't got POSIX mq for IPC ports
 #if defined TGT_OS_TYPE_LINUX
@@ -595,6 +644,11 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
     imgTlm_ptr->start(0, 20, 20*1024, CORE_GNC);
+
+    buffLogMVCamUnproc_ptr->start(0, 20, 20*1024);
+    buffLogHiresCamUnproc_ptr->start(0, 20, 20*1024);
+    buffAccumMVCamUnproc_ptr->start(0, 20, 20*1024);
+    buffAccumHiresCamUnproc_ptr->start(0, 20, 20*1024);
 
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
@@ -708,6 +762,9 @@ void exitTasks(bool isChild) {
     mvCam_ptr->deallocateBuffers(buffMallocator);
     mvCam_ptr->join(NULL);
     hexRouter_ptr->quitReadThreads();
+
+    buffLogMVCamUnproc_ptr->deallocateQueue(buffMallocator);
+    buffLogHiresCamUnproc_ptr->deallocateQueue(buffMallocator);
     
 #ifdef LLROUTER_DEVICES
     serialDriverLL_ptr->quitReadThread();
@@ -716,6 +773,12 @@ void exitTasks(bool isChild) {
     atiNetbox_ptr->stop();
 		    
     imgTlm_ptr->exit();
+
+    buffLogMVCamUnproc_ptr->exit();
+    buffLogHiresCamUnproc_ptr->exit();
+    buffAccumMVCamUnproc_ptr->exit();
+    buffAccumHiresCamUnproc_ptr->exit();
+
     mvVislam_ptr->exit();    
     llRouter_ptr->exit();
     serialTextConv_ptr->exit();

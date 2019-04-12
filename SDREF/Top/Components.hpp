@@ -19,6 +19,8 @@ void exitTasks(void);
 #include <Svc/FileUplink/FileUplink.hpp>
 #include <Svc/FileDownlink/FileDownlink.hpp>
 #include <Svc/BufferManager/BufferManager.hpp>
+#include <Svc/BufferAccumulator/BufferAccumulatorComponentImpl.hpp>
+#include <Svc/BufferLogger/BufferLoggerComponentImpl.hpp>
 #include <Svc/Health/HealthComponentImpl.hpp>
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
@@ -87,5 +89,10 @@ extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
 extern Svc::IPCRelayComponentImpl* ipcRelay_ptr;
 
 extern Svc::ImgTlmComponentImpl* imgTlm_ptr;
+
+extern Svc::BufferLogger* buffLogMVCamUnproc_ptr;
+extern Svc::BufferLogger* buffLogHiresCamUnproc_ptr;
+extern Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr;
+extern Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr;
 
 #endif
