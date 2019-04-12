@@ -394,6 +394,7 @@ void constructApp() {
     // Open devices
 
 #ifdef BUILD_DSPAL
+#ifdef SOC_8074
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrv_ptr->open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
     imuDRInt_ptr->open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
@@ -411,7 +412,19 @@ void constructApp() {
     //NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
     // /dev/pwm-1 on QuRT
     //escPwm_ptr->open(1, pwmPins, 4, 20 * 1000);
-#endif
+#else 
+    // /dev/spi-10 on 820; connected to MPU9250
+    spiDrv_ptr->open(10, 0, Drv::SPI_FREQUENCY_1MHZ);
+    imuDRInt_ptr->open(78, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    
+    // TODO(mereweth) - hardware enable pin
+
+    // TODO(mereweth) - I2C port
+
+    // TODO(mereweth) - Spektrum UART and binding GPIO
+    // TODO(mereweth) - PWM pins
+#endif // SOC
+#endif // BUILD_DSPAL
 
     // Active component startup
     // NOTE(mereweth) - GNC att & pos loops run in this thread:

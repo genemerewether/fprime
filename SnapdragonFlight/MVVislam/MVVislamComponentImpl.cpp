@@ -74,7 +74,9 @@ namespace SnapdragonFlight {
   void MVVislamComponentImpl ::
     preamble(void)
   {
+#ifndef SOC_8096
       initHelper();
+#endif
   }
 
 
