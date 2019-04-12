@@ -8,12 +8,12 @@
     <import_port_type>Common/Ports/ShortLogPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <comment>A component that queues events and forwards one short version each cycle</comment>
-    <port name="FatalAnnounce" data_type="Svc::FatalEvent" kind="output" >
-        <comment>
-            FATAL event announce port
-        </comment>
-    </port>
     <ports>
+	<port name="FatalAnnounce" data_type="Svc::FatalEvent" kind="output" >
+	    <comment>
+		FATAL event announce port
+	    </comment>
+	</port>
         <port name="LogRecv" data_type="Fw::Log" kind="sync_input" >
             <comment>
             Event input port
