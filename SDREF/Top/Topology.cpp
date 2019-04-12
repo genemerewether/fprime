@@ -586,7 +586,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     eventLoggerLL_ptr->start(0,50,20*1024);
     chanTlm_ptr->start(0,60,20*1024);
     prmDb_ptr->start(0,50,20*1024);
-    textLogger.start(0,30,20*1024);
+    textLogger_ptr->start(0,30,20*1024);
 
     snapHealth_ptr->start(0,40,20*1024);
 
@@ -729,6 +729,7 @@ void exitTasks(bool isChild) {
     eventLoggerLL_ptr->exit();
     chanTlm_ptr->exit();
     prmDb_ptr->exit();
+    textLogger_ptr->exit();
     fileLogger_ptr->exit();
     cmdSeq_ptr->exit();
     cmdSeq2_ptr->exit();
