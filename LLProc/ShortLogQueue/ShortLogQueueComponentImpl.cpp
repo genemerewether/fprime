@@ -73,6 +73,14 @@ namespace LLProc {
       if (Fw::LOG_DIAGNOSTIC == severity) {
           return;
       }
+
+      // if connected, announce the FATAL
+      if (Fw::LOG_FATAL == severity) {
+          if (this->isConnected_FatalAnnounce_OutputPort(0)) {
+              this->FatalAnnounce_out(0,id);
+          }
+      }
+
       // assert if we would overrun
       FW_ASSERT((this->m_head+1)%SHORT_LOG_QUEUE_DEPTH != this->m_tail);
       // store the event at the head of the queue

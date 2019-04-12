@@ -10,7 +10,7 @@ void exitTasks(void);
 #include <Svc/SerLogger/SerLoggerComponentImpl.hpp>
 #include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
-#include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
+#include <Svc/ActiveTextLogger/ActiveTextLoggerImpl.hpp>
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Svc/TlmChan/TlmChanImpl.hpp>
@@ -63,7 +63,7 @@ extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
 extern Svc::CmdSequencerComponentImpl* cmdSeq2_ptr;
 extern Svc::SocketGndIfImpl* sockGndIf_ptr;
 extern Svc::SocketGndIfImpl* sockGndIfLL_ptr;
-extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
+extern Svc::ActiveTextLoggerComponentImpl* textLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLoggerLL_ptr;
 extern Svc::ActiveFileLoggerImpl* fileLogger_ptr;

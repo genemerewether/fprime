@@ -56,7 +56,7 @@ Svc::ActiveRateGroupImpl* rgXfer_ptr = 0;
 
 Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
 Svc::SocketGndIfImpl* sockGndIfLL_ptr = 0;
-Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
+Svc::ActiveTextLoggerComponentImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLoggerLL_ptr = 0;
 Svc::ActiveFileLoggerImpl* fileLogger_ptr = 0;
@@ -130,7 +130,7 @@ void allocComps() {
 #endif
 ;
 
-    textLogger_ptr = new Svc::ConsoleTextLoggerImpl
+    textLogger_ptr = new Svc::ActiveTextLoggerComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("TLOG")
 #endif
@@ -428,11 +428,12 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     rgXfer_ptr->init(60,0);
 
 #if FW_ENABLE_TEXT_LOGGING
-    textLogger_ptr->init();
+    // Queue needs to be large enough to process many text messages at once
+    textLogger_ptr->init(500);
 #endif
 
-    eventLogger_ptr->init(60,0);
-    eventLoggerLL_ptr->init(60,0);
+    eventLogger_ptr->init(500,0);
+    eventLoggerLL_ptr->init(500,0);
     fileLogger_ptr->init(60);
     serLogger_ptr->init(0);
     serLogger_ptr->setStreamId(AFL_ACTADAP_ESC);
@@ -515,7 +516,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvVislam_ptr->regCommands();
     hiresCam_ptr->regCommands();
     atiNetbox_ptr->regCommands();
-    //fatalHandler_ptr->regCommands();
+    fatalHandler_ptr->regCommands();
     
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
@@ -536,6 +537,9 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);
     serialTextConv_ptr->set_log_file(logFileName, 100*1024, 0);
+
+    snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);
+    textLogger_ptr->set_log_file(logFileName,100*1024, 0);
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -582,6 +586,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     eventLoggerLL_ptr->start(0,50,20*1024);
     chanTlm_ptr->start(0,60,20*1024);
     prmDb_ptr->start(0,50,20*1024);
+    textLogger.start(0,30,20*1024);
 
     snapHealth_ptr->start(0,40,20*1024);
 
