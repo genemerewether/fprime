@@ -149,10 +149,12 @@ LLPROC_MODULES := \
 	LLProc/LLTlmChan
 
 HLPROC_MODULES := \
-	HLProc/HLRosIface \
 	HLProc/LLRouter \
 	HLProc/EventExpander \
 	HLProc/Cfg
+
+HLPROC_ROS_MODULES := \
+	HLProc/HLRosIface
 
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
@@ -285,6 +287,7 @@ SDREF_MODULES := \
 	$(ZMQ_MODULES) \
 	\
 	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
 	\
 	$(COMMON_MODULES) \
 	\
