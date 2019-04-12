@@ -19,8 +19,8 @@ void exitTasks(void);
 #include <Svc/FileUplink/FileUplink.hpp>
 #include <Svc/FileDownlink/FileDownlink.hpp>
 #include <Svc/BufferManager/BufferManager.hpp>
-#include <Svc/BufferAccumulator/BufferAccumulatorComponentImpl.hpp>
-#include <Svc/BufferLogger/BufferLoggerComponentImpl.hpp>
+#include <Svc/BufferAccumulator/BufferAccumulator.hpp>
+#include <Svc/BufferLogger/BufferLogger.hpp>
 #include <Svc/Health/HealthComponentImpl.hpp>
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>

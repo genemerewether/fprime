@@ -763,8 +763,8 @@ void exitTasks(bool isChild) {
     mvCam_ptr->join(NULL);
     hexRouter_ptr->quitReadThreads();
 
-    buffLogMVCamUnproc_ptr->deallocateQueue(buffMallocator);
-    buffLogHiresCamUnproc_ptr->deallocateQueue(buffMallocator);
+    buffAccumMVCamUnproc_ptr->deallocateQueue(buffMallocator);
+    buffAccumHiresCamUnproc_ptr->deallocateQueue(buffMallocator);
     
 #ifdef LLROUTER_DEVICES
     serialDriverLL_ptr->quitReadThread();
