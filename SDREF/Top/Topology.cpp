@@ -41,7 +41,7 @@ enum {
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
-#define PRM_PATH "PrmDb.dat"
+#define PRM_PATH "/eng/SDREFPrmDb.dat"
 
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
@@ -515,6 +515,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvVislam_ptr->regCommands();
     hiresCam_ptr->regCommands();
     atiNetbox_ptr->regCommands();
+    //fatalHandler_ptr->regCommands();
     
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
