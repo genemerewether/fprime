@@ -26,7 +26,7 @@ void block_indefinite(void)
   sem_wait(&forever);
 }
   
-#ifdef TARGET_8096
+#ifdef SOC_8096
 
 void __cxa_atexit(void)
 {
