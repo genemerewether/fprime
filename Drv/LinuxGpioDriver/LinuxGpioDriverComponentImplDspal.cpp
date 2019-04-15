@@ -90,7 +90,7 @@ namespace Drv {
       enum DSPAL_GPIO_VALUE_TYPE val;
       int bytes = read(this->m_fd, &val, 1);
       if (bytes != 1) {
-          this->log_WARNING_HI_GP_WriteError(this->m_gpio,bytes);
+          this->log_WARNING_HI_GP_ReadError(this->m_gpio,bytes);
           return;
       } else {
 	  /* NOTE(mereweth) - observed weird case on 801 where DSP gpio
