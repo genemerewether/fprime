@@ -550,6 +550,11 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     hiresCam_ptr->regCommands();
     atiNetbox_ptr->regCommands();
     fatalHandler_ptr->regCommands();
+
+    buffLogMVCamUnproc_ptr->regCommands();
+    buffLogHiresCamUnproc_ptr->regCommands();
+    buffAccumMVCamUnproc_ptr->regCommands();
+    buffAccumHiresCamUnproc_ptr->regCommands();
     
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
