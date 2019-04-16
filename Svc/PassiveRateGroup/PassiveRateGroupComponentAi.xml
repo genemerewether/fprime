@@ -14,7 +14,7 @@
         </port>
 
         <!-- Output Scheduler Ports -->
-        <port name="RateGroupMemberOut" data_type="Sched" kind="output" max_number="$PassiveRateGroupOutputPorts">
+        <port name="RateGroupMemberOut" data_type="Sched" kind="output" max_number="80">
             <comment>Scheduler output port to rate group members</comment>
         </port>
 
