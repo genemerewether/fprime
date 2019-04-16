@@ -92,23 +92,26 @@ namespace Gnc {
       Fw::ParamValid valid[12];
       int stat;
 
-      quest_gnc::multirotor::MultirotorModel mrModel = {paramGet_mass(valid[0]),
-                                                        paramGet_I_xx(valid[1]),
-                                                        paramGet_I_yy(valid[2]),
-                                                        paramGet_I_zz(valid[3]),
-                                                        paramGet_I_xy(valid[4]),
-                                                        paramGet_I_xz(valid[5]),
-                                                        paramGet_I_yz(valid[6])};
+      quest_gnc::RigidBodyModel rigidBody = {paramGet_mass(valid[0]),
+					     paramGet_I_xx(valid[1]),
+					     paramGet_I_yy(valid[2]),
+					     paramGet_I_zz(valid[3]),
+					     paramGet_I_xy(valid[4]),
+					     paramGet_I_xz(valid[5]),
+					     paramGet_I_yz(valid[6])};
+      
+      quest_gnc::Se3Model se3Model = {rigidBody,
+				      paramGet_force_z(valid[7])};
 
-      for (U32 i = 0; i < 7; i++) {
+      for (U32 i = 0; i < 8; i++) {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
       }
 
-      this->mass = mrModel.mass;
-      this->J_b << mrModel.Ixx, mrModel.Ixy, mrModel.Ixz,
-                   mrModel.Ixy, mrModel.Iyy, mrModel.Iyz,
-                   mrModel.Ixz, mrModel.Iyz, mrModel.Izz;
-      stat = se3Control.SetModel(mrModel);
+      this->mass = rigidBody.mass;
+      this->J_b << rigidBody.Ixx, rigidBody.Ixy, rigidBody.Ixz,
+                   rigidBody.Ixy, rigidBody.Iyy, rigidBody.Iyz,
+                   rigidBody.Ixz, rigidBody.Iyz, rigidBody.Izz;
+      stat = se3Control.SetModel(se3Model);
       if (stat) {  return;  }
 
       stat = se3Control.SetGains(Eigen::Vector3d(paramGet_k_x__x(valid[0]),
