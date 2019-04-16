@@ -44,8 +44,7 @@ static Fw::SimpleObjRegistry simpleReg;
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
 Svc::ActiveDecouplerComponentImpl* actDecouple_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
-Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
-Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
+Svc::PassiveRateGroupImpl* rgOp_ptr = 0;
 Svc::PassiveRateGroupImpl* rgTlm_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
@@ -56,8 +55,8 @@ Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
-Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
-Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
+Gnc::Se3CtrlComponentImpl* se3Ctrl_ptr = 0;
+Gnc::WrenchMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::AttFilterComponentImpl* attFilter_ptr = 0;
@@ -87,7 +86,7 @@ void allocComps() {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
-        Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
+        Gnc::SE3CTRL_SCHED_CONTEXT_TLM, // se3Ctrl
         0, // mixer
         Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
         0, // logQueue
@@ -101,7 +100,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+    NATIVE_INT_TYPE rgGncDivs[] = {10, 1000};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -109,40 +108,22 @@ void allocComps() {
 #endif
                         rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
-    NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    NATIVE_UINT_TYPE rgOpContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-        Gnc::ATTFILTER_SCHED_CONTEXT_ATT, // attFilter
-        Gnc::SIGGEN_SCHED_CONTEXT_ATT, // sigGen
-        Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+        Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
+        Gnc::SIGGEN_SCHED_CONTEXT_OP, // sigGen
+        Gnc::SE3CTRL_SCHED_CONTEXT_CTRL, // se3Ctrl
         0, // mixer
-        0, // adapter
+	Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
         0, // logQueue
         0, // kraitRouter
     };
 
-    rgAtt_ptr = new Svc::PassiveRateGroupImpl(
+    rgOp_ptr = new Svc::PassiveRateGroupImpl(
 #if FW_OBJECT_NAMES == 1
-                            "RGATT",
+                            "RGOP",
 #endif
-                            rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
-;
-
-    NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        0, //TODO(mereweth) - IMU?
-        Gnc::ATTFILTER_SCHED_CONTEXT_POS, // attFilter
-        0, // sigGen
-        Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
-        0, // mixer
-        Gnc::ACTADAP_SCHED_CONTEXT_POS, // adapter - for arming
-        0, // logQueue
-        0, // kraitRouter
-    };
-
-    rgPos_ptr = new Svc::PassiveRateGroupImpl(
-#if FW_OBJECT_NAMES == 1
-                    "RGPOS",
-#endif
-                    rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
+                            rgOpContext,FW_NUM_ARRAY_ELEMENTS(rgOpContext));
 ;
 
     textLogger_ptr = new Svc::ConsoleTextLoggerImpl
@@ -199,13 +180,13 @@ void allocComps() {
 #endif
 ;
  
-    leeCtrl_ptr = new Gnc::LeeCtrlComponentImpl
+    se3Ctrl_ptr = new Gnc::Se3CtrlComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("LEECTRL")
+                        ("SE3CTRL")
 #endif
 ;
 
-    mixer_ptr = new Gnc::BasicMixerComponentImpl
+    mixer_ptr = new Gnc::WrenchMixerComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("MIXER")
 #endif
@@ -289,7 +270,7 @@ void manualConstruct(void) {
 
     mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
-    leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
+    se3Ctrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
     actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
@@ -304,9 +285,9 @@ void manualConstruct(void) {
     // aux actuator command
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, se3Ctrl_ptr->get_flatOutput_InputPort(0));
+    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
+    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(8));
@@ -340,13 +321,12 @@ void constructApp() {
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0);
     actDecouple_ptr->init(1, 500); // big message queue entry, few entries
-    rgAtt_ptr->init(1);
-    rgPos_ptr->init(0);
+    rgOp_ptr->init(0);
     rgTlm_ptr->init(2);
 
     // Initialize the GNC components
     ctrlXest_ptr->init(0);
-    leeCtrl_ptr->init(0);
+    se3Ctrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
     sigGen_ptr->init(0);
@@ -385,7 +365,7 @@ void constructApp() {
     fatalHandler_ptr->regCommands();
 
     ctrlXest_ptr->regCommands();
-    leeCtrl_ptr->regCommands();
+    se3Ctrl_ptr->regCommands();
     attFilter_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
@@ -516,7 +496,7 @@ int hexref_arm() {
     Fw::CmdPacket cmdPkt;
     Fw::ComBuffer dat0(&buf[0], sizeof(buf));
     Fw::SerializeStatus stat = cmdPkt.deserialize(dat0);
-    Fw::InputCmdPort* p2 = leeCtrl_ptr->get_CmdDisp_InputPort(0);
+    Fw::InputCmdPort* p2 = se3Ctrl_ptr->get_CmdDisp_InputPort(0);
     p2->invoke(0x1a1,0,cmdPkt.getArgBuffer());
     usleep(50000);
     DEBUG_PRINT("hexref_arm after sleep\n");

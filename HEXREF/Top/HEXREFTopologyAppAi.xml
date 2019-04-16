@@ -22,9 +22,9 @@
 	<import_component_type>Svc/RateGroupDecoupler/RateGroupDecouplerComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxI2CDriver/LinuxI2CDriverComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
-	<import_component_type>Gnc/Ctrl/BasicMixer/BasicMixerComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Ctrl/WrenchMixer/WrenchMixerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveTextLogger/PassiveTextLoggerComponentAi.xml</import_component_type>
-	<import_component_type>Gnc/Ctrl/LeeCtrl/LeeCtrlComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Ctrl/Se3Ctrl/Se3CtrlComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxGpioDriver/LinuxGpioDriverComponentAi.xml</import_component_type>
 
    <instance namespace="Svc" name="fatalHandler" type="FatalHandler" base_id="10000"  base_id_window="25" />
@@ -51,13 +51,11 @@
 
    <instance namespace="LLProc" name="tlmChan" type="LLTlmChan" base_id="10200"  base_id_window="25" />
 
-   <instance namespace="Svc" name="rgAtt" type="PassiveRateGroup" base_id="10225"  base_id_window="25" />
+   <instance namespace="Svc" name="rgOp" type="PassiveRateGroup" base_id="10225"  base_id_window="25" />
 
    <instance namespace="Svc" name="fatalAdapter" type="AssertFatalAdapter" base_id="10250"  base_id_window="25" />
 
    <instance namespace="Gnc" name="actuatorAdapter" type="ActuatorAdapter" base_id="3500"  base_id_window="500" />
-
-   <instance namespace="Svc" name="rgPos" type="PassiveRateGroup" base_id="10275"  base_id_window="25" />
 
    <instance namespace="LLProc" name="logQueue" type="ShortLogQueue" base_id="10300"  base_id_window="25" />
 
@@ -69,17 +67,17 @@
 
    <instance namespace="Svc" name="rgTlm" type="PassiveRateGroup" base_id="10400"  base_id_window="25" />
 
-   <instance namespace="Gnc" name="mixer" type="BasicMixer" base_id="2500"  base_id_window="500" />
+   <instance namespace="Gnc" name="mixer" type="WrenchMixer" base_id="2500"  base_id_window="500" />
 
    <instance namespace="Svc" name="textLogger" type="PassiveTextLogger" base_id="10425"  base_id_window="25" />
 
-   <instance namespace="Gnc" name="leeCtrl" type="LeeCtrl" base_id="2000"  base_id_window="500" />
+   <instance namespace="Gnc" name="se3Ctrl" type="Se3Ctrl" base_id="2000"  base_id_window="500" />
 
    <instance namespace="Drv" name="imuDRInt" type="LinuxGpioDriver" base_id="10450"  base_id_window="25" />
 
 
 <connection name = "Connection1">
-	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
+	 <source component = "se3Ctrl" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection2">
@@ -99,7 +97,7 @@
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection6">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "sigGen" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection7">
@@ -107,8 +105,8 @@
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection8">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
- 	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "0"/>
+        <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
+        <target component = "kraitRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection9">
 	 <source component = "escPwm" port = "log" type = "Log" num = "0"/>
@@ -171,11 +169,11 @@
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection24">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection25">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
  	 <target component = "kraitRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection26">
@@ -183,7 +181,7 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection27">
-	 <source component = "leeCtrl" port = "Tlm" type = "Tlm" num = "0"/>
+	 <source component = "se3Ctrl" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection28">
@@ -191,7 +189,7 @@
  	 <target component = "i2cDrv" port = "I2CConfig" type = "I2CConfig" num = "0"/>
 </connection>
 <connection name = "Connection29">
-	 <source component = "leeCtrl" port = "LogText" type = "LogText" num = "0"/>
+	 <source component = "se3Ctrl" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection30">
@@ -235,12 +233,12 @@
  	 <target component = "actuatorAdapter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection40">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
+        <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+        <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection41">
-	 <source component = "rgPos" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+        <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+        <target component = "sigGen" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection42">
 	 <source component = "hwEnablePin" port = "Log" type = "Log" num = "0"/>
@@ -255,11 +253,11 @@
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection45">
-	 <source component = "rgAtt" port = "Tlm" type = "Tlm" num = "0"/>
+	 <source component = "rgOp" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection46">
-	 <source component = "leeCtrl" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+	 <source component = "se3Ctrl" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection47">
@@ -271,7 +269,7 @@
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection49">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
  	 <target component = "actuatorAdapter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection50">
@@ -291,7 +289,7 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection54">
-	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "2"/>
+	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
  	 <target component = "rgTlm" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection55">
@@ -306,10 +304,6 @@
 	 <source component = "imuDRInt" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection58">
-	 <source component = "sigGen" port = "controls" type = "TorqueThrust" num = "0"/>
- 	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
-</connection>
 <connection name = "Connection59">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
  	 <target component = "logQueue" port = "Run" type = "Sched" num = "0"/>
@@ -320,7 +314,7 @@
 </connection>
 <connection name = "Connection61">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+ 	 <target component = "se3Ctrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection62">
 	 <source component = "actuatorAdapter" port = "LogText" type = "LogText" num = "0"/>
@@ -351,8 +345,8 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection69">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
+ 	 <target component = "se3Ctrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection70">
 	 <source component = "sigGen" port = "Time" type = "Time" num = "0"/>
@@ -366,17 +360,13 @@
 	 <source component = "i2cDrv" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection73">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
- 	 <target component = "logQueue" port = "Run" type = "Sched" num = "0"/>
-</connection>
 <connection name = "Connection74">
 	 <source component = "mpu9250" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection75">
 	 <source component = "ctrlXest" port = "odomOutA" type = "Odometry" num = "0"/>
- 	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
+ 	 <target component = "se3Ctrl" port = "odometry" type = "Odometry" num = "0"/>
 </connection>
 <connection name = "Connection76">
 	 <source component = "sigGen" port = "Tlm" type = "Tlm" num = "0"/>
@@ -390,16 +380,12 @@
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
  	 <target component = "tlmChan" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection79">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
-</connection>
 <connection name = "Connection80">
 	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection81">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "mpu9250" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection82">
@@ -407,7 +393,7 @@
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection83">
-	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
+	 <source component = "se3Ctrl" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection84">
@@ -415,8 +401,8 @@
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection85">
-	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
- 	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
+	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
+ 	 <target component = "rgOp" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection86">
 	 <source component = "rgDecouple" port = "LogText" type = "LogText" num = "0"/>
@@ -442,10 +428,6 @@
 	 <source component = "i2cDrv" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection92">
-	 <source component = "sigGen" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
- 	 <target component = "leeCtrl" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
-</connection>
 <connection name = "Connection93">
 	 <source component = "spiDrv" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
@@ -455,8 +437,8 @@
  	 <target component = "spiDrv" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
 </connection>
 <connection name = "Connection95">
-	 <source component = "leeCtrl" port = "controls" type = "TorqueThrust" num = "0"/>
- 	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
+	 <source component = "se3Ctrl" port = "controls" type = "WrenchStamped" num = "0"/>
+ 	 <target component = "mixer" port = "controls" type = "WrenchStamped" num = "0"/>
 </connection>
 <connection name = "Connection96">
 	 <source component = "escPwm" port = "time" type = "Time" num = "0"/>
@@ -466,12 +448,8 @@
 	 <source component = "rgDecouple" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection98">
-	 <source component = "rgPos" port = "Tlm" type = "Tlm" num = "0"/>
- 	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
-</connection>
 <connection name = "Connection99">
-	 <source component = "rgAtt" port = "Time" type = "Time" num = "0"/>
+	 <source component = "rgOp" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection100">
@@ -495,16 +473,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection105">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
  	 <target component = "logQueue" port = "Run" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection106">
 	 <source component = "kraitRouter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection107">
-	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
- 	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection108">
 	 <source component = "ctrlXest" port = "LogText" type = "LogText" num = "0"/>
@@ -552,10 +526,10 @@
 </connection>
 <connection name = "Connection119">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "4"/>
- 	 <target component = "leeCtrl" port = "CmdDisp" type = "Cmd" num = "0"/>
+ 	 <target component = "se3Ctrl" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
 <connection name = "Connection120">
-	 <source component = "leeCtrl" port = "CmdReg" type = "CmdReg" num = "0"/>
+	 <source component = "se3Ctrl" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "4"/>
 </connection>
 <connection name = "Connection121">
