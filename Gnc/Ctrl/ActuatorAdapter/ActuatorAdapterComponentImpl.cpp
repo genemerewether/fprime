@@ -685,7 +685,7 @@ namespace Gnc {
   	  this->tlmWrite_ACTADAP_ArmState(static_cast<ArmStateTlm>(this->armedState));
 	  this->tlmWrite_ACTADAP_HwEnabled(hwEnabled);
       }
-      else if ((ACTADAP_SCHED_CONTEXT_POS == context) &&
+      else if ((ACTADAP_SCHED_CONTEXT_ARM == context) &&
 	       (ARMING == this->armedState)) {
           if (++this->armCount > ACTADAP_ARM_COUNT) {
               this->armedState = ARMED;
