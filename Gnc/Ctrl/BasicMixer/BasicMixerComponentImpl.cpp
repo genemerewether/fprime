@@ -87,7 +87,7 @@ namespace Gnc {
       Fw::ParamValid valid[4];
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-      if (this->numRotors >= quest_gnc::multirotor::kBasicMixerMaxActuators) {  return;  }
+      if (this->numRotors > quest_gnc::multirotor::kBasicMixerMaxActuators) {  return;  }
       quest_gnc::multirotor::BasicMixer::MixMatrix mixer;
 
       // TODO(mereweth) - macro-ize the param get calls?

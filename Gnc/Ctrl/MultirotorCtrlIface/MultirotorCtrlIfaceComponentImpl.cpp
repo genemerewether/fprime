@@ -375,6 +375,10 @@ namespace Gnc {
             !std::isfinite(msg->angular_rates.y) ||
 	    !std::isfinite(msg->angular_rates.z) ||
 	    
+	    !std::isfinite(msg->angular_acceleration.x) ||
+            !std::isfinite(msg->angular_acceleration.y) ||
+	    !std::isfinite(msg->angular_acceleration.z) ||
+	    
             !std::isfinite(msg->thrust.x) ||
 	    !std::isfinite(msg->thrust.y) ||
 	    !std::isfinite(msg->thrust.z)) {
@@ -396,6 +400,7 @@ namespace Gnc {
 
               Quaternion(msg->attitude.x, msg->attitude.y, msg->attitude.z, msg->attitude.w),
               Vector3(msg->angular_rates.x, msg->angular_rates.y, msg->angular_rates.z),
+              Vector3(msg->angular_acceleration.x, msg->angular_acceleration.y, msg->angular_acceleration.z),
               Vector3(msg->thrust.x, msg->thrust.y, msg->thrust.z)
 
             ); // end AttitudeRateThrust constructor
