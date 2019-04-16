@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="Se3Ctrl" kind="passive" namespace="Gnc">
+
+
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/geometry_msgs/Ports/WrenchStampedPortAi.xml</import_port_type>
+
+    <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
+
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+    <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionSerializableAi.xml</import_serializable_type>
+
+    <import_dictionary>Gnc/Ctrl/Se3Ctrl/Telemetry.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/Se3Ctrl/Commands.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/Se3Ctrl/Params.xml</import_dictionary>
+    <import_dictionary>Gnc/Ctrl/Se3Ctrl/Events.xml</import_dictionary>
+
+    <ports>
+        <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="sync_input" max_number="1">
+        </port>
+
+        <port name="accelCommand" data_type="ROS::geometry_msgs::AccelStamped"  kind="output" max_number="1">
+        </port>
+
+        <port name="controls" data_type="ROS::geometry_msgs::WrenchStamped"  kind="output" max_number="1">
+        </port>
+
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="2">
+        </port>
+
+        <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        </port>
+
+        <port name="log" data_type="Fw::Log"  kind="output"    max_number="1">
+        </port>
+
+        <port name="logText" data_type="Fw::LogText"  kind="output"    max_number="1">
+        </port>
+
+        <port name="time" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port-->
+    </ports>
+
+</component>

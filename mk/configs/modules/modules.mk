@@ -179,6 +179,7 @@ QUEST_GNC_ROSIFACE_MODULES := \
 
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
+	Gnc/Ctrl/Se3Ctrl \
 	Gnc/Ctrl/BasicMixer \
 	Gnc/Ctrl/WrenchMixer \
 	Gnc/Est/ImuInteg \
