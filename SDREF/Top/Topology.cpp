@@ -240,24 +240,24 @@ void allocComps() {
 
     buffLogMVCamUnproc_ptr = new Svc::BufferLogger
 #if FW_OBJECT_NAMES == 1
-                        ("BUFLOGMVUNPROC")
+                        ("BUFLOG_M_U")
 #endif
 ;
 
     buffLogHiresCamUnproc_ptr = new Svc::BufferLogger
 #if FW_OBJECT_NAMES == 1
-                        ("BUFLOGHIRESUNPROC")
+                        ("BUFLOG_H_U")
 #endif
 ;
 
     buffAccumMVCamUnproc_ptr = new Svc::BufferAccumulator
 #if FW_OBJECT_NAMES == 1
-                        ("BUFACCMVUNPROC")
+                        ("BUFACC_M_U")
 #endif
 ;
     buffAccumHiresCamUnproc_ptr = new Svc::BufferAccumulator
 #if FW_OBJECT_NAMES == 1
-                        ("BUFACCHIRESUNPROC")
+                        ("BUFACC_H_U")
 #endif
 ;
 
