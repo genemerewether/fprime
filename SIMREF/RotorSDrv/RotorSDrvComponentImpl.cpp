@@ -129,8 +129,7 @@ namespace SIMREF {
           NATIVE_UINT_TYPE context
       )
     {
-        if ((context == RSDRV_SCHED_CONTEXT_ATT) ||
-            (context == RSDRV_SCHED_CONTEXT_POS)) {
+        if (context == RSDRV_SCHED_CONTEXT_OP) {
             for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuSet); i++) {
                 m_imuSet[i].mutex.lock();
                 if (m_imuSet[i].fresh) {

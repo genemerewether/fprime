@@ -94,11 +94,9 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-      if (SIGGEN_SCHED_CONTEXT_POS == context) {
+      if (SIGGEN_SCHED_CONTEXT_TLM == context) {
       }
-      else if (SIGGEN_SCHED_CONTEXT_TLM == context) {
-      }
-      else if (SIGGEN_SCHED_CONTEXT_ATT == context) {
+      else if (SIGGEN_SCHED_CONTEXT_OP == context) {
           if (IDLE == this->sigType) {
               return;
           }

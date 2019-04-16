@@ -5,8 +5,7 @@ namespace Gnc {
 
 enum {
     SIGGEN_SCHED_CONTEXT_TLM,
-    SIGGEN_SCHED_CONTEXT_ATT,
-    SIGGEN_SCHED_CONTEXT_POS
+    SIGGEN_SCHED_CONTEXT_OP
 };
 
 enum {

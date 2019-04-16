@@ -87,7 +87,7 @@ namespace Gnc {
       Fw::ParamValid valid[6];
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-      if (this->numRotors >= quest_gnc::multirotor::kWrenchMixerMaxActuators) {  return;  }
+      if (this->numRotors > quest_gnc::multirotor::kWrenchMixerMaxActuators) {  return;  }
       quest_gnc::multirotor::WrenchMixer::MixMatrix mixer;
 
       // TODO(mereweth) - macro-ize the param get calls?
@@ -201,7 +201,7 @@ namespace Gnc {
       quest_gnc::multirotor::WrenchMixer::MixOutput rotorVel;
       this->wrenchMixer.GetRotorVelCommand(&rotorVel);
 
-      FW_ASSERT(quest_gnc::multirotor::kWrenchMixerMaxActuators > this->numRotors, this->numRotors);
+      FW_ASSERT(quest_gnc::multirotor::kWrenchMixerMaxActuators >= this->numRotors, this->numRotors);
       F64 angVel[quest_gnc::multirotor::kWrenchMixerMaxActuators] = { 0.0 };
       F64 angles[0], normalized[0];
       for (U32 i = 0; i < this->numRotors; i ++) {
