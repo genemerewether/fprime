@@ -111,8 +111,8 @@ void allocComps() {
 
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-        Gnc::ATTFILTER_SCHED_CONTEXT_ATT, // attFilter
-        Gnc::SIGGEN_SCHED_CONTEXT_ATT, // sigGen
+        Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
+        Gnc::SIGGEN_SCHED_CONTEXT_OP, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
         0, // mixer
         0, // adapter
@@ -129,7 +129,7 @@ void allocComps() {
 
     NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         0, //TODO(mereweth) - IMU?
-        Gnc::ATTFILTER_SCHED_CONTEXT_POS, // attFilter
+        Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
         0, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
         0, // mixer

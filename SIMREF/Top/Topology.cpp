@@ -62,9 +62,9 @@ Svc::RateGroupDriverImpl rgGncDrv(
 
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
-    SIMREF::RSDRV_SCHED_CONTEXT_ATT,
-    Gnc::ATTFILTER_SCHED_CONTEXT_ATT,
-    Gnc::SIGGEN_SCHED_CONTEXT_ATT,
+    SIMREF::RSDRV_SCHED_CONTEXT_OP,
+    Gnc::ATTFILTER_SCHED_CONTEXT_FILT,
+    Gnc::SIGGEN_SCHED_CONTEXT_OP,
     Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
 Svc::PassiveRateGroupImpl rgAtt(
@@ -76,9 +76,9 @@ Svc::PassiveRateGroupImpl rgAtt(
 
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
-    SIMREF::RSDRV_SCHED_CONTEXT_POS,
-    Gnc::ATTFILTER_SCHED_CONTEXT_POS,
-    Gnc::SIGGEN_SCHED_CONTEXT_POS,
+    SIMREF::RSDRV_SCHED_CONTEXT_OP,
+    Gnc::ATTFILTER_SCHED_CONTEXT_FILT,
+    Gnc::SIGGEN_SCHED_CONTEXT_OP,
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
 Svc::PassiveRateGroupImpl rgPos(
