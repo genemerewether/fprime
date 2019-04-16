@@ -24,6 +24,7 @@
 #include <Gnc/Ctrl/Se3Ctrl/Se3CtrlComponentImplCfg.hpp>
 
 #include "quest_gnc/ctrl/se3_control.h"
+#include "quest_gnc/utils/rigidbody_model.h"
 #include "quest_gnc/utils/multirotor_model.h"
 #include "quest_gnc/utils/world_params.h"
 
@@ -171,7 +172,7 @@ namespace Gnc {
 
       ROS::geometry_msgs::Vector3 alpha_b__des;
 
-      quest_gnc::multirotor::Se3Control se3Control;
+      quest_gnc::Se3Control se3Control;
 
       PosCtrlMode posCtrlMode;
     

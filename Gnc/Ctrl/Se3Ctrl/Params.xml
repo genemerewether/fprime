@@ -61,6 +61,10 @@
     <parameter id="18" set_opcode="56" save_opcode="57" name="mass" data_type="F64" >
       <comment>Mass</comment>
     </parameter>
+    
+    <parameter id="19" set_opcode="58" save_opcode="59" name="force_z" data_type="F64" >
+      <comment>Z force from buoyancy / tether</comment>
+    </parameter>
 
     <parameter id="20" set_opcode="60" save_opcode="61" name="sat_x__x" data_type="F64" default="1.0">
       <comment>Position feedback saturation</comment>
