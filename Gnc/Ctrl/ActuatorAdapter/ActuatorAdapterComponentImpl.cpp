@@ -129,7 +129,7 @@ namespace Gnc {
       Fw::ParamValid valid[7];
       this->numActuators = paramGet_numActuators(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-      if (this->numActuators >= ACTADAP_MAX_ACTUATORS) {  return;  }
+      if (this->numActuators > ACTADAP_MAX_ACTUATORS) {  return;  }
 
       // NOTE(mereweth) - start convenience defines
 #define MAP_AND_FB_FROM_PARM_IDX(XXX) \
@@ -380,7 +380,7 @@ namespace Gnc {
                       }
                       else if (inVal > i2c.cmdOutputMap.maxIn) {  inVal = i2c.cmdOutputMap.maxIn;  }
                       else if (inVal < i2c.cmdOutputMap.minIn) {  inVal = i2c.cmdOutputMap.minIn;  }
-                      I32 out = 0u;
+                      I64 out = 0;
                       F64 des = 0.0;
 
                       // TODO(mereweth) - share mapping among output types
@@ -396,6 +396,8 @@ namespace Gnc {
                       else {
                           // TODO(mereweth) - EVR!!
                       }
+
+		      // TODO(mereweth) - fix mapping for use with negative values - flag for symmetric or not
                       switch (i2c.cmdOutputMap.type) {
                           case CMD_OUTPUT_MAP_LIN_MINMAX:
                               out = (inVal - i2c.cmdOutputMap.minIn) /
@@ -465,7 +467,7 @@ namespace Gnc {
                               break;
                       }          
 
-                      DEBUG_PRINT("esc addr %u, in %f, out %u\n", i2c.addr, angVels[i], out);
+                      DEBUG_PRINT("esc addr %u, in %f, out %lld\n", i2c.addr, angVels[i], out);
 
                       if (out > i2c.maxOut) {  out = i2c.maxOut;  }
                       if (out < i2c.minOut) {  out = i2c.minOut;  }
@@ -473,11 +475,17 @@ namespace Gnc {
                       Fw::Buffer readBufObj(0, 0, 0, 0); // no read
                       if (OUTPUT_I2C == this->outputInfo[i].type) {
   			  if (i2c.reverse) {  out = -out;  }
-			
+
+			  I8 outI8[2] = { out >> 8, out };
+			  U8 outU8[2] = { 0 };
+			  memcpy(outU8, outI8, 2);
                           // MSB is reverse bit
-                          U8 writeBuf[3] = { 0x00,
-                                             (U8) (out / 8),
-                                             (U8) (out % 8) };
+
+			  DEBUG_PRINT("reverse: %u, ihigh: %d, ilow: %d, high: %u, low: %u\n",
+				      i2c.reverse, outI8[0], outI8[1],
+				      outU8[0], outU8[1]);
+			  
+                          U8 writeBuf[3] = { 0x00, outU8[0], outU8[1] };
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
                           this->escReadWrite_out(0, writeBufObj, readBufObj);
                       }
@@ -560,6 +568,10 @@ namespace Gnc {
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI
                                     * this->outputInfo[i].feedback.counts
                                     / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
+
+				  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
+					      i, this->outputInfo[i].feedback.counts,
+					      this->outputInfo[i].feedback.angVel);
                               }
                               else {
                                   U32 countsDiff = 0u;
@@ -573,8 +585,12 @@ namespace Gnc {
 
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI * countsDiff
                                     / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
-                              }
 
+				  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
+					      i, countsDiff,
+					      this->outputInfo[i].feedback.angVel);
+                              }
+			  
                               // TODO(mereweth) - run rate estimator here
 
                               switch (i) {

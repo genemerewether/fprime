@@ -2,56 +2,56 @@ NUMACTUATORS_PRM_SET, 8
 
 # front right
 A1_ADDR_PRM_SET, 17
-A1_REVERSE_PRM_SET, 0
+A1_REVERSE_PRM_SET, False
 # bluez esc I2C protocol
 A1_TYPE_PRM_SET, 2
 A1_PARMSLOT_PRM_SET, 1
 
 # back left
 A2_ADDR_PRM_SET, 12
-A2_REVERSE_PRM_SET, 0
+A2_REVERSE_PRM_SET, False
 # bluez esc I2C protocol
 A2_TYPE_PRM_SET, 2
 A2_PARMSLOT_PRM_SET, 1
 
 # front left
 A3_ADDR_PRM_SET, 16
-A3_REVERSE_PRM_SET, 0
+A3_REVERSE_PRM_SET, True
 # bluez esc I2C protocol
 A3_TYPE_PRM_SET, 2
 A3_PARMSLOT_PRM_SET, 1
 
 # back right
 A4_ADDR_PRM_SET, 14
-A4_REVERSE_PRM_SET, 0
+A4_REVERSE_PRM_SET, True
 # bluez esc I2C protocol
 A4_TYPE_PRM_SET, 2
 A4_PARMSLOT_PRM_SET, 1
 
 # x-thrust, plus z moment
 A5_ADDR_PRM_SET, 15
-A5_REVERSE_PRM_SET, 0
+A5_REVERSE_PRM_SET, False
 # bluez esc I2C protocol
 A5_TYPE_PRM_SET, 2
 A5_PARMSLOT_PRM_SET, 1
 
 # x-thrust, minus z moment
 A6_ADDR_PRM_SET, 18
-A6_REVERSE_PRM_SET, 0
+A6_REVERSE_PRM_SET, True
 # bluez esc I2C protocol
 A6_TYPE_PRM_SET, 2
 A6_PARMSLOT_PRM_SET, 1
 
 # y-thrust, plus z moment
-A7_ADDR_PRM_SET, 11
-A7_REVERSE_PRM_SET, 0
+A7_ADDR_PRM_SET, 13
+A7_REVERSE_PRM_SET, False
 # bluez esc I2C protocol
 A7_TYPE_PRM_SET, 2
 A7_PARMSLOT_PRM_SET, 1
 
 # y-thrust, minus z moment
-A8_ADDR_PRM_SET, 13
-A8_REVERSE_PRM_SET, 0
+A8_ADDR_PRM_SET, 11
+A8_REVERSE_PRM_SET, True
 # bluez esc I2C protocol
 A8_TYPE_PRM_SET, 2
 A8_PARMSLOT_PRM_SET, 1
