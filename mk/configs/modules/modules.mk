@@ -367,16 +367,36 @@ SIMREF_MODULES := \
 	$(SIMREF_GENERAL_MODULES)
 
 HEXREF_GENERAL_MODULES := \
-	$(ROS_TYPE_MODULES) \
-	$(ROS_PORT_MODULES) \
 	\
-	$(QUEST_GNC_MODULES) \
+	ROS/Gen/std_msgs/Ports  \
+	ROS/Gen/geometry_msgs/Ports      \
+	ROS/Gen/nav_msgs/Ports           \
+	ROS/Gen/mav_msgs/Ports		 \
+	ROS/Gen/sensor_msgs/Ports	\
+	\
+	ROS/Gen/std_msgs/Types  \
+	ROS/Gen/geometry_msgs/Types      \
+	ROS/Gen/nav_msgs/Types           \
+	ROS/Gen/mav_msgs/Types		 \
+	ROS/Gen/sensor_msgs/Types	\
+	\
+	Gnc/Ctrl/Se3Ctrl \
+	Gnc/Ctrl/WrenchMixer \
+	Gnc/Est/AttFilter \
+	Gnc/Sysid/SigGen \
+	Gnc/Utils/FrameTransform \
+	Gnc/quest_gnc/src/diffeo \
+	Gnc/quest_gnc/src/traj \
+	Gnc/quest_gnc/src/ctrl \
+	Gnc/quest_gnc/src/est \
+	Gnc/quest_gnc/src/mixer \
+	Gnc/quest_gnc/src/sysid \
+	\
 	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(HEXAGON_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
-	Drv/Mavlink/ActuatorControls \
 	Drv/PwmDriverPorts \
 	Drv/GpioDriverPorts \
 	Drv/SerialDriverPorts \
@@ -387,17 +407,14 @@ HEXREF_GENERAL_MODULES := \
 	Drv/LinuxI2CDriver \
 	Drv/LinuxPwmDriver \
 	\
-	Svc/BufferManager \
 	Svc/CmdDispatcher \
-	Svc/CmdSequencer \
 	Svc/Seq \
-	Svc/ActiveRateGroup \
 	Svc/PassiveRateGroup \
+	Svc/PassiveTextLogger \
+	Svc/PassiveConsoleTextLogger \
 	Svc/RateGroupDriver \
 	Svc/RateGroupDecoupler \
 	Svc/Sched \
-	Svc/PassiveTextLogger \
-	Svc/PassiveConsoleTextLogger \
 	Svc/Time \
 	Svc/Cycle \
 	Svc/LinuxTime \
@@ -405,7 +422,6 @@ HEXREF_GENERAL_MODULES := \
 	Svc/Fatal \
 	Svc/PolyIf \
 	Svc/PolyDb \
-	Svc/PrmDb \
 	Svc/Ping \
 	Svc/Health \
 	Svc/WatchDog \
