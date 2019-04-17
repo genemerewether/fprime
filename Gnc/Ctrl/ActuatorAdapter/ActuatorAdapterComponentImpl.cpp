@@ -289,6 +289,12 @@ namespace Gnc {
               case 5:
                   METADATA_FROM_ACT_IDX(6);
                   break;
+              case 6:
+                  METADATA_FROM_ACT_IDX(7);
+                  break;
+              case 7:
+                  METADATA_FROM_ACT_IDX(8);
+                  break;
               default:
                   FW_ASSERT(0, i);
           }
