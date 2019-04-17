@@ -81,6 +81,32 @@
       <comment>actuator 6 which param set</comment>
     </parameter>
 
+    <parameter id="70" set_opcode="160" save_opcode="161" name="a7_addr" data_type="U32" >
+      <comment>actuator 7 address (I2C)</comment>
+    </parameter>
+    <parameter id="75" set_opcode="170" save_opcode="171" name="a7_reverse" data_type="bool" >
+      <comment>actuator 7 reverse direction flag</comment>
+    </parameter>
+    <parameter id="76" set_opcode="172" save_opcode="173" name="a7_type" data_type="U8" >
+      <comment>actuator 7 type</comment>
+    </parameter>
+    <parameter id="78" set_opcode="176" save_opcode="177" name="a7_parmSlot" data_type="U8" >
+      <comment>actuator 7 which param set</comment>
+    </parameter>
+
+    <parameter id="80" set_opcode="180" save_opcode="181" name="a8_addr" data_type="U32" >
+      <comment>actuator 8 address (I2C)</comment>
+    </parameter>
+    <parameter id="85" set_opcode="190" save_opcode="191" name="a8_reverse" data_type="bool" >
+      <comment>actuator 8 reverse direction flag</comment>
+    </parameter>
+    <parameter id="86" set_opcode="192" save_opcode="193" name="a8_type" data_type="U8" >
+      <comment>actuator 8 type</comment>
+    </parameter>
+    <parameter id="88" set_opcode="196" save_opcode="197" name="a8_parmSlot" data_type="U8" >
+      <comment>actuator 8 which param set</comment>
+    </parameter>
+
     <parameter id="100" set_opcode="220" save_opcode="221" name="p1_minCmd" data_type="F64" >
       <comment>parm slot 1 minimum command</comment>
     </parameter>

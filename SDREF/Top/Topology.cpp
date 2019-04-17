@@ -955,6 +955,8 @@ int main(int argc, char* argv[]) {
         filterIface_ptr->startPub();
         rosSeq_ptr->startPub();
 
+	ros::console::shutdown();
+
         Os::TaskString waiter_task_name("WAITER");
 #ifdef BUILD_SDFLIGHT
         // TODO(mereweth) - test that calling other functions before init has no effect
