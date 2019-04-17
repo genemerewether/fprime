@@ -5,8 +5,7 @@ namespace Gnc {
 
 enum {
     IMUINTEG_SCHED_CONTEXT_TLM,
-    IMUINTEG_SCHED_CONTEXT_ATT,
-    IMUINTEG_SCHED_CONTEXT_POS
+    IMUINTEG_SCHED_CONTEXT_FILT
 };
 
 } // namespace Gnc
