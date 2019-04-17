@@ -460,64 +460,7 @@ MINRPC_MODULES := \
 TESTRPC_MODULES := \
 	TESTRPC/Top \
 	HEXREF/Rpc \
-	\
-	$(ROS_TYPE_MODULES) \
-	$(ROS_PORT_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	\
-	$(HEXAGON_MODULES) \
-	\
-	Drv/IMU/MPU9250 \
-	Drv/PwmDriverPorts \
-	Drv/GpioDriverPorts \
-	Drv/SerialDriverPorts \
-	Drv/SpiDriverPorts \
-	Drv/I2CDriverPorts \
-	Drv/LinuxGpioDriver \
-	Drv/LinuxSpiDriver \
-	Drv/LinuxI2CDriver \
-	Drv/LinuxPwmDriver \
-	\
-	Svc/BufferManager \
-	Svc/CmdDispatcher \
-	Svc/CmdSequencer \
-	Svc/Seq \
-	Svc/ActiveRateGroup \
-	Svc/PassiveRateGroup \
-	Svc/RateGroupDriver \
-	Svc/RateGroupDecoupler \
-	Svc/Sched \
-	Svc/PassiveTextLogger \
-	Svc/PassiveConsoleTextLogger \
-	Svc/Time \
-	Svc/Cycle \
-	Svc/LinuxTime \
-	Svc/ActiveLogger \
-	Svc/Fatal \
-	Svc/PolyIf \
-	Svc/PolyDb \
-	Svc/PrmDb \
-	Svc/Ping \
-	Svc/Health \
-	Svc/WatchDog \
-	Svc/AssertFatalAdapter \
-	Svc/FatalHandler \
-	\
-	$(FW_MODULES) \
-	\
-	$(UTILS_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	LLProc/ShortLogQueue
+	$(HEXREF_GENERAL_MODULES)
 
 R5REF_DEPLOYMENT_MODULES := \
 	R5REF/Top
