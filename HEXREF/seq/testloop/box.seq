@@ -1,0 +1,13 @@
+R00:00:00 SE3CTRL_SetPosCtrlMode, LINVEL
+
+R00:00:00 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 
+R00:00:05 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+R00:00:01 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 
+R00:00:05 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+R00:00:01 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0 
+R00:00:05 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+R00:00:01 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0 
+R00:00:05 SE3CTRL_LinearSetpoint, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
