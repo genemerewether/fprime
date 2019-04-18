@@ -119,7 +119,7 @@ WMIX_InitParams
 NUMACTUATORS_PRM_SET, 8
 
 # front right
-A1_ADDR_PRM_SET, 17
+A1_ADDR_PRM_SET, 19
 A1_REVERSE_PRM_SET, False
 # bluez esc I2C protocol
 A1_TYPE_PRM_SET, 2
