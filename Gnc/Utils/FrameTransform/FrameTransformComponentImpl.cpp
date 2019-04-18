@@ -125,14 +125,16 @@ namespace Gnc {
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
       ROS::geometry_msgs::Vector3 lin = twist.getlinear();
-      const Vector3d lin_b = this->b_X_a * Vector3d(lin.getx(), lin.gety(), lin.getz());
+      const Vector3d lin_b = this->b_X_a.rotation()
+	* Vector3d(lin.getx(), lin.gety(), lin.getz());
       lin.setx(lin_b(0));
       lin.sety(lin_b(1));
       lin.setz(lin_b(2));
       twist.setlinear(lin);
 
       ROS::geometry_msgs::Vector3 ang = twist.getangular();
-      const Vector3d ang_b = this->b_X_a * Vector3d(ang.getx(), ang.gety(), ang.getz());
+      const Vector3d ang_b = this->b_X_a.rotation()
+	* Vector3d(ang.getx(), ang.gety(), ang.getz());
       ang.setx(ang_b(0));
       ang.sety(ang_b(1));
       ang.setz(ang_b(2));
@@ -173,14 +175,16 @@ namespace Gnc {
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
       ROS::geometry_msgs::Vector3 lin = twist.getlinear();
-      const Vector3d lin_a = this->a_X_b * Vector3d(lin.getx(), lin.gety(), lin.getz());
+      const Vector3d lin_a = this->a_X_b.rotation()
+	* Vector3d(lin.getx(), lin.gety(), lin.getz());
       lin.setx(lin_a(0));
       lin.sety(lin_a(1));
       lin.setz(lin_a(2));
       twist.setlinear(lin);
 
       ROS::geometry_msgs::Vector3 ang = twist.getangular();
-      const Vector3d ang_a = this->a_X_b * Vector3d(ang.getx(), ang.gety(), ang.getz());
+      const Vector3d ang_a = this->a_X_b.rotation()
+	* Vector3d(ang.getx(), ang.gety(), ang.getz());
       ang.setx(ang_a(0));
       ang.sety(ang_a(1));
       ang.setz(ang_a(2));
