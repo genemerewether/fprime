@@ -451,7 +451,16 @@ namespace Gnc {
                           // TODO(mereweth) - EVR!!
                       }
 
-		      // TODO(mereweth) - fix mapping for use with negative values - flag for symmetric or not
+		      const F64 inValAbs = fabs(inVal);
+		      I64 sign = 1;
+		      
+                      if ((CMD_OUTPUT_MAP_LIN_0BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_1BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_2BRK == i2c.cmdOutputMap.type)) {
+			  if (inVal < 0.0) {
+			      sign = -1;
+			  }
+		      }
                       switch (i2c.cmdOutputMap.type) {
                           case CMD_OUTPUT_MAP_LIN_MINMAX:
                               out = (inVal - i2c.cmdOutputMap.minIn) /
@@ -459,36 +468,36 @@ namespace Gnc {
                                 + i2c.minOut;
                               break;
                           case CMD_OUTPUT_MAP_LIN_2BRK:
-                              if (inVal < i2c.cmdOutputMap.x0) {
-                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              if (inValAbs < i2c.cmdOutputMap.x0) {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + i2c.cmdOutputMap.b;
                               }
-                              else if (inVal < i2c.cmdOutputMap.x1) {
+                              else if (inValAbs < i2c.cmdOutputMap.x1) {
                                   des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
                                     + i2c.cmdOutputMap.b
-                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - i2c.cmdOutputMap.x0);
                               }
                               else {
                                   des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
                                     + i2c.cmdOutputMap.b
                                     + i2c.cmdOutputMap.k1  * Vnom_by_Vact
                                                            * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
-                                    + i2c.cmdOutputMap.k2 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x1);
+                                    + i2c.cmdOutputMap.k2 * Vnom_by_Vact * (inValAbs - i2c.cmdOutputMap.x1);
                               }
                               out = (I32) des;
                               break;
                           case CMD_OUTPUT_MAP_LIN_1BRK:
-                              if (inVal < i2c.cmdOutputMap.x0) {
-                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              if (inValAbs < i2c.cmdOutputMap.x0) {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + i2c.cmdOutputMap.b;
                               }
                               else {
                                   des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
                                     + i2c.cmdOutputMap.b
-                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - i2c.cmdOutputMap.x0);
                               }
                               out = (I32) des;
                               break;
                           case CMD_OUTPUT_MAP_LIN_0BRK:
-                              des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + i2c.cmdOutputMap.b;
                               out = (I32) des;
                               break;
                           case CMD_OUTPUT_MAP_UNSET:
@@ -502,7 +511,8 @@ namespace Gnc {
                       F64 delta = 0.0;
                       switch (i2c.fbMeta.ctrlType) {
                           case FEEDBACK_CTRL_PROP:
-                              delta = i2c.fbMeta.kp * (inVal - this->outputInfo[i].feedback.angVel);
+			      // TODO(Mereweth) - what if not tracking near zero in bidirectional?
+  			      delta = i2c.fbMeta.kp * (inValAbs - fabs(this->outputInfo[i].feedback.angVel));    
                               
                               // NOTE(Mereweth) - fallthrough so this code runs for all control types except NONE
 
@@ -519,7 +529,29 @@ namespace Gnc {
                           case FEEDBACK_CTRL_NONE:
                           default:
                               break;
-                      }          
+                      }
+
+		      // if we took fabs of inVal for calculating the mapping, put it back the right way
+		      out *= sign;
+		      
+		      /* NOTE(mereweth) - prevent piecewise mappings from flipping the sign due to e.g.
+		       * negative y intercept, or controller flipping the sign
+		       */
+		      
+		      if (((inVal > 0.0) && (out < 0.0)) ||
+			  ((inVal < 0.0) && (out > 0.0))) {
+			  out = 0;
+		      }
+
+		      /* NOTE(mereweth) - in case inVal is exactly 0.0
+		       */
+                      if ((CMD_OUTPUT_MAP_LIN_0BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_1BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_2BRK == i2c.cmdOutputMap.type)) {
+			  if (inVal == 0.0) {
+			      out = 0;
+			  }
+		      }
 
                       DEBUG_PRINT("esc addr %u, in %f, out %lld\n", i2c.addr, angVels[i], out);
 
