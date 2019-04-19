@@ -56,20 +56,26 @@ A8_REVERSE_PRM_SET, True
 A8_TYPE_PRM_SET, 2
 A8_PARMSLOT_PRM_SET, 1
 
-P1_MINCMD_PRM_SET, -160.0
-P1_MAXCMD_PRM_SET, 160.0
-P1_MINOUT_PRM_SET, -200
-P1_MAXOUT_PRM_SET, 200
+P1_MINCMD_PRM_SET, -300.0
+P1_MAXCMD_PRM_SET, 300.0
+P1_MINOUT_PRM_SET, -7500
+P1_MAXOUT_PRM_SET, 7500
 P1_COUNTS_PRM_SET, 36
-# mapping determined at 11.1 volts
-P1_MAP_VNOM_PRM_SET, 11.1
 
-# scale between min and max
-P1_MAPTYPE_PRM_SET, 1
-# no feedback control
-P1_CTRLTYPE_PRM_SET, 0
+# piecewise linear, 1 break
+P1_MAPTYPE_PRM_SET, 3
+P1_MAP_X0_PRM_SET, 180.0
+P1_MAP_K0_PRM_SET, 66.7
+P1_MAP_K1_PRM_SET, 125.0
+P1_MAP_B_PRM_SET, -4000.0
+# mapping determined at 15.6 volts
+P1_MAP_VNOM_PRM_SET, 15.6
+
+# proportional feedback control
+P1_CTRLTYPE_PRM_SET, 1
+P1_CTRL_KP_PRM_SET, 10
 # output units max delta from open loop mapping
-P1_CTRL_MAXERR_PRM_SET, 10.0
+P1_CTRL_MAXERR_PRM_SET, 2000.0
 
 ACTADAP_InitParams
 
