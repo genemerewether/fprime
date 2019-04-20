@@ -356,10 +356,6 @@
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "llRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection60">
-	 <source component = "mvVislam" port = "ImuFwd" type = "ImuNoCov" num = "0"/>
- 	 <target component = "sdRosIface" port = "Imu" type = "ImuNoCov" num = "0"/>
-</connection>
 <connection name = "Connection61">
 	 <source component = "atiNetbox" port = "ParamSet" type = "PrmSet" num = "0"/>
  	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>
