@@ -246,7 +246,7 @@ P1_MAP_VNOM_PRM_SET, 15.6
 
 # proportional feedback control
 P1_CTRLTYPE_PRM_SET, 1
-P1_CTRL_KP_PRM_SET, 10
+P1_CTRL_KP_PRM_SET, 10.0
 # output units max delta from open loop mapping
 P1_CTRL_MAXERR_PRM_SET, 2000.0
 
