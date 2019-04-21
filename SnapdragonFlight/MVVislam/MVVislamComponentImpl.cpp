@@ -447,7 +447,7 @@ namespace SnapdragonFlight {
   {
       if (m_initialized) {
 #ifdef BUILD_SDFLIGHT
-  	  mvVISLAM_Reset(m_mvVISLAMPtr, false);
+  	  mvVISLAM_Reset(m_mvVISLAMPtr, true);
 #endif //BUILD_SDFLIGHT
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
       }
