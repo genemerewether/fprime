@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   trac_ik_lib
   image_transport
+  tf
   )
 find_package(orocos_kdl)
 
@@ -21,6 +22,7 @@ catkin_package(
   trac_ik_lib
   image_transport
   roscpp
+  tf
 )
 
 genmodmk()

@@ -30,8 +30,6 @@
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/fill_image.h> 
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -53,6 +51,7 @@ namespace Gnc {
 #endif
     m_rosInited(false),
     m_nodeHandle(NULL),
+    m_trBroad(NULL),
     m_imuStateUpdateSet() // zero-initialize instead of default-initializing
   {
       for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
@@ -80,6 +79,7 @@ namespace Gnc {
         // TODO(mereweth) - prevent calling twice
         FW_ASSERT(m_nodeHandle);
         ros::NodeHandle* n = this->m_nodeHandle;
+	this->m_trBroad = new tf::TransformBroadcaster();
 
         char buf[32];
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
@@ -232,6 +232,18 @@ namespace Gnc {
         msg.twist.twist.angular.z = vec.getz();
 	
         m_odomPub[portNum].publish(msg);
+
+	tf::Transform tfo;
+	tf::poseMsgToTF(msg.pose.pose, tfo);
+	
+	tf::StampedTransform tfoStamp;
+	tfoStamp.stamp_ = msg.header.stamp;
+	tfoStamp.child_frame_id_ = msg.child_frame_id;
+	tfoStamp.frame_id_ = msg.header.frame_id;
+	tfoStamp.setData(tfo);
+	
+	FW_ASSERT(this->m_trBroad);
+	this->m_trBroad->sendTransform(tfoStamp);
     }
 
     void FilterIfaceComponentImpl ::
