@@ -26,6 +26,8 @@
   <depend>image_transport</depend>
   <depend>fprime_msgs</depend>
   
+  <depend>tf</depend>
+  
   <depend>actionlib</depend>
 
   <!-- for manipulation -->

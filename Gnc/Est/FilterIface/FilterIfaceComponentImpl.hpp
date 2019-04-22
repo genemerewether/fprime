@@ -25,6 +25,7 @@
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
 #include "mav_msgs/ImuStateUpdate.h"
+#include "tf/transform_broadcaster.h"
 
 #include "Os/Task.hpp"
 #include "Os/Mutex.hpp"
@@ -128,6 +129,8 @@ namespace Gnc {
         ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
 
         ros::NodeHandle* m_nodeHandle;
+
+        tf::TransformBroadcaster* m_trBroad;
 
         //! Entry point for task waiting for interrupt
         static void intTaskEntry(void * ptr);
