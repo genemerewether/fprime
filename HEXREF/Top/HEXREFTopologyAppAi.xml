@@ -398,10 +398,10 @@
 	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection81">
+<!--connection name = "Connection81">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
- 	 <target component = "mpu9250" port = "sched" type = "Sched" num = "0"/>
-</connection>
+ 	 <target component = "imuProc" port = "sched" type = "Sched" num = "0"/>
+</connection-->
 <connection name = "Connection82">
 	 <source component = "cmdDisp" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
@@ -509,10 +509,6 @@
 <connection name = "Connection108">
 	 <source component = "ctrlXest" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection109">
-	 <source component = "mpu9250" port = "Imu" type = "ImuNoCov" num = "0"/>
- 	 <target component = "attFilter" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
 <connection name = "Connection110">
 	 <source component = "hwEnablePin" port = "LogText" type = "LogText" num = "0"/>

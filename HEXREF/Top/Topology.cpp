@@ -42,11 +42,14 @@ static Fw::SimpleObjRegistry simpleReg;
 // Component instance pointers
 
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
+Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr = 0;
+Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr = 0;
 Svc::ActiveDecouplerComponentImpl* actDecouple_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
 Svc::PassiveRateGroupImpl* rgTlm_ptr = 0;
+Svc::PassiveRateGroupImpl* rgDev_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
@@ -76,6 +79,20 @@ void allocComps() {
                         5) // multiply by sleep duration in run1backupCycle
 ;
 
+    imuDataPasser_ptr = new Svc::QueuedDecouplerComponentImpl(
+#if FW_OBJECT_NAMES == 1
+                        "IMUDATPASSER"
+#endif
+                                                            )
+;
+	
+    imuDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
+#if FW_OBJECT_NAMES == 1
+                        "IMUDECOUPLE"
+#endif
+                                                            )
+;
+    
     actDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "ACTDECOUPLE"
@@ -83,6 +100,17 @@ void allocComps() {
                                                             )
 ;
 
+    NATIVE_UINT_TYPE rgDevContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        Drv::MPU9250_SCHED_CONTEXT_OPERATE, // mpu9250
+    };
+
+    rgDev_ptr = new Svc::PassiveRateGroupImpl(
+#if FW_OBJECT_NAMES == 1
+                            "RGDEV",
+#endif
+                            rgDevContext,FW_NUM_ARRAY_ELEMENTS(rgDevContext));
+;
+ 
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // attFilter
@@ -110,7 +138,7 @@ void allocComps() {
                         rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        Drv::MPU9250_SCHED_CONTEXT_OPERATE,
+        0, //TODO(mereweth) - imu?
         Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_OP, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
@@ -312,6 +340,15 @@ void manualConstruct(void) {
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(8));
 
     // other serial ports
+    imuDRInt_ptr->set_intOut_OutputPort(1, imuDecouple_ptr->get_DataIn_InputPort(0));
+    imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
+
+    mpu9250_ptr->set_Imu_OutputPort(0, imuDataPasser_ptr->get_DataIn_InputPort(0));
+    imuDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+
+    // TODO(mereweth) - put in MD model with time and tlm connections
+    rgDev_ptr->set_RateGroupMemberOut_OutputPort(0, mpu9250_ptr->get_sched_InputPort(0));
+    
 #ifdef DECOUPLE_ACTUATORS
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
     actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
@@ -339,6 +376,8 @@ void constructApp() {
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0);
+    imuDataPasser_ptr->init(100, 400); // big entries for IMU
+    imuDecouple_ptr->init(10, 20); // just need to serialize cycle port
     actDecouple_ptr->init(1, 500); // big message queue entry, few entries
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
@@ -427,6 +466,7 @@ void constructApp() {
 #endif // BUILD_DSPAL
 
     // Active component startup
+    imuDecouple_ptr->start(0, 91, 20*1024);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple_ptr->start(0, 90, 20*1024);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
@@ -489,6 +529,7 @@ void run1backupCycle(void) {
 
 void exitTasks(void) {
     rgDecouple_ptr->exit();
+    imuDecouple_ptr->exit();
     actDecouple_ptr->exit();
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();

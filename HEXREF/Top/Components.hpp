@@ -16,6 +16,7 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>
+#include <Svc/QueuedDecoupler/QueuedDecouplerComponentImpl.hpp>
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 
@@ -36,11 +37,14 @@ void exitTasks(void);
 #include <LLProc/LLTlmChan/LLTlmChanImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
+extern Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr;
+extern Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr;
 extern Svc::ActiveDecouplerComponentImpl* actDecouple_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
 extern Svc::PassiveRateGroupImpl* rgTlm_ptr;
+extern Svc::PassiveRateGroupImpl* rgDev_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
