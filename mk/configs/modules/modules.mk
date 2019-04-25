@@ -116,6 +116,7 @@ SVC_MODULES := \
 	Svc/ActiveTextLogger \
 	Svc/Tee \
 	Svc/ActiveDecoupler \
+	Svc/QueuedDecoupler \
 	Svc/UdpSender \
 	Svc/UdpReceiver \
 	Svc/CameraFrame \
@@ -186,6 +187,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
 	Gnc/Utils/FrameTransform \
+	Gnc/Utils/ImuProc \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
@@ -422,6 +424,7 @@ HEXREF_GENERAL_MODULES := \
 	Svc/AssertFatalAdapter \
 	Svc/FatalHandler \
 	Svc/ActiveDecoupler \
+	Svc/QueuedDecoupler \
 	\
 	$(FW_MODULES) \
 	\
