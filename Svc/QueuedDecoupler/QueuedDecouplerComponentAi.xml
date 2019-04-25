@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="QueuedDecoupler" kind="queued" namespace="Svc">
+    <comment>A component that gives passive port calls thread safety</comment>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <ports>
+        <port name="DataIn" data_type="Serial" full="drop" kind="async_input" max_number="10" />
+
+        <port name="DataOut" data_type="Serial" kind="output" max_number="10" />
+
+	<port name="sched" data_type="Sched" kind="sync_input" max_number="1">
+        </port>
+    </ports>
+
+</component>
+

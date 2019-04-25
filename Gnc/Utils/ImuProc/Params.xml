@@ -1,0 +1,8 @@
+<parameters>
+    <parameter id="0" set_opcode="20" save_opcode="21" name="fastImu_dt" data_type="F64" >
+      <comment>Nominal high rate IMU timestep</comment>
+    </parameter>
+    <parameter id="1" set_opcode="22" save_opcode="23" name="imuDown_div" data_type="U32" >
+      <comment>divider for rate for downsampled IMU - 1 is no change</comment>
+    </parameter>
+</parameters>
