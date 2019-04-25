@@ -28,6 +28,8 @@ INDIGO_ARM_SYSROOT := $(HEXAGON_ARM_SYSROOT)
 
 FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=softfp
 
+MULTIARCH_TUPLE :=
+
 RPATH_SYSROOT_CMD := -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib
 # arbitrary convention - for use in inc.mk
 INCLUDE_ARM_SYSROOTS := $(INDIGO_ARM_SYSROOT)
@@ -55,6 +57,8 @@ HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/qrlinux_sysroot
 INDIGO_ARM_SYSROOT :=  /opt/tools/quest/Qualcomm/indigo_sysroot
 
 FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
+
+MULTIARCH_TUPLE := arm-linux-gnueabihf
 
 RPATH_SYSROOT_CMD := -L$(HEXAGON_ARM_SYSROOT)/usr/lib/ -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/
 # arbitrary convention - for use in inc.mk
