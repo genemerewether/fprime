@@ -209,9 +209,9 @@ namespace Gnc {
 
         // TODO(mereweth) - convert frame ID
         U32 frame_id = header.getframe_id();
-        msg.header.frame_id = "odom";
+        msg.header.frame_id = "world";
 
-        msg.child_frame_id = "base_link";
+        msg.child_frame_id = "quest-base-link";
 
         ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
         msg.pose.pose.position.x = p.getx();
