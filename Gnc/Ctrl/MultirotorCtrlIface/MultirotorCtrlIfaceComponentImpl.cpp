@@ -51,9 +51,14 @@ namespace Gnc {
 #endif
     m_rosInited(false),
     m_nodeHandle(NULL),
+    m_boolStampedSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
     m_attRateThrustSet() // zero-initialize instead of default-initializing
   {
+      for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_boolStampedSet); i++) {
+          m_boolStampedSet[i].fresh = false;
+          m_boolStampedSet[i].overflows = 0u;
+      }
       for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
           m_flatOutSet[i].fresh = false;
           m_flatOutSet[i].overflows = 0u;
@@ -112,6 +117,22 @@ namespace Gnc {
           NATIVE_UINT_TYPE context
       )
     {
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_boolStampedSet); i++) {
+            m_boolStampedSet[i].mutex.lock();
+            if (m_boolStampedSet[i].fresh) {
+                if (this->isConnected_boolStamped_OutputPort(i)) {
+                    // mimics driver hardware getting and sending sensor data
+                    this->boolStamped_out(i, m_boolStampedSet[i].boolStamped);
+                }
+                else {
+                    DEBUG_PRINT("Bool stamped port %d not connected\n", i);
+                }
+                m_boolStampedSet[i].fresh = false;
+            }
+            // TODO(mereweth) - notify that no new msg received?
+            m_boolStampedSet[i].mutex.unLock();
+        }
+      
         for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
             m_flatOutSet[i].mutex.lock();
             if (m_flatOutSet[i].fresh) {
@@ -241,12 +262,19 @@ namespace Gnc {
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
+	BoolStampedHandler boolStampedHandler(compPtr, 0);
         FlatOutputHandler flatoutHandler(compPtr, 0);
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
+	
         ros::Subscriber flatoutSub = n->subscribe("flat_output_setpoint", 1,
                                                  &FlatOutputHandler::flatOutputCallback,
                                                  &flatoutHandler,
                                                  ros::TransportHints().tcpNoDelay());
+	
+	ros::Subscriber boolStampedSub = n->subscribe("flysafe", 1,
+						      &BoolStampedHandler::boolStampedCallback,
+						      &boolStampedHandler,
+						      ros::TransportHints().tcpNoDelay());
 
         ros::Subscriber attRateThrustSub = n->subscribe("attitude_rate_thrust_setpoint", 10,
                                                        &AttitudeRateThrustHandler::attitudeRateThrustCallback,
@@ -259,6 +287,100 @@ namespace Gnc {
         }
     }
 
+    // Bool stamped constructor/destructor/callback
+    MultirotorCtrlIfaceComponentImpl :: BoolStampedHandler ::
+      BoolStampedHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
+			 int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_BOOLSTAMPED_OUTPUT_PORTS);
+    }
+
+    MultirotorCtrlIfaceComponentImpl :: BoolStampedHandler :: ~BoolStampedHandler()
+    {
+
+    }
+
+    void MultirotorCtrlIfaceComponentImpl :: BoolStampedHandler ::
+      boolStampedCallback(const mav_msgs::BoolStamped::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_BOOLSTAMPED_OUTPUT_PORTS);
+
+        DEBUG_PRINT("bool stamped port handler %d\n", this->portNum);
+
+	if (!std::isfinite(msg->header.stamp.sec) ||
+	    !std::isfinite(msg->header.stamp.nsec)) {
+	    //TODO(mereweth) - EVR
+	    return;
+	}
+
+	//TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
+                      + (I64) msg->header.stamp.nsec / 1000LL;
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (walltimeDspLeadUs > usecRos) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld greater than message time %lu\n",
+                   walltimeDspLeadUs, usecRos);
+            return;
+        }
+        I64 usecDsp = usecRos - walltimeDspLeadUs;
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (usecDsp / 1000 / 1000),
+                          (U32) (usecDsp % (1000 * 1000)));
+
+        //TODO(mereweth) - END convert time instead using HLTimeConv
+	
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::mav_msgs;
+            BoolStamped boolStamped(
+              Header(msg->header.seq,
+		     convTime,
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+
+              Bool(msg->data.data)
+
+            ); // end BoolStamped constructor
+
+            this->compPtr->m_boolStampedSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_boolStampedSet[this->portNum].fresh) {
+                this->compPtr->m_boolStampedSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting flatout port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_boolStampedSet[this->portNum].boolStamped = boolStamped;
+            this->compPtr->m_boolStampedSet[this->portNum].fresh = true;
+            this->compPtr->m_boolStampedSet[this->portNum].mutex.unLock();
+        }
+    }
+  
     // Flat output constructor/destructor/callback
     MultirotorCtrlIfaceComponentImpl :: FlatOutputHandler ::
       FlatOutputHandler(MultirotorCtrlIfaceComponentImpl* compPtr,

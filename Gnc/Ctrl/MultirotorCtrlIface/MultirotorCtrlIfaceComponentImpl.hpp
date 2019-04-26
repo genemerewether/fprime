@@ -24,6 +24,7 @@
 
 #include "ros/ros.h"
 #include "mav_msgs/AttitudeRateThrust.h"
+#include "mav_msgs/BoolStamped.h"
 #include "mav_msgs/FlatOutput.h"
 
 #include "Os/Task.hpp"
@@ -74,6 +75,24 @@ namespace Gnc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
+        class BoolStampedHandler
+        {
+          public:
+              BoolStampedHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
+				 int portNum);
+
+              ~BoolStampedHandler();
+
+              void boolStampedCallback(const mav_msgs::BoolStamped::ConstPtr& msg);
+
+          PRIVATE:
+
+              MultirotorCtrlIfaceComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class BoolStampedHandler
+    
         class FlatOutputHandler
         {
           public:
@@ -149,7 +168,14 @@ namespace Gnc {
         //! Task object for RTI task
         //!
         Os::Task m_intTask;
-    
+
+        struct BoolStampedSet {
+            Os::Mutex mutex; //! Mutex lock to guard flat output object
+            ROS::mav_msgs::BoolStamped boolStamped; //! bool stamped object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_boolStampedSet[NUM_BOOLSTAMPED_OUTPUT_PORTS];
+
         struct FlatOutSet {
             Os::Mutex mutex; //! Mutex lock to guard flat output object
             ROS::mav_msgs::FlatOutput flatOutput; //! flat output object

@@ -44,4 +44,6 @@
 |---|---|---|---|---|---|---|
 |ACTADAP_AlreadyArmed|0 (0x0)|| | | | |
 |ACTADAP_Error|1 (0x1)|| | | | |
-| | | |error|ACTADAP_ErrorType||The error code|    
+| | | |error|ErrorType||The error code|    
+|ACTADAP_NotFlySafe|2 (0x2)|| | | | |
+| | | |reason|NotFlySafeType||The error code|    

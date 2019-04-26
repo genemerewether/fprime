@@ -63,6 +63,13 @@ namespace Gnc {
     cmdSeq(0u),
     armCount(0u),
     numActuators(0u),
+    flySafe(true),
+    flySafeCheckCycles(false),
+    flySafeCycles(0u),
+    flySafeMaxElapsedCycles(0u),
+    flySafeCheckTime(false),
+    flySafeLastTime(),
+    flySafeMaxElapsedTime(),
     paramsInited(false)
   {
       for (U32 i = 0; i < ACTADAP_MAX_ACTUATORS; i++) {
@@ -354,6 +361,33 @@ namespace Gnc {
           }
       }
 
+      this->flySafeMaxElapsedCycles = paramGet_flySafeCycles(valid[0]);
+      if (0 == this->flySafeMaxElapsedCycles) {
+  	  this->flySafeCheckCycles = false;
+      }
+      const F64 flySafeFloatSecs = paramGet_flySafeTime(valid[1]);
+      const Fw::Time forBaseContext = this->getTime();
+      const TimeBase timeBase = forBaseContext.getTimeBase();
+      const FwTimeContextStoreType timeContext = forBaseContext.getContext();
+      if (flySafeFloatSecs > 0.0) {
+	  const U32 flySafeSecs = (U32) flySafeFloatSecs;
+	  this->flySafeLastTime = Fw::Time(timeBase, timeContext, 0, 0);
+	  this->flySafeMaxElapsedTime = Fw::Time(timeBase, timeContext,
+						 flySafeSecs,
+						 (U32) ((flySafeFloatSecs - flySafeSecs)
+							* 1000.0 * 1000.0));
+      }
+      else { // user gave negative value for timeout, indicating don't check time
+  	  this->flySafeCheckTime = false;
+      }
+	
+      for (unsigned int i = 0; i < 2; i++) {
+	  if ((Fw::PARAM_VALID   != valid[i])  &&
+	      (Fw::PARAM_DEFAULT != valid[i])) {
+	      return;
+	  }
+      }
+      
       this->paramsInited = true;
   }
 
@@ -361,6 +395,26 @@ namespace Gnc {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
+  void ActuatorAdapterComponentImpl ::
+    flySafe_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::BoolStamped &BoolStamped
+    )
+  {
+      Fw::Time msgStamp = BoolStamped.getheader().getstamp();
+      // If msg time < time of last fly safe msg, it is out of order, so ignore it
+      if (msgStamp < this->flySafeLastTime) {
+  	  return;
+      }
+      // if msg time > current time, there has been an error in time translation, so ignore it
+      if (msgStamp > this->getTime()) {
+  	  return;
+      }
+      this->flySafeCycles = 0;
+      this->flySafeLastTime = msgStamp;
+      this->flySafe = BoolStamped.getdata().getdata();
+  }
+  
   void ActuatorAdapterComponentImpl ::
     motor_handler(
         const NATIVE_INT_TYPE portNum,
@@ -375,7 +429,14 @@ namespace Gnc {
       if (ARMED != this->armedState) {
   	  return;
       }
-      if (!paramsInited || !hwEnabled) {
+
+      const bool didFlySafeCycleTimeout = (this->flySafeCheckCycles &&
+					   ((++this->flySafeCycles) > this->flySafeMaxElapsedCycles));
+      const bool didFlySafeTimeTimeout = (this->flySafeCheckTime &&
+					  (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
+								 	   this->flySafeLastTime)));
+      if (!paramsInited || !hwEnabled ||
+	  didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe) {
 	  // TODO(mereweth) - send out min cmd here before disarming?
 	  this->armedState = DISARMED;
 	  if (!this->paramsInited) {
@@ -383,6 +444,15 @@ namespace Gnc {
 	  }
 	  if (!hwEnabled) {
 	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  if (didFlySafeCycleTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
+	  }
+	  if (didFlySafeTimeTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
+	  }
+	  if (!this->flySafe) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
 	  }
 	  return;
       }
@@ -772,8 +842,15 @@ namespace Gnc {
 	  this->outputEnable_out(0, hwEnabled);
       }
 
+      // NOTE(mereweth) - don't increment cycle count here; do that in motor_handler
+      const bool didFlySafeCycleTimeout = (this->flySafeCheckCycles &&
+					   (this->flySafeCycles > this->flySafeMaxElapsedCycles));
+      const bool didFlySafeTimeTimeout = (this->flySafeCheckTime &&
+					  (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
+									   this->flySafeLastTime)));
       if ((DISARMED != this->armedState)  &&
-	  (!paramsInited || !hwEnabled)) {
+	  (!paramsInited || !hwEnabled ||
+	   didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe)) {
 	
   	  if (ARMING == this->armedState) {
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
@@ -785,6 +862,15 @@ namespace Gnc {
 	  }
 	  if (!hwEnabled) {
 	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  if (didFlySafeCycleTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
+	  }
+	  if (didFlySafeTimeTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
+	  }
+	  if (!this->flySafe) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
 	  }
 	  return;
       }
