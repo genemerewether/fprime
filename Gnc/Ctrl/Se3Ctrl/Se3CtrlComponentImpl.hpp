@@ -78,6 +78,13 @@ namespace Gnc {
           ROS::nav_msgs::Odometry &Odometry
       );
 
+      //! Handler implementation for se3Cmd
+      //!
+      void se3Cmd_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::Se3FeedForward &Se3FeedForward 
+      );
+    
       //! Handler implementation for sched
       //!
       void sched_handler(

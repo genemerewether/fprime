@@ -10,5 +10,6 @@ ImuStateUpdateNoCovSerializableAi.xml \
 ImuStateUpdateSerializableAi.xml \
 RateThrustSerializableAi.xml \
 RollPitchYawrateThrustSerializableAi.xml \
+Se3FeedForwardSerializableAi.xml \
 StatusSerializableAi.xml \
 TorqueThrustSerializableAi.xml

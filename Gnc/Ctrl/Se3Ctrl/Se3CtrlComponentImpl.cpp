@@ -297,6 +297,21 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void Se3CtrlComponentImpl ::
+    se3Cmd_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::Se3FeedForward &Se3FeedForward
+    )
+  {
+      this->x_w__des = Se3FeedForward.getposition();
+      this->v_w__des = Se3FeedForward.getvelocity();
+      this->a_w__des = Se3FeedForward.getacceleration();
+      
+      this->w_q_b__des = Se3FeedForward.getattitude();
+      this->omega_b__des = Se3FeedForward.getangular_rates();
+      this->alpha_b__des = Se3FeedForward.getangular_acceleration();
+  }
+  
+  void Se3CtrlComponentImpl ::
     odometry_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::nav_msgs::Odometry &Odometry
@@ -397,9 +412,9 @@ namespace Gnc {
                                                   this->omega_b__des.gety(),
                                                   this->omega_b__des.getz()),
                                               Eigen::Vector3d(
-                                                  this->omega_b__des.getx(),
-                                                  this->omega_b__des.gety(),
-                                                  this->omega_b__des.getz()),
+                                                  this->alpha_b__des.getx(),
+                                                  this->alpha_b__des.gety(),
+                                                  this->alpha_b__des.getz()),
                                               rpVelOnly, yawVelOnly,
 					      doSaturation);
           }
