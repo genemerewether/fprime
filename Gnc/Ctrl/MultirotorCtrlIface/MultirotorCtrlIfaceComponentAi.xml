@@ -10,6 +10,7 @@
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/BoolStampedPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
@@ -41,6 +42,9 @@
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
         </port>
         
+        <port name="boolStamped" data_type="ROS::mav_msgs::BoolStamped"  kind="output" max_number="1">
+        </port>
+	
         <port name="flatOutput" data_type="ROS::mav_msgs::FlatOutput"  kind="output" max_number="1">
         </port>
 

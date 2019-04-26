@@ -121,7 +121,14 @@ namespace Gnc {
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
-
+    
+      //! Handler implementation for flySafe
+      //!
+      void flySafe_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::BoolStamped &BoolStamped 
+      );
+    
       //! Handler implementation for motor
       //!
       void motor_handler(
@@ -212,6 +219,16 @@ namespace Gnc {
 
       U32 numActuators;
 
+      bool flySafe;
+
+      bool flySafeCheckCycles;
+      U32 flySafeCycles;
+      U32 flySafeMaxElapsedCycles;
+
+      bool flySafeCheckTime;    
+      Fw::Time flySafeLastTime;
+      Fw::Time flySafeMaxElapsedTime;
+    
       bool paramsInited;
 
     };

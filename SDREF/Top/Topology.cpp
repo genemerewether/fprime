@@ -386,6 +386,8 @@ void manualConstruct() {
 
     cmdSeq2_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(8));
     hexRouter_ptr->set_HexPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
+
+    mrCtrlIface_ptr->set_boolStamped_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(9));
 #else
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
@@ -408,6 +410,8 @@ void manualConstruct() {
 
     cmdSeq2_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(8));
     llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
+    
+    mrCtrlIface_ptr->set_boolStamped_OutputPort(0, llRouter_ptr->get_KraitPortsIn_InputPort(9));
 #endif
     
     hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
