@@ -10,5 +10,6 @@ ImuStateUpdateNoCovPortAi.xml \
 ImuStateUpdatePortAi.xml \
 RateThrustPortAi.xml \
 RollPitchYawrateThrustPortAi.xml \
+Se3FeedForwardPortAi.xml \
 StatusPortAi.xml \
 TorqueThrustPortAi.xml

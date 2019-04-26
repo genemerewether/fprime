@@ -186,6 +186,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Est/ImuInteg \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
+	Gnc/Utils/FixedAxisSe3Adapter \
 	Gnc/Utils/FrameTransform \
 	Gnc/Utils/ImuProc \
 	Gnc/quest_gnc/src/diffeo \

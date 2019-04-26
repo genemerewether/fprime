@@ -1,0 +1,18 @@
+<serializable name="Se3FeedForward" namespace="ROS::mav_msgs">
+  <members>
+    <member name="header" type="ROS::std_msgs::Header"/>
+    <member name="position" type="ROS::geometry_msgs::Point"/>
+    <member name="velocity" type="ROS::geometry_msgs::Vector3"/>
+    <member name="acceleration" type="ROS::geometry_msgs::Vector3"/>
+    <member name="attitude" type="ROS::geometry_msgs::Quaternion"/>
+    <member name="angular_rates" type="ROS::geometry_msgs::Vector3"/>
+    <member name="angular_acceleration" type="ROS::geometry_msgs::Vector3"/>
+  </members>
+  <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/QuaternionSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/geometry_msgs/Types/Vector3SerializableAi.xml</import_serializable_type>
+</serializable>
