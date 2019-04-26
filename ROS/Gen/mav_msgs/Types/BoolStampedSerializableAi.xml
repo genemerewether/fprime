@@ -1,7 +1,7 @@
 <serializable name="BoolStamped" namespace="ROS::mav_msgs">
   <members>
     <member name="header" type="ROS::std_msgs::Header"/>
-    <member name="bool" type="ROS::std_msgs::Bool"/>
+    <member name="data" type="ROS::std_msgs::Bool"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/std_msgs/Types/BoolSerializableAi.xml</import_serializable_type>
