@@ -104,12 +104,14 @@ namespace Gnc {
       using namespace Eigen;
       ROS::geometry_msgs::PoseWithCovariance poseCov = Odometry.getpose();
       ROS::geometry_msgs::Pose pose = poseCov.getpose();
-      ROS::geometry_msgs::Point p = pose.getposition();
-      const Vector3d p_b = this->b_X_a * Vector3d(p.getx(), p.gety(), p.getz());
-      p.setx(p_b(0));
-      p.sety(p_b(1));
-      p.setz(p_b(2));
-      pose.setposition(p);
+      if (0) { // TODO(Mereweth) - parameter
+	  ROS::geometry_msgs::Point p = pose.getposition();
+	  const Vector3d p_b = this->b_X_a * Vector3d(p.getx(), p.gety(), p.getz());
+	  p.setx(p_b(0));
+	  p.sety(p_b(1));
+	  p.setz(p_b(2));
+	  pose.setposition(p);
+      }
       
       ROS::geometry_msgs::Quaternion q = pose.getorientation();
       const Quaterniond q_b(this->b_X_a.rotation()
@@ -124,13 +126,15 @@ namespace Gnc {
       
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
-      ROS::geometry_msgs::Vector3 lin = twist.getlinear();
-      const Vector3d lin_b = this->b_X_a.rotation()
-	* Vector3d(lin.getx(), lin.gety(), lin.getz());
-      lin.setx(lin_b(0));
-      lin.sety(lin_b(1));
-      lin.setz(lin_b(2));
-      twist.setlinear(lin);
+      if (1) { // TODO(Mereweth) - parameter)
+	  ROS::geometry_msgs::Vector3 lin = twist.getlinear();
+	  const Vector3d lin_b = this->b_X_a.rotation()
+	    * Vector3d(lin.getx(), lin.gety(), lin.getz());
+	  lin.setx(lin_b(0));
+	  lin.sety(lin_b(1));
+	  lin.setz(lin_b(2));
+	  twist.setlinear(lin);
+      }
 
       ROS::geometry_msgs::Vector3 ang = twist.getangular();
       const Vector3d ang_b = this->b_X_a.rotation()
@@ -154,12 +158,14 @@ namespace Gnc {
       using namespace Eigen;
       ROS::geometry_msgs::PoseWithCovariance poseCov = Odometry.getpose();
       ROS::geometry_msgs::Pose pose = poseCov.getpose();
-      ROS::geometry_msgs::Point p = pose.getposition();
-      const Vector3d p_a = this->a_X_b * Vector3d(p.getx(), p.gety(), p.getz());
-      p.setx(p_a(0));
-      p.sety(p_a(1));
-      p.setz(p_a(2));
-      pose.setposition(p);
+      if (0) { // TODO(Mereweth) - parameter)
+	  ROS::geometry_msgs::Point p = pose.getposition();
+	  const Vector3d p_a = this->a_X_b * Vector3d(p.getx(), p.gety(), p.getz());
+	  p.setx(p_a(0));
+	  p.sety(p_a(1));
+	  p.setz(p_a(2));
+	  pose.setposition(p);
+      }
       
       ROS::geometry_msgs::Quaternion q = pose.getorientation();
       const Quaterniond q_a(this->a_X_b.rotation()
@@ -174,13 +180,15 @@ namespace Gnc {
       
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
-      ROS::geometry_msgs::Vector3 lin = twist.getlinear();
-      const Vector3d lin_a = this->a_X_b.rotation()
-	* Vector3d(lin.getx(), lin.gety(), lin.getz());
-      lin.setx(lin_a(0));
-      lin.sety(lin_a(1));
-      lin.setz(lin_a(2));
-      twist.setlinear(lin);
+      if (1) { // TODO(Mereweth) - parameter)
+	  ROS::geometry_msgs::Vector3 lin = twist.getlinear();
+	  const Vector3d lin_a = this->a_X_b.rotation()
+	    * Vector3d(lin.getx(), lin.gety(), lin.getz());
+	  lin.setx(lin_a(0));
+	  lin.sety(lin_a(1));
+	  lin.setz(lin_a(2));
+	  twist.setlinear(lin);
+      }
 
       ROS::geometry_msgs::Vector3 ang = twist.getangular();
       const Vector3d ang_a = this->a_X_b.rotation()
