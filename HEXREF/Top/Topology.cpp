@@ -277,9 +277,13 @@ void manualConstruct(void) {
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, attFilter_ptr->get_ImuStateUpdate_InputPort(0));
 #ifdef DECOUPLE_ACTUATORS
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(9, actDecouple_ptr->get_DataIn_InputPort(2));
+    actDecouple_ptr->set_DataOut_OutputPort(2, actuatorAdapter_ptr->get_flySafe_InputPort(0));
+    
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actDecouple_ptr->get_DataIn_InputPort(3));
     actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
 #else
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(9, actuatorAdapter_ptr->get_flySafe_InputPort(0));    
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
 #endif
     // aux actuator command
@@ -320,7 +324,7 @@ void constructApp() {
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0);
-    actDecouple_ptr->init(1, 500); // big message queue entry, few entries
+    actDecouple_ptr->init(10, 500); // big message queue entry, few entries
     rgOp_ptr->init(0);
     rgTlm_ptr->init(2);
 
