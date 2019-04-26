@@ -31,3 +31,9 @@ DOROTX_PRM_SET, False # x in world frame; going between body frames
 DOROTV_PRM_SET, True # v in body frame; going between body frames
 
 FTFO_InitParams
+
+
+FLYSAFECYCLES_PRM_SET, 1000
+FLYSAFETIME_PRM_SET, 10.0
+
+ACTADAP_InitParams
