@@ -64,7 +64,17 @@ namespace Gnc {
         ROS::mav_msgs::FlatOutput &FlatOutput
     )
   {
-    // TODO
+      using namespace ROS::geometry_msgs;
+      using namespace ROS::mav_msgs;
+      Se3FeedForward se3ff(FlatOutput.getheader(),
+			   FlatOutput.getposition(),
+			   FlatOutput.getvelocity(),
+			   FlatOutput.getacceleration(),
+			   // TODO(mereweth) - convert yaw
+			   Quaternion(0.0, 0.0, 0.0, 1.0),
+			   Vector3(0.0, 0.0, 0.0),
+			   Vector3(0.0, 0.0, 0.0));
+      this->se3Cmd_out(0, se3ff);			   
   }
 
   // ----------------------------------------------------------------------
