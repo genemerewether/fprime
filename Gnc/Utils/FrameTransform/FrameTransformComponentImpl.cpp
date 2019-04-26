@@ -40,7 +40,9 @@ namespace Gnc {
 #endif
       paramsInited(false),
       a_X_b(Eigen::Affine3d::Identity()),
-      b_X_a(Eigen::Affine3d::Identity())
+      b_X_a(Eigen::Affine3d::Identity()),
+      doRotX(false),
+      doRotV(true)
   {
 
   }
@@ -88,6 +90,16 @@ namespace Gnc {
       this->a_X_b = a_R_b * a_r_b; // translation after rotation
       this->b_X_a = this->a_X_b.inverse();
 
+      this->doRotX = paramGet_doRotX(valid[0]);
+      this->doRotV = paramGet_doRotV(valid[1]);
+      
+      for (unsigned int i = 0; i < 2; i++) {
+	  if ((Fw::PARAM_VALID   != valid[i])  &&
+	      (Fw::PARAM_DEFAULT != valid[i])) {
+	      return;
+	  }
+      }
+      
       this->paramsInited = true;
   }
 
@@ -104,7 +116,7 @@ namespace Gnc {
       using namespace Eigen;
       ROS::geometry_msgs::PoseWithCovariance poseCov = Odometry.getpose();
       ROS::geometry_msgs::Pose pose = poseCov.getpose();
-      if (0) { // TODO(Mereweth) - parameter
+      if (this->doRotX) {
 	  ROS::geometry_msgs::Point p = pose.getposition();
 	  const Vector3d p_b = this->b_X_a * Vector3d(p.getx(), p.gety(), p.getz());
 	  p.setx(p_b(0));
@@ -112,6 +124,9 @@ namespace Gnc {
 	  p.setz(p_b(2));
 	  pose.setposition(p);
       }
+      /* NOTE(mereweth) - could account for offset from A to B
+       * if both are body, but would need to know world_q_a or world_q_b
+       */
       
       ROS::geometry_msgs::Quaternion q = pose.getorientation();
       const Quaterniond q_b(this->b_X_a.rotation()
@@ -126,7 +141,7 @@ namespace Gnc {
       
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
-      if (1) { // TODO(Mereweth) - parameter)
+      if (this->doRotV) {
 	  ROS::geometry_msgs::Vector3 lin = twist.getlinear();
 	  const Vector3d lin_b = this->b_X_a.rotation()
 	    * Vector3d(lin.getx(), lin.gety(), lin.getz());
@@ -158,7 +173,7 @@ namespace Gnc {
       using namespace Eigen;
       ROS::geometry_msgs::PoseWithCovariance poseCov = Odometry.getpose();
       ROS::geometry_msgs::Pose pose = poseCov.getpose();
-      if (0) { // TODO(Mereweth) - parameter)
+      if (this->doRotX) {
 	  ROS::geometry_msgs::Point p = pose.getposition();
 	  const Vector3d p_a = this->a_X_b * Vector3d(p.getx(), p.gety(), p.getz());
 	  p.setx(p_a(0));
@@ -166,6 +181,9 @@ namespace Gnc {
 	  p.setz(p_a(2));
 	  pose.setposition(p);
       }
+      /* NOTE(mereweth) - could account for offset from A to B
+       * if both are body, but would need to know world_q_a or world_q_b
+       */
       
       ROS::geometry_msgs::Quaternion q = pose.getorientation();
       const Quaterniond q_a(this->a_X_b.rotation()
@@ -180,7 +198,7 @@ namespace Gnc {
       
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
-      if (1) { // TODO(Mereweth) - parameter)
+      if (this->doRotV) {
 	  ROS::geometry_msgs::Vector3 lin = twist.getlinear();
 	  const Vector3d lin_a = this->a_X_b.rotation()
 	    * Vector3d(lin.getx(), lin.gety(), lin.getz());

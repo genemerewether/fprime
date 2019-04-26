@@ -21,4 +21,11 @@
     <parameter id="6" set_opcode="32" save_opcode="33" name="a_r_b__z" data_type="F64" >
       <comment>z component of translation from origin of a frame to origin of b frame</comment>
     </parameter>
+
+    <parameter id="7" set_opcode="34" save_opcode="35" name="doRotX" data_type="bool" default="false">
+      <comment>whether to rotate the position; false for going between two body frames</comment>
+    </parameter>
+    <parameter id="8" set_opcode="36" save_opcode="37" name="doRotV" data_type="bool" default="true">
+      <comment>whether to rotate the linear velocity; false for going between two body frames if velocity is in world frame</comment>
+    </parameter>
 </parameters>
