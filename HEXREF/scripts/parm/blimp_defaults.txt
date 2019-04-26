@@ -25,3 +25,9 @@ SAT_OMEGA__Y_PRM_SET, 3.0
 SAT_OMEGA__Z_PRM_SET, 3.0
 
 SE3CTRL_InitParams
+
+
+DOROTX_PRM_SET, False # x in world frame; going between body frames
+DOROTV_PRM_SET, True # v in body frame; going between body frames
+
+FTFO_InitParams

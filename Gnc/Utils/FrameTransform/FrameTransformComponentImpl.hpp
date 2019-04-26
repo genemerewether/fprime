@@ -99,6 +99,9 @@ namespace Gnc {
       Eigen::Affine3d a_X_b; // takes point in b frame to a frame
       Eigen::Affine3d b_X_a; // takes point in a frame to b frame
 
+      bool doRotX; // see params.xml
+      bool doRotV; // see params.xml
+    
     };
 
 } // end namespace Gnc
