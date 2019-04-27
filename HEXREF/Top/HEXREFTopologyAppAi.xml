@@ -41,7 +41,7 @@
 
    <instance namespace="Gnc" name="attFilter" type="AttFilter" base_id="1500"  base_id_window="500" />
 
-   <instance namespace="Gnc" name="ctrlXest" type="FrameTransform" base_id="4000"  base_id_window="25" />
+   <instance namespace="Gnc" name="ctrlXest" type="FrameTransform" base_id="4000"  base_id_window="50" />
 
    <instance namespace="Drv" name="hwEnablePin" type="LinuxGpioDriver" base_id="10125"  base_id_window="25" />
 
