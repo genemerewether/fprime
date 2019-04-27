@@ -365,11 +365,15 @@ namespace Gnc {
       if (0 == this->flySafeMaxElapsedCycles) {
   	  this->flySafeCheckCycles = false;
       }
+      else {
+  	  this->flySafeCheckCycles = true;
+      }
       const F64 flySafeFloatSecs = paramGet_flySafeTime(valid[1]);
       const Fw::Time forBaseContext = this->getTime();
       const TimeBase timeBase = forBaseContext.getTimeBase();
       const FwTimeContextStoreType timeContext = forBaseContext.getContext();
       if (flySafeFloatSecs > 0.0) {
+  	  this->flySafeCheckTime = true;
 	  const U32 flySafeSecs = (U32) flySafeFloatSecs;
 	  this->flySafeLastTime = Fw::Time(timeBase, timeContext, 0, 0);
 	  this->flySafeMaxElapsedTime = Fw::Time(timeBase, timeContext,
