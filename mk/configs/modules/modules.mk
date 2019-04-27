@@ -387,6 +387,7 @@ HEXREF_GENERAL_MODULES := \
 	Gnc/Ctrl/WrenchMixer \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
+	Gnc/Utils/FixedAxisSe3Adapter \
 	Gnc/Utils/FrameTransform \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \

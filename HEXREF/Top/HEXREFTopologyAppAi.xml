@@ -9,6 +9,7 @@
 	<import_component_type>Drv/LinuxPwmDriver/LinuxPwmDriverComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Est/AttFilter/AttFilterComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Utils/FrameTransform/FrameTransformComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Utils/FixedAxisSe3Adapter/FixedAxisSe3AdapterComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxGpioDriver/LinuxGpioDriverComponentAi.xml</import_component_type>
 	<import_component_type>LLProc/LLCmdDispatcher/LLCmdDispatcherComponentAi.xml</import_component_type>
 	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
@@ -42,6 +43,8 @@
    <instance namespace="Gnc" name="attFilter" type="AttFilter" base_id="1500"  base_id_window="500" />
 
    <instance namespace="Gnc" name="ctrlXest" type="FrameTransform" base_id="4000"  base_id_window="25" />
+   
+   <instance namespace="Gnc" name="axSe3Adap" type="FixedAxisSe3Adapter" base_id="4025"  base_id_window="25" />
 
    <instance namespace="Drv" name="hwEnablePin" type="LinuxGpioDriver" base_id="10125"  base_id_window="25" />
 
@@ -148,6 +151,10 @@
 	 <source component = "mixer" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
+<connection name = "Connection19a">
+	 <source component = "axSe3Adap_ptr" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
 <connection name = "Connection19">
 	 <source component = "ctrlXest" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
@@ -194,6 +201,10 @@
 </connection>
 <connection name = "Connection30">
 	 <source component = "sigGen" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection31a">
+	 <source component = "axSe3Adap" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection31">
@@ -278,6 +289,10 @@
 </connection>
 <connection name = "Connection51">
 	 <source component = "rgDecouple" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection52a">
+	 <source component = "axSe3Adap" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection52">
@@ -480,6 +495,10 @@
 	 <source component = "kraitRouter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
+<connection name = "Connection108a">
+	 <source component = "axSe3Adap" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
 <connection name = "Connection108">
 	 <source component = "ctrlXest" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
@@ -508,6 +527,14 @@
 	 <source component = "actuatorAdapter" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "1"/>
 </connection>
+<connection name = "Connection115a">
+	 <source component = "axSe3Adap" port = "CmdReg" type = "CmdReg" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "70"/>
+</connection>
+<connection name = "Connection116a">
+	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "70"/>
+ 	 <target component = "axSe3Adap" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
 <connection name = "Connection115">
 	 <source component = "ctrlXest" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "2"/>
@@ -515,6 +542,10 @@
 <connection name = "Connection116">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "2"/>
  	 <target component = "ctrlXest" port = "CmdDisp" type = "Cmd" num = "0"/>
+</connection>
+<connection name = "Connection117a">
+	 <source component = "axSe3Adap" port = "se3Cmd" type = "Se3FeedForward" num = "0"/>
+ 	 <target component = "se3Ctrl" port = "se3Cmd" type = "Se3FeedForward" num = "0"/>
 </connection>
 <connection name = "Connection117">
 	 <source component = "attFilter" port = "CmdReg" type = "CmdReg" num = "0"/>

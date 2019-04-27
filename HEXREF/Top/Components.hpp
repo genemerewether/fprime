@@ -25,6 +25,7 @@ void exitTasks(void);
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
+#include <Gnc/Utils/FixedAxisSe3Adapter/FixedAxisSe3AdapterComponentImpl.hpp>
 #include <Gnc/Ctrl/Se3Ctrl/Se3CtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/WrenchMixer/WrenchMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
@@ -49,6 +50,7 @@ extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr;
 extern Gnc::FrameTransformComponentImpl* ctrlXest_ptr;
+extern Gnc::FixedAxisSe3AdapterComponentImpl* axSe3Adap_ptr;
 extern Gnc::Se3CtrlComponentImpl* se3Ctrl_ptr;
 extern Gnc::WrenchMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;

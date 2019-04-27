@@ -55,6 +55,7 @@ Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
+Gnc::FixedAxisSe3AdapterComponentImpl* axSe3Adap_ptr = 0;
 Gnc::Se3CtrlComponentImpl* se3Ctrl_ptr = 0;
 Gnc::WrenchMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
@@ -179,6 +180,12 @@ void allocComps() {
                         ("CTRLXEST")
 #endif
 ;
+    
+    axSe3Adap_ptr = new Gnc::FixedAxisSe3AdapterComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("AXSE3ADAP")
+#endif
+;
  
     se3Ctrl_ptr = new Gnc::Se3CtrlComponentImpl
 #if FW_OBJECT_NAMES == 1
@@ -289,7 +296,7 @@ void manualConstruct(void) {
     // aux actuator command
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
-    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, se3Ctrl_ptr->get_flatOutput_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, axSe3Adap_ptr->get_flatOutput_InputPort(0));
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
 
@@ -330,6 +337,7 @@ void constructApp() {
 
     // Initialize the GNC components
     ctrlXest_ptr->init(0);
+    axSe3Adap_ptr->init(0);
     se3Ctrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
@@ -370,6 +378,7 @@ void constructApp() {
 
     ctrlXest_ptr->regCommands();
     se3Ctrl_ptr->regCommands();
+    axSe3Adap_ptr->regCommands();
     attFilter_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
