@@ -270,10 +270,6 @@
 	 <source component = "sigGen" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection49">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
- 	 <target component = "actuatorAdapter" port = "sched" type = "Sched" num = "0"/>
-</connection>
 <connection name = "Connection50">
 	 <source component = "spiDrv" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>

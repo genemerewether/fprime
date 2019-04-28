@@ -352,6 +352,7 @@ void manualConstruct(void) {
 
     // TODO(mereweth) - put in MD model with time and tlm connections
     rgDev_ptr->set_RateGroupMemberOut_OutputPort(0, mpu9250_ptr->get_sched_InputPort(0));
+    rgAtt_ptr->set_RateGroupMemberOut_OutputPort(0, imuDataPasser_ptr->get_sched_InputPort(0));
     
 #ifdef DECOUPLE_ACTUATORS
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
@@ -359,10 +360,17 @@ void manualConstruct(void) {
         
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
+
+    // TODO(mereweth) - remove rgPos to actAdap connection from MD model
+    rgPos_ptr->set_RateGroupMemberOut_OutputPort(5, actDecouple_ptr->get_DataIn_InputPort(4));
+    actDecouple_ptr->set_DataOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
 #else
     mixer_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
         
     sigGen_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+
+    // TODO(mereweth) - remove rgPos to actAdap connection from MD model    
+    rgPos_ptr->set_RateGroupMemberOut_OutputPort(5, actuatorAdapter_ptr->get_sched_InputPort(0));
 #endif
 }
 
@@ -386,6 +394,7 @@ void constructApp() {
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
     rgTlm_ptr->init(2);
+    rgDev_ptr->init(3);
 
     // Initialize the GNC components
     ctrlXest_ptr->init(0);
@@ -635,15 +644,15 @@ int hexref_run(void) {
         return -1;
     }
     
-    rgDecouple_ptr->setEnabled(true);
     while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
         cycleStart.take();
         port->invoke(cycleStart);
         Os::Task::delay(10);
     }
-
+    rgDecouple_ptr->setEnabled(true);
+    
     int backupCycle = 0;
 
     while (!terminate) {
@@ -670,15 +679,15 @@ int hexref_cycle(unsigned int backupCycles) {
         return -1;
     }
     
-    rgDecouple_ptr->setEnabled(true);
     while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
         cycleStart.take();
         port->invoke(cycleStart);
         Os::Task::delay(10);
     }
 
+    rgDecouple_ptr->setEnabled(true);
     for (unsigned int i = 0; i < backupCycles; i++) {
         if (terminate) break;
         run1backupCycle();
