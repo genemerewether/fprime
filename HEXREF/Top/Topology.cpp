@@ -45,6 +45,7 @@ Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
 Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr = 0;
 Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr = 0;
 Svc::ActiveDecouplerComponentImpl* actDecouple_ptr = 0;
+Svc::RateGroupDriverImpl* rgDcplDrv_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
 Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
 Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
@@ -129,7 +130,15 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 16};
+
+    rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
+#if FW_OBJECT_NAMES == 1
+                        "RGDCPLDRV",
+#endif
+                        rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
+ 
+    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 500};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -138,12 +147,12 @@ void allocComps() {
                         rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        0, //TODO(mereweth) - imu?
+        0, // imuDataPasser
         Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_OP, // sigGen
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
-        0, // mixer
-        0, // adapter
+        0,
+        0,
         0, // logQueue
         0, // kraitRouter
     };
@@ -156,11 +165,11 @@ void allocComps() {
 ;
 
     NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        0, //TODO(mereweth) - IMU?
-        Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
-        0, // sigGen
+        0,
+	0,
+        0,
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
-        0, // mixer
+        0,
         Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
         0, // logQueue
         0, // kraitRouter
@@ -315,6 +324,7 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
+    // TODO(mereweth) - replace with imuproc
     mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
@@ -344,15 +354,19 @@ void manualConstruct(void) {
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(8));
 
     // other serial ports
-    imuDRInt_ptr->set_intOut_OutputPort(1, imuDecouple_ptr->get_DataIn_InputPort(0));
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
     imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
 
+    // TODO(mereweth) - replace with imuproc
     mpu9250_ptr->set_Imu_OutputPort(0, imuDataPasser_ptr->get_DataIn_InputPort(0));
     imuDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
 
     // TODO(mereweth) - put in MD model with time and tlm connections
     rgDev_ptr->set_RateGroupMemberOut_OutputPort(0, mpu9250_ptr->get_sched_InputPort(0));
+    // TODO(mereweth) - add imuProc
+    //rgDev_ptr->set_RateGroupMemberOut_OutputPort(1, imuProc_ptr->get_sched_InputPort(0));
     rgAtt_ptr->set_RateGroupMemberOut_OutputPort(0, imuDataPasser_ptr->get_sched_InputPort(0));
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(1, rgDecouple_ptr->get_CycleIn_InputPort(0));
     
 #ifdef DECOUPLE_ACTUATORS
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
@@ -385,6 +399,7 @@ void constructApp() {
 
     // Initialize rate group driver
     rgGncDrv_ptr->init();
+    rgDcplDrv_ptr->init();
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0);
@@ -405,6 +420,8 @@ void constructApp() {
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
 
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
+    
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
     hwEnablePin_ptr->init(1);

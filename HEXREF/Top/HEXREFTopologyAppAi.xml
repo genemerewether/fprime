@@ -35,6 +35,8 @@
 
    <instance namespace="Gnc" name="sigGen" type="SigGen" base_id="1000"  base_id_window="500" />
 
+   <instance namespace="Svc" name="rgDcplDrv" type="RateGroupDriver" base_id="10475"  base_id_window="25" />
+   
    <instance namespace="Svc" name="rgGncDrv" type="RateGroupDriver" base_id="10075"  base_id_window="25" />
 
    <instance namespace="Drv" name="escPwm" type="LinuxPwmDriver" base_id="10100"  base_id_window="25" />
@@ -233,10 +235,6 @@
 <connection name = "Connection39">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
  	 <target component = "actuatorAdapter" port = "sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection40">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection41">
 	 <source component = "rgPos" port = "Time" type = "Time" num = "0"/>
@@ -480,7 +478,7 @@
 </connection>
 <connection name = "Connection102">
 	 <source component = "imuDRInt" port = "intOut" type = "Cycle" num = "0"/>
- 	 <target component = "rgDecouple" port = "CycleIn" type = "Cycle" num = "0"/>
+ 	 <target component = "rgDcplDrv" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection103">
 	 <source component = "i2cDrv" port = "Log" type = "Log" num = "0"/>

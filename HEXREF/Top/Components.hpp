@@ -40,6 +40,7 @@ extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
 extern Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr;
 extern Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr;
 extern Svc::ActiveDecouplerComponentImpl* actDecouple_ptr;
+extern Svc::RateGroupDriverImpl* rgDcplDrv_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
