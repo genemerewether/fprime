@@ -133,8 +133,12 @@ int dsp_relay_gpio_relay_read(int fd) {
         LOG_ERR("GPIO read %d failure: %d: %s",fd,bytes,strerror(errno));
         return -1;
     } else {
-        LOG_INFO("GPIO %d value %d read",fd,value_read);
-        return value_read;
+        LOG_INFO("GPIO %u value %u read",fd,value_read);
+	/* NOTE(mereweth) - observed weird case on 801 where DSP gpio
+	 * read value was large number, odd or even to indicate state.
+	 * even is low, odd is high
+	 */
+        return (value_read % 2);
     }
 
 }

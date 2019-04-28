@@ -2,36 +2,35 @@
 <?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <assembly name = "SIMREF">
 	<import_component_type>Svc/FatalHandler/FatalHandlerComponentAi.xml</import_component_type>
-	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/TlmChan/TlmChanComponentAi.xml</import_component_type>
-	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveFileLogger/ActiveFileLoggerComponentAi.xml</import_component_type>
 	<import_component_type>SIMREF/RotorSDrv/RotorSDrvComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Sysid/SigGen/SigGenComponentAi.xml</import_component_type>
 	<import_component_type>Svc/RateGroupDriver/RateGroupDriverComponentAi.xml</import_component_type>
-	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
 	<import_component_type>ROS/RosCycle/RosCycleComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Est/AttFilter/AttFilterComponentAi.xml</import_component_type>
-	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
-	<import_component_type>Svc/RateGroupDecoupler/RateGroupDecouplerComponentAi.xml</import_component_type>
-	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Svc/CmdDispatcher/CommandDispatcherComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PrmDb/PrmDbComponentAi.xml</import_component_type>
 	<import_component_type>SIMREF/GazeboManipIf/GazeboManipIfComponentAi.xml</import_component_type>
-	<import_component_type>Gnc/Ctrl/BasicMixer/BasicMixerComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Est/FilterIface/FilterIfaceComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>Svc/CmdSequencer/CmdSequencerComponentAi.xml</import_component_type>
+	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
+	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
+	<import_component_type>ROS/RosTime/RosTimeComponentAi.xml</import_component_type>
+	<import_component_type>Svc/RateGroupDecoupler/RateGroupDecouplerComponentAi.xml</import_component_type>
+	<import_component_type>ROS/RosSeq/RosSeqComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Ctrl/BasicMixer/BasicMixerComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveTextLogger/PassiveTextLoggerComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/LeeCtrl/LeeCtrlComponentAi.xml</import_component_type>
 
    <instance namespace="Svc" name="fatalHandler" type="FatalHandler"/>
 
-   <instance namespace="Svc" name="fatalAdapter" type="AssertFatalAdapter"/>
-
    <instance namespace="Svc" name="chanTlm" type="TlmChan"/>
-
-   <instance namespace="Svc" name="rgPos" type="PassiveRateGroup"/>
 
    <instance namespace="Svc" name="fileLogger" type="ActiveFileLogger"/>
 
@@ -41,19 +40,9 @@
 
    <instance namespace="Svc" name="rgGncDrv" type="RateGroupDriver"/>
 
-   <instance namespace="Svc" name="sockGndIf" type="GndIf"/>
-
-   <instance namespace="Svc" name="eventLogger" type="ActiveLogger"/>
-
    <instance namespace="ROS" name="rosCycle" type="RosCycle"/>
 
    <instance namespace="Gnc" name="attFilter" type="AttFilter" base_id="1500"  base_id_window="500" />
-
-   <instance namespace="Svc" name="linuxTime" type="Time"/>
-
-   <instance namespace="Svc" name="rgDecouple" type="RateGroupDecoupler"/>
-
-   <instance namespace="Svc" name="rg" type="ActiveRateGroup"/>
 
    <instance namespace="Svc" name="cmdDisp" type="CommandDispatcher"/>
 
@@ -61,11 +50,31 @@
 
    <instance namespace="SIMREF" name="gzManipIf" type="GazeboManipIf"/>
 
-   <instance namespace="Gnc" name="mixer" type="BasicMixer" base_id="2500"  base_id_window="500" />
+   <instance namespace="Gnc" name="filterIface" type="FilterIface"/>
 
    <instance namespace="Svc" name="rgAtt" type="PassiveRateGroup"/>
 
    <instance namespace="Svc" name="cmdSeq" type="CmdSequencer"/>
+
+   <instance namespace="Svc" name="fatalAdapter" type="AssertFatalAdapter"/>
+
+   <instance namespace="Svc" name="rgPos" type="PassiveRateGroup"/>
+
+   <instance namespace="Svc" name="sockGndIf" type="GndIf"/>
+
+   <instance namespace="Svc" name="eventLogger" type="ActiveLogger"/>
+
+   <instance namespace="ROS" name="rosTime" type="RosTime"/>
+
+   <instance namespace="Svc" name="rgDecouple" type="RateGroupDecoupler"/>
+
+   <instance namespace="ROS" name="rosSeq" type="RosSeq"/>
+
+   <instance namespace="Svc" name="rg" type="ActiveRateGroup"/>
+
+   <instance namespace="Gnc" name="mixer" type="BasicMixer" base_id="2500"  base_id_window="500" />
+
+   <instance namespace="Gnc" name="mrCtrlIface" type="MultirotorCtrlIface"/>
 
    <instance namespace="Svc" name="textLogger" type="PassiveTextLogger"/>
 
@@ -73,12 +82,12 @@
 
 
 <connection name = "Connection1">
-	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
- 	 <target component = "cmdSeq" port = "schedIn" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection2">
 	 <source component = "cmdDisp" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection2">
+	 <source component = "attFilter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection3">
 	 <source component = "attFilter" port = "ParamSet" type = "PrmSet" num = "0"/>
@@ -93,558 +102,614 @@
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection6">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "10"/>
+ 	 <target component = "cmdSeq" port = "schedIn" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection7">
+	 <source component = "rgDecouple" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection8">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection7">
+<connection name = "Connection9">
+	 <source component = "mrCtrlIface" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
+ 	 <target component = "leeCtrl" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
+</connection>
+<connection name = "Connection10">
 	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection8">
+<connection name = "Connection11">
+	 <source component = "mixer" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection12">
+	 <source component = "prmDb" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection13">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection9">
-	 <source component = "rosCycle" port = "logText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection10">
+<connection name = "Connection14">
 	 <source component = "rotorSDrv" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
  	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
 </connection>
-<connection name = "Connection11">
+<connection name = "Connection15">
+	 <source component = "rosCycle" port = "logText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection16">
 	 <source component = "sigGen" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
  	 <target component = "leeCtrl" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
 </connection>
-<connection name = "Connection12">
+<connection name = "Connection17">
+	 <source component = "mrCtrlIface" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection18">
 	 <source component = "rgDecouple" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection13">
+<connection name = "Connection19">
 	 <source component = "sockGndIf" port = "uplinkPort" type = "Com" num = "0"/>
  	 <target component = "cmdDisp" port = "seqCmdBuff" type = "Com" num = "1"/>
 </connection>
-<connection name = "Connection14">
+<connection name = "Connection20">
 	 <source component = "rotorSDrv" port = "SimImu" type = "ImuNoCov" num = "0"/>
  	 <target component = "attFilter" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
-<connection name = "Connection15">
+<connection name = "Connection21">
 	 <source component = "cmdDisp" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection16">
-	 <source component = "eventLogger" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+<connection name = "Connection22">
+	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection17">
+<connection name = "Connection23">
+	 <source component = "mrCtrlIface" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection24">
 	 <source component = "sigGen" port = "controls" type = "TorqueThrust" num = "0"/>
  	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
 </connection>
-<connection name = "Connection18">
+<connection name = "Connection25">
 	 <source component = "eventLogger" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection19">
+<connection name = "Connection26">
+	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection27">
 	 <source component = "leeCtrl" port = "controls" type = "TorqueThrust" num = "0"/>
  	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
 </connection>
-<connection name = "Connection20">
+<connection name = "Connection28">
+	 <source component = "cmdSeq" port = "seqDone" type = "CmdResponse" num = "0"/>
+ 	 <target component = "rosSeq" port = "seqDoneIn" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection29">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection21">
+<connection name = "Connection30">
 	 <source component = "rgDecouple" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgGncDrv" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection22">
-	 <source component = "fatalHandler" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+<connection name = "Connection31">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "9"/>
+ 	 <target component = "mrCtrlIface" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection23">
+<connection name = "Connection32">
 	 <source component = "mixer" port = "motor" type = "Actuators" num = "0"/>
  	 <target component = "rotorSDrv" port = "motor" type = "Actuators" num = "0"/>
 </connection>
-<connection name = "Connection24">
+<connection name = "Connection33">
 	 <source component = "cmdSeq" port = "comCmdOut" type = "Com" num = "0"/>
  	 <target component = "cmdDisp" port = "seqCmdBuff" type = "Com" num = "0"/>
 </connection>
-<connection name = "Connection25">
+<connection name = "Connection34">
+	 <source component = "fatalHandler" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection35">
 	 <source component = "rg" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection26">
+<connection name = "Connection36">
+	 <source component = "rotorSDrv" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection37">
 	 <source component = "sigGen" port = "motor" type = "Actuators" num = "0"/>
  	 <target component = "rotorSDrv" port = "motor" type = "Actuators" num = "0"/>
 </connection>
-<connection name = "Connection27">
-	 <source component = "rg" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection28">
+<connection name = "Connection38">
 	 <source component = "mixer" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection29">
+<connection name = "Connection39">
+	 <source component = "attFilter" port = "odomNoCov" type = "OdometryNoCov" num = "0"/>
+ 	 <target component = "filterIface" port = "Odometry" type = "OdometryNoCov" num = "0"/>
+</connection>
+<connection name = "Connection40">
 	 <source component = "attFilter" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection30">
+<connection name = "Connection41">
 	 <source component = "cmdSeq" port = "cmdResponseOut" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection31">
+<connection name = "Connection42">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
  	 <target component = "sigGen" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection32">
-	 <source component = "sigGen" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection33">
-	 <source component = "gzManipIf" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection34">
+<connection name = "Connection43">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "sigGen" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection35">
+<connection name = "Connection44">
+	 <source component = "rgPos" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection45">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "rosCycle" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection36">
-	 <source component = "rosCycle" port = "tlm" type = "Tlm" num = "0"/>
- 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
-</connection>
-<connection name = "Connection37">
+<connection name = "Connection46">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
  	 <target component = "mixer" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection38">
+<connection name = "Connection47">
+	 <source component = "rosCycle" port = "tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
+</connection>
+<connection name = "Connection48">
 	 <source component = "rgAtt" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection39">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection40">
+<connection name = "Connection49">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "chanTlm" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection41">
-	 <source component = "fileLogger" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+<connection name = "Connection50">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
+ 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection42">
-	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+<connection name = "Connection51">
+	 <source component = "sigGen" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection43">
-	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+<connection name = "Connection52">
+	 <source component = "filterIface" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection44">
+<connection name = "Connection53">
 	 <source component = "gzManipIf" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection45">
+<connection name = "Connection54">
 	 <source component = "chanTlm" port = "PktSend" type = "Com" num = "0"/>
  	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
 </connection>
-<connection name = "Connection46">
+<connection name = "Connection55">
 	 <source component = "attFilter" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection47">
+<connection name = "Connection56">
 	 <source component = "attFilter" port = "odometry" type = "Odometry" num = "0"/>
  	 <target component = "leeCtrl" port = "odometry" type = "Odometry" num = "0"/>
 </connection>
-<connection name = "Connection48">
-	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection49">
+<connection name = "Connection57">
 	 <source component = "eventLogger" port = "PktSend" type = "Com" num = "0"/>
  	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
 </connection>
-<connection name = "Connection50">
+<connection name = "Connection58">
 	 <source component = "leeCtrl" port = "ParamSet" type = "PrmSet" num = "0"/>
  	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>
 </connection>
-<connection name = "Connection51">
-	 <source component = "rotorSDrv" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+<connection name = "Connection59">
+	 <source component = "filterIface" port = "ImuStateUpdate" type = "ImuStateUpdate" num = "0"/>
+ 	 <target component = "attFilter" port = "ImuStateUpdate" type = "ImuStateUpdate" num = "0"/>
 </connection>
-<connection name = "Connection52">
+<connection name = "Connection60">
 	 <source component = "sigGen" port = "ParamSet" type = "PrmSet" num = "0"/>
  	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>
 </connection>
-<connection name = "Connection53">
+<connection name = "Connection61">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "8"/>
+ 	 <target component = "filterIface" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection62">
+	 <source component = "mrCtrlIface" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
+ 	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
+</connection>
+<connection name = "Connection63">
+	 <source component = "rosSeq" port = "seqCancelOut" type = "CmdSeqCancel" num = "0"/>
+ 	 <target component = "cmdSeq" port = "seqCancelIn" type = "CmdSeqCancel" num = "0"/>
+</connection>
+<connection name = "Connection64">
 	 <source component = "eventLogger" port = "FatalAnnounce" type = "FatalEvent" num = "0"/>
  	 <target component = "fatalHandler" port = "FatalReceive" type = "FatalEvent" num = "0"/>
 </connection>
-<connection name = "Connection54">
+<connection name = "Connection65">
 	 <source component = "mixer" port = "ParamSet" type = "PrmSet" num = "0"/>
  	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>
 </connection>
-<connection name = "Connection55">
-	 <source component = "attFilter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection56">
+<connection name = "Connection66">
 	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection57">
+<connection name = "Connection67">
 	 <source component = "leeCtrl" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection58">
+<connection name = "Connection68">
+	 <source component = "mrCtrlIface" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection69">
 	 <source component = "rg" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection59">
-	 <source component = "attFilter" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection60">
+<connection name = "Connection70">
 	 <source component = "rg" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection61">
-	 <source component = "attFilter" port = "ParamGet" type = "PrmGet" num = "0"/>
- 	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
-</connection>
-<connection name = "Connection62">
-	 <source component = "gzManipIf" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection63">
-	 <source component = "gzManipIf" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
- 	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
-</connection>
-<connection name = "Connection64">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
- 	 <target component = "rotorSDrv" port = "sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection65">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
- 	 <target component = "rotorSDrv" port = "sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection66">
-	 <source component = "fileLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection67">
-	 <source component = "mixer" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection68">
-	 <source component = "rgDecouple" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection69">
-	 <source component = "leeCtrl" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection70">
-	 <source component = "fileLogger" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
 <connection name = "Connection71">
-	 <source component = "prmDb" port = "Log" type = "Log" num = "0"/>
+	 <source component = "attFilter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection72">
-	 <source component = "mixer" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+	 <source component = "attFilter" port = "ParamGet" type = "PrmGet" num = "0"/>
+ 	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
 </connection>
 <connection name = "Connection73">
-	 <source component = "prmDb" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection74">
-	 <source component = "sigGen" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+	 <source component = "gzManipIf" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
+<connection name = "Connection74">
+	 <source component = "gzManipIf" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
+ 	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
+</connection>
 <connection name = "Connection75">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
+ 	 <target component = "rotorSDrv" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection76">
+	 <source component = "mixer" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection77">
+	 <source component = "fileLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection78">
+	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
+ 	 <target component = "rotorSDrv" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection79">
+	 <source component = "fileLogger" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection80">
+	 <source component = "leeCtrl" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection81">
+	 <source component = "prmDb" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection82">
 	 <source component = "rgDecouple" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection76">
+<connection name = "Connection83">
+	 <source component = "sigGen" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection84">
 	 <source component = "gzManipIf" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection77">
+<connection name = "Connection85">
 	 <source component = "mixer" port = "ParamGet" type = "PrmGet" num = "0"/>
  	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
 </connection>
-<connection name = "Connection78">
+<connection name = "Connection86">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "8"/>
  	 <target component = "fileLogger" port = "SchedIn" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection79">
-	 <source component = "eventLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection80">
-	 <source component = "sigGen" port = "ParamGet" type = "PrmGet" num = "0"/>
- 	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
-</connection>
-<connection name = "Connection81">
-	 <source component = "rotorSDrv" port = "ImuStateUpdate" type = "ImuStateUpdate" num = "0"/>
- 	 <target component = "attFilter" port = "ImuStateUpdate" type = "ImuStateUpdate" num = "0"/>
-</connection>
-<connection name = "Connection82">
-	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection83">
-	 <source component = "sockGndIf" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection84">
-	 <source component = "prmDb" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection85">
-	 <source component = "mixer" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection86">
-	 <source component = "rgAtt" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
 <connection name = "Connection87">
-	 <source component = "rotorSDrv" port = "flatOutput" type = "FlatOutput" num = "0"/>
+	 <source component = "mrCtrlIface" port = "flatOutput" type = "FlatOutput" num = "0"/>
  	 <target component = "leeCtrl" port = "flatOutput" type = "FlatOutput" num = "0"/>
 </connection>
 <connection name = "Connection88">
-	 <source component = "leeCtrl" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+	 <source component = "eventLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection89">
-	 <source component = "rosCycle" port = "time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+	 <source component = "sigGen" port = "ParamGet" type = "PrmGet" num = "0"/>
+ 	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
 </connection>
 <connection name = "Connection90">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+	 <source component = "rosSeq" port = "seqRunOut" type = "CmdSeqIn" num = "0"/>
+ 	 <target component = "cmdSeq" port = "seqRunIn" type = "CmdSeqIn" num = "0"/>
 </connection>
 <connection name = "Connection91">
-	 <source component = "sigGen" port = "Tlm" type = "Tlm" num = "0"/>
- 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
+	 <source component = "cmdSeq" port = "timeCaller" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection92">
-	 <source component = "cmdDisp" port = "seqCmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdSeq" port = "cmdResponseIn" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection93">
-	 <source component = "rgPos" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection94">
-	 <source component = "rgPos" port = "Tlm" type = "Tlm" num = "0"/>
- 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
-</connection>
-<connection name = "Connection95">
-	 <source component = "sockGndIf" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection96">
-	 <source component = "fatalAdapter" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection97">
-	 <source component = "prmDb" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection98">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
- 	 <target component = "sigGen" port = "sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection99">
-	 <source component = "sigGen" port = "Log" type = "Log" num = "0"/>
+	 <source component = "sockGndIf" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
+<connection name = "Connection93">
+	 <source component = "prmDb" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection94">
+	 <source component = "filterIface" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection95">
+	 <source component = "mixer" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection96">
+	 <source component = "leeCtrl" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection97">
+	 <source component = "leeCtrl" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection98">
+	 <source component = "filterIface" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
+ 	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
+</connection>
+<connection name = "Connection99">
+	 <source component = "rosCycle" port = "time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
 <connection name = "Connection100">
-	 <source component = "sigGen" port = "LogText" type = "LogText" num = "0"/>
+	 <source component = "filterIface" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection101">
-	 <source component = "gzManipIf" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
+ 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection102">
-	 <source component = "attFilter" port = "odomNoCov" type = "OdometryNoCov" num = "0"/>
- 	 <target component = "rotorSDrv" port = "OdomLog" type = "OdometryNoCov" num = "0"/>
+	 <source component = "cmdDisp" port = "seqCmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdSeq" port = "cmdResponseIn" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection103">
-	 <source component = "fileLogger" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "sigGen" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection104">
-	 <source component = "mixer" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+	 <source component = "filterIface" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection105">
-	 <source component = "attFilter" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+	 <source component = "rgPos" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection106">
-	 <source component = "cmdSeq" port = "LogText" type = "LogText" num = "0"/>
+	 <source component = "sockGndIf" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection107">
-	 <source component = "rosCycle" port = "log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "fatalAdapter" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection108">
-	 <source component = "cmdDisp" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "prmDb" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection109">
-	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+ 	 <target component = "sigGen" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection110">
-	 <source component = "leeCtrl" port = "ParamGet" type = "PrmGet" num = "0"/>
- 	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
+	 <source component = "gzManipIf" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection111">
-	 <source component = "rotorSDrv" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
- 	 <target component = "leeCtrl" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
+	 <source component = "sigGen" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection112">
-	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
- 	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
+	 <source component = "gzManipIf" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection113">
-	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
- 	 <target component = "rotorSDrv" port = "sched" type = "Sched" num = "0"/>
+	 <source component = "sigGen" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection114">
-	 <source component = "cmdSeq" port = "timeCaller" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+	 <source component = "fileLogger" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection115">
-	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
+	 <source component = "fileLogger" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection116">
-	 <source component = "rgDecouple" port = "Tlm" type = "Tlm" num = "0"/>
- 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
+	 <source component = "mixer" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection117">
-	 <source component = "rotorSDrv" port = "LogText" type = "LogText" num = "0"/>
+	 <source component = "attFilter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection118">
-	 <source component = "rotorSDrv" port = "Log" type = "Log" num = "0"/>
+	 <source component = "cmdDisp" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection119">
-	 <source component = "rosCycle" port = "cycle" type = "Cycle" num = "0"/>
- 	 <target component = "rgDecouple" port = "CycleIn" type = "Cycle" num = "0"/>
+	 <source component = "cmdSeq" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection120">
-	 <source component = "cmdSeq" port = "tlmOut" type = "Tlm" num = "0"/>
- 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
+	 <source component = "rosCycle" port = "log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection121">
-	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
- 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+	 <source component = "eventLogger" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection122">
-	 <source component = "cmdSeq" port = "logOut" type = "Log" num = "0"/>
+	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection123">
+	 <source component = "leeCtrl" port = "ParamGet" type = "PrmGet" num = "0"/>
+ 	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
+</connection>
+<connection name = "Connection124">
+	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "1"/>
+ 	 <target component = "rgAtt" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection125">
+	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
+ 	 <target component = "rotorSDrv" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection126">
+	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+ 	 <target component = "attFilter" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection127">
+	 <source component = "rotorSDrv" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection128">
+	 <source component = "rgDecouple" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
+</connection>
+<connection name = "Connection129">
+	 <source component = "rgAtt" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection130">
+	 <source component = "rotorSDrv" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection131">
+	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection132">
+	 <source component = "rosCycle" port = "cycle" type = "Cycle" num = "0"/>
+ 	 <target component = "rgDecouple" port = "CycleIn" type = "Cycle" num = "0"/>
+</connection>
+<connection name = "Connection133">
+	 <source component = "cmdSeq" port = "tlmOut" type = "Tlm" num = "0"/>
+ 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
+</connection>
+<connection name = "Connection134">
+	 <source component = "rg" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "rosTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection135">
+	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
+ 	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection136">
+	 <source component = "cmdSeq" port = "logOut" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection137">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "0"/>
  	 <target component = "gzManipIf" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection124">
+<connection name = "Connection138">
 	 <source component = "gzManipIf" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "0"/>
 </connection>
-<connection name = "Connection125">
+<connection name = "Connection139">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "1"/>
  	 <target component = "prmDb" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection126">
+<connection name = "Connection140">
 	 <source component = "prmDb" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "1"/>
 </connection>
-<connection name = "Connection127">
+<connection name = "Connection141">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "2"/>
  	 <target component = "mixer" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection128">
+<connection name = "Connection142">
 	 <source component = "mixer" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "2"/>
 </connection>
-<connection name = "Connection129">
+<connection name = "Connection143">
 	 <source component = "fatalHandler" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "3"/>
 </connection>
-<connection name = "Connection130">
+<connection name = "Connection144">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "3"/>
  	 <target component = "fatalHandler" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection131">
+<connection name = "Connection145">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "4"/>
  	 <target component = "sigGen" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection132">
+<connection name = "Connection146">
 	 <source component = "sigGen" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "4"/>
 </connection>
-<connection name = "Connection133">
+<connection name = "Connection147">
 	 <source component = "cmdDisp" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "5"/>
 </connection>
-<connection name = "Connection134">
+<connection name = "Connection148">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "5"/>
  	 <target component = "cmdDisp" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection135">
+<connection name = "Connection149">
 	 <source component = "cmdSeq" port = "cmdRegOut" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "6"/>
 </connection>
-<connection name = "Connection136">
+<connection name = "Connection150">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "6"/>
  	 <target component = "cmdSeq" port = "cmdIn" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection137">
+<connection name = "Connection151">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "7"/>
  	 <target component = "leeCtrl" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection138">
+<connection name = "Connection152">
 	 <source component = "leeCtrl" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "7"/>
 </connection>
-<connection name = "Connection139">
+<connection name = "Connection153">
 	 <source component = "eventLogger" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "8"/>
 </connection>
-<connection name = "Connection140">
+<connection name = "Connection154">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "8"/>
  	 <target component = "eventLogger" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection141">
+<connection name = "Connection155">
 	 <source component = "attFilter" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "9"/>
 </connection>
-<connection name = "Connection142">
+<connection name = "Connection156">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "9"/>
  	 <target component = "attFilter" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection143">
+<connection name = "Connection157">
 	 <source component = "cmdDisp" port = "compCmdSend" type = "Cmd" num = "10"/>
  	 <target component = "fileLogger" port = "CmdDisp" type = "Cmd" num = "0"/>
 </connection>
-<connection name = "Connection144">
+<connection name = "Connection158">
 	 <source component = "fileLogger" port = "CmdReg" type = "CmdReg" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdReg" type = "CmdReg" num = "10"/>
 </connection>

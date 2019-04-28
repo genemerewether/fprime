@@ -116,6 +116,7 @@ SVC_MODULES := \
 	Svc/ActiveTextLogger \
 	Svc/Tee \
 	Svc/ActiveDecoupler \
+	Svc/QueuedDecoupler \
 	Svc/UdpSender \
 	Svc/UdpReceiver \
 	Svc/CameraFrame \
@@ -149,10 +150,12 @@ LLPROC_MODULES := \
 	LLProc/LLTlmChan
 
 HLPROC_MODULES := \
-	HLProc/HLRosIface \
 	HLProc/LLRouter \
 	HLProc/EventExpander \
 	HLProc/Cfg
+
+HLPROC_ROS_MODULES := \
+	HLProc/HLRosIface
 
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
@@ -171,12 +174,21 @@ HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/KraitRouter
 
+QUEST_GNC_ROSIFACE_MODULES := \
+	Gnc/Ctrl/MultirotorCtrlIface \
+	Gnc/Est/FilterIface
+
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
+	Gnc/Ctrl/Se3Ctrl \
 	Gnc/Ctrl/BasicMixer \
+	Gnc/Ctrl/WrenchMixer \
 	Gnc/Est/ImuInteg \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
+	Gnc/Utils/FixedAxisSe3Adapter \
+	Gnc/Utils/FrameTransform \
+	Gnc/Utils/ImuProc \
 	Gnc/quest_gnc/src/diffeo \
 	Gnc/quest_gnc/src/traj \
 	Gnc/quest_gnc/src/ctrl \
@@ -244,6 +256,8 @@ ROS_MODULES := \
 	\
 	ROS/RosTime \
 	\
+	ROS/RosSeq \
+	\
 	$(ROS_TYPE_MODULES) \
 	\
 	$(ROS_PORT_MODULES)
@@ -272,14 +286,18 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	Drv/ForceTorque/ATINetbox \
+	\
 	$(ZMQ_MODULES) \
 	\
 	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
 	\
 	$(COMMON_MODULES) \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
 	\
 	$(SNAPDRAGON_MODULES) \
 	\
@@ -324,16 +342,12 @@ BASEREF_MODULES := \
 	\
 	$(UTILS_MODULES)
 
-SIMREF_DEPLOYMENT_MODULES := \
+SIMREF_GENERAL_MODULES := \
 	SIMREF/RotorSDrv \
 	SIMREF/GazeboManipIf \
-	SIMREF/Top
-
-SIMREF_MODULES := \
 	\
 	$(QUEST_GNC_MODULES) \
-	\
-	$(SIMREF_DEPLOYMENT_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
 	\
 	$(SVC_MODULES) \
 	\
@@ -351,20 +365,28 @@ SIMREF_MODULES := \
 	\
 	$(UTILS_MODULES)
 
-HEXREF_DEPLOYMENT_MODULES := \
-	HEXREF/Top \
-	HEXREF/Rpc
+SIMREF_MODULES := \
+	SIMREF/Top \
+	$(SIMREF_GENERAL_MODULES)
 
-HEXREF_MODULES := \
-	$(ROS_TYPE_MODULES) \
-	$(ROS_PORT_MODULES) \
+HEXREF_GENERAL_MODULES := \
+	\
+	ROS/Gen/std_msgs/Ports  \
+	ROS/Gen/geometry_msgs/Ports      \
+	ROS/Gen/nav_msgs/Ports           \
+	ROS/Gen/mav_msgs/Ports		 \
+	ROS/Gen/sensor_msgs/Ports	\
+	\
+	ROS/Gen/std_msgs/Types  \
+	ROS/Gen/geometry_msgs/Types      \
+	ROS/Gen/nav_msgs/Types           \
+	ROS/Gen/mav_msgs/Types		 \
+	ROS/Gen/sensor_msgs/Types	\
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(HEXAGON_MODULES) \
-	\
-	$(HEXREF_DEPLOYMENT_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
 	Drv/Mavlink/ActuatorControls \
@@ -403,6 +425,7 @@ HEXREF_MODULES := \
 	Svc/AssertFatalAdapter \
 	Svc/FatalHandler \
 	Svc/ActiveDecoupler \
+	Svc/QueuedDecoupler \
 	\
 	$(FW_MODULES) \
 	\
@@ -421,8 +444,14 @@ HEXREF_MODULES := \
 	LLProc/LLTlmChan
 #Svc/ComLogger
 
+HEXREF_MODULES := \
+	HEXREF/Top \
+	HEXREF/Rpc \
+	$(HEXREF_GENERAL_MODULES)
+
 DSPRELAY_MODULES := SnapdragonFlight/DspRelay \
-	SnapdragonFlight/RpcCommon
+	SnapdragonFlight/RpcCommon \
+	DSPRELAY/Top
 
 MINRPC_MODULES := \
 	MINRPC/Top \
@@ -445,64 +474,7 @@ MINRPC_MODULES := \
 TESTRPC_MODULES := \
 	TESTRPC/Top \
 	HEXREF/Rpc \
-	\
-	$(ROS_TYPE_MODULES) \
-	$(ROS_PORT_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	\
-	$(HEXAGON_MODULES) \
-	\
-	Drv/IMU/MPU9250 \
-	Drv/PwmDriverPorts \
-	Drv/GpioDriverPorts \
-	Drv/SerialDriverPorts \
-	Drv/SpiDriverPorts \
-	Drv/I2CDriverPorts \
-	Drv/LinuxGpioDriver \
-	Drv/LinuxSpiDriver \
-	Drv/LinuxI2CDriver \
-	Drv/LinuxPwmDriver \
-	\
-	Svc/BufferManager \
-	Svc/CmdDispatcher \
-	Svc/CmdSequencer \
-	Svc/Seq \
-	Svc/ActiveRateGroup \
-	Svc/PassiveRateGroup \
-	Svc/RateGroupDriver \
-	Svc/RateGroupDecoupler \
-	Svc/Sched \
-	Svc/PassiveTextLogger \
-	Svc/PassiveConsoleTextLogger \
-	Svc/Time \
-	Svc/Cycle \
-	Svc/LinuxTime \
-	Svc/ActiveLogger \
-	Svc/Fatal \
-	Svc/PolyIf \
-	Svc/PolyDb \
-	Svc/PrmDb \
-	Svc/Ping \
-	Svc/Health \
-	Svc/WatchDog \
-	Svc/AssertFatalAdapter \
-	Svc/FatalHandler \
-	\
-	$(FW_MODULES) \
-	\
-	$(UTILS_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	LLProc/ShortLogQueue
+	$(HEXREF_GENERAL_MODULES)
 
 R5REF_DEPLOYMENT_MODULES := \
 	R5REF/Top

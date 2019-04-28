@@ -496,7 +496,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_EXPOSUREFIXED:
                 if (EXPOSURE_FIXED == m_exposureMode) {
-                    U16 exposure = paramGet_exposureFixed(valid);
+                    U32 exposure = paramGet_exposureFixed(valid);
                     if ((Fw::PARAM_VALID != valid) &&
                         (Fw::PARAM_DEFAULT != valid)) {
                         // TODO(mereweth) - issue EVR
@@ -518,7 +518,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_GAINFIXED:
                 if (EXPOSURE_FIXED == m_exposureMode) {
-                    U8 gain = paramGet_gainFixed(valid);
+                    U32 gain = paramGet_gainFixed(valid);
                     if ((Fw::PARAM_VALID != valid) &&
                         (Fw::PARAM_DEFAULT != valid)) {
                         // TODO(mereweth) - issue EVR
@@ -616,7 +616,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_MAXDELTA:
             {
-                U16 temp = paramGet_maxDelta(valid);
+                U32 temp = paramGet_maxDelta(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -633,7 +633,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_EXPOSURECHANGETHRESHOLD:
             {
-                U16 temp = paramGet_exposureChangeThreshold(valid);
+                U32 temp = paramGet_exposureChangeThreshold(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -650,7 +650,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_GAINCHANGETHRESHOLD:
             {
-                U16 temp = paramGet_gainChangeThreshold(valid);
+                U32 temp = paramGet_gainChangeThreshold(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -667,7 +667,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_EXPOSUREMIN:
             {
-                U16 temp = paramGet_exposureMin(valid);
+                U32 temp = paramGet_exposureMin(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -690,7 +690,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_EXPOSUREMAX:
             {
-                U16 temp = paramGet_exposureMax(valid);
+                U32 temp = paramGet_exposureMax(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -713,7 +713,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_GAINMIN:
             {
-                U16 temp = paramGet_gainMin(valid);
+                U32 temp = paramGet_gainMin(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -736,7 +736,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_GAINMAX:
             {
-                U16 temp = paramGet_gainMax(valid);
+                U32 temp = paramGet_gainMax(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR

@@ -73,7 +73,9 @@ namespace Svc
             (void) Os::Task::delay(1000);
             //Os::Log::logMsg("Exiting.\n", 0, 0, 0, 0, 0, 0);
             //assert(0);
+#ifndef BUILD_DSPAL
             (void) raise(SIGTERM);
+#endif
             pthread_exit(0);
         }
     }

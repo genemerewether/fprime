@@ -3,4 +3,32 @@
         <comment>
         </comment>
     </event>
+    <event id="1" name="ACTADAP_Error" severity="WARNING_HI" format_string = "ActAdap error %d" >
+        <comment>
+        </comment>
+	<args>
+	    <arg name="error" type="ENUM">
+		<enum name="ErrorType">
+		    <item name="HWEnableLow" comment="HW enable pin low"/>
+		    <item name="ParamsUninit" comment="Params not inited"/>
+		    <item name="NaNCmd" comment="Got NaN cmd"/>
+		</enum>
+		<comment>The error code</comment>
+	    </arg>
+	</args>
+    </event>
+    <event id="2" name="ACTADAP_NotFlySafe" severity="WARNING_HI" format_string = "ActAdap not flysafe reason %d" >
+        <comment>
+        </comment>
+	<args>
+	    <arg name="reason" type="ENUM">
+		<enum name="NotFlySafeType">
+		    <item name="CycleTimeout" comment="too many elapsed cycles"/>
+		    <item name="TimeTimeout" comment="too much elapsed time"/>
+		    <item name="ValueFalse" comment="value received is false"/>
+		</enum>
+		<comment>The error code</comment>
+	    </arg>
+	</args>
+    </event>
 </events>

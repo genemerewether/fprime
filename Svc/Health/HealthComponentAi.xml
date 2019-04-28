@@ -6,12 +6,12 @@
     <import_port_type>Svc/WatchDog/WatchDogPortAi.xml</import_port_type>
     <comment>A component to check the health of other components</comment>
     <ports>
-        <port name="PingSend" data_type="Svc::Ping" kind="output" max_number="$HealthPingPorts">
+        <port name="PingSend" data_type="Svc::Ping" kind="output" max_number="80">
             <comment>
             Ping output port
             </comment>
         </port>
-        <port name="PingReturn" data_type="Svc::Ping" kind="async_input" max_number="$HealthPingPorts">
+        <port name="PingReturn" data_type="Svc::Ping" kind="async_input" max_number="80">
             <comment>
             Ping return port
             </comment>
@@ -27,7 +27,7 @@
             </comment>
         </port>
     </ports>
-    <commands opcode_base="$HealthOpcodeBase">
+    <commands>
         <command kind="async" opcode="0x0" mnemonic="HLTH_ENABLE">
             <comment>
             A command to enable or disable health checks
@@ -76,14 +76,14 @@
              </args>
         </command>
     </commands>
-    <telemetry telemetry_base="$HealthTelemetryBase">
+    <telemetry>
         <channel id="0x0" name="PingLateWarnings" data_type="U32" abbrev="T001-1234">
             <comment>
             Number of overrun warnings
             </comment>
         </channel>
     </telemetry>
-    <events event_base="$HealthEventsBase">
+    <events>
         <event id="0x0" name="HLTH_PING_WARN" severity="WARNING_HI" format_string = "Ping entry %s late warning" >
             <comment>
             Warn that a ping target is longer than the warning value

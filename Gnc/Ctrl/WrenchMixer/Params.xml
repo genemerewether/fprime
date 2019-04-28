@@ -1,0 +1,158 @@
+<parameters>
+    <parameter id="0" set_opcode="20" save_opcode="21" name="numRotors" data_type="U32" >
+      <comment>number of rotors</comment>
+    </parameter>
+    
+    <parameter id="10" set_opcode="40" save_opcode="41" name="m_x__1" data_type="F64" >
+      <comment>rotor 1 x moment coeff</comment>
+    </parameter>
+    <parameter id="11" set_opcode="42" save_opcode="43" name="m_y__1" data_type="F64" >
+      <comment>rotor 1 y moment coeff</comment>
+    </parameter>
+    <parameter id="12" set_opcode="44" save_opcode="45" name="m_z__1" data_type="F64" >
+      <comment>rotor 1 z moment coeff</comment>
+    </parameter>
+    <parameter id="13" set_opcode="46" save_opcode="47" name="t_x__1" data_type="F64" >
+      <comment>rotor 1 x thrust coeff</comment>
+    </parameter>
+    <parameter id="14" set_opcode="48" save_opcode="49" name="t_y__1" data_type="F64" >
+      <comment>rotor 1 y thrust coeff</comment>
+    </parameter>
+    <parameter id="15" set_opcode="50" save_opcode="51" name="t_z__1" data_type="F64" >
+      <comment>rotor 1 z thrust coeff</comment>
+    </parameter>
+    
+    <parameter id="16" set_opcode="52" save_opcode="53" name="m_x__2" data_type="F64" >
+      <comment>rotor 2 x moment coeff</comment>
+    </parameter>
+    <parameter id="17" set_opcode="54" save_opcode="55" name="m_y__2" data_type="F64" >
+      <comment>rotor 2 y moment coeff</comment>
+    </parameter>
+    <parameter id="18" set_opcode="56" save_opcode="57" name="m_z__2" data_type="F64" >
+      <comment>rotor 2 z moment coeff</comment>
+    </parameter>
+    <parameter id="19" set_opcode="58" save_opcode="59" name="t_x__2" data_type="F64" >
+      <comment>rotor 2 x thrust coeff</comment>
+    </parameter>
+    <parameter id="20" set_opcode="60" save_opcode="61" name="t_y__2" data_type="F64" >
+      <comment>rotor 2 y thrust coeff</comment>
+    </parameter>
+    <parameter id="21" set_opcode="62" save_opcode="63" name="t_z__2" data_type="F64" >
+      <comment>rotor 2 z thrust coeff</comment>
+    </parameter>
+    
+    <parameter id="22" set_opcode="64" save_opcode="65" name="m_x__3" data_type="F64" >
+      <comment>rotor 3 x moment coeff</comment>
+    </parameter>
+    <parameter id="23" set_opcode="66" save_opcode="67" name="m_y__3" data_type="F64" >
+      <comment>rotor 3 y moment coeff</comment>
+    </parameter>
+    <parameter id="24" set_opcode="68" save_opcode="69" name="m_z__3" data_type="F64" >
+      <comment>rotor 3 z moment coeff</comment>
+    </parameter>
+    <parameter id="25" set_opcode="70" save_opcode="71" name="t_x__3" data_type="F64" >
+      <comment>rotor 3 x thrust coeff</comment>
+    </parameter>
+    <parameter id="26" set_opcode="72" save_opcode="73" name="t_y__3" data_type="F64" >
+      <comment>rotor 3 y thrust coeff</comment>
+    </parameter>
+    <parameter id="27" set_opcode="74" save_opcode="75" name="t_z__3" data_type="F64" >
+      <comment>rotor 3 z thrust coeff</comment>
+    </parameter>
+
+    <parameter id="28" set_opcode="76" save_opcode="77" name="m_x__4" data_type="F64" >
+      <comment>rotor 4 x moment coeff</comment>
+    </parameter>
+    <parameter id="29" set_opcode="78" save_opcode="79" name="m_y__4" data_type="F64" >
+      <comment>rotor 4 y moment coeff</comment>
+    </parameter>
+    <parameter id="30" set_opcode="80" save_opcode="81" name="m_z__4" data_type="F64" >
+      <comment>rotor 4 z moment coeff</comment>
+    </parameter>
+    <parameter id="31" set_opcode="82" save_opcode="83" name="t_x__4" data_type="F64" >
+      <comment>rotor 4 x thrust coeff</comment>
+    </parameter>
+    <parameter id="32" set_opcode="84" save_opcode="85" name="t_y__4" data_type="F64" >
+      <comment>rotor 4 y thrust coeff</comment>
+    </parameter>
+    <parameter id="33" set_opcode="86" save_opcode="87" name="t_z__4" data_type="F64" >
+      <comment>rotor 4 z thrust coeff</comment>
+    </parameter>
+    
+    <parameter id="34" set_opcode="88" save_opcode="89" name="m_x__5" data_type="F64" >
+      <comment>rotor 5 x moment coeff</comment>
+    </parameter>
+    <parameter id="35" set_opcode="90" save_opcode="91" name="m_y__5" data_type="F64" >
+      <comment>rotor 5 y moment coeff</comment>
+    </parameter>
+    <parameter id="36" set_opcode="92" save_opcode="93" name="m_z__5" data_type="F64" >
+      <comment>rotor 5 z moment coeff</comment>
+    </parameter>
+    <parameter id="37" set_opcode="94" save_opcode="95" name="t_x__5" data_type="F64" >
+      <comment>rotor 5 x thrust coeff</comment>
+    </parameter>
+    <parameter id="38" set_opcode="96" save_opcode="97" name="t_y__5" data_type="F64" >
+      <comment>rotor 5 y thrust coeff</comment>
+    </parameter>
+    <parameter id="39" set_opcode="98" save_opcode="99" name="t_z__5" data_type="F64" >
+      <comment>rotor 5 z thrust coeff</comment>
+    </parameter>
+    
+    <parameter id="40" set_opcode="100" save_opcode="101" name="m_x__6" data_type="F64" >
+      <comment>rotor 6 x moment coeff</comment>
+    </parameter>
+    <parameter id="41" set_opcode="102" save_opcode="103" name="m_y__6" data_type="F64" >
+      <comment>rotor 6 y moment coeff</comment>
+    </parameter>
+    <parameter id="42" set_opcode="104" save_opcode="105" name="m_z__6" data_type="F64" >
+      <comment>rotor 6 z moment coeff</comment>
+    </parameter>
+    <parameter id="43" set_opcode="106" save_opcode="107" name="t_x__6" data_type="F64" >
+      <comment>rotor 6 x thrust coeff</comment>
+    </parameter>
+    <parameter id="44" set_opcode="108" save_opcode="109" name="t_y__6" data_type="F64" >
+      <comment>rotor 6 y thrust coeff</comment>
+    </parameter>
+    <parameter id="45" set_opcode="110" save_opcode="111" name="t_z__6" data_type="F64" >
+      <comment>rotor 6 z thrust coeff</comment>
+    </parameter>
+    
+    <parameter id="46" set_opcode="112" save_opcode="113" name="m_x__7" data_type="F64" >
+      <comment>rotor 7 x moment coeff</comment>
+    </parameter>
+    <parameter id="47" set_opcode="114" save_opcode="115" name="m_y__7" data_type="F64" >
+      <comment>rotor 7 y moment coeff</comment>
+    </parameter>
+    <parameter id="48" set_opcode="116" save_opcode="117" name="m_z__7" data_type="F64" >
+      <comment>rotor 7 z moment coeff</comment>
+    </parameter>
+    <parameter id="49" set_opcode="118" save_opcode="119" name="t_x__7" data_type="F64" >
+      <comment>rotor 7 x thrust coeff</comment>
+    </parameter>
+    <parameter id="50" set_opcode="120" save_opcode="121" name="t_y__7" data_type="F64" >
+      <comment>rotor 7 y thrust coeff</comment>
+    </parameter>
+    <parameter id="51" set_opcode="122" save_opcode="123" name="t_z__7" data_type="F64" >
+      <comment>rotor 7 z thrust coeff</comment>
+    </parameter>
+    
+    <parameter id="52" set_opcode="124" save_opcode="125" name="m_x__8" data_type="F64" >
+      <comment>rotor 8 x moment coeff</comment>
+    </parameter>
+    <parameter id="53" set_opcode="126" save_opcode="127" name="m_y__8" data_type="F64" >
+      <comment>rotor 8 y moment coeff</comment>
+    </parameter>
+    <parameter id="54" set_opcode="128" save_opcode="129" name="m_z__8" data_type="F64" >
+      <comment>rotor 8 z moment coeff</comment>
+    </parameter>
+    <parameter id="55" set_opcode="130" save_opcode="131" name="t_x__8" data_type="F64" >
+      <comment>rotor 8 x thrust coeff</comment>
+    </parameter>
+    <parameter id="56" set_opcode="132" save_opcode="133" name="t_y__8" data_type="F64" >
+      <comment>rotor 8 y thrust coeff</comment>
+    </parameter>
+    <parameter id="57" set_opcode="134" save_opcode="135" name="t_z__8" data_type="F64" >
+      <comment>rotor 8 z thrust coeff</comment>
+    </parameter>
+
+</parameters>

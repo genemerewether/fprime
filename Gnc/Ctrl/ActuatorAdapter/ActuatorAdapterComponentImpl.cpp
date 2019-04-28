@@ -63,9 +63,16 @@ namespace Gnc {
     cmdSeq(0u),
     armCount(0u),
     numActuators(0u),
+    flySafe(true),
+    flySafeCheckCycles(false),
+    flySafeCycles(0u),
+    flySafeMaxElapsedCycles(0u),
+    flySafeCheckTime(false),
+    flySafeLastTime(),
+    flySafeMaxElapsedTime(),
     paramsInited(false)
   {
-      for (U32 i = 0; i < AA_MAX_ACTUATORS; i++) {
+      for (U32 i = 0; i < ACTADAP_MAX_ACTUATORS; i++) {
           this->outputInfo[i].type = OUTPUT_UNSET;
       }
   }
@@ -91,7 +98,7 @@ namespace Gnc {
              bool useSimple
     )
   {
-      if (actuator >= AA_MAX_ACTUATORS) {
+      if (actuator >= ACTADAP_MAX_ACTUATORS) {
           return false;
       }
       // TODO(mereweth) - factor out FeedbackMetadata and CmdOutputMapMetadata checking
@@ -129,7 +136,7 @@ namespace Gnc {
       Fw::ParamValid valid[7];
       this->numActuators = paramGet_numActuators(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-      if (this->numActuators >= AA_MAX_ACTUATORS) {  return;  }
+      if (this->numActuators > ACTADAP_MAX_ACTUATORS) {  return;  }
 
       // NOTE(mereweth) - start convenience defines
 #define MAP_AND_FB_FROM_PARM_IDX(XXX) \
@@ -206,8 +213,8 @@ namespace Gnc {
 
 #define I2C_FROM_PARM_IDX(XXX) \
       { \
-          i2c.minOut = (U32) paramGet_p ## XXX ## _minOut(valid[0]); \
-          i2c.maxOut = (U32) paramGet_p ## XXX ## _maxOut(valid[1]); \
+          i2c.minOut = paramGet_p ## XXX ## _minOut(valid[0]); \
+          i2c.maxOut = paramGet_p ## XXX ## _maxOut(valid[1]); \
           for (U32 j = 0; j < 2; j++) { \
               if (Fw::PARAM_VALID != valid[j]) {  return;  } \
           } \
@@ -289,11 +296,48 @@ namespace Gnc {
               case 5:
                   METADATA_FROM_ACT_IDX(6);
                   break;
+              case 6:
+                  METADATA_FROM_ACT_IDX(7);
+                  break;
+              case 7:
+                  METADATA_FROM_ACT_IDX(8);
+                  break;
               default:
                   FW_ASSERT(0, i);
           }
       }
 
+      this->flySafeMaxElapsedCycles = paramGet_flySafeCycles(valid[0]);
+      if (0 == this->flySafeMaxElapsedCycles) {
+  	  this->flySafeCheckCycles = false;
+      }
+      else {
+  	  this->flySafeCheckCycles = true;
+      }
+      const F64 flySafeFloatSecs = paramGet_flySafeTime(valid[1]);
+      const Fw::Time forBaseContext = this->getTime();
+      const TimeBase timeBase = forBaseContext.getTimeBase();
+      const FwTimeContextStoreType timeContext = forBaseContext.getContext();
+      if (flySafeFloatSecs > 0.0) {
+  	  this->flySafeCheckTime = true;
+	  const U32 flySafeSecs = (U32) flySafeFloatSecs;
+	  this->flySafeLastTime = Fw::Time(timeBase, timeContext, 0, 0);
+	  this->flySafeMaxElapsedTime = Fw::Time(timeBase, timeContext,
+						 flySafeSecs,
+						 (U32) ((flySafeFloatSecs - flySafeSecs)
+							* 1000.0 * 1000.0));
+      }
+      else { // user gave negative value for timeout, indicating don't check time
+  	  this->flySafeCheckTime = false;
+      }
+	
+      for (unsigned int i = 0; i < 2; i++) {
+	  if ((Fw::PARAM_VALID   != valid[i])  &&
+	      (Fw::PARAM_DEFAULT != valid[i])) {
+	      return;
+	  }
+      }
+      
       this->paramsInited = true;
   }
 
@@ -302,18 +346,69 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void ActuatorAdapterComponentImpl ::
+    flySafe_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::BoolStamped &BoolStamped
+    )
+  {
+      Fw::Time msgStamp = BoolStamped.getheader().getstamp();
+      // If msg time < time of last fly safe msg, it is out of order, so ignore it
+      if (msgStamp < this->flySafeLastTime) {
+  	  return;
+      }
+      // if msg time > current time, there has been an error in time translation, so ignore it
+      if (msgStamp > this->getTime()) {
+  	  return;
+      }
+      this->flySafeCycles = 0;
+      this->flySafeLastTime = msgStamp;
+      this->flySafe = BoolStamped.getdata().getdata();
+  }
+  
+  void ActuatorAdapterComponentImpl ::
     motor_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::mav_msgs::Actuators &Actuators
     )
   {
-      if ((ARMED != this->armedState) ||
-          !paramsInited) {
-          return;
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
+      }
+    
+      if (ARMED != this->armedState) {
+  	  return;
+      }
+
+      const bool didFlySafeCycleTimeout = (this->flySafeCheckCycles &&
+					   ((++this->flySafeCycles) > this->flySafeMaxElapsedCycles));
+      const bool didFlySafeTimeTimeout = (this->flySafeCheckTime &&
+					  (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
+								 	   this->flySafeLastTime)));
+      if (!paramsInited || !hwEnabled ||
+	  didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe) {
+	  // TODO(mereweth) - send out min cmd here before disarming?
+	  this->armedState = DISARMED;
+	  if (!this->paramsInited) {
+	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+	  }
+	  if (!hwEnabled) {
+	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  if (didFlySafeCycleTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
+	  }
+	  if (didFlySafeTimeTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
+	  }
+	  if (!this->flySafe) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
+	  }
+	  return;
       }
 
       U32 angVelCount = FW_MIN(Actuators.getangular_velocities_count(),
-                               FW_MIN(AA_MAX_ACTUATORS,
+                               FW_MIN(ACTADAP_MAX_ACTUATORS,
                                       this->numActuators));
       NATIVE_INT_TYPE angVelSize = 0;
       const F64* angVels = Actuators.getangular_velocities(angVelSize);
@@ -354,10 +449,12 @@ namespace Gnc {
                           // TODO(mereweth) - EVR about disarming due to NaN
                           inVal = i2c.cmdOutputMap.minIn;
                           this->armedState = DISARMED;
+			  
+			  this->log_WARNING_HI_ACTADAP_Error(NaNCmd);
                       }
                       else if (inVal > i2c.cmdOutputMap.maxIn) {  inVal = i2c.cmdOutputMap.maxIn;  }
                       else if (inVal < i2c.cmdOutputMap.minIn) {  inVal = i2c.cmdOutputMap.minIn;  }
-                      U32 out = 0u;
+                      I64 out = 0;
                       F64 des = 0.0;
 
                       // TODO(mereweth) - share mapping among output types
@@ -373,6 +470,17 @@ namespace Gnc {
                       else {
                           // TODO(mereweth) - EVR!!
                       }
+
+		      const F64 inValAbs = fabs(inVal);
+		      I64 sign = 1;
+		      
+                      if ((CMD_OUTPUT_MAP_LIN_0BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_1BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_2BRK == i2c.cmdOutputMap.type)) {
+			  if (inVal < 0.0) {
+			      sign = -1;
+			  }
+		      }
                       switch (i2c.cmdOutputMap.type) {
                           case CMD_OUTPUT_MAP_LIN_MINMAX:
                               out = (inVal - i2c.cmdOutputMap.minIn) /
@@ -380,40 +488,37 @@ namespace Gnc {
                                 + i2c.minOut;
                               break;
                           case CMD_OUTPUT_MAP_LIN_2BRK:
-                              if (inVal < i2c.cmdOutputMap.x0) {
-                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              if (inValAbs < i2c.cmdOutputMap.x0) {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + i2c.cmdOutputMap.b;
                               }
-                              else if (inVal < i2c.cmdOutputMap.x1) {
+                              else if (inValAbs < i2c.cmdOutputMap.x1) {
                                   des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
                                     + i2c.cmdOutputMap.b
-                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - i2c.cmdOutputMap.x0);
                               }
                               else {
                                   des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
                                     + i2c.cmdOutputMap.b
                                     + i2c.cmdOutputMap.k1  * Vnom_by_Vact
                                                            * (i2c.cmdOutputMap.x1 - i2c.cmdOutputMap.x0)
-                                    + i2c.cmdOutputMap.k2 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x1);
+                                    + i2c.cmdOutputMap.k2 * Vnom_by_Vact * (inValAbs - i2c.cmdOutputMap.x1);
                               }
-                              if (des < 0.0) {  out = 0;  }
-                              else {  out = (U32) des;  }
+                              out = (I32) des;
                               break;
                           case CMD_OUTPUT_MAP_LIN_1BRK:
-                              if (inVal < i2c.cmdOutputMap.x0) {
-                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
+                              if (inValAbs < i2c.cmdOutputMap.x0) {
+                                  des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + i2c.cmdOutputMap.b;
                               }
                               else {
                                   des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * i2c.cmdOutputMap.x0
                                     + i2c.cmdOutputMap.b
-                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inVal - i2c.cmdOutputMap.x0);
+                                    + i2c.cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - i2c.cmdOutputMap.x0);
                               }
-                              if (des < 0.0) {  out = 0;  }
-                              else {  out = (U32) des;  }
+                              out = (I32) des;
                               break;
                           case CMD_OUTPUT_MAP_LIN_0BRK:
-                              des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inVal + i2c.cmdOutputMap.b;
-                              if (des < 0.0) {  out = 0;  }
-                              else {  out = (U32) des;  }
+                              des = i2c.cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + i2c.cmdOutputMap.b;
+                              out = (I32) des;
                               break;
                           case CMD_OUTPUT_MAP_UNSET:
                           default:
@@ -426,51 +531,72 @@ namespace Gnc {
                       F64 delta = 0.0;
                       switch (i2c.fbMeta.ctrlType) {
                           case FEEDBACK_CTRL_PROP:
-                              delta = i2c.fbMeta.kp * (inVal - this->outputInfo[i].feedback.angVel);
+			      // TODO(Mereweth) - what if not tracking near zero in bidirectional?
+  			      delta = i2c.fbMeta.kp * (inValAbs - fabs(this->outputInfo[i].feedback.angVel));    
                               
                               // NOTE(Mereweth) - fallthrough so this code runs for all control types except NONE
 
                               // NOTE(Mereweth) - clamp the delta vs the open-loop mapping
                               if (delta > 0.0) {
-                                delta = FW_MIN(delta, i2c.fbMeta.maxErr);
+                                  delta = FW_MIN(delta, i2c.fbMeta.maxErr);
                               }
                               if (delta < 0.0) {
-                                delta = -1.0 * FW_MIN(-1.0 * delta, i2c.fbMeta.maxErr);
+                                  delta = -1.0 * FW_MIN(-1.0 * delta, i2c.fbMeta.maxErr);
                               }
 
-                              if (delta > 0.0) {
-                                  out += delta;
-                              }
-                              // have to be careful with signs
-                              // delta < 0; |delta| < out; out + delta > 0
-                              else if (fabs(delta) < (F64) out) {
-                                  out = (U32) ((F64) out + delta);
-                              }
-                              // delta < 0; |delta| > out; out + delta < 0; so would overflow
-                              else {
-                                  out = 0u;
-                              }
+			      out += delta;
                               break;
                           case FEEDBACK_CTRL_NONE:
                           default:
                               break;
-                      }          
+                      }
 
-                      DEBUG_PRINT("esc addr %u, in %f, out %u\n", i2c.addr, angVels[i], out);
+		      // if we took fabs of inVal for calculating the mapping, put it back the right way
+		      out *= sign;
+		      
+		      /* NOTE(mereweth) - prevent piecewise mappings from flipping the sign due to e.g.
+		       * negative y intercept, or controller flipping the sign
+		       */
+		      
+		      if (((inVal > 0.0) && (out < 0.0)) ||
+			  ((inVal < 0.0) && (out > 0.0))) {
+			  out = 0;
+		      }
+
+		      /* NOTE(mereweth) - in case inVal is exactly 0.0
+		       */
+                      if ((CMD_OUTPUT_MAP_LIN_0BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_1BRK == i2c.cmdOutputMap.type) ||
+			  (CMD_OUTPUT_MAP_LIN_2BRK == i2c.cmdOutputMap.type)) {
+			  if (inVal == 0.0) {
+			      out = 0;
+			  }
+		      }
+
+                      DEBUG_PRINT("esc addr %u, in %f, out %lld\n", i2c.addr, angVels[i], out);
 
                       if (out > i2c.maxOut) {  out = i2c.maxOut;  }
                       if (out < i2c.minOut) {  out = i2c.minOut;  }
 
                       Fw::Buffer readBufObj(0, 0, 0, 0); // no read
                       if (OUTPUT_I2C == this->outputInfo[i].type) {
+  			  if (i2c.reverse) {  out = -out;  }
+
+			  I8 outI8[2] = { out >> 8, out };
+			  U8 outU8[2] = { 0 };
+			  memcpy(outU8, outI8, 2);
                           // MSB is reverse bit
-                          U8 writeBuf[3] = { 0x00,
-                                             (U8) ((out / 8) | ((i2c.reverse ? 1 : 0) << 7)),
-                                             (U8) (out % 8) };
+
+			  DEBUG_PRINT("reverse: %u, ihigh: %d, ilow: %d, high: %u, low: %u\n",
+				      i2c.reverse, outI8[0], outI8[1],
+				      outU8[0], outU8[1]);
+			  
+                          U8 writeBuf[3] = { 0x00, outU8[0], outU8[1] };
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
                           this->escReadWrite_out(0, writeBufObj, readBufObj);
                       }
                       else { // simple protocol
+  			  if (out < 0) {  out = 0;  }
                           U8 writeBuf[2] = { (U8) (out / 8), (U8) (out % 8) };
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
                           this->escReadWrite_out(0, writeBufObj, readBufObj);
@@ -530,9 +656,9 @@ namespace Gnc {
                           (OUTPUT_I2C_SIMPLE == this->outputInfo[i].type)) {
                           this->outputInfo[i].feedback.counts      = (readBuf[0] << 8) + readBuf[1];
                           // TODO(mereweth) - establish units and validity
-                          this->outputInfo[i].feedback.voltage     = (F32) ((readBuf[2] << 8) + readBuf[3]);
+                          this->outputInfo[i].feedback.voltage     = (F32) ((readBuf[2] << 8) + readBuf[3]) / 2016.0;
                           this->outputInfo[i].feedback.temperature = (F32) ((readBuf[4] << 8) + readBuf[5]);
-                          this->outputInfo[i].feedback.current     = (F32) ((readBuf[6] << 8) + readBuf[7]);
+                          this->outputInfo[i].feedback.current     = ((F32) ((readBuf[6] << 8) + readBuf[7]) - 32767.0) / 891.0;
                           this->outputInfo[i].feedback.fbSec       = fbTime.getSeconds();
                           this->outputInfo[i].feedback.fbUsec      = fbTime.getUSeconds();
                           
@@ -548,6 +674,10 @@ namespace Gnc {
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI
                                     * this->outputInfo[i].feedback.counts
                                     / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
+
+				  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
+					      i, this->outputInfo[i].feedback.counts,
+					      this->outputInfo[i].feedback.angVel);
                               }
                               else {
                                   U32 countsDiff = 0u;
@@ -561,8 +691,12 @@ namespace Gnc {
 
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI * countsDiff
                                     / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
-                              }
 
+				  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
+					      i, countsDiff,
+					      this->outputInfo[i].feedback.angVel);
+                              }
+			  
                               // TODO(mereweth) - run rate estimator here
 
                               switch (i) {
@@ -653,18 +787,56 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-      if (ARMING == this->armedState) {
-          if (!paramsInited) {
-              this->armedState = DISARMED;
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
+      }
+
+      // NOTE(mereweth) - don't increment cycle count here; do that in motor_handler
+      const bool didFlySafeCycleTimeout = (this->flySafeCheckCycles &&
+					   (this->flySafeCycles > this->flySafeMaxElapsedCycles));
+      const bool didFlySafeTimeTimeout = (this->flySafeCheckTime &&
+					  (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
+									   this->flySafeLastTime)));
+      if ((DISARMED != this->armedState)  &&
+	  (!paramsInited || !hwEnabled ||
+	   didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe)) {
+	
+  	  if (ARMING == this->armedState) {
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-              return;
-          }
-          if (++this->armCount > AA_ARM_COUNT) {
+ 	  }
+	  // TODO(mereweth) - send out min cmd here before disarming?
+	  this->armedState = DISARMED;
+	  if (!this->paramsInited) {
+	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+	  }
+	  if (!hwEnabled) {
+	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  if (didFlySafeCycleTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
+	  }
+	  if (didFlySafeTimeTimeout) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
+	  }
+	  if (!this->flySafe) {
+	      this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
+	  }
+	  return;
+      }
+      
+      if (ACTADAP_SCHED_CONTEXT_TLM == context) {
+  	  this->tlmWrite_ACTADAP_ArmState(static_cast<ArmStateTlm>(this->armedState));
+	  this->tlmWrite_ACTADAP_HwEnabled(hwEnabled);
+      }
+      else if ((ACTADAP_SCHED_CONTEXT_ARM == context) &&
+	       (ARMING == this->armedState)) {
+          if (++this->armCount > ACTADAP_ARM_COUNT) {
               this->armedState = ARMED;
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_OK);
               return;
           }
-          for (U32 i = 0; i < FW_MIN(this->numActuators, AA_MAX_ACTUATORS); i++) {
+          for (U32 i = 0; i < FW_MIN(this->numActuators, ACTADAP_MAX_ACTUATORS); i++) {
               switch (this->outputInfo[i].type) {
                   case OUTPUT_UNSET:
                   {
@@ -726,20 +898,10 @@ namespace Gnc {
         bool armState
     )
   {
-      if (!this->paramsInited) {
-          this->armedState = DISARMED;
-          this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-          return;
+      bool hwEnabled = true;
+      if (this->isConnected_outputEnable_OutputPort(0)) {
+	  this->outputEnable_out(0, hwEnabled);
       }
-      // can only arm if disarmed
-      if ((DISARMED != this->armedState) && armState) {
-          this->log_WARNING_LO_ACTADAP_AlreadyArmed();
-          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-          return;
-      }
-
-      // if we get here, either we are disarmed now, or about to disarm
-      this->armCount = 0u;
 
       // can disarm immediately - change this if hardware changes
       if (!armState) {
@@ -747,6 +909,28 @@ namespace Gnc {
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
           return;
       }
+      // after this point, we are trying to arm
+
+      if (!this->paramsInited || !hwEnabled) {
+  	  this->armedState = DISARMED;
+	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+	  if (!this->paramsInited) {
+	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+	  }
+	  if (!hwEnabled) {
+	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+	  }
+	  return;
+      }
+      // can only arm if disarmed
+      if (DISARMED != this->armedState) {
+          this->log_WARNING_LO_ACTADAP_AlreadyArmed();
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+          return;
+      }
+
+      // if we get here, either we are disarmed now, or about to disarm
+      this->armCount = 0u;
 
       // if we get here, we are disarmed, and want to arm
       this->armedState = ARMING;

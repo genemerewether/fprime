@@ -33,12 +33,6 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif // BUILD_DSPAL
 
-#if defined BUILD_SDFLIGHT || defined BUILD_DSPAL || defined BUILD_TIR5
-#define BIG_ENDIAN
-#else // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
-#define LITTLE_ENDIAN
-#endif // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
-
 #undef DEBUG_PRINT
 #define DEBUG_PRINT(x,...)
 
@@ -136,7 +130,8 @@ namespace Drv {
                     // Offset returned data by one half-word
                     readBufOffset = readBuf + 2;
 #endif
-                    //DEBUG_PRINT("MPU9250 before read\n");
+                    DEBUG_PRINT("MPU9250 before read at %u.%06u\n",
+                                ImuNow.getSeconds(), ImuNow.getUSeconds());
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     timer.stop();
                     DEBUG_PRINT("reg read %d bytes in %u usec\n",
@@ -160,20 +155,7 @@ namespace Drv {
                     NATIVE_UINT_TYPE sIdx;
                     NATIVE_UINT_TYPE sBase = 1;
                     // read starts at index 1 in read buffer
-#ifdef LITTLE_ENDIAN // little-endian - x86
-                    for (sIdx = 0; sIdx < 3; sIdx++) {
-                        accel[sIdx] = ((int16_t) readBufOffset[2*sIdx+1+sBase]) << 8 |
-                                        (int16_t) readBufOffset[2*sIdx+sBase];
-                    }
-                    sBase += 6;
-                    temp = ((int16_t) readBufOffset[1+sBase]) << 8 |
-                           (int16_t) readBufOffset[sBase];
-                    sBase += 2;
-                    for (sIdx = 0; sIdx < 3; sIdx++) {
-                        gyro[sIdx] = ((int16_t) readBufOffset[2*sIdx+1+sBase]) << 8 |
-                                        (int16_t) readBufOffset[2*sIdx+sBase];
-                    }
-#else // big endian - ARM & Hexagon
+
                     for (sIdx = 0; sIdx < 3; sIdx++) {
                         accel[sIdx] = ((int16_t) readBufOffset[2*sIdx+sBase]) << 8 |
                                         (int16_t) readBufOffset[1+2*sIdx+sBase];
@@ -186,7 +168,6 @@ namespace Drv {
                         gyro[sIdx] = ((int16_t) readBufOffset[2*sIdx+sBase]) << 8 |
                                         (int16_t) readBufOffset[1+2*sIdx+sBase];
                     }
-#endif
 
                     F64 accelX = m_accelRawToMS2 * (float) accel[0];
                     F64 accelY = m_accelRawToMS2 * (float) accel[1];
@@ -244,12 +225,7 @@ namespace Drv {
                     readBufObj.setsize(3);
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     readBufObj.setsize(2); // reset for everyone else
-                    // TODO(mereweth) - add endianness check to Fw - FIFO_COUNT_H first
-#ifdef LITTLE_ENDIAN // little-endian - x86
-                    uint16_t fifoLen = ((uint16_t) readBuf[2]) << 8 | (uint16_t) readBuf[1];
-#else // big endian - ARM & Hexagon
                     uint16_t fifoLen = ((uint16_t) readBuf[1]) << 8 | (uint16_t) readBuf[2];
-#endif
                     // get config execution time
                     timer.stop();
                     DEBUG_PRINT("FIFO count %u; low 0x%x, high 0x%x; calc in %u usec\n",

@@ -2,6 +2,12 @@
     <parameter id="0" set_opcode="20" save_opcode="21" name="numActuators" data_type="U32" >
       <comment>number of actuators</comment>
     </parameter>
+    <parameter id="1" set_opcode="22" save_opcode="23" name="flySafeCycles" data_type="U32" default="10000">
+      <comment>max number of cycles since last flysafe port call; 0 to disable check</comment>
+    </parameter>
+    <parameter id="2" set_opcode="24" save_opcode="25" name="flySafeTime" data_type="F64" default="10.0">
+      <comment>max elapsed time (seconds) since last flysafe port call; negative to disable check</comment>
+    </parameter>
 
     <parameter id="10" set_opcode="40" save_opcode="41" name="a1_addr" data_type="U32" >
       <comment>actuator 1 address (I2C)</comment>
@@ -81,16 +87,42 @@
       <comment>actuator 6 which param set</comment>
     </parameter>
 
+    <parameter id="70" set_opcode="160" save_opcode="161" name="a7_addr" data_type="U32" >
+      <comment>actuator 7 address (I2C)</comment>
+    </parameter>
+    <parameter id="75" set_opcode="170" save_opcode="171" name="a7_reverse" data_type="bool" >
+      <comment>actuator 7 reverse direction flag</comment>
+    </parameter>
+    <parameter id="76" set_opcode="172" save_opcode="173" name="a7_type" data_type="U8" >
+      <comment>actuator 7 type</comment>
+    </parameter>
+    <parameter id="78" set_opcode="176" save_opcode="177" name="a7_parmSlot" data_type="U8" >
+      <comment>actuator 7 which param set</comment>
+    </parameter>
+
+    <parameter id="80" set_opcode="180" save_opcode="181" name="a8_addr" data_type="U32" >
+      <comment>actuator 8 address (I2C)</comment>
+    </parameter>
+    <parameter id="85" set_opcode="190" save_opcode="191" name="a8_reverse" data_type="bool" >
+      <comment>actuator 8 reverse direction flag</comment>
+    </parameter>
+    <parameter id="86" set_opcode="192" save_opcode="193" name="a8_type" data_type="U8" >
+      <comment>actuator 8 type</comment>
+    </parameter>
+    <parameter id="88" set_opcode="196" save_opcode="197" name="a8_parmSlot" data_type="U8" >
+      <comment>actuator 8 which param set</comment>
+    </parameter>
+
     <parameter id="100" set_opcode="220" save_opcode="221" name="p1_minCmd" data_type="F64" >
       <comment>parm slot 1 minimum command</comment>
     </parameter>
     <parameter id="101" set_opcode="222" save_opcode="223" name="p1_maxCmd" data_type="F64" >
       <comment>parm slot 1 maximum command</comment>
     </parameter>
-    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="U64" >
+    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="I64" >
       <comment>parm slot 1 minimum output (interpret as float for some types)</comment>
     </parameter>
-    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="U64" >
+    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="I64" >
       <comment>parm slot 1 maximum output (interpret as float for some types)</comment>
     </parameter>
     <parameter id="104" set_opcode="228" save_opcode="229" name="p1_counts" data_type="U32" >

@@ -1,0 +1,11 @@
+<parameters>
+    <parameter id="0" set_opcode="20" save_opcode="21" name="w_x" data_type="F64" default="0.0">
+      <comment>rotational x axis to parameterize about</comment>
+    </parameter>
+    <parameter id="1" set_opcode="22" save_opcode="23" name="w_y" data_type="F64" default="0.0">
+      <comment>rotational y axis to parameterize about</comment>
+    </parameter>
+    <parameter id="2" set_opcode="24" save_opcode="25" name="w_z" data_type="F64" default="1.0">
+      <comment>rotational z axis to parameterize about</comment>
+    </parameter>
+</parameters>

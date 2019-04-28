@@ -634,6 +634,25 @@ namespace Fw {
 
     }
 
+    SerializeStatus SerializeBufferBase::copyRawOffset(SerializeBufferBase& dest, NATIVE_UINT_TYPE size) {
+        // make sure there is sufficient size in destination
+        if (dest.getBuffCapacity() < size + dest.getBuffLength()) {
+            return FW_SERIALIZE_NO_ROOM_LEFT;
+        }
+        // make sure there is sufficient buffer in source
+        if (this->getBuffLeft() < size) {
+            return FW_DESERIALIZE_SIZE_MISMATCH;
+        }
+
+        // otherwise, serialize bytes to destination without writing length
+        SerializeStatus stat = dest.serialize(&this->getBuffAddr()[this->m_deserLoc], size, true);
+        if (stat == FW_SERIALIZE_OK) {
+            this->m_deserLoc += size;
+        }
+        return stat;
+
+    }
+
     SerializeStatus SerializeBufferBase::deserializeNoCopy(ExternalSerializeBuffer& val) {
         SerializeStatus stat = FW_SERIALIZE_OK;
 

@@ -74,7 +74,7 @@
       <comment>FTAveB2</comment>
     </parameter>
     <parameter id="0x10" set_opcode="0x20" save_opcode="0x21"
-	       name="R11" data_type="F32" default="0" >
+	       name="R11" data_type="F32" default="1" >
       <comment>R11</comment>
     </parameter>
     <parameter id="0x11" set_opcode="0x22" save_opcode="0x23"
@@ -82,7 +82,7 @@
       <comment>R12</comment>
     </parameter>
     <parameter id="0x12" set_opcode="0x24" save_opcode="0x25"
-	       name="R13" data_type="F32" default="-1" >
+	       name="R13" data_type="F32" default="0" >
       <comment>R13</comment>
     </parameter>
     <parameter id="0x13" set_opcode="0x26" save_opcode="0x27"
@@ -98,7 +98,7 @@
       <comment>R23</comment>
     </parameter>
     <parameter id="0x16" set_opcode="0x2C" save_opcode="0x2D"
-	       name="R31" data_type="F32" default="1" >
+	       name="R31" data_type="F32" default="0" >
       <comment>R31</comment>
     </parameter>
     <parameter id="0x17" set_opcode="0x2E" save_opcode="0x2F"
@@ -106,7 +106,7 @@
       <comment>R32</comment>
     </parameter>
     <parameter id="0x18" set_opcode="0x30" save_opcode="0x31"
-	       name="R33" data_type="F32" default="0" >
+	       name="R33" data_type="F32" default="1" >
       <comment>R33</comment>
     </parameter>
 
@@ -137,7 +137,7 @@
       <comment>BFZ</comment>
     </parameter>
     <parameter id="0x53" set_opcode="0x76" save_opcode="0x77"
-               name="PX" data_type="F32" default="11.5" >
+               name="PX" data_type="F32" default="0" >
       <comment>PX</comment>
     </parameter>
     <parameter id="0x54" set_opcode="0x78" save_opcode="0x79"
@@ -145,7 +145,7 @@
       <comment>PY</comment>
     </parameter>
     <parameter id="0x55" set_opcode="0x7A" save_opcode="0x7B"
-               name="PZ" data_type="F32" default="92" >
+               name="PZ" data_type="F32" default="0" >
       <comment>PZ</comment>
     </parameter>
 

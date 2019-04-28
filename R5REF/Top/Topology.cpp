@@ -281,6 +281,8 @@ void manualConstruct() {
 
     hlRouter_ptr->set_HLPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(8));
+
+    hlRouter_ptr->set_HLPortsOut_OutputPort(9, actuatorAdapter_ptr->get_flySafe_InputPort(0));
 }
 
 void constructApp() {

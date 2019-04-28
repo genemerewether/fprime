@@ -13,8 +13,6 @@ LINK_LIB_FLAGS := rcs
 LIBRARY_TO :=
 POST_LINK_LIB := ranlib
 
-FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
-
 LINK_BIN := $(CXX)
 LINK_BIN_FLAGS := $(FP_FLAGS) -rdynamic -z muldefs $(LIBS)
 
@@ -31,21 +29,26 @@ LINK_LIBS :=    --sysroot=$(HEXAGON_ARM_SYSROOT) \
 OPT_SPEED := -O3 -funroll-loops
 DEBUG := -g3
 
+LINARO_GNU_COMMON := -D SOC_$(TARGET_SOC)
+
 LINUX_GNU_CFLAGS := $(LINUX_FLAGS_COMMON) \
 			$(COMMON_DEFINES) \
 			$(GNU_CFLAGS_COMMON) \
-			$(FP_FLAGS)
+			$(FP_FLAGS) \
+	        $(LINARO_GNU_COMMON)
 
 LINUX_GNU_CXXFLAGS :=	$(LINUX_FLAGS_COMMON) \
 			-std=c++11 \
 			$(COMMON_DEFINES) \
 			$(GNU_CXXFLAGS_COMMON) \
-			$(FP_FLAGS)
+			$(FP_FLAGS) \
+	        $(LINARO_GNU_COMMON)
 
 COVERAGE := -fprofile-arcs -ftest-coverage
 
 LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 			$(COMMON_INCLUDES) \
+			--sysroot=$(HEXAGON_ARM_SYSROOT) \
 			-I$(HEXAGON_SDK_ROOT)/incs \
 			-I$(HEXAGON_SDK_ROOT)/incs/stddef \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem/inc \
@@ -53,8 +56,7 @@ LINUX_GNU_INCLUDES := 	$(LINUX_INCLUDES_COMMON) \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/rpcmem \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/adspmsgd/ship/UbuntuARM_Debug \
 			-I$(HEXAGON_SDK_ROOT)/libs/common/remote/ship/UbuntuARM_Debug \
-			-I$(HEXAGON_SDK_ROOT)/incs/stddef \
-			$(INCLUDE_ARM_SYSROOT_CMD)
+			-I$(HEXAGON_SDK_ROOT)/incs/stddef
 
 DUMP = $(BUILD_ROOT)/mk/bin/empty.sh
 

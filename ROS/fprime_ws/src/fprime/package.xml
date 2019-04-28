@@ -24,9 +24,11 @@
   <depend>mav_planning_msgs</depend>
   <depend>rosgraph_msgs</depend>
   <depend>image_transport</depend>
+  <depend>fprime_msgs</depend>
+  
+  <depend>tf</depend>
   
   <depend>actionlib</depend>
-  <depend>actionlib_msgs</depend>
 
   <!-- for manipulation -->
   <depend>trac_ik_lib</depend>

@@ -103,8 +103,8 @@ namespace Gnc {
 
       struct I2CMetadata {
           U32 addr;
-          U32 minOut;
-          U32 maxOut;
+          I32 minOut;
+          I32 maxOut;
           bool reverse;
           FeedbackMetadata fbMeta;
           CmdOutputMapMetadata cmdOutputMap;
@@ -121,7 +121,14 @@ namespace Gnc {
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
-
+    
+      //! Handler implementation for flySafe
+      //!
+      void flySafe_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::BoolStamped &BoolStamped 
+      );
+    
       //! Handler implementation for motor
       //!
       void motor_handler(
@@ -178,7 +185,7 @@ namespace Gnc {
       struct Feedback {
           U32 cmdSec;
           U32 cmdUsec;
-          U32 cmd;
+          I32 cmd;
           F64 cmdIn;
           U32 fbSec;
           U32 fbUsec;
@@ -196,7 +203,7 @@ namespace Gnc {
               I2CMetadata i2cMeta;
           };
           Feedback feedback;
-      } outputInfo[AA_MAX_ACTUATORS];
+      } outputInfo[ACTADAP_MAX_ACTUATORS];
 
       enum ArmingState {
           DISARMED,
@@ -212,6 +219,16 @@ namespace Gnc {
 
       U32 numActuators;
 
+      bool flySafe;
+
+      bool flySafeCheckCycles;
+      U32 flySafeCycles;
+      U32 flySafeMaxElapsedCycles;
+
+      bool flySafeCheckTime;    
+      Fw::Time flySafeLastTime;
+      Fw::Time flySafeMaxElapsedTime;
+    
       bool paramsInited;
 
     };

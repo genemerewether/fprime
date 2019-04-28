@@ -146,6 +146,15 @@ namespace Gnc {
       DEBUG_PRINT("IMU state update\n");
     
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();
+      // TODO(mereweth) - EVR about state update from future
+      if (h.getstamp() > this->getTime()) {
+  	  DEBUG_PRINT("state update from future: %u.%06u vs. %u.%06u\n",
+		      h.getstamp().getSeconds(),
+		      h.getstamp().getUSeconds(),
+		      this->getTime().getSeconds(),
+		      this->getTime().getUSeconds());
+  	  return;
+      }
       
       //this->seq = h.getseq();
 
@@ -185,14 +194,14 @@ namespace Gnc {
   {
       //TODO(mereweth) - report uninitialized status if params not good
     
-      if ((context == ATTFILTER_SCHED_CONTEXT_POS) ||
-          (context == ATTFILTER_SCHED_CONTEXT_ATT)) {
+      if (context == ATTFILTER_SCHED_CONTEXT_FILT) {
           using namespace ROS::geometry_msgs;
           this->attFilter.PropagateState();
           Eigen::Vector3d x_w(0, 0, 0);
           Eigen::Quaterniond w_q_b(1, 0, 0, 0);
           Eigen::Vector3d v_b(0, 0, 0);
           Eigen::Vector3d omega_b(0, 0, 0);
+	  // TODO(mereweth) - get time of latest state and fill header with that
           this->attFilter.GetState(&x_w,
                                   &w_q_b,
                                   &v_b,

@@ -204,7 +204,9 @@ namespace SnapdragonFlight {
                 if (m_callbackTimeout == 0) {
                     stat = 0;
 #ifdef BUILD_SDFLIGHT
+#ifndef SOC_8096
                     stat = m_cameraPtr->takePicture();
+#endif
 #endif // BUILD_SDFLIGHT
                     if (stat == 0) {
                         m_callbackTimeout = static_cast<NATIVE_UINT_TYPE>(HIRESCAM_IMG_WAIT_SEC);

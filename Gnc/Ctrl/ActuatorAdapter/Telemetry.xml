@@ -24,27 +24,27 @@
       </comment>
     </channel>
 
-    <channel id="10" name="ACTADAP_Cmd0" data_type="U32">
+    <channel id="10" name="ACTADAP_Cmd0" data_type="I32">
       <comment>
       </comment>
     </channel>
-    <channel id="11" name="ACTADAP_Cmd1" data_type="U32">
+    <channel id="11" name="ACTADAP_Cmd1" data_type="I32">
       <comment>
       </comment>
     </channel>
-    <channel id="12" name="ACTADAP_Cmd2" data_type="U32">
+    <channel id="12" name="ACTADAP_Cmd2" data_type="I32">
       <comment>
       </comment>
     </channel>
-    <channel id="13" name="ACTADAP_Cmd3" data_type="U32">
+    <channel id="13" name="ACTADAP_Cmd3" data_type="I32">
       <comment>
       </comment>
     </channel>
-    <channel id="14" name="ACTADAP_Cmd4" data_type="U32">
+    <channel id="14" name="ACTADAP_Cmd4" data_type="I32">
       <comment>
       </comment>
     </channel>
-    <channel id="15" name="ACTADAP_Cmd5" data_type="U32">
+    <channel id="15" name="ACTADAP_Cmd5" data_type="I32">
       <comment>
       </comment>
     </channel>
@@ -72,5 +72,19 @@
     <channel id="25" name="ACTADAP_CmdVel5" data_type="F32" format_string="%.3f rad">
       <comment>
       </comment>
+    </channel>
+    
+    <channel id="30" name="ACTADAP_ArmState" data_type="ENUM">
+        <enum name="ArmStateTlm">
+            <item name="DISARMED"/>
+            <item name="ARMING"/>
+            <item name="ARMED"/>
+	</enum>
+        <comment>
+        </comment>
+    </channel>
+    <channel id="31" name="ACTADAP_HwEnabled" data_type="bool">
+        <comment>
+        </comment>
     </channel>
 </telemetry>

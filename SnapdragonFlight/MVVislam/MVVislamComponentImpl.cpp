@@ -24,6 +24,11 @@
 #include <Eigen/Geometry>
 #include <math.h>
 
+#include <Os/File.hpp>
+
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace SnapdragonFlight {
 
   // ----------------------------------------------------------------------
@@ -44,6 +49,9 @@ namespace SnapdragonFlight {
 #endif
       ,m_initialized(false)
       ,m_activated(false)
+      ,m_errorCode(0u)
+      ,w_q_b(0.0, 0.0, 0.0, 1.0)
+      ,x_b(0.0, 0.0, 0.0)
   {
 
   }
@@ -66,7 +74,9 @@ namespace SnapdragonFlight {
   void MVVislamComponentImpl ::
     preamble(void)
   {
+#ifndef SOC_8096
       initHelper();
+#endif
   }
 
 
@@ -153,16 +163,54 @@ namespace SnapdragonFlight {
         ROS::sensor_msgs::ImuNoCov &imu
     )
   {
+      //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+      ROS::std_msgs::Header h = imu.getheader();
+      Fw::Time stamp = h.getstamp();
+      const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
+      Os::File::Status stat = Os::File::OTHER_ERROR;
+      Os::File file;
+      stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+      if (stat != Os::File::OP_OK) {
+	  // TODO(mereweth) - EVR
+	  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+	  return;
+      }
+      char buff[255];
+      NATIVE_INT_TYPE size = sizeof(buff);
+      stat = file.read(buff, size, false);
+      file.close();
+      if ((stat != Os::File::OP_OK) ||
+	  !size) {
+	  // TODO(mereweth) - EVR
+	  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+	  return;
+      }
+      // Make sure buffer is null-terminated:
+      buff[sizeof(buff)-1] = 0;
+      const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+      if (-walltimeDspLeadUs > usecDsp) {
+	  // TODO(mereweth) - EVR; can't have difference greater than time
+	  printf("linux-dsp diff %lld negative; greater than message time %lu\n",
+		 walltimeDspLeadUs, usecDsp);
+	  return;
+      }
+      const I64 usecRos = usecDsp + walltimeDspLeadUs;
+      stamp.set((U32) (usecRos / 1000LL / 1000LL),
+		(U32) (usecRos % (1000LL * 1000LL)));
+      h.setstamp(stamp);
+      imu.setheader(h);
+
+      //TODO(mereweth) - END convert time instead using HLTimeConv
+    
       if (m_initialized && m_activated) {
-          Fw::Time t = imu.getheader().getstamp();
-          I64 imu_timestamp_ns = t.getSeconds() * 1000LL * 1000LL * 1000LL
-                                 + t.getUSeconds() * 1000LL;
 #ifdef BUILD_SDFLIGHT
-          mvVISLAM_AddAccel(m_mvVISLAMPtr, imu_timestamp_ns,
+          mvVISLAM_AddAccel(m_mvVISLAMPtr, usecRos * 1000LL,
                             imu.getlinear_acceleration().getx(),
                             imu.getlinear_acceleration().gety(),
                             imu.getlinear_acceleration().getz());
-          mvVISLAM_AddGyro(m_mvVISLAMPtr, imu_timestamp_ns,
+          mvVISLAM_AddGyro(m_mvVISLAMPtr, usecRos * 1000LL,
                            imu.getangular_velocity().getx(),
                            imu.getangular_velocity().gety(),
                            imu.getangular_velocity().getz());
@@ -184,13 +232,37 @@ namespace SnapdragonFlight {
       if (m_initialized && m_activated) {
 #ifdef BUILD_SDFLIGHT
           Fw::Time t = Image.getheader().getstamp();
-          I64 cam_timestamp_ns = t.getSeconds() * 1000LL * 1000LL * 1000LL
-                                 + t.getUSeconds() * 1000LL;
-          mvVISLAM_AddImage(m_mvVISLAMPtr, cam_timestamp_ns, (U8*) (data.getdata()));
+          I64 usecRos = t.getSeconds() * 1000LL * 1000LL + t.getUSeconds();
+          mvVISLAM_AddImage(m_mvVISLAMPtr, usecRos * 1000LL, (U8*) (data.getdata()));
           mvVISLAMPose vio_pose = mvVISLAM_GetPose(m_mvVISLAMPtr);
+	  
+	  /*
+	    - \b 0:  Reset: cov not pos definite
+	    - \b 1:  Reset: IMU exceeded range
+	    - \b 2:  Reset: IMU bandwidth too low
+	    - \b 3:  Reset: not stationary at initialization
+	    - \b 4:  Reset: no features for x seconds
+	    - \b 5:  Reset: insufficient constraints from features
+	    - \b 6:  Reset: failed to add new features
+	    - \b 7:  Reset: exceeded instant velocity uncertainty
+	    - \b 8:  Reset: exceeded velocity uncertainty over window
+	    - \b 10:  Dropped IMU samples
+	    - \b 11:  Intrinsic camera cal questionable
+	    - \b 12:  Insufficient number of good features to initialize
+	    - \b 13:  Dropped camera frame
+	    - \b 14:  Dropped GPS velocity sample
+	    - \b 15:  Sensor measurements with uninitialized time stamps or uninitialized uncertainty (set to 0)
+	  */
 
-          {
+	  //TODO(mereweth) - move these after transform
+	  this->x_b.setx(vio_pose.bodyPose.matrix[0][3]);
+	  this->x_b.sety(vio_pose.bodyPose.matrix[1][3]);
+	  this->x_b.setz(vio_pose.bodyPose.matrix[2][3]);
+	  
+	  this->m_errorCode = vio_pose.errorCode;
+          if (!this->m_errorCode) {
               using namespace Eigen;
+              using namespace ROS::std_msgs;
               using namespace ROS::mav_msgs;
               using namespace ROS::geometry_msgs;
               Vector3f grav(vio_pose.gravity[0], vio_pose.gravity[1], vio_pose.gravity[2]);
@@ -218,8 +290,53 @@ namespace SnapdragonFlight {
               const Quaternionf odom_to_imu_q(odom_to_imu.rotation());
               const Vector3f odom_to_imu_v(odom_to_imu.translation());
 
+	      //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+	      Os::File::Status stat = Os::File::OTHER_ERROR;
+	      Os::File file;
+	      stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+	      if (stat != Os::File::OP_OK) {
+		  // TODO(mereweth) - EVR
+		  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+		  return;
+	      }
+	      char buff[255];
+	      NATIVE_INT_TYPE size = sizeof(buff);
+	      stat = file.read(buff, size, false);
+	      file.close();
+	      if ((stat != Os::File::OP_OK) ||
+		  !size) {
+		  // TODO(mereweth) - EVR
+		  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+		  return;
+	      }
+	      // Make sure buffer is null-terminated:
+	      buff[sizeof(buff)-1] = 0;
+	      I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+	      if (walltimeDspLeadUs > usecRos) {
+		  // TODO(mereweth) - EVR; can't have difference greater than time
+		  printf("linux-dsp diff %lld greater than message time %lu\n",
+			 walltimeDspLeadUs, usecRos);
+		  return;
+	      }
+	      I64 usecDsp = usecRos - walltimeDspLeadUs;
+	      Fw::Time convTime(TB_WORKSTATION_TIME,
+				0,
+				(U32) (usecDsp / 1000 / 1000),
+				(U32) (usecDsp % (1000 * 1000)));
+
+	      DEBUG_PRINT("usecRos %lld, lead %lld, convTime %u.%06u\n",
+			  usecRos,
+			  walltimeDspLeadUs,
+			  convTime.getSeconds(),
+			  convTime.getUSeconds());
+
+	      //TODO(mereweth) - END convert time instead using HLTimeConv
+	      
               ImuStateUpdateNoCov update(
-                           Image.getheader(),
+			   Header(Image.getheader().getseq(),
+				  convTime,
+				  0),
                            0, // TODO(mereweth) - child id
                            Pose(Point(odom_to_imu_v(0),
                                       odom_to_imu_v(1),
@@ -241,9 +358,9 @@ namespace SnapdragonFlight {
               ); // end ImuStateUpdate constructor
 
               if (isConnected_ImuStateUpdate_OutputPort(0)) {
-                  ImuStateUpdate_out(0, update);
+		  ImuStateUpdate_out(0, update);
               }
-          }
+          } // if !errorCode
 
           int num_points = mvVISLAM_HasUpdatedPointCloud(m_mvVISLAMPtr);
           //std::vector<mvVISLAMMapPoint> map_points(num_points, {0});
@@ -262,7 +379,8 @@ namespace SnapdragonFlight {
         NATIVE_UINT_TYPE context
     )
   {
-    // TODO
+      tlmWrite_MVVISLAM_ErrorCode(m_errorCode);
+      tlmWrite_MVVISLAM_x_b(x_b);
   }
 
   void MVVislamComponentImpl ::
@@ -317,6 +435,24 @@ namespace SnapdragonFlight {
       }
       else {
           m_activated = false;
+	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+  }
+  
+  void MVVislamComponentImpl ::
+    MVVISLAM_Reset_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq
+    )
+  {
+      if (m_initialized) {
+#ifdef BUILD_SDFLIGHT
+  	  mvVISLAM_Reset(m_mvVISLAMPtr, true);
+#endif //BUILD_SDFLIGHT
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+      }
+      else {
+	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
       }
   }
 

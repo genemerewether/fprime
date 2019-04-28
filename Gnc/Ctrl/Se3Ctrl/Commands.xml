@@ -1,0 +1,70 @@
+<commands>
+    <command kind="sync" opcode="0" mnemonic="SE3CTRL_SetPosCtrlMode">
+        <comment>
+        Set position controller mode
+        </comment>
+        <args>
+            <arg name="mode" type="ENUM">
+                <enum name="PosCtrlMode">
+                    <item name="POS_LINVEL"/>
+                    <item name="LINVEL"/>
+                    <item name="POSCTRL_DISABLED"/>
+                </enum>
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="1" mnemonic="SE3CTRL_SetAttCtrlMode">
+        <comment>
+        Set attitude controller mode
+        </comment>
+        <args>
+            <arg name="mode" type="ENUM">
+                <enum name="AttCtrlMode">
+                    <item name="ATT_ATTRATE"/>
+                    <item name="RPRATE_YAW"/>
+                    <item name="ATTRATE"/>
+                    <item name="YAW_ONLY"/>
+                    <item name="ATTCTRL_DISABLED"/>
+                </enum>
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="2" mnemonic="SE3CTRL_LinearSetpoint">
+        <args>
+            <arg name="x_w__x" type="F64">
+            </arg>
+            <arg name="x_w__y" type="F64">
+            </arg>
+            <arg name="x_w__z" type="F64">
+            </arg>
+            <arg name="v_w__x" type="F64">
+            </arg>
+            <arg name="v_w__y" type="F64">
+            </arg>
+            <arg name="v_w__z" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="3" mnemonic="SE3CTRL_AngularSetpoint">
+        <args>
+            <arg name="w_q_b__x" type="F64">
+            </arg>
+            <arg name="w_q_b__y" type="F64">
+            </arg>
+            <arg name="w_q_b__z" type="F64">
+            </arg>
+            <arg name="w_q_b__w" type="F64">
+            </arg>
+            <arg name="omega_b__x" type="F64">
+            </arg>
+            <arg name="omega_b__y" type="F64">
+            </arg>
+            <arg name="omega_b__z" type="F64">
+            </arg>
+         </args>
+    </command>
+    <command kind="sync" opcode="4" mnemonic="SE3CTRL_InitParams">
+      <args>
+      </args>
+    </command>
+</commands>

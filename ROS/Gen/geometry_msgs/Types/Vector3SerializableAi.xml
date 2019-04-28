@@ -1,7 +1,7 @@
 <serializable name="Vector3" namespace="ROS::geometry_msgs">
   <members>
-    <member name="x" type="F64"/>
-    <member name="y" type="F64"/>
-    <member name="z" type="F64"/>
+    <member name="x" type="F64" format="%.4f" />
+    <member name="y" type="F64" format="%.4f" />
+    <member name="z" type="F64" format="%.4f" />
   </members>
 </serializable>

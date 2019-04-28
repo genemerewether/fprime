@@ -119,6 +119,13 @@ namespace SnapdragonFlight {
           const U32 cmdSeq, /*!< The command sequence number*/
           bool enable 
       );
+    
+      //! Implementation for MVVISLAM_Reset command handler
+      //! 
+      void MVVISLAM_Reset_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
       
       void initHelper();
 
@@ -129,6 +136,12 @@ namespace SnapdragonFlight {
       bool m_initialized;
       
       bool m_activated;
+
+      U32 m_errorCode;
+
+      ROS::geometry_msgs::Quaternion w_q_b;
+    
+      ROS::geometry_msgs::Vector3 x_b;
 
     };
 
