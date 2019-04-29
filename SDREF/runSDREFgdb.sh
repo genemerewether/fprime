@@ -17,7 +17,7 @@ screen -r "SDREF" -X stuff "insmod /golden/dsp-offset_taskset_cpustat_mqueue.ko 
 screen -r "SDREF" -X stuff "export ROS_HOME=/eng/ros\n"
 screen -r "SDREF" -X stuff ". /eng/load/set_ip_snap.bash || true\n"
 screen -r "SDREF" -X stuff ". /opt/ros/indigo/setup.bash || true\n"
-screen -r "SDREF" -X stuff "pgrep roscore || roscore &\n"
+screen -r "SDREF" -X stuff "rostopic list || roscore &\n"
 screen -r "SDREF" -X stuff "gdb /golden/SDREF0\n"
 screen -r "SDREF" -X stuff "handle SIGILL pass noprint nostop\n"
 screen -r "SDREF" -X stuff "r -p 50000 -x 50010 -u 50020 -z localhost:50030 -a localhost -s"

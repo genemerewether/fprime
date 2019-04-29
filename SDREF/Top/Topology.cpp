@@ -367,7 +367,7 @@ void manualConstruct() {
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
-    hexRouter_ptr->set_HexPortsOut_OutputPort(1, sdRosIface_ptr->get_Imu_InputPort(0));
+    hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
