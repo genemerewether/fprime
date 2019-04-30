@@ -22,6 +22,8 @@
 
 #include "Gnc/Utils/ImuProc/ImuProcComponentAc.hpp"
 
+#include "quest_gnc/utils/filter.h"
+
 namespace Gnc {
 
   class ImuProcComponentImpl :
