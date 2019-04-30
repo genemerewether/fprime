@@ -60,6 +60,7 @@ Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
+Gnc::ImuProcComponentImpl* imuProc_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
 Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
@@ -236,6 +237,12 @@ void allocComps() {
 #endif
 ;
  
+    imuProc_ptr = new Gnc::ImuProcComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("IMUPROC")
+#endif
+;
+
     leeCtrl_ptr = new Gnc::LeeCtrlComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("LEECTRL")
@@ -324,8 +331,7 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
-    // TODO(mereweth) - replace mpu9250 with imuproc
-    mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
+    imuProc_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
@@ -357,12 +363,8 @@ void manualConstruct(void) {
     rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
     imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
 
-    // TODO(mereweth) - replace mpu9250 with imuproc
-    mpu9250_ptr->set_Imu_OutputPort(0, imuDataPasser_ptr->get_DataIn_InputPort(0));
+    imuProc_ptr->set_Imu_OutputPort(0, imuDataPasser_ptr->get_DataIn_InputPort(0));
     imuDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
-
-    // TODO(mereweth) - add imuProc
-    //rgDev_ptr->set_RateGroupMemberOut_OutputPort(1, imuProc_ptr->get_sched_InputPort(0));
     
 #ifdef DECOUPLE_ACTUATORS
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
@@ -407,6 +409,7 @@ void constructApp() {
 
     // Initialize the GNC components
     ctrlXest_ptr->init(0);
+    imuProc_ptr->init(0);
     leeCtrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
@@ -448,6 +451,7 @@ void constructApp() {
     fatalHandler_ptr->regCommands();
 
     ctrlXest_ptr->regCommands();
+    imuProc_ptr->regCommands();
     leeCtrl_ptr->regCommands();
     attFilter_ptr->regCommands();
     mixer_ptr->regCommands();
