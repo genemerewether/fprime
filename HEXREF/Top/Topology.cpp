@@ -398,10 +398,10 @@ void constructApp() {
     rgDcplDrv_ptr->init();
 
     // Initialize the rate groups
-    rgDecouple_ptr->init(10, 0);
+    rgDecouple_ptr->init(10, 0); // designed to drop if full
     imuDataPasser_ptr->init(100, 400); // big entries for IMU
-    imuDecouple_ptr->init(10, 20); // just need to serialize cycle port
-    actDecouple_ptr->init(10, 500); // big message queue entry, few entries
+    imuDecouple_ptr->init(100, 20); // just need to serialize cycle port
+    actDecouple_ptr->init(100, 500); // big message queue entry, few entries
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
     rgTlm_ptr->init(2);

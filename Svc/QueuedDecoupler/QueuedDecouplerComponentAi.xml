@@ -5,7 +5,7 @@
     <comment>A component that gives passive port calls thread safety</comment>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <ports>
-        <port name="DataIn" data_type="Serial" full="drop" kind="async_input" max_number="10" />
+        <port name="DataIn" data_type="Serial" kind="async_input" max_number="10" />
 
         <port name="DataOut" data_type="Serial" kind="output" max_number="10" />
 
