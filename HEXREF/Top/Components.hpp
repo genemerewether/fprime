@@ -26,6 +26,7 @@ void exitTasks(void);
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
+#include <Gnc/Utils/ImuProc/ImuProcComponentImpl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
@@ -40,6 +41,7 @@ extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
 extern Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr;
 extern Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr;
 extern Svc::ActiveDecouplerComponentImpl* actDecouple_ptr;
+extern Svc::RateGroupDriverImpl* rgDcplDrv_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
 extern Svc::PassiveRateGroupImpl* rgPos_ptr;
@@ -54,6 +56,7 @@ extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr;
 extern Gnc::FrameTransformComponentImpl* ctrlXest_ptr;
+extern Gnc::ImuProcComponentImpl* imuProc_ptr;
 extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
 extern Gnc::BasicMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
