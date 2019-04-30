@@ -1,0 +1,6 @@
+<interface name="AckermannDriveStamped" namespace="ROS::ackermann_msgs">
+  <args>
+    <arg name="AckermannDriveStamped" pass_by="reference" type="ROS::ackermann_msgs::AckermannDriveStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/ackermann_msgs/Types/AckermannDriveStampedSerializableAi.xml</import_serializable_type>
+</interface>

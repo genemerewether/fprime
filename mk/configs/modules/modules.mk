@@ -176,6 +176,7 @@ HEXAGON_MODULES := \
 
 QUEST_GNC_ROSIFACE_MODULES := \
 	Gnc/Ctrl/MultirotorCtrlIface \
+	Gnc/Utils/AckermannIface \
 	Gnc/Est/FilterIface
 
 QUEST_GNC_MODULES := \
@@ -214,7 +215,8 @@ ROS_PORT_MODULES := \
 	ROS/Gen/rosgraph_msgs/Ports	 \
 	ROS/Gen/actionlib_msgs/Ports     \
 	ROS/Gen/mav_msgs/Ports		 \
-	ROS/Gen/sensor_msgs/Ports
+	ROS/Gen/sensor_msgs/Ports	 \
+	ROS/Gen/ackermann_msgs/Ports
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
@@ -224,7 +226,8 @@ ROS_TYPE_MODULES := \
 	ROS/Gen/rosgraph_msgs/Types	 \
 	ROS/Gen/actionlib_msgs/Types     \
 	ROS/Gen/mav_msgs/Types		 \
-	ROS/Gen/sensor_msgs/Types
+	ROS/Gen/sensor_msgs/Types	 \
+	ROS/Gen/ackermann_msgs/Types
 
 ROS_TYPE_PORT_MODULES_ALL := \
 	$(ROS_TYPE_MODULES) \
