@@ -165,12 +165,12 @@ void allocComps() {
 ;
 
     NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        0,
-	0,
-        0,
+        Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
         0,
-        Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
+        0,
+        0,
+        0,
         0, // logQueue
         0, // kraitRouter
     };
@@ -324,7 +324,7 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
-    // TODO(mereweth) - replace with imuproc
+    // TODO(mereweth) - replace mpu9250 with imuproc
     mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
@@ -357,16 +357,12 @@ void manualConstruct(void) {
     rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
     imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
 
-    // TODO(mereweth) - replace with imuproc
+    // TODO(mereweth) - replace mpu9250 with imuproc
     mpu9250_ptr->set_Imu_OutputPort(0, imuDataPasser_ptr->get_DataIn_InputPort(0));
     imuDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
 
-    // TODO(mereweth) - put in MD model with time and tlm connections
-    rgDev_ptr->set_RateGroupMemberOut_OutputPort(0, mpu9250_ptr->get_sched_InputPort(0));
     // TODO(mereweth) - add imuProc
     //rgDev_ptr->set_RateGroupMemberOut_OutputPort(1, imuProc_ptr->get_sched_InputPort(0));
-    rgAtt_ptr->set_RateGroupMemberOut_OutputPort(0, imuDataPasser_ptr->get_sched_InputPort(0));
-    rgDcplDrv_ptr->set_CycleOut_OutputPort(1, rgDecouple_ptr->get_CycleIn_InputPort(0));
     
 #ifdef DECOUPLE_ACTUATORS
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
@@ -375,16 +371,14 @@ void manualConstruct(void) {
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
 
-    // TODO(mereweth) - remove rgPos to actAdap connection from MD model
-    rgPos_ptr->set_RateGroupMemberOut_OutputPort(5, actDecouple_ptr->get_DataIn_InputPort(4));
+    rgPos_ptr->set_RateGroupMemberOut_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(4));
     actDecouple_ptr->set_DataOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
 #else
     mixer_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
         
     sigGen_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
 
-    // TODO(mereweth) - remove rgPos to actAdap connection from MD model    
-    rgPos_ptr->set_RateGroupMemberOut_OutputPort(5, actuatorAdapter_ptr->get_sched_InputPort(0));
+    rgPos_ptr->set_RateGroupMemberOut_OutputPort(0, actuatorAdapter_ptr->get_sched_InputPort(0));
 #endif
 }
 
