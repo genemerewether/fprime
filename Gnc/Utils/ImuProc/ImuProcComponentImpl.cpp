@@ -21,6 +21,16 @@
 #include <Gnc/Utils/ImuProc/ImuProcComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else // BUILD_DSPAL
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif // BUILD_DSPAL
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -64,7 +74,15 @@ namespace Gnc {
         ROS::sensor_msgs::ImuNoCov &ImuNoCov
     )
   {
-    // TODO
+      // TODO (mereweth) - actually do processing and downsample
+      for (int i = 0; i < NUM_DOWNSAMPLEDIMU_OUTPUT_PORTS; i++) {
+	  if (this->isConnected_DownsampledImu_OutputPort(i)) {
+	      this->DownsampledImu_out(i, ImuNoCov);
+	  }
+	  else {
+	      DEBUG_PRINT("MPU9250 Imu out port %d not connected\n", i);
+	  }
+      }
   }
 
   // ----------------------------------------------------------------------
