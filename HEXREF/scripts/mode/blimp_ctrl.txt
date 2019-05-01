@@ -1,0 +1,2 @@
+SE3CTRL_SetAttCtrlMode, YAW_ONLY
+SE3CTRL_SetPosCtrlMode, POS_LINVEL
