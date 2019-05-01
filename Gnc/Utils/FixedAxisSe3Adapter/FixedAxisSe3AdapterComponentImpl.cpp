@@ -21,6 +21,8 @@
 #include <Gnc/Utils/FixedAxisSe3Adapter/FixedAxisSe3AdapterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <Eigen/Geometry>
+
 namespace Gnc {
 
   // ----------------------------------------------------------------------
@@ -66,12 +68,18 @@ namespace Gnc {
   {
       using namespace ROS::geometry_msgs;
       using namespace ROS::mav_msgs;
+
+      Eigen::Quaterniond yawQ;
+      yawQ = Eigen::AngleAxisd(FlatOutput.getyaw(),
+			       Eigen::Vector3d::UnitZ());
       Se3FeedForward se3ff(FlatOutput.getheader(),
 			   FlatOutput.getposition(),
 			   FlatOutput.getvelocity(),
 			   FlatOutput.getacceleration(),
-			   // TODO(mereweth) - convert yaw
-			   Quaternion(0.0, 0.0, 0.0, 1.0),
+			   Quaternion(yawQ.x(),
+				      yawQ.y(),
+				      yawQ.z(),
+				      yawQ.w()),
 			   Vector3(0.0, 0.0, 0.0),
 			   Vector3(0.0, 0.0, 0.0));
       this->se3Cmd_out(0, se3ff);			   
