@@ -147,7 +147,7 @@ void allocComps() {
 #endif
 ;
 
-    sdRosIface_ptr = new HLProc::HLRosIfaceComponentImpl
+    hlRosIface_ptr = new HLProc::HLRosIfaceComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SDROSIFACE")
 #endif
@@ -262,12 +262,6 @@ void allocComps() {
     linuxTime_ptr = new Svc::LinuxTimeImpl
 #if FW_OBJECT_NAMES == 1
                         ("LTIME")
-#endif
-;
-
-    kraitRouter_ptr = new SnapdragonFlight::KraitRouterComponentImpl
-#if FW_OBJECT_NAMES == 1
-                        ("KRAITRTR")
 #endif
 ;
 
@@ -429,7 +423,7 @@ void manualConstruct(void) {
     mrCtrlIface_ptr->set_boolStamped_OutputPort(9, actDecouple_ptr->get_DataIn_InputPort(2));
     actDecouple_ptr->set_DataOut_OutputPort(2, actuatorAdapter_ptr->get_flySafe_InputPort(0));
     
-    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(3));
+    hlRosIface_ptr->set_ActuatorsData_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(3));
     actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
     
     rgOp_ptr->set_RateGroupMemberOut_OutputPort(4, actDecouple_ptr->get_DataIn_InputPort(4));
@@ -535,11 +529,8 @@ void constructApp(unsigned int port_number,
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
-
-    fileLogger_ptr->initLog("/log/");
     
     prmDb_ptr->readParamFile();
-
     
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);
@@ -721,12 +712,12 @@ int main(int argc, char* argv[]) {
     
     ros::start();
 
-    sdRosIface_ptr->startIntTask(30, 5*1000*1024);
+    hlRosIface_ptr->startIntTask(30, 5*1000*1024);
     mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
     filterIface_ptr->startIntTask(30, 5*1000*1024);
     rosSeq_ptr->startIntTask(30, 5*1000*1024);
 
-    sdRosIface_ptr->startPub();
+    hlRosIface_ptr->startPub();
     mrCtrlIface_ptr->startPub();
     filterIface_ptr->startPub();
     rosSeq_ptr->startPub();
