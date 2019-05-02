@@ -1,5 +1,5 @@
 # Makefile to run global make.
-DEPLOYMENT := HEXREF
+DEPLOYMENT := BLIMPREF
 BUILD_ROOT ?= $(subst /$(DEPLOYMENT),,$(CURDIR))
 
 export BUILD_ROOT
