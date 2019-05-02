@@ -118,7 +118,7 @@ namespace Drv {
                     // this is done when leaving last INIT phase
                     //this->SpiConfig_out(0, MPU9250_SPI_DATA_HZ);
                     writeBuf[0] = MPU9250_REG_ACCEL_XOUT_H | SPI_BITS_READ;
-#ifdef BUILD_DSPAL || BUILD_LINUX
+#if defined(BUILD_DSPAL) || defined(BUILD_LINUX) || defined(BUILD_SDFLIGHT)
                     readBufObj.setsize(2 + MPU9250_REG_GYRO_ZOUT_L
                                        - MPU9250_REG_ACCEL_XOUT_H);
 #else // most microcontrollers
@@ -130,6 +130,7 @@ namespace Drv {
                     // Offset returned data by one half-word
                     readBufOffset = readBuf + 2;
 #endif
+		    
                     DEBUG_PRINT("MPU9250 before read at %u.%06u\n",
                                 ImuNow.getSeconds(), ImuNow.getUSeconds());
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);

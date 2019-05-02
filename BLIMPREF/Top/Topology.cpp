@@ -662,16 +662,16 @@ void run1backupCycle(void) {
 }
 
 void exitTasks(void) {
-    rgDecouple_ptr->exit();
-    imuDecouple_ptr->exit();
-    actDecouple_ptr->exit();
-    
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
     imuDRIntSnap_ptr->exitThread();
 #else
     imuDRInt_ptr->exitThread();
 #endif
     
+    rgDecouple_ptr->exit();
+    imuDecouple_ptr->exit();
+    actDecouple_ptr->exit();
+        
     snapHealth_ptr->exit();
     cmdDisp_ptr->exit();
     eventLogger_ptr->exit();
@@ -801,6 +801,8 @@ int main(int argc, char* argv[]) {
 #endif // LINUX_DEV
     }
 
+    rgDecouple_ptr->setEnabled(false);
+    
     DEBUG_PRINT("Stopping tasks\n");
     ros::shutdown();
     
