@@ -78,7 +78,7 @@ namespace Svc {
     )
   { 
       if (isConnected_DataOut_OutputPort(portNum)) {
- 	  DEBUG_PRINT("active decoupler data out\n");
+ 	  DEBUG_PRINT("active decoupler data out %d\n, portNum");
           this->DataOut_out(portNum, Buffer);
       }
   }
