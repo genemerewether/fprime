@@ -290,6 +290,7 @@ BLIMPREF_MODULES := \
 	$(BLIMPREF_DEPLOYMENT_MODULES) \
 	\
 	Drv/ForceTorque/ATINetbox \
+	Drv/IMU/MPU9250 \
 	\
 	$(ZMQ_MODULES) \
 	\
