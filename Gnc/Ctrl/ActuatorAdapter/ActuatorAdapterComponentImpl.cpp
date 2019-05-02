@@ -91,6 +91,60 @@ namespace Gnc {
 
   }
 
+  void ActuatorAdapterComponentImpl ::
+    sendZeroCmdAll(void)
+  {
+      for (U32 i = 0; i < FW_MIN(this->numActuators, ACTADAP_MAX_ACTUATORS); i++) {
+	  switch (this->outputInfo[i].type) {
+	      case OUTPUT_UNSET:
+	      {
+		  //TODO(mereweth) - issue error
+	      }
+		  break;
+	      case OUTPUT_PWM:
+	      {
+		  if (this->isConnected_pwmSetDuty_OutputPort(0)) {
+
+		  }
+		  else {
+		      //TODO(mereweth) - issue error
+		  }
+	      }
+		  break;
+	      case OUTPUT_I2C:
+	      case OUTPUT_I2C_SIMPLE:
+	      {
+		  if (this->isConnected_escConfig_OutputPort(0) &&
+		      this->isConnected_escReadWrite_OutputPort(0)) {
+		      // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
+		      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
+
+		      Fw::Buffer readBufObj(0, 0, 0, 0); // no read
+		      if (OUTPUT_I2C == this->outputInfo[i].type) {
+			  // MSB is reverse bit
+			  U8 writeBuf[3] = { 0 };
+			  Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+			  this->escReadWrite_out(0, writeBufObj, readBufObj);
+		      }
+		      else { // simple protocol
+			  U8 writeBuf[2] = { 0 };
+			  Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+			  this->escReadWrite_out(0, writeBufObj, readBufObj);
+		      }
+		  }
+		  else {
+		      //TODO(mereweth) - issue error
+		  }
+	      }
+		  break;
+	      default:
+		  //TODO(mereweth) - DEBUG_PRINT
+		  FW_ASSERT(0, this->outputInfo[i].type);
+	  }
+      }
+  }
+
+
   bool ActuatorAdapterComponentImpl ::
     setupI2C(
              U32 actuator,
@@ -805,7 +859,7 @@ namespace Gnc {
   	  if (ARMING == this->armedState) {
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
  	  }
-	  // TODO(mereweth) - send out min cmd here before disarming?
+	  this->sendZeroCmdAll();
 	  this->armedState = DISARMED;
 	  if (!this->paramsInited) {
 	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
@@ -905,6 +959,10 @@ namespace Gnc {
 
       // can disarm immediately - change this if hardware changes
       if (!armState) {
+  	  if (ARMED == this->armedState) {
+	      this->sendZeroCmdAll();
+	  }
+	
           this->armedState = DISARMED;
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
           return;
@@ -912,6 +970,9 @@ namespace Gnc {
       // after this point, we are trying to arm
 
       if (!this->paramsInited || !hwEnabled) {
+  	  if (ARMED == this->armedState) {
+	      this->sendZeroCmdAll();
+	  }
   	  this->armedState = DISARMED;
 	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
 	  if (!this->paramsInited) {

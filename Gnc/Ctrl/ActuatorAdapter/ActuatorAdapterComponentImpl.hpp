@@ -118,6 +118,8 @@ namespace Gnc {
 
     PRIVATE:
 
+      void sendZeroCmdAll();
+
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
