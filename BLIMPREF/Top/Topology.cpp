@@ -30,7 +30,7 @@ enum {
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
-#define DECOUPLE_ACTUATORS
+//#define LINUX_DEV
 
 #define PRM_PATH "/eng/BLIMPREFPrmDb.dat"
 
@@ -212,6 +212,7 @@ void allocComps() {
         0, // mixer
         Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
         0, // snapHealth
+	0, // cmdSeq
         0, // chanTlm
     };
 
@@ -248,8 +249,6 @@ void allocComps() {
 	0, // hlRosIface
 	0, // mrCtrlIface
 	0, // filterIface
-        0, // logQueue
-        0, // kraitRouter
     };
 
     rgOp_ptr = new Svc::PassiveRateGroupImpl(
@@ -411,7 +410,53 @@ void manualConstruct(void) {
     imuProc_ptr->set_DownsampledImu_OutputPort(0, passiveDataPasser_ptr->get_DataIn_InputPort(0));
     passiveDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
 
-    // TODO(Mereweth) - all connections into passive rgs
+    // TODO(Mereweth) - all connections into passive rgs from another thread
+    const U32 NUM_CMD_PORTS = Svc::CommandDispatcherImpl::NUM_CMD_PORTS;
+
+    // NOTE(Mereweth) - decrement cmdDisp port #; increment passiveDataPasser port #; others are 0
+
+    U32 cmdIdx = 1;
+    U32 dpIdx = 1;
+    cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, attFilter_ptr->get_CmdDisp_InputPort(0));
+    attFilter_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
+    attFilter_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+
+    cmdIdx = dpIdx = 2;
+    cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, se3Ctrl_ptr->get_CmdDisp_InputPort(0));
+    se3Ctrl_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
+    se3Ctrl_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    
+    cmdIdx = dpIdx = 3;
+    cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, mixer_ptr->get_CmdDisp_InputPort(0));
+    mixer_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
+    mixer_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    
+    cmdIdx = dpIdx = 4;
+    cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, actuatorAdapter_ptr->get_CmdDisp_InputPort(0));
+    actuatorAdapter_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
+    actuatorAdapter_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+
+    cmdIdx = dpIdx = 5;
+    cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, sigGen_ptr->get_CmdDisp_InputPort(0));
+    sigGen_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
+    sigGen_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    
+    cmdIdx = dpIdx = 6;
+    cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, ctrlXest_ptr->get_CmdDisp_InputPort(0));
+    ctrlXest_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
+    ctrlXest_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+    
+    cmdIdx = dpIdx = 7;
+    cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, imuProc_ptr->get_CmdDisp_InputPort(0));
+    imuProc_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
+    imuProc_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
     
     // actuator decoupler
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
@@ -420,7 +465,7 @@ void manualConstruct(void) {
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
 
-    mrCtrlIface_ptr->set_boolStamped_OutputPort(9, actDecouple_ptr->get_DataIn_InputPort(2));
+    mrCtrlIface_ptr->set_boolStamped_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(2));
     actDecouple_ptr->set_DataOut_OutputPort(2, actuatorAdapter_ptr->get_flySafe_InputPort(0));
     
     hlRosIface_ptr->set_ActuatorsData_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(3));
@@ -560,8 +605,9 @@ void constructApp(unsigned int port_number,
 #endif // SOC
 
 #else // LINUX
-
+#ifdef LINUX_DEV
     // TODO(mereweth) - open devices
+#endif // LINUX_DEV
 #endif // SDFLIGHT vs LINUX
 
     // Active component startup
@@ -584,7 +630,10 @@ void constructApp(unsigned int port_number,
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
     imuDRIntSnap_ptr->startIntTask(99);
 #else
+   
+#ifdef LINUX_DEV
     imuDRInt_ptr->startIntTask(99);
+#endif // LINUX_DEV
 #endif
 
     // Initialize socket server
@@ -600,6 +649,15 @@ void constructApp(unsigned int port_number,
     //simpleReg.dump();
 #endif
 
+}
+
+void run1testCycle(void) {
+    // call interrupt to emulate a clock
+    Svc::InputCyclePort* port = rgDcplDrv_ptr->get_CycleIn_InputPort(0);
+    Svc::TimerVal cycleStart;
+    cycleStart.take();
+    port->invoke(cycleStart);
+    Os::Task::delay(1);
 }
 
 void run1backupCycle(void) {
@@ -738,6 +796,9 @@ int main(int argc, char* argv[]) {
     while (!terminate) {
         run1backupCycle();
         backupCycle++;
+#if !defined(LINUX_DEV) and !defined(BUILD_SDFLIGHT)
+	run1testCycle();
+#endif // LINUX_DEV
     }
 
     DEBUG_PRINT("Stopping tasks\n");
