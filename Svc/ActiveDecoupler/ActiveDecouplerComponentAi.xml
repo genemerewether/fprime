@@ -4,7 +4,7 @@
 <component name="ActiveDecoupler" kind="active" namespace="Svc">
     <comment>A component that gives passive port calls a thread to run in</comment>
     <ports>
-        <port name="DataIn" data_type="Serial" full="drop" kind="async_input" max_number="10" />
+        <port name="DataIn" data_type="Serial" kind="async_input" max_number="10" />
 
         <port name="DataOut" data_type="Serial" kind="output" max_number="10" />
     </ports>

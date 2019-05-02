@@ -439,7 +439,7 @@ void constructApp() {
     cmdDisp_ptr->init(0);
     tlmChan_ptr->init(0);
 
-    kraitRouter_ptr->init(50, 1000);
+    kraitRouter_ptr->init(200, 1000);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
