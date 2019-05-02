@@ -3,20 +3,30 @@
 void constructBLIMPREFArchitecture(void);
 void exitTasks(void);
 
+#include <Svc/CmdDispatcher/CommandDispatcherImpl.hpp>
+#include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
+#include <Svc/ActiveTextLogger/ActiveTextLoggerImpl.hpp>
+#include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
+#include <Svc/TlmChan/TlmChanImpl.hpp>
+#include <Svc/PrmDb/PrmDbImpl.hpp>
+#include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
+#include <SnapdragonFlight/SnapdragonHealth/SnapdragonHealthComponentImpl.hpp>
+#include <Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentImpl.hpp>
+#include <Gnc/Est/FilterIface/FilterIfaceComponentImpl.hpp>
+#include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
+#include <ROS/RosSeq/RosSeqComponentImpl.hpp>
+
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 #include <Svc/RateGroupDecoupler/RateGroupDecouplerComponentImpl.hpp>
-
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
-
 #include <BLIMPREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>
 #include <Svc/QueuedDecoupler/QueuedDecouplerComponentImpl.hpp>
-
 #include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
 #include <SnapdragonFlight/BlspSpiDriver/BlspSpiDriverComponentImpl.hpp>
 #include <SnapdragonFlight/BlspI2CDriver/BlspI2CDriverComponentImpl.hpp>
@@ -66,5 +76,19 @@ extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr;
 extern Drv::LinuxPwmDriverComponentImpl* escPwm_ptr;
+
+extern Svc::CommandDispatcherImpl* cmdDisp_ptr;
+extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
+extern Svc::ActiveTextLoggerComponentImpl* textLogger_ptr;
+extern Svc::ActiveLoggerImpl* eventLogger_ptr;
+extern Svc::TlmChanImpl* chanTlm_ptr;
+extern Svc::PrmDbImpl* prmDb_ptr;
+extern Svc::SocketGndIfImpl* sockGndIf_ptr;
+extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
+
+extern HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr;
+extern Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr;
+extern Gnc::FilterIfaceComponentImpl* filterIface_ptr;
+extern ROS::RosSeqComponentImpl* rosSeq_ptr;
 
 #endif

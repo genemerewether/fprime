@@ -1,5 +1,17 @@
 #include <Components.hpp>
 
+enum {
+    CORE_NONE = -1,
+    CORE_0 = 0,
+    CORE_1 = 1,
+    CORE_2 = 2,
+    CORE_3 = 3,
+
+    CORE_CDH = CORE_0,
+    CORE_RPC = CORE_1,
+    CORE_CAM = CORE_2,
+    CORE_GNC = CORE_3
+};
 
 #include <Fw/Types/Assert.hpp>
 #include <BLIMPREF/Top/TargetInit.hpp>
@@ -20,12 +32,30 @@
 
 #define DECOUPLE_ACTUATORS
 
+#define PRM_PATH "/eng/BLIMPREFPrmDb.dat"
+
 // Registry
 #if FW_OBJECT_REGISTRATION == 1
 static Fw::SimpleObjRegistry simpleReg;
 #endif
 
+Fw::MallocAllocator seqMallocator;
+
 // Component instance pointers
+
+Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
+Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
+Svc::ActiveTextLoggerComponentImpl* textLogger_ptr = 0;
+Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
+Svc::TlmChanImpl* chanTlm_ptr = 0;
+Svc::PrmDbImpl* prmDb_ptr = 0;
+Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
+SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
+
+HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr = 0;
+Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr = 0;
+Gnc::FilterIfaceComponentImpl* filterIface_ptr = 0;
+ROS::RosSeqComponentImpl* rosSeq_ptr = 0;
 
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
 Svc::QueuedDecouplerComponentImpl* passiveDataPasser_ptr = 0;
@@ -61,6 +91,80 @@ Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr = 0;
 Drv::LinuxPwmDriverComponentImpl* escPwm_ptr = 0;
 
 void allocComps() {
+    sockGndIf_ptr = new Svc::SocketGndIfImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SGIF")
+#endif
+;
+
+    textLogger_ptr = new Svc::ActiveTextLoggerComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TLOG")
+#endif
+;
+
+    eventLogger_ptr = new Svc::ActiveLoggerImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ELOG")
+#endif
+;
+
+    chanTlm_ptr = new Svc::TlmChanImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TLM")
+#endif
+;
+
+    cmdDisp_ptr = new Svc::CommandDispatcherImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDDISP")
+#endif
+;
+
+    cmdSeq_ptr = new Svc::CmdSequencerComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CMDSEQ")
+#endif
+;
+
+    prmDb_ptr = new Svc::PrmDbImpl
+#if FW_OBJECT_NAMES == 1
+                        ("PRM",PRM_PATH)
+#else
+                        (PRM_PATH)
+#endif
+;
+
+    snapHealth_ptr = new SnapdragonFlight::SnapdragonHealthComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SDHEALTH")
+#endif
+;
+
+    rosSeq_ptr = new ROS::RosSeqComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ROSSEQ")
+#endif
+;
+
+    sdRosIface_ptr = new HLProc::HLRosIfaceComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SDROSIFACE")
+#endif
+;
+
+    mrCtrlIface_ptr = new Gnc::MultirotorCtrlIfaceComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("MRCTRLIFACE")
+#endif
+;
+
+    filterIface_ptr = new Gnc::FilterIfaceComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("FILTIFACE")
+#endif
+;
+    
     rgDecouple_ptr = new Svc::RateGroupDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "RGDECOUPLE",
@@ -107,7 +211,7 @@ void allocComps() {
         Gnc::SE3CTRL_SCHED_CONTEXT_TLM, // se3Ctrl
         0, // mixer
         Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
-        0, // logQueue
+        0, // snapHealth
         0, // chanTlm
     };
 
@@ -135,12 +239,15 @@ void allocComps() {
                         rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
     NATIVE_UINT_TYPE rgOpContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        0,
+        0, // passiveDataPasser
         Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_OP, // sigGen
         Gnc::SE3CTRL_SCHED_CONTEXT_CTRL, // se3Ctrl
         Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
-        0, // unused
+        0, // cmdSeq
+	0, // hlRosIface
+	0, // mrCtrlIface
+	0, // filterIface
         0, // logQueue
         0, // kraitRouter
     };
@@ -231,6 +338,30 @@ void allocComps() {
                          false) // don't use magnetometer for now
 ;
 
+    spiDrvSnap_ptr = new SnapdragonFlight::BlspSpiDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SNAPSPIDRV")
+#endif
+;
+
+    i2cDrvSnap_ptr = new SnapdragonFlight::BlspI2CDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                    ("SNAPI2CDRV")
+#endif
+;
+
+    imuDRIntSnap_ptr = new SnapdragonFlight::BlspGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SNAPIMUDRINT")
+#endif
+;
+
+    hwEnablePinSnap_ptr = new SnapdragonFlight::BlspGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SNAPHWENPIN")
+#endif
+;
+    
     spiDrv_ptr = new Drv::LinuxSpiDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SPIDRV")
@@ -278,11 +409,37 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct(void) {  
-    // Manual connections
+    // imu decoupler
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
+    imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
 
+    // passive data passer
+    imuProc_ptr->set_DownsampledImu_OutputPort(0, passiveDataPasser_ptr->get_DataIn_InputPort(0));
+    passiveDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+
+    // TODO(Mereweth) - all connections into passive rgs
+    
+    // actuator decoupler
+    mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
+    actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+        
+    sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
+    actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
+
+    mrCtrlIface_ptr->set_boolStamped_OutputPort(9, actDecouple_ptr->get_DataIn_InputPort(2));
+    actDecouple_ptr->set_DataOut_OutputPort(2, actuatorAdapter_ptr->get_flySafe_InputPort(0));
+    
+    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(3));
+    actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
+    
+    rgOp_ptr->set_RateGroupMemberOut_OutputPort(4, actDecouple_ptr->get_DataIn_InputPort(4));
+    actDecouple_ptr->set_DataOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
 }
 
-void constructApp() {
+void constructApp(unsigned int port_number,
+		  char* hostname,
+                  unsigned int boot_count,
+		  bool startSocketNow) {
     allocComps();
 
     localTargetInit();
@@ -291,6 +448,31 @@ void constructApp() {
     Fw::PortBase::setTrace(false);
 #endif
 
+#if FW_ENABLE_TEXT_LOGGING
+    // Queue needs to be large enough to process many text messages at once
+    textLogger_ptr->init(500);
+#endif
+
+    eventLogger_ptr->init(500,0);
+    
+    chanTlm_ptr->init(60,0);
+
+    cmdDisp_ptr->init(60,0);
+
+    cmdSeq_ptr->init(60,0);
+    cmdSeq_ptr->allocateBuffer(0,seqMallocator,100*1024);
+
+    prmDb_ptr->init(60,0);
+    snapHealth_ptr->init(60,0);
+    snapHealth_ptr->setBootCount(boot_count);
+    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_DYNAMIC);
+    sockGndIf_ptr->init(0);
+
+    hlRosIface_ptr->init(0);
+    mrCtrlIface_ptr->init(0);
+    filterIface_ptr->init(0);
+    rosSeq_ptr->init(0);
+    
     // Initialize rate group driver
     rgGncDrv_ptr->init();
     rgDcplDrv_ptr->init();
@@ -339,6 +521,13 @@ void constructApp() {
     /* Register commands */
     fatalHandler_ptr->regCommands();
 
+    sockGndIf_ptr->regCommands();
+    cmdSeq_ptr->regCommands();
+    cmdDisp_ptr->regCommands();
+    eventLogger_ptr->regCommands();
+    prmDb_ptr->regCommands();
+    snapHealth_ptr->regCommands();
+    
     ctrlXest_ptr->regCommands();
     imuProc_ptr->regCommands();
     se3Ctrl_ptr->regCommands();
@@ -347,40 +536,42 @@ void constructApp() {
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
 
+    fileLogger_ptr->initLog("/log/");
+    
+    prmDb_ptr->readParamFile();
+
+    
+    char logFileName[256];
+    snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);
+    textLogger_ptr->set_log_file(logFileName,100*1024, 0);
+
     // Open devices
 
-#ifdef BUILD_DSPAL
+#ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
 #ifdef SOC_8074
     // /dev/spi-1 on QuRT; connected to MPU9250
-    spiDrv_ptr->open(1, 0, Drv::SPI_FREQUENCY_1MHZ);
-    imuDRInt_ptr->open(65, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    spiDrvSnap_ptr->open(1, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
+    imuDRIntSnap_ptr->open(65, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_INT);
     
     // J13-3, 5V level
-    hwEnablePin_ptr->open(28, Drv::LinuxGpioDriverComponentImpl::GPIO_IN);
+    hwEnablePinSnap_ptr->open(28, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_IN);
 
     // J15, BLSP9
-    i2cDrv_ptr->open(9, Drv::I2C_FREQUENCY_400KHZ);
-
-    // J15, BLSP9
-    // TODO(mereweth) - Spektrum UART and binding GPIO
-
-    // J13 is already at 5V, so use for 4 of the ESCs
-    //NATIVE_UINT_TYPE pwmPins[4] = {27, 28, 29, 30};
-    // /dev/pwm-1 on QuRT
-    //escPwm_ptr->open(1, pwmPins, 4, 20 * 1000);
+    i2cDrvSnap_ptr->open(9, SnapdragonFlight::I2C_FREQUENCY_400KHZ);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
-    spiDrv_ptr->open(10, 0, Drv::SPI_FREQUENCY_1MHZ);
-    imuDRInt_ptr->open(78, Drv::LinuxGpioDriverComponentImpl::GPIO_INT);
+    spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
+    imuDRIntSnap_ptr->open(78, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_INT);
     
     // TODO(mereweth) - hardware enable pin
 
     // TODO(mereweth) - I2C port
-
-    // TODO(mereweth) - Spektrum UART and binding GPIO
-    // TODO(mereweth) - PWM pins
 #endif // SOC
-#endif // BUILD_DSPAL
+
+#else // LINUX
+
+    // TODO(mereweth) - open devices
+#endif // SDFLIGHT vs LINUX
 
     // Active component startup
     imuDecouple_ptr->start(0, 91, 20*1024);
@@ -388,34 +579,36 @@ void constructApp() {
     rgDecouple_ptr->start(0, 90, 20*1024);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
     actDecouple_ptr->start(0, 89, 20*1024);
-    
-#ifdef BUILD_DSPAL
-    imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
+
+    cmdDisp_ptr->start(0,60,20*1024);
+    // start sequencer
+    cmdSeq_ptr->start(0,50,20*1024);
+    // start telemetry
+    eventLogger_ptr->start(0,50,20*1024);
+    chanTlm_ptr->start(0,60,20*1024);
+    prmDb_ptr->start(0,50,20*1024);
+    textLogger_ptr->start(0,30,20*1024);
+
+    snapHealth_ptr->start(0,40,20*1024);
+#ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
+    imuDRIntSnap_ptr->startIntTask(99);
+#else
+    imuDRInt_ptr->startIntTask(99);
 #endif
 
+    // Initialize socket server
+    if (port_number && hostname) {
+        if (startSocketNow) {
+	    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+        } else {
+	    sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+        }
+    }
+    
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
 
-}
-
-int hexref_rpc_relay_buff_read(unsigned int* port, unsigned char* buff, int buffLen, int* bytes) {
-    return kraitRouter_ptr->buffRead(port, buff, buffLen, bytes);
-}
-
-int hexref_rpc_relay_port_read(unsigned char* buff, int buffLen, int* bytes) {
-#ifndef BUILD_DSPAL
-    DEBUG_PRINT("hexref_rpc_relay_port_read\n");
-#endif
-    return kraitRouter_ptr->portRead(buff, buffLen, bytes);
-}
-
-int hexref_rpc_relay_buff_write(unsigned int port, const unsigned char* buff, int buffLen) {
-    return kraitRouter_ptr->buffWrite(port, buff, buffLen);
-}
-
-int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
-    return kraitRouter_ptr->portWrite(buff, buffLen);
 }
 
 void run1backupCycle(void) {
@@ -425,129 +618,121 @@ void run1backupCycle(void) {
     cycleStart.take();
     port->invoke(cycleStart);
     Os::Task::delay(10);
-
-#ifndef BUILD_DSPAL // stress test
-    for (int i = 0; i < 45; i++) {
-        Fw::ExternalSerializeBuffer bufObj;
-        char buf[996] = {"hi"};
-        bufObj.setExtBuffer((U8*) buf, sizeof(buf));
-        bufObj.setBuffLen(sizeof(buf));
-        Fw::InputSerializePort* serPort = kraitRouter_ptr->get_HexPortsIn_InputPort(1);
-        serPort->invokeSerial(bufObj);
-    }
-#endif
-
-#ifndef BUILD_DSPAL
-    U8 readBuf[4096*1000];
-    int len = 0;
-    hexref_rpc_relay_port_read(readBuf, sizeof(readBuf), &len);
-#endif
 }
 
 void exitTasks(void) {
     rgDecouple_ptr->exit();
     imuDecouple_ptr->exit();
     actDecouple_ptr->exit();
-#ifdef BUILD_DSPAL
+    
+#ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
+    imuDRIntSnap_ptr->exitThread();
+#else
     imuDRInt_ptr->exitThread();
 #endif
-    kraitRouter_ptr->exit();
+    
+    snapHealth_ptr->exit();
+    cmdDisp_ptr->exit();
+    eventLogger_ptr->exit();
+    chanTlm_ptr->exit();
+    prmDb_ptr->exit();
+    textLogger_ptr->exit();
+    cmdSeq_ptr->exit();
 }
 
-volatile bool terminate = false;
-volatile bool preinit = true;
 
-#include <Fw/Cmd/CmdPacket.hpp>
+void print_usage() {
+    (void) printf("Usage: ./SDREF [options]\n"
+		  "-p\tport_number\n"
+		  "-a\thostname/IP address\n"
+		  "-l\tFor time-based cycles\n"
+		  "-b\tBoot count\n"
+		  "-s\tStart socket immediately\n");
+}
 
-int hexref_arm() {
-    DEBUG_PRINT("hexref_arm\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_arm preinit - returning\n");
-        return -1;
+
+#include <signal.h>
+#include <stdio.h>
+
+extern "C" {
+    int main(int argc, char* argv[]);
+};
+
+volatile sig_atomic_t terminate = 0;
+
+static void sighandler(int signum) {
+    terminate = 1;
+    ros::shutdown();
+}
+
+void dummy() {
+    while(!terminate) {
+        Os::Task::delay(1000);
     }
+}
 
-    /*
-    U8 buf[16] = {0};
-    buf[2+4] = 0x01;
-    buf[3+4] = 0xA1;
+int main(int argc, char* argv[]) {
+    U32 port_number = 0;
+    I32 option = 0;
+    char *hostname = NULL;
+    bool startSocketNow = false;
+    U32 boot_count = 0;
 
-    Fw::CmdPacket cmdPkt;
-    Fw::ComBuffer dat0(&buf[0], sizeof(buf));
-    Fw::SerializeStatus stat = cmdPkt.deserialize(dat0);
-    Fw::InputCmdPort* p2 = se3Ctrl_ptr->get_CmdDisp_InputPort(0);
-    p2->invoke(0x1a1,0,cmdPkt.getArgBuffer());
-    usleep(50000);
-    DEBUG_PRINT("hexref_arm after sleep\n");
-    */
+    // Removes ROS cmdline args as a side-effect
+    ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    /*
-    Fw::InputComPort* port = cmdDisp_ptr->get_seqCmdBuff_InputPort(0);
-    usleep(50000);
-    Fw::ComBuffer dat(buf, sizeof(buf));
-    port->invoke(dat, 0);
-    usleep(50000);
-    DEBUG_PRINT("hexref_arm after sleep\n");
-    */
-
-    /*
-    Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
-    Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
-    for (U32 i = 0; i < 35; i++) {
-        DEBUG_PRINT("arm %u", i);
-        for (U32 j = 11; j <= 14; j++) {
-            confPort->invoke(400, j, 100);
-            U8 readBuf[1] = { 0 };
-            U8 writeBuf[1] = { 0 };
-            Fw::Buffer writeObj = Fw::Buffer(0, 0, (U64) writeBuf, 1);
-            Fw::Buffer readObj = Fw::Buffer(0, 0, (U64) readBuf, 1);
-            rwPort->invoke(writeObj,
-                           readObj);
-            usleep(2500);
+    while ((option = getopt(argc, argv, "ifhlsp:x:a:u:t:o:b:z:")) != -1){
+        switch(option) {
+            case 'h':
+                print_usage();
+                return 0;
+                break;
+            case 'b':
+                boot_count = atoi(optarg);
+                break;
+            case 'p':
+                port_number = atoi(optarg);
+                break;
+            case 'a':
+                hostname = optarg;
+                break;
+            case 's':
+                startSocketNow = true;
+                break;
+            case '?':
+                return 1;
+            default:
+                print_usage();
+                return 1;
         }
     }
-    */
 
-    // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
-    /*
-    Drv::InputPwmSetDutyCycleDataPort * port = escPwm_ptr->get_pwmSetDuty_InputPort(0);
-    static F32 d1 = 0.05;
-    static F32 d2 = 0.1;
-    F32 duty[4] = {d1, d2, d1, d2};
-    Drv::PwmSetDutyCycle config(duty, 4, 0x0f);
-    port->invoke(config);
-    d1 += 0.005;
-    if (d1 > 0.1) {  d1 = 0.05;  }
-    d2 -= 0.005;
-    if (d2 < 0.05) {  d2 = 0.1;  }
-    */
-    return 0;
-}
+    signal(SIGINT,sighandler);
+    signal(SIGTERM,sighandler);
+    signal(SIGKILL,sighandler);
+    signal(SIGPIPE, SIG_IGN);
 
-int hexref_init(void) {
-    DEBUG_PRINT("Before constructing app\n");
-    constructApp();
-    DEBUG_PRINT("After constructing app\n");
-
-    //TODO(mereweth) - move to HexPower component
-#ifdef BUILD_DSPAL
-    HAP_power_request(100, 100, 1);
-#endif // BUILD_DSPAL
-
-    //dumparch();
-
-    Os::Task::delay(1000);
-    preinit = false;
-
-    return 0;
-}
-
-int hexref_run(void) {
-    DEBUG_PRINT("hexref_run\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_run preinit - returning\n");
-        return -1;
-    }
+    (void) printf("Hit Ctrl-C to quit\n");
     
+    constructApp(port_number,
+		 hostname, boot_count,
+		 startSocketNow);
+    //dumparch();
+    
+    ros::start();
+
+    sdRosIface_ptr->startIntTask(30, 5*1000*1024);
+    mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
+    filterIface_ptr->startIntTask(30, 5*1000*1024);
+    rosSeq_ptr->startIntTask(30, 5*1000*1024);
+
+    sdRosIface_ptr->startPub();
+    mrCtrlIface_ptr->startPub();
+    filterIface_ptr->startPub();
+    rosSeq_ptr->startPub();
+
+    ros::console::shutdown();
+
     while (!mpu9250_ptr->isReady()) {
         Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
@@ -564,99 +749,15 @@ int hexref_run(void) {
         backupCycle++;
     }
 
-    // stop tasks
-    rgDecouple_ptr->setEnabled(false);
+    DEBUG_PRINT("Stopping tasks\n");
+    ros::shutdown();
+    
     exitTasks();
+
     // Give time for threads to exit
-    DEBUG_PRINT("Waiting for threads...\n");
+    (void) printf("Waiting for threads...\n");
     Os::Task::delay(1000);
 
-    DEBUG_PRINT("Exiting...\n");
-
+    (void) printf("Exiting...\n");
     return 0;
 }
-
-int hexref_cycle(unsigned int backupCycles) {
-    DEBUG_PRINT("hexref_cycle\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_cycle preinit - returning\n");
-        return -1;
-    }
-    
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
-
-    rgDecouple_ptr->setEnabled(true);
-    for (unsigned int i = 0; i < backupCycles; i++) {
-        if (terminate) break;
-        run1backupCycle();
-    }
-    rgDecouple_ptr->setEnabled(false);
-    DEBUG_PRINT("hexref_cycle returning\n");
-
-    return 0;
-}
-
-int hexref_wait() {
-    DEBUG_PRINT("hexref_wait\n");
-    while (!terminate) {
-        DEBUG_PRINT("hexref_wait loop; terminate: %d\n", terminate);
-        Os::Task::delay(1000);
-    }
-    return 0;
-}
-
-int hexref_fini(void) {
-    DEBUG_PRINT("hexref_fini called...\n");
-    terminate = true;
-    DEBUG_PRINT("hexref_fini done...\n");
-    return 0;
-}
-
-#ifndef BUILD_DSPAL
-
-#include <signal.h>
-#include <stdio.h>
-
-extern "C" {
-    int main(int argc, char* argv[]);
-};
-
-static void sighandler(int signum) {
-    terminate = 1;
-}
-
-int main(int argc, char* argv[]) {
-    hexref_init();
-
-    signal(SIGINT,sighandler);
-    signal(SIGTERM,sighandler);
-    signal(SIGHUP,sighandler);
-
-    preinit=false;
-
-    for (int i = 0; i < 1000; i++) {
-        // call interrupt to emulate a clock
-        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-
-        if (0 == i%10) {
-            // call interrupt to emulate a clock
-            Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
-            Svc::TimerVal cycleStart;
-            cycleStart.take();
-            port->invoke(cycleStart);
-        }
-
-        Os::Task::delay(1);
-    }
-}
-
-#endif //ifndef BUILD_DSPAL
