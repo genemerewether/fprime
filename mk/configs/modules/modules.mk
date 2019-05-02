@@ -165,6 +165,7 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/BlspSerialDriver \
 	SnapdragonFlight/BlspGpioDriver \
 	SnapdragonFlight/BlspSpiDriver \
+	SnapdragonFlight/BlspI2CDriver \
 	SnapdragonFlight/SnapdragonHealth \
 	SnapdragonFlight/MVCam \
 	SnapdragonFlight/HiresCam \

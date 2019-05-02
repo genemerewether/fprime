@@ -1,0 +1,107 @@
+<events>
+    <!-- Open error -->
+    <event id="0" name="I2C_OpenError" severity="WARNING_HI" format_string = "Error opening I2C device %d: %d" >
+        <comment>
+        I2C open error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+        </args>
+    </event>
+    <!-- Open error -->
+    <event id="1" name="I2C_ConfigError" severity="WARNING_HI" format_string = "Error configuring I2C device %d: %d" >
+        <comment>
+        I2C config error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+        </args>
+    </event>
+    <event id="2" name="I2C_ReadWriteError" severity="WARNING_HI" format_string = "Error writing/reading I2C device %d addr %u: %d; %d bytes actual; %d bytes desired"  throttle = "5">
+        <comment>
+        I2C write error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="addr" type="U32">
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+            <arg name="bytesAct" type="I32">
+            </arg>
+            <arg name="bytesDes" type="I32">
+            </arg>
+        </args>
+    </event>
+    <event id="3" name="I2C_WriteError" severity="WARNING_HI" format_string = "Error writing I2C device %d addr %u: %d; %d bytes actual; %d bytes desired"  throttle = "5">
+        <comment>
+        I2C write error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="addr" type="U32">
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+            <arg name="bytesAct" type="I32">
+            </arg>
+            <arg name="bytesDes" type="I32">
+            </arg>
+        </args>
+    </event>
+    <event id="4" name="I2C_PortOpened" severity="ACTIVITY_HI" format_string = "I2C Device %d configured" >
+        <comment>
+        I2C open notification
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+        </args>
+    </event>
+    <event id="5" name="I2C_ReadError" severity="WARNING_HI" format_string = "Error reading I2C device %d addr %u: %d; %d bytes actual; %d bytes desired"  throttle = "5">
+        <comment>
+        I2C read error
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+            <arg name="addr" type="U32">
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>
+            <arg name="bytesAct" type="I32">
+            </arg>
+            <arg name="bytesDes" type="I32">
+            </arg>
+        </args>
+    </event>
+    <event id="6" name="I2C_BadReadWriteCall" severity="WARNING_HI" format_string = "Received bad ReadWrite request for device %d"  throttle = "5">
+        <comment>
+        I2C malformed request
+        </comment>
+        <args>
+            <arg name="device" type="I32">
+                <comment>The device</comment>
+            </arg>
+        </args>
+    </event>
+</events>
