@@ -131,7 +131,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 16};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 10};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -139,7 +139,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
  
-    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 500};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 100};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -152,8 +152,8 @@ void allocComps() {
         Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_OP, // sigGen
         Gnc::SE3CTRL_SCHED_CONTEXT_CTRL, // se3Ctrl
-        0, // mixer
-	Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
+        Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
+        0, // unused
         0, // logQueue
         0, // kraitRouter
     };
@@ -341,6 +341,8 @@ void manualConstruct(void) {
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, axSe3Adap_ptr->get_flatOutput_InputPort(0));
+
+    axSe3Adap_ptr->set_se3Cmd_OutputPort(0, se3Ctrl_ptr->get_se3Cmd_InputPort(0));
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
 
@@ -360,10 +362,15 @@ void manualConstruct(void) {
         
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
+
+    rgOp_ptr->set_RateGroupMemberOut_OutputPort(4, actDecouple_ptr->get_DataIn_InputPort(4));
+    actDecouple_ptr->set_DataOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
 #else
     mixer_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
         
     sigGen_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+
+    rgOp_ptr->set_RateGroupMemberOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
 #endif
 }
 
@@ -434,7 +441,6 @@ void constructApp() {
     ctrlXest_ptr->regCommands();
     imuProc_ptr->regCommands();
     se3Ctrl_ptr->regCommands();
-    axSe3Adap_ptr->regCommands();
     attFilter_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
