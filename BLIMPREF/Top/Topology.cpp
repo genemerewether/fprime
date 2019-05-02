@@ -345,7 +345,7 @@ void allocComps() {
 
     imuDRIntSnap_ptr = new SnapdragonFlight::BlspGpioDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("SNAPIMUDRINT")
+                        ("SNAPDRINT")
 #endif
 ;
 
@@ -627,14 +627,6 @@ void constructApp(unsigned int port_number,
     textLogger_ptr->start(0,30,20*1024);
 
     snapHealth_ptr->start(0,40,20*1024);
-#ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
-    imuDRIntSnap_ptr->startIntTask(99);
-#else
-   
-#ifdef LINUX_DEV
-    imuDRInt_ptr->startIntTask(99);
-#endif // LINUX_DEV
-#endif
 
     // Initialize socket server
     if (port_number && hostname) {
@@ -789,6 +781,14 @@ int main(int argc, char* argv[]) {
         port->invoke(cycleStart);
         Os::Task::delay(10);
     }
+#ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
+    imuDRIntSnap_ptr->startIntTask(99);
+#else
+   
+#ifdef LINUX_DEV
+    imuDRInt_ptr->startIntTask(99);
+#endif // LINUX_DEV
+#endif
     rgDecouple_ptr->setEnabled(true);
     
     int backupCycle = 0;
