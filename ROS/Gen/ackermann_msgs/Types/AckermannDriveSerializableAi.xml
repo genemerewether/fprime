@@ -1,0 +1,9 @@
+<serializable name="AckermannDrive" namespace="ROS::ackermann_msgs">
+  <members>
+    <member name="steering_angle" type="F32"/>
+    <member name="steering_angle_velocity" type="F32"/>
+    <member name="speed" type="F32"/>
+    <member name="acceleration" type="F32"/>
+    <member name="jerk" type="F32"/>
+  </members>
+</serializable>

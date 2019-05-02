@@ -34,7 +34,7 @@ static NATIVE_UINT_TYPE rgContext[Svc::ActiveRateGroupImpl::CONTEXT_SIZE] = {
     SIMREF::RSDRV_SCHED_CONTEXT_TLM, // rotorSDrv
     Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
-    Gnc::SE3CTRL_SCHED_CONTEXT_TLM, // se3Ctrl
+    Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
     0, // mixer
     0 // activeFileLogger
 };
@@ -53,26 +53,39 @@ Svc::RateGroupDecouplerComponentImpl rgDecouple
 ;
 
 //NOTE(mereweth) - change this in sync with RosCycle timeDivMS
-static NATIVE_INT_TYPE rgGncDivs[] = {1, 100};
+static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 100};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGGNCDRV",
 #endif
                     rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
-static NATIVE_UINT_TYPE rgOpContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
     SIMREF::RSDRV_SCHED_CONTEXT_OP,
     Gnc::ATTFILTER_SCHED_CONTEXT_FILT,
     Gnc::SIGGEN_SCHED_CONTEXT_OP,
-    Gnc::SE3CTRL_SCHED_CONTEXT_CTRL,
+    Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
-
-Svc::PassiveRateGroupImpl rgOp(
+Svc::PassiveRateGroupImpl rgAtt(
 #if FW_OBJECT_NAMES == 1
-                    "RGOP",
+                    "RGATT",
 #endif
-                    rgOpContext,FW_NUM_ARRAY_ELEMENTS(rgOpContext));
+                    rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
+;
+
+static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+    // TODO(mereweth) - add sched contexts here - keep in sync with MD model
+    SIMREF::RSDRV_SCHED_CONTEXT_OP,
+    Gnc::ATTFILTER_SCHED_CONTEXT_FILT,
+    Gnc::SIGGEN_SCHED_CONTEXT_OP,
+    Gnc::LCTRL_SCHED_CONTEXT_POS,
+};
+Svc::PassiveRateGroupImpl rgPos(
+#if FW_OBJECT_NAMES == 1
+                    "RGPOS",
+#endif
+                    rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
 ;
 
 // Command Components
@@ -153,13 +166,13 @@ SIMREF::GazeboManipIfComponentImpl gzManipIf
 #endif
 ;
 
-Gnc::Se3CtrlComponentImpl se3Ctrl
+Gnc::LeeCtrlComponentImpl leeCtrl
 #if FW_OBJECT_NAMES == 1
-                    ("SE3CTRL")
+                    ("LEECTRL")
 #endif
 ;
 
-Gnc::WrenchMixerComponentImpl mixer
+Gnc::BasicMixerComponentImpl mixer
 #if FW_OBJECT_NAMES == 1
                     ("MIXER")
 #endif
@@ -245,10 +258,11 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     // Initialize the rate groups
     rg.init(10,0);
     rgDecouple.init(10,0);
-    rgOp.init(0);
+    rgAtt.init(0);
+    rgPos.init(0);
 
     // Initialize the GNC components
-    se3Ctrl.init(0);
+    leeCtrl.init(0);
     mixer.init(0);
     attFilter.init(0);
     sigGen.init(0);
@@ -288,7 +302,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
     
-    //udpReceiver.set_PortsOut_OutputPort(0, se3Ctrl.get_attRateThrust_InputPort(0));
+    udpReceiver.set_PortsOut_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
 
     /* Register commands */
     cmdSeq.regCommands();
@@ -298,7 +312,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     prmDb.regCommands();
     fatalHandler.regCommands();
 
-    se3Ctrl.regCommands();
+    leeCtrl.regCommands();
     attFilter.regCommands();
     mixer.regCommands();
     sigGen.regCommands();
@@ -310,7 +324,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     
     // read parameters
     prmDb.readParamFile();
-    se3Ctrl.loadParameters();
+    leeCtrl.loadParameters();
     attFilter.loadParameters();
     mixer.loadParameters();
     sigGen.loadParameters();
@@ -439,7 +453,7 @@ int main(int argc, char* argv[]) {
     constructApp(port_number, udp_string, hostname);
 
     if (!local_cycle) {
-        rgGncDrv.set_CycleOut_OutputPort(1, rg.get_CycleIn_InputPort(0));
+        rgGncDrv.set_CycleOut_OutputPort(2, rg.get_CycleIn_InputPort(0));
     }
     //dumparch();
 

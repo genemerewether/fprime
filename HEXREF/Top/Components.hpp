@@ -16,6 +16,7 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>
+#include <Svc/QueuedDecoupler/QueuedDecouplerComponentImpl.hpp>
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 
@@ -25,6 +26,7 @@ void exitTasks(void);
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
+#include <Gnc/Utils/ImuProc/ImuProcComponentImpl.hpp>
 #include <Gnc/Utils/FixedAxisSe3Adapter/FixedAxisSe3AdapterComponentImpl.hpp>
 #include <Gnc/Ctrl/Se3Ctrl/Se3CtrlComponentImpl.hpp>
 #include <Gnc/Ctrl/WrenchMixer/WrenchMixerComponentImpl.hpp>
@@ -37,10 +39,14 @@ void exitTasks(void);
 #include <LLProc/LLTlmChan/LLTlmChanImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
+extern Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr;
+extern Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr;
 extern Svc::ActiveDecouplerComponentImpl* actDecouple_ptr;
+extern Svc::RateGroupDriverImpl* rgDcplDrv_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
 extern Svc::PassiveRateGroupImpl* rgOp_ptr;
 extern Svc::PassiveRateGroupImpl* rgTlm_ptr;
+extern Svc::PassiveRateGroupImpl* rgDev_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
@@ -50,6 +56,7 @@ extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr;
 extern Gnc::FrameTransformComponentImpl* ctrlXest_ptr;
+extern Gnc::ImuProcComponentImpl* imuProc_ptr;
 extern Gnc::FixedAxisSe3AdapterComponentImpl* axSe3Adap_ptr;
 extern Gnc::Se3CtrlComponentImpl* se3Ctrl_ptr;
 extern Gnc::WrenchMixerComponentImpl* mixer_ptr;

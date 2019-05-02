@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   genfprime message_generation roscpp
   std_msgs geometry_msgs sensor_msgs rosgraph_msgs
   mav_msgs mav_planning_msgs
+  ackermann_msgs
   fprime_msgs
   actionlib
   trac_ik_lib
@@ -18,6 +19,7 @@ catkin_package(
   message_runtime
   std_msgs geometry_msgs sensor_msgs rosgraph_msgs
   mav_msgs mav_planning_msgs
+  ackermann_msgs
   fprime_msgs
   trac_ik_lib
   image_transport
