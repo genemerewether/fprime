@@ -165,6 +165,7 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/BlspSerialDriver \
 	SnapdragonFlight/BlspGpioDriver \
 	SnapdragonFlight/BlspSpiDriver \
+	SnapdragonFlight/BlspI2CDriver \
 	SnapdragonFlight/SnapdragonHealth \
 	SnapdragonFlight/MVCam \
 	SnapdragonFlight/HiresCam \
@@ -289,6 +290,7 @@ BLIMPREF_MODULES := \
 	$(BLIMPREF_DEPLOYMENT_MODULES) \
 	\
 	Drv/ForceTorque/ATINetbox \
+	Drv/IMU/MPU9250 \
 	\
 	$(ZMQ_MODULES) \
 	\

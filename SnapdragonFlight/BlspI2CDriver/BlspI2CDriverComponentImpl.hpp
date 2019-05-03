@@ -1,7 +1,7 @@
 // ====================================================================== 
-// \title  BlspSpiDriverImpl.hpp
+// \title  BlspI2CDriverImpl.hpp
 // \author tcanham
-// \brief  hpp file for BlspSpiDriver component implementation class
+// \brief  hpp file for BlspI2CDriver component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,10 +17,10 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
-#ifndef BlspSpiDriver_HPP
-#define BlspSpiDriver_HPP
+#ifndef BlspI2CDriver_HPP
+#define BlspI2CDriver_HPP
 
-#include "SnapdragonFlight/BlspSpiDriver/BlspSpiDriverComponentAc.hpp"
+#include "SnapdragonFlight/BlspI2CDriver/BlspI2CDriverComponentAc.hpp"
 
 namespace SnapdragonFlight {
 
@@ -31,16 +31,14 @@ namespace SnapdragonFlight {
      * MPU9x50 SPI interface supports upto 20MHz frequency. However 20MHz is not
      * reliable in our test and corrupted data is observed.
      */
-    enum SpiFrequency
+    enum I2CFrequency
     {
-       SPI_FREQUENCY_1MHZ = 1000000UL,
-       SPI_FREQUENCY_5MHZ = 5000000UL,
-       SPI_FREQUENCY_10MHZ = 10000000UL,
-       SPI_FREQUENCY_15MHZ = 15000000UL,
-       SPI_FREQUENCY_20MHZ = 20000000UL,
+       I2C_FREQUENCY_100KHZ = 100UL,
+       I2C_FREQUENCY_400KHZ = 400UL,
+       I2C_FREQUENCY_1MHZ = 1000UL,
     };
 
-    class BlspSpiDriverComponentImpl: public BlspSpiDriverComponentBase {
+    class BlspI2CDriverComponentImpl: public BlspI2CDriverComponentBase {
 
         public:
 
@@ -48,9 +46,9 @@ namespace SnapdragonFlight {
             // Construction, initialization, and destruction
             // ----------------------------------------------------------------------
 
-            //! Construct object BlspSpiDriver
+            //! Construct object BlspI2CDriver
             //!
-            BlspSpiDriverComponentImpl(
+            BlspI2CDriverComponentImpl(
 #if FW_OBJECT_NAMES == 1
                     const char * const compName /*!< The component name*/
 #else
@@ -58,17 +56,17 @@ namespace SnapdragonFlight {
 #endif
                     );
 
-            //! Initialize object BlspSpiDriver
+            //! Initialize object BlspI2CDriver
             //!
             void init(const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
             );
 
-            //! Destroy object BlspSpiDriver
+            //! Destroy object BlspI2CDriver
             //!
-            ~BlspSpiDriverComponentImpl(void);
+            ~BlspI2CDriverComponentImpl(void);
 
             //! Open device
-            void open(NATIVE_INT_TYPE device, SpiFrequency clock);
+            void open(NATIVE_INT_TYPE device, I2CFrequency clock);
 
         PRIVATE:
 
@@ -76,21 +74,24 @@ namespace SnapdragonFlight {
             // Handler implementations for user-defined typed input ports
             // ----------------------------------------------------------------------
 
-	    //! Handler implementation for SpiConfig
-	    //!
-	    void SpiConfig_handler(
-		const NATIVE_INT_TYPE portNum, /*!< The port number*/
-		U32 busSpeed 
-	    );
-      
-            //! Handler implementation for SpiReadWrite
+            //! Handler implementation for I2CReadWrite
             //!
-            void SpiReadWrite_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
-            Fw::Buffer &WriteBuffer, Fw::Buffer &readBuffer);
+            void I2CReadWrite_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                      Fw::Buffer &WriteBuffer,
+                                      Fw::Buffer &readBuffer);
+
+            //! Handler implementation for I2CConfig
+            //!
+            void I2CConfig_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                   U32 busSpeed,
+                                   U32 slaveAddr,
+                                   U32 timeout);
 
             NATIVE_INT_TYPE m_fd;
             NATIVE_INT_TYPE m_device;
-            U32 m_bytes;
+            U32 m_addr;
+            U32 m_readBytes;
+            U32 m_writeBytes;
 
     };
 

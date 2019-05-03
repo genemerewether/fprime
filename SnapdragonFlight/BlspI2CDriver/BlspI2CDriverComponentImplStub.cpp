@@ -1,7 +1,7 @@
 // ====================================================================== 
-// \title  BlspSpiDriverImpl.cpp
+// \title  BlspI2CDriverImpl.cpp
 // \author tcanham
-// \brief  cpp file for BlspSpiDriver component implementation class
+// \brief  cpp file for BlspI2CDriver component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,12 +17,12 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
-#include <SnapdragonFlight/BlspSpiDriver/BlspSpiDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspI2CDriver/BlspI2CDriverComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
 namespace SnapdragonFlight {
 
-    void BlspSpiDriverComponentImpl::open(NATIVE_INT_TYPE device, SpiFrequency clock) {
+    void BlspI2CDriverComponentImpl::open(NATIVE_INT_TYPE device, I2CFrequency clock) {
 
     }
 
@@ -30,21 +30,28 @@ namespace SnapdragonFlight {
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
-    void BlspSpiDriverComponentImpl ::
-      SpiConfig_handler(
-          const NATIVE_INT_TYPE portNum,
-          U32 busSpeed
+    void BlspI2CDriverComponentImpl ::
+      I2CReadWrite_handler(
+	  const NATIVE_INT_TYPE portNum,
+	  Fw::Buffer &writeBuffer,
+	  Fw::Buffer &readBuffer
       )
     {
-    }
-      
-    void BlspSpiDriverComponentImpl::SpiReadWrite_handler(
-            const NATIVE_INT_TYPE portNum, Fw::Buffer &WriteBuffer,
-            Fw::Buffer &readBuffer) {
-        // TODO
+      // TODO
     }
 
-    BlspSpiDriverComponentImpl::~BlspSpiDriverComponentImpl(void) {
+    void BlspI2CDriverComponentImpl ::
+      I2CConfig_handler(
+	  const NATIVE_INT_TYPE portNum,
+	  U32 busSpeed,
+	  U32 slaveAddr,
+	  U32 timeout
+      )
+    {
+      // TODO
+    }
+
+    BlspI2CDriverComponentImpl::~BlspI2CDriverComponentImpl(void) {
 
     }
 

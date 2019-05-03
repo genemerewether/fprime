@@ -4,6 +4,7 @@
 <component name="BlspSpiDriver" kind="passive" namespace="SnapdragonFlight">
 
     <import_port_type>Drv/SpiDriverPorts/SpiReadWritePortAi.xml</import_port_type>
+    <import_port_type>Drv/SpiDriverPorts/SpiConfigPortAi.xml</import_port_type>
     <import_dictionary>SnapdragonFlight/BlspSpiDriver/Events.xml</import_dictionary>
     <import_dictionary>SnapdragonFlight/BlspSpiDriver/Telemetry.xml</import_dictionary>
 
@@ -12,7 +13,9 @@
         <port name="SpiReadWrite" data_type="Drv::SpiReadWrite"  kind="sync_input">
            <comment>Port to push serial data received from driver</comment>
         </port>
-        
+
+	<port name="SpiConfig" data_type="Drv::SpiConfig"  kind="sync_input"    max_number="1">
+        </port>
     </ports>
 
 </component>

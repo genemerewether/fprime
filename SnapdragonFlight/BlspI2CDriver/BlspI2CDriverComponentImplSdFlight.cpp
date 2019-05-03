@@ -1,7 +1,7 @@
 // ====================================================================== 
-// \title  BlspSpiDriverImpl.cpp
+// \title  BlspI2CDriverImpl.cpp
 // \author tcanham
-// \brief  cpp file for BlspSpiDriver component implementation class
+// \brief  cpp file for BlspI2CDriver component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,7 +17,7 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
-#include <SnapdragonFlight/BlspSpiDriver/BlspSpiDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspI2CDriver/BlspI2CDriverComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 #include "SnapdragonFlight/DspRelay/dsp_relay.h"
 #include <Fw/Types/Assert.hpp>
@@ -28,24 +28,23 @@ namespace SnapdragonFlight {
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
-    void BlspSpiDriverComponentImpl ::
-      SpiConfig_handler(
+    void BlspI2CDriverComponentImpl ::
+      I2CConfig_handler(
           const NATIVE_INT_TYPE portNum,
-          U32 busSpeed
+          U32 busSpeed,
+          U32 slaveAddr,
+          U32 timeout
       )
     {
-        if (this->m_fd == -1) {
+        NATIVE_INT_TYPE stat = dsp_relay_i2c_relay_configure(this->m_fd, busSpeed, slaveAddr, timeout);
+        if (stat != 0) {
+            this->log_WARNING_HI_I2C_ConfigError(this->m_device,stat);
             return;
         }
-
-        NATIVE_INT_TYPE stat = dsp_relay_spi_relay_configure(this->m_fd,busSpeed);
-        if (stat != 0) {
-            this->log_WARNING_HI_SPI_ConfigError(this->m_device,stat);
-            return;
-        }      
+        this->m_addr = slaveAddr;
     }
   
-    void BlspSpiDriverComponentImpl::SpiReadWrite_handler(
+    void BlspI2CDriverComponentImpl::I2CReadWrite_handler(
             const NATIVE_INT_TYPE portNum, Fw::Buffer &writeBuffer,
             Fw::Buffer &readBuffer) {
 
@@ -53,44 +52,41 @@ namespace SnapdragonFlight {
             return;
         }
 
-        // TODO: Max buffer size for SPI is 512, so should check for this.
-        //       See dev_fs_lib_spi.h- DSPAL_SPI_TRANSMIT_BUFFER_LENGTH
-        NATIVE_INT_TYPE stat = dsp_relay_spi_relay_read_write(this->m_fd,
+        NATIVE_INT_TYPE stat = dsp_relay_i2c_relay_read_write(this->m_fd,
                 reinterpret_cast<unsigned char*>(writeBuffer.getdata()),
                 writeBuffer.getsize(),
                 reinterpret_cast<unsigned char*>(readBuffer.getdata()),
                 readBuffer.getsize());
 
         if (stat != 0) {
-            this->log_WARNING_HI_SPI_WriteError(this->m_device,stat);
+            this->log_WARNING_HI_I2C_WriteError(this->m_device,
+						this->m_addr,
+						stat,
+						0, writeBuffer.getsize());
         }
-
-        this->m_bytes += readBuffer.getsize();
-        this->tlmWrite_SPI_Bytes(this->m_bytes);
-
+	
+	this->m_readBytes += readBuffer.getsize();
+	this->m_writeBytes += writeBuffer.getsize();
+       
+        this->tlmWrite_I2C_ReadBytes(this->m_readBytes);
+        this->tlmWrite_I2C_WriteBytes(this->m_writeBytes);
     }
 
-    void BlspSpiDriverComponentImpl::open(NATIVE_INT_TYPE device, SpiFrequency clock) {
+    void BlspI2CDriverComponentImpl::open(NATIVE_INT_TYPE device, I2CFrequency clock) {
 
         this->m_device = device;
 
-        NATIVE_INT_TYPE fd = dsp_relay_spi_relay_open(device);
+        NATIVE_INT_TYPE fd = dsp_relay_i2c_relay_open(device);
         if (-1 == fd) {
-            this->log_WARNING_HI_SPI_OpenError(device,fd);
+            this->log_WARNING_HI_I2C_OpenError(device,fd);
             return;
         }
 
         this->m_fd = fd;
-
-        NATIVE_INT_TYPE stat = dsp_relay_spi_relay_configure(fd,clock);
-        if (stat != 0) {
-            this->log_WARNING_HI_SPI_ConfigError(device,stat);
-            return;
-        }
     }
 
-    BlspSpiDriverComponentImpl::~BlspSpiDriverComponentImpl(void) {
-        dsp_relay_spi_relay_close(this->m_fd);
+    BlspI2CDriverComponentImpl::~BlspI2CDriverComponentImpl(void) {
+        dsp_relay_i2c_relay_close(this->m_fd);
     }
 
 } // end namespace SnapdragonFlight

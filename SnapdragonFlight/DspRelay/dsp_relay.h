@@ -53,6 +53,10 @@ __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_open)(int device) __Q
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_configure)(int fd, int clock) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_read_write)(int fd, const unsigned char* write_data, int write_dataLen, unsigned char* read_data, int read_dataLen) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_close)(int fd) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_open)(int device) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_configure)(int fd, int busSpeed, int slaveAddr, int timeout) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_read_write)(int fd, const unsigned char* write_data, int write_dataLen, unsigned char* read_data, int read_dataLen) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_close)(int fd) __QAIC_HEADER_ATTRIBUTE;
 #ifdef __cplusplus
 }
 #endif
