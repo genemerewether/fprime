@@ -57,6 +57,8 @@ namespace Drv {
       bool isReady(void);
 
       enum OutputMode {
+          OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ,
+          OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ,
           OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ,
           OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ
       };
@@ -100,6 +102,7 @@ namespace Drv {
         INIT_GYRO_CONFIG,
         INIT_ACCEL_CONFIG_1,
         INIT_ACCEL_CONFIG_2,
+	INIT_SMPLRT_DIV_CONFIG,
         INIT_MAG_CONFIG,
         INIT_COMPLETE,
         INIT_ERROR,

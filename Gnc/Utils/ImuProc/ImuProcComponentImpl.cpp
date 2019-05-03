@@ -76,8 +76,8 @@ namespace Gnc {
   {
       // TODO (mereweth) - actually do processing and downsample
       static unsigned int down = 0u;
-      if (++down >= 8) {
-	down = 0u;
+      /*      if (++down >= 8) {
+	      down = 0u;*/
 	
       for (int i = 0; i < NUM_DOWNSAMPLEDIMU_OUTPUT_PORTS; i++) {
 	  if (this->isConnected_DownsampledImu_OutputPort(i)) {
@@ -87,7 +87,7 @@ namespace Gnc {
 	      DEBUG_PRINT("MPU9250 Imu out port %d not connected\n", i);
 	  }
       }
-      }
+      //}
   }
 
   // ----------------------------------------------------------------------
