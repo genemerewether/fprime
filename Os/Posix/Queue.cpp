@@ -29,8 +29,27 @@ namespace Os {
             FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
             ret = pthread_cond_init(&this->queueNotFull, NULL);
             FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
-            ret = pthread_mutex_init(&this->mp, NULL);
-            FW_ASSERT(ret == 0, ret); // If this fails, something horrible happened.
+
+	    // set attributes
+	    pthread_mutexattr_t attr;
+	    pthread_mutexattr_init(&attr);
+
+	    NATIVE_INT_TYPE stat;
+	    // set to error checking
+	    //stat = pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_ERRORCHECK);
+            //FW_ASSERT(stat == 0,stat);
+
+	    // set to normal mutex type
+	    stat = pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_NORMAL);
+	    FW_ASSERT(stat == 0,stat);
+
+	    // set to check for priority inheritance
+	    stat = pthread_mutexattr_setprotocol(&attr,PTHREAD_PRIO_INHERIT);
+	    FW_ASSERT(stat == 0,stat);
+
+	    stat = pthread_mutex_init(&this->mp,&attr);	
+	    FW_ASSERT(stat == 0,stat);
+	    
             this->handle = m_handle;
         }
         ~QueueHandle() { 

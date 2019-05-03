@@ -16,6 +16,7 @@ void exitTasks(void);
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>
+#include <Svc/QueuedDecoupler/QueuedDecouplerComponentImpl.hpp>
 
 #include <SnapdragonFlight/KraitRouter/KraitRouterComponentImpl.hpp>
 
@@ -25,9 +26,9 @@ void exitTasks(void);
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
-#include <Gnc/Utils/FixedAxisSe3Adapter/FixedAxisSe3AdapterComponentImpl.hpp>
-#include <Gnc/Ctrl/Se3Ctrl/Se3CtrlComponentImpl.hpp>
-#include <Gnc/Ctrl/WrenchMixer/WrenchMixerComponentImpl.hpp>
+#include <Gnc/Utils/ImuProc/ImuProcComponentImpl.hpp>
+#include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
+#include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
@@ -37,10 +38,15 @@ void exitTasks(void);
 #include <LLProc/LLTlmChan/LLTlmChanImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
+extern Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr;
+extern Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr;
 extern Svc::ActiveDecouplerComponentImpl* actDecouple_ptr;
+extern Svc::RateGroupDriverImpl* rgDcplDrv_ptr;
 extern Svc::RateGroupDriverImpl* rgGncDrv_ptr;
-extern Svc::PassiveRateGroupImpl* rgOp_ptr;
+extern Svc::PassiveRateGroupImpl* rgAtt_ptr;
+extern Svc::PassiveRateGroupImpl* rgPos_ptr;
 extern Svc::PassiveRateGroupImpl* rgTlm_ptr;
+extern Svc::PassiveRateGroupImpl* rgDev_ptr;
 extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
@@ -50,9 +56,9 @@ extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::KraitRouterComponentImpl* kraitRouter_ptr;
 extern Gnc::FrameTransformComponentImpl* ctrlXest_ptr;
-extern Gnc::FixedAxisSe3AdapterComponentImpl* axSe3Adap_ptr;
-extern Gnc::Se3CtrlComponentImpl* se3Ctrl_ptr;
-extern Gnc::WrenchMixerComponentImpl* mixer_ptr;
+extern Gnc::ImuProcComponentImpl* imuProc_ptr;
+extern Gnc::LeeCtrlComponentImpl* leeCtrl_ptr;
+extern Gnc::BasicMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 extern Gnc::SigGenComponentImpl* sigGen_ptr;
 extern Gnc::AttFilterComponentImpl* attFilter_ptr;

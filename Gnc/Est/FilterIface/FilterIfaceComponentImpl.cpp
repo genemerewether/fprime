@@ -31,6 +31,8 @@
 
 #include <ros/callback_queue.h>
 
+#define DO_TIME_CONV
+
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
@@ -142,6 +144,7 @@ namespace Gnc {
 
         ROS::std_msgs::Header header = Odometry.getheader();
         Fw::Time stamp = header.getstamp();
+#ifdef DO_TIME_CONV
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
@@ -184,6 +187,11 @@ namespace Gnc {
 	 	  (U32) (usecRos % (1000LL * 1000LL)));
 	header.setstamp(stamp);
         Odometry.setheader(header);
+#else
+        msg.header.stamp.sec = stamp.getSeconds();
+        msg.header.stamp.nsec = stamp.getUSeconds() * 1000LL;
+#endif // ifdef DO_TIME_CONV
+	
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -317,7 +325,8 @@ namespace Gnc {
 	    //TODO(mereweth) - EVR
 	    return;
 	}
-	    
+
+#ifdef DO_TIME_CONV
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
         I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
@@ -355,7 +364,12 @@ namespace Gnc {
                           0,
                           (U32) (usecDsp / 1000 / 1000),
                           (U32) (usecDsp % (1000 * 1000)));
-
+#else
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (msg->header.stamp.sec),
+                          (U32) (msg->header.stamp.nsec / 1000));
+#endif //DO_TIME_CONV
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
 	if (!std::isfinite(msg->pose.pose.position.x) ||

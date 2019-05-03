@@ -1,0 +1,6 @@
+<interface name="AckermannDrive" namespace="ROS::ackermann_msgs">
+  <args>
+    <arg name="AckermannDrive" pass_by="reference" type="ROS::ackermann_msgs::AckermannDrive"/>
+  </args>
+  <import_serializable_type>ROS/Gen/ackermann_msgs/Types/AckermannDriveSerializableAi.xml</import_serializable_type>
+</interface>

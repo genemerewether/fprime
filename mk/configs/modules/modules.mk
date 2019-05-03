@@ -165,6 +165,7 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/BlspSerialDriver \
 	SnapdragonFlight/BlspGpioDriver \
 	SnapdragonFlight/BlspSpiDriver \
+	SnapdragonFlight/BlspI2CDriver \
 	SnapdragonFlight/SnapdragonHealth \
 	SnapdragonFlight/MVCam \
 	SnapdragonFlight/HiresCam \
@@ -176,6 +177,7 @@ HEXAGON_MODULES := \
 
 QUEST_GNC_ROSIFACE_MODULES := \
 	Gnc/Ctrl/MultirotorCtrlIface \
+	Gnc/Utils/AckermannIface \
 	Gnc/Est/FilterIface
 
 QUEST_GNC_MODULES := \
@@ -214,7 +216,8 @@ ROS_PORT_MODULES := \
 	ROS/Gen/rosgraph_msgs/Ports	 \
 	ROS/Gen/actionlib_msgs/Ports     \
 	ROS/Gen/mav_msgs/Ports		 \
-	ROS/Gen/sensor_msgs/Ports
+	ROS/Gen/sensor_msgs/Ports	 \
+	ROS/Gen/ackermann_msgs/Ports
 
 ROS_TYPE_MODULES := \
 	ROS/Gen/std_msgs/Types  \
@@ -224,7 +227,8 @@ ROS_TYPE_MODULES := \
 	ROS/Gen/rosgraph_msgs/Types	 \
 	ROS/Gen/actionlib_msgs/Types     \
 	ROS/Gen/mav_msgs/Types		 \
-	ROS/Gen/sensor_msgs/Types
+	ROS/Gen/sensor_msgs/Types	 \
+	ROS/Gen/ackermann_msgs/Types
 
 ROS_TYPE_PORT_MODULES_ALL := \
 	$(ROS_TYPE_MODULES) \
@@ -269,6 +273,45 @@ Ref_MODULES := \
 	$(SVC_MODULES) \
 	\
 	$(DRV_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+BLIMPREF_DEPLOYMENT_MODULES := \
+	BLIMPREF/Top
+
+BLIMPREF_MODULES := \
+	\
+	$(BLIMPREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	Drv/IMU/MPU9250 \
+	\
+	$(ZMQ_MODULES) \
+	\
+	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
+	\
+	$(SNAPDRAGON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
+	\
+	$(DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
 	\
 	$(FW_MODULES) \
 	\
@@ -383,24 +426,13 @@ HEXREF_GENERAL_MODULES := \
 	ROS/Gen/mav_msgs/Types		 \
 	ROS/Gen/sensor_msgs/Types	\
 	\
-	Gnc/Ctrl/Se3Ctrl \
-	Gnc/Ctrl/WrenchMixer \
-	Gnc/Est/AttFilter \
-	Gnc/Sysid/SigGen \
-	Gnc/Utils/FixedAxisSe3Adapter \
-	Gnc/Utils/FrameTransform \
-	Gnc/quest_gnc/src/diffeo \
-	Gnc/quest_gnc/src/traj \
-	Gnc/quest_gnc/src/ctrl \
-	Gnc/quest_gnc/src/est \
-	Gnc/quest_gnc/src/mixer \
-	Gnc/quest_gnc/src/sysid \
-	\
+	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(HEXAGON_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/Mavlink/ActuatorControls \
 	Drv/PwmDriverPorts \
 	Drv/GpioDriverPorts \
 	Drv/SerialDriverPorts \
@@ -411,14 +443,17 @@ HEXREF_GENERAL_MODULES := \
 	Drv/LinuxI2CDriver \
 	Drv/LinuxPwmDriver \
 	\
+	Svc/BufferManager \
 	Svc/CmdDispatcher \
+	Svc/CmdSequencer \
 	Svc/Seq \
+	Svc/ActiveRateGroup \
 	Svc/PassiveRateGroup \
-	Svc/PassiveTextLogger \
-	Svc/PassiveConsoleTextLogger \
 	Svc/RateGroupDriver \
 	Svc/RateGroupDecoupler \
 	Svc/Sched \
+	Svc/PassiveTextLogger \
+	Svc/PassiveConsoleTextLogger \
 	Svc/Time \
 	Svc/Cycle \
 	Svc/LinuxTime \
@@ -426,6 +461,7 @@ HEXREF_GENERAL_MODULES := \
 	Svc/Fatal \
 	Svc/PolyIf \
 	Svc/PolyDb \
+	Svc/PrmDb \
 	Svc/Ping \
 	Svc/Health \
 	Svc/WatchDog \
@@ -634,7 +670,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

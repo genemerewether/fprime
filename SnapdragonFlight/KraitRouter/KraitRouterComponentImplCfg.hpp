@@ -31,6 +31,7 @@ enum {
 
 enum KraitRouterReturnCode {
     KR_RTN_QUIT_PREINIT = -10,
+    KR_RTN_SEND_FULL = -4,
     KR_RTN_SEND_TOO_BIG = -3,
     KR_RTN_QUIT = -2,
 

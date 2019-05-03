@@ -42,10 +42,15 @@ static Fw::SimpleObjRegistry simpleReg;
 // Component instance pointers
 
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
+Svc::QueuedDecouplerComponentImpl* imuDataPasser_ptr = 0;
+Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr = 0;
 Svc::ActiveDecouplerComponentImpl* actDecouple_ptr = 0;
+Svc::RateGroupDriverImpl* rgDcplDrv_ptr = 0;
 Svc::RateGroupDriverImpl* rgGncDrv_ptr = 0;
-Svc::PassiveRateGroupImpl* rgOp_ptr = 0;
+Svc::PassiveRateGroupImpl* rgAtt_ptr = 0;
+Svc::PassiveRateGroupImpl* rgPos_ptr = 0;
 Svc::PassiveRateGroupImpl* rgTlm_ptr = 0;
+Svc::PassiveRateGroupImpl* rgDev_ptr = 0;
 Svc::ConsoleTextLoggerImpl* textLogger_ptr = 0;
 LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
 Svc::LinuxTimeImpl* linuxTime_ptr = 0;
@@ -55,9 +60,9 @@ Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
 Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
-Gnc::FixedAxisSe3AdapterComponentImpl* axSe3Adap_ptr = 0;
-Gnc::Se3CtrlComponentImpl* se3Ctrl_ptr = 0;
-Gnc::WrenchMixerComponentImpl* mixer_ptr = 0;
+Gnc::ImuProcComponentImpl* imuProc_ptr = 0;
+Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
+Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::AttFilterComponentImpl* attFilter_ptr = 0;
@@ -76,6 +81,20 @@ void allocComps() {
                         5) // multiply by sleep duration in run1backupCycle
 ;
 
+    imuDataPasser_ptr = new Svc::QueuedDecouplerComponentImpl(
+#if FW_OBJECT_NAMES == 1
+                        "IMUDATPASSER"
+#endif
+                                                            )
+;
+	
+    imuDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
+#if FW_OBJECT_NAMES == 1
+                        "IMUDECOUPLE"
+#endif
+                                                            )
+;
+    
     actDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "ACTDECOUPLE"
@@ -83,11 +102,22 @@ void allocComps() {
                                                             )
 ;
 
+    NATIVE_UINT_TYPE rgDevContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        Drv::MPU9250_SCHED_CONTEXT_OPERATE, // mpu9250
+    };
+
+    rgDev_ptr = new Svc::PassiveRateGroupImpl(
+#if FW_OBJECT_NAMES == 1
+                            "RGDEV",
+#endif
+                            rgDevContext,FW_NUM_ARRAY_ELEMENTS(rgDevContext));
+;
+ 
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
-        Gnc::SE3CTRL_SCHED_CONTEXT_TLM, // se3Ctrl
+        Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
         Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
         0, // logQueue
@@ -101,7 +131,15 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgGncDivs[] = {10, 1000};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 16};
+
+    rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
+#if FW_OBJECT_NAMES == 1
+                        "RGDCPLDRV",
+#endif
+                        rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
+ 
+    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 500};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -109,22 +147,40 @@ void allocComps() {
 #endif
                         rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
-    NATIVE_UINT_TYPE rgOpContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        Drv::MPU9250_SCHED_CONTEXT_OPERATE,
+    NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        0, // imuDataPasser
         Gnc::ATTFILTER_SCHED_CONTEXT_FILT, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_OP, // sigGen
-        Gnc::SE3CTRL_SCHED_CONTEXT_CTRL, // se3Ctrl
-        0, // mixer
-	Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
+        Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
+        0,
+        0,
         0, // logQueue
         0, // kraitRouter
     };
 
-    rgOp_ptr = new Svc::PassiveRateGroupImpl(
+    rgAtt_ptr = new Svc::PassiveRateGroupImpl(
 #if FW_OBJECT_NAMES == 1
-                            "RGOP",
+                            "RGATT",
 #endif
-                            rgOpContext,FW_NUM_ARRAY_ELEMENTS(rgOpContext));
+                            rgAttContext,FW_NUM_ARRAY_ELEMENTS(rgAttContext));
+;
+
+    NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
+        Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
+        0,
+        0,
+        0,
+        0,
+        0, // logQueue
+        0, // kraitRouter
+    };
+
+    rgPos_ptr = new Svc::PassiveRateGroupImpl(
+#if FW_OBJECT_NAMES == 1
+                    "RGPOS",
+#endif
+                    rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
 ;
 
     textLogger_ptr = new Svc::ConsoleTextLoggerImpl
@@ -180,20 +236,20 @@ void allocComps() {
                         ("CTRLXEST")
 #endif
 ;
-    
-    axSe3Adap_ptr = new Gnc::FixedAxisSe3AdapterComponentImpl
-#if FW_OBJECT_NAMES == 1
-                        ("AXSE3ADAP")
-#endif
-;
  
-    se3Ctrl_ptr = new Gnc::Se3CtrlComponentImpl
+    imuProc_ptr = new Gnc::ImuProcComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("SE3CTRL")
+                        ("IMUPROC")
 #endif
 ;
 
-    mixer_ptr = new Gnc::WrenchMixerComponentImpl
+    leeCtrl_ptr = new Gnc::LeeCtrlComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("LEECTRL")
+#endif
+;
+
+    mixer_ptr = new Gnc::BasicMixerComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("MIXER")
 #endif
@@ -275,9 +331,9 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
-    mpu9250_ptr->set_Imu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
+    imuProc_ptr->set_DownsampledImu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
-    se3Ctrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
+    leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
     actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
@@ -296,24 +352,35 @@ void manualConstruct(void) {
     // aux actuator command
     //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, axSe3Adap_ptr->get_flatOutput_InputPort(0));
-    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
-    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, se3Ctrl_ptr->get_attRateThrust_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(7, leeCtrl_ptr->get_attRateThrust_InputPort(0));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(8));
 
     // other serial ports
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
+    imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
+
+    imuProc_ptr->set_DownsampledImu_OutputPort(0, imuDataPasser_ptr->get_DataIn_InputPort(0));
+    imuDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+    
 #ifdef DECOUPLE_ACTUATORS
     mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
     actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
         
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
+
+    rgPos_ptr->set_RateGroupMemberOut_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(4));
+    actDecouple_ptr->set_DataOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
 #else
     mixer_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
         
     sigGen_ptr->set_motor_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
+
+    rgPos_ptr->set_RateGroupMemberOut_OutputPort(0, actuatorAdapter_ptr->get_sched_InputPort(0));
 #endif
 }
 
@@ -328,23 +395,30 @@ void constructApp() {
 
     // Initialize rate group driver
     rgGncDrv_ptr->init();
+    rgDcplDrv_ptr->init();
 
     // Initialize the rate groups
-    rgDecouple_ptr->init(10, 0);
-    actDecouple_ptr->init(10, 500); // big message queue entry, few entries
-    rgOp_ptr->init(0);
+    rgDecouple_ptr->init(10, 0); // designed to drop if full
+    imuDataPasser_ptr->init(100, 400); // big entries for IMU
+    imuDecouple_ptr->init(100, 20); // just need to serialize cycle port
+    actDecouple_ptr->init(100, 500); // big message queue entry, few entries
+    rgAtt_ptr->init(1);
+    rgPos_ptr->init(0);
     rgTlm_ptr->init(2);
+    rgDev_ptr->init(3);
 
     // Initialize the GNC components
     ctrlXest_ptr->init(0);
-    axSe3Adap_ptr->init(0);
-    se3Ctrl_ptr->init(0);
+    imuProc_ptr->init(0);
+    leeCtrl_ptr->init(0);
     mixer_ptr->init(0);
     actuatorAdapter_ptr->init(0);
     sigGen_ptr->init(0);
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
 
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
+    
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
     hwEnablePin_ptr->init(1);
@@ -365,7 +439,7 @@ void constructApp() {
     cmdDisp_ptr->init(0);
     tlmChan_ptr->init(0);
 
-    kraitRouter_ptr->init(50, 1000);
+    kraitRouter_ptr->init(200, 1000);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -377,8 +451,8 @@ void constructApp() {
     fatalHandler_ptr->regCommands();
 
     ctrlXest_ptr->regCommands();
-    se3Ctrl_ptr->regCommands();
-    axSe3Adap_ptr->regCommands();
+    imuProc_ptr->regCommands();
+    leeCtrl_ptr->regCommands();
     attFilter_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
@@ -420,6 +494,7 @@ void constructApp() {
 #endif // BUILD_DSPAL
 
     // Active component startup
+    imuDecouple_ptr->start(0, 91, 20*1024);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple_ptr->start(0, 90, 20*1024);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
@@ -482,6 +557,7 @@ void run1backupCycle(void) {
 
 void exitTasks(void) {
     rgDecouple_ptr->exit();
+    imuDecouple_ptr->exit();
     actDecouple_ptr->exit();
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
@@ -509,7 +585,7 @@ int hexref_arm() {
     Fw::CmdPacket cmdPkt;
     Fw::ComBuffer dat0(&buf[0], sizeof(buf));
     Fw::SerializeStatus stat = cmdPkt.deserialize(dat0);
-    Fw::InputCmdPort* p2 = se3Ctrl_ptr->get_CmdDisp_InputPort(0);
+    Fw::InputCmdPort* p2 = leeCtrl_ptr->get_CmdDisp_InputPort(0);
     p2->invoke(0x1a1,0,cmdPkt.getArgBuffer());
     usleep(50000);
     DEBUG_PRINT("hexref_arm after sleep\n");
@@ -583,15 +659,15 @@ int hexref_run(void) {
         return -1;
     }
     
-    rgDecouple_ptr->setEnabled(true);
     while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
         cycleStart.take();
         port->invoke(cycleStart);
         Os::Task::delay(10);
     }
-
+    rgDecouple_ptr->setEnabled(true);
+    
     int backupCycle = 0;
 
     while (!terminate) {
@@ -618,15 +694,15 @@ int hexref_cycle(unsigned int backupCycles) {
         return -1;
     }
     
-    rgDecouple_ptr->setEnabled(true);
     while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
         cycleStart.take();
         port->invoke(cycleStart);
         Os::Task::delay(10);
     }
 
+    rgDecouple_ptr->setEnabled(true);
     for (unsigned int i = 0; i < backupCycles; i++) {
         if (terminate) break;
         run1backupCycle();

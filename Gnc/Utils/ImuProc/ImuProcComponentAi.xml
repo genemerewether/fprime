@@ -21,7 +21,7 @@
         <port name="NotchedImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="1">
         </port>
 
-        <port name="DownsampledImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="1">
+        <port name="DownsampledImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="2">
         </port>
 	
         <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

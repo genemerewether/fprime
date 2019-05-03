@@ -30,15 +30,16 @@ void exitTasks(void);
 #include <Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentImpl.hpp>
 #include <Gnc/Est/FilterIface/FilterIfaceComponentImpl.hpp>
 #include <SIMREF/GazeboManipIf/GazeboManipIfComponentImpl.hpp>
-#include <Gnc/Ctrl/Se3Ctrl/Se3CtrlComponentImpl.hpp>
-#include <Gnc/Ctrl/WrenchMixer/WrenchMixerComponentImpl.hpp>
+#include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
+#include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
-extern Svc::PassiveRateGroupImpl rgOp;
+extern Svc::PassiveRateGroupImpl rgAtt;
+extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::CmdSequencerComponentImpl cmdSeq;
 extern Svc::SocketGndIfImpl sockGndIf;
 extern Svc::ConsoleTextLoggerImpl textLogger;
@@ -57,8 +58,8 @@ extern SIMREF::RotorSDrvComponentImpl rotorSDrv;
 extern Gnc::MultirotorCtrlIfaceComponentImpl mrCtrlIface;
 extern Gnc::FilterIfaceComponentImpl filterIface;
 extern SIMREF::GazeboManipIfComponentImpl gzManipIf;
-extern Gnc::Se3CtrlComponentImpl se3Ctrl;
-extern Gnc::WrenchMixerComponentImpl mixer;
+extern Gnc::LeeCtrlComponentImpl leeCtrl;
+extern Gnc::BasicMixerComponentImpl mixer;
 extern Gnc::SigGenComponentImpl sigGen;
 extern Gnc::AttFilterComponentImpl attFilter;
 

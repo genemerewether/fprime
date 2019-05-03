@@ -168,6 +168,9 @@ namespace SnapdragonFlight {
 
         Os::Queue::QueueStatus qStatus =
           this->m_sendQueue.send(buff, buffLen, 0, Os::Queue::QUEUE_NONBLOCKING);
+	if (Os::Queue::QUEUE_FULL == qStatus) {
+	    return KR_RTN_SEND_FULL;
+	}
         FW_ASSERT(
             qStatus == Os::Queue::QUEUE_OK,
             static_cast<AssertArg>(qStatus)
