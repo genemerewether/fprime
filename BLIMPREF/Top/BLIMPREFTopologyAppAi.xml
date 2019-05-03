@@ -80,11 +80,11 @@
 
    <instance namespace="Svc" name="cmdSeq" type="CmdSequencer" base_id="26000"  base_id_window="100" />
 
-   <instance namespace="Snapdragon" name="hwEnablePinSnap" type="BlspGpioDriver" base_id="20100"  base_id_window="25" />
+   <instance namespace="SnapdragonFlight" name="hwEnablePinSnap" type="BlspGpioDriver" base_id="20100"  base_id_window="25" />
 
    <instance namespace="Svc" name="fatalAdapter" type="AssertFatalAdapter" base_id="10250"  base_id_window="25" />
 
-   <instance namespace="Snapdragon" name="spiDrvSnap" type="BlspSpiDriver" base_id="20125"  base_id_window="25" />
+   <instance namespace="SnapdragonFlight" name="spiDrvSnap" type="BlspSpiDriver" base_id="20125"  base_id_window="25" />
 
    <instance namespace="Svc" name="passiveDataPasser" type="QueuedDecoupler" base_id="10525"  base_id_window="25" />
 
@@ -110,7 +110,7 @@
 
    <instance namespace="Gnc" name="mrCtrlIface" type="MultirotorCtrlIface" base_id="20325"  base_id_window="25" />
 
-   <instance namespace="Snapdragon" name="imuDRIntSnap" type="BlspGpioDriver" base_id="20150"  base_id_window="25" />
+   <instance namespace="SnapdragonFlight" name="imuDRIntSnap" type="BlspGpioDriver" base_id="20150"  base_id_window="25" />
 
    <instance namespace="Gnc" name="axSe3Adap" type="FixedAxisSe3Adapter" base_id="4050"  base_id_window="50" />
 
