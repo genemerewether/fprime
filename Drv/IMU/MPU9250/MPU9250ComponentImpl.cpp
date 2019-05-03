@@ -328,6 +328,14 @@ namespace Drv {
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_CONFIG | SPI_BITS_WRITE;
                     // temperature & gyro DLPF, FIFO mode
+		    if (OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ == m_outMode) {
+                        writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_20HZ |
+                                      MPU9250_BITS_CONFIG_FIFO_MODE_STOP;
+                    }
+		    if (OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ == m_outMode) {
+                        writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_41HZ |
+                                      MPU9250_BITS_CONFIG_FIFO_MODE_STOP;
+                    }
                     if (OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ == m_outMode) {
                         // 184Hz low-pass gives data output at 1 kHz
                         writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_184HZ | //MPU9250_BITS_GYRO_DLPF_CFG_250HZ |
@@ -366,6 +374,14 @@ namespace Drv {
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_ACCEL_CONFIG2 | SPI_BITS_WRITE;
 
+		    if (OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ == m_outMode) {
+                        writeBuf[1] = MPU9250_BITS_ACCEL_BW_LTE_460HZ |
+                                      MPU9250_BITS_ACCEL_DLPF_CFG_20HZ;
+                    }
+		    if (OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ == m_outMode) {
+                        writeBuf[1] = MPU9250_BITS_ACCEL_BW_LTE_460HZ |
+                                      MPU9250_BITS_ACCEL_DLPF_CFG_41HZ;
+                    }
                     if (OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ == m_outMode) {
                         // TODO(mereweth) - better performance with DLPF?
                         // 460Hz low-pass gives data output at 1 kHz
@@ -377,6 +393,23 @@ namespace Drv {
                         writeBuf[1] = MPU9250_BITS_ACCEL_BW_1130HZ;
                     }
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+		    m_initState = INIT_SMPLRT_DIV_CONFIG;
+		    break;
+                case INIT_SMPLRT_DIV_CONFIG:
+                    DEBUG_PRINT("MPU9250 enter INIT_SMPLRT_DIV_CONFIG\n");
+                    this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
+                    writeBuf[0] = MPU9250_REG_SMPLRT_DIV | SPI_BITS_WRITE;
+
+		    if (OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ == m_outMode) {
+		        // NOTE(mereweth) - divide rate by (1+smplrt_div) 
+                        writeBuf[1] = 19;
+                        this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    }
+		    if (OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ == m_outMode) {
+		        // NOTE(mereweth) - divide rate by (1+smplrt_div) 
+                        writeBuf[1] = 9;
+                        this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
+                    }
                     m_initState = INIT_MAG_CONFIG;
                     break;
                 case INIT_MAG_CONFIG:

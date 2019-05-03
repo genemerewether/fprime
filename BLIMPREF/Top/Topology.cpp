@@ -5,12 +5,7 @@ enum {
     CORE_0 = 0,
     CORE_1 = 1,
     CORE_2 = 2,
-    CORE_3 = 3,
-
-    CORE_CDH = CORE_0,
-    CORE_RPC = CORE_1,
-    CORE_CAM = CORE_2,
-    CORE_GNC = CORE_3
+    CORE_3 = 3
 };
 
 #include <Fw/Types/Assert.hpp>
@@ -223,7 +218,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 50};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 1};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -231,7 +226,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
  
-    NATIVE_INT_TYPE rgGncDivs[] = {1, 20};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 50};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -518,9 +513,9 @@ void constructApp(unsigned int port_number,
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0); // designed to drop if full
-    passiveDataPasser_ptr->init(1000, 1000); // big entries - all passive components in rgOp use this
+    passiveDataPasser_ptr->init(10000, 1000); // big entries - all passive components in rgOp use this
     imuDecouple_ptr->init(1000, 20); // just need to serialize cycle port
-    actDecouple_ptr->init(100, 500); // big message queue entry, few entries
+    actDecouple_ptr->init(1000, 500); // big message queue entry, few entries
     rgOp_ptr->init(0);
     rgTlm_ptr->init(2);
     rgDev_ptr->init(3);
@@ -535,6 +530,9 @@ void constructApp(unsigned int port_number,
     sigGen_ptr->init(0);
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
+    
+    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ);
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ);
 
     spiDrvSnap_ptr->init(0);
     i2cDrvSnap_ptr->init(0);
@@ -611,11 +609,11 @@ void constructApp(unsigned int port_number,
 #endif // SDFLIGHT vs LINUX
 
     // Active component startup
-    imuDecouple_ptr->start(0, 91, 20*1024);
+    imuDecouple_ptr->start(0, 91, 20*1024, CORE_1);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
-    rgDecouple_ptr->start(0, 90, 20*1024);
+    rgDecouple_ptr->start(0, 90, 20*1024, CORE_2);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
-    actDecouple_ptr->start(0, 92, 20*1024);
+    actDecouple_ptr->start(0, 92, 20*1024, CORE_3);
 
     cmdDisp_ptr->start(0,60,20*1024);
     // start sequencer
