@@ -68,8 +68,8 @@ namespace Gnc {
     flySafeCycles(0u),
     flySafeMaxElapsedCycles(0u),
     flySafeCheckTime(false),
-    flySafeLastTime(),
-    flySafeMaxElapsedTime(),
+    flySafeLastTime(TB_WORKSTATION_TIME, 0, 0, 0),
+    flySafeMaxElapsedTime(TB_WORKSTATION_TIME, 0, 0, 0),
     paramsInited(false)
   {
       for (U32 i = 0; i < ACTADAP_MAX_ACTUATORS; i++) {
@@ -82,7 +82,7 @@ namespace Gnc {
         const NATIVE_INT_TYPE instance
     )
   {
-    ActuatorAdapterComponentBase::init(instance);
+      ActuatorAdapterComponentBase::init(instance);
   }
 
   ActuatorAdapterComponentImpl ::

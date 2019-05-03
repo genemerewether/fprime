@@ -223,7 +223,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 10};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 50};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -231,7 +231,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
  
-    NATIVE_INT_TYPE rgGncDivs[] = {1, 100};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 20};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -504,7 +504,7 @@ void constructApp(unsigned int port_number,
     prmDb_ptr->init(60,0);
     snapHealth_ptr->init(60,0);
     snapHealth_ptr->setBootCount(boot_count);
-    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_DYNAMIC);
+    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_OFF);
     sockGndIf_ptr->init(0);
 
     hlRosIface_ptr->init(0);
@@ -518,8 +518,8 @@ void constructApp(unsigned int port_number,
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0); // designed to drop if full
-    passiveDataPasser_ptr->init(200, 1000); // big entries - all passive components in rgOp use this
-    imuDecouple_ptr->init(100, 20); // just need to serialize cycle port
+    passiveDataPasser_ptr->init(1000, 1000); // big entries - all passive components in rgOp use this
+    imuDecouple_ptr->init(1000, 20); // just need to serialize cycle port
     actDecouple_ptr->init(100, 500); // big message queue entry, few entries
     rgOp_ptr->init(0);
     rgTlm_ptr->init(2);
@@ -615,7 +615,7 @@ void constructApp(unsigned int port_number,
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
     rgDecouple_ptr->start(0, 90, 20*1024);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
-    actDecouple_ptr->start(0, 89, 20*1024);
+    actDecouple_ptr->start(0, 92, 20*1024);
 
     cmdDisp_ptr->start(0,60,20*1024);
     // start sequencer
@@ -658,7 +658,7 @@ void run1backupCycle(void) {
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(10);
+    Os::Task::delay(50);
 }
 
 void exitTasks(void) {

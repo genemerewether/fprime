@@ -13,7 +13,6 @@ fi
 screen -S "BLIMPREF" -d -m bash --norc
 screen -S "BLIMPREF" -X logfile $(date +"/eng/BLIMPREF_%F_%H-%M.log")
 screen -S "BLIMPREF" -X log
-screen -r "BLIMPREF" -X stuff "insmod /golden/dsp-offset_taskset_cpustat_mqueue.ko || true\n"
 screen -r "BLIMPREF" -X stuff "export ROS_HOME=/eng/ros\n"
 screen -r "BLIMPREF" -X stuff ". /eng/load/set_ip_snap.bash || true\n"
 screen -r "BLIMPREF" -X stuff ". /opt/ros/indigo/setup.bash || true\n"

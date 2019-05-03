@@ -31,6 +31,8 @@
 
 #include <ros/callback_queue.h>
 
+#define DO_TIME_CONV
+
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
@@ -317,6 +319,7 @@ namespace Gnc {
 	    return;
 	}
 
+#ifdef DO_TIME_CONV
 	//TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
         I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
@@ -354,6 +357,12 @@ namespace Gnc {
                           0,
                           (U32) (usecDsp / 1000 / 1000),
                           (U32) (usecDsp % (1000 * 1000)));
+#else
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (msg->header.stamp.sec),
+                          (U32) (msg->header.stamp.nsec / 1000));
+#endif //DO_TIME_CONV
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 	
