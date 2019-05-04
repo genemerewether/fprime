@@ -178,7 +178,8 @@ HEXAGON_MODULES := \
 QUEST_GNC_ROSIFACE_MODULES := \
 	Gnc/Ctrl/MultirotorCtrlIface \
 	Gnc/Utils/AckermannIface \
-	Gnc/Est/FilterIface
+	Gnc/Est/FilterIface \
+	Gnc/Est/GroundTruthIface
 
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
