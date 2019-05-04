@@ -13,6 +13,7 @@ void exitTasks(void);
 #include <SnapdragonFlight/SnapdragonHealth/SnapdragonHealthComponentImpl.hpp>
 #include <Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentImpl.hpp>
 #include <Gnc/Est/FilterIface/FilterIfaceComponentImpl.hpp>
+#include <Gnc/Est/GroundTruthIface/GroundTruthIfaceComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
 
@@ -89,6 +90,7 @@ extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
 extern HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr;
 extern Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr;
 extern Gnc::FilterIfaceComponentImpl* filterIface_ptr;
+extern Gnc::GroundTruthIfaceComponentImpl* gtIface_ptr;
 extern ROS::RosSeqComponentImpl* rosSeq_ptr;
 
 #endif

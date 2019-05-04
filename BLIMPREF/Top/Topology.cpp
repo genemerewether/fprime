@@ -50,6 +50,7 @@ SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr = 0;
 Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr = 0;
 Gnc::FilterIfaceComponentImpl* filterIface_ptr = 0;
+Gnc::GroundTruthIfaceComponentImpl* gtIface_ptr = 0;
 ROS::RosSeqComponentImpl* rosSeq_ptr = 0;
 
 Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr = 0;
@@ -159,7 +160,13 @@ void allocComps() {
                         ("FILTIFACE")
 #endif
 ;
-    
+ 
+    gtIface_ptr = new Gnc::GroundTruthIfaceComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("FILTIFACE")
+#endif
+;
+   
     rgDecouple_ptr = new Svc::RateGroupDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "RGDECOUPLE",
@@ -244,6 +251,7 @@ void allocComps() {
 	0, // hlRosIface
 	0, // mrCtrlIface
 	0, // filterIface
+	0, // gtIface
     };
 
     rgOp_ptr = new Svc::PassiveRateGroupImpl(
@@ -396,7 +404,15 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(void) {  
+void manualConstruct(bool internalIMUProp) {  
+    // switch based on command line options
+    if (internalIMUProp) {
+        attFilter_ptr->set_odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
+    }
+    else {
+        gtIface_ptr->set_Odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
+    }
+
     // imu decoupler
     rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
     imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
@@ -473,7 +489,8 @@ void manualConstruct(void) {
 void constructApp(unsigned int port_number,
 		  char* hostname,
                   unsigned int boot_count,
-		  bool startSocketNow) {
+		  bool startSocketNow,
+		  bool internalIMUProp) {
     allocComps();
 
     localTargetInit();
@@ -505,6 +522,7 @@ void constructApp(unsigned int port_number,
     hlRosIface_ptr->init(0);
     mrCtrlIface_ptr->init(0);
     filterIface_ptr->init(0);
+    gtIface_ptr->init(0);
     rosSeq_ptr->init(0);
     
     // Initialize rate group driver
@@ -553,7 +571,7 @@ void constructApp(unsigned int port_number,
     // Connect rate groups to rate group driver
     constructBLIMPREFArchitecture();
 
-    manualConstruct();
+    manualConstruct(internalIMUProp);
 
     /* Register commands */
     fatalHandler_ptr->regCommands();
@@ -716,11 +734,12 @@ int main(int argc, char* argv[]) {
     char *hostname = NULL;
     bool startSocketNow = false;
     U32 boot_count = 0;
+    bool internalIMUProp = false;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlsp:x:a:u:t:o:b:z:")) != -1){
+    while ((option = getopt(argc, argv, "hisp:a:b:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -737,6 +756,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 's':
                 startSocketNow = true;
+                break;
+            case 'i':
+                internalIMUProp = true;
                 break;
             case '?':
                 return 1;
@@ -755,7 +777,8 @@ int main(int argc, char* argv[]) {
     
     constructApp(port_number,
 		 hostname, boot_count,
-		 startSocketNow);
+		 startSocketNow,
+		 internalIMUProp);
     //dumparch();
     
     ros::start();
@@ -763,11 +786,13 @@ int main(int argc, char* argv[]) {
     hlRosIface_ptr->startIntTask(30, 5*1000*1024);
     mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
     filterIface_ptr->startIntTask(30, 5*1000*1024);
+    gtIface_ptr->startIntTask(30, 5*1000*1024);
     rosSeq_ptr->startIntTask(30, 5*1000*1024);
 
     hlRosIface_ptr->startPub();
     mrCtrlIface_ptr->startPub();
     filterIface_ptr->startPub();
+    gtIface_ptr->startPub();
     rosSeq_ptr->startPub();
 
     ros::console::shutdown();

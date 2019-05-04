@@ -17,6 +17,7 @@
 	<import_component_type>Svc/PrmDb/PrmDbComponentAi.xml</import_component_type>
 	<import_component_type>Svc/CmdDispatcher/CommandDispatcherComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Est/FilterIface/FilterIfaceComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Est/GroundTruthIface/GroundTruthIfaceComponentAi.xml</import_component_type>
 	<import_component_type>Drv/IMU/MPU9250/MPU9250ComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Ctrl/Se3Ctrl/Se3CtrlComponentAi.xml</import_component_type>
 	<import_component_type>Svc/CmdSequencer/CmdSequencerComponentAi.xml</import_component_type>
@@ -73,6 +74,8 @@
    <instance namespace="Svc" name="cmdDisp" type="CommandDispatcher" base_id="20050"  base_id_window="25" />
 
    <instance namespace="Gnc" name="filterIface" type="FilterIface" base_id="20350"  base_id_window="25" />
+
+   <instance namespace="Gnc" name="gtIface" type="GroundTruthIface" base_id="20375"  base_id_window="25" />
 
    <instance namespace="Drv" name="mpu9250" type="MPU9250" base_id="10175"  base_id_window="25" />
 
@@ -259,10 +262,6 @@
 	 <source component = "rosSeq" port = "seqRunOut" type = "CmdSeqIn" num = "0"/>
  	 <target component = "cmdSeq" port = "seqRunIn" type = "CmdSeqIn" num = "0"/>
 </connection>
-<connection name = "Connection35">
-	 <source component = "attFilter" port = "odometry" type = "Odometry" num = "0"/>
- 	 <target component = "ctrlXest" port = "odomInB" type = "Odometry" num = "0"/>
-</connection>
 <connection name = "Connection36">
 	 <source component = "actuatorAdapter" port = "escConfig" type = "I2CConfig" num = "0"/>
  	 <target component = "i2cDrvSnap" port = "I2CConfig" type = "I2CConfig" num = "0"/>
@@ -307,12 +306,20 @@
 	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "8"/>
  	 <target component = "filterIface" port = "sched" type = "Sched" num = "0"/>
 </connection>
+<connection name = "Connection46a">
+	 <source component = "rgOp" port = "RateGroupMemberOut" type = "Sched" num = "9"/>
+ 	 <target component = "gtIface" port = "sched" type = "Sched" num = "0"/>
+</connection>
 <connection name = "Connection47">
 	 <source component = "mpu9250" port = "Imu" type = "ImuNoCov" num = "0"/>
  	 <target component = "imuProc" port = "HighRateImu" type = "ImuNoCov" num = "0"/>
 </connection>
 <connection name = "Connection48">
 	 <source component = "filterIface" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection48a">
+	 <source component = "gtIface" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection49">
