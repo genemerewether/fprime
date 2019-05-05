@@ -336,7 +336,8 @@ void manualConstruct(void) {
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
-    actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
+    // TODO(mereweth) - too much data?
+    //actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, attFilter_ptr->get_ImuStateUpdate_InputPort(0));
 #ifdef DECOUPLE_ACTUATORS
@@ -577,60 +578,6 @@ int hexref_arm() {
         return -1;
     }
 
-    /*
-    U8 buf[16] = {0};
-    buf[2+4] = 0x01;
-    buf[3+4] = 0xA1;
-
-    Fw::CmdPacket cmdPkt;
-    Fw::ComBuffer dat0(&buf[0], sizeof(buf));
-    Fw::SerializeStatus stat = cmdPkt.deserialize(dat0);
-    Fw::InputCmdPort* p2 = leeCtrl_ptr->get_CmdDisp_InputPort(0);
-    p2->invoke(0x1a1,0,cmdPkt.getArgBuffer());
-    usleep(50000);
-    DEBUG_PRINT("hexref_arm after sleep\n");
-    */
-
-    /*
-    Fw::InputComPort* port = cmdDisp_ptr->get_seqCmdBuff_InputPort(0);
-    usleep(50000);
-    Fw::ComBuffer dat(buf, sizeof(buf));
-    port->invoke(dat, 0);
-    usleep(50000);
-    DEBUG_PRINT("hexref_arm after sleep\n");
-    */
-
-    /*
-    Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
-    Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
-    for (U32 i = 0; i < 35; i++) {
-        DEBUG_PRINT("arm %u", i);
-        for (U32 j = 11; j <= 14; j++) {
-            confPort->invoke(400, j, 100);
-            U8 readBuf[1] = { 0 };
-            U8 writeBuf[1] = { 0 };
-            Fw::Buffer writeObj = Fw::Buffer(0, 0, (U64) writeBuf, 1);
-            Fw::Buffer readObj = Fw::Buffer(0, 0, (U64) readBuf, 1);
-            rwPort->invoke(writeObj,
-                           readObj);
-            usleep(2500);
-        }
-    }
-    */
-
-    // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
-    /*
-    Drv::InputPwmSetDutyCycleDataPort * port = escPwm_ptr->get_pwmSetDuty_InputPort(0);
-    static F32 d1 = 0.05;
-    static F32 d2 = 0.1;
-    F32 duty[4] = {d1, d2, d1, d2};
-    Drv::PwmSetDutyCycle config(duty, 4, 0x0f);
-    port->invoke(config);
-    d1 += 0.005;
-    if (d1 > 0.1) {  d1 = 0.05;  }
-    d2 -= 0.005;
-    if (d2 < 0.05) {  d2 = 0.1;  }
-    */
     return 0;
 }
 

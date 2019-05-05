@@ -15,9 +15,6 @@
     <parameter id="15" set_opcode="50" save_opcode="51" name="a1_reverse" data_type="bool" >
       <comment>actuator 1 reverse direction flag</comment>
     </parameter>
-    <parameter id="16" set_opcode="52" save_opcode="53" name="a1_type" data_type="U8" >
-      <comment>actuator 1 type</comment>
-    </parameter>
     <parameter id="18" set_opcode="56" save_opcode="57" name="a1_parmSlot" data_type="U8" >
       <comment>actuator 1 which param set</comment>
     </parameter>
@@ -27,9 +24,6 @@
     </parameter>
     <parameter id="25" set_opcode="70" save_opcode="71" name="a2_reverse" data_type="bool" >
       <comment>actuator 2 reverse direction flag</comment>
-    </parameter>
-    <parameter id="26" set_opcode="72" save_opcode="73" name="a2_type" data_type="U8" >
-      <comment>actuator 2 type</comment>
     </parameter>
     <parameter id="28" set_opcode="76" save_opcode="77" name="a2_parmSlot" data_type="U8" >
       <comment>actuator 2 which param set</comment>
@@ -41,9 +35,6 @@
     <parameter id="35" set_opcode="90" save_opcode="91" name="a3_reverse" data_type="bool" >
       <comment>actuator 3 reverse direction flag</comment>
     </parameter>
-    <parameter id="36" set_opcode="92" save_opcode="93" name="a3_type" data_type="U8" >
-      <comment>actuator 3 type</comment>
-    </parameter>
     <parameter id="38" set_opcode="96" save_opcode="97" name="a3_parmSlot" data_type="U8" >
       <comment>actuator 3 which param set</comment>
     </parameter>
@@ -53,9 +44,6 @@
     </parameter>
     <parameter id="45" set_opcode="110" save_opcode="111" name="a4_reverse" data_type="bool" >
       <comment>actuator 4 reverse direction flag</comment>
-    </parameter>
-    <parameter id="46" set_opcode="112" save_opcode="113" name="a4_type" data_type="U8" >
-      <comment>actuator 4 type</comment>
     </parameter>
     <parameter id="48" set_opcode="116" save_opcode="117" name="a4_parmSlot" data_type="U8" >
       <comment>actuator 4 which param set</comment>
@@ -67,9 +55,6 @@
     <parameter id="55" set_opcode="130" save_opcode="131" name="a5_reverse" data_type="bool" >
       <comment>actuator 5 reverse direction flag</comment>
     </parameter>
-    <parameter id="56" set_opcode="132" save_opcode="133" name="a5_type" data_type="U8" >
-      <comment>actuator 5 type</comment>
-    </parameter>
     <parameter id="58" set_opcode="136" save_opcode="137" name="a5_parmSlot" data_type="U8" >
       <comment>actuator 5 which param set</comment>
     </parameter>
@@ -79,9 +64,6 @@
     </parameter>
     <parameter id="65" set_opcode="150" save_opcode="151" name="a6_reverse" data_type="bool" >
       <comment>actuator 6 reverse direction flag</comment>
-    </parameter>
-    <parameter id="66" set_opcode="152" save_opcode="153" name="a6_type" data_type="U8" >
-      <comment>actuator 6 type</comment>
     </parameter>
     <parameter id="68" set_opcode="156" save_opcode="157" name="a6_parmSlot" data_type="U8" >
       <comment>actuator 6 which param set</comment>
@@ -93,9 +75,6 @@
     <parameter id="75" set_opcode="170" save_opcode="171" name="a7_reverse" data_type="bool" >
       <comment>actuator 7 reverse direction flag</comment>
     </parameter>
-    <parameter id="76" set_opcode="172" save_opcode="173" name="a7_type" data_type="U8" >
-      <comment>actuator 7 type</comment>
-    </parameter>
     <parameter id="78" set_opcode="176" save_opcode="177" name="a7_parmSlot" data_type="U8" >
       <comment>actuator 7 which param set</comment>
     </parameter>
@@ -105,9 +84,6 @@
     </parameter>
     <parameter id="85" set_opcode="190" save_opcode="191" name="a8_reverse" data_type="bool" >
       <comment>actuator 8 reverse direction flag</comment>
-    </parameter>
-    <parameter id="86" set_opcode="192" save_opcode="193" name="a8_type" data_type="U8" >
-      <comment>actuator 8 type</comment>
     </parameter>
     <parameter id="88" set_opcode="196" save_opcode="197" name="a8_parmSlot" data_type="U8" >
       <comment>actuator 8 which param set</comment>
@@ -119,11 +95,11 @@
     <parameter id="101" set_opcode="222" save_opcode="223" name="p1_maxCmd" data_type="F64" >
       <comment>parm slot 1 maximum command</comment>
     </parameter>
-    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="I64" >
-      <comment>parm slot 1 minimum output (interpret as float for some types)</comment>
+    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="F64" >
+      <comment>parm slot 1 minimum output</comment>
     </parameter>
-    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="I64" >
-      <comment>parm slot 1 maximum output (interpret as float for some types)</comment>
+    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="F64" >
+      <comment>parm slot 1 maximum output</comment>
     </parameter>
     <parameter id="104" set_opcode="228" save_opcode="229" name="p1_counts" data_type="U32" >
       <comment>parm slot 1 counts per rev</comment>
@@ -162,5 +138,15 @@
     </parameter>
     <parameter id="122" set_opcode="264" save_opcode="265" name="p1_ctrl_kp" data_type="F64" >
       <comment>parm slot 1 proportional gain on error</comment>
+    </parameter>
+
+    <parameter id="130" set_opcode="280" save_opcode="281" name="p1_outputType" data_type="U8" >
+      <comment>parm slot 1 actuator output type</comment>
+    </parameter>
+    <parameter id="131" set_opcode="282" save_opcode="283" name="p1_inputActType" data_type="U8" >
+      <comment>parm slot 1 actuator input type</comment>
+    </parameter>
+    <parameter id="132" set_opcode="284" save_opcode="285" name="p1_inputActIdx" data_type="U8" >
+      <comment>parm slot 1 actuator input index</comment>
     </parameter>
 </parameters>

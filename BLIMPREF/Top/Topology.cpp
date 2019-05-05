@@ -702,7 +702,7 @@ void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
 		  "-p\tport_number\n"
 		  "-a\thostname/IP address\n"
-		  "-l\tFor time-based cycles\n"
+		  "-i\tUse odometry from internal IMU propagation\n"
 		  "-b\tBoot count\n"
 		  "-s\tStart socket immediately\n");
 }

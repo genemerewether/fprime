@@ -84,6 +84,8 @@ namespace Gnc {
       struct CmdOutputMapMetadata {
           F64 minIn;
           F64 maxIn;
+          F64 minOut;
+          F64 maxOut;
           CmdOutputMapType type;
           F64 Vnom;
           F64 Vact;
@@ -96,21 +98,33 @@ namespace Gnc {
       };
 
       struct PwmMetadata {
-          F32 minOut;
-          F32 maxOut;
+          U32 addr;
+          bool reverse;
           CmdOutputMapMetadata cmdOutputMap;
       };
 
       struct I2CMetadata {
           U32 addr;
-          I32 minOut;
-          I32 maxOut;
           bool reverse;
           FeedbackMetadata fbMeta;
           CmdOutputMapMetadata cmdOutputMap;
       };
 
-      bool setupI2C(U32 actuator, I2CMetadata meta, bool useSimple);
+      enum InputActuatorType {
+          INPUTACT_UNSET = 0,
+          INPUTACT_VALID_MIN = 1,
+          INPUTACT_ANGLE = INPUTACT_VALID_MIN,
+          INPUTACT_ANGULAR_VELOCITY = 2,
+          INPUTACT_NORMALIZED = 3,
+          INPUTACT_VALID_MAX = INPUTACT_NORMALIZED
+      };
+
+      bool setupI2C(U32 actuator, I2CMetadata meta,
+	  	    bool useSimple,
+		    InputActuatorType inputActType, U32 inputActIdx);
+
+      bool setupPwm(U32 actuator, PwmMetadata meta,
+	  	    InputActuatorType inputActType, U32 inputActIdx);
 
       void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
 
@@ -187,7 +201,7 @@ namespace Gnc {
       struct Feedback {
           U32 cmdSec;
           U32 cmdUsec;
-          I32 cmd;
+          F64 cmd;
           F64 cmdIn;
           U32 fbSec;
           U32 fbUsec;
@@ -204,6 +218,8 @@ namespace Gnc {
               PwmMetadata pwmMeta;
               I2CMetadata i2cMeta;
           };
+          InputActuatorType inputActType;
+ 	  U32 inputActIdx;
           Feedback feedback;
       } outputInfo[ACTADAP_MAX_ACTUATORS];
 

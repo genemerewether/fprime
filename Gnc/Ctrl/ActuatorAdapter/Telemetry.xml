@@ -23,6 +23,14 @@
       <comment>
       </comment>
     </channel>
+    <channel id="6" name="ACTADAP_Rot6" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="7" name="ACTADAP_Rot7" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
 
     <channel id="10" name="ACTADAP_Cmd0" data_type="I32">
       <comment>
@@ -48,6 +56,14 @@
       <comment>
       </comment>
     </channel>
+    <channel id="16" name="ACTADAP_Cmd6" data_type="I32">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="17" name="ACTADAP_Cmd7" data_type="I32">
+      <comment>
+      </comment>
+    </channel>
     
     <channel id="20" name="ACTADAP_CmdVel0" data_type="F32" format_string="%.3f rad">
         <comment>
@@ -70,6 +86,14 @@
       </comment>
     </channel>
     <channel id="25" name="ACTADAP_CmdVel5" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="26" name="ACTADAP_CmdVel6" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="27" name="ACTADAP_CmdVel7" data_type="F32" format_string="%.3f rad">
       <comment>
       </comment>
     </channel>
