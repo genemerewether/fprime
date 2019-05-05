@@ -175,64 +175,56 @@ NUMACTUATORS_PRM_SET, 8
 
 # front right
 A1_ADDR_PRM_SET, 19
+A1_INPUTACTIDX_PRM_SET, 0
 A1_REVERSE_PRM_SET, False
-# bluez esc I2C protocol
-A1_TYPE_PRM_SET, 2
 A1_PARMSLOT_PRM_SET, 1
 
 # back left
 A2_ADDR_PRM_SET, 12
+A2_INPUTACTIDX_PRM_SET, 1
 A2_REVERSE_PRM_SET, False
-# bluez esc I2C protocol
-A2_TYPE_PRM_SET, 2
 A2_PARMSLOT_PRM_SET, 1
 
 # front left
 A3_ADDR_PRM_SET, 16
+A3_INPUTACTIDX_PRM_SET, 2
 A3_REVERSE_PRM_SET, True
-# bluez esc I2C protocol
-A3_TYPE_PRM_SET, 2
 A3_PARMSLOT_PRM_SET, 1
 
 # back right
 A4_ADDR_PRM_SET, 14
+A4_INPUTACTIDX_PRM_SET, 3
 A4_REVERSE_PRM_SET, True
-# bluez esc I2C protocol
-A4_TYPE_PRM_SET, 2
 A4_PARMSLOT_PRM_SET, 1
 
 # x-thrust, plus z moment
 A5_ADDR_PRM_SET, 15
+A5_INPUTACTIDX_PRM_SET, 4
 A5_REVERSE_PRM_SET, False
-# bluez esc I2C protocol
-A5_TYPE_PRM_SET, 2
 A5_PARMSLOT_PRM_SET, 1
 
 # x-thrust, minus z moment
 A6_ADDR_PRM_SET, 18
+A6_INPUTACTIDX_PRM_SET, 5
 A6_REVERSE_PRM_SET, True
-# bluez esc I2C protocol
-A6_TYPE_PRM_SET, 2
 A6_PARMSLOT_PRM_SET, 1
 
 # y-thrust, plus z moment
 A7_ADDR_PRM_SET, 13
+A7_INPUTACTIDX_PRM_SET, 6
 A7_REVERSE_PRM_SET, False
-# bluez esc I2C protocol
-A7_TYPE_PRM_SET, 2
 A7_PARMSLOT_PRM_SET, 1
 
 # y-thrust, minus z moment
 A8_ADDR_PRM_SET, 11
+A8_INPUTACTIDX_PRM_SET, 7
 A8_REVERSE_PRM_SET, True
-# bluez esc I2C protocol
-A8_TYPE_PRM_SET, 2
 A8_PARMSLOT_PRM_SET, 1
 
 P1_MINCMD_PRM_SET, -300.0
 P1_MAXCMD_PRM_SET, 300.0
-P1_MINOUT_PRM_SET, -3000
-P1_MAXOUT_PRM_SET, 3000
+P1_MINOUT_PRM_SET, -3000.0
+P1_MAXOUT_PRM_SET, 3000.0
 P1_COUNTS_PRM_SET, 36
 
 # piecewise linear, 1 break
@@ -249,6 +241,11 @@ P1_CTRLTYPE_PRM_SET, 1
 P1_CTRL_KP_PRM_SET, 10.0
 # output units max delta from open loop mapping
 P1_CTRL_MAXERR_PRM_SET, 2000.0
+
+# bluez esc I2C protocol
+P1_TYPE_PRM_SET, 2
+# take input from angular velocities
+P1_INPUTACTTYPE_PRM_SET, 2
 
 ACTADAP_InitParams
 

@@ -339,7 +339,7 @@ namespace Gnc {
 	      case 1: \
 		  outType = (OutputType) paramGet_p1_outputType(valid[0]); \
 		  inputActType = (InputActuatorType) paramGet_p1_inputActType(valid[1]); \
-		  inputActIdx = paramGet_p1_inputActIdx(valid[2]); \
+		  inputActIdx = paramGet_a ## XXX ## _inputActIdx(valid[2]); \
 		  break; \
               default: \
 		  DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \

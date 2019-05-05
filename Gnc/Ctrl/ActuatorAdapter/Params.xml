@@ -10,7 +10,10 @@
     </parameter>
 
     <parameter id="10" set_opcode="40" save_opcode="41" name="a1_addr" data_type="U32" >
-      <comment>actuator 1 address (I2C)</comment>
+      <comment>actuator 1 address</comment>
+    </parameter>
+    <parameter id="11" set_opcode="42" save_opcode="43" name="a1_inputActIdx" data_type="U8" >
+      <comment>actuator 1 input index</comment>
     </parameter>
     <parameter id="15" set_opcode="50" save_opcode="51" name="a1_reverse" data_type="bool" >
       <comment>actuator 1 reverse direction flag</comment>
@@ -20,7 +23,10 @@
     </parameter>
 
     <parameter id="20" set_opcode="60" save_opcode="61" name="a2_addr" data_type="U32" >
-      <comment>actuator 2 address (I2C)</comment>
+      <comment>actuator 2 address</comment>
+    </parameter>
+    <parameter id="21" set_opcode="62" save_opcode="63" name="a2_inputActIdx" data_type="U8" >
+      <comment>actuator 2 input index</comment>
     </parameter>
     <parameter id="25" set_opcode="70" save_opcode="71" name="a2_reverse" data_type="bool" >
       <comment>actuator 2 reverse direction flag</comment>
@@ -30,7 +36,10 @@
     </parameter>
 
     <parameter id="30" set_opcode="80" save_opcode="81" name="a3_addr" data_type="U32" >
-      <comment>actuator 3 address (I2C)</comment>
+      <comment>actuator 3 address</comment>
+    </parameter>
+    <parameter id="31" set_opcode="82" save_opcode="83" name="a3_inputActIdx" data_type="U8" >
+      <comment>actuator 3 input index</comment>
     </parameter>
     <parameter id="35" set_opcode="90" save_opcode="91" name="a3_reverse" data_type="bool" >
       <comment>actuator 3 reverse direction flag</comment>
@@ -40,7 +49,10 @@
     </parameter>
 
     <parameter id="40" set_opcode="100" save_opcode="101" name="a4_addr" data_type="U32" >
-      <comment>actuator 4 address (I2C)</comment>
+      <comment>actuator 4 address</comment>
+    </parameter>
+    <parameter id="41" set_opcode="102" save_opcode="103" name="a4_inputActIdx" data_type="U8" >
+      <comment>actuator 4 input index</comment>
     </parameter>
     <parameter id="45" set_opcode="110" save_opcode="111" name="a4_reverse" data_type="bool" >
       <comment>actuator 4 reverse direction flag</comment>
@@ -50,7 +62,10 @@
     </parameter>
 
     <parameter id="50" set_opcode="120" save_opcode="121" name="a5_addr" data_type="U32" >
-      <comment>actuator 5 address (I2C)</comment>
+      <comment>actuator 5 address</comment>
+    </parameter>
+    <parameter id="51" set_opcode="122" save_opcode="123" name="a5_inputActIdx" data_type="U8" >
+      <comment>actuator 5 input index</comment>
     </parameter>
     <parameter id="55" set_opcode="130" save_opcode="131" name="a5_reverse" data_type="bool" >
       <comment>actuator 5 reverse direction flag</comment>
@@ -60,7 +75,10 @@
     </parameter>
 
     <parameter id="60" set_opcode="140" save_opcode="141" name="a6_addr" data_type="U32" >
-      <comment>actuator 6 address (I2C)</comment>
+      <comment>actuator 6 address</comment>
+    </parameter>
+    <parameter id="61" set_opcode="142" save_opcode="143" name="a6_inputActIdx" data_type="U8" >
+      <comment>actuator 6 input index</comment>
     </parameter>
     <parameter id="65" set_opcode="150" save_opcode="151" name="a6_reverse" data_type="bool" >
       <comment>actuator 6 reverse direction flag</comment>
@@ -70,7 +88,10 @@
     </parameter>
 
     <parameter id="70" set_opcode="160" save_opcode="161" name="a7_addr" data_type="U32" >
-      <comment>actuator 7 address (I2C)</comment>
+      <comment>actuator 7 address</comment>
+    </parameter>
+    <parameter id="71" set_opcode="162" save_opcode="163" name="a7_inputActIdx" data_type="U8" >
+      <comment>actuator 7 input index</comment>
     </parameter>
     <parameter id="75" set_opcode="170" save_opcode="171" name="a7_reverse" data_type="bool" >
       <comment>actuator 7 reverse direction flag</comment>
@@ -80,7 +101,10 @@
     </parameter>
 
     <parameter id="80" set_opcode="180" save_opcode="181" name="a8_addr" data_type="U32" >
-      <comment>actuator 8 address (I2C)</comment>
+      <comment>actuator 8 address</comment>
+    </parameter>
+    <parameter id="81" set_opcode="182" save_opcode="183" name="a8_inputActIdx" data_type="U8" >
+      <comment>actuator 8 input index</comment>
     </parameter>
     <parameter id="85" set_opcode="190" save_opcode="191" name="a8_reverse" data_type="bool" >
       <comment>actuator 8 reverse direction flag</comment>
@@ -145,8 +169,5 @@
     </parameter>
     <parameter id="131" set_opcode="282" save_opcode="283" name="p1_inputActType" data_type="U8" >
       <comment>parm slot 1 actuator input type</comment>
-    </parameter>
-    <parameter id="132" set_opcode="284" save_opcode="285" name="p1_inputActIdx" data_type="U8" >
-      <comment>parm slot 1 actuator input index</comment>
     </parameter>
 </parameters>
