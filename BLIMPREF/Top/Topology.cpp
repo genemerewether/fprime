@@ -180,7 +180,7 @@ void allocComps() {
 #endif
                                                             )
 ;
-	
+    
     imuDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "IMUDECOUPLE"
@@ -214,7 +214,7 @@ void allocComps() {
         0, // mixer
         Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
         0, // snapHealth
-	0, // cmdSeq
+        0, // cmdSeq
         0, // chanTlm
     };
 
@@ -248,10 +248,10 @@ void allocComps() {
         Gnc::SE3CTRL_SCHED_CONTEXT_CTRL, // se3Ctrl
         Gnc::ACTADAP_SCHED_CONTEXT_ARM, // adapter - for arming
         0, // cmdSeq
-	0, // hlRosIface
-	0, // mrCtrlIface
-	0, // filterIface
-	0, // gtIface
+        0, // hlRosIface
+        0, // mrCtrlIface
+        0, // filterIface
+        0, // gtIface
     };
 
     rgOp_ptr = new Svc::PassiveRateGroupImpl(
@@ -487,10 +487,10 @@ void manualConstruct(bool internalIMUProp) {
 }
 
 void constructApp(unsigned int port_number,
-		  char* hostname,
+          char* hostname,
                   unsigned int boot_count,
-		  bool startSocketNow,
-		  bool internalIMUProp) {
+          bool startSocketNow,
+          bool internalIMUProp) {
     allocComps();
 
     localTargetInit();
@@ -592,6 +592,14 @@ void constructApp(unsigned int port_number,
     sigGen_ptr->regCommands();
     
     prmDb_ptr->readParamFile();
+
+    ctrlXest_ptr->loadParameters();
+    imuProc_ptr->loadParameters();
+    se3Ctrl_ptr->loadParameters();
+    attFilter_ptr->loadParameters();
+    mixer_ptr->loadParameters();
+    actuatorAdapter_ptr->loadParameters();
+    sigGen_ptr->loadParameters();
     
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);
@@ -647,9 +655,9 @@ void constructApp(unsigned int port_number,
     // Initialize socket server
     if (port_number && hostname) {
         if (startSocketNow) {
-	    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+        sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-	    sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+        sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
     
@@ -700,11 +708,11 @@ void exitTasks(void) {
 
 void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
-		  "-p\tport_number\n"
-		  "-a\thostname/IP address\n"
-		  "-i\tUse odometry from internal IMU propagation\n"
-		  "-b\tBoot count\n"
-		  "-s\tStart socket immediately\n");
+          "-p\tport_number\n"
+          "-a\thostname/IP address\n"
+          "-i\tUse odometry from internal IMU propagation\n"
+          "-b\tBoot count\n"
+          "-s\tStart socket immediately\n");
 }
 
 
@@ -776,9 +784,9 @@ int main(int argc, char* argv[]) {
     (void) printf("Hit Ctrl-C to quit\n");
     
     constructApp(port_number,
-		 hostname, boot_count,
-		 startSocketNow,
-		 internalIMUProp);
+         hostname, boot_count,
+         startSocketNow,
+         internalIMUProp);
     //dumparch();
     
     ros::start();
@@ -820,7 +828,7 @@ int main(int argc, char* argv[]) {
         run1backupCycle();
         backupCycle++;
 #if !defined(LINUX_DEV) and !defined(BUILD_SDFLIGHT)
-	run1testCycle();
+    run1testCycle();
 #endif // LINUX_DEV
     }
 

@@ -1,9 +1,0 @@
-K_X__X_PRM_SET, 0.5
-K_X__Y_PRM_SET, 0.0
-K_X__Z_PRM_SET, 0.0
-
-K_V__X_PRM_SET, 2.0
-K_V__Y_PRM_SET, 2.0
-K_V__Z_PRM_SET, 2.0
-
-SE3CTRL_InitParams
