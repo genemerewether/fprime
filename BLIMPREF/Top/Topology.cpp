@@ -79,6 +79,7 @@ SnapdragonFlight::BlspSpiDriverComponentImpl* spiDrvSnap_ptr = 0;
 SnapdragonFlight::BlspI2CDriverComponentImpl* i2cDrvSnap_ptr = 0;
 SnapdragonFlight::BlspGpioDriverComponentImpl* imuDRIntSnap_ptr = 0;
 SnapdragonFlight::BlspGpioDriverComponentImpl* hwEnablePinSnap_ptr = 0;
+SnapdragonFlight::BlspPwmDriverComponentImpl* escPwmSnap_ptr = 0;
 
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
 Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr = 0;
@@ -357,6 +358,12 @@ void allocComps() {
                         ("SNAPHWENPIN")
 #endif
 ;
+
+    escPwmSnap_ptr = new SnapdragonFlight::BlspPwmDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SNAPESCPWM")
+#endif
+;
     
     spiDrv_ptr = new Drv::LinuxSpiDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
@@ -556,6 +563,7 @@ void constructApp(unsigned int port_number,
     i2cDrvSnap_ptr->init(0);
     hwEnablePinSnap_ptr->init(1);
     imuDRIntSnap_ptr->init(0);
+    escPwmSnap_ptr->init(0);
 
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);

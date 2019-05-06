@@ -31,6 +31,7 @@ void exitTasks(void);
 #include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
 #include <SnapdragonFlight/BlspSpiDriver/BlspSpiDriverComponentImpl.hpp>
 #include <SnapdragonFlight/BlspI2CDriver/BlspI2CDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspPwmDriver/BlspPwmDriverComponentImpl.hpp>
 #include <SnapdragonFlight/BlspGpioDriver/BlspGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxSpiDriver/LinuxSpiDriverComponentImpl.hpp>
 #include <Drv/LinuxI2CDriver/LinuxI2CDriverComponentImpl.hpp>
@@ -71,6 +72,7 @@ extern SnapdragonFlight::BlspSpiDriverComponentImpl* spiDrvSnap_ptr;
 extern SnapdragonFlight::BlspI2CDriverComponentImpl* i2cDrvSnap_ptr;
 extern SnapdragonFlight::BlspGpioDriverComponentImpl* imuDRIntSnap_ptr;
 extern SnapdragonFlight::BlspGpioDriverComponentImpl* hwEnablePinSnap_ptr;
+extern SnapdragonFlight::BlspPwmDriverComponentImpl* escPwmSnap_ptr;
 
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
 extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;

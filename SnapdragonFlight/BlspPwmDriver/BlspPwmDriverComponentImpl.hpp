@@ -59,6 +59,7 @@ namespace SnapdragonFlight {
       bool open(NATIVE_UINT_TYPE pwmchip,
                 NATIVE_UINT_TYPE * channel,
                 NATIVE_UINT_TYPE channelSize,
+                F32 * initDutyCycle,
                 NATIVE_UINT_TYPE period_in_usecs);
 
     PRIVATE:

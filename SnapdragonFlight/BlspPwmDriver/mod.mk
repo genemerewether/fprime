@@ -10,6 +10,4 @@ SRC_CYGWIN = BlspPwmDriverComponentImplStub.cpp
 
 HDR = BlspPwmDriverComponentImpl.hpp
 
-SUBDIRS = test
-
 SRC_LINUXRT = BlspPwmDriverComponentImplStub.cpp
