@@ -70,6 +70,7 @@ Gnc::ImuProcComponentImpl* imuProc_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::AttFilterComponentImpl* attFilter_ptr = 0;
+Gnc::AckermannConverterComponentImpl* ackermannConverter_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 
 SnapdragonFlight::BlspSpiDriverComponentImpl* spiDrvSnap_ptr = 0;
@@ -307,6 +308,12 @@ void allocComps() {
 #endif
 ;
 
+    ackermannConverter_ptr = new Gnc::AckermannConverterComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ACKMNCONV")
+#endif
+;
+
     mpu9250_ptr = new Drv::MPU9250ComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "MPU9250",
@@ -530,6 +537,7 @@ void constructApp(unsigned int port_number,
     actuatorAdapter_ptr->init(0);
     sigGen_ptr->init(0);
     attFilter_ptr->init(0);
+    ackermannConverter_ptr->init(0);
     mpu9250_ptr->init(0);
     
     //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ);
@@ -570,6 +578,7 @@ void constructApp(unsigned int port_number,
     ctrlXest_ptr->regCommands();
     imuProc_ptr->regCommands();
     attFilter_ptr->regCommands();
+    //ackermannConverter_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
     
@@ -578,6 +587,7 @@ void constructApp(unsigned int port_number,
     ctrlXest_ptr->loadParameters();
     imuProc_ptr->loadParameters();
     attFilter_ptr->loadParameters();
+    //ackermannConverter_ptr->loadParameters();
     actuatorAdapter_ptr->loadParameters();
     sigGen_ptr->loadParameters();
     
@@ -600,7 +610,7 @@ void constructApp(unsigned int port_number,
     NATIVE_UINT_TYPE pwmPins[2] = {29, 30};
     F32 duty[2] = {0.15, 0.15};
     // /dev/pwm-1 on QuRT
-    escPwm_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
+    escPwmSnap_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
@@ -612,7 +622,7 @@ void constructApp(unsigned int port_number,
     NATIVE_UINT_TYPE pwmPins[2] = {83, 84};
     F32 duty[2] = {0.15, 0.15};
     // /dev/pwm-1 on QuRT
-    escPwm_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
+    escPwmSnap_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
 #endif // SOC
 
 #else // LINUX

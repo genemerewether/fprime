@@ -13,6 +13,7 @@ void exitTasks(void);
 #include <SnapdragonFlight/SnapdragonHealth/SnapdragonHealthComponentImpl.hpp>
 #include <Gnc/Est/FilterIface/FilterIfaceComponentImpl.hpp>
 #include <Gnc/Utils/AckermannIface/AckermannIfaceComponentImpl.hpp>
+#include <Gnc/Utils/AckermannConverter/AckermannConverterComponentImpl.hpp>
 #include <Gnc/Est/GroundTruthIface/GroundTruthIfaceComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
@@ -63,6 +64,7 @@ extern Gnc::ImuProcComponentImpl* imuProc_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 extern Gnc::SigGenComponentImpl* sigGen_ptr;
 extern Gnc::AttFilterComponentImpl* attFilter_ptr;
+extern Gnc::AckermannConverterComponentImpl* ackermannConverter_ptr;
 extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 
 extern SnapdragonFlight::BlspSpiDriverComponentImpl* spiDrvSnap_ptr;
