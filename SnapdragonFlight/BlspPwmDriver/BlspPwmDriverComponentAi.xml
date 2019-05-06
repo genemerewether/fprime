@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="BlspPwmDriver" kind="passive" namespace="SnapdragonFlight" modeler="true">
+
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Svc/Cycle/CyclePortAi.xml</import_port_type>
+    <import_port_type>Drv/PwmDriverPorts/PwmConfigPortAi.xml</import_port_type>
+    <import_port_type>Drv/PwmDriverPorts/PwmSetDutyCyclePortAi.xml</import_port_type>
+    <import_dictionary>SnapdragonFlight/BlspPwmDriver/Events.xml</import_dictionary>
+    <ports>
+
+
+        <port name="pwmConfig" data_type="Drv::PwmConfigData"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycleData"  kind="sync_input"    max_number="2">
+        </port>
+
+        <port name="log" data_type="Fw::Log"  kind="output" role="LogEvent"    max_number="1">
+        </port>
+
+        <port name="logText" data_type="Fw::LogText"  kind="output" role="LogTextEvent"    max_number="1">
+        </port>
+
+        <port name="time" data_type="Fw::Time"  kind="output" role="TimeGet"    max_number="1">
+        </port>
+    </ports>
+
+</component>
