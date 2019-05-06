@@ -596,8 +596,11 @@ void constructApp(unsigned int port_number,
     // J13-3, 5V level
     hwEnablePinSnap_ptr->open(28, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_IN);
 
-    // J15, BLSP9
-    i2cDrvSnap_ptr->open(9, SnapdragonFlight::I2C_FREQUENCY_400KHZ);
+    // J13 is already at 5V, so use for 2 pwm connectors
+    NATIVE_UINT_TYPE pwmPins[2] = {29, 30};
+    F32 duty[2] = {0.15, 0.15};
+    // /dev/pwm-1 on QuRT
+    escPwm_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
@@ -605,7 +608,11 @@ void constructApp(unsigned int port_number,
     
     // TODO(mereweth) - hardware enable pin
 
-    // TODO(mereweth) - I2C port
+    // J12 is already at 5V, so use for 2 pwm connectors
+    NATIVE_UINT_TYPE pwmPins[2] = {83, 84};
+    F32 duty[2] = {0.15, 0.15};
+    // /dev/pwm-1 on QuRT
+    escPwm_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
 #endif // SOC
 
 #else // LINUX
