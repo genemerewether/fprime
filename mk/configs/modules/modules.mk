@@ -72,7 +72,6 @@ UTILS_MODULES := \
 
 # dependent on turbojpeg and zmq
 SVC_EXTRA_MODULES := \
-	Svc/ImgComp \
 	Svc/ImgTlm
 
 SVC_MODULES := \
