@@ -463,8 +463,8 @@ void manualConstruct(bool internalIMUProp) {
     imuProc_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
     
     // actuator decoupler
-    /*mixer_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
-      actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));*/
+    ackermannConverter_ptr->set_actuators_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
+    actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
         
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
