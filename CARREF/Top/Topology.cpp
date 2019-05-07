@@ -400,7 +400,7 @@ void dumpobj(const char* objName) {
 void manualConstruct(bool internalIMUProp) {
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
 #ifdef SOC_8074
-    actuatorAdapter_ptr->_set_outputEnable_OutputPort(0, hwEnablePinSnap_ptr->get_gpioRead_InputPort(0));
+    actuatorAdapter_ptr->set_outputEnable_OutputPort(0, hwEnablePinSnap_ptr->get_gpioRead_InputPort(0));
 #else // SOC_8074
     // TODO(mereweth) - connect when we add enable pin
 #endif
