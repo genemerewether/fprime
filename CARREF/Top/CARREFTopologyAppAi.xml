@@ -387,11 +387,7 @@
 	 <source component = "rgTlm" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<<<<<<< HEAD
-<connection name = "Connection68">
-=======
 <connection name = "Connection67">
->>>>>>> 5973a06dc1f83a104c561698cd40a056524b42a9
 	 <source component = "snapHealth" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
