@@ -31,7 +31,7 @@
 
 #include <ros/callback_queue.h>
 #include <sensor_msgs/Image.h>
-#include <sensor_msgs/fill_image.h> 
+#include <sensor_msgs/fill_image.h>
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -81,7 +81,7 @@ namespace HLProc {
         // TODO(mereweth) - prevent calling twice; free imageXport
         FW_ASSERT(m_nodeHandle);
         ros::NodeHandle* n = this->m_nodeHandle;
-	m_imageXport = new image_transport::ImageTransport(*n);
+        m_imageXport = new image_transport::ImageTransport(*n);
 
         char buf[32];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
@@ -89,7 +89,7 @@ namespace HLProc {
             m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
         }
 
-	m_imagePub = m_imageXport->advertise("image_raw", 1);
+        m_imagePub = m_imageXport->advertise("image_raw", 1);
 
         m_rosInited = true;
     }
@@ -99,7 +99,7 @@ namespace HLProc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("HLROSIFACE");
-	this->m_nodeHandle = new ros::NodeHandle();
+        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, HLRosIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -139,11 +139,11 @@ namespace HLProc {
 
             this->FileLogger_out(0,fileBuff);
         }
-        
+
         if (!m_rosInited) {
             return;
         }
-      
+
         sensor_msgs::Imu msg;
         msg.header.stamp.sec = header.getstamp().getSeconds();
         msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
@@ -199,33 +199,31 @@ namespace HLProc {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
     }
-  
+
     void HLRosIfaceComponentImpl ::
       ImageRecv_handler(
-	  const NATIVE_INT_TYPE portNum,
-	  ROS::sensor_msgs::Image &Image
+          const NATIVE_INT_TYPE portNum,
+          ROS::sensor_msgs::Image &Image
       )
     {
         sensor_msgs::Image msg;
-	const U8* ptr = (const U8*) Image.getdata().getdata();
-	sensor_msgs::fillImage(
-	    msg,
-	    sensor_msgs::image_encodings::MONO8,
-	    Image.getheight(),
-            Image.getwidth(),
-	    Image.getstep(),
-	    ptr
-	);
-	msg.header.frame_id = "dfc";
-	msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
-	msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
-	msg.is_bigendian = 0;
-	m_imagePub.publish(msg);
+        const U8* ptr = (const U8*) Image.getdata().getdata();
+        sensor_msgs::fillImage(msg,
+                               sensor_msgs::image_encodings::MONO8,
+                               Image.getheight(),
+                               Image.getwidth(),
+                               Image.getstep(),
+                               ptr);
+        msg.header.frame_id = "dfc";
+        msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
+        msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
+        msg.is_bigendian = 0;
+        m_imagePub.publish(msg);
 
-	Fw::Buffer temp = Image.getdata();
+        Fw::Buffer temp = Image.getdata();
         this->ImageForward_out(0, temp);
     }
-  
+
 
     // ----------------------------------------------------------------------
     // Member function definitions
@@ -242,7 +240,7 @@ namespace HLProc {
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
         ros::NodeHandle* n = compPtr->m_nodeHandle;
-	FW_ASSERT(n);
+        FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
@@ -251,13 +249,13 @@ namespace HLProc {
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler0,
                                             ros::TransportHints().tcpNoDelay());
-        
+
         ActuatorsHandler actuatorsHandler1(compPtr, 1);
         ros::Subscriber actuatorsSub1 = n->subscribe("aux_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());
-        
+
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -291,11 +289,11 @@ namespace HLProc {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
 
-	    if (!std::isfinite(msg->header.stamp.sec) ||
-		!std::isfinite(msg->header.stamp.nsec)) {
-  	        //TODO(mereweth) - EVR
-	        return;
-	    }
+            if (!std::isfinite(msg->header.stamp.sec) ||
+                !std::isfinite(msg->header.stamp.nsec)) {
+                //TODO(mereweth) - EVR
+                return;
+            }
             Header head(msg->header.seq,
                         Fw::Time(TB_ROS_TIME, 0,
                                  msg->header.stamp.sec,
@@ -310,32 +308,32 @@ namespace HLProc {
              * ROS value or the min of that and the allocated size
              */
             size = msg->angles.size();
-	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
-	        if (!std::isfinite(msg->angles[i])) {
-  	            //TODO(mereweth) - EVR
-		    return;
-		}
-	    }
+            for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+                if (!std::isfinite(msg->angles[i])) {
+                    //TODO(mereweth) - EVR
+                    return;
+                }
+            }
             actuators.setangles(msg->angles.data(), size);
             actuators.setangles_count(msg->angles.size());
-            
+
             size = msg->angular_velocities.size();
-	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
-	        if (!std::isfinite(msg->angular_velocities[i])) {
-  	            //TODO(mereweth) - EVR
-		    return;
-		}
-	    }
+            for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+                if (!std::isfinite(msg->angular_velocities[i])) {
+                    //TODO(mereweth) - EVR
+                    return;
+                }
+            }
             actuators.setangular_velocities(msg->angular_velocities.data(), size);
             actuators.setangular_velocities_count(msg->angular_velocities.size());
 
             size = msg->normalized.size();
-	    for (NATIVE_INT_TYPE i = 0; i < size; i++) {
-	        if (!std::isfinite(msg->normalized[i])) {
-  	            //TODO(mereweth) - EVR
-		    return;
-		}
-	    }
+            for (NATIVE_INT_TYPE i = 0; i < size; i++) {
+                if (!std::isfinite(msg->normalized[i])) {
+                    //TODO(mereweth) - EVR
+                    return;
+                }
+            }
             actuators.setnormalized(msg->normalized.data(), size);
             actuators.setnormalized_count(msg->normalized.size());
 
@@ -354,5 +352,5 @@ namespace HLProc {
             this->compPtr->m_actuatorsSet[this->portNum].mutex.unLock();
         }
     }
-  
+
 } // end namespace
