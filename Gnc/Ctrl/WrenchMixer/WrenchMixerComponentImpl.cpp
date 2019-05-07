@@ -194,7 +194,7 @@ namespace Gnc {
                                             force_b.getx(),
                                             force_b.gety(),
                                             force_b.getz()),
-				     Eigen::Vector3d(
+                                     Eigen::Vector3d(
                                             moment_b.getx(),
                                             moment_b.gety(),
                                             moment_b.getz()));

@@ -86,7 +86,7 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-	this->m_nodeHandle = new ros::NodeHandle();
+        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, GroundTruthIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -132,7 +132,7 @@ namespace Gnc {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
     }
-   
+
 
     // ----------------------------------------------------------------------
     // Member function definitions
@@ -149,17 +149,17 @@ namespace Gnc {
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
         ros::NodeHandle* n = compPtr->m_nodeHandle;
-	FW_ASSERT(n);
+        FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
         OdometryHandler updateHandler(compPtr, 0);
 
         ros::Subscriber updateSub = n->subscribe("odom_in", 10,
-						 &OdometryHandler::odometryCallback,
-						 &updateHandler,
-						 ros::TransportHints().tcpNoDelay());
-        
+                                                 &OdometryHandler::odometryCallback,
+                                                 &updateHandler,
+                                                 ros::TransportHints().tcpNoDelay());
+
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -189,11 +189,11 @@ namespace Gnc {
 
         DEBUG_PRINT("odometry port handler %d\n", this->portNum);
 
-	if (!std::isfinite(msg->header.stamp.sec) ||
-	    !std::isfinite(msg->header.stamp.nsec)) {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
 
 #ifdef DO_TIME_CONV
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
@@ -241,32 +241,32 @@ namespace Gnc {
 #endif //DO_TIME_CONV
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
-	if (!std::isfinite(msg->pose.pose.position.x) ||
-	    !std::isfinite(msg->pose.pose.position.y) ||
-	    !std::isfinite(msg->pose.pose.position.z) ||
-	    
-	    !std::isfinite(msg->pose.pose.orientation.x) ||
+        if (!std::isfinite(msg->pose.pose.position.x) ||
+            !std::isfinite(msg->pose.pose.position.y) ||
+            !std::isfinite(msg->pose.pose.position.z) ||
+
+            !std::isfinite(msg->pose.pose.orientation.x) ||
             !std::isfinite(msg->pose.pose.orientation.y) ||
-	    !std::isfinite(msg->pose.pose.orientation.z) ||
-	    !std::isfinite(msg->pose.pose.orientation.w) ||
-	    
+            !std::isfinite(msg->pose.pose.orientation.z) ||
+            !std::isfinite(msg->pose.pose.orientation.w) ||
+
             !std::isfinite(msg->twist.twist.linear.x) ||
-	    !std::isfinite(msg->twist.twist.linear.y) ||
-	    !std::isfinite(msg->twist.twist.linear.z) ||
-	    
-	    !std::isfinite(msg->twist.twist.angular.x) ||
-	    !std::isfinite(msg->twist.twist.angular.y) ||
-	    !std::isfinite(msg->twist.twist.angular.z)) {
-	  //TODO(mereweth) - EVR
-	  return;
-	}
-	
+            !std::isfinite(msg->twist.twist.linear.y) ||
+            !std::isfinite(msg->twist.twist.linear.z) ||
+
+            !std::isfinite(msg->twist.twist.angular.x) ||
+            !std::isfinite(msg->twist.twist.angular.y) ||
+            !std::isfinite(msg->twist.twist.angular.z)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::nav_msgs;
             using namespace ROS::geometry_msgs;
 
-	    F64 dummy[36] = { 0.0 };
+            F64 dummy[36] = { 0.0 };
 
             Odometry odometry(
               Header(msg->header.seq,
@@ -275,31 +275,31 @@ namespace Gnc {
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               0/*Fw::EightyCharString(msg->child_frame_id.data())*/,
               PoseWithCovariance(Pose(Point(msg->pose.pose.position.x,
-					    msg->pose.pose.position.y,
-					    msg->pose.pose.position.z),
-				      Quaternion(msg->pose.pose.orientation.x,
-						 msg->pose.pose.orientation.y,
-						 msg->pose.pose.orientation.z,
-						 msg->pose.pose.orientation.w)),
-				 dummy, FW_NUM_ARRAY_ELEMENTS(dummy)),
+                                            msg->pose.pose.position.y,
+                                            msg->pose.pose.position.z),
+                                      Quaternion(msg->pose.pose.orientation.x,
+                                                 msg->pose.pose.orientation.y,
+                                                 msg->pose.pose.orientation.z,
+                                                 msg->pose.pose.orientation.w)),
+                                      dummy, FW_NUM_ARRAY_ELEMENTS(dummy)),
               TwistWithCovariance(Twist(Vector3(msg->twist.twist.linear.x,
-						msg->twist.twist.linear.y,
-						msg->twist.twist.linear.z),
-					Vector3(msg->twist.twist.angular.x,
-						msg->twist.twist.angular.y,
-						msg->twist.twist.angular.z)),
-				  dummy, FW_NUM_ARRAY_ELEMENTS(dummy))
+                                                msg->twist.twist.linear.y,
+                                                msg->twist.twist.linear.z),
+                                        Vector3(msg->twist.twist.angular.x,
+                                                msg->twist.twist.angular.y,
+                                                msg->twist.twist.angular.z)),
+                                        dummy, FW_NUM_ARRAY_ELEMENTS(dummy))
             ); // end Odometry constructor
 
             this->compPtr->m_odometrySet[this->portNum].mutex.lock();
-	    if (this->compPtr->m_odometrySet[this->portNum].fresh) {
-		this->compPtr->m_odometrySet[this->portNum].overflows++;
-		DEBUG_PRINT("Overwriting odometry port %d before Sched\n", this->portNum);
-	    }
-	    this->compPtr->m_odometrySet[this->portNum].odometry = odometry;
-	    this->compPtr->m_odometrySet[this->portNum].fresh = true;
-	}
-	this->compPtr->m_odometrySet[this->portNum].mutex.unLock();
+            if (this->compPtr->m_odometrySet[this->portNum].fresh) {
+                this->compPtr->m_odometrySet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting odometry port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_odometrySet[this->portNum].odometry = odometry;
+            this->compPtr->m_odometrySet[this->portNum].fresh = true;
+        }
+        this->compPtr->m_odometrySet[this->portNum].mutex.unLock();
     }
-  
+
 } // end namespace

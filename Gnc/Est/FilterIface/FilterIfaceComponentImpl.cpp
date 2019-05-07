@@ -81,7 +81,7 @@ namespace Gnc {
         // TODO(mereweth) - prevent calling twice
         FW_ASSERT(m_nodeHandle);
         ros::NodeHandle* n = this->m_nodeHandle;
-	this->m_trBroad = new tf::TransformBroadcaster();
+        this->m_trBroad = new tf::TransformBroadcaster();
 
         char buf[32];
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
@@ -97,7 +97,7 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-	this->m_nodeHandle = new ros::NodeHandle();
+        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, FilterIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -139,7 +139,7 @@ namespace Gnc {
           const NATIVE_INT_TYPE portNum,
           ROS::nav_msgs::OdometryNoCov &Odometry
       )
-    {        
+    {
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
@@ -183,15 +183,15 @@ namespace Gnc {
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
-	stamp.set((U32) (usecRos / 1000LL / 1000LL),
-	 	  (U32) (usecRos % (1000LL * 1000LL)));
-	header.setstamp(stamp);
+        stamp.set((U32) (usecRos / 1000LL / 1000LL),
+                  (U32) (usecRos % (1000LL * 1000LL)));
+        header.setstamp(stamp);
         Odometry.setheader(header);
 #else
         msg.header.stamp.sec = stamp.getSeconds();
         msg.header.stamp.nsec = stamp.getUSeconds() * 1000LL;
 #endif // ifdef DO_TIME_CONV
-	
+
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -208,11 +208,11 @@ namespace Gnc {
 
             this->FileLogger_out(0,fileBuff);
         }
-	
+
         if (!m_rosInited) {
             return;
         }
-	
+
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
@@ -238,20 +238,20 @@ namespace Gnc {
         msg.twist.twist.angular.x = vec.getx();
         msg.twist.twist.angular.y = vec.gety();
         msg.twist.twist.angular.z = vec.getz();
-	
+
         m_odomPub[portNum].publish(msg);
 
-	tf::Transform tfo;
-	tf::poseMsgToTF(msg.pose.pose, tfo);
-	
-	tf::StampedTransform tfoStamp;
-	tfoStamp.stamp_ = msg.header.stamp;
-	tfoStamp.child_frame_id_ = msg.child_frame_id;
-	tfoStamp.frame_id_ = msg.header.frame_id;
-	tfoStamp.setData(tfo);
-	
-	FW_ASSERT(this->m_trBroad);
-	this->m_trBroad->sendTransform(tfoStamp);
+        tf::Transform tfo;
+        tf::poseMsgToTF(msg.pose.pose, tfo);
+
+        tf::StampedTransform tfoStamp;
+        tfoStamp.stamp_ = msg.header.stamp;
+        tfoStamp.child_frame_id_ = msg.child_frame_id;
+        tfoStamp.frame_id_ = msg.header.frame_id;
+        tfoStamp.setData(tfo);
+
+        FW_ASSERT(this->m_trBroad);
+        this->m_trBroad->sendTransform(tfoStamp);
     }
 
     void FilterIfaceComponentImpl ::
@@ -263,7 +263,7 @@ namespace Gnc {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
     }
-   
+
 
     // ----------------------------------------------------------------------
     // Member function definitions
@@ -280,7 +280,7 @@ namespace Gnc {
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
         ros::NodeHandle* n = compPtr->m_nodeHandle;
-	FW_ASSERT(n);
+        FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
@@ -290,7 +290,7 @@ namespace Gnc {
                                                 &ImuStateUpdateHandler::imuStateUpdateCallback,
                                                 &updateHandler,
                                                 ros::TransportHints().tcpNoDelay());
-        
+
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -320,11 +320,11 @@ namespace Gnc {
 
         DEBUG_PRINT("imuStateUpdate port handler %d\n", this->portNum);
 
-	if (!std::isfinite(msg->header.stamp.sec) ||
-	    !std::isfinite(msg->header.stamp.nsec)) {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
 
 #ifdef DO_TIME_CONV
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
@@ -372,34 +372,34 @@ namespace Gnc {
 #endif //DO_TIME_CONV
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
-	if (!std::isfinite(msg->pose.pose.position.x) ||
-	    !std::isfinite(msg->pose.pose.position.y) ||
-	    !std::isfinite(msg->pose.pose.position.z) ||
-	    
-	    !std::isfinite(msg->pose.pose.orientation.x) ||
+        if (!std::isfinite(msg->pose.pose.position.x) ||
+            !std::isfinite(msg->pose.pose.position.y) ||
+            !std::isfinite(msg->pose.pose.position.z) ||
+
+            !std::isfinite(msg->pose.pose.orientation.x) ||
             !std::isfinite(msg->pose.pose.orientation.y) ||
-	    !std::isfinite(msg->pose.pose.orientation.z) ||
-	    !std::isfinite(msg->pose.pose.orientation.w) ||
-	    
+            !std::isfinite(msg->pose.pose.orientation.z) ||
+            !std::isfinite(msg->pose.pose.orientation.w) ||
+
             !std::isfinite(msg->twist.twist.linear.x) ||
-	    !std::isfinite(msg->twist.twist.linear.y) ||
-	    !std::isfinite(msg->twist.twist.linear.z) ||
-	    
-	    !std::isfinite(msg->twist.twist.angular.x) ||
-	    !std::isfinite(msg->twist.twist.angular.y) ||
-	    !std::isfinite(msg->twist.twist.angular.z) ||
-	    
-	    !std::isfinite(msg->angular_velocity_bias.x) ||
-	    !std::isfinite(msg->angular_velocity_bias.y) ||
-	    !std::isfinite(msg->angular_velocity_bias.z) ||
-	    
-	    !std::isfinite(msg->linear_acceleration_bias.x) ||
-	    !std::isfinite(msg->linear_acceleration_bias.y) ||
-	    !std::isfinite(msg->linear_acceleration_bias.z)) {
-	  //TODO(mereweth) - EVR
-	  return;
-	}
-	
+            !std::isfinite(msg->twist.twist.linear.y) ||
+            !std::isfinite(msg->twist.twist.linear.z) ||
+
+            !std::isfinite(msg->twist.twist.angular.x) ||
+            !std::isfinite(msg->twist.twist.angular.y) ||
+            !std::isfinite(msg->twist.twist.angular.z) ||
+
+            !std::isfinite(msg->angular_velocity_bias.x) ||
+            !std::isfinite(msg->angular_velocity_bias.y) ||
+            !std::isfinite(msg->angular_velocity_bias.z) ||
+
+            !std::isfinite(msg->linear_acceleration_bias.x) ||
+            !std::isfinite(msg->linear_acceleration_bias.y) ||
+            !std::isfinite(msg->linear_acceleration_bias.z)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
@@ -433,14 +433,14 @@ namespace Gnc {
             ); // end ImuStateUpdate constructor
 
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
-	    if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
-		this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
-		DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
-	    }
-	    this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
-	    this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
-	}
-	this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
+            if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
+                this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
+            this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+        }
+        this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
     }
-  
+
 } // end namespace
