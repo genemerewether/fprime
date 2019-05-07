@@ -27,7 +27,8 @@
         <args>
             <arg name="outputMode" type="ENUM">
                 <enum name="OutputMode">
-                    <item name="ACTUATOR"/>
+                    <item name="ACTUATOR_ANGLE"/>
+                    <item name="ACTUATOR_ANGVEL"/>
                     <item name="THRUST"/>
                     <item name="MOMENT"/>
                     <item name="ATT_RATE"/>

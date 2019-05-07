@@ -108,21 +108,19 @@ namespace Gnc {
                       if (this->isConnected_pwmSetDuty_OutputPort(0)) {
                           PwmMetadata pwm = this->outputInfo[i].pwmMeta;
 
-                          // TODO(mereweth) - change to zero?
-                          F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.15 };
+                          F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.0 };
                           if (pwm.addr >= FW_NUM_ARRAY_ELEMENTS(duty)) {
                               //TODO(mereweth) - evr
                               break;
                           }
 
-                          // TODO(mereweth) - set zero for this actuator
-                          //duty[pwm.addr] = zero;
+                          duty[pwm.addr] = this->outputInfo[i].pwmMeta.cmdOutputMap.offset;
                           U32 bitmask = 1 << pwm.addr;
                           Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
                           this->pwmSetDuty_out(0, dutySer);
                       }
                       else {
-                    //TODO(mereweth) - issue error
+                          //TODO(mereweth) - issue error
                       }
                   }
                       break;
@@ -727,8 +725,6 @@ namespace Gnc {
                   FW_ASSERT(0, cmdOutputMap.type);
                   break;
           }
-          // NOTE(mereweth) - default param value for offset is zero
-          out += cmdOutputMap.offset;
 
           F64 delta = 0.0;
           switch (fbMeta.ctrlType) {
@@ -775,7 +771,7 @@ namespace Gnc {
               }
           }
 
-          DEBUG_PRINT("esc idx %u, in %f, out %lld\n", i, inVal, out);
+          DEBUG_PRINT("esc idx %u, in %f, out %f\n", i, inVal, out);
 
           switch (this->outputInfo[i].type) {
               case OUTPUT_UNSET:
@@ -788,17 +784,21 @@ namespace Gnc {
                   if (this->isConnected_pwmSetDuty_OutputPort(0)) {
                       Fw::Time cmdTime = this->getTime();
                       PwmMetadata pwm = this->outputInfo[i].pwmMeta;
-
-                      // TODO(mereweth)
-                      F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.15 };
+                      
+                      if (out > pwm.cmdOutputMap.maxOut) {  out = pwm.cmdOutputMap.maxOut;  }
+                      if (out < pwm.cmdOutputMap.minOut) {  out = pwm.cmdOutputMap.minOut;  }
+                      
+                      // TODO(mereweth) - param for default zero value
+                      F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.0 };
                       if (pwm.addr >= FW_NUM_ARRAY_ELEMENTS(duty)) {
                           //TODO(mereweth) - evr
                           break;
                       }
 
-                      // TODO(mereweth)
-                      //duty[pwm.addr] = out;
+                      duty[pwm.addr] = out + cmdOutputMap.offset;
                       U32 bitmask = 1 << pwm.addr;
+                      DEBUG_PRINT("pwm esc idx %u, offset %f, duty %f\n",
+                                  i, cmdOutputMap.offset, duty[pwm.addr]);
                       Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
                       this->pwmSetDuty_out(0, dutySer);
                       this->outputInfo[i].feedback.cmdIn   = inVal;
