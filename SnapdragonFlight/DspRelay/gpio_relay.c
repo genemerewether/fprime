@@ -146,7 +146,7 @@ int dsp_relay_gpio_relay_read(int fd) {
 // struct for signal waiting
 static struct GpioWaitInfo {
     sem_t semId; // semaphore for signaling waiting thread
-    int quitRequested; // used to signal exit of semaphore waits
+    volatile int quitRequested; // used to signal exit of semaphore waits
 } gpioInfo[NUM_DEVICES];;
 
 void *gpio_int_isr(DSPAL_GPIO_INT_ISR_CTX context)

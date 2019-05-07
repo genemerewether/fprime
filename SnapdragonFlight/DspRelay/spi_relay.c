@@ -171,7 +171,7 @@ int dsp_relay_spi_relay_read_write(int fd, const unsigned char* write_data, int 
         return errno;
     }
 	*/
-#if 1
+#if 0
 	LOG_INFO("SPI: ");
     for (byte = 0; byte < read_write.write_buffer_length; byte++) {
     	LOG_INFO("write_data: 0x%02X ",write_data[byte]);

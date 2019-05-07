@@ -356,7 +356,7 @@ namespace Gnc {
 		  return; \
 	  } \
           inputActIdx = paramGet_a ## XXX ## _inputActIdx(valid[2]); \
-	  for (U32 j = 0; j < 2; j++) { \
+	  for (U32 j = 0; j < 3; j++) { \
 	      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
 	  } \
           if ((outType < OUTPUT_VALID_MIN) || \
@@ -365,6 +365,7 @@ namespace Gnc {
               (inputActType > INPUTACT_VALID_MAX)) { \
               return; \
           } \
+          DEBUG_PRINT("Parm slot %u first part ok\n", parmSlot); \
 	  \
           switch (outType) { \
               case OUTPUT_UNSET: \
@@ -391,12 +392,14 @@ namespace Gnc {
                           DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
                           return; \
                   } \
+                  DEBUG_PRINT("Parm slot %u map ok\n", parmSlot);    \
                   pwm.cmdOutputMap = cmdOutputMap; \
                   \
                   if (!setupPwm(i, pwm, inputActType, inputActIdx)) { \
+                      DEBUG_PRINT("Setup pwm failed\n"); \
                       return; \
                   } \
-                  return; \
+                  break; \
               case OUTPUT_I2C: \
               case OUTPUT_I2C_SIMPLE: \
                   i2c.addr = paramGet_a ## XXX ## _addr(valid[0]); \
