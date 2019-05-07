@@ -622,7 +622,7 @@ void constructApp(unsigned int port_number,
     NATIVE_UINT_TYPE pwmPins[2] = {29, 30};
     F32 duty[2] = {0.15, 0.15};
     // /dev/pwm-1 on QuRT
-    escPwmSnap_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
+    escPwmSnap_ptr->open(1, pwmPins, 2, duty, 10 * 1000);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
@@ -632,7 +632,7 @@ void constructApp(unsigned int port_number,
     NATIVE_UINT_TYPE pwmPins[2] = {83, 84};
     F32 duty[2] = {0.15, 0.15};
     // /dev/pwm-1 on QuRT
-    escPwmSnap_ptr->open(1, pwmPins, 2, duty, 100 * 1000);
+    escPwmSnap_ptr->open(1, pwmPins, 2, duty, 10 * 1000);
 #endif // SOC
 
 #else // LINUX

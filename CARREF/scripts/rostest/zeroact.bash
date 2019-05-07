@@ -6,8 +6,7 @@ rostopic pub -r 100 /flight_actuators_command mav_msgs/Actuators "header:
     secs: 0
     nsecs: 0
   frame_id: ''
-angles:
-- 0
-angular_velocities: [0,0,0,0,0,0,0,0]
+angles: [0]
+angular_velocities: [0]
 normalized:
 - 0"

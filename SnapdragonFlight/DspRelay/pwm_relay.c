@@ -78,6 +78,7 @@ int dsp_relay_pwm_relay_configure(int fd, uint64* handle, const unsigned int* ch
 
     // Send the signal definition to the DSP.
     if (ioctl(fd, PWM_IOCTL_SIGNAL_DEFINITION, &signal_definition) != 0) {
+        LOG_ERR("failed to send pwm signal def to DSP\n");
         return -2;
     }
 
@@ -85,13 +86,17 @@ int dsp_relay_pwm_relay_configure(int fd, uint64* handle, const unsigned int* ch
     // pulse width.
     if (ioctl(fd, PWM_IOCTL_GET_UPDATE_BUFFER, &update_buffer) != 0)
     {
+        LOG_ERR("failed to get shared pwm buffer from DSP\n");
         return -3;
     }
+    *handle = (uint64) update_buffer;
+    LOG_INFO("Successfully configured PWM fd %d; handle %llu",fd,*handle);
     return 0;
 }
 
 int dsp_relay_pwm_relay_set_duty(uint64 handle, const unsigned int* pulse_width_in_usecs, unsigned int pulse_width_in_usecsLen, unsigned int bitmask) {
     if (0 == handle) {
+        LOG_ERR("bad handle in pwm set duty\n");
         return -2;
     }
 
@@ -101,7 +106,9 @@ int dsp_relay_pwm_relay_set_duty(uint64 handle, const unsigned int* pulse_width_
     for (int i = 0; i < updateBuf->num_gpios; i++) {
         if (i >= pulse_width_in_usecsLen) {  return -3;  }
         if (bitmask & (1 << i)) {
+            LOG_INFO("setting pwm %d to %u\n", i, pulse_width_in_usecs[i]);
             updateBuf->pwm_signal[i].pulse_width_in_usecs = pulse_width_in_usecs[i];
         }
     }
+    return 0;
 }

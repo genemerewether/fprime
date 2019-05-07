@@ -22,7 +22,7 @@
 #include <Fw/Types/BasicTypes.hpp>
 #include "SnapdragonFlight/DspRelay/dsp_relay.h"
 
-//#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
 // TODO(Mereweth) - from dspal, but can't include
@@ -49,6 +49,7 @@ namespace SnapdragonFlight {
           Drv::PwmSetDutyCycle pwmSetDutyCycle
       )
     {
+        DEBUG_PRINT("pwm set duty\n");
         if (!this->m_handle) {
             //TODO(mereweth) - issue EVR
             return;
@@ -62,6 +63,8 @@ namespace SnapdragonFlight {
 
         for (int i = 0; i < FW_MIN(dutySize, m_numGpios); i++) {
             pulse_width_in_usecs[i] = (U32) (this->m_periodInUsecs * duty[i]);
+            DEBUG_PRINT("setting pwm %d to duty %f, usec %u\n",
+                        i, duty[i], pulse_width_in_usecs[i]);
         }
 
         U32 bitmask = pwmSetDutyCycle.getbitmask();
@@ -82,7 +85,7 @@ namespace SnapdragonFlight {
         if (channelSize > DEV_FS_PWM_MAX_NUM_SIGNALS) {
             DEBUG_PRINT("not enough channel slots: %d < %d!\n",
                         channelSize, DEV_FS_PWM_MAX_NUM_SIGNALS);
-            this->log_WARNING_HI_PWM_OpenError(pwmchip, 0, -1);
+            this->log_WARNING_HI_PWM_OpenError(pwmchip, 0, -2);
             return false;
         }
 
@@ -91,18 +94,19 @@ namespace SnapdragonFlight {
             this->log_WARNING_HI_PWM_OpenError(pwmchip, 0, fd);
             return false;
         }
-        this->m_fd = fd;
         this->m_pwmchip = pwmchip;
 
         U64 handle = 0u;
-        int stat = dsp_relay_pwm_relay_configure(this->m_fd, &handle,
+        int stat = dsp_relay_pwm_relay_configure(fd, &handle,
                                                  channel, channelSize,
                                                  period_in_usecs);
 
-        if (0 != stat) {
+        if ((0 != stat) ||
+            (0 == handle)) {
             this->log_WARNING_HI_PWM_OpenError(pwmchip, 0, stat);
             return false;
         }
+        this->m_fd = fd;
         this->m_periodInUsecs = period_in_usecs;
         this->m_handle = (void *) handle;
         this->m_numGpios = channelSize;
