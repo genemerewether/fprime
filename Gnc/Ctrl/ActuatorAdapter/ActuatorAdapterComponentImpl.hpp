@@ -121,11 +121,11 @@ namespace Gnc {
       };
 
       bool setupI2C(U32 actuator, I2CMetadata meta,
-	  	    bool useSimple,
-		    InputActuatorType inputActType, U32 inputActIdx);
+                    bool useSimple,
+                    InputActuatorType inputActType, U32 inputActIdx);
 
       bool setupPwm(U32 actuator, PwmMetadata meta,
-	  	    InputActuatorType inputActType, U32 inputActIdx);
+                    InputActuatorType inputActType, U32 inputActIdx);
 
       void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
 
@@ -138,14 +138,14 @@ namespace Gnc {
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
-    
+
       //! Handler implementation for flySafe
       //!
       void flySafe_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::mav_msgs::BoolStamped &BoolStamped 
+          ROS::mav_msgs::BoolStamped &BoolStamped
       );
-    
+
       //! Handler implementation for motor
       //!
       void motor_handler(
@@ -182,12 +182,12 @@ namespace Gnc {
       );
 
       //! Implementation for ACTADAP_SetVoltAct command handler
-      //! 
+      //!
       void ACTADAP_SetVoltAct_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq, /*!< The command sequence number*/
-          U8 actIdx, 
-          F64 voltage 
+          U8 actIdx,
+          F64 voltage
       );
 
       enum OutputType {
@@ -220,7 +220,7 @@ namespace Gnc {
               I2CMetadata i2cMeta;
           };
           InputActuatorType inputActType;
- 	  U32 inputActIdx;
+     U32 inputActIdx;
           Feedback feedback;
       } outputInfo[ACTADAP_MAX_ACTUATORS];
 
@@ -244,10 +244,10 @@ namespace Gnc {
       U32 flySafeCycles;
       U32 flySafeMaxElapsedCycles;
 
-      bool flySafeCheckTime;    
+      bool flySafeCheckTime;
       Fw::Time flySafeLastTime;
       Fw::Time flySafeMaxElapsedTime;
-    
+
       bool paramsInited;
 
     };

@@ -96,67 +96,67 @@ namespace Gnc {
     sendZeroCmdAll(void)
   {
       for (U32 i = 0; i < FW_MIN(this->numActuators, ACTADAP_MAX_ACTUATORS); i++) {
-	  if (INPUTACT_ANGLE != this->outputInfo[i].inputActType) {
-	      switch (this->outputInfo[i].type) {
-		  case OUTPUT_UNSET:
-		  {
-		      //TODO(mereweth) - issue error
-		  }
-		      break;
-		  case OUTPUT_PWM:
-		  {
-		      if (this->isConnected_pwmSetDuty_OutputPort(0)) {
-			  PwmMetadata pwm = this->outputInfo[i].pwmMeta;
+          if (INPUTACT_ANGLE != this->outputInfo[i].inputActType) {
+              switch (this->outputInfo[i].type) {
+                  case OUTPUT_UNSET:
+                  {
+                      //TODO(mereweth) - issue error
+                  }
+                      break;
+                  case OUTPUT_PWM:
+                  {
+                      if (this->isConnected_pwmSetDuty_OutputPort(0)) {
+                          PwmMetadata pwm = this->outputInfo[i].pwmMeta;
 
-			  // TODO(mereweth) - change to zero?
-			  F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.15 };
-			  if (pwm.addr >= FW_NUM_ARRAY_ELEMENTS(duty)) { 
-			      //TODO(mereweth) - evr
-			      break;
-			  }
+                          // TODO(mereweth) - change to zero?
+                          F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.15 };
+                          if (pwm.addr >= FW_NUM_ARRAY_ELEMENTS(duty)) {
+                              //TODO(mereweth) - evr
+                              break;
+                          }
 
-			  // TODO(mereweth) - set zero for this actuator
-			  //duty[pwm.addr] = zero;
-			  U32 bitmask = 1 << pwm.addr;
-			  Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
-			  this->pwmSetDuty_out(0, dutySer);
-		      }
-		      else {
-			  //TODO(mereweth) - issue error
-		      }
-		  }
-		      break;
-		  case OUTPUT_I2C:
-		  case OUTPUT_I2C_SIMPLE:
-		  {
-		      if (this->isConnected_escConfig_OutputPort(0) &&
-			  this->isConnected_escReadWrite_OutputPort(0)) {
-			  // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-			  this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
+                          // TODO(mereweth) - set zero for this actuator
+                          //duty[pwm.addr] = zero;
+                          U32 bitmask = 1 << pwm.addr;
+                          Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
+                          this->pwmSetDuty_out(0, dutySer);
+                      }
+                      else {
+                    //TODO(mereweth) - issue error
+                      }
+                  }
+                      break;
+                  case OUTPUT_I2C:
+                  case OUTPUT_I2C_SIMPLE:
+                  {
+                      if (this->isConnected_escConfig_OutputPort(0) &&
+                          this->isConnected_escReadWrite_OutputPort(0)) {
+                          // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
+                          this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
 
-			  Fw::Buffer readBufObj(0, 0, 0, 0); // no read
-			  if (OUTPUT_I2C == this->outputInfo[i].type) {
-			      // MSB is reverse bit
-			      U8 writeBuf[3] = { 0 };
-			      Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-			      this->escReadWrite_out(0, writeBufObj, readBufObj);
-			  }
-			  else { // simple protocol
-			      U8 writeBuf[2] = { 0 };
-			      Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-			      this->escReadWrite_out(0, writeBufObj, readBufObj);
-			  }
-		      }
-		      else {
-			  //TODO(mereweth) - issue error
-		      }
-		  }
-		      break;
-		  default:
-		      //TODO(mereweth) - DEBUG_PRINT
-		      FW_ASSERT(0, this->outputInfo[i].type);
-	      }
-	  }
+                          Fw::Buffer readBufObj(0, 0, 0, 0); // no read
+                          if (OUTPUT_I2C == this->outputInfo[i].type) {
+                              // MSB is reverse bit
+                              U8 writeBuf[3] = { 0 };
+                              Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          }
+                          else { // simple protocol
+                              U8 writeBuf[2] = { 0 };
+                              Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
+                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          }
+                      }
+                      else {
+                    //TODO(mereweth) - issue error
+                      }
+                  }
+                      break;
+                  default:
+                      //TODO(mereweth) - DEBUG_PRINT
+                      FW_ASSERT(0, this->outputInfo[i].type);
+              }
+          }
       }
   }
 
@@ -165,15 +165,15 @@ namespace Gnc {
              U32 actuator,
              I2CMetadata meta,
              bool useSimple,
-	     InputActuatorType inputActType,
-	     U32 inputActIdx
+             InputActuatorType inputActType,
+             U32 inputActIdx
     )
   {
       if (actuator >= ACTADAP_MAX_ACTUATORS) {
           return false;
       }
       if ((inputActType > INPUTACT_VALID_MAX) ||
-	  (inputActType < INPUTACT_VALID_MIN)) {
+          (inputActType < INPUTACT_VALID_MIN)) {
           return false;
       }
       this->outputInfo[actuator].inputActType = inputActType;
@@ -202,15 +202,15 @@ namespace Gnc {
     setupPwm(
              U32 actuator,
              PwmMetadata meta,
-	     InputActuatorType inputActType,
-	     U32 inputActIdx
+             InputActuatorType inputActType,
+             U32 inputActIdx
     )
   {
       if (actuator >= ACTADAP_MAX_ACTUATORS) {
           return false;
       }
       if ((inputActType > INPUTACT_VALID_MAX) ||
-	  (inputActType < INPUTACT_VALID_MIN)) {
+          (inputActType < INPUTACT_VALID_MIN)) {
           return false;
       }
       this->outputInfo[actuator].inputActType = inputActType;
@@ -218,7 +218,7 @@ namespace Gnc {
       // TODO(mereweth) - factor out FeedbackMetadata and CmdOutputMapMetadata checking
       meta.cmdOutputMap.Vnom = fabs(meta.cmdOutputMap.Vnom);
       meta.cmdOutputMap.Vact = meta.cmdOutputMap.Vnom;
-      
+
       this->outputInfo[actuator].type = OUTPUT_PWM;
       this->outputInfo[actuator].pwmMeta = meta;
 
@@ -257,7 +257,7 @@ namespace Gnc {
           for (U32 j = 0; j < 2; j++) { \
               if (Fw::PARAM_VALID != valid[j]) {  return;  } \
           } \
-	  \
+          \
           cmdOutputMap.offset = paramGet_p ## XXX ## _map_offset(valid[0]); \
           \
           if ((Fw::PARAM_VALID != valid[0]) && \
@@ -308,7 +308,6 @@ namespace Gnc {
           } \
       }
 
-
 #define FB_FROM_PARM_IDX(XXX) \
       { \
           memset(&fb, 0, sizeof(fb)); \
@@ -340,33 +339,33 @@ namespace Gnc {
       { \
           U8 parmSlot = paramGet_a ## XXX ## _parmSlot(valid[0]); \
           if (Fw::PARAM_VALID != valid[0]) {  return;  } \
-	  switch (parmSlot) { \
-	      case 0: \
- 		  return; \
-	      case 1: \
-		  outType = (OutputType) paramGet_p1_outputType(valid[0]); \
-		  inputActType = (InputActuatorType) paramGet_p1_inputActType(valid[1]); \
+          switch (parmSlot) { \
+              case 0: \
+                  return; \
+              case 1: \
+                  outType = (OutputType) paramGet_p1_outputType(valid[0]); \
+                  inputActType = (InputActuatorType) paramGet_p1_inputActType(valid[1]); \
                   break; \
               case 2: \
                   outType = (OutputType) paramGet_p2_outputType(valid[0]); \
                   inputActType = (InputActuatorType) paramGet_p2_inputActType(valid[1]); \
-		  break; \
+                  break; \
               default: \
-		  DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
-		  return; \
-	  } \
+                  DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
+                  return; \
+          } \
           inputActIdx = paramGet_a ## XXX ## _inputActIdx(valid[2]); \
-	  for (U32 j = 0; j < 3; j++) { \
-	      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
-	  } \
+          for (U32 j = 0; j < 3; j++) { \
+              if (Fw::PARAM_VALID != valid[j]) {  return;  } \
+          } \
           if ((outType < OUTPUT_VALID_MIN) || \
               (outType > OUTPUT_VALID_MAX) || \
-	      (inputActType < INPUTACT_VALID_MIN) || \
+              (inputActType < INPUTACT_VALID_MIN) || \
               (inputActType > INPUTACT_VALID_MAX)) { \
               return; \
           } \
           DEBUG_PRINT("Parm slot %u first part ok\n", parmSlot); \
-	  \
+          \
           switch (outType) { \
               case OUTPUT_UNSET: \
                   DEBUG_PRINT("Actuator type unset\n"); \
@@ -392,7 +391,7 @@ namespace Gnc {
                           DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
                           return; \
                   } \
-                  DEBUG_PRINT("Parm slot %u map ok\n", parmSlot);    \
+                  DEBUG_PRINT("Parm slot %u map ok\n", parmSlot); \
                   pwm.cmdOutputMap = cmdOutputMap; \
                   \
                   if (!setupPwm(i, pwm, inputActType, inputActIdx)) { \
@@ -448,8 +447,8 @@ namespace Gnc {
       FeedbackMetadata fb;
       CmdOutputMapMetadata cmdOutputMap;
       for (U32 i = 0; i < this->numActuators; i++) {
-	  outType = OUTPUT_UNSET;
-	  inputActType = INPUTACT_UNSET;
+          outType = OUTPUT_UNSET;
+          inputActType = INPUTACT_UNSET;
           switch (i) {
               case 0:
                   METADATA_FROM_ACT_IDX(1);
@@ -482,35 +481,35 @@ namespace Gnc {
 
       this->flySafeMaxElapsedCycles = paramGet_flySafeCycles(valid[0]);
       if (0 == this->flySafeMaxElapsedCycles) {
-  	  this->flySafeCheckCycles = false;
+          this->flySafeCheckCycles = false;
       }
       else {
-  	  this->flySafeCheckCycles = true;
+          this->flySafeCheckCycles = true;
       }
       const F64 flySafeFloatSecs = paramGet_flySafeTime(valid[1]);
       const Fw::Time forBaseContext = this->getTime();
       const TimeBase timeBase = forBaseContext.getTimeBase();
       const FwTimeContextStoreType timeContext = forBaseContext.getContext();
       if (flySafeFloatSecs > 0.0) {
-  	  this->flySafeCheckTime = true;
-	  const U32 flySafeSecs = (U32) flySafeFloatSecs;
-	  this->flySafeLastTime = Fw::Time(timeBase, timeContext, 0, 0);
-	  this->flySafeMaxElapsedTime = Fw::Time(timeBase, timeContext,
-						 flySafeSecs,
-						 (U32) ((flySafeFloatSecs - flySafeSecs)
-							* 1000.0 * 1000.0));
+      this->flySafeCheckTime = true;
+      const U32 flySafeSecs = (U32) flySafeFloatSecs;
+      this->flySafeLastTime = Fw::Time(timeBase, timeContext, 0, 0);
+      this->flySafeMaxElapsedTime = Fw::Time(timeBase, timeContext,
+                                             flySafeSecs,
+                                             (U32) ((flySafeFloatSecs - flySafeSecs)
+                                             * 1000.0 * 1000.0));
       }
       else { // user gave negative value for timeout, indicating don't check time
-  	  this->flySafeCheckTime = false;
+          this->flySafeCheckTime = false;
       }
-	
+
       for (unsigned int i = 0; i < 2; i++) {
-	  if ((Fw::PARAM_VALID   != valid[i])  &&
-	      (Fw::PARAM_DEFAULT != valid[i])) {
-	      return;
-	  }
+          if ((Fw::PARAM_VALID   != valid[i])  &&
+              (Fw::PARAM_DEFAULT != valid[i])) {
+              return;
+          }
       }
-      
+
       this->paramsInited = true;
   }
 
@@ -527,17 +526,17 @@ namespace Gnc {
       Fw::Time msgStamp = BoolStamped.getheader().getstamp();
       // If msg time < time of last fly safe msg, it is out of order, so ignore it
       if (msgStamp < this->flySafeLastTime) {
-  	  return;
+          return;
       }
       // if msg time > current time, there has been an error in time translation, so ignore it
       if (msgStamp > this->getTime()) {
-  	  return;
+          return;
       }
       this->flySafeCycles = 0;
       this->flySafeLastTime = msgStamp;
       this->flySafe = BoolStamped.getdata().getdata();
   }
-  
+
   void ActuatorAdapterComponentImpl ::
     motor_handler(
         const NATIVE_INT_TYPE portNum,
@@ -546,38 +545,38 @@ namespace Gnc {
   {
       bool hwEnabled = true;
       if (this->isConnected_outputEnable_OutputPort(0)) {
-	  this->outputEnable_out(0, hwEnabled);
+          this->outputEnable_out(0, hwEnabled);
       }
-    
+
       if (ARMED != this->armedState) {
-  	  return;
+          return;
       }
 
       const bool didFlySafeCycleTimeout = (this->flySafeCheckCycles &&
-					   ((++this->flySafeCycles) > this->flySafeMaxElapsedCycles));
+                                           ((++this->flySafeCycles) > this->flySafeMaxElapsedCycles));
       const bool didFlySafeTimeTimeout = (this->flySafeCheckTime &&
-					  (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
-								 	   this->flySafeLastTime)));
+                                          (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
+                                                                           this->flySafeLastTime)));
       if (!paramsInited || !hwEnabled ||
-	  didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe) {
-	  // TODO(mereweth) - send out min cmd here before disarming?
-	  this->armedState = DISARMED;
-	  if (!this->paramsInited) {
-	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
-	  }
-	  if (!hwEnabled) {
-	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
-	  }
-	  if (didFlySafeCycleTimeout) {
-	      this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
-	  }
-	  if (didFlySafeTimeTimeout) {
-	      this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
-	  }
-	  if (!this->flySafe) {
-	      this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
-	  }
-	  return;
+          didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe) {
+          this->armedState = DISARMED;
+          this->sendZeroCmdAll();
+          if (!this->paramsInited) {
+              this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+          }
+          if (!hwEnabled) {
+              this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+          }
+          if (didFlySafeCycleTimeout) {
+              this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
+          }
+          if (didFlySafeTimeTimeout) {
+              this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
+          }
+          if (!this->flySafe) {
+              this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
+          }
+          return;
       }
 
       U32 angleCount = Actuators.getangles_count();
@@ -592,8 +591,8 @@ namespace Gnc {
 
       // send commands - lower latency
       for (U32 i = 0; i < FW_MIN(this->numActuators, ACTADAP_MAX_ACTUATORS); i++) {
-	  F64 inVal = 0.0;
-	  switch (this->outputInfo[i].inputActType) {
+          F64 inVal = 0.0;
+          switch (this->outputInfo[i].inputActType) {
               case INPUTACT_UNSET:
               {
                   //TODO(mereweth) - issue diagnostic that this is unset
@@ -601,31 +600,31 @@ namespace Gnc {
                   break;
               case INPUTACT_ANGLE:
               {
-		  if (this->outputInfo[i].inputActIdx >= numAngles) {
-		      // TODO(mereweth) - EVR
-		      break;
-		  }
-		  inVal = angles[this->outputInfo[i].inputActIdx];
-	      }
-	          break;
+                  if (this->outputInfo[i].inputActIdx >= numAngles) {
+                      // TODO(mereweth) - EVR
+                      break;
+                  }
+                  inVal = angles[this->outputInfo[i].inputActIdx];
+              }
+                  break;
               case INPUTACT_ANGULAR_VELOCITY:
               {
-		  if (this->outputInfo[i].inputActIdx >= numAngVels) {
-		      // TODO(mereweth) - EVR
-		      break;
-		  }
-		  inVal = angVels[this->outputInfo[i].inputActIdx];
-	      }
-	          break;
+                  if (this->outputInfo[i].inputActIdx >= numAngVels) {
+                      // TODO(mereweth) - EVR
+                      break;
+                  }
+                  inVal = angVels[this->outputInfo[i].inputActIdx];
+              }
+                  break;
               default:
                   //TODO(mereweth) - DEBUG_PRINT
                   FW_ASSERT(0, this->outputInfo[i].inputActType);
-	  }
-	  // initialize to safe values
+          }
+          // initialize to safe values
           FeedbackMetadata fbMeta;
-	  fbMeta.ctrlType = FEEDBACK_CTRL_NONE;
+          fbMeta.ctrlType = FEEDBACK_CTRL_NONE;
           CmdOutputMapMetadata cmdOutputMap;
-	  cmdOutputMap.type = CMD_OUTPUT_MAP_UNSET;
+          cmdOutputMap.type = CMD_OUTPUT_MAP_UNSET;
           switch (this->outputInfo[i].type) {
               case OUTPUT_UNSET:
               {
@@ -634,14 +633,14 @@ namespace Gnc {
                   break;
               case OUTPUT_PWM:
               {
-		  cmdOutputMap = this->outputInfo[i].pwmMeta.cmdOutputMap;
+                  cmdOutputMap = this->outputInfo[i].pwmMeta.cmdOutputMap;
               }
                   break;
               case OUTPUT_I2C:
               case OUTPUT_I2C_SIMPLE:
               {
-		  cmdOutputMap = this->outputInfo[i].i2cMeta.cmdOutputMap;
-		  fbMeta = this->outputInfo[i].i2cMeta.fbMeta;
+                  cmdOutputMap = this->outputInfo[i].i2cMeta.cmdOutputMap;
+                  fbMeta = this->outputInfo[i].i2cMeta.fbMeta;
               }
                   break;
               default:
@@ -649,134 +648,134 @@ namespace Gnc {
                   FW_ASSERT(0, this->outputInfo[i].type);
           }
 
-	  // NOTE(Mereweth) - DSPAL has no isnan
-	  if (!(inVal < cmdOutputMap.maxIn) && 
-	      !(inVal > cmdOutputMap.minIn)) {
-	      // TODO(mereweth) - EVR about disarming due to NaN
-	      inVal = cmdOutputMap.minIn;
-	      this->armedState = DISARMED;
+          // NOTE(Mereweth) - DSPAL has no isnan
+          if (!(inVal < cmdOutputMap.maxIn) &&
+              !(inVal > cmdOutputMap.minIn)) {
+              // TODO(mereweth) - EVR about disarming due to NaN
+              inVal = cmdOutputMap.minIn;
+              this->armedState = DISARMED;
 
-	      this->log_WARNING_HI_ACTADAP_Error(NaNCmd);
-	  }
-	  else if (inVal > cmdOutputMap.maxIn) {  inVal = cmdOutputMap.maxIn;  }
-	  else if (inVal < cmdOutputMap.minIn) {  inVal = cmdOutputMap.minIn;  }
-	  F64 out = 0.0;
+              this->log_WARNING_HI_ACTADAP_Error(NaNCmd);
+          }
+          else if (inVal > cmdOutputMap.maxIn) {  inVal = cmdOutputMap.maxIn;  }
+          else if (inVal < cmdOutputMap.minIn) {  inVal = cmdOutputMap.minIn;  }
+          F64 out = 0.0;
 
-	  // TODO(mereweth) - share mapping among output types
-	  F64 Vnom_by_Vact = 1.0;
-	  if (cmdOutputMap.Vact > 1e-3) {
-	      Vnom_by_Vact = cmdOutputMap.Vnom / cmdOutputMap.Vact;
-	      if ((Vnom_by_Vact < 0.1) ||
-		  (Vnom_by_Vact > 10.0)) {
-		  // TODO(mereweth) - EVR!!
-		  Vnom_by_Vact = 1.0;
-	      }
-	  }
-	  else {
-	      // TODO(mereweth) - EVR!!
-	  }
+          // TODO(mereweth) - share mapping among output types
+          F64 Vnom_by_Vact = 1.0;
+          if (cmdOutputMap.Vact > 1e-3) {
+              Vnom_by_Vact = cmdOutputMap.Vnom / cmdOutputMap.Vact;
+              if ((Vnom_by_Vact < 0.1) ||
+                  (Vnom_by_Vact > 10.0)) {
+                  // TODO(mereweth) - EVR!!
+                  Vnom_by_Vact = 1.0;
+              }
+          }
+          else {
+              // TODO(mereweth) - EVR!!
+          }
 
-	  const F64 inValAbs = fabs(inVal);
-	  F64 sign = 1.0;
+          const F64 inValAbs = fabs(inVal);
+          F64 sign = 1.0;
 
-	  if ((CMD_OUTPUT_MAP_LIN_0BRK == cmdOutputMap.type) ||
-	      (CMD_OUTPUT_MAP_LIN_1BRK == cmdOutputMap.type) ||
-	      (CMD_OUTPUT_MAP_LIN_2BRK == cmdOutputMap.type)) {
-	      if (inVal < 0.0) {
-		  sign = -1.0;
-	      }
-	  }
-	  switch (cmdOutputMap.type) {
-	      case CMD_OUTPUT_MAP_LIN_MINMAX:
-		  out = (inVal - cmdOutputMap.minIn) /
-		    (cmdOutputMap.maxIn - cmdOutputMap.minIn) * (cmdOutputMap.maxOut - cmdOutputMap.minOut)
-		    + cmdOutputMap.minOut;
-		  break;
-	      case CMD_OUTPUT_MAP_LIN_2BRK:
-		  if (inValAbs < cmdOutputMap.x0) {
-		      out = cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + cmdOutputMap.b;
-		  }
-		  else if (inValAbs < cmdOutputMap.x1) {
-		      out = cmdOutputMap.k0 * Vnom_by_Vact * cmdOutputMap.x0
-			+ cmdOutputMap.b
-			+ cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - cmdOutputMap.x0);
-		  }
-		  else {
-		      out = cmdOutputMap.k0 * Vnom_by_Vact * cmdOutputMap.x0
-			+ cmdOutputMap.b
-			+ cmdOutputMap.k1  * Vnom_by_Vact
-					       * (cmdOutputMap.x1 - cmdOutputMap.x0)
-			+ cmdOutputMap.k2 * Vnom_by_Vact * (inValAbs - cmdOutputMap.x1);
-		  }
-		  break;
-	      case CMD_OUTPUT_MAP_LIN_1BRK:
-		  if (inValAbs < cmdOutputMap.x0) {
-		      out = cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + cmdOutputMap.b;
-		  }
-		  else {
-		      out = cmdOutputMap.k0 * Vnom_by_Vact * cmdOutputMap.x0
-			+ cmdOutputMap.b
-			+ cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - cmdOutputMap.x0);
-		  }
-		  break;
-	      case CMD_OUTPUT_MAP_LIN_0BRK:
-		  out = cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + cmdOutputMap.b;
-		  break;
-	      case CMD_OUTPUT_MAP_UNSET:
-	      default:
-		  DEBUG_PRINT("Unhandled command output map slot %u\n", cmdOutputMap.type);
-		  FW_ASSERT(0, cmdOutputMap.type);
-		  break;
-	  }
-      // NOTE(mereweth) - default param value for offset is zero
-      out += cmdOutputMap.offset;
+          if ((CMD_OUTPUT_MAP_LIN_0BRK == cmdOutputMap.type) ||
+              (CMD_OUTPUT_MAP_LIN_1BRK == cmdOutputMap.type) ||
+              (CMD_OUTPUT_MAP_LIN_2BRK == cmdOutputMap.type)) {
+              if (inVal < 0.0) {
+                  sign = -1.0;
+              }
+          }
+          switch (cmdOutputMap.type) {
+              case CMD_OUTPUT_MAP_LIN_MINMAX:
+                  out = (inVal - cmdOutputMap.minIn) /
+                        (cmdOutputMap.maxIn - cmdOutputMap.minIn) * (cmdOutputMap.maxOut - cmdOutputMap.minOut)
+                        + cmdOutputMap.minOut;
+                  break;
+              case CMD_OUTPUT_MAP_LIN_2BRK:
+                  if (inValAbs < cmdOutputMap.x0) {
+                      out = cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + cmdOutputMap.b;
+                  }
+                  else if (inValAbs < cmdOutputMap.x1) {
+                      out = cmdOutputMap.k0 * Vnom_by_Vact * cmdOutputMap.x0
+                            + cmdOutputMap.b
+                            + cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - cmdOutputMap.x0);
+                  }
+                  else {
+                      out = cmdOutputMap.k0 * Vnom_by_Vact * cmdOutputMap.x0
+                            + cmdOutputMap.b
+                            + cmdOutputMap.k1  * Vnom_by_Vact
+                            * (cmdOutputMap.x1 - cmdOutputMap.x0)
+                            + cmdOutputMap.k2 * Vnom_by_Vact * (inValAbs - cmdOutputMap.x1);
+                  }
+                    break;
+              case CMD_OUTPUT_MAP_LIN_1BRK:
+                  if (inValAbs < cmdOutputMap.x0) {
+                      out = cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + cmdOutputMap.b;
+                  }
+                  else {
+                      out = cmdOutputMap.k0 * Vnom_by_Vact * cmdOutputMap.x0
+                            + cmdOutputMap.b
+                            + cmdOutputMap.k1 * Vnom_by_Vact * (inValAbs - cmdOutputMap.x0);
+                  }
+                  break;
+              case CMD_OUTPUT_MAP_LIN_0BRK:
+                    out = cmdOutputMap.k0 * Vnom_by_Vact * inValAbs + cmdOutputMap.b;
+                    break;
+              case CMD_OUTPUT_MAP_UNSET:
+              default:
+                  DEBUG_PRINT("Unhandled command output map slot %u\n", cmdOutputMap.type);
+                  FW_ASSERT(0, cmdOutputMap.type);
+                  break;
+          }
+          // NOTE(mereweth) - default param value for offset is zero
+          out += cmdOutputMap.offset;
 
-	  F64 delta = 0.0;
-	  switch (fbMeta.ctrlType) {
-	      case FEEDBACK_CTRL_PROP:
-		  // TODO(Mereweth) - what if not tracking near zero in bidirectional?
-		  // TODO(mereweth) - check input type here - feedback might be an angle
-		  delta = fbMeta.kp * (inValAbs - fabs(this->outputInfo[i].feedback.angVel));
+          F64 delta = 0.0;
+          switch (fbMeta.ctrlType) {
+              case FEEDBACK_CTRL_PROP:
+                  // TODO(Mereweth) - what if not tracking near zero in bidirectional?
+                  // TODO(mereweth) - check input type here - feedback might be an angle
+                  delta = fbMeta.kp * (inValAbs - fabs(this->outputInfo[i].feedback.angVel));
 
-		  // NOTE(Mereweth) - fallthrough so this code runs for all control types except NONE
+                  // NOTE(Mereweth) - fallthrough so this code runs for all control types except NONE
 
-		  // NOTE(Mereweth) - clamp the delta vs the open-loop mapping
-		  if (delta > 0.0) {
-		      delta = FW_MIN(delta, fbMeta.maxErr);
-		  }
-		  if (delta < 0.0) {
-		      delta = -1.0 * FW_MIN(-1.0 * delta, fbMeta.maxErr);
-		  }
+                  // NOTE(Mereweth) - clamp the delta vs the open-loop mapping
+                  if (delta > 0.0) {
+                      delta = FW_MIN(delta, fbMeta.maxErr);
+                  }
+                  if (delta < 0.0) {
+                      delta = -1.0 * FW_MIN(-1.0 * delta, fbMeta.maxErr);
+                  }
 
-		  out += delta;
-		  break;
-	      case FEEDBACK_CTRL_NONE:
-	      default:
-		  break;
-	  }
+                  out += delta;
+                  break;
+              case FEEDBACK_CTRL_NONE:
+                  default:
+                  break;
+          }
 
-	  // if we took fabs of inVal for calculating the mapping, put it back the right way
-	  out *= sign;
+          // if we took fabs of inVal for calculating the mapping, put it back the right way
+          out *= sign;
 
-	  /* NOTE(mereweth) - prevent piecewise mappings from flipping the sign due to e.g.
-	   * negative y intercept, or controller flipping the sign
-	   */
-	  if (((inVal > 0.0) && (out < 0.0)) ||
-	      ((inVal < 0.0) && (out > 0.0))) {
-	      out = 0.0;
-	  }
+          /* NOTE(mereweth) - prevent piecewise mappings from flipping the sign due to e.g.
+          * negative y intercept, or controller flipping the sign
+          */
+          if (((inVal > 0.0) && (out < 0.0)) ||
+              ((inVal < 0.0) && (out > 0.0))) {
+              out = 0.0;
+          }
 
-	  /* NOTE(mereweth) - in case inVal is exactly 0.0
-	   */
-	  if ((CMD_OUTPUT_MAP_LIN_0BRK == cmdOutputMap.type) ||
-	      (CMD_OUTPUT_MAP_LIN_1BRK == cmdOutputMap.type) ||
-	      (CMD_OUTPUT_MAP_LIN_2BRK == cmdOutputMap.type)) {
-	      if (inVal == 0.0) {
-		  out = 0;
-	      }
-	  }
+          /* NOTE(mereweth) - in case inVal is exactly 0.0
+          */
+          if ((CMD_OUTPUT_MAP_LIN_0BRK == cmdOutputMap.type) ||
+              (CMD_OUTPUT_MAP_LIN_1BRK == cmdOutputMap.type) ||
+              (CMD_OUTPUT_MAP_LIN_2BRK == cmdOutputMap.type)) {
+              if (inVal == 0.0) {
+                  out = 0;
+              }
+          }
 
-	  DEBUG_PRINT("esc idx %u, in %f, out %lld\n", i, inVal, out);
+          DEBUG_PRINT("esc idx %u, in %f, out %lld\n", i, inVal, out);
 
           switch (this->outputInfo[i].type) {
               case OUTPUT_UNSET:
@@ -790,18 +789,18 @@ namespace Gnc {
                       Fw::Time cmdTime = this->getTime();
                       PwmMetadata pwm = this->outputInfo[i].pwmMeta;
 
-		      // TODO(mereweth)
-		      F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.15 };
-		      if (pwm.addr >= FW_NUM_ARRAY_ELEMENTS(duty)) { 
-			  //TODO(mereweth) - evr
-			  break;
-		      }
+                      // TODO(mereweth)
+                      F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.15 };
+                      if (pwm.addr >= FW_NUM_ARRAY_ELEMENTS(duty)) {
+                          //TODO(mereweth) - evr
+                          break;
+                      }
 
-		      // TODO(mereweth)
-		      //duty[pwm.addr] = out;
-		      U32 bitmask = 1 << pwm.addr;
-		      Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
-		      this->pwmSetDuty_out(0, dutySer);
+                      // TODO(mereweth)
+                      //duty[pwm.addr] = out;
+                      U32 bitmask = 1 << pwm.addr;
+                      Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
+                      this->pwmSetDuty_out(0, dutySer);
                       this->outputInfo[i].feedback.cmdIn   = inVal;
                       this->outputInfo[i].feedback.cmd     = duty[pwm.addr];
                       this->outputInfo[i].feedback.cmdSec  = cmdTime.getSeconds();
@@ -822,30 +821,30 @@ namespace Gnc {
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
                       I2CMetadata i2c = this->outputInfo[i].i2cMeta;
                       this->escConfig_out(0, 400, i2c.addr, 500);
-		      
-		      I64 outInt = (I64) out;
+
+                      I64 outInt = (I64) out;
                       if (outInt > i2c.cmdOutputMap.maxOut) {  outInt = i2c.cmdOutputMap.maxOut;  }
                       if (outInt < i2c.cmdOutputMap.minOut) {  outInt = i2c.cmdOutputMap.minOut;  }
 
                       Fw::Buffer readBufObj(0, 0, 0, 0); // no read
                       if (OUTPUT_I2C == this->outputInfo[i].type) {
-  			  if (i2c.reverse) {  outInt = -outInt;  }
+                          if (i2c.reverse) {  outInt = -outInt;  }
 
-			  I8 outI8[2] = { outInt >> 8, outInt };
-			  U8 outU8[2] = { 0 };
-			  memcpy(outU8, outI8, 2);
+                          I8 outI8[2] = { outInt >> 8, outInt };
+                          U8 outU8[2] = { 0 };
+                          memcpy(outU8, outI8, 2);
                           // MSB is reverse bit
 
-			  DEBUG_PRINT("reverse: %u, ihigh: %d, ilow: %d, high: %u, low: %u\n",
-				      i2c.reverse, outI8[0], outI8[1],
-				      outU8[0], outU8[1]);
-			  
+                          DEBUG_PRINT("reverse: %u, ihigh: %d, ilow: %d, high: %u, low: %u\n",
+                          i2c.reverse, outI8[0], outI8[1],
+                          outU8[0], outU8[1]);
+
                           U8 writeBuf[3] = { 0x00, outU8[0], outU8[1] };
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
                           this->escReadWrite_out(0, writeBufObj, readBufObj);
                       }
                       else { // simple protocol
-  			  if (outInt < 0) {  outInt = 0;  }
+                          if (outInt < 0) {  outInt = 0;  }
                           U8 writeBuf[2] = { (U8) (outInt / 8), (U8) (outInt % 8) };
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
                           this->escReadWrite_out(0, writeBufObj, readBufObj);
@@ -881,14 +880,14 @@ namespace Gnc {
                       this->isConnected_escReadWrite_OutputPort(0)) {
                       Fw::Time fbTime = this->getTime();
                       F64 fbTimeLast = (F64) this->outputInfo[i].feedback.fbSec +
-                        (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
+                                       (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
                       U32 countsLast = this->outputInfo[i].feedback.counts;
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
                       this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
 
                       U8 readBuf[9] = { 0 };
-                      
+
                       if (OUTPUT_I2C == this->outputInfo[i].type) {
                           U8 writeBuf[1] = { 0x02 }; // start at rev_count_h
                           Fw::Buffer readBufObj(0, 0, (U64) readBuf, FW_NUM_ARRAY_ELEMENTS(readBuf));
@@ -900,7 +899,7 @@ namespace Gnc {
                           Fw::Buffer writeBufObj(0, 0, 0, 0); // no write in simple protocol
                           this->escReadWrite_out(0, writeBufObj, readBufObj);
                       }
-                      
+
                       if ((0xab == readBuf[8]) ||
                           (OUTPUT_I2C_SIMPLE == this->outputInfo[i].type)) {
                           this->outputInfo[i].feedback.counts      = (readBuf[0] << 8) + readBuf[1];
@@ -910,23 +909,22 @@ namespace Gnc {
                           this->outputInfo[i].feedback.current     = ((F32) ((readBuf[6] << 8) + readBuf[7]) - 32767.0) / 891.0;
                           this->outputInfo[i].feedback.fbSec       = fbTime.getSeconds();
                           this->outputInfo[i].feedback.fbUsec      = fbTime.getUSeconds();
-                          
+
                           F64 fbTimeFloat = (F64) this->outputInfo[i].feedback.fbSec +
-                            (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
+                                            (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
 
                           // guard against bad parameter setting and small time increment
-                          if ((this->outputInfo[i].i2cMeta.fbMeta.countsPerRev > 0) && 
+                          if ((this->outputInfo[i].i2cMeta.fbMeta.countsPerRev > 0) &&
                               (fbTimeFloat - fbTimeLast > 1e-4)) {
 
                               if (OUTPUT_I2C == this->outputInfo[i].type) {
-
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI
-                                    * this->outputInfo[i].feedback.counts
-                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
+                                      * this->outputInfo[i].feedback.counts
+                                      / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
 
-				  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
-					      i, this->outputInfo[i].feedback.counts,
-					      this->outputInfo[i].feedback.angVel);
+                                  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
+                                              i, this->outputInfo[i].feedback.counts,
+                                              this->outputInfo[i].feedback.angVel);
                               }
                               else {
                                   U32 countsDiff = 0u;
@@ -939,17 +937,17 @@ namespace Gnc {
                                   }
 
                                   this->outputInfo[i].feedback.angVel = 2.0 * M_PI * countsDiff
-                                    / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
+                                      / (fbTimeFloat - fbTimeLast) / this->outputInfo[i].i2cMeta.fbMeta.countsPerRev;
 
-				  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
-					      i, countsDiff,
-					      this->outputInfo[i].feedback.angVel);
+                                  DEBUG_PRINT("esc id: %u, counts: %u, angVel: %f\n",
+                                              i, countsDiff,
+                                              this->outputInfo[i].feedback.angVel);
                               }
-			  
+
                               // TODO(mereweth) - run rate estimator here
                           }
                       }
-                      
+
                       Fw::SerializeStatus status;
                       // sec, usec, motor id, command, response
                       U8 buff[sizeof(U8) + 2 * sizeof(U32) + 2 * sizeof(F64)
@@ -993,50 +991,50 @@ namespace Gnc {
                   FW_ASSERT(0, this->outputInfo[i].type);
           }
 
-	  switch (i) {
-	      case 0:
-		  this->tlmWrite_ACTADAP_Rot0(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd0(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel0(angVels[i]);
-		  break;
-	      case 1:
-		  this->tlmWrite_ACTADAP_Rot1(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd1(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel1(angVels[i]);
-		  break;
-	      case 2:
-		  this->tlmWrite_ACTADAP_Rot2(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd2(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel2(angVels[i]);
-		  break;
-	      case 3:
-		  this->tlmWrite_ACTADAP_Rot3(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd3(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel3(angVels[i]);
-		  break;
-	      case 4:
-		  this->tlmWrite_ACTADAP_Rot4(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd4(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel4(angVels[i]);
-		  break;
-	      case 5:
-		  this->tlmWrite_ACTADAP_Rot5(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd5(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel5(angVels[i]);
-		  break;
-	      case 6:
-		  this->tlmWrite_ACTADAP_Rot6(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd6(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel6(angVels[i]);
-		  break;
-	      case 7:
-		  this->tlmWrite_ACTADAP_Rot7(this->outputInfo[i].feedback.angVel);
-		  this->tlmWrite_ACTADAP_Cmd7(this->outputInfo[i].feedback.cmd);
-		  this->tlmWrite_ACTADAP_CmdVel7(angVels[i]);
-		  break;
-	      default:
-		  break;
-	  }
+          switch (i) {
+              case 0:
+                  this->tlmWrite_ACTADAP_Rot0(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd0(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel0(angVels[i]);
+                  break;
+              case 1:
+                  this->tlmWrite_ACTADAP_Rot1(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd1(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel1(angVels[i]);
+                  break;
+              case 2:
+                  this->tlmWrite_ACTADAP_Rot2(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd2(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel2(angVels[i]);
+                  break;
+              case 3:
+                  this->tlmWrite_ACTADAP_Rot3(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd3(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel3(angVels[i]);
+                  break;
+              case 4:
+                  this->tlmWrite_ACTADAP_Rot4(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd4(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel4(angVels[i]);
+                  break;
+              case 5:
+                  this->tlmWrite_ACTADAP_Rot5(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd5(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel5(angVels[i]);
+                  break;
+              case 6:
+                  this->tlmWrite_ACTADAP_Rot6(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd6(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel6(angVels[i]);
+                  break;
+              case 7:
+                  this->tlmWrite_ACTADAP_Rot7(this->outputInfo[i].feedback.angVel);
+                  this->tlmWrite_ACTADAP_Cmd7(this->outputInfo[i].feedback.cmd);
+                  this->tlmWrite_ACTADAP_CmdVel7(angVels[i]);
+                  break;
+              default:
+                  break;
+          }
       }
   }
 
@@ -1048,48 +1046,48 @@ namespace Gnc {
   {
       bool hwEnabled = true;
       if (this->isConnected_outputEnable_OutputPort(0)) {
-	  this->outputEnable_out(0, hwEnabled);
+          this->outputEnable_out(0, hwEnabled);
       }
 
       // NOTE(mereweth) - don't increment cycle count here; do that in motor_handler
       const bool didFlySafeCycleTimeout = (this->flySafeCheckCycles &&
-					   (this->flySafeCycles > this->flySafeMaxElapsedCycles));
+                                           (this->flySafeCycles > this->flySafeMaxElapsedCycles));
       const bool didFlySafeTimeTimeout = (this->flySafeCheckTime &&
-					  (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
-									   this->flySafeLastTime)));
-      if ((DISARMED != this->armedState)  &&
-	  (!paramsInited || !hwEnabled ||
-	   didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe)) {
-	
-  	  if (ARMING == this->armedState) {
+                                          (this->getTime() > Fw::Time::add(this->flySafeMaxElapsedTime,
+                                                                           this->flySafeLastTime)));
+      if ((DISARMED != this->armedState) &&
+          (!paramsInited || !hwEnabled ||
+           didFlySafeCycleTimeout || didFlySafeTimeTimeout || !flySafe)) {
+
+          if (ARMING == this->armedState) {
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
- 	  }
-	  this->sendZeroCmdAll();
-	  this->armedState = DISARMED;
-	  if (!this->paramsInited) {
-	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
-	  }
-	  if (!hwEnabled) {
-	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
-	  }
-	  if (didFlySafeCycleTimeout) {
-	      this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
-	  }
-	  if (didFlySafeTimeTimeout) {
-	      this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
-	  }
-	  if (!this->flySafe) {
-	      this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
-	  }
-	  return;
+          }
+          this->sendZeroCmdAll();
+          this->armedState = DISARMED;
+          if (!this->paramsInited) {
+              this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+          }
+          if (!hwEnabled) {
+              this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+          }
+          if (didFlySafeCycleTimeout) {
+              this->log_WARNING_HI_ACTADAP_NotFlySafe(CycleTimeout);
+          }
+          if (didFlySafeTimeTimeout) {
+              this->log_WARNING_HI_ACTADAP_NotFlySafe(TimeTimeout);
+          }
+          if (!this->flySafe) {
+              this->log_WARNING_HI_ACTADAP_NotFlySafe(ValueFalse);
+          }
+          return;
       }
-      
+
       if (ACTADAP_SCHED_CONTEXT_TLM == context) {
-  	  this->tlmWrite_ACTADAP_ArmState(static_cast<ArmStateTlm>(this->armedState));
-	  this->tlmWrite_ACTADAP_HwEnabled(hwEnabled);
+          this->tlmWrite_ACTADAP_ArmState(static_cast<ArmStateTlm>(this->armedState));
+          this->tlmWrite_ACTADAP_HwEnabled(hwEnabled);
       }
       else if ((ACTADAP_SCHED_CONTEXT_ARM == context) &&
-	       (ARMING == this->armedState)) {
+               (ARMING == this->armedState)) {
           if (++this->armCount > ACTADAP_ARM_COUNT) {
               this->armedState = ARMED;
               this->cmdResponse_out(this->opCode, this->cmdSeq, Fw::COMMAND_OK);
@@ -1159,15 +1157,15 @@ namespace Gnc {
   {
       bool hwEnabled = true;
       if (this->isConnected_outputEnable_OutputPort(0)) {
-	  this->outputEnable_out(0, hwEnabled);
+          this->outputEnable_out(0, hwEnabled);
       }
 
       // can disarm immediately - change this if hardware changes
       if (!armState) {
-  	  if (ARMED == this->armedState) {
-	      this->sendZeroCmdAll();
-	  }
-	
+          if (ARMED == this->armedState) {
+              this->sendZeroCmdAll();
+          }
+
           this->armedState = DISARMED;
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
           return;
@@ -1175,18 +1173,18 @@ namespace Gnc {
       // after this point, we are trying to arm
 
       if (!this->paramsInited || !hwEnabled) {
-  	  if (ARMED == this->armedState) {
-	      this->sendZeroCmdAll();
-	  }
-  	  this->armedState = DISARMED;
-	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
-	  if (!this->paramsInited) {
-	      this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
-	  }
-	  if (!hwEnabled) {
-	      this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
-	  }
-	  return;
+          if (ARMED == this->armedState) {
+              this->sendZeroCmdAll();
+          }
+          this->armedState = DISARMED;
+          this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+          if (!this->paramsInited) {
+              this->log_WARNING_HI_ACTADAP_Error(ParamsUninit);
+          }
+          if (!hwEnabled) {
+              this->log_WARNING_HI_ACTADAP_Error(HWEnableLow);
+          }
+          return;
       }
       // can only arm if disarmed
       if (DISARMED != this->armedState) {
