@@ -153,6 +153,9 @@
     <parameter id="112" set_opcode="244" save_opcode="245" name="p1_map_Vnom" data_type="F64" >
       <comment>parm slot 1 voltage at which mapping was determined</comment>
     </parameter>
+    <parameter id="113" set_opcode="246" save_opcode="247" name="p1_map_offset" data_type="F64" default="0.0" >
+      <comment>parm slot 1 output range zero offset</comment>
+    </parameter>
 
     <parameter id="120" set_opcode="260" save_opcode="261" name="p1_ctrlType" data_type="U8" >
       <comment>parm slot 1 error control type</comment>
@@ -169,5 +172,66 @@
     </parameter>
     <parameter id="131" set_opcode="282" save_opcode="283" name="p1_inputActType" data_type="U8" >
       <comment>parm slot 1 actuator input type</comment>
+    </parameter>
+    
+    <parameter id="140" set_opcode="300" save_opcode="301" name="p2_minCmd" data_type="F64" >
+      <comment>parm slot 2 minimum command</comment>
+    </parameter>
+    <parameter id="141" set_opcode="302" save_opcode="303" name="p2_maxCmd" data_type="F64" >
+      <comment>parm slot 2 maximum command</comment>
+    </parameter>
+    <parameter id="142" set_opcode="304" save_opcode="305" name="p2_minOut" data_type="F64" >
+      <comment>parm slot 2 minimum output</comment>
+    </parameter>
+    <parameter id="143" set_opcode="306" save_opcode="307" name="p2_maxOut" data_type="F64" >
+      <comment>parm slot 2 maximum output</comment>
+    </parameter>
+    <parameter id="144" set_opcode="308" save_opcode="309" name="p2_counts" data_type="U32" >
+      <comment>parm slot 2 counts per rev</comment>
+    </parameter>
+
+    <parameter id="145" set_opcode="310" save_opcode="311" name="p2_mapType" data_type="U8" >
+      <comment>parm slot 2 mapping from command to output</comment>
+    </parameter>
+    <parameter id="146" set_opcode="312" save_opcode="313" name="p2_map_x0" data_type="F64" >
+      <comment>parm slot 2 first break in piecewise linear</comment>
+    </parameter>
+    <parameter id="147" set_opcode="314" save_opcode="315" name="p2_map_x1" data_type="F64" >
+      <comment>parm slot 2 second break in piecewise linear</comment>
+    </parameter>
+    <parameter id="148" set_opcode="316" save_opcode="317" name="p2_map_k0" data_type="F64" >
+      <comment>parm slot 2 first slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="149" set_opcode="318" save_opcode="319" name="p2_map_k1" data_type="F64" >
+      <comment>parm slot 2 second slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="150" set_opcode="320" save_opcode="321" name="p2_map_k2" data_type="F64" >
+      <comment>parm slot 2 third slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="151" set_opcode="322" save_opcode="323" name="p2_map_b" data_type="F64" >
+      <comment>parm slot 2 y intercept in piecewise linear</comment>
+    </parameter>
+    <parameter id="152" set_opcode="324" save_opcode="325" name="p2_map_Vnom" data_type="F64" >
+      <comment>parm slot 2 voltage at which mapping was determined</comment>
+    </parameter>
+    <parameter id="153" set_opcode="326" save_opcode="327" name="p2_map_offset" data_type="F64" default="0.0" >
+      <comment>parm slot 2 output range zero offset</comment>
+    </parameter>
+
+    <parameter id="160" set_opcode="340" save_opcode="341" name="p2_ctrlType" data_type="U8" >
+      <comment>parm slot 2 error control type</comment>
+    </parameter>
+    <parameter id="161" set_opcode="342" save_opcode="343" name="p2_ctrl_maxErr" data_type="F64" >
+      <comment>parm slot 2 max delta from controller</comment>
+    </parameter>
+    <parameter id="162" set_opcode="344" save_opcode="345" name="p2_ctrl_kp" data_type="F64" >
+      <comment>parm slot 2 proportional gain on error</comment>
+    </parameter>
+
+    <parameter id="170" set_opcode="360" save_opcode="361" name="p2_outputType" data_type="U8" >
+      <comment>parm slot 2 actuator output type</comment>
+    </parameter>
+    <parameter id="171" set_opcode="362" save_opcode="363" name="p2_inputActType" data_type="U8" >
+      <comment>parm slot 2 actuator input type</comment>
     </parameter>
 </parameters>

@@ -397,7 +397,19 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(bool internalIMUProp) {  
+void manualConstruct(bool internalIMUProp) {
+#ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
+#ifdef SOC_8074
+    actuatorAdapter_ptr->_set_outputEnable_OutputPort(0, hwEnablePinSnap_ptr->get_gpioRead_InputPort(0));
+#else // SOC_8074
+    // TODO(mereweth) - connect when we add enable pin
+#endif
+#else // LINUX
+#ifdef LINUX_DEV
+    // TODO(mereweth) - open devices
+#endif // LINUX_DEV
+#endif
+  
     // switch based on command line options
     if (internalIMUProp) {
         attFilter_ptr->set_odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
@@ -615,8 +627,6 @@ void constructApp(unsigned int port_number,
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
     imuDRIntSnap_ptr->open(78, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_INT);
-    
-    // TODO(mereweth) - hardware enable pin
 
     // J12 is already at 5V, so use for 2 pwm connectors
     NATIVE_UINT_TYPE pwmPins[2] = {83, 84};
@@ -744,7 +754,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "hisp:a:b:")) != -1){
+    while ((option = getopt(argc, argv, "hisp:a:b:u:z:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -755,6 +765,10 @@ int main(int argc, char* argv[]) {
                 break;
             case 'p':
                 port_number = atoi(optarg);
+                break;
+            case 'u':
+                break;
+            case 'z':
                 break;
             case 'a':
                 hostname = optarg;

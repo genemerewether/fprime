@@ -86,6 +86,7 @@ namespace Gnc {
           F64 maxIn;
           F64 minOut;
           F64 maxOut;
+          F64 offset;
           CmdOutputMapType type;
           F64 Vnom;
           F64 Vact;

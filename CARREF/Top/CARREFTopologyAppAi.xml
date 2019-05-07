@@ -387,10 +387,6 @@
 	 <source component = "rgTlm" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection67">
-	 <source component = "actuatorAdapter" port = "outputEnable" type = "GpioRead" num = "0"/>
- 	 <target component = "hwEnablePinSnap" port = "gpioRead" type = "GpioRead" num = "0"/>
-</connection>
 <connection name = "Connection68">
 	 <source component = "snapHealth" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>

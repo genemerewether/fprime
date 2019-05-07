@@ -258,6 +258,13 @@ namespace Gnc {
               if (Fw::PARAM_VALID != valid[j]) {  return;  } \
           } \
 	  \
+          cmdOutputMap.offset = paramGet_p ## XXX ## _map_offset(valid[0]); \
+          \
+          if ((Fw::PARAM_VALID != valid[0]) && \
+              (Fw::PARAM_DEFAULT != valid[0])) { \
+              return; \
+          } \
+          \
           cmdOutputMap.type = (CmdOutputMapType) paramGet_p ## XXX ## _mapType(valid[0]); \
           if ((Fw::PARAM_VALID != valid[0]) || \
               (cmdOutputMap.type < CMD_OUTPUT_MAP_VALID_MIN) || \
@@ -339,12 +346,16 @@ namespace Gnc {
 	      case 1: \
 		  outType = (OutputType) paramGet_p1_outputType(valid[0]); \
 		  inputActType = (InputActuatorType) paramGet_p1_inputActType(valid[1]); \
-		  inputActIdx = paramGet_a ## XXX ## _inputActIdx(valid[2]); \
+                  break; \
+              case 2: \
+                  outType = (OutputType) paramGet_p2_outputType(valid[0]); \
+                  inputActType = (InputActuatorType) paramGet_p2_inputActType(valid[1]); \
 		  break; \
               default: \
 		  DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
 		  return; \
 	  } \
+          inputActIdx = paramGet_a ## XXX ## _inputActIdx(valid[2]); \
 	  for (U32 j = 0; j < 2; j++) { \
 	      if (Fw::PARAM_VALID != valid[j]) {  return;  } \
 	  } \
@@ -373,6 +384,9 @@ namespace Gnc {
                       case 1: \
                           MAP_FROM_PARM_IDX(1); \
                           break; \
+                      case 2: \
+                          MAP_FROM_PARM_IDX(2); \
+                          break; \
                       default: \
                           DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
                           return; \
@@ -398,6 +412,10 @@ namespace Gnc {
                       case 1: \
                           MAP_FROM_PARM_IDX(1); \
                           FB_FROM_PARM_IDX(1); \
+                          break; \
+                      case 2: \
+                          MAP_FROM_PARM_IDX(2); \
+                          FB_FROM_PARM_IDX(2); \
                           break; \
                       default: \
                           DEBUG_PRINT("Unhandled parm slot %u\n", parmSlot); \
@@ -707,6 +725,8 @@ namespace Gnc {
 		  FW_ASSERT(0, cmdOutputMap.type);
 		  break;
 	  }
+      // NOTE(mereweth) - default param value for offset is zero
+      out += cmdOutputMap.offset;
 
 	  F64 delta = 0.0;
 	  switch (fbMeta.ctrlType) {
