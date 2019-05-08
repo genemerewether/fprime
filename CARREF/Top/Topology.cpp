@@ -874,8 +874,10 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
 
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
     imuDRIntSnap_ptr->exitThread();
+    imuDRIntSnap_ptr->joinThread(NULL);
 #else
     imuDRInt_ptr->exitThread();
+    imuDRInt_ptr->joinThread(NULL);
 #endif
 
     rgDecouple_ptr->exit();
@@ -1030,9 +1032,9 @@ int main(int argc, char* argv[]) {
             //DEBUG_PRINT("Parent Cycle %d\n",cycle);
         }
 
+        backupCycle++;
         if (!isHiresChild && !isStereoChild) {
             run1backupCycle();
-            backupCycle++;
 #if !defined(LINUX_DEV) and !defined(BUILD_SDFLIGHT)
             run1testCycle();
 #endif // LINUX_DEV

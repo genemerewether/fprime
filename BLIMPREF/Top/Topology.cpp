@@ -696,8 +696,10 @@ void run1backupCycle(void) {
 void exitTasks(void) {
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
     imuDRIntSnap_ptr->exitThread();
+    imuDRIntSnap_ptr->joinThread(NULL);
 #else
     imuDRInt_ptr->exitThread();
+    imuDRInt_ptr->joinThread(NULL);
 #endif
     
     rgDecouple_ptr->exit();

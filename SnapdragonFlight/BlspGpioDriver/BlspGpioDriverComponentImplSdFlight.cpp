@@ -158,6 +158,14 @@ namespace SnapdragonFlight {
       this->m_quitThread = true;
   }
 
+  void BlspGpioDriverComponentImpl ::
+    joinThread(void **value_ptr) {
+      Os::Task::TaskStatus stat = this->m_intTask.join(value_ptr);
+
+      if (stat != Os::Task::TASK_OK) {
+          printf("Task join error: %d\n",stat);
+      }
+  }
 
 
   BlspGpioDriverComponentImpl ::

@@ -209,6 +209,10 @@ namespace Drv {
           this->m_fd = -1;
       }
   }
+  
+  void LinuxGpioDriverComponentImpl ::
+    joinThread(void **value_ptr) {
+  }
 
   LinuxGpioDriverComponentImpl ::
     ~LinuxGpioDriverComponentImpl(void)

@@ -17,7 +17,8 @@ export ROS_ROOT=/opt/ros
 export ROS_DISTRO=indigo
 export PATH=$PATH:/opt/ros/indigo/bin
 export LD_LIBRARY_PATH=/opt/ros/indigo/lib
-export ROS_MASTER_URI=http://localhost:11311
+export ROS_HOSTNAME=127.0.0.1
+export ROS_MASTER_URI=http://127.0.0.1:11311
 export CMAKE_PREFIX_PATH=/opt/ros/indigo
 #touch /opt/ros/indigo/.catkin
 

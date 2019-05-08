@@ -70,6 +70,9 @@ namespace SnapdragonFlight {
 
       //! exit thread
       void exitThread(void);
+    
+      //! join thread
+      void joinThread(void **value_ptr);
 
     PRIVATE:
 
