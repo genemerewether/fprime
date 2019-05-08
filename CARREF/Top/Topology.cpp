@@ -224,7 +224,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 1};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 5};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -232,7 +232,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
 
-    NATIVE_INT_TYPE rgGncDivs[] = {1, 50};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 10};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1

@@ -338,6 +338,7 @@ namespace HLProc {
             actuators.setnormalized_count(msg->normalized.size());
 
             DEBUG_PRINT("Actuators port %d sizes %u, %u, %u\n",
+                        this->portNum,
                         msg->angles.size(),
                         msg->angular_velocities.size(),
                         msg->normalized.size());
