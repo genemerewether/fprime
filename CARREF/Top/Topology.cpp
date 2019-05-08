@@ -5,7 +5,12 @@ enum {
     CORE_0 = 0,
     CORE_1 = 1,
     CORE_2 = 2,
-    CORE_3 = 3
+    CORE_3 = 3,
+
+    CORE_CDH = CORE_0,
+    CORE_RPC = CORE_1,
+    CORE_CAM = CORE_2,
+    CORE_GNC = CORE_3
 };
 
 #include <Fw/Types/Assert.hpp>
@@ -13,6 +18,7 @@ enum {
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
+#include <Fw/Types/MmapAllocator.hpp>
 
 #if defined TGT_OS_TYPE_LINUX || TGT_OS_TYPE_DARWIN
 #include <getopt.h>
@@ -35,6 +41,8 @@ static Fw::SimpleObjRegistry simpleReg;
 #endif
 
 Fw::MallocAllocator seqMallocator;
+Fw::MallocAllocator buffMallocator;
+Fw::MmapAllocator hiresMallocator;
 
 // Component instance pointers
 
@@ -85,6 +93,11 @@ Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr = 0;
 Drv::LinuxPwmDriverComponentImpl* escPwm_ptr = 0;
 
+SnapdragonFlight::MVCamComponentImpl* mvCam_ptr = 0;
+SnapdragonFlight::StereoCamComponentImpl* stereoCam_ptr = 0;
+SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr = 0;
+Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
+
 void allocComps() {
     sockGndIf_ptr = new Svc::SocketGndIfImpl
 #if FW_OBJECT_NAMES == 1
@@ -133,6 +146,30 @@ void allocComps() {
     snapHealth_ptr = new SnapdragonFlight::SnapdragonHealthComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SDHEALTH")
+#endif
+;
+
+    mvCam_ptr = new SnapdragonFlight::MVCamComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("MVCAM")
+#endif
+;
+
+    stereoCam_ptr = new SnapdragonFlight::StereoCamComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SCAM")
+#endif
+;
+
+    ipcRelay_ptr = new Svc::IPCRelayComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("IPCRELAY")
+#endif
+;
+
+    hiresCam_ptr = new SnapdragonFlight::HiresCamComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("HIRESCAM")
 #endif
 ;
 
@@ -209,11 +246,12 @@ void allocComps() {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // attFilter
         Gnc::SIGGEN_SCHED_CONTEXT_TLM, // sigGen
-        0, // TODO(mereweth)
-        0, // TODO(mereweth)
+        0, // mvCam
+        0, // hiresCam
         Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
         0, // snapHealth
         0, // cmdSeq
+        0, // stereoCam
         0, // chanTlm
     };
 
@@ -489,13 +527,62 @@ void manualConstruct(bool internalIMUProp) {
 
     rgOp_ptr->set_RateGroupMemberOut_OutputPort(4, actDecouple_ptr->get_DataIn_InputPort(4));
     actDecouple_ptr->set_DataOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
+
+    rgTlm_ptr->set_RateGroupMemberOut_OutputPort(5, actDecouple_ptr->get_DataIn_InputPort(5));
+    actDecouple_ptr->set_DataOut_OutputPort(5, actuatorAdapter_ptr->get_sched_InputPort(0));
+
+    hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
+    // doesn't matter which compCmdStat port # for cmdDisp
+    ipcRelay_ptr->set_proc2Out_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+
+    hiresCam_ptr->set_Tlm_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(1));
+    // doesn't matter which TlmRecv port # for pktTlm
+    ipcRelay_ptr->set_proc2Out_OutputPort(1, chanTlm_ptr->get_TlmRecv_InputPort(0));
+
+    hiresCam_ptr->set_Log_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(2));
+    // doesn't matter which LogRecv port # for eventLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(2, eventLogger_ptr->get_LogRecv_InputPort(0));
+
+    hiresCam_ptr->set_LogText_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(3));
+    // doesn't matter which TextLogger port # for textLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(3, textLogger_ptr->get_TextLogger_InputPort(0));
+
+    /*hiresCam_ptr->set_ProcSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(4));
+      ipcRelay_ptr->set_proc2Out_OutputPort(4, buffAccumHiresCamProc_ptr->get_bufferSendInFill_InputPort(0));*/
+
+    /*hiresCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(5));
+    ipcRelay_ptr->set_proc2Out_OutputPort(5, buffAccumHiresCamUnproc_ptr->get_bufferSendInFill_InputPort(0));*/
+
+
+    stereoCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(6));
+    // doesn't matter which compCmdStat port # for cmdDisp
+    ipcRelay_ptr->set_proc2Out_OutputPort(6, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+
+    stereoCam_ptr->set_Tlm_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(7));
+    // doesn't matter which TlmRecv port # for pktTlm
+    ipcRelay_ptr->set_proc2Out_OutputPort(7, chanTlm_ptr->get_TlmRecv_InputPort(0));
+
+    stereoCam_ptr->set_Log_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(8));
+    // doesn't matter which LogRecv port # for eventLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(8, eventLogger_ptr->get_LogRecv_InputPort(0));
+
+    stereoCam_ptr->set_LogText_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(9));
+    // doesn't matter which TextLogger port # for textLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(9, textLogger_ptr->get_TextLogger_InputPort(0));
+
+    /*stereoCam_ptr->set_ProcSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(10));
+      ipcRelay_ptr->set_proc2Out_OutputPort(10, buffAccumstereoCamProc_ptr->get_bufferSendInFill_InputPort(0));*/
+
+    /*stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
+    ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));*/
 }
 
 void constructApp(unsigned int port_number,
-          char* hostname,
+                  char* hostname,
                   unsigned int boot_count,
-          bool startSocketNow,
-          bool internalIMUProp) {
+                  bool startSocketNow,
+                  bool &isHiresChild, bool &isStereoChild,
+                  bool internalIMUProp) {
     allocComps();
 
     localTargetInit();
@@ -572,6 +659,11 @@ void constructApp(unsigned int port_number,
     fatalAdapter_ptr->init(0);
     fatalHandler_ptr->init(0);
 
+    mvCam_ptr->init(60, 0);
+    ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
+    hiresCam_ptr->init(60, 0);
+    stereoCam_ptr->init(60, 0);
+
     // Connect rate groups to rate group driver
     constructCARREFArchitecture();
 
@@ -594,6 +686,10 @@ void constructApp(unsigned int port_number,
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
 
+    mvCam_ptr->regCommands();
+    stereoCam_ptr->regCommands();
+    hiresCam_ptr->regCommands();
+
     prmDb_ptr->readParamFile();
 
     ctrlXest_ptr->loadParameters();
@@ -603,9 +699,30 @@ void constructApp(unsigned int port_number,
     actuatorAdapter_ptr->loadParameters();
     sigGen_ptr->loadParameters();
 
+    mvCam_ptr->loadParameters();
+    stereoCam_ptr->loadParameters();
+
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);
     textLogger_ptr->set_log_file(logFileName,100*1024, 0);
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+    COMPILE_TIME_ASSERT(200 <= SnapdragonFlight::MVCAM_IMG_LP_BUFFER_POOL_SIZE,
+                        NCAM_IMG_LP_BUFFER_ENOUGH);
+    COMPILE_TIME_ASSERT(10 <= SnapdragonFlight::HIRESCAM_MAX_NUM_BUFFERS,
+                        RCAM_BUFFER_ENOUGH);
+    COMPILE_TIME_ASSERT(200 <= SnapdragonFlight::SCAM_IMG_LP_BUFFER_POOL_SIZE,
+                        SCAM_IMG_LP_BUFFER_ENOUGH);
+    #pragma GCC diagnostic pop
+
+    mvCam_ptr->allocateBuffers(0, buffMallocator,
+                               SnapdragonFlight::MVCAM_IMG_HP_BUFFER_POOL_SIZE,
+                               200);
+    hiresCam_ptr->allocateBuffers(0, hiresMallocator, 10);
+    stereoCam_ptr->allocateBuffers(0, hiresMallocator,
+                                   SnapdragonFlight::SCAM_IMG_HP_BUFFER_POOL_SIZE,
+                                   200);
 
     // Open devices
 
@@ -641,12 +758,44 @@ void constructApp(unsigned int port_number,
 #endif // LINUX_DEV
 #endif // SDFLIGHT vs LINUX
 
+    isHiresChild = false;
+    isStereoChild = false;
+// fork works just fine on Darwin; just haven't got POSIX mq for IPC ports
+#if defined TGT_OS_TYPE_LINUX
+    int childPID = hiresCam_ptr->spawnChild();
+    if (childPID == 0) { // we are in the child process
+        isHiresChild = true;
+#endif
+
+        hiresCam_ptr->start(0,40,5*1000*1024, CORE_CAM);
+
+#if defined TGT_OS_TYPE_LINUX
+        return; // don't start any other threads in the child
+    }
+#endif
+
+#if defined TGT_OS_TYPE_LINUX
+    childPID = stereoCam_ptr->spawnChild();
+    if (childPID == 0) { // we are in the child process
+        isStereoChild = true;
+#endif
+
+        stereoCam_ptr->start(0,40,5*1000*1024, CORE_CAM);
+
+#if defined TGT_OS_TYPE_LINUX
+        return; // don't start any other threads in the child
+    }
+#endif
+
+    // NOTE(mereweth) - putting this near the top in case we want to fork in ipcRelay instead
+    ipcRelay_ptr->start(0,30,20*1024);
+
     // Active component startup
-    imuDecouple_ptr->start(0, 91, 20*1024, CORE_1);
+    imuDecouple_ptr->start(0, 91, 20*1024, CORE_RPC);
     // NOTE(mereweth) - GNC att & pos loops run in this thread:
-    rgDecouple_ptr->start(0, 90, 20*1024, CORE_2);
+    rgDecouple_ptr->start(0, 90, 20*1024, CORE_RPC);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
-    actDecouple_ptr->start(0, 92, 20*1024, CORE_3);
+    actDecouple_ptr->start(0, 92, 20*1024, CORE_RPC);
 
     cmdDisp_ptr->start(0,60,20*1024);
     // start sequencer
@@ -659,12 +808,14 @@ void constructApp(unsigned int port_number,
 
     snapHealth_ptr->start(0,40,20*1024);
 
+    mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
+
     // Initialize socket server
     if (port_number && hostname) {
         if (startSocketNow) {
-        sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-        sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
 
@@ -692,7 +843,35 @@ void run1backupCycle(void) {
     Os::Task::delay(50);
 }
 
-void exitTasks(void) {
+void exitTasks(bool isHiresChild, bool isStereoChild) {
+#if defined TGT_OS_TYPE_LINUX
+    if (isHiresChild) {
+#endif
+        hiresCam_ptr->exit();
+        hiresCam_ptr->deallocateBuffers(hiresMallocator);
+        hiresCam_ptr->join(NULL);
+#if defined TGT_OS_TYPE_LINUX
+        return;
+    }
+#endif
+
+#if defined TGT_OS_TYPE_LINUX
+    if (isStereoChild) {
+#endif
+        stereoCam_ptr->exit();
+        stereoCam_ptr->deallocateBuffers(hiresMallocator);
+        stereoCam_ptr->join(NULL);
+#if defined TGT_OS_TYPE_LINUX
+        return;
+    }
+#endif
+
+    ipcRelay_ptr->exit();
+
+    mvCam_ptr->exit();
+    mvCam_ptr->deallocateBuffers(buffMallocator);
+    mvCam_ptr->join(NULL);
+
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
     imuDRIntSnap_ptr->exitThread();
 #else
@@ -750,6 +929,8 @@ int main(int argc, char* argv[]) {
     bool startSocketNow = false;
     U32 boot_count = 0;
     bool internalIMUProp = false;
+    bool isHiresChild = false;
+    bool isStereoChild = false;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
@@ -797,58 +978,78 @@ int main(int argc, char* argv[]) {
     constructApp(port_number,
                  hostname, boot_count,
                  startSocketNow,
+                 isHiresChild, isStereoChild,
                  internalIMUProp);
     //dumparch();
 
-    ros::start();
+    if (!isHiresChild && !isStereoChild) {
+        ros::start();
 
-    hlRosIface_ptr->startIntTask(30, 5*1000*1024);
-    ackermannIface_ptr->startIntTask(30, 5*1000*1024);
-    filterIface_ptr->startIntTask(30, 5*1000*1024);
-    gtIface_ptr->startIntTask(30, 5*1000*1024);
-    rosSeq_ptr->startIntTask(30, 5*1000*1024);
+        hlRosIface_ptr->startIntTask(30, 5*1000*1024);
+        ackermannIface_ptr->startIntTask(30, 5*1000*1024);
+        filterIface_ptr->startIntTask(30, 5*1000*1024);
+        gtIface_ptr->startIntTask(30, 5*1000*1024);
+        rosSeq_ptr->startIntTask(30, 5*1000*1024);
 
-    hlRosIface_ptr->startPub();
-    ackermannIface_ptr->startPub();
-    filterIface_ptr->startPub();
-    gtIface_ptr->startPub();
-    rosSeq_ptr->startPub();
+        hlRosIface_ptr->startPub();
+        ackermannIface_ptr->startPub();
+        filterIface_ptr->startPub();
+        gtIface_ptr->startPub();
+        rosSeq_ptr->startPub();
 
-    ros::console::shutdown();
+        ros::console::shutdown();
 
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
+        while (!mpu9250_ptr->isReady()) {
+            Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
+            Svc::TimerVal cycleStart;
+            cycleStart.take();
+            port->invoke(cycleStart);
+            Os::Task::delay(10);
+        }
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
-    imuDRIntSnap_ptr->startIntTask(99);
+        imuDRIntSnap_ptr->startIntTask(99);
 #else
 
 #ifdef LINUX_DEV
-    imuDRInt_ptr->startIntTask(99);
+        imuDRInt_ptr->startIntTask(99);
 #endif // LINUX_DEV
 #endif
-    rgDecouple_ptr->setEnabled(true);
+        rgDecouple_ptr->setEnabled(true);
+    } //!isHiresChild && !isStereoChild
 
     int backupCycle = 0;
 
     while (!terminate) {
-        run1backupCycle();
-        backupCycle++;
+        if (isHiresChild) {
+            DEBUG_PRINT("Hires Child Cycle %d\n",backupCycle);
+        }
+        else if (isStereoChild) {
+            DEBUG_PRINT("Stereo Child Cycle %d\n",backupCycle);
+        }
+        else {
+            //DEBUG_PRINT("Parent Cycle %d\n",cycle);
+        }
+
+        if (!isHiresChild && !isStereoChild) {
+            run1backupCycle();
+            backupCycle++;
 #if !defined(LINUX_DEV) and !defined(BUILD_SDFLIGHT)
-    run1testCycle();
+            run1testCycle();
 #endif // LINUX_DEV
+        }
+        else {
+            Os::Task::delay(1000);
+        }
     }
 
-    rgDecouple_ptr->setEnabled(false);
+    if (!isHiresChild && !isStereoChild) {
+        rgDecouple_ptr->setEnabled(false);
 
-    DEBUG_PRINT("Stopping tasks\n");
-    ros::shutdown();
+        DEBUG_PRINT("Stopping tasks\n");
+        ros::shutdown();
+    } // !isHiresChild && !isStereoChild
 
-    exitTasks();
+    exitTasks(isHiresChild, isStereoChild);
 
     // Give time for threads to exit
     (void) printf("Waiting for threads...\n");

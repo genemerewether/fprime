@@ -47,6 +47,11 @@ void exitTasks(void);
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 
+#include <SnapdragonFlight/MVCam/MVCamComponentImpl.hpp>
+#include <SnapdragonFlight/StereoCam/StereoCamComponentImpl.hpp>
+#include <SnapdragonFlight/HiresCam/HiresCamComponentImpl.hpp>
+#include <Svc/IPCRelay/IPCRelayComponentImpl.hpp>
+
 extern Svc::RateGroupDecouplerComponentImpl* rgDecouple_ptr;
 extern Svc::QueuedDecouplerComponentImpl* passiveDataPasser_ptr;
 extern Svc::ActiveDecouplerComponentImpl* imuDecouple_ptr;
@@ -93,5 +98,10 @@ extern Gnc::AckermannIfaceComponentImpl* ackermannIface_ptr;
 extern Gnc::FilterIfaceComponentImpl* filterIface_ptr;
 extern Gnc::GroundTruthIfaceComponentImpl* gtIface_ptr;
 extern ROS::RosSeqComponentImpl* rosSeq_ptr;
+
+extern SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;
+extern SnapdragonFlight::StereoCamComponentImpl* stereoCam_ptr;
+extern SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
+extern Svc::IPCRelayComponentImpl* ipcRelay_ptr;
 
 #endif
