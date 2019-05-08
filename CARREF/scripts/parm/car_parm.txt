@@ -1,13 +1,13 @@
 NUMACTUATORS_PRM_SET, 2
 
-# steering, 2nd pwm pin, first angle in
-A1_ADDR_PRM_SET, 1
+# steering, 1st pwm pin, first angle in
+A1_ADDR_PRM_SET, 0
 A1_INPUTACTIDX_PRM_SET, 0
 A1_REVERSE_PRM_SET, True
 A1_PARMSLOT_PRM_SET, 1
 
-# throttle, 1st pwm pin, first angVel in
-A2_ADDR_PRM_SET, 0
+# throttle, 2nd pwm pin, first angVel in
+A2_ADDR_PRM_SET, 1
 A2_INPUTACTIDX_PRM_SET, 0
 A2_REVERSE_PRM_SET, False
 A2_PARMSLOT_PRM_SET, 2
@@ -20,7 +20,7 @@ P1_COUNTS_PRM_SET, 1
 # scale from min to max
 P1_MAPTYPE_PRM_SET, 1
 P1_MAP_VNOM_PRM_SET, 6.0
-P1_MAP_OFFSET_PRM_SET, 0.15
+P1_MAP_OFFSET_PRM_SET, 0.1583
 # no control
 P1_CTRLTYPE_PRM_SET, 0
 # output units max delta from open loop mapping
@@ -98,13 +98,13 @@ P2_INPUTACTTYPE_PRM_SAVE
 FLYSAFECYCLES_PRM_SAVE
 FLYSAFETIME_PRM_SAVE
 
-DT_PRM_SET, 0.0489
+DT_PRM_SET, 0.1
 ATTFILTER_InitParams
 
 DT_PRM_SAVE
 
 
-SIGGEN_DT_PRM_SET, 0.0489
+SIGGEN_DT_PRM_SET, 0.1
 SIGGEN_InitParams
 
 SIGGEN_DT_PRM_SAVE
