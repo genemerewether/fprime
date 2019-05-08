@@ -131,7 +131,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 16};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 2};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -400,9 +400,9 @@ void constructApp() {
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0); // designed to drop if full
-    imuDataPasser_ptr->init(100, 400); // big entries for IMU
-    imuDecouple_ptr->init(100, 20); // just need to serialize cycle port
-    actDecouple_ptr->init(100, 500); // big message queue entry, few entries
+    imuDataPasser_ptr->init(1000, 400); // big entries for IMU
+    imuDecouple_ptr->init(1000, 20); // just need to serialize cycle port
+    actDecouple_ptr->init(1000, 500); // big message queue entry, few entries
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
     rgTlm_ptr->init(2);
@@ -418,9 +418,9 @@ void constructApp() {
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
 
-    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
+    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
 
-    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ);
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ);
     
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
