@@ -88,6 +88,7 @@ namespace SnapdragonFlight {
             return;
         }
 
+#ifndef SOC_8096
         bool found = false;
 
         for (NATIVE_INT_TYPE i = 0; i < numCameras; i++) {
@@ -109,6 +110,9 @@ namespace SnapdragonFlight {
             this->log_WARNING_HI_HIRESCAM_CameraError(HIRESCAM_NO_CAMERA);
             return;
         }
+#else
+        cameraID = static_cast<NATIVE_INT_TYPE>(HIRESCAM_CAMERA_TYPE);
+#endif
 
         stat = camera::ICameraDevice::createInstance(cameraID, &m_cameraPtr);
         if (stat || (m_cameraPtr == NULL)) {

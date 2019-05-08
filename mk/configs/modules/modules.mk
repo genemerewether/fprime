@@ -168,6 +168,7 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/BlspPwmDriver \
 	SnapdragonFlight/SnapdragonHealth \
 	SnapdragonFlight/MVCam \
+	SnapdragonFlight/StereoCam \
 	SnapdragonFlight/HiresCam \
 	SnapdragonFlight/MVVislam
 

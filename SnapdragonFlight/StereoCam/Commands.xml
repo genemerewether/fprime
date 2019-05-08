@@ -1,0 +1,132 @@
+    <commands>
+        <command kind="async" opcode="0" mnemonic="SCAM_SET_LOGGING" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="LogMode">
+                        <item name="LOGGING_ALL"/>
+                        <item name="LOGGING_UNPROC"/>
+                        <item name="LOGGING_PROC"/>
+                        <item name="LOGGING_WAYPT"/>
+                        <item name="LOGGING_OFF"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Turn on logging images to a file</comment>
+        </command>
+        <command kind="async" opcode="1" mnemonic="SCAM_ADD_WAYPOINT" >
+            <args>
+                <arg name="waypoint" type="U32">
+                </arg>
+                <arg name="destination" type="ENUM">
+                    <enum name="WayptDestination">
+                        <item name="WAYPT_STORAGE"/>
+                        <item name="WAYPT_XMIT"/>
+                        <item name="WAYPT_STORAGE_XMIT"/>
+                        <item name="WAYPT_UNPROC"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+            <comment>Add a waypoint</comment>
+        </command>
+        <command kind="async" opcode="2" mnemonic="SCAM_TAKE_IMG" >
+            <comment>Take a still image</comment>
+            <args>
+                <arg name="destination" type="ENUM">
+                    <enum name="TakeImgDestination">
+                        <item name="TAKE_IMG_STORAGE"/>
+                        <item name="TAKE_IMG_XMIT"/>
+                        <item name="TAKE_IMG_STORAGE_XMIT"/>
+                        <item name="TAKE_IMG_UNPROC"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="3" mnemonic="SCAM_ACTIVATE" >
+            <args>
+                <arg name="Mode" type="ENUM">
+                    <enum name="StereoCamActive">
+                        <item name="IMAGING_ON"/>
+                        <item name="IMAGING_OFF"/>
+                    </enum>
+                </arg>
+            </args>
+            <comment>Turn imaging on or off</comment>
+        </command>
+        <command kind="async" opcode="4" mnemonic="SCAM_WAYPOINT_TEST" >
+            <args>
+                <arg name="index" type="U32">
+                </arg>
+            </args>
+            <comment>Manually trigger a waypoint image like port call would</comment>
+        </command>
+        <command kind="async" opcode="5" mnemonic="SCAM_TEST_IMG" >
+            <comment>Send a still image test pattern</comment>
+            <args>
+                <arg name="destination" type="ENUM">
+                    <comment>Manually keep in sync with CameraFrameSerializable</comment>
+                    <enum name="TestImgDestination">
+                        <item name="TEST_IMG_STORAGE"/>
+                        <item name="TEST_IMG_XMIT"/>
+                        <item name="TEST_IMG_STORAGE_XMIT"/>
+                    </enum>
+                </arg>
+                <arg name="quality" type="U8">
+                    <comment>Compression quality; between 1 and 100, inclusive; greater than 100 is passthrough</comment>
+                </arg>
+            </args>
+        </command>
+        <!--command kind="async" opcode="9" mnemonic="SCAM_SET_EXP_PARMS" >
+            <comment>Set the SCam MV CPA exposure parameters; defaults in Cfg.hpp</comment>
+            <args>
+                <arg name="max_change" type="U16">
+                    <comment>Max frame to frame exposure change; between 1 and 500, inclusive</comment>
+                </arg>
+                <arg name="exposure_cost" type="F32">
+                    <comment>MV CPA cost mode exposure cost</comment>
+                </arg>
+                <arg name="gain_cost" type="F32">
+                    <comment>MV CPA cost mode gain cost</comment>
+                </arg>
+                <arg name="max_exposure" type="U16">
+                    <comment>MV CPA max exposure</comment>
+                </arg>
+                <arg name="max_gain" type="U16">
+                    <comment>MV CPA max gain</comment>
+                </arg>
+            </args>
+        </command-->
+        <command kind="async" opcode="6" mnemonic="SCAM_FLIGHT_MODE" >
+            <comment>Toggle delivery of images to GNC and frame-to-frame autoexposure clamp</comment>
+            <args>
+                <arg name="mode" type="ENUM">
+                    <enum name="StereoCamFlightMode">
+                        <item name="SCAM_MODE_PREFLIGHT"/>
+                        <item name="SCAM_MODE_FLIGHT"/>
+                    </enum>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="7" mnemonic="SCAM_IMG_TLM_MODE" >
+            <comment>Toggle image telemetry</comment>
+            <args>
+                <arg name="mode" type="ENUM">
+                    <enum name="StereoCamImgTlmMode">
+                        <item name="SCAM_IMG_TLM_OFF"/>
+                        <item name="SCAM_IMG_TLM_ON"/>
+                    </enum>
+                </arg>
+            </args>
+        </command>
+        <command kind="async" opcode="8" mnemonic="SCAM_SET_LOG_SKIP" >
+            <args>
+                <arg name="skipCount" type="U32">
+                </arg>
+            </args>
+        </command>
+  </commands>

@@ -159,13 +159,13 @@ void allocComps() {
                         ("FILTIFACE")
 #endif
 ;
- 
+
     gtIface_ptr = new Gnc::GroundTruthIfaceComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("FILTIFACE")
 #endif
 ;
-   
+
     rgDecouple_ptr = new Svc::RateGroupDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "RGDECOUPLE",
@@ -179,14 +179,14 @@ void allocComps() {
 #endif
                                                             )
 ;
-    
+
     imuDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "IMUDECOUPLE"
 #endif
                                                             )
 ;
-    
+
     actDecouple_ptr = new Svc::ActiveDecouplerComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "ACTDECOUPLE"
@@ -204,7 +204,7 @@ void allocComps() {
 #endif
                             rgDevContext,FW_NUM_ARRAY_ELEMENTS(rgDevContext));
 ;
- 
+
     NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
         Gnc::ATTFILTER_SCHED_CONTEXT_TLM, // attFilter
@@ -231,7 +231,7 @@ void allocComps() {
                         "RGDCPLDRV",
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
- 
+
     NATIVE_INT_TYPE rgGncDivs[] = {1, 50};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
@@ -283,7 +283,7 @@ void allocComps() {
                         ("CTRLXEST")
 #endif
 ;
- 
+
     imuProc_ptr = new Gnc::ImuProcComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("IMUPROC")
@@ -350,7 +350,7 @@ void allocComps() {
                         ("SNAPESCPWM")
 #endif
 ;
-    
+
     spiDrv_ptr = new Drv::LinuxSpiDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SPIDRV")
@@ -409,7 +409,7 @@ void manualConstruct(bool internalIMUProp) {
     // TODO(mereweth) - open devices
 #endif // LINUX_DEV
 #endif
-  
+
     // switch based on command line options
     if (internalIMUProp) {
         attFilter_ptr->set_odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
@@ -443,13 +443,13 @@ void manualConstruct(bool internalIMUProp) {
     passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, se3Ctrl_ptr->get_CmdDisp_InputPort(0));
     se3Ctrl_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
     se3Ctrl_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
-    
+
     cmdIdx = dpIdx = 3;
     cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
     passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, mixer_ptr->get_CmdDisp_InputPort(0));
     mixer_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
     mixer_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));*/
-    
+
     cmdIdx = dpIdx = 4;
     cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
     passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, actuatorAdapter_ptr->get_CmdDisp_InputPort(0));
@@ -461,32 +461,32 @@ void manualConstruct(bool internalIMUProp) {
     passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, sigGen_ptr->get_CmdDisp_InputPort(0));
     sigGen_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
     sigGen_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
-    
+
     cmdIdx = dpIdx = 6;
     cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
     passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, ctrlXest_ptr->get_CmdDisp_InputPort(0));
     ctrlXest_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
     ctrlXest_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
-    
+
     cmdIdx = dpIdx = 7;
     cmdDisp_ptr->set_compCmdSend_OutputPort(NUM_CMD_PORTS - cmdIdx, passiveDataPasser_ptr->get_DataIn_InputPort(dpIdx));
     passiveDataPasser_ptr->set_DataOut_OutputPort(dpIdx, imuProc_ptr->get_CmdDisp_InputPort(0));
     imuProc_ptr->set_CmdReg_OutputPort(0, cmdDisp_ptr->get_compCmdReg_InputPort(NUM_CMD_PORTS - cmdIdx));
     imuProc_ptr->set_CmdStatus_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
-    
+
     // actuator decoupler
     ackermannConverter_ptr->set_actuators_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(0));
     actDecouple_ptr->set_DataOut_OutputPort(0, actuatorAdapter_ptr->get_motor_InputPort(0));
-        
+
     sigGen_ptr->set_motor_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(1));
     actDecouple_ptr->set_DataOut_OutputPort(1, actuatorAdapter_ptr->get_motor_InputPort(0));
 
     /*mrCtrlIface_ptr->set_boolStamped_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(2));
       actDecouple_ptr->set_DataOut_OutputPort(2, actuatorAdapter_ptr->get_flySafe_InputPort(0));*/
-    
+
     hlRosIface_ptr->set_ActuatorsData_OutputPort(0, actDecouple_ptr->get_DataIn_InputPort(3));
     actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
-    
+
     rgOp_ptr->set_RateGroupMemberOut_OutputPort(4, actDecouple_ptr->get_DataIn_InputPort(4));
     actDecouple_ptr->set_DataOut_OutputPort(4, actuatorAdapter_ptr->get_sched_InputPort(0));
 }
@@ -510,7 +510,7 @@ void constructApp(unsigned int port_number,
 #endif
 
     eventLogger_ptr->init(500,0);
-    
+
     chanTlm_ptr->init(60,0);
 
     cmdDisp_ptr->init(60,0);
@@ -529,7 +529,7 @@ void constructApp(unsigned int port_number,
     filterIface_ptr->init(0);
     gtIface_ptr->init(0);
     rosSeq_ptr->init(0);
-    
+
     // Initialize rate group driver
     rgGncDrv_ptr->init();
     rgDcplDrv_ptr->init();
@@ -551,7 +551,7 @@ void constructApp(unsigned int port_number,
     attFilter_ptr->init(0);
     ackermannConverter_ptr->init(0);
     mpu9250_ptr->init(0);
-    
+
     //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ);
     mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ);
 
@@ -586,14 +586,14 @@ void constructApp(unsigned int port_number,
     eventLogger_ptr->regCommands();
     prmDb_ptr->regCommands();
     snapHealth_ptr->regCommands();
-    
+
     ctrlXest_ptr->regCommands();
     imuProc_ptr->regCommands();
     attFilter_ptr->regCommands();
     //ackermannConverter_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
-    
+
     prmDb_ptr->readParamFile();
 
     ctrlXest_ptr->loadParameters();
@@ -602,7 +602,7 @@ void constructApp(unsigned int port_number,
     //ackermannConverter_ptr->loadParameters();
     actuatorAdapter_ptr->loadParameters();
     sigGen_ptr->loadParameters();
-    
+
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);
     textLogger_ptr->set_log_file(logFileName,100*1024, 0);
@@ -614,7 +614,7 @@ void constructApp(unsigned int port_number,
     // /dev/spi-1 on QuRT; connected to MPU9250
     spiDrvSnap_ptr->open(1, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
     imuDRIntSnap_ptr->open(65, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_INT);
-    
+
     // J13-3, 5V level
     hwEnablePinSnap_ptr->open(28, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_IN);
 
@@ -623,7 +623,7 @@ void constructApp(unsigned int port_number,
     F32 duty[2] = {0.15, 0.15};
     // /dev/pwm-1 on QuRT
     escPwmSnap_ptr->open(1, pwmPins, 2, duty, 10 * 1000);
-#else 
+#else
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
     imuDRIntSnap_ptr->open(78, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_INT);
@@ -667,7 +667,7 @@ void constructApp(unsigned int port_number,
         sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
-    
+
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -698,11 +698,11 @@ void exitTasks(void) {
 #else
     imuDRInt_ptr->exitThread();
 #endif
-    
+
     rgDecouple_ptr->exit();
     imuDecouple_ptr->exit();
     actDecouple_ptr->exit();
-        
+
     snapHealth_ptr->exit();
     cmdDisp_ptr->exit();
     eventLogger_ptr->exit();
@@ -715,11 +715,11 @@ void exitTasks(void) {
 
 void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
-          "-p\tport_number\n"
-          "-a\thostname/IP address\n"
-          "-i\tUse odometry from internal IMU propagation\n"
-          "-b\tBoot count\n"
-          "-s\tStart socket immediately\n");
+                  "-p\tport_number\n"
+                  "-a\thostname/IP address\n"
+                  "-i\tUse odometry from internal IMU propagation\n"
+                  "-b\tBoot count\n"
+                  "-s\tStart socket immediately\n");
 }
 
 
@@ -793,13 +793,13 @@ int main(int argc, char* argv[]) {
     signal(SIGPIPE, SIG_IGN);
 
     (void) printf("Hit Ctrl-C to quit\n");
-    
+
     constructApp(port_number,
-         hostname, boot_count,
-         startSocketNow,
-         internalIMUProp);
+                 hostname, boot_count,
+                 startSocketNow,
+                 internalIMUProp);
     //dumparch();
-    
+
     ros::start();
 
     hlRosIface_ptr->startIntTask(30, 5*1000*1024);
@@ -826,13 +826,13 @@ int main(int argc, char* argv[]) {
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
     imuDRIntSnap_ptr->startIntTask(99);
 #else
-   
+
 #ifdef LINUX_DEV
     imuDRInt_ptr->startIntTask(99);
 #endif // LINUX_DEV
 #endif
     rgDecouple_ptr->setEnabled(true);
-    
+
     int backupCycle = 0;
 
     while (!terminate) {
@@ -844,10 +844,10 @@ int main(int argc, char* argv[]) {
     }
 
     rgDecouple_ptr->setEnabled(false);
-    
+
     DEBUG_PRINT("Stopping tasks\n");
     ros::shutdown();
-    
+
     exitTasks();
 
     // Give time for threads to exit
