@@ -12,7 +12,6 @@ export MARKDOWN ?= $(PYTHON_BASE)/bin/markdown_py -x markdown.extensions.extra -
 JOBS := -j `nproc`
 
 TURBOJPEG := /opt/tools/quest/turbojpeg
-TURBOJPEG_LIB := $(TURBOJPEG)/lib/libturbojpeg.a
 TURBOJPEG_INCLUDE := -I$(TURBOJPEG)/include
 
 TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
@@ -55,6 +54,7 @@ AR := $(ARM_CC_BASE)-ar
 HEXAGON_TOOLS_ROOT := /opt/tools/quest/Qualcomm/HEXAGON_Tools/7.2.12/Tools
 HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/qrlinux_sysroot
 INDIGO_ARM_SYSROOT :=  /opt/tools/quest/Qualcomm/indigo_sysroot
+TURBOJPEG_LIB := $(TURBOJPEG)/lib/libturbojpeg.a
 
 FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
 

@@ -461,12 +461,14 @@ HEXREF_GENERAL_MODULES := \
 	ROS/Gen/nav_msgs/Ports           \
 	ROS/Gen/mav_msgs/Ports		 \
 	ROS/Gen/sensor_msgs/Ports	\
+	ROS/Gen/ackermann_msgs/Ports	\
 	\
 	ROS/Gen/std_msgs/Types  \
 	ROS/Gen/geometry_msgs/Types      \
 	ROS/Gen/nav_msgs/Types           \
 	ROS/Gen/mav_msgs/Types		 \
 	ROS/Gen/sensor_msgs/Types	\
+	ROS/Gen/ackermann_msgs/Types	\
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
