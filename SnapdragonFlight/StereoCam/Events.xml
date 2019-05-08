@@ -1,27 +1,27 @@
     <events>
-        <event id="0" name="SCAM_UninitializedError" severity="WARNING_HI" format_string = "MVCam not initialized" >
+        <event id="0" name="SCAM_UninitializedError" severity="WARNING_HI" format_string = "StereoCam not initialized" >
             <comment>
-            MVCam received a command while the component was uninitialized
+            StereoCam received a command while the component was uninitialized
             </comment>
         </event>
-        <event id="1" name="SCAM_AlreadyInitializedError" severity="WARNING_HI" format_string = "MVCam already initialized" >
+        <event id="1" name="SCAM_AlreadyInitializedError" severity="WARNING_HI" format_string = "StereoCam already initialized" >
             <comment>
-            MVCam asked to initialize while already initialized
+            StereoCam asked to initialize while already initialized
             </comment>
         </event>
-        <event id="2" name="SCAM_DeactivatedError" severity="WARNING_HI" format_string = "MVCam not activated" >
+        <event id="2" name="SCAM_DeactivatedError" severity="WARNING_HI" format_string = "StereoCam not activated" >
             <comment>
-            MVCam tried to wait for an image callback while deactivated
+            StereoCam tried to wait for an image callback while deactivated
             </comment>
         </event>
-        <event id="3" name="SCAM_ExtraPreviewCallbackError" severity="WARNING_LO" format_string = "MVCam received preview frame while (de)activating" >
+        <event id="3" name="SCAM_ExtraPreviewCallbackError" severity="WARNING_LO" format_string = "StereoCam received preview frame while (de)activating" >
             <comment>
-            MVCam received an image callback while (de)activating
+            StereoCam received an image callback while (de)activating
             </comment>
         </event>
-        <event id="4" name="SCAM_CameraError" severity="WARNING_HI" format_string = "MVCam camera error %d" >
+        <event id="4" name="SCAM_CameraError" severity="WARNING_HI" format_string = "StereoCam camera error %d" >
             <comment>
-            MVCam error with Snapdragon Linux Camera API
+            StereoCam error with Snapdragon Linux Camera API
             </comment>
             <args>
                 <arg name="error" type="ENUM">
@@ -39,24 +39,24 @@
                 </arg>
             </args>
         </event>
-        <event id="5" name="SCAM_TookImg" severity="ACTIVITY_HI" format_string = "MVCam took image" >
+        <event id="5" name="SCAM_TookImg" severity="ACTIVITY_HI" format_string = "StereoCam took image" >
             <comment>
-            MVCam took an image using the SCAM_TAKE_IMG command
+            StereoCam took an image using the SCAM_TAKE_IMG command
             </comment>
         </event>
-        <event id="6" name="SCAM_Activated" severity="ACTIVITY_HI" format_string = "MVCam image cycling started" >
+        <event id="6" name="SCAM_Activated" severity="ACTIVITY_HI" format_string = "StereoCam image cycling started" >
             <comment>
-            MVCam began dispatching images
+            StereoCam began dispatching images
             </comment>
         </event>
-        <event id="7" name="SCAM_Deactivated" severity="ACTIVITY_HI" format_string = "MVCam image cycling stopped" >
+        <event id="7" name="SCAM_Deactivated" severity="ACTIVITY_HI" format_string = "StereoCam image cycling stopped" >
             <comment>
-            MVCam stopped dispatching images
+            StereoCam stopped dispatching images
             </comment>
         </event>
-        <event id="8" name="SCAM_LoggingModeChange" severity="ACTIVITY_HI" format_string = "MVCam image log mode changed to %d" >
+        <event id="8" name="SCAM_LoggingModeChange" severity="ACTIVITY_HI" format_string = "StereoCam image log mode changed to %d" >
             <comment>
-              MVCam logging mode changed
+              StereoCam logging mode changed
             </comment>
             <args>
                 <arg name="Mode" type="ENUM">
@@ -70,36 +70,36 @@
                 </arg>
             </args>
         </event>
-        <event id="9" name="SCAM_NoHPBuffers" severity="WARNING_HI" throttle="5" format_string = "MVCam ran out of HP buffers on port %d" >
+        <event id="9" name="SCAM_NoHPBuffers" severity="WARNING_HI" throttle="5" format_string = "StereoCam ran out of HP buffers on port %d" >
             <comment>
-            MVCam ran out of buffers on the specified High Priority port
+            StereoCam ran out of buffers on the specified High Priority port
             </comment>
             <args>
                 <arg name="port" type="U32">
                 </arg>
             </args>
         </event>
-        <event id="10" name="SCAM_NoLPBuffers" severity="ACTIVITY_HI" throttle="5" format_string = "MVCam ran out of LP buffers on port %d" >
+        <event id="10" name="SCAM_NoLPBuffers" severity="ACTIVITY_HI" throttle="5" format_string = "StereoCam ran out of LP buffers on port %d" >
             <comment>
-            MVCam ran out of buffers on the specified Low Priority port
+            StereoCam ran out of buffers on the specified Low Priority port
             </comment>
             <args>
                 <arg name="port" type="U32">
                 </arg>
             </args>
         </event>
-        <event id="11" name="SCAM_LoRate" severity="WARNING_HI" throttle="5" format_string = "MVCam only captured %d images in 1 second" >
+        <event id="11" name="SCAM_LoRate" severity="WARNING_HI" throttle="5" format_string = "StereoCam only captured %d images in 1 second" >
             <comment>
-            MVCam captured less than SCAM_MIN_RATE_WARN images since last Sched call
+            StereoCam captured less than SCAM_MIN_RATE_WARN images since last Sched call
             </comment>
             <args>
                 <arg name="numImages" type="U32">
                 </arg>
             </args>
         </event>
-        <event id="12" name="SCAM_ExposureModeChange" severity="WARNING_HI" format_string = "MVCam exposure mode changed to %d" >
+        <event id="12" name="SCAM_ExposureModeChange" severity="WARNING_HI" format_string = "StereoCam exposure mode changed to %d" >
             <comment>
-            MVCam switched from fixed to autoexposure or vice versa
+            StereoCam switched from fixed to autoexposure or vice versa
             </comment>
             <args>
                 <arg name="Mode" type="ENUM">
@@ -111,30 +111,30 @@
                 </arg>
             </args>
         </event>
-        <event id="13" name="SCAM_BusyWaitingImage" severity="WARNING_HI" format_string = "MVCam busy - asked to take image at waypoint %d" >
+        <event id="13" name="SCAM_BusyWaitingImage" severity="WARNING_HI" format_string = "StereoCam busy - asked to take image at waypoint %d" >
             <comment>
-            MVCam busy waiting for previous image to be acquired
+            StereoCam busy waiting for previous image to be acquired
             </comment>
             <args>
                 <arg name="waypoint" type="I32">
                     <comment>
-                    -1 for the waypoint value means MVCam was asked for a manual image
+                    -1 for the waypoint value means StereoCam was asked for a manual image
                     </comment>
                 </arg>
             </args>
         </event>
-        <event id="14" name="SCAM_MissedWaypoint" severity="WARNING_HI" format_string = "MVCam was deactivated when received waypoint %d" >
+        <event id="14" name="SCAM_MissedWaypoint" severity="WARNING_HI" format_string = "StereoCam was deactivated when received waypoint %d" >
             <comment>
-            MVCam did not take an image at waypoint because it was deactivated
+            StereoCam did not take an image at waypoint because it was deactivated
             </comment>
             <args>
                 <arg name="waypoint" type="U32">
                 </arg>
             </args>
         </event>
-        <event id="15" name="SCAM_WaypointError" severity="WARNING_HI" format_string = "MVCam waypoint %d, type %d had spec error" >
+        <event id="15" name="SCAM_WaypointError" severity="WARNING_HI" format_string = "StereoCam waypoint %d, type %d had spec error" >
             <comment>
-            MVCam waypoint had spec error
+            StereoCam waypoint had spec error
             </comment>
             <args>
                 <arg name="waypoint" type="U32">
@@ -143,14 +143,14 @@
                 </arg>
             </args>
         </event>
-        <event id="16" name="SCAM_NoWaypointsLeft" severity="WARNING_HI" format_string = "MVCam ran out of waypoint slots" >
+        <event id="16" name="SCAM_NoWaypointsLeft" severity="WARNING_HI" format_string = "StereoCam ran out of waypoint slots" >
             <comment>
-            MVCam used all the waypoint slots
+            StereoCam used all the waypoint slots
             </comment>
         </event>
-        <event id="17" name="SCAM_WaypointAdded" severity="ACTIVITY_LO" format_string = "MVCam added waypoint index %d, type %d, quality %d" >
+        <event id="17" name="SCAM_WaypointAdded" severity="ACTIVITY_LO" format_string = "StereoCam added waypoint index %d, type %d, quality %d" >
             <comment>
-            MVCam added a waypoint
+            StereoCam added a waypoint
             </comment>
             <args>
                 <arg name="waypoint" type="U32">
@@ -161,27 +161,27 @@
                 </arg>
             </args>
         </event>
-        <event id="18" name="SCAM_NoWaypointSpec" severity="ACTIVITY_HI" format_string = "MVCam waypoint %d not found in list" >
+        <event id="18" name="SCAM_NoWaypointSpec" severity="ACTIVITY_HI" format_string = "StereoCam waypoint %d not found in list" >
             <comment>
-            MVCam did not take an image at waypoint - not found in list
+            StereoCam did not take an image at waypoint - not found in list
             </comment>
             <args>
                 <arg name="waypoint" type="U32">
                 </arg>
             </args>
         </event>
-        <event id="19" name="SCAM_WaypointRecv" severity="ACTIVITY_HI" format_string = "MVCam waypoint %d" >
+        <event id="19" name="SCAM_WaypointRecv" severity="ACTIVITY_HI" format_string = "StereoCam waypoint %d" >
             <comment>
-            MVCam received a waypoint notification
+            StereoCam received a waypoint notification
             </comment>
             <args>
                 <arg name="waypoint" type="U32">
                 </arg>
             </args>
         </event>
-        <event id="20" name="SCAM_MaxExposureDelta" severity="WARNING_HI" format_string = "MVCam unable to change exposure from %d to %d" throttle="5">
+        <event id="20" name="SCAM_MaxExposureDelta" severity="WARNING_HI" format_string = "StereoCam unable to change exposure from %d to %d" throttle="5">
             <comment>
-            MVCam unable to change exposure because max delta was hit
+            StereoCam unable to change exposure because max delta was hit
             </comment>
             <args>
                 <arg name="oldExp" type="U32">
@@ -190,9 +190,9 @@
                 </arg>
             </args>
         </event>
-        <event id="21" name="SCAM_FlightModeChange" severity="ACTIVITY_HI" format_string = "MVCam flight mode changed to %d" >
+        <event id="21" name="SCAM_FlightModeChange" severity="ACTIVITY_HI" format_string = "StereoCam flight mode changed to %d" >
             <comment>
-            MVCam switched from preflight to flight or vice versa
+            StereoCam switched from preflight to flight or vice versa
             </comment>
             <args>
                 <arg name="Mode" type="ENUM">
@@ -203,9 +203,9 @@
                 </arg>
             </args>
         </event>
-        <event id="22" name="SCAM_ImgTlmModeChange" severity="ACTIVITY_LO" format_string = "MVCam img tlm mode changed to %d" >
+        <event id="22" name="SCAM_ImgTlmModeChange" severity="ACTIVITY_LO" format_string = "StereoCam img tlm mode changed to %d" >
             <comment>
-            MVCam turned image telemetry on or off
+            StereoCam turned image telemetry on or off
             </comment>
             <args>
                 <arg name="Mode" type="ENUM">
@@ -216,7 +216,7 @@
                 </arg>
             </args>
         </event>
-        <event id="23" name="SCAM_OverrodeQuality" severity="ACTIVITY_HI" format_string = "MVCam overrode bad compression quality of %d with %d" >
+        <event id="23" name="SCAM_OverrodeQuality" severity="ACTIVITY_HI" format_string = "StereoCam overrode bad compression quality of %d with %d" >
             <args>
                 <arg name="oldQual" type="U32">
                 </arg>
@@ -224,9 +224,9 @@
                 </arg>
             </args>
         </event>
-        <event id="24" name="SCAM_CallbackTypeChange" severity="WARNING_HI" format_string = "MVCam callback type changed to %d" >
+        <event id="24" name="SCAM_CallbackTypeChange" severity="WARNING_HI" format_string = "StereoCam callback type changed to %d" >
             <comment>
-            MVCam switched between 8-bit and 10-bit callbacks
+            StereoCam switched between 8-bit and 10-bit callbacks
             </comment>
             <args>
                 <arg name="Type" type="ENUM">

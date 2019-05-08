@@ -48,7 +48,7 @@ namespace Svc {
         m_cycleSlips(0u),
         m_backupCycles(0u),
         m_droppedCyclesError(droppedCyclesError),
-	m_enabled(true)
+        m_enabled(true)
     {
 
     }
@@ -105,14 +105,15 @@ namespace Svc {
           Svc::TimerVal &cycleStart
       )
     {
-	if (!this->m_enabled) {
-	    return;
-	}
+        if (!this->m_enabled) {
+            return;
+        }
       
         TimerVal end;
 
         this->m_cycleStarted = false;
 
+        DEBUG_PRINT("Rg Decoup cyclein\n");
         this->CycleOut_out(0, cycleStart);
 
         // grab timer for end of cycle

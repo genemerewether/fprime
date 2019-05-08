@@ -419,6 +419,8 @@ void constructApp() {
     mpu9250_ptr->init(0);
 
     mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
+
+    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ);
     
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
@@ -500,11 +502,11 @@ void constructApp() {
     rgDecouple_ptr->start(0, 90, 20*1024);
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
     actDecouple_ptr->start(0, 89, 20*1024);
-    
+
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
-
+    
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -536,7 +538,7 @@ void run1backupCycle(void) {
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(10);
+    Os::Task::delay(100);
 
 #ifndef BUILD_DSPAL // stress test
     for (int i = 0; i < 45; i++) {
@@ -599,6 +601,25 @@ int hexref_init(void) {
     return 0;
 }
 
+void start_mpu9250() {    
+    while (!mpu9250_ptr->isReady()) {
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+        
+        //Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
+        //port->invoke(cycleStart);
+
+        Fw::InputSerializePort* serPort = imuDecouple_ptr->get_DataIn_InputPort(0);
+        Fw::ExternalSerializeBuffer bufObj;
+        char buf[18];
+        bufObj.setExtBuffer((U8*) buf, sizeof(buf));
+        bufObj.serialize(cycleStart);
+        serPort->invokeSerial(bufObj);
+        
+        Os::Task::delay(10);
+    }
+}
+
 int hexref_run(void) {
     DEBUG_PRINT("hexref_run\n");
     if (preinit) {
@@ -606,13 +627,7 @@ int hexref_run(void) {
         return -1;
     }
     
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
+    start_mpu9250();
     rgDecouple_ptr->setEnabled(true);
     
     int backupCycle = 0;
@@ -640,15 +655,8 @@ int hexref_cycle(unsigned int backupCycles) {
         DEBUG_PRINT("hexref_cycle preinit - returning\n");
         return -1;
     }
-    
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
 
+    start_mpu9250();
     rgDecouple_ptr->setEnabled(true);
     for (unsigned int i = 0; i < backupCycles; i++) {
         if (terminate) break;
