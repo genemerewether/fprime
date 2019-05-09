@@ -533,28 +533,13 @@ int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
 }
 
 void run1backupCycle(void) {
+#ifndef SOC_8096
     // call interrupt to emulate a clock
     Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
     Os::Task::delay(100);
-
-#ifndef BUILD_DSPAL // stress test
-    for (int i = 0; i < 45; i++) {
-        Fw::ExternalSerializeBuffer bufObj;
-        char buf[996] = {"hi"};
-        bufObj.setExtBuffer((U8*) buf, sizeof(buf));
-        bufObj.setBuffLen(sizeof(buf));
-        Fw::InputSerializePort* serPort = kraitRouter_ptr->get_HexPortsIn_InputPort(1);
-        serPort->invokeSerial(bufObj);
-    }
-#endif
-
-#ifndef BUILD_DSPAL
-    U8 readBuf[4096*1000];
-    int len = 0;
-    hexref_rpc_relay_port_read(readBuf, sizeof(readBuf), &len);
 #endif
 }
 
