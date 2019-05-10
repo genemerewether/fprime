@@ -147,6 +147,8 @@ namespace SIMREF {
 
         bool m_rosInited;
 
+        ros::NodeHandle* m_nodeHandle;
+
         actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>* m_client;
 
     };

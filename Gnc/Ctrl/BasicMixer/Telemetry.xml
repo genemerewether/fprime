@@ -23,5 +23,13 @@
       <comment>
       </comment>
     </channel>
+    <channel id="6" name="BMIX_Rot6" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="7" name="BMIX_Rot7" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
 
 </telemetry>

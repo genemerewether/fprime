@@ -6,8 +6,7 @@
 
 |Channel Name|ID|Type|Description|
 |---|---|---|---|
-|RSDRV_Odometry1Overflows|0 (0x0)|U32|Number of times that ROS odometry message was not sent on a port (by Sched call)|
-|RSDRV_Odometry2Overflows|1 (0x1)|U32|Number of times that ROS odometry message was not sent on a port (by Sched call)|
+|RSDRV_Imu1Overflows|0 (0x0)|U32|Number of times that ROS IMU message was not sent on a port (by Sched call)|
 
 ## Event List
 

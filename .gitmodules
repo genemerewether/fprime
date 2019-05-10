@@ -38,3 +38,9 @@
 [submodule "ROS/fprime_ws/src/control_msgs"]
 	path = ROS/fprime_ws/src/control_msgs
 	url = https://github.com/ros-controls/control_msgs.git
+[submodule "ROS/fprime_ws/src/fprime_msgs"]
+	path = ROS/fprime_ws/src/fprime_msgs
+	url = ../fprime_msgs.git
+[submodule "ROS/fprime_ws/src/ackermann_msgs"]
+	path = ROS/fprime_ws/src/ackermann_msgs
+	url = https://github.com/ros-drivers/ackermann_msgs.git

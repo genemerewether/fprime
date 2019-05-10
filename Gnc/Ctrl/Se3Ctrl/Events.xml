@@ -1,0 +1,7 @@
+<events>
+    <event id="0" name="SE3CTRL_Dummy" severity="ACTIVITY_LO" format_string = "SE3 Control dummy event" >
+        <comment>
+            SE3 Control dummy event
+        </comment>
+    </event>
+</events>

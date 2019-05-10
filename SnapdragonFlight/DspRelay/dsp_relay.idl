@@ -53,6 +53,21 @@ interface dsp_relay
    long spi_relay_configure(in long fd, in long clock);
    long spi_relay_read_write(in long fd, in dataBuffer write_data, rout dataBuffer read_data);
    long spi_relay_close(in long fd);
+
+   // I2C interfaces
    
+   long i2c_relay_open(in long device);
+   long i2c_relay_configure(in long fd, in long busSpeed, in long slaveAddr, in long timeout);
+   long i2c_relay_read_write(in long fd, in dataBuffer write_data, rout dataBuffer read_data);
+   long i2c_relay_close(in long fd);
+   
+   // PWM interfaces
+
+   typedef sequence<unsigned long, 32> configBuffer;
+
+   long pwm_relay_open(in long device);
+   long pwm_relay_configure(in long fd, rout unsigned long long handle, in configBuffer channel, in unsigned long period_in_usecs);
+   long pwm_relay_set_duty(in unsigned long long handle, in configBuffer pulse_width_in_usecs, in unsigned long bitmask);
+   long pwm_relay_close(in long fd);
 };
 

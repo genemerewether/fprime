@@ -39,7 +39,7 @@ namespace Gnc {
       paramsInited(false),
       dt(0.0),
       sigType(IDLE),
-      outputMode(ACTUATOR),
+      outputMode(ACTUATOR_ANGLE),
       offset(0.0),
       actuatorIdx(0u),
       seq(0u),
@@ -94,16 +94,16 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-      if (SIGGEN_SCHED_CONTEXT_POS == context) {
+      if (SIGGEN_SCHED_CONTEXT_TLM == context) {
       }
-      else if (SIGGEN_SCHED_CONTEXT_TLM == context) {
-      }
-      else if (SIGGEN_SCHED_CONTEXT_ATT == context) {
+      else if (SIGGEN_SCHED_CONTEXT_OP == context) {
           if (IDLE == this->sigType) {
               return;
           }
 
-          if (ACTUATOR == this->outputMode) {
+          if ((ACTUATOR_ANGLE == this->outputMode) ||
+              (ACTUATOR_ANGVEL == this->outputMode)) {
+              F64 angle[SIGGEN_MAX_ACTUATORS] = {0.0};
               F64 angVel[SIGGEN_MAX_ACTUATORS] = {0.0};
               NATIVE_INT_TYPE stat = 0;
               if (this->actuatorIdx >= SIGGEN_MAX_ACTUATORS) {
@@ -116,9 +116,17 @@ namespace Gnc {
               FW_ASSERT(SIGGEN_MAX_ACTUATORS > this->actuatorIdx,
                         SIGGEN_MAX_ACTUATORS, this->actuatorIdx);
               F64 temp;
-              stat = this->signalGen.GetScalar(&angVel[this->actuatorIdx],
+              F64 value;
+              stat = this->signalGen.GetScalar(&value,
                                                &temp);
-              angVel[this->actuatorIdx] += offset;
+              value += offset;
+              
+              if (ACTUATOR_ANGLE == this->outputMode) {
+                  angle[this->actuatorIdx] = value;
+              }
+              else if (ACTUATOR_ANGVEL == this->outputMode) {
+                  angVel[this->actuatorIdx] = value;
+              }
               
               if (stat) {
                   this->sigType = IDLE;
@@ -128,6 +136,7 @@ namespace Gnc {
                   this->cmdResponse_out(this->opCode, this->cmdSeq,
                                         Fw::COMMAND_OK);
 
+                  angle[this->actuatorIdx] = 0.0;
                   angVel[this->actuatorIdx] = 0.0;
               }
 
@@ -137,7 +146,7 @@ namespace Gnc {
 
               ROS::mav_msgs::Actuators actuators__comm;
               actuators__comm.set(h,
-                                  NULL, 0, 0,
+                                  angle, SIGGEN_MAX_ACTUATORS, SIGGEN_MAX_ACTUATORS,
                                   // TODO(mereweth) - specify actuator count?
                                   angVel, SIGGEN_MAX_ACTUATORS, SIGGEN_MAX_ACTUATORS,
                                   NULL, 0, 0);

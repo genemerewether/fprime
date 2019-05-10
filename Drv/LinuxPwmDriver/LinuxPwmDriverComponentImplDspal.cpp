@@ -31,12 +31,6 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
-// TODO make proper static constants for these
-#define DSPAL_PWM_PATH "/dev/pwm-"
-#define MAX_BUF 64
-
-#define MAX_NUM_CHANNELS 8
-
 #include <HAP_farf.h>
 //#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
 #define DEBUG_PRINT(x,...)
@@ -87,20 +81,23 @@ namespace Drv {
       open(NATIVE_UINT_TYPE pwmchip,
            NATIVE_UINT_TYPE * channel,
            NATIVE_UINT_TYPE channelSize,
+           F32 * initDutyCycle,
            NATIVE_UINT_TYPE period_in_usecs) {
         // TODO check for invalid pwm device?
+        FW_ASSERT(channel);
+        FW_ASSERT(initDutyCycle);
 
         // Configure:
         int fd, len;
-        char buf[MAX_BUF];
+        char buf[64];
 
-        if (channelSize > MAX_NUM_CHANNELS) {
+        if (channelSize > DEV_FS_PWM_MAX_NUM_SIGNALS) {
             DEBUG_PRINT("not enough channel slots: %d < %d!\n",
-                        channelSize, MAX_NUM_CHANNELS);
+                        channelSize, DEV_FS_PWM_MAX_NUM_SIGNALS);
             return false;
         }
 
-        len = snprintf(buf, sizeof(buf), DSPAL_PWM_PATH "%d", pwmchip);
+        len = snprintf(buf, sizeof(buf), DEV_FS_PWM_DEVICE_TYPE_STRING "%d", pwmchip);
         FW_ASSERT(len > 0, len);
 
         fd = ::open(buf, 0);
@@ -111,7 +108,7 @@ namespace Drv {
         }
         this->m_fd = fd;
 
-        struct dspal_pwm pwm_gpio[MAX_NUM_CHANNELS];
+        struct dspal_pwm pwm_gpio[DEV_FS_PWM_MAX_NUM_SIGNALS];
         struct dspal_pwm_ioctl_signal_definition signal_definition;
         struct dspal_pwm_ioctl_update_buffer *update_buffer;
 
@@ -124,7 +121,7 @@ namespace Drv {
 
         // Describe the overall signal and reference the above array.
         signal_definition.num_gpios = channelSize;
-        m_numGpios = channelSize;
+        this->m_numGpios = channelSize;
         signal_definition.period_in_usecs = period_in_usecs;
         this->m_periodInUsecs = period_in_usecs;
         signal_definition.pwm_signal = &pwm_gpio[0];
@@ -140,8 +137,13 @@ namespace Drv {
         {
             return false;
         }
-        FW_ASSERT(update_buffer->num_gpios == m_numGpios);
+        FW_ASSERT(update_buffer->num_gpios == this->m_numGpios);
         this->m_handle = (void *) update_buffer;
+
+        for (int i = 0; i < this->m_numGpios; i++) {
+            update_buffer->pwm_signal[i].pulse_width_in_usecs =
+              (U32) (m_periodInUsecs * initDutyCycle[i]);
+        }
 
         return true;
     }

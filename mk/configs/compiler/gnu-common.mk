@@ -13,6 +13,7 @@ GNU_CFLAGS_COMMON := $(GNU_COMMON) -std=c99 \
 				-Wstrict-prototypes
 
 GNU_CXXFLAGS_COMMON := $(GNU_COMMON)  -fcheck-new \
+				-std=c++11 \
 				-Wnon-virtual-dtor 
 
 COMPILE_ONLY := -c

@@ -18,6 +18,8 @@
 |BMIX_Rot3|3 (0x3)|F32||
 |BMIX_Rot4|4 (0x4)|F32||
 |BMIX_Rot5|5 (0x5)|F32||
+|BMIX_Rot6|6 (0x6)|F32||
+|BMIX_Rot7|7 (0x7)|F32||
 
 ## Event List
 

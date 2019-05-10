@@ -90,15 +90,15 @@ namespace Drv {
       enum DSPAL_GPIO_VALUE_TYPE val;
       int bytes = read(this->m_fd, &val, 1);
       if (bytes != 1) {
-          this->log_WARNING_HI_GP_WriteError(this->m_gpio,bytes);
+          this->log_WARNING_HI_GP_ReadError(this->m_gpio,bytes);
           return;
       } else {
 	  /* NOTE(mereweth) - observed weird case on 801 where DSP gpio
 	   * read value was large number, odd or even to indicate state.
 	   * even is low, odd is high
 	   */
-	state = (val % 2);
-	DEBUG_PRINT("GPIO %u value %u read; state %u",this->m_fd, val, state);
+          state = (val % 2);
+          DEBUG_PRINT("GPIO %u value %u read; state %u",this->m_fd, val, state);
       }
   }
 
@@ -187,6 +187,7 @@ namespace Drv {
 
       for (NATIVE_INT_TYPE port = 0; port < compPtr->getNum_intOut_OutputPorts(); port++) {
           if (compPtr->isConnected_intOut_OutputPort(port)) {
+              DEBUG_PRINT("gpio int %d\n", port);
               compPtr->intOut_out(port,timerVal);
           }
       }
@@ -208,6 +209,10 @@ namespace Drv {
           close(this->m_fd);
           this->m_fd = -1;
       }
+  }
+  
+  void LinuxGpioDriverComponentImpl ::
+    joinThread(void **value_ptr) {
   }
 
   LinuxGpioDriverComponentImpl ::

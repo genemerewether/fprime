@@ -418,16 +418,16 @@ struct Interface {
 #define __QAIC_SLIM_EXPORT
 #endif
 
-static const Type types[1];
-static const Type types[1] = {{0x1,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x1}};
-static const Parameter parameters[4] = {{0x4,{{(const uintptr_t)0,(const uintptr_t)1}}, 2,0x4,0,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),3,0},{0x4,{{(const uintptr_t)0,(const uintptr_t)1}}, 2,0x4,3,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),0,0}};
-static const Parameter* const parameterArrays[14] = {(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[3])),(&(parameters[1])),(&(parameters[0])),(&(parameters[1])),(&(parameters[2]))};
-static const Method methods[7] = {{REMOTE_SCALARS_MAKEX(0,0,0x0,0x0,0x0,0x0),0x0,0x0,0,0,0,0x0,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x4,0x0,1,1,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x8,0x0,2,2,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x20,0x0,8,8,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x2,0x0,0x0),0x8,0x4,5,3,(&(parameterArrays[11])),0x4,0x4},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x0,0x0,0x0),0xc,0x0,4,3,(&(parameterArrays[7])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x1,0x0,0x0),0xc,0x0,6,3,(&(parameterArrays[8])),0x4,0x1}};
-static const Method* const methodArrays[20] = {&(methods[0]),&(methods[1]),&(methods[1]),&(methods[2]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[2]),&(methods[1]),&(methods[1]),&(methods[3]),&(methods[4]),&(methods[5]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[6]),&(methods[1])};
-static const char strings[456] = "uart_receive_allocate\0spi_relay_read_write\0uart_relay_configure\0gpio_relay_start_int\0gpio_relay_configure\0spi_relay_configure\0gpio_relay_isr_wait\0uart_relay_close\0uart_relay_write\0gpio_relay_write\0gpio_relay_close\0spi_relay_close\0uart_relay_quit\0uart_relay_read\0uart_relay_open\0gpio_relay_quit\0gpio_relay_read\0gpio_relay_open\0spi_relay_open\0flow_control\0write_data\0read_data\0stop_bits\0parity\0device\0clock\0bytes\0block\0value\0size\0buff\0baud\0type\0gpio\0test\0fd\0";
-static const uint16_t methodStrings[59] = {43,453,392,433,385,380,375,341,411,22,453,354,365,163,453,392,428,246,392,428,405,106,453,399,0,392,423,146,453,392,126,443,453,64,443,453,180,453,417,85,453,438,214,453,326,392,230,392,262,392,278,443,294,453,197,453,310,443,448};
-static const uint16_t methodStringsArrays[20] = {58,56,54,39,36,52,33,30,50,48,0,17,13,27,46,24,44,21,9,42};
-__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(dsp_relay_slim) = {20,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
+static const Type types[2];
+static const Type types[2] = {{0x1,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x1},{0x4,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x4}};
+static const Parameter parameters[8] = {{0x4,{{(const uintptr_t)0,(const uintptr_t)1}}, 2,0x4,0,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),3,0},{0x4,{{(const uintptr_t)0,(const uintptr_t)1}}, 2,0x4,3,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[0]),(const uintptr_t)0x400}}, 9,SLIM_IFPTR32(0x4,0x8),0,0},{0x8,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x8,3,0},{SLIM_IFPTR32(0x8,0x10),{{(const uintptr_t)&(types[1]),(const uintptr_t)0x20}}, 9,SLIM_IFPTR32(0x4,0x8),0,0},{0x4,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x4,0,0},{0x8,{{(const uintptr_t)0,(const uintptr_t)0}}, 2,0x8,0,0}};
+static const Parameter* const parameterArrays[24] = {(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[0])),(&(parameters[4])),(&(parameters[5])),(&(parameters[6])),(&(parameters[7])),(&(parameters[5])),(&(parameters[6])),(&(parameters[0])),(&(parameters[3])),(&(parameters[1])),(&(parameters[0])),(&(parameters[0])),(&(parameters[3])),(&(parameters[0])),(&(parameters[1])),(&(parameters[2]))};
+static const Method methods[10] = {{REMOTE_SCALARS_MAKEX(0,0,0x0,0x0,0x0,0x0),0x0,0x0,0,0,0,0x0,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x4,0x0,1,1,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x8,0x0,2,2,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x20,0x0,8,8,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x2,0x0,0x0),0x8,0x4,5,3,(&(parameterArrays[21])),0x4,0x4},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x0,0x0,0x0),0xc,0x0,4,3,(&(parameterArrays[18])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x1,0x0,0x0),0xc,0x0,6,3,(&(parameterArrays[15])),0x4,0x1},{REMOTE_SCALARS_MAKEX(0,0,0x1,0x0,0x0,0x0),0x10,0x0,4,4,(&(parameterArrays[0])),0x4,0x0},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x1,0x0,0x0),0xc,0x8,5,4,(&(parameterArrays[8])),0x4,0x8},{REMOTE_SCALARS_MAKEX(0,0,0x2,0x0,0x0,0x0),0x10,0x0,6,3,(&(parameterArrays[12])),0x8,0x0}};
+static const Method* const methodArrays[28] = {&(methods[0]),&(methods[1]),&(methods[1]),&(methods[2]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[2]),&(methods[1]),&(methods[1]),&(methods[3]),&(methods[4]),&(methods[5]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[1]),&(methods[2]),&(methods[6]),&(methods[1]),&(methods[1]),&(methods[7]),&(methods[6]),&(methods[1]),&(methods[1]),&(methods[8]),&(methods[9]),&(methods[1])};
+static const char strings[685] = "uart_receive_allocate\0pulse_width_in_usecs\0i2c_relay_read_write\0spi_relay_read_write\0uart_relay_configure\0gpio_relay_start_int\0gpio_relay_configure\0pwm_relay_configure\0i2c_relay_configure\0spi_relay_configure\0gpio_relay_isr_wait\0pwm_relay_set_duty\0uart_relay_close\0uart_relay_write\0gpio_relay_write\0gpio_relay_close\0pwm_relay_close\0period_in_usecs\0i2c_relay_close\0spi_relay_close\0uart_relay_quit\0uart_relay_read\0uart_relay_open\0gpio_relay_quit\0gpio_relay_read\0gpio_relay_open\0pwm_relay_open\0i2c_relay_open\0spi_relay_open\0flow_control\0write_data\0slaveAddr\0read_data\0stop_bits\0busSpeed\0bitmask\0channel\0timeout\0handle\0parity\0device\0clock\0bytes\0block\0value\0size\0buff\0baud\0type\0gpio\0test\0fd\0";
+static const uint16_t methodStrings[85] = {85,682,621,662,614,569,564,520,640,148,682,607,591,331,168,682,574,544,599,228,607,22,583,43,682,533,554,64,682,533,554,264,682,621,657,395,621,657,634,188,682,628,0,621,652,247,682,621,208,672,682,106,672,682,281,682,646,127,682,667,315,682,475,621,347,682,490,621,363,682,505,621,379,621,411,621,427,672,443,682,298,682,459,672,677};
+static const uint16_t methodStringsArrays[28] = {84,82,80,57,54,78,51,48,76,74,0,35,31,45,72,42,70,39,27,68,66,14,23,64,62,9,19,60};
+__QAIC_SLIM_EXPORT const Interface __QAIC_SLIM(dsp_relay_slim) = {28,&(methodArrays[0]),0,0,&(methodStringsArrays [0]),methodStrings,strings};
 #endif //_DSP_RELAY_SLIM_H
 #ifdef __cplusplus
 extern "C" {
@@ -510,8 +510,6 @@ __QAIC_STUB_EXPORT remote_handle _dsp_relay_handle(void) {
 }
 
 #endif //__qdsp6__
-
-int remote_register_dma_handle(int, uint32_t);
 
 __QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_skel_invoke)(uint32_t _sc, remote_arg* _pra) __QAIC_STUB_ATTRIBUTE {
    return __QAIC_REMOTE(remote_handle_invoke)(_dsp_relay_handle(), _sc, _pra);
@@ -715,6 +713,92 @@ __QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_spi_relay_read_write)(int fd, const
 }
 __QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_spi_relay_close)(int fd) __QAIC_STUB_ATTRIBUTE {
    uint32_t _mid = 19;
+   return _stub_method_1(_dsp_relay_handle(), _mid, (uint32_t*)&fd);
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_i2c_relay_open)(int device) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 20;
+   return _stub_method_1(_dsp_relay_handle(), _mid, (uint32_t*)&device);
+}
+static __inline int _stub_method_7(remote_handle _handle, uint32_t _mid, uint32_t _in0[1], uint32_t _in1[1], uint32_t _in2[1], uint32_t _in3[1]) {
+   remote_arg _pra[1];
+   uint32_t _primIn[4];
+   int _nErr = 0;
+   _pra[0].buf.pv = (void*)_primIn;
+   _pra[0].buf.nLen = sizeof(_primIn);
+   _COPY(_primIn, 0, _in0, 0, 4);
+   _COPY(_primIn, 4, _in1, 0, 4);
+   _COPY(_primIn, 8, _in2, 0, 4);
+   _COPY(_primIn, 12, _in3, 0, 4);
+   _TRY(_nErr, __QAIC_REMOTE(remote_handle_invoke)(_handle, REMOTE_SCALARS_MAKEX(0, _mid, 1, 0, 0, 0), _pra));
+   _CATCH(_nErr) {}
+   return _nErr;
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_i2c_relay_configure)(int fd, int busSpeed, int slaveAddr, int timeout) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 21;
+   return _stub_method_7(_dsp_relay_handle(), _mid, (uint32_t*)&fd, (uint32_t*)&busSpeed, (uint32_t*)&slaveAddr, (uint32_t*)&timeout);
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_i2c_relay_read_write)(int fd, const unsigned char* write_data, int write_dataLen, unsigned char* read_data, int read_dataLen) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 22;
+   return _stub_method_6(_dsp_relay_handle(), _mid, (uint32_t*)&fd, (char**)&write_data, (uint32_t*)&write_dataLen, (char**)&read_data, (uint32_t*)&read_dataLen);
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_i2c_relay_close)(int fd) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 23;
+   return _stub_method_1(_dsp_relay_handle(), _mid, (uint32_t*)&fd);
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_pwm_relay_open)(int device) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 24;
+   return _stub_method_1(_dsp_relay_handle(), _mid, (uint32_t*)&device);
+}
+static __inline int _stub_method_8(remote_handle _handle, uint32_t _mid, uint32_t _in0[1], uint64_t _rout1[1], char* _in2[1], uint32_t _in2Len[1], uint32_t _in3[1]) {
+   int _numIn[1];
+   remote_arg _pra[3];
+   uint32_t _primIn[3];
+   uint64_t _primROut[1];
+   remote_arg* _praIn;
+   int _nErr = 0;
+   _numIn[0] = 1;
+   _pra[0].buf.pv = (void*)_primIn;
+   _pra[0].buf.nLen = sizeof(_primIn);
+   _pra[(_numIn[0] + 1)].buf.pv = (void*)_primROut;
+   _pra[(_numIn[0] + 1)].buf.nLen = sizeof(_primROut);
+   _COPY(_primIn, 0, _in0, 0, 4);
+   _COPY(_primIn, 4, _in2Len, 0, 4);
+   _praIn = (_pra + 1);
+   _praIn[0].buf.pv = _in2[0];
+   _praIn[0].buf.nLen = (4 * _in2Len[0]);
+   _COPY(_primIn, 8, _in3, 0, 4);
+   _TRY(_nErr, __QAIC_REMOTE(remote_handle_invoke)(_handle, REMOTE_SCALARS_MAKEX(0, _mid, 2, 1, 0, 0), _pra));
+   _COPY(_rout1, 0, _primROut, 0, 8);
+   _CATCH(_nErr) {}
+   return _nErr;
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_pwm_relay_configure)(int fd, uint64* handle, const unsigned int* channel, int channelLen, unsigned int period_in_usecs) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 25;
+   return _stub_method_8(_dsp_relay_handle(), _mid, (uint32_t*)&fd, (uint64_t*)handle, (char**)&channel, (uint32_t*)&channelLen, (uint32_t*)&period_in_usecs);
+}
+static __inline int _stub_method_9(remote_handle _handle, uint32_t _mid, uint64_t _in0[1], char* _in1[1], uint32_t _in1Len[1], uint32_t _in2[1]) {
+   remote_arg _pra[2];
+   uint64_t _primIn[2];
+   remote_arg* _praIn;
+   int _nErr = 0;
+   _pra[0].buf.pv = (void*)_primIn;
+   _pra[0].buf.nLen = sizeof(_primIn);
+   _COPY(_primIn, 0, _in0, 0, 8);
+   _COPY(_primIn, 8, _in1Len, 0, 4);
+   _praIn = (_pra + 1);
+   _praIn[0].buf.pv = _in1[0];
+   _praIn[0].buf.nLen = (4 * _in1Len[0]);
+   _COPY(_primIn, 12, _in2, 0, 4);
+   _TRY(_nErr, __QAIC_REMOTE(remote_handle_invoke)(_handle, REMOTE_SCALARS_MAKEX(0, _mid, 2, 0, 0, 0), _pra));
+   _CATCH(_nErr) {}
+   return _nErr;
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_pwm_relay_set_duty)(uint64 handle, const unsigned int* pulse_width_in_usecs, int pulse_width_in_usecsLen, unsigned int bitmask) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 26;
+   return _stub_method_9(_dsp_relay_handle(), _mid, (uint64_t*)&handle, (char**)&pulse_width_in_usecs, (uint32_t*)&pulse_width_in_usecsLen, (uint32_t*)&bitmask);
+}
+__QAIC_STUB_EXPORT int __QAIC_STUB(dsp_relay_pwm_relay_close)(int fd) __QAIC_STUB_ATTRIBUTE {
+   uint32_t _mid = 27;
    return _stub_method_1(_dsp_relay_handle(), _mid, (uint32_t*)&fd);
 }
 #ifdef __cplusplus

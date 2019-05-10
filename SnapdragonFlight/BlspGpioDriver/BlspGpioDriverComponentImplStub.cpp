@@ -59,6 +59,10 @@ namespace SnapdragonFlight {
     exitThread(void) {
   }
   
+  void BlspGpioDriverComponentImpl ::
+    joinThread(void **value_ptr) {
+  }
+  
   BlspGpioDriverComponentImpl ::
     ~BlspGpioDriverComponentImpl(void)
   {

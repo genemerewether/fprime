@@ -147,6 +147,12 @@ namespace SnapdragonFlight {
         MVCamComponentBase::init(queueDepth, instance);
     }
 
+    int MVCamComponentImpl ::
+      spawnChild()
+    {
+        return MVCamComponentBase::spawnChild();
+    }
+
     //! Give the class its memory. Should be called after constructor
     //! and init, but before task is spawned.
     void MVCamComponentImpl ::

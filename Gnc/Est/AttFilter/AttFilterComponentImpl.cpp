@@ -194,8 +194,7 @@ namespace Gnc {
   {
       //TODO(mereweth) - report uninitialized status if params not good
     
-      if ((context == ATTFILTER_SCHED_CONTEXT_POS) ||
-          (context == ATTFILTER_SCHED_CONTEXT_ATT)) {
+      if (context == ATTFILTER_SCHED_CONTEXT_FILT) {
           using namespace ROS::geometry_msgs;
           this->attFilter.PropagateState();
           Eigen::Vector3d x_w(0, 0, 0);

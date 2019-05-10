@@ -1,0 +1,6 @@
+<commands>
+    <command kind="sync" opcode="0" mnemonic="AXSE3ADAP_InitParams">
+      <args>
+      </args>
+    </command>
+</commands>

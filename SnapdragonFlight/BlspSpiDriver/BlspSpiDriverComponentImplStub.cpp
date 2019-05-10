@@ -30,6 +30,14 @@ namespace SnapdragonFlight {
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
+    void BlspSpiDriverComponentImpl ::
+      SpiConfig_handler(
+          const NATIVE_INT_TYPE portNum,
+          U32 busSpeed
+      )
+    {
+    }
+      
     void BlspSpiDriverComponentImpl::SpiReadWrite_handler(
             const NATIVE_INT_TYPE portNum, Fw::Buffer &WriteBuffer,
             Fw::Buffer &readBuffer) {

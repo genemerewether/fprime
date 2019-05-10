@@ -21,6 +21,17 @@
 #include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Svc {
 
   // ----------------------------------------------------------------------
@@ -67,6 +78,7 @@ namespace Svc {
     )
   { 
       if (isConnected_DataOut_OutputPort(portNum)) {
+ 	  DEBUG_PRINT("active decoupler data out %d\n, portNum");
           this->DataOut_out(portNum, Buffer);
       }
   }

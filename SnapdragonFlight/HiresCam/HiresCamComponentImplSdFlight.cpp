@@ -88,6 +88,7 @@ namespace SnapdragonFlight {
             return;
         }
 
+#ifndef SOC_8096
         bool found = false;
 
         for (NATIVE_INT_TYPE i = 0; i < numCameras; i++) {
@@ -109,6 +110,9 @@ namespace SnapdragonFlight {
             this->log_WARNING_HI_HIRESCAM_CameraError(HIRESCAM_NO_CAMERA);
             return;
         }
+#else
+        cameraID = static_cast<NATIVE_INT_TYPE>(HIRESCAM_CAMERA_TYPE);
+#endif
 
         stat = camera::ICameraDevice::createInstance(cameraID, &m_cameraPtr);
         if (stat || (m_cameraPtr == NULL)) {
@@ -497,15 +501,9 @@ namespace SnapdragonFlight {
                     memcpy((void*)ptr, frame->data, minSize);
 
                     switch (i) {
-                        case HIRESCAM_UNPROC_OUT:
-                            // OK - buffer return handler resets size
-                            buff.setsize(minSize);
-                            DEBUG_PRINT("\nHiresCam sending image out on image port as Fw::Buffer; i = %d\n", i);
-                            this->UnprocSend_out(0, buff);
-                            break;
                         case HIRESCAM_PROC_OUT:
+                        case HIRESCAM_UNPROC_OUT:
                         {
-                            DEBUG_PRINT("\nHiresCam Sending image out on image port as CameraFrame; i = %d\n", i);
                             U32 offsets[3] = {0u, 0u, 0u};
                             U32 strides[3] = {0u, 0u, 0u};
                             Svc::CameraFrame camFrame;
@@ -601,14 +599,24 @@ namespace SnapdragonFlight {
                             Fw::ExternalSerializeBuffer extBuf(ptr + minSize,
                                                                Svc::CameraFrame::SERIALIZED_SIZE);
                             Fw::SerializeStatus serStat = camFrame.serialize(extBuf);
-                            if (serStat != Fw::FW_SERIALIZE_OK) {
-                                //TODO(mereweth) - warning
-                                this->m_buffSet[0][entry].available = true;
+
+                            if (HIRESCAM_PROC_OUT == i) {
+                                DEBUG_PRINT("\nHiresCam Sending image out on image port as CameraFrame; i = %d\n", i);
+                                if (serStat != Fw::FW_SERIALIZE_OK) {
+                                    //TODO(mereweth) - warning
+                                    this->m_buffSet[0][entry].available = true;
+                                }
+                                else {
+                                    Fw::Buffer outBuff(0, 0, (U64) (ptr + minSize),
+                                                       Svc::CameraFrame::SERIALIZED_SIZE);
+                                    this->ProcSend_out(0, outBuff);
+                                }
                             }
                             else {
-                                Fw::Buffer outBuff(0, 0, (U64) (ptr + minSize),
-                                                   Svc::CameraFrame::SERIALIZED_SIZE);
-                                this->ProcSend_out(0, outBuff);
+                                // OK - buffer return handler resets size
+                                buff.setsize(minSize);
+                                DEBUG_PRINT("\nHiresCam sending image out on image port as Fw::Buffer; i = %d\n", i);
+                                this->UnprocSend_out(0, buff);
                             }
                         } // this brace is just for scoping in the switch
                             break;

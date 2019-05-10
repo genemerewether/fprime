@@ -61,6 +61,8 @@ namespace SnapdragonFlight {
         //!
         ~KraitRouterComponentImpl(void);
 
+        void quit();
+      
         int buffRead(unsigned int* port, unsigned char* buff, int buffLen, int* bytes);
 
         // multiple serialized port calls
@@ -96,9 +98,6 @@ namespace SnapdragonFlight {
           Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
         );
 
-        // temporary buffer to get data out of handler
-        Fw::ExternalSerializeBuffer m_tempBuff;
-
         U32 m_localMsgSize;
 
         volatile enum InitState {
@@ -108,6 +107,7 @@ namespace SnapdragonFlight {
             KR_STATE_QUIT
         } m_initialized;
 
+        Os::Queue m_recvQueue;
         Os::Queue m_sendQueue;
     };
 

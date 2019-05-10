@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="ACKMNIFACE_Dummy" data_type="U32">
+        <comment>
+            ACKMNIFACE dummy channel
+        </comment>
+    </channel>
+</telemetry>

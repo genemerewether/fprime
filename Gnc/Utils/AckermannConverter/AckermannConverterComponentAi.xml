@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="AckermannConverter" kind="passive" namespace="Gnc">
+
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/ackermann_msgs/Ports/AckermannDriveStampedPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
+
+    <ports>
+        <port name="ackermann" data_type="ROS::ackermann_msgs::AckermannDriveStamped"  kind="sync_input" max_number="1">
+        </port>
+
+	    <port name="actuators" data_type="ROS::mav_msgs::Actuators"  kind="output" max_number="1">
+        </port>
+
+        <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        </port>
+
+        <port name="log" data_type="Fw::Log"  kind="output"    max_number="1">
+        </port>
+
+        <port name="logText" data_type="Fw::LogText"  kind="output"    max_number="1">
+        </port>
+
+        <port name="time" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port-->
+    </ports>
+
+</component>

@@ -17,7 +17,7 @@
             </comment>
         </port>
         <!-- Output Scheduler Ports -->
-        <port name="CycleOut" data_type="Cycle" kind="output" max_number="$RateGroupDriverRateGroupPorts">
+        <port name="CycleOut" data_type="Cycle" kind="output" max_number="5">
             <comment>
             Cycle output from the rate group driver
             </comment>

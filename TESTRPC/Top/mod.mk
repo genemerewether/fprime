@@ -1,1 +1,2 @@
-SRC = Topology.cpp
+SRC = Topology.cpp \
+	  HEXREFTopologyAppAi.xml

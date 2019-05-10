@@ -101,6 +101,7 @@ namespace SnapdragonFlight {
           return;
       }
 
+#ifndef SOC_8096
       bool found = false;
 
       for (NATIVE_INT_TYPE i = 0; i < numCameras; i++) {
@@ -124,6 +125,9 @@ namespace SnapdragonFlight {
           this->log_WARNING_HI_MVCAM_CameraError(MVCAM_NO_CAMERA);
           return;
       }
+#else
+        cameraID = static_cast<NATIVE_INT_TYPE>(MVCAM_CAMERA_TYPE);
+#endif
 
       stat = camera::ICameraDevice::createInstance(cameraID, &m_cameraPtr);
       if ((stat != 0) ||

@@ -173,8 +173,7 @@ namespace Gnc {
   {
       //TODO(mereweth) - report uninitialized status if params not good
     
-      if ((context == IMUINTEG_SCHED_CONTEXT_POS) ||
-          (context == IMUINTEG_SCHED_CONTEXT_ATT)) {
+      if (context == IMUINTEG_SCHED_CONTEXT_FILT) {
           using namespace ROS::geometry_msgs;
           this->imuInteg.PropagateState();
           Eigen::Vector3d x_w(0, 0, 0);

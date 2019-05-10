@@ -29,16 +29,20 @@ LINK_LIBS :=    --sysroot=$(HEXAGON_ARM_SYSROOT) \
 OPT_SPEED := -O3 -funroll-loops
 DEBUG := -g3
 
+LINARO_GNU_COMMON := -D SOC_$(TARGET_SOC)
+
 LINUX_GNU_CFLAGS := $(LINUX_FLAGS_COMMON) \
 			$(COMMON_DEFINES) \
 			$(GNU_CFLAGS_COMMON) \
-			$(FP_FLAGS)
+			$(FP_FLAGS) \
+	        $(LINARO_GNU_COMMON)
 
 LINUX_GNU_CXXFLAGS :=	$(LINUX_FLAGS_COMMON) \
 			-std=c++11 \
 			$(COMMON_DEFINES) \
 			$(GNU_CXXFLAGS_COMMON) \
-			$(FP_FLAGS)
+			$(FP_FLAGS) \
+	        $(LINARO_GNU_COMMON)
 
 COVERAGE := -fprofile-arcs -ftest-coverage
 

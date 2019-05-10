@@ -86,6 +86,8 @@
             <enum name="CameraFormatType">
                 <item name="CAMFMT_IMG_MVCAM_RAW" comment="10 bit MVCam"/>
                 <item name="CAMFMT_IMG_MVCAM_GRAY" comment="8 bit MVCam, grayscale"/>
+                <item name="CAMFMT_IMG_SCAM_RAW" comment="10 bit StereoCam"/>
+                <item name="CAMFMT_IMG_SCAM_GRAY" comment="8 bit StereoCam, grayscale"/>
                 <item name="CAMFMT_IMG_HIRES_RAW" comment="10 bit Hires"/>
                 <item name="CAMFMT_IMG_HIRES_GRAY" comment="8 bit Hires, grayscale"/>
                 <item name="CAMFMT_IMG_HIRES_YUV420SP" comment="8 bit Hires, 4:2:0, YUV"/>

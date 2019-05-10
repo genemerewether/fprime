@@ -2,7 +2,7 @@ SRC =
 
 SRC_SDFLIGHT = dsp_relay_stub.c
 
-SRC_DSPAL = dsp_relay_skel.c spi_relay.c dsp_relay_tests.c uart_relay.c gpio_relay.c
+SRC_DSPAL = dsp_relay_skel.c spi_relay.c dsp_relay_tests.c uart_relay.c gpio_relay.c i2c_relay.c pwm_relay.c
 
 SRC_DARWIN =  
 

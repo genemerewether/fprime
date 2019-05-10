@@ -74,7 +74,9 @@ namespace SnapdragonFlight {
   void MVVislamComponentImpl ::
     preamble(void)
   {
+#ifndef SOC_8096
       initHelper();
+#endif
   }
 
 
@@ -258,7 +260,8 @@ namespace SnapdragonFlight {
 	  this->x_b.setz(vio_pose.bodyPose.matrix[2][3]);
 	  
 	  this->m_errorCode = vio_pose.errorCode;
-          if (!this->m_errorCode) {
+          if ((!this->m_errorCode) &&
+	      (MV_TRACKING_STATE_HIGH_QUALITY == vio_pose.poseQuality)) {
               using namespace Eigen;
               using namespace ROS::std_msgs;
               using namespace ROS::mav_msgs;
@@ -267,7 +270,7 @@ namespace SnapdragonFlight {
               grav.normalize();
               Transform<float,3,Affine> odom_to_imu(AngleAxisf(3.14159, Vector3f::UnitY())
                                                     * AngleAxisf(acos(grav.dot(Vector3f::UnitZ())),
-                                                                 grav.cross(Vector3f::UnitZ())));
+								 grav.cross(Vector3f::UnitZ())));
               Transform<float,3,Affine> imu_start_to_imu;
               imu_start_to_imu.matrix() << vio_pose.bodyPose.matrix[0][0],
                 vio_pose.bodyPose.matrix[0][1],
@@ -445,7 +448,7 @@ namespace SnapdragonFlight {
   {
       if (m_initialized) {
 #ifdef BUILD_SDFLIGHT
-  	  mvVISLAM_Reset(m_mvVISLAMPtr, false);
+  	  mvVISLAM_Reset(m_mvVISLAMPtr, true);
 #endif //BUILD_SDFLIGHT
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
       }

@@ -4,6 +4,16 @@
 #include <Fw/Types/EightyCharString.hpp>
 #include <stdio.h>
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
 
 namespace Fw {
 
@@ -58,6 +68,10 @@ namespace Fw {
         // indicated that task is started
         comp->m_task.setStarted(true);
         // print out message when task is started
+#if FW_OBJECT_NAMES == 1
+	DEBUG_PRINT("after task start for name %s\n",
+		    comp->getObjName());
+#endif
         // printf("Active Component %s task started.\n",comp->getObjName());
         // call preamble
         comp->preamble();

@@ -1,3 +1,8 @@
+P1_MAP_OFFSET_PRM_SET, 0.0
+
+ACTADAP_InitParams
+
+
 ACCELGAIN_PRM_SET, 0.01
 BIASALPHA_PRM_SET, 0.01
 MAGGAIN_PRM_SET, 0.01
@@ -27,3 +32,15 @@ SAT_OMEGA__Z_PRM_SET, 9.0
 SAT_YAW_PRM_SET, 1.7
 
 LCTRL_InitParams
+
+
+DOROTX_PRM_SET, False # x in world frame; going between body frames
+DOROTV_PRM_SET, True # v in body frame; going between body frames
+
+FTFO_InitParams
+
+
+FLYSAFECYCLES_PRM_SET, 10000
+FLYSAFETIME_PRM_SET, 10.0
+
+ACTADAP_InitParams
