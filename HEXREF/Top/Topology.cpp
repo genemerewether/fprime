@@ -543,13 +543,11 @@ int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
 
 void run1backupCycle(void) {
 #ifdef DECOUPLE_RG
-#ifndef SOC_8096
     // call interrupt to emulate a clock
     Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-#endif
 #endif
     Os::Task::delay(100);
 }
@@ -607,7 +605,7 @@ void start_mpu9250() {
         DEBUG_PRINT("starting imu cycle %d\n", imuCycle++);
         Svc::TimerVal cycleStart;
         cycleStart.take();
-#ifdef SOC_8096
+#if 0
         Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
         port->invoke(cycleStart);
 #else

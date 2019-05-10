@@ -254,10 +254,10 @@
 	 <source component = "rgDev" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<!--connection name = "Connection42">
+<connection name = "Connection42">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "5"/>
  	 <target component = "actuatorAdapter" port = "sched" type = "Sched" num = "0"/>
-</connection-->
+</connection>
 <connection name = "Connection43">
 	 <source component = "mpu9250" port = "Imu" type = "ImuNoCov" num = "0"/>
  	 <target component = "imuProc" port = "HighRateImu" type = "ImuNoCov" num = "0"/>

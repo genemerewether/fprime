@@ -87,8 +87,6 @@ SRC_SDFLIGHT =  Posix/IPCQueue.cpp \
 				Posix/LocklessQueue.cpp \
 				Linux/FileSystem.cpp	
 
-# NOTE(mereweth) - condition vars cause problems on DSPAL
-
 SRC_DSPAL =     Pthreads/Queue.cpp \
 				Pthreads/BufferQueueCommon.cpp \
 				Pthreads/PriorityBufferQueue.cpp \

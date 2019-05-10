@@ -87,6 +87,15 @@ namespace SnapdragonFlight {
       quit(void)
     {
         m_initialized = KR_STATE_QUIT;
+        U8 msgBuff[sizeof(U32)];
+        Fw::ExternalSerializeBuffer msgSerBuff(msgBuff,sizeof(msgBuff));
+
+        Fw::SerializeStatus serStat = msgSerBuff.serialize((I32) 0);
+        FW_ASSERT(serStat == Fw::FW_SERIALIZE_OK, serStat);
+
+        // unblock the queue
+        Os::Queue::QueueStatus qStatus =
+          this->m_recvQueue.send(msgSerBuff, 0, Os::Queue::QUEUE_NONBLOCKING);
     }
   
     KraitRouterComponentImpl ::
@@ -132,34 +141,38 @@ namespace SnapdragonFlight {
             return KR_RTN_FASTRPC_FAIL;
         }
 
-        Fw::ExternalSerializeBuffer msg(buff, buffLen);
+        Fw::ExternalSerializeBuffer rpcBuf(buff, buffLen);
+        
         NATIVE_INT_TYPE priority;
 
         // NOTE(mereweth) - BLOCKING!!!
-        while ((msg.getBuffCapacity() - msg.getBuffLength())
+        while ((rpcBuf.getBuffCapacity() - rpcBuf.getBuffLength())
                >= this->m_localMsgSize) {
             if (KR_STATE_QUIT == this->m_initialized) {
                 return KR_RTN_QUIT;
             }
             // TODO(mereweth) - probably should push the quit code through the queue
-            
+
+            Fw::ExternalSerializeBuffer msg(rpcBuf.getBuffAddrSer(), this->m_localMsgSize);
             Os::Queue::QueueStatus msgStatus = this->m_recvQueue.receive(msg,
                                             priority, Os::Queue::QUEUE_BLOCKING);
-            DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d\n",
-                        (unsigned long) this, this->m_initialized,
-                        msg.getBuffCapacity() - msg.getBuffLength());
+            if (KR_STATE_QUIT == this->m_initialized) {
+                return KR_RTN_QUIT;
+            }
+            DEBUG_PRINT("buffLeft %d, got size %u\n",
+                        rpcBuf.getBuffCapacity() - rpcBuf.getBuffLength(),
+                        msg.getBuffLength());
+            Fw::SerializeStatus serStat = rpcBuf.setBuffLen(rpcBuf.getBuffLength() + msg.getBuffLength());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == serStat, serStat);
             FW_ASSERT(
                 msgStatus == Os::Queue::QUEUE_OK,
                 static_cast<AssertArg>(msgStatus)
             );
         }
 
-        *bytes = msg.getBuffLength();
+        *bytes = rpcBuf.getBuffLength();
 
-        DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d, returning %d bytes\n",
-                    (unsigned long) this, this->m_initialized,
-                    msg.getBuffCapacity() - msg.getBuffLength(),
-                    *bytes);
+        DEBUG_PRINT("returning %d bytes\n", *bytes);
 
         return KR_RTN_OK;
     }

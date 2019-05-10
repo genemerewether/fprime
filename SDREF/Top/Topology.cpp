@@ -704,7 +704,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #endif
 
     // NOTE(mereweth) - putting this near the top in case we want to fork in ipcRelay instead
-    ipcRelay_ptr->start(0,30,20*1024);
+    ipcRelay_ptr->start(0,30,20*1024, CORE_CAM);
 
     // Active component startup
     // start rate groups
@@ -838,6 +838,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
         hiresCam_ptr->exit();
         hiresCam_ptr->deallocateBuffers(hiresMallocator);
         hiresCam_ptr->join(NULL);
+        DEBUG_PRINT("After hires thread quit\n");
 #if defined TGT_OS_TYPE_LINUX
         return;
     }
@@ -849,17 +850,21 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
         stereoCam_ptr->exit();
         stereoCam_ptr->deallocateBuffers(hiresMallocator);
         stereoCam_ptr->join(NULL);
+        DEBUG_PRINT("After stereo thread quit\n");
 #if defined TGT_OS_TYPE_LINUX
         return;
     }
 #endif
 
     ipcRelay_ptr->exit();
+    DEBUG_PRINT("After IPCRelay thread quit\n");
 
     mvCam_ptr->exit();
     mvCam_ptr->deallocateBuffers(buffMallocator);
     mvCam_ptr->join(NULL);
+    DEBUG_PRINT("After mvcam thread quit\n");
     hexRouter_ptr->quitReadThreads();
+    DEBUG_PRINT("After HexRouter read thread quit\n");
 
     buffAccumMVCamUnproc_ptr->deallocateQueue(buffMallocator);
     buffAccumHiresCamUnproc_ptr->deallocateQueue(buffMallocator);
@@ -882,7 +887,6 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     llRouter_ptr->exit();
     serialTextConv_ptr->exit();
 
-    DEBUG_PRINT("After HexRouter read thread quit\n");
     snapHealth_ptr->exit();
     rgTlm_ptr->exit();
     rgXfer_ptr->exit();
