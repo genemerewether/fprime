@@ -18,6 +18,8 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
+#define HEX_ROUTER
+
 extern "C" {
     int main(int argc, char* argv[]);
 };
@@ -108,7 +110,7 @@ int main(int argc, char* argv[]) {
     if (!noInit) {
         hexref_init();
     }
-#if 0
+#ifdef HEX_ROUTER
     DEBUG_PRINT("Starting HexRouter\n");
     hexRouter.init(10, 200);
     hexRouter.start(0, 90, 20*1024, 0);
@@ -118,8 +120,10 @@ int main(int argc, char* argv[]) {
         Os::TaskString task_name("HEXRPC");
         DEBUG_PRINT("Starting cycler on hexagon\n");
         task.start(task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_run, NULL);
-	waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
     }
+#ifdef SOC_8074
+    waiter.start(waiter_task_name, 0, 10, 20*1024, (Os::Task::taskRoutine) hexref_wait, NULL);
+#endif
     
 #else
     if (hexCycle) {
@@ -140,7 +144,7 @@ int main(int argc, char* argv[]) {
         while (!terminate) {
             DEBUG_PRINT("Waiting on Krait\n");
 
-#if 0
+#ifdef HEX_ROUTER
             Fw::ExternalSerializeBuffer bufObj;
             char buf[200] = {"hi"};
             DEBUG_PRINT("Contents of buf: %s\n", buf);
@@ -162,19 +166,21 @@ int main(int argc, char* argv[]) {
     }
 #endif //BUILD_SDFLIGHT
 
+#ifdef HEX_ROUTER
     DEBUG_PRINT("Quitting hexrouter read threads\n");
-#if 0
     hexRouter.quitReadThreads();
-    //hexRouter.exit();
+    hexRouter.exit();
 #endif //BUILD_SDFLIGHT
 
     if (hexCycle) {
         DEBUG_PRINT("Waiting for the runner to return\n");
         FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
-	FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
+        
+#ifdef SOC_8074
+        DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
+        FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
+#endif
     }
-
-    DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
 
     return 0;
 }

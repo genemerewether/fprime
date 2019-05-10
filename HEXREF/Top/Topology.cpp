@@ -2,7 +2,6 @@
 
 
 #include <Fw/Types/Assert.hpp>
-#include <HEXREF/Top/TargetInit.hpp>
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
@@ -32,6 +31,7 @@
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
+#define DECOUPLE_RG
 #define DECOUPLE_ACTUATORS
 
 // Registry
@@ -326,7 +326,14 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(void) {  
+void manualConstruct(void) {
+#ifdef DECOUPLE_RG
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(1, rgDecouple_ptr->get_CycleIn_InputPort(0));
+    rgDecouple_ptr->set_CycleOut_OutputPort(0, rgGncDrv_ptr->get_CycleIn_InputPort(0));
+#else
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(1, rgGncDrv_ptr->get_CycleIn_InputPort(0));
+#endif
+  
     // Manual connections
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
@@ -388,8 +395,6 @@ void manualConstruct(void) {
 void constructApp() {
     allocComps();
 
-    localTargetInit();
-
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
 #endif
@@ -400,9 +405,9 @@ void constructApp() {
 
     // Initialize the rate groups
     rgDecouple_ptr->init(10, 0); // designed to drop if full
-    imuDataPasser_ptr->init(1000, 400); // big entries for IMU
-    imuDecouple_ptr->init(1000, 20); // just need to serialize cycle port
-    actDecouple_ptr->init(1000, 500); // big message queue entry, few entries
+    imuDataPasser_ptr->init(100, 400); // big entries for IMU
+    imuDecouple_ptr->init(100, 20); // just need to serialize cycle port
+    actDecouple_ptr->init(100, 500); // big message queue entry, few entries
     rgAtt_ptr->init(1);
     rgPos_ptr->init(0);
     rgTlm_ptr->init(2);
@@ -498,10 +503,14 @@ void constructApp() {
 
     // Active component startup
     imuDecouple_ptr->start(0, 91, 20*1024);
-    // NOTE(mereweth) - GNC att & pos loops run in this thread:
+#ifdef DECOUPLE_RG
+    // NOTE(mereweth) - GNC att & pos loops run in this thread on 801:
     rgDecouple_ptr->start(0, 90, 20*1024);
+#endif
+#ifdef DECOUPLE_ACTUATORS
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
     actDecouple_ptr->start(0, 89, 20*1024);
+#endif
 
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
@@ -533,24 +542,30 @@ int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
 }
 
 void run1backupCycle(void) {
+#ifdef DECOUPLE_RG
 #ifndef SOC_8096
     // call interrupt to emulate a clock
     Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(100);
 #endif
+#endif
+    Os::Task::delay(100);
 }
 
 void exitTasks(void) {
+    kraitRouter_ptr->quit();
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->exit();
+#endif
     imuDecouple_ptr->exit();
+#ifdef DECOUPLE_ACTUATORS
     actDecouple_ptr->exit();
+#endif
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif
-    kraitRouter_ptr->exit();
 }
 
 volatile bool terminate = false;
@@ -586,20 +601,23 @@ int hexref_init(void) {
     return 0;
 }
 
-void start_mpu9250() {    
+void start_mpu9250() {
+    int imuCycle = 0;
     while (!mpu9250_ptr->isReady()) {
+        DEBUG_PRINT("starting imu cycle %d\n", imuCycle++);
         Svc::TimerVal cycleStart;
         cycleStart.take();
-        
-        //Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        //port->invoke(cycleStart);
-
+#ifdef SOC_8096
+        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
+        port->invoke(cycleStart);
+#else
         Fw::InputSerializePort* serPort = imuDecouple_ptr->get_DataIn_InputPort(0);
         Fw::ExternalSerializeBuffer bufObj;
         char buf[18];
         bufObj.setExtBuffer((U8*) buf, sizeof(buf));
         bufObj.serialize(cycleStart);
         serPort->invokeSerial(bufObj);
+#endif
         
         Os::Task::delay(10);
     }
@@ -613,17 +631,21 @@ int hexref_run(void) {
     }
     
     start_mpu9250();
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(true);
+#endif
     
     int backupCycle = 0;
 
     while (!terminate) {
+        DEBUG_PRINT("running cycle %d\n", backupCycle++);
         run1backupCycle();
-        backupCycle++;
     }
 
     // stop tasks
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(false);
+#endif
     exitTasks();
     // Give time for threads to exit
     DEBUG_PRINT("Waiting for threads...\n");
@@ -642,12 +664,16 @@ int hexref_cycle(unsigned int backupCycles) {
     }
 
     start_mpu9250();
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(true);
+#endif
     for (unsigned int i = 0; i < backupCycles; i++) {
         if (terminate) break;
         run1backupCycle();
     }
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(false);
+#endif
     DEBUG_PRINT("hexref_cycle returning\n");
 
     return 0;

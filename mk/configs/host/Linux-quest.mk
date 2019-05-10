@@ -25,7 +25,7 @@ HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.1
 HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
 INDIGO_ARM_SYSROOT := $(HEXAGON_ARM_SYSROOT)
 
-FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=softfp
+FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon-vfpv4 -mfloat-abi=softfp
 
 MULTIARCH_TUPLE :=
 

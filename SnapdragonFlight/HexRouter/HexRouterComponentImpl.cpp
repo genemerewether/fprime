@@ -248,7 +248,6 @@ namespace SnapdragonFlight {
                 DEBUG_PRINT("After rpc_relay_port_read() at %d %d; quit? %d\n",
                             stime.tv_sec, stime.tv_nsec, comp->m_quitReadThreads);
 
-                // TODO(mereweth) - is this the best strategy for performance? Favor the DSP
                 // check for timeout
                 if ((stat == KR_RTN_OK) &&
                     (sizeRead == 0))     {
@@ -256,7 +255,6 @@ namespace SnapdragonFlight {
                         waiting = false;
                         break;
                     }
-                    usleep(HR_NO_MSG_SLEEP_US);
                 } else { // quit if other error or if data received
                     waiting = false;
                 }

@@ -50,9 +50,9 @@ namespace SnapdragonFlight {
                                  compName
     #endif
                                  ),
-        m_tempBuff(),
         m_localMsgSize(0u),
         m_initialized(KR_STATE_PREINIT),
+        m_recvQueue(),
         m_sendQueue()
     {
 
@@ -65,9 +65,9 @@ namespace SnapdragonFlight {
           const NATIVE_INT_TYPE instance
       )
     {
-        KraitRouterComponentBase::init(queueDepth, msgSize, instance);
+        KraitRouterComponentBase::init(instance);
 
-        m_localMsgSize = msgSize + 2 * sizeof(U32);
+        m_localMsgSize = msgSize + sizeof(U32);
 
         Fw::EightyCharString queueName;
 #if FW_OBJECT_NAMES == 1
@@ -77,15 +77,21 @@ namespace SnapdragonFlight {
         (void)snprintf(queueNameChar,sizeof(queueNameChar),"CompQ_%d",Os::Queue::getNumQueues());
         queueName = queueNameChar;
 #endif
+        m_recvQueue.create(queueName, queueDepth, m_localMsgSize);
         m_sendQueue.create(queueName, queueDepth, m_localMsgSize);
 
         m_initialized = KR_STATE_INIT;
     }
 
+    void KraitRouterComponentImpl ::
+      quit(void)
+    {
+        m_initialized = KR_STATE_QUIT;
+    }
+  
     KraitRouterComponentImpl ::
       ~KraitRouterComponentImpl(void)
     {
-        m_initialized = KR_STATE_QUIT;
     }
 
     int KraitRouterComponentImpl::buffRead(unsigned int* port,
@@ -111,6 +117,8 @@ namespace SnapdragonFlight {
     int KraitRouterComponentImpl::portRead(unsigned char* buff,
                                            int buffLen,
                                            int* bytes) {
+        DEBUG_PRINT("portRead called on object 0x%X, init %d\n",
+                    (unsigned long) this, this->m_initialized);
         while (this->m_initialized == KR_STATE_PREINIT) {
             // queue isn't initialized yet so we have no choice but to sleep.
             usleep(KR_PREINIT_SLEEP_US);
@@ -123,26 +131,34 @@ namespace SnapdragonFlight {
         if (buffLen < 0) {
             return KR_RTN_FASTRPC_FAIL;
         }
-        this->m_tempBuff.setExtBuffer(buff,
-                                      static_cast<unsigned int>(buffLen));
-        this->m_tempBuff.resetSer();
 
-        Fw::QueuedComponentBase::MsgDispatchStatus msgStat = Fw::QueuedComponentBase::MSG_DISPATCH_OK;
-        // dequeue any pending messages
-        while ((msgStat != Fw::QueuedComponentBase::MSG_DISPATCH_EMPTY) &&
-               ((this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength())
-                >= this->m_localMsgSize)) {
-            msgStat = this->doDispatch();
-            if (msgStat == Fw::QueuedComponentBase::MSG_DISPATCH_EXIT) {
+        Fw::ExternalSerializeBuffer msg(buff, buffLen);
+        NATIVE_INT_TYPE priority;
+
+        // NOTE(mereweth) - BLOCKING!!!
+        while ((msg.getBuffCapacity() - msg.getBuffLength())
+               >= this->m_localMsgSize) {
+            if (KR_STATE_QUIT == this->m_initialized) {
                 return KR_RTN_QUIT;
             }
+            // TODO(mereweth) - probably should push the quit code through the queue
+            
+            Os::Queue::QueueStatus msgStatus = this->m_recvQueue.receive(msg,
+                                            priority, Os::Queue::QUEUE_BLOCKING);
+            DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d\n",
+                        (unsigned long) this, this->m_initialized,
+                        msg.getBuffCapacity() - msg.getBuffLength());
+            FW_ASSERT(
+                msgStatus == Os::Queue::QUEUE_OK,
+                static_cast<AssertArg>(msgStatus)
+            );
         }
 
-        *bytes = this->m_tempBuff.getBuffLength();
+        *bytes = msg.getBuffLength();
 
-        DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d, msgStat %d, returning %d bytes\n",
+        DEBUG_PRINT("portRead object 0x%X, init %d, buffLeft %d, returning %d bytes\n",
                     (unsigned long) this, this->m_initialized,
-                    this->m_tempBuff.getBuffCapacity() - this->m_tempBuff.getBuffLength(), msgStat,
+                    msg.getBuffCapacity() - msg.getBuffLength(),
                     *bytes);
 
         return KR_RTN_OK;
@@ -168,9 +184,9 @@ namespace SnapdragonFlight {
 
         Os::Queue::QueueStatus qStatus =
           this->m_sendQueue.send(buff, buffLen, 0, Os::Queue::QUEUE_NONBLOCKING);
-	if (Os::Queue::QUEUE_FULL == qStatus) {
-	    return KR_RTN_SEND_FULL;
-	}
+        if (Os::Queue::QUEUE_FULL == qStatus) {
+            return KR_RTN_SEND_FULL;
+        }
         FW_ASSERT(
             qStatus == Os::Queue::QUEUE_OK,
             static_cast<AssertArg>(qStatus)
@@ -190,6 +206,8 @@ namespace SnapdragonFlight {
       )
     {
         for (int i = 0; i < KR_SCHED_MAX_ITER; i++) {
+            DEBUG_PRINT("sched iter %d called on object 0x%X, init %d\n",
+                        i, (unsigned long) this, this->m_initialized);
             U8 msgBuff[this->m_localMsgSize];
             Fw::ExternalSerializeBuffer msg(msgBuff,this->m_localMsgSize);
             NATIVE_INT_TYPE priority;
@@ -254,16 +272,31 @@ namespace SnapdragonFlight {
           Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
       )
     {
-        // NOTE(mereweth) - called from FastRPC portRead thread
+        // NOTE(mereweth) - called from DSP spawned thread; read from FastRPC thread
         DEBUG_PRINT("HexPortsIn_handler for port %d with %d bytes\n",
                     portNum, Buffer.getBuffLength());
 
-        Fw::SerializeStatus stat = this->m_tempBuff.serialize(portNum);
-        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK);
-        // serializes length and copies contents
-        stat = this->m_tempBuff.serialize(Buffer);
-        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK);
+        if (Buffer.getBuffLength() > this->m_localMsgSize) {
+            DEBUG_PRINT("HexPort greater than max msg size\n");
+            return;
+        }
 
+        U8 msgBuff[this->m_localMsgSize];
+        Fw::ExternalSerializeBuffer msgSerBuff(msgBuff,this->m_localMsgSize);
+
+        Fw::SerializeStatus serStat = msgSerBuff.serialize(portNum);
+        FW_ASSERT(serStat == Fw::FW_SERIALIZE_OK, serStat);
+        serStat = msgSerBuff.serialize(Buffer);
+        FW_ASSERT(serStat == Fw::FW_SERIALIZE_OK, serStat);
+        
+        Os::Queue::QueueStatus qStatus =
+          this->m_recvQueue.send(msgSerBuff, 0, Os::Queue::QUEUE_NONBLOCKING);
+        if (qStatus == Os::Queue::QUEUE_FULL) {
+            DEBUG_PRINT("hexports full, dropping\n");
+            return;
+        }
+        FW_ASSERT(Os::Queue::QUEUE_OK == qStatus, qStatus);
+    
         DEBUG_PRINT("HexPortsIn_handler done port %d with %d bytes\n",
                     portNum, Buffer.getBuffLength());
     }

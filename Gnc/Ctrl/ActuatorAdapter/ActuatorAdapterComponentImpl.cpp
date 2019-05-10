@@ -990,51 +990,6 @@ namespace Gnc {
                   //TODO(mereweth) - DEBUG_PRINT
                   FW_ASSERT(0, this->outputInfo[i].type);
           }
-
-          switch (i) {
-              case 0:
-                  this->tlmWrite_ACTADAP_Rot0(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd0(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel0(angVels[i]);
-                  break;
-              case 1:
-                  this->tlmWrite_ACTADAP_Rot1(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd1(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel1(angVels[i]);
-                  break;
-              case 2:
-                  this->tlmWrite_ACTADAP_Rot2(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd2(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel2(angVels[i]);
-                  break;
-              case 3:
-                  this->tlmWrite_ACTADAP_Rot3(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd3(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel3(angVels[i]);
-                  break;
-              case 4:
-                  this->tlmWrite_ACTADAP_Rot4(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd4(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel4(angVels[i]);
-                  break;
-              case 5:
-                  this->tlmWrite_ACTADAP_Rot5(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd5(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel5(angVels[i]);
-                  break;
-              case 6:
-                  this->tlmWrite_ACTADAP_Rot6(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd6(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel6(angVels[i]);
-                  break;
-              case 7:
-                  this->tlmWrite_ACTADAP_Rot7(this->outputInfo[i].feedback.angVel);
-                  this->tlmWrite_ACTADAP_Cmd7(this->outputInfo[i].feedback.cmd);
-                  this->tlmWrite_ACTADAP_CmdVel7(angVels[i]);
-                  break;
-              default:
-                  break;
-          }
       }
   }
 
@@ -1085,6 +1040,38 @@ namespace Gnc {
       if (ACTADAP_SCHED_CONTEXT_TLM == context) {
           this->tlmWrite_ACTADAP_ArmState(static_cast<ArmStateTlm>(this->armedState));
           this->tlmWrite_ACTADAP_HwEnabled(hwEnabled);
+
+          this->tlmWrite_ACTADAP_Rot0(this->outputInfo[0].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd0(this->outputInfo[0].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel0(this->outputInfo[0].feedback.cmdIn);
+
+          this->tlmWrite_ACTADAP_Rot1(this->outputInfo[1].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd1(this->outputInfo[1].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel1(this->outputInfo[1].feedback.cmdIn);
+
+          this->tlmWrite_ACTADAP_Rot2(this->outputInfo[2].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd2(this->outputInfo[2].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel2(this->outputInfo[2].feedback.cmdIn);
+
+          this->tlmWrite_ACTADAP_Rot3(this->outputInfo[3].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd3(this->outputInfo[3].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel3(this->outputInfo[3].feedback.cmdIn);
+
+          this->tlmWrite_ACTADAP_Rot4(this->outputInfo[4].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd4(this->outputInfo[4].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel4(this->outputInfo[4].feedback.cmdIn);
+
+          this->tlmWrite_ACTADAP_Rot5(this->outputInfo[5].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd5(this->outputInfo[5].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel5(this->outputInfo[5].feedback.cmdIn);
+
+          this->tlmWrite_ACTADAP_Rot6(this->outputInfo[6].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd6(this->outputInfo[6].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel6(this->outputInfo[6].feedback.cmdIn);
+
+          this->tlmWrite_ACTADAP_Rot7(this->outputInfo[7].feedback.angVel);
+          this->tlmWrite_ACTADAP_Cmd7(this->outputInfo[7].feedback.cmd);
+          this->tlmWrite_ACTADAP_CmdVel7(this->outputInfo[7].feedback.cmdIn);
       }
       else if ((ACTADAP_SCHED_CONTEXT_ARM == context) &&
                (ARMING == this->armedState)) {

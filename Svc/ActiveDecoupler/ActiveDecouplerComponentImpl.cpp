@@ -29,8 +29,8 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
-#undef DEBUG_PRINT
-#define DEBUG_PRINT(x,...)
+//#undef DEBUG_PRINT
+//#define DEBUG_PRINT(x,...)
 
 namespace Svc {
 

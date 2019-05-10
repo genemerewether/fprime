@@ -20,9 +20,11 @@ void HAP_debug(const char *msg, int level, const char *filename, int line) { }
 void HAP_power_request(int a, int b, int c) { }
 
 int sem_init(sem_t *, int, unsigned int) {  return 0;  }
+int sem_trywait(sem_t *) {  return 0;  }
 int sem_wait(sem_t *) {  return 0;  }
 int sem_getvalue(sem_t *, int *) {  return 0;  }
 int sem_post(sem_t *) {  return 0;  }
+int sem_destroy(sem_t *) {  return 0;  }
 
 int tcgetattr(int, struct termios *) {  return 0;  }
 int tcsetattr(int, int,
