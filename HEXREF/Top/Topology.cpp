@@ -494,7 +494,8 @@ void constructApp() {
     
     // TODO(mereweth) - hardware enable pin
 
-    // TODO(mereweth) - I2C port
+    // J10, SSC I2C 2, sonar pinout
+    i2cDrv_ptr->open(2, Drv::I2C_FREQUENCY_400KHZ);
 
     // TODO(mereweth) - Spektrum UART and binding GPIO
     // TODO(mereweth) - PWM pins
@@ -593,7 +594,6 @@ int hexref_init(void) {
 
     //dumparch();
 
-    Os::Task::delay(1000);
     preinit = false;
 
     return 0;
