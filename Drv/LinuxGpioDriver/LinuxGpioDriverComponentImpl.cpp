@@ -407,7 +407,10 @@ namespace Drv {
       this->m_quitThread = true;
   }
 
-
+  void LinuxGpioDriverComponentImpl ::
+    joinThread(void **value_ptr) {
+      this->m_intTask.join(value_ptr);
+  }
 
   LinuxGpioDriverComponentImpl ::
     ~LinuxGpioDriverComponentImpl(void)

@@ -411,7 +411,8 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(bool internalIMUProp) {  
+void manualConstruct(bool internalIMUProp,
+                     bool externalIMU) {  
     // switch based on command line options
     if (internalIMUProp) {
         attFilter_ptr->set_odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
@@ -425,8 +426,13 @@ void manualConstruct(bool internalIMUProp) {
     imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
 
     // passive data passer
-    imuProc_ptr->set_DownsampledImu_OutputPort(0, passiveDataPasser_ptr->get_DataIn_InputPort(0));
-    passiveDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+    if (externalIMU) {
+        filterIface_ptr->set_Imu_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+    }
+    else {
+        imuProc_ptr->set_DownsampledImu_OutputPort(0, passiveDataPasser_ptr->get_DataIn_InputPort(0));
+        passiveDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+    }
 
     // TODO(Mereweth) - all connections into passive rgs from another thread
     const U32 NUM_CMD_PORTS = Svc::CommandDispatcherImpl::NUM_CMD_PORTS;
@@ -494,10 +500,11 @@ void manualConstruct(bool internalIMUProp) {
 }
 
 void constructApp(unsigned int port_number,
-          char* hostname,
+                  char* hostname,
                   unsigned int boot_count,
-          bool startSocketNow,
-          bool internalIMUProp) {
+                  bool startSocketNow,
+                  bool internalIMUProp,
+                  bool externalIMU) {
     allocComps();
 
     localTargetInit();
@@ -556,8 +563,8 @@ void constructApp(unsigned int port_number,
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
     
-    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ);
-    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ);
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ);
+    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ);
 
     spiDrvSnap_ptr->init(0);
     i2cDrvSnap_ptr->init(0);
@@ -579,7 +586,8 @@ void constructApp(unsigned int port_number,
     // Connect rate groups to rate group driver
     constructBLIMPREFArchitecture();
 
-    manualConstruct(internalIMUProp);
+    manualConstruct(internalIMUProp,
+                    externalIMU);
 
     /* Register commands */
     fatalHandler_ptr->regCommands();
@@ -663,9 +671,9 @@ void constructApp(unsigned int port_number,
     // Initialize socket server
     if (port_number && hostname) {
         if (startSocketNow) {
-        sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-        sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
     
@@ -720,7 +728,7 @@ void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
           "-p\tport_number\n"
           "-a\thostname/IP address\n"
-          "-i\tUse odometry from internal IMU propagation\n"
+          "-i\tUse internal IMU\n"
           "-b\tBoot count\n"
           "-s\tStart socket immediately\n");
 }
@@ -752,7 +760,8 @@ int main(int argc, char* argv[]) {
     char *hostname = NULL;
     bool startSocketNow = false;
     U32 boot_count = 0;
-    bool internalIMUProp = false;
+    bool internalIMUProp = true;
+    bool externalIMU = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
@@ -776,7 +785,7 @@ int main(int argc, char* argv[]) {
                 startSocketNow = true;
                 break;
             case 'i':
-                internalIMUProp = true;
+                externalIMU = false;
                 break;
             case '?':
                 return 1;
@@ -794,9 +803,10 @@ int main(int argc, char* argv[]) {
     (void) printf("Hit Ctrl-C to quit\n");
     
     constructApp(port_number,
-         hostname, boot_count,
-         startSocketNow,
-         internalIMUProp);
+                 hostname, boot_count,
+                 startSocketNow,
+                 internalIMUProp,
+                 externalIMU);
     //dumparch();
     
     ros::start();
