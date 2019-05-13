@@ -1,3 +1,10 @@
+#
+#   Copyright 2004-2008, by the California Institute of Technology.
+#   ALL RIGHTS RESERVED. United States Government Sponsorship
+#   acknowledged.
+#
+#
+
 SRC = 			TaskCommon.cpp \
 				TaskString.cpp \
 				QueueCommon.cpp \
@@ -5,8 +12,9 @@ SRC = 			TaskCommon.cpp \
 				IPCQueueCommon.cpp \
 				SimpleQueueRegistry.cpp \
 				MemCommon.cpp \
+				ValidateFileCommon.cpp \
 				ValidatedFile.cpp \
-				ValidateFileCommon.cpp 
+				FileCommon.cpp
 
 HDR = 			Queue.hpp \
 				IPCQueue.hpp \
@@ -20,13 +28,13 @@ HDR = 			Queue.hpp \
 				Mutex.hpp \
 				File.hpp \
 				ValidateFile.hpp \
-				ValidatedFile.hpp \
 				FileSystem.hpp \
-				LocklessQueue.hpp
+				LocklessQueue.hpp \
+				ValidatedFile.hpp
 
 SRC_LINUX=      Posix/IPCQueue.cpp \
-		Pthreads/Queue.cpp \
-		Pthreads/BufferQueueCommon.cpp \
+               	Pthreads/Queue.cpp \
+               	Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
 				Linux/File.cpp \
@@ -40,8 +48,8 @@ SRC_LINUX=      Posix/IPCQueue.cpp \
 				Linux/FileSystem.cpp \
 				Posix/LocklessQueue.cpp
 
-SRC_DARWIN =   	MacOs/IPCQueueStub.cpp \ # NOTE(mereweth) - provide a stub that only works in single-process, not IPC
-		Pthreads/Queue.cpp \
+SRC_DARWIN =    MacOs/IPCQueueStub.cpp \ # NOTE(mereweth) - provide a stub that only works in single-process, not IPC
+               	Pthreads/Queue.cpp \
                 Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
@@ -57,7 +65,7 @@ SRC_DARWIN =   	MacOs/IPCQueueStub.cpp \ # NOTE(mereweth) - provide a stub that 
 				Posix/LocklessQueue.cpp
 
 SRC_CYGWIN =    Pthreads/Queue.cpp \
-		Pthreads/BufferQueueCommon.cpp \
+               	Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
 				Linux/File.cpp \
@@ -72,8 +80,8 @@ SRC_CYGWIN =    Pthreads/Queue.cpp \
 				Posix/LocklessQueue.cpp
 
 SRC_SDFLIGHT =  Posix/IPCQueue.cpp \
-		Pthreads/Queue.cpp \
-		Pthreads/BufferQueueCommon.cpp \
+                Pthreads/Queue.cpp \
+                Pthreads/BufferQueueCommon.cpp \
                 Pthreads/PriorityBufferQueue.cpp \
                 Pthreads/MaxHeap/MaxHeap.cpp \
 				Linux/File.cpp \

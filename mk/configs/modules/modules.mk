@@ -59,7 +59,7 @@ COMMON_MODULES := \
 	Common/Ports
 
 OS_MODULES := \
-	Os
+	Os 
 
 CFDP_MODULES := \
 	CFDP/Checksum
@@ -75,9 +75,9 @@ SVC_EXTRA_MODULES := \
 	Svc/ImgTlm
 
 SVC_MODULES := \
-	Svc/BufferManager \
 	Svc/BufferAccumulator \
 	Svc/BufferLogger \
+	Svc/BufferManager \
 	Svc/CmdDispatcher \
 	Svc/CmdSequencer \
 	Svc/Seq \
@@ -98,6 +98,7 @@ SVC_MODULES := \
 	Svc/Time \
 	Svc/Cycle \
 	Svc/LinuxTime \
+	Svc/LinuxTimer \
 	Svc/ActiveLogger \
 	Svc/Fatal \
 	Svc/PolyIf \
@@ -121,9 +122,12 @@ SVC_MODULES := \
 	Svc/CameraFrame \
 	Svc/IPCRelay
 
-DRV_MODULES := \
+DEMO_DRV_MODULES := \
 	Drv/DataTypes \
 	Drv/BlockDriver \
+	Drv/GpioDriverPorts
+		
+LINUX_DRV_MODULES := \
 	Drv/LinuxGpioDriver \
 	Drv/LinuxPwmDriver \
 	Drv/LinuxSerialDriver \
@@ -275,426 +279,96 @@ Ref_MODULES := \
 	\
 	$(SVC_MODULES) \
 	\
-	$(DRV_MODULES) \
+	$(DEMO_DRV_MODULES) \
 	\
 	$(FW_MODULES) \
 	\
 	$(OS_MODULES) \
 	\
 	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-BLIMPREF_DEPLOYMENT_MODULES := \
-	BLIMPREF/Top
-
-BLIMPREF_MODULES := \
-	\
-	$(BLIMPREF_DEPLOYMENT_MODULES) \
-	\
-	Drv/ForceTorque/ATINetbox \
-	Drv/IMU/MPU9250 \
-	\
-	$(ZMQ_MODULES) \
-	\
-	$(HLPROC_MODULES) \
-	$(HLPROC_ROS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	$(QUEST_GNC_ROSIFACE_MODULES) \
-	\
-	$(SNAPDRAGON_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(SVC_EXTRA_MODULES) \
-	\
-	$(DRV_MODULES) \
-	\
-	$(ROS_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-CARREF_DEPLOYMENT_MODULES := \
-	CARREF/Top
-
-CARREF_MODULES := \
-	\
-	$(CARREF_DEPLOYMENT_MODULES) \
-	\
-	Drv/ForceTorque/ATINetbox \
-	Drv/IMU/MPU9250 \
-	\
-	$(ZMQ_MODULES) \
-	\
-	$(HLPROC_MODULES) \
-	$(HLPROC_ROS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	$(QUEST_GNC_ROSIFACE_MODULES) \
-	\
-	$(SNAPDRAGON_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(SVC_EXTRA_MODULES) \
-	\
-	$(DRV_MODULES) \
-	\
-	$(ROS_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-SDREF_DEPLOYMENT_MODULES := \
-	HEXREF/Rpc \
-	SDREF/Top
-
-SDREF_MODULES := \
-	\
-	$(SDREF_DEPLOYMENT_MODULES) \
-	\
-	Drv/ForceTorque/ATINetbox \
-	\
-	$(ZMQ_MODULES) \
-	\
-	$(HLPROC_MODULES) \
-	$(HLPROC_ROS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	$(QUEST_GNC_ROSIFACE_MODULES) \
-	\
-	$(SNAPDRAGON_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(SVC_EXTRA_MODULES) \
-	\
-	$(DRV_MODULES) \
-	\
-	$(ROS_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-BASEREF_DEPLOYMENT_MODULES := \
-	BASEREF/Top
-
-BASEREF_MODULES := \
-	\
-	$(BASEREF_DEPLOYMENT_MODULES) \
-	\
-	Drv/ForceTorque/ATINetbox \
-	\
-	$(COMMON_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(DRV_MODULES) \
-	\
-	$(ROS_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-SIMREF_GENERAL_MODULES := \
-	SIMREF/RotorSDrv \
-	SIMREF/GazeboManipIf \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_ROSIFACE_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(DRV_MODULES) \
-	\
-	$(ROS_MODULES) \
-	\
-	$(ROS_TYPE_PORT_MODULES_ALL) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-SIMREF_MODULES := \
-	SIMREF/Top \
-	$(SIMREF_GENERAL_MODULES)
-
-HEXREF_GENERAL_MODULES := \
-	\
-	ROS/Gen/std_msgs/Ports  \
-	ROS/Gen/geometry_msgs/Ports      \
-	ROS/Gen/nav_msgs/Ports           \
-	ROS/Gen/mav_msgs/Ports		 \
-	ROS/Gen/sensor_msgs/Ports	\
-	ROS/Gen/ackermann_msgs/Ports	\
-	\
-	ROS/Gen/std_msgs/Types  \
-	ROS/Gen/geometry_msgs/Types      \
-	ROS/Gen/nav_msgs/Types           \
-	ROS/Gen/mav_msgs/Types		 \
-	ROS/Gen/sensor_msgs/Types	\
-	ROS/Gen/ackermann_msgs/Types	\
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	\
-	$(HEXAGON_MODULES) \
-	\
-	Drv/IMU/MPU9250 \
-	Drv/Mavlink/ActuatorControls \
-	Drv/PwmDriverPorts \
-	Drv/GpioDriverPorts \
-	Drv/SerialDriverPorts \
-	Drv/SpiDriverPorts \
-	Drv/I2CDriverPorts \
-	Drv/LinuxGpioDriver \
-	Drv/LinuxSpiDriver \
-	Drv/LinuxI2CDriver \
-	Drv/LinuxPwmDriver \
-	\
-	Svc/BufferManager \
-	Svc/CmdDispatcher \
-	Svc/CmdSequencer \
-	Svc/Seq \
-	Svc/ActiveRateGroup \
-	Svc/PassiveRateGroup \
-	Svc/RateGroupDriver \
-	Svc/RateGroupDecoupler \
-	Svc/Sched \
-	Svc/PassiveTextLogger \
-	Svc/PassiveConsoleTextLogger \
-	Svc/Time \
-	Svc/Cycle \
-	Svc/LinuxTime \
-	Svc/ActiveLogger \
-	Svc/Fatal \
-	Svc/PolyIf \
-	Svc/PolyDb \
-	Svc/PrmDb \
-	Svc/Ping \
-	Svc/Health \
-	Svc/WatchDog \
-	Svc/AssertFatalAdapter \
-	Svc/FatalHandler \
-	Svc/ActiveDecoupler \
-	Svc/QueuedDecoupler \
-	\
-	$(FW_MODULES) \
-	\
-	$(UTILS_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	LLProc/ShortLogQueue \
-	LLProc/LLCmdDispatcher \
-	LLProc/LLTlmChan
-#Svc/ComLogger
-
-HEXREF_MODULES := \
-	HEXREF/Top \
-	HEXREF/Rpc \
-	$(HEXREF_GENERAL_MODULES)
-
-DSPRELAY_MODULES := SnapdragonFlight/DspRelay \
-	SnapdragonFlight/RpcCommon \
-	DSPRELAY/Top
-
-MINRPC_MODULES := \
-	MINRPC/Top \
-	HEXREF/Rpc \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(UTILS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	Svc/Sched \
-	\
-	SnapdragonFlight/HexRouter \
-	SnapdragonFlight/KraitRouter \
-	SnapdragonFlight/RpcCommon
-
-TESTRPC_MODULES := \
-	TESTRPC/Top \
-	HEXREF/Rpc \
-	$(HEXREF_GENERAL_MODULES)
-
-R5REF_DEPLOYMENT_MODULES := \
-	R5REF/Top
-
-R5REF_MODULES := \
-	$(ROS_TYPE_MODULES) \
-	$(ROS_PORT_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	\
-	$(LLPROC_MODULES) \
-	\
-	$(R5REF_DEPLOYMENT_MODULES) \
-	\
-	$(R5_MODULES) \
-	\
-	Drv/IMU/MPU9250 \
-	Drv/Mavlink/ActuatorControls \
-	Drv/Altimeter/LIDARLiteV3 \
-	\
-	Svc/PassiveRateGroup \
-	Svc/RateGroupDriver \
-	\
-	Svc/Sched \
-	Svc/Time \
-	Svc/Cycle \
-	\
-	Drv/PwmDriverPorts \
-	Drv/SerialDriverPorts \
-	Drv/SpiDriverPorts \
-	Drv/I2CDriverPorts \
-	Drv/Altimeter/AltimeterPorts \
-	Drv/Altimeter/AltimeterTypes \
-	\
-	Os \
-	\
-	$(FW_MODULES)
-
-R5RELAY_MODULES := \
-	$(COMMON_MODULES) \
-	\
-	Drv/LinuxSerialDriver \
-	Drv/SerialDriverPorts\
-	\
-	Svc/PassiveRateGroup \
-	Svc/GndIf \
-	Svc/SocketGndIf \
-	\
-	Svc/Sched \
-	Svc/Cycle \
-	Svc/Ping \
-	Svc/PolyIf \
-	Svc/PolyDb \
-	Svc/Time \
-	Svc/LinuxTime \
-	Svc/ActiveLogger \
-	Svc/Fatal \
-	\
-	HLProc/LLRouter \
-	HLProc/EventExpander \
-	\
-	Os \
-	\
-	R5RELAY/Top \
-	\
-	$(FW_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-
+  	\
+  	$(UTILS_MODULES)
+		
 ACDEVTEST_MODULES := \
-	Autocoders/test/active_tester \
-	Autocoders/test/app1 \
-	Autocoders/test/app2 \
-	Autocoders/test/cnt_only \
-	Autocoders/test/command1 \
-	Autocoders/test/command2 \
-	Autocoders/test/command_res \
-	Autocoders/test/command_multi_inst \
-	Autocoders/test/command_string \
-	Autocoders/test/command_tester \
-	Autocoders/test/comp_diff_namespace \
-	Autocoders/test/comp_no_namespace \
-	Autocoders/test/enum1port \
-	Autocoders/test/enum_return_port \
-	Autocoders/test/event1 \
-	Autocoders/test/event2 \
-	Autocoders/test/event_throttle \
-	Autocoders/test/event_enum \
-	Autocoders/test/event_multi_inst \
-	Autocoders/test/event_string \
-	Autocoders/test/ext_dict \
-	Autocoders/test/log1 \
-	Autocoders/test/log_tester \
-	Autocoders/test/main \
-	Autocoders/test/noargport \
-	Autocoders/test/param1 \
-	Autocoders/test/param2 \
-	Autocoders/test/param_enum \
-	Autocoders/test/param_multi_inst \
-	Autocoders/test/param_string \
-	Autocoders/test/param_tester \
-	Autocoders/test/time_tester \
-	#Autocoders/test/queued1 \
-	\ # Autocoders/test/partition \
-	Autocoders/test/pass_by_attrib \
-	\ # Autocoders/test/passive \
-	Autocoders/test/port_nogen \
-	Autocoders/test/port_return_type \
-	Autocoders/test/serialize_enum \
-	Autocoders/test/serialize_stringbuffer \
-	Autocoders/test/serialize_template \
-	Autocoders/test/serialize_user \
-	Autocoders/test/serialize1 \
-	Autocoders/test/serialize2 \
-	Autocoders/test/serialize3 \
-	Autocoders/test/stress \
-	Autocoders/test/string_port \
-	Autocoders/test/telem_tester \
-	Autocoders/test/tlm_enum \
-	Autocoders/test/tlm_string \
-	Autocoders/test/tlm1 \
-	Autocoders/test/tlm2 \
-	Autocoders/test/tlm_onchange \
-	Autocoders/test/tlm_multi_inst \
-	Autocoders/test/interface1 \
-	Autocoders/test/port_loopback \
-	Autocoders/test/serial_passive \
+	Autocoders/Python/test/active_tester \
+	Autocoders/Python/test/app1 \
+	Autocoders/Python/test/app2 \
+	Autocoders/Python/test/cnt_only \
+	Autocoders/Python/test/command1 \
+	Autocoders/Python/test/command2 \
+	Autocoders/Python/test/command_res \
+	Autocoders/Python/test/command_multi_inst \
+	Autocoders/Python/test/command_string \
+	Autocoders/Python/test/command_tester \
+	Autocoders/Python/test/comp_diff_namespace \
+	Autocoders/Python/test/comp_no_namespace \
+	Autocoders/Python/test/enum1port \
+	Autocoders/Python/test/enum_return_port \
+	Autocoders/Python/test/event1 \
+	Autocoders/Python/test/event2 \
+	Autocoders/Python/test/event_throttle \
+	Autocoders/Python/test/event_enum \
+	Autocoders/Python/test/event_multi_inst \
+	Autocoders/Python/test/event_string \
+	Autocoders/Python/test/ext_dict \
+	Autocoders/Python/test/log1 \
+	Autocoders/Python/test/log_tester \
+	Autocoders/Python/test/main \
+	Autocoders/Python/test/noargport \
+	Autocoders/Python/test/param1 \
+	Autocoders/Python/test/param2 \
+	Autocoders/Python/test/param_enum \
+	Autocoders/Python/test/param_multi_inst \
+	Autocoders/Python/test/param_string \
+	Autocoders/Python/test/param_tester \
+	Autocoders/Python/test/time_tester \
+	#Autocoders/Python/test/queued1 \
+	\ # Autocoders/Python/test/partition \
+	Autocoders/Python/test/pass_by_attrib \
+	\ # Autocoders/Python/test/passive \
+	Autocoders/Python/test/port_nogen \
+	Autocoders/Python/test/port_return_type \
+	Autocoders/Python/test/serialize_enum \
+	Autocoders/Python/test/serialize_stringbuffer \
+	Autocoders/Python/test/serialize_template \
+	Autocoders/Python/test/serialize_user \
+	Autocoders/Python/test/serialize1 \
+	Autocoders/Python/test/serialize2 \
+	Autocoders/Python/test/serialize3 \
+	Autocoders/Python/test/stress \
+	Autocoders/Python/test/string_port \
+	Autocoders/Python/test/telem_tester \
+	Autocoders/Python/test/tlm_enum \
+	Autocoders/Python/test/tlm_string \
+	Autocoders/Python/test/tlm1 \
+	Autocoders/Python/test/tlm2 \
+	Autocoders/Python/test/tlm_onchange \
+	Autocoders/Python/test/tlm_multi_inst \
+	Autocoders/Python/test/interface1 \
+	Autocoders/Python/test/port_loopback \
+	Autocoders/Python/test/serial_passive \
     \
-	Autocoders/templates
+	Autocoders/Python/templates
+	
+RPI_APP_MODULES := \
+	RPI/Top \
+	RPI/RpiDemo
+	
+RPI_MODULES := \
+	\
+	$(RPI_APP_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(LINUX_DRV_MODULES) \
+	\
+	$(CFDP_MODULES) \
+  	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+  	$(UTILS_MODULES)
 
 acdev_MODULES := \
 	$(FW_MODULES) \
@@ -714,7 +388,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF RPI
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

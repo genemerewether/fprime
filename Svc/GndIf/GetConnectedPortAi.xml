@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <?xml-model href="../../Autocoders/schema/ISF/interface_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+=======
+<?xml-model href="../../Autocoders/Python/schema/ISF/interface_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+>>>>>>> upstream-pub-fprime/master
 
 <interface name="GetConnected" namespace="Svc">
     <comment>
@@ -13,4 +17,8 @@
               <item name="SOCKET_NOT_CONNECTED"/>
           </enum>
        </return>
+<<<<<<< HEAD
 </interface>
+=======
+</interface>
+>>>>>>> upstream-pub-fprime/master

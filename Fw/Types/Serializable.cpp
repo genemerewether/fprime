@@ -7,6 +7,7 @@
 #ifdef BUILD_UT
 #ifndef BUILD_DSPAL
 #include <iomanip>
+#include <Fw/Types/EightyCharString.hpp>
 #endif
 #endif
 
@@ -26,6 +27,17 @@ namespace Fw {
         text = "NOSPEC"; // set to not specified.
     }
 
+#endif
+
+#ifdef BUILD_UT
+    std::ostream& operator<<(std::ostream& os, const Serializable& val) {
+        Fw::EightyCharString out;
+        val.toString(out);
+
+        os << out;
+
+        return os;
+    }
 #endif
 
     SerializeBufferBase::SerializeBufferBase() :
@@ -589,6 +601,19 @@ namespace Fw {
         this->m_deserLoc = 0;
     }
 
+    SerializeStatus SerializeBufferBase::deserializeSkip(NATIVE_UINT_TYPE numBytesToSkip)
+    {
+        // check for room
+        if (this->getBuffLength() == this->m_deserLoc) {
+            return FW_DESERIALIZE_BUFFER_EMPTY;
+        } else if (this->getBuffLength() - this->m_deserLoc < numBytesToSkip) {
+            return FW_DESERIALIZE_SIZE_MISMATCH;
+        }
+        // update location in buffer to skip the value
+        this->m_deserLoc += numBytesToSkip;
+        return FW_SERIALIZE_OK;
+    }
+
     NATIVE_UINT_TYPE SerializeBufferBase::getBuffLength(void) const {
         return this->m_serLoc;
     }
@@ -651,28 +676,6 @@ namespace Fw {
         }
         return stat;
 
-    }
-
-    SerializeStatus SerializeBufferBase::deserializeNoCopy(ExternalSerializeBuffer& val) {
-        SerializeStatus stat = FW_SERIALIZE_OK;
-
-        FwBuffSizeType storedLength;
-        stat = this->deserialize(storedLength);
-        if (stat != FW_SERIALIZE_OK) {
-            return stat;
-        }
-        // make sure source has enough
-        if (storedLength > this->getBuffLeft()) {
-            return FW_DESERIALIZE_SIZE_MISMATCH;
-        }
-
-        // getBuffAddrLeft now points to beginning of buffer data
-        val.setExtBuffer(&this->getBuffAddr()[this->m_deserLoc], storedLength);
-        val.setBuffLen(storedLength); // fill with data that was just added
-
-        this->m_deserLoc += storedLength;
-
-        return FW_SERIALIZE_OK;
     }
 
     // return address of buffer not yet deserialized. This is used
@@ -755,3 +758,4 @@ namespace Fw {
     }
 
 }
+

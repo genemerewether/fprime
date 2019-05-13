@@ -1,8 +1,13 @@
 
 TEST_SRC = main.cpp \
 	Tester.cpp \
+<<<<<<< HEAD
 	GTestBase.cpp \
 	TesterBase.cpp
+=======
+	Handcode/GTestBase.cpp \
+	Handcode/TesterBase.cpp
+>>>>>>> upstream-pub-fprime/master
 	
 TEST_MODS = Svc/UdpSender \
 			Svc/Sched \
@@ -15,4 +20,11 @@ TEST_MODS = Svc/UdpSender \
 			Fw/Buffer \
 			Fw/Types \
 			Os \
+<<<<<<< HEAD
 			gtest
+=======
+			gtest
+
+
+COMPARGS = -I$(CURDIR)/test/ut/Handcode
+>>>>>>> upstream-pub-fprime/master

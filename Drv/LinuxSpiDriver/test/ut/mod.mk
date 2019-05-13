@@ -1,4 +1,4 @@
-TEST_SRC = 	TesterBase.cpp \
+TEST_SRC = 	Handcode/TesterBase.cpp \
 			Tester.cpp \
 			main.cpp
 
@@ -14,3 +14,7 @@ TEST_MODS = Drv/LinuxSpiDriver \
 			Fw/Time \
 			Fw/Types \
 			Os
+
+
+
+COMPARGS = -I$(CURDIR)/test/ut/Handcode

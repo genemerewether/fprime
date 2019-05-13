@@ -27,7 +27,7 @@ namespace Fw {
     }
 #endif
     ActiveComponentBase::~ActiveComponentBase() {
-
+        DEBUG_PRINT("ActiveComponent %s destructor.\n",this->getObjName());
     }
 
     void ActiveComponentBase::init(NATIVE_INT_TYPE instance) {
@@ -53,15 +53,15 @@ namespace Fw {
         taskName = taskNameChar;
 #endif
 
-    	Os::Task::TaskStatus status = this->m_task.start(taskName, identifier, priority, stackSize, this->s_baseTask,
-							 this, cpuAffinity);
+    	Os::Task::TaskStatus status = this->m_task.start(taskName, identifier, priority, stackSize, this->s_baseTask,this, cpuAffinity);
     	FW_ASSERT(status == Os::Task::TASK_OK,(NATIVE_INT_TYPE)status);
     }
 
     Os::Task::TaskStatus ActiveComponentBase::join(void **value_ptr) {
+        DEBUG_PRINT("join %s\n", this->getObjName());
         return this->m_task.join(value_ptr);
     }
-  
+
     void ActiveComponentBase::s_baseTask(void* ptr) {
         // cast void* back to active component
         ActiveComponentBase* comp = static_cast<ActiveComponentBase*> (ptr);
@@ -69,8 +69,8 @@ namespace Fw {
         comp->m_task.setStarted(true);
         // print out message when task is started
 #if FW_OBJECT_NAMES == 1
-	DEBUG_PRINT("after task start for name %s\n",
-		    comp->getObjName());
+        DEBUG_PRINT("after task start for name %s\n",
+                    comp->getObjName());
 #endif
         // printf("Active Component %s task started.\n",comp->getObjName());
         // call preamble
