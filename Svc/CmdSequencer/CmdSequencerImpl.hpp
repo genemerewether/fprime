@@ -552,6 +552,11 @@ namespace Svc {
           const NATIVE_INT_TYPE instance //!< The instance number
       );
 
+      void setOpCodeRanges(U32 numRanges,
+                           const U32* portNum,
+                           const FwOpcodeType* minOpCode,
+                           const FwOpcodeType* maxOpCode);
+    
       //! (Optional) Set a timeout. 
       //! Sequence will quit if a command takes longer than the number of
       //! seconds in the timeout value.
@@ -610,6 +615,12 @@ namespace Svc {
           NATIVE_UINT_TYPE order //!< The call order
       );
 
+      //! Handler implementation for seqCancelIn
+      //!
+      void seqCancelIn_handler(
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
+      );
+    
       //! Handler for input port seqRunIn
       void seqRunIn_handler(
           NATIVE_INT_TYPE portNum, //!< The port number
@@ -736,6 +747,8 @@ namespace Svc {
           const Fw::Time &currentTime //!< The current time
       );
 
+      U32 portFromOpcode(FwOpcodeType opcode);
+    
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -766,6 +779,15 @@ namespace Svc {
       //! The sequence record currently being processed
       Sequence::Record m_record;
 
+      //! The output port for the command currently being processed
+      U32 m_cmdPortNum;
+
+      struct {
+        U32 port;
+        FwOpcodeType min;
+        FwOpcodeType max;
+      } m_portOpcodeCorr[NUM_COMCMDOUT_OUTPUT_PORTS];
+    
       //! The command time timer
       Timer m_cmdTimer;
 

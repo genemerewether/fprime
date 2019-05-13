@@ -14,6 +14,7 @@
 #include <Fw/Types/SerialBuffer.hpp>
 #include <Svc/CmdSequencer/CmdSequencerImpl.hpp>
 #include <Fw/Com/ComPacket.hpp>
+#include <Fw/Cmd/CmdPacket.hpp>
 #include <Fw/Types/Serializable.hpp>
 extern "C" {
   #include <Utils/Hash/libcrc/lib_crc.h>
@@ -40,12 +41,18 @@ namespace Svc {
         m_errorCount(0),
         m_runMode(STOPPED),
         m_stepMode(AUTO),
+        m_cmdPortNum(0u),
+        m_portOpcodeCorr(),
         m_executedCount(0),
         m_totalExecutedCount(0),
         m_sequencesCompletedCount(0),
         m_timeout(0)
     {
-
+        for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr); i++) {
+            m_portOpcodeCorr[i].port = 0u;
+            m_portOpcodeCorr[i].min = 0u;
+            m_portOpcodeCorr[i].max = 0u;
+        }
     }
 
     void CmdSequencerComponentImpl::init(const NATIVE_INT_TYPE queueDepth,
@@ -53,6 +60,29 @@ namespace Svc {
         CmdSequencerComponentBase::init(queueDepth, instance);
     }
 
+    void CmdSequencerComponentImpl::setOpCodeRanges(
+            U32 numRanges,
+            const U32* portNum,
+            const FwOpcodeType* minOpCode,
+            const FwOpcodeType* maxOpCode) {
+        FW_ASSERT(numRanges <= FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr),
+                  numRanges,
+                  FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr));
+
+        FW_ASSERT(NULL != portNum, (U64) portNum);
+        FW_ASSERT(NULL != minOpCode, (U64) minOpCode);
+        FW_ASSERT(NULL != maxOpCode, (U64) maxOpCode);
+
+        for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr); i++) {
+            m_portOpcodeCorr[i].port = portNum[i];
+            m_portOpcodeCorr[i].min = minOpCode[i];
+            m_portOpcodeCorr[i].max = maxOpCode[i];
+
+            FW_ASSERT(this->isConnected_comCmdOut_OutputPort(i),
+                      this->isConnected_comCmdOut_OutputPort(i));
+        }
+    }
+  
     void CmdSequencerComponentImpl::setTimeout(NATIVE_UINT_TYPE timeout) {
         this->m_timeout = timeout;
     }
@@ -91,11 +121,21 @@ namespace Svc {
     CmdSequencerComponentImpl::~CmdSequencerComponentImpl(void) {
 
     }
-
+  
     // ----------------------------------------------------------------------
     // Handler implementations
     // ----------------------------------------------------------------------
 
+    U32 CmdSequencerComponentImpl::portFromOpcode(FwOpcodeType opcode) {
+        for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr); i++) {
+            if ((opcode >= m_portOpcodeCorr[i].min) &&
+                (opcode < m_portOpcodeCorr[i].max)) {
+                return m_portOpcodeCorr[i].port;
+            }
+        }
+        return 0u;
+    }
+  
     void CmdSequencerComponentImpl::CS_RUN_cmdHandler(
             FwOpcodeType opCode,
             U32 cmdSeq,
@@ -149,6 +189,21 @@ namespace Svc {
 
     }
 
+    void CmdSequencerComponentImpl ::
+      seqCancelIn_handler(
+	      const NATIVE_INT_TYPE portNum
+      )
+    {
+        if (RUNNING == this->m_runMode) {
+            this->performCmd_Cancel();
+            this->log_ACTIVITY_HI_CS_SequenceCanceled(this->m_sequence->getLogFileName());
+            ++this->m_cancelCmdCount;
+            this->tlmWrite_CS_CancelCommands(this->m_cancelCmdCount);
+        } else {
+            this->log_WARNING_LO_CS_NoSequenceActive();
+        }
+    }
+  
     //! Handler for input port seqRunIn
     void CmdSequencerComponentImpl::seqRunIn_handler(
            NATIVE_INT_TYPE portNum,
@@ -282,7 +337,7 @@ namespace Svc {
         Fw::Time currTime = this->getTime();
         // check to see if a command time is pending
         if (this->m_cmdTimer.isExpiredAt(currTime)) {
-            this->comCmdOut_out(0, m_record.m_command, 0);
+            this->comCmdOut_out(m_cmdPortNum, m_record.m_command, 0);
             this->m_cmdTimer.clear();
             // start command timeout timer
             this->setCmdTimeout(currTime);
@@ -394,6 +449,19 @@ namespace Svc {
         this->m_record.m_timeTag.setTimeBase(header.m_timeBase);
         this->m_record.m_timeTag.setTimeContext(header.m_timeContext);
 
+        // NOTE(mereweth) - pre-read opcode to know which output port
+        Fw::CmdPacket cmdPkt;
+        Fw::SerializeStatus stat = cmdPkt.deserialize(this->m_record.m_command);
+        if (stat == Fw::FW_SERIALIZE_OK) {
+            this->m_cmdPortNum = this->portFromOpcode(cmdPkt.getOpCode());
+        }
+        else {
+            this->log_WARNING_HI_CS_NoOpcode(this->m_sequence->getLogFileName(),
+                                             this->m_executedCount,
+                                             stat);
+        }
+        this->m_record.m_command.resetDeser();
+        
         Fw::Time currentTime = this->getTime();
         switch (this->m_record.m_descriptor) {
           case Sequence::Record::END_OF_SEQUENCE:
@@ -446,7 +514,7 @@ namespace Svc {
       performCmd_Step_ABSOLUTE(Fw::Time& currentTime)
     {
         if (currentTime >= this->m_record.m_timeTag) {
-            this->comCmdOut_out(0, m_record.m_command, 0);
+            this->comCmdOut_out(m_cmdPortNum, m_record.m_command, 0);
             this->setCmdTimeout(currentTime);
         } else {
             this->m_cmdTimer.set(this->m_record.m_timeTag);
