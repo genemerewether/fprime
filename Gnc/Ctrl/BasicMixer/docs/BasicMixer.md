@@ -6,7 +6,7 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|BMIX_InitParams|0 (0x0)|| | |   
+|BMIX_InitParams|0 (0x0)|| | |
 
 ## Telemetry Channel List
 

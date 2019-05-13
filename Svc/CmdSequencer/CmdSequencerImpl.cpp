@@ -88,25 +88,6 @@ namespace Svc {
         this->m_sequence->deallocateBuffer(allocator);
     }
 
-    void CmdSequencerComponentImpl::setOpCodeRanges(
-            U32 numRanges,
-            const U32* portNum,
-            const FwOpcodeType* minOpCode,
-            const FwOpcodeType* maxOpCode) {
-        FW_ASSERT(numRanges <= FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr),
-                  numRanges,
-                  FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr));
-
-        FW_ASSERT(NULL != portNum, (U64) portNum);
-        FW_ASSERT(NULL != minOpCode, (U64) minOpCode);
-        FW_ASSERT(NULL != maxOpCode, (U64) maxOpCode);
-
-        for (U32 i = 0; i < FW_MIN(numRanges, FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr)); i++) {
-            m_portOpcodeCorr[i].port = portNum[i];
-            m_portOpcodeCorr[i].min = minOpCode[i];
-            m_portOpcodeCorr[i].max = maxOpCode[i];
-            m_portOpcodeCorr[i].valid = true;
-
     CmdSequencerComponentImpl::~CmdSequencerComponentImpl(void) {
 
     }

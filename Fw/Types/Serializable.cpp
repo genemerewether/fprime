@@ -678,6 +678,28 @@ namespace Fw {
 
     }
 
+    SerializeStatus SerializeBufferBase::deserializeNoCopy(ExternalSerializeBuffer& val) {
+        SerializeStatus stat = FW_SERIALIZE_OK;
+
+        FwBuffSizeType storedLength;
+        stat = this->deserialize(storedLength);
+        if (stat != FW_SERIALIZE_OK) {
+            return stat;
+        }
+        // make sure source has enough
+        if (storedLength > this->getBuffLeft()) {
+            return FW_DESERIALIZE_SIZE_MISMATCH;
+        }
+
+        // getBuffAddrLeft now points to beginning of buffer data
+        val.setExtBuffer(&this->getBuffAddr()[this->m_deserLoc], storedLength);
+        val.setBuffLen(storedLength); // fill with data that was just added
+
+        this->m_deserLoc += storedLength;
+
+        return FW_SERIALIZE_OK;
+    }
+
     // return address of buffer not yet deserialized. This is used
     // to copy the remainder of a buffer.
     const U8* SerializeBufferBase::getBuffAddrLeft(void) const {

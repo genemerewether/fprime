@@ -14,14 +14,11 @@ SRC_CYGWIN = FatalHandlerComponentLinuxImpl.cpp
 
 SRC_DARWIN = FatalHandlerComponentLinuxImpl.cpp
 
-<<<<<<< HEAD
 SRC_SDFLIGHT = FatalHandlerComponentLinuxImpl.cpp
 
-#TODO(mereweth) - how should we exit on DSPAL?
 SRC_DSPAL = FatalHandlerComponentLinuxImpl.cpp
-=======
+
 SRC_RASPIAN = FatalHandlerComponentLinuxImpl.cpp
->>>>>>> upstream-pub-fprime/master
 
 HDR = FatalHandlerComponentImpl.hpp	
 

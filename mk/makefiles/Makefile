@@ -75,9 +75,13 @@ endif
 	@echo Linking binary...
 	@echo $(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(EXTRA_LIBS) $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
 	@$(LINK_BIN) $(LINK_BIN_FLAGS) $(LINK_BIN_TO) $@ $(LINK_BIN_PRE_LIB_FLAGS) $(LIBS_START) $^ $(LINK_LIBS) $(BUILD_ROOT)/$(DEPLOYMENT)/$(OUTPUT_DIR)/version.o $(EXTRA_LIBS) $(LIBS_END) $(LINK_BIN_POST_LIB_FLAGS)
-   	@$(POST_LINK_BIN) $(POST_LINK_PRE_ARGS) $@ $(POST_LINK_POST_ARGS) 
+ifdef POST_LINK_BIN
+	@$(POST_LINK_BIN) $(POST_LINK_PRE_ARGS) $@ $(POST_LINK_POST_ARGS)
+endif
 	@$(SIZE) $@
+ifdef CKSUM_SH
 	@$(CKSUM_SH) $@ $@.$(CKSUM_EXT)
+endif
 
 endif
 # Module-level code generator targets

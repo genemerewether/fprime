@@ -279,19 +279,4 @@
             </arg>
         </args>
     </event>
-    <event id="23" name="CS_NoOpcode" severity="WARNING_HI"
-    	   format_string="Sequence file %s: Record %d opcode not read. Err: %d">
-    	   <comment>The format of a command record was invalid.</comment>
-        <args>
-            <arg name="fileName" type="string" size="60">
-                <comment>The name of the sequence file</comment>
-            </arg>
-            <arg name="recordNumber" type="U32">
-                <comment>The record number</comment>
-            </arg>
-            <arg name="error" type="I32">
-                <comment>The error code</comment>
-            </arg>
-        </args>
-    </event>
 </events>

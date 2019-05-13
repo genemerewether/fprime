@@ -204,9 +204,4 @@
             <data type = "anyURI"></data>
         </element>
     </define>
-<<<<<<< HEAD:Autocoders/schema/default/component_schema.rng
-   
-=======
-
->>>>>>> upstream-pub-fprime/master:Autocoders/Python/schema/default/component_schema.rng
 </grammar>

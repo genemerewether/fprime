@@ -59,7 +59,7 @@ COMMON_MODULES := \
 	Common/Ports
 
 OS_MODULES := \
-	Os 
+	Os
 
 CFDP_MODULES := \
 	CFDP/Checksum
@@ -75,9 +75,9 @@ SVC_EXTRA_MODULES := \
 	Svc/ImgTlm
 
 SVC_MODULES := \
+	Svc/BufferManager \
 	Svc/BufferAccumulator \
 	Svc/BufferLogger \
-	Svc/BufferManager \
 	Svc/CmdDispatcher \
 	Svc/CmdSequencer \
 	Svc/Seq \
@@ -98,7 +98,6 @@ SVC_MODULES := \
 	Svc/Time \
 	Svc/Cycle \
 	Svc/LinuxTime \
-	Svc/LinuxTimer \
 	Svc/ActiveLogger \
 	Svc/Fatal \
 	Svc/PolyIf \
@@ -126,7 +125,7 @@ DEMO_DRV_MODULES := \
 	Drv/DataTypes \
 	Drv/BlockDriver \
 	Drv/GpioDriverPorts
-		
+
 LINUX_DRV_MODULES := \
 	Drv/LinuxGpioDriver \
 	Drv/LinuxPwmDriver \
@@ -137,7 +136,9 @@ LINUX_DRV_MODULES := \
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
-	Drv/I2CDriverPorts \
+	Drv/I2CDriverPorts
+
+DEV_DRV_MODULES := \
 	Drv/Altimeter/AltimeterPorts \
 	Drv/Altimeter/AltimeterTypes
 
@@ -286,9 +287,358 @@ Ref_MODULES := \
 	$(OS_MODULES) \
 	\
 	$(CFDP_MODULES) \
-  	\
-  	$(UTILS_MODULES)
-		
+	\
+	$(UTILS_MODULES)
+
+BLIMPREF_DEPLOYMENT_MODULES := \
+	BLIMPREF/Top
+
+BLIMPREF_MODULES := \
+	\
+	$(BLIMPREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	Drv/IMU/MPU9250 \
+	\
+	$(ZMQ_MODULES) \
+	\
+	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
+	\
+	$(SNAPDRAGON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
+	\
+	$(LINUX_DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+CARREF_DEPLOYMENT_MODULES := \
+	CARREF/Top
+
+CARREF_MODULES := \
+	\
+	$(CARREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	Drv/IMU/MPU9250 \
+	\
+	$(ZMQ_MODULES) \
+	\
+	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
+	\
+	$(SNAPDRAGON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
+	\
+	$(LINUX_DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+SDREF_DEPLOYMENT_MODULES := \
+	HEXREF/Rpc \
+	SDREF/Top
+
+SDREF_MODULES := \
+	\
+	$(SDREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	\
+	$(ZMQ_MODULES) \
+	\
+	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
+	\
+	$(SNAPDRAGON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
+	\
+	$(LINUX_DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+BASEREF_DEPLOYMENT_MODULES := \
+	BASEREF/Top
+
+BASEREF_MODULES := \
+	\
+	$(BASEREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(LINUX_DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+SIMREF_GENERAL_MODULES := \
+	SIMREF/RotorSDrv \
+	SIMREF/GazeboManipIf \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(LINUX_DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(ROS_TYPE_PORT_MODULES_ALL) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+SIMREF_MODULES := \
+	SIMREF/Top \
+	$(SIMREF_GENERAL_MODULES)
+
+HEXREF_GENERAL_MODULES := \
+	\
+	ROS/Gen/std_msgs/Ports  \
+	ROS/Gen/geometry_msgs/Ports      \
+	ROS/Gen/nav_msgs/Ports           \
+	ROS/Gen/mav_msgs/Ports		 \
+	ROS/Gen/sensor_msgs/Ports	\
+	ROS/Gen/ackermann_msgs/Ports	\
+	\
+	ROS/Gen/std_msgs/Types  \
+	ROS/Gen/geometry_msgs/Types      \
+	ROS/Gen/nav_msgs/Types           \
+	ROS/Gen/mav_msgs/Types		 \
+	ROS/Gen/sensor_msgs/Types	\
+	ROS/Gen/ackermann_msgs/Types	\
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	\
+	$(HEXAGON_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	Drv/Mavlink/ActuatorControls \
+	Drv/PwmDriverPorts \
+	Drv/GpioDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
+	Drv/LinuxGpioDriver \
+	Drv/LinuxSpiDriver \
+	Drv/LinuxI2CDriver \
+	Drv/LinuxPwmDriver \
+	\
+	Svc/BufferManager \
+	Svc/CmdDispatcher \
+	Svc/CmdSequencer \
+	Svc/Seq \
+	Svc/ActiveRateGroup \
+	Svc/PassiveRateGroup \
+	Svc/RateGroupDriver \
+	Svc/RateGroupDecoupler \
+	Svc/Sched \
+	Svc/PassiveTextLogger \
+	Svc/PassiveConsoleTextLogger \
+	Svc/Time \
+	Svc/Cycle \
+	Svc/LinuxTime \
+	Svc/ActiveLogger \
+	Svc/Fatal \
+	Svc/PolyIf \
+	Svc/PolyDb \
+	Svc/PrmDb \
+	Svc/Ping \
+	Svc/Health \
+	Svc/WatchDog \
+	Svc/AssertFatalAdapter \
+	Svc/FatalHandler \
+	Svc/ActiveDecoupler \
+	Svc/QueuedDecoupler \
+	\
+	$(FW_MODULES) \
+	\
+	$(UTILS_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	LLProc/ShortLogQueue \
+	LLProc/LLCmdDispatcher \
+	LLProc/LLTlmChan
+#Svc/ComLogger
+
+HEXREF_MODULES := \
+	HEXREF/Top \
+	HEXREF/Rpc \
+	$(HEXREF_GENERAL_MODULES)
+
+DSPRELAY_MODULES := SnapdragonFlight/DspRelay \
+	SnapdragonFlight/RpcCommon \
+	DSPRELAY/Top
+
+MINRPC_MODULES := \
+	MINRPC/Top \
+	HEXREF/Rpc \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(UTILS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	Svc/Sched \
+	\
+	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/KraitRouter \
+	SnapdragonFlight/RpcCommon
+
+TESTRPC_MODULES := \
+	TESTRPC/Top \
+	HEXREF/Rpc \
+	$(HEXREF_GENERAL_MODULES)
+
+R5REF_DEPLOYMENT_MODULES := \
+	R5REF/Top
+
+R5REF_MODULES := \
+	$(ROS_TYPE_MODULES) \
+	$(ROS_PORT_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	\
+	$(LLPROC_MODULES) \
+	\
+	$(R5REF_DEPLOYMENT_MODULES) \
+	\
+	$(R5_MODULES) \
+	\
+	Drv/IMU/MPU9250 \
+	Drv/Mavlink/ActuatorControls \
+	Drv/Altimeter/LIDARLiteV3 \
+	\
+	Svc/PassiveRateGroup \
+	Svc/RateGroupDriver \
+	\
+	Svc/Sched \
+	Svc/Time \
+	Svc/Cycle \
+	\
+	Drv/PwmDriverPorts \
+	Drv/SerialDriverPorts \
+	Drv/SpiDriverPorts \
+	Drv/I2CDriverPorts \
+	Drv/Altimeter/AltimeterPorts \
+	Drv/Altimeter/AltimeterTypes \
+	\
+	Os \
+	\
+	$(FW_MODULES)
+
+R5RELAY_MODULES := \
+	$(COMMON_MODULES) \
+	\
+	Drv/LinuxSerialDriver \
+	Drv/SerialDriverPorts\
+	\
+	Svc/PassiveRateGroup \
+	Svc/GndIf \
+	Svc/SocketGndIf \
+	\
+	Svc/Sched \
+	Svc/Cycle \
+	Svc/Ping \
+	Svc/PolyIf \
+	Svc/PolyDb \
+	Svc/Time \
+	Svc/LinuxTime \
+	Svc/ActiveLogger \
+	Svc/Fatal \
+	\
+	HLProc/LLRouter \
+	HLProc/EventExpander \
+	\
+	Os \
+	\
+	R5RELAY/Top \
+	\
+	$(FW_MODULES) \
+	\
+	$(UTILS_MODULES)
+
 ACDEVTEST_MODULES := \
 	Autocoders/Python/test/active_tester \
 	Autocoders/Python/test/app1 \
@@ -349,11 +699,11 @@ ACDEVTEST_MODULES := \
 	Autocoders/Python/test/serial_passive \
     \
 	Autocoders/Python/templates
-	
+
 RPI_APP_MODULES := \
 	RPI/Top \
 	RPI/RpiDemo
-	
+
 RPI_MODULES := \
 	\
 	$(RPI_APP_MODULES) \

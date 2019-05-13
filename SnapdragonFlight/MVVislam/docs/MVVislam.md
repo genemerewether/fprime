@@ -6,10 +6,10 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|MVVISLAM_Reinit|0 (0x0)|| | |   
-|MVVISLAM_Activate|1 (0x1)|| | |   
-| | | |enable|bool||                    
-|MVVISLAM_Reset|2 (0x2)|| | |   
+|MVVISLAM_Reinit|0 (0x0)|| | |
+|MVVISLAM_Activate|1 (0x1)|| | |
+| | | |enable|bool||
+|MVVISLAM_Reset|2 (0x2)|| | |
 
 ## Telemetry Channel List
 

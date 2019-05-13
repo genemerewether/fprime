@@ -13,7 +13,6 @@
     <import_port_type>Fw/Cmd/CmdPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Svc/Seq/CmdSeqInPortAi.xml</import_port_type>
-    <import_port_type>Svc/Seq/CmdSeqCancelPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_dictionary>Svc/CmdSequencer/Commands.xml</import_dictionary>
     <import_dictionary>Svc/CmdSequencer/Telemetry.xml</import_dictionary>
@@ -39,13 +38,13 @@
         <port name="timeCaller" data_type="Fw::Time"  kind="output" role="TimeGet"    max_number="1">
         </port>
 
-        <port name="comCmdOut" data_type="Fw::Com"  kind="output"    max_number="3">
+        <port name="comCmdOut" data_type="Fw::Com"  kind="output"    max_number="1">
         </port>
 
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
         </port>
 
-        <port name="cmdResponseIn" data_type="Fw::CmdResponse"  kind="async_input"    max_number="3">
+        <port name="cmdResponseIn" data_type="Fw::CmdResponse"  kind="async_input"    max_number="1">
         </port>
 
         <port name="cmdIn" data_type="Fw::Cmd"  kind="input" role="Cmd"    max_number="1">
@@ -55,9 +54,6 @@
         </port>
 
         <port name="seqRunIn" data_type="Svc::CmdSeqIn"  kind="async_input"    max_number="1">
-        </port>
-
-        <port name="seqCancelIn" data_type="Svc::CmdSeqCancel"  kind="async_input"    max_number="1">
         </port>
 
         <port name="logOut" data_type="Fw::Log"  kind="output" role="LogEvent"    max_number="1">

@@ -6,8 +6,8 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|ATTFILTER_InitParams|0 (0x0)|| | |   
-|ATTFILTER_Reinit|1 (0x1)|| | |   
+|ATTFILTER_InitParams|0 (0x0)|| | |
+|ATTFILTER_Reinit|1 (0x1)|| | |
 
 ## Telemetry Channel List
 

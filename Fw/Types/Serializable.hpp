@@ -132,8 +132,6 @@ namespace Fw {
             SerializeStatus copyRaw(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
             SerializeStatus copyRawOffset(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
                                                                                       // Will increment deserialization pointer
-            SerializeStatus copyRawOffset(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
-                                                                                    // Will increment deserialization pointer
 
 
             //!< Dangerous - setup a temporary buffer with a piece of ourselves and shift deserialization pointer
