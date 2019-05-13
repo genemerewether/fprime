@@ -16,7 +16,6 @@ enum {
 };
 
 #include <Fw/Types/Assert.hpp>
-#include <SDREF/Top/TargetInit.hpp>
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
@@ -489,8 +488,6 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                   bool &isHiresChild, bool &isStereoChild,
                   bool startSocketNow) {
     allocComps();
-
-    localTargetInit();
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
