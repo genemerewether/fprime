@@ -14,6 +14,9 @@ SRC_LINUX = IPCActiveComponentBase.cpp \
 SRC_LINUXRT = IPCActiveComponentBase.cpp \
               IPCQueuedComponentBase.cpp
 
+SRC_SDFLIGHT = IPCActiveComponentBase.cpp \
+               IPCQueuedComponentBase.cpp
+
 SRC = \
     ActiveComponentBase.cpp \
     QueuedComponentBase.cpp \
