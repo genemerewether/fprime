@@ -87,7 +87,7 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-	this->m_nodeHandle = new ros::NodeHandle();
+        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, AckermannIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -133,7 +133,7 @@ namespace Gnc {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
     }
-   
+
 
     // ----------------------------------------------------------------------
     // Member function definitions
@@ -150,7 +150,7 @@ namespace Gnc {
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
         ros::NodeHandle* n = compPtr->m_nodeHandle;
-	FW_ASSERT(n);
+        FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
@@ -160,7 +160,7 @@ namespace Gnc {
                                                 &AckermannDriveStampedHandler::ackermannDriveStampedCallback,
                                                 &updateHandler,
                                                 ros::TransportHints().tcpNoDelay());
-        
+
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -190,48 +190,48 @@ namespace Gnc {
 
         DEBUG_PRINT("ackermannDriveStamped port handler %d\n", this->portNum);
 
-	if (!std::isfinite(msg->header.stamp.sec) ||
-	    !std::isfinite(msg->header.stamp.nsec)) {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
 
-	if (!std::isfinite(msg->drive.steering_angle)          ||
-	    !std::isfinite(msg->drive.steering_angle_velocity) ||
-	    !std::isfinite(msg->drive.speed)                   ||
-	    !std::isfinite(msg->drive.acceleration)            ||
-	    !std::isfinite(msg->drive.jerk))                    {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
-	
+        if (!std::isfinite(msg->drive.steering_angle)          ||
+            !std::isfinite(msg->drive.steering_angle_velocity) ||
+            !std::isfinite(msg->drive.speed)                   ||
+            !std::isfinite(msg->drive.acceleration)            ||
+            !std::isfinite(msg->drive.jerk))                    {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::ackermann_msgs;
 
             AckermannDriveStamped ackermannDriveStamped(
               Header(msg->header.seq,
-		     Fw::Time(TB_ROS_TIME, 0,
+                     Fw::Time(TB_ROS_TIME, 0,
                               msg->header.stamp.sec,
                               msg->header.stamp.nsec / 1000),
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               AckermannDrive(msg->drive.steering_angle,
-			     msg->drive.steering_angle_velocity,
-			     msg->drive.speed,
-			     msg->drive.acceleration,
-			     msg->drive.jerk)
+                             msg->drive.steering_angle_velocity,
+                             msg->drive.speed,
+                             msg->drive.acceleration,
+                             msg->drive.jerk)
             ); // end AckermannDriveStamped constructor
 
             this->compPtr->m_ackermannDriveStampedSet[this->portNum].mutex.lock();
-	    if (this->compPtr->m_ackermannDriveStampedSet[this->portNum].fresh) {
-		this->compPtr->m_ackermannDriveStampedSet[this->portNum].overflows++;
-		DEBUG_PRINT("Overwriting ackermannDriveStamped port %d before Sched\n", this->portNum);
-	    }
-	    this->compPtr->m_ackermannDriveStampedSet[this->portNum].ackermannDriveStamped = ackermannDriveStamped;
-	    this->compPtr->m_ackermannDriveStampedSet[this->portNum].fresh = true;
-	}
-	this->compPtr->m_ackermannDriveStampedSet[this->portNum].mutex.unLock();
+            if (this->compPtr->m_ackermannDriveStampedSet[this->portNum].fresh) {
+                this->compPtr->m_ackermannDriveStampedSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting ackermannDriveStamped port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_ackermannDriveStampedSet[this->portNum].ackermannDriveStamped = ackermannDriveStamped;
+            this->compPtr->m_ackermannDriveStampedSet[this->portNum].fresh = true;
+        }
+        this->compPtr->m_ackermannDriveStampedSet[this->portNum].mutex.unLock();
     }
-  
+
 } // end namespace

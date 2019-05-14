@@ -92,14 +92,14 @@ namespace Gnc {
 
       this->doRotX = paramGet_doRotX(valid[0]);
       this->doRotV = paramGet_doRotV(valid[1]);
-      
+
       for (unsigned int i = 0; i < 2; i++) {
-	  if ((Fw::PARAM_VALID   != valid[i])  &&
-	      (Fw::PARAM_DEFAULT != valid[i])) {
-	      return;
-	  }
+          if ((Fw::PARAM_VALID   != valid[i])  &&
+              (Fw::PARAM_DEFAULT != valid[i])) {
+              return;
+          }
       }
-      
+
       this->paramsInited = true;
   }
 
@@ -117,20 +117,20 @@ namespace Gnc {
       ROS::geometry_msgs::PoseWithCovariance poseCov = Odometry.getpose();
       ROS::geometry_msgs::Pose pose = poseCov.getpose();
       if (this->doRotX) {
-	  ROS::geometry_msgs::Point p = pose.getposition();
-	  const Vector3d p_b = this->b_X_a * Vector3d(p.getx(), p.gety(), p.getz());
-	  p.setx(p_b(0));
-	  p.sety(p_b(1));
-	  p.setz(p_b(2));
-	  pose.setposition(p);
+          ROS::geometry_msgs::Point p = pose.getposition();
+          const Vector3d p_b = this->b_X_a * Vector3d(p.getx(), p.gety(), p.getz());
+          p.setx(p_b(0));
+          p.sety(p_b(1));
+          p.setz(p_b(2));
+          pose.setposition(p);
       }
       /* NOTE(mereweth) - could account for offset from A to B
        * if both are body, but would need to know world_q_a or world_q_b
        */
-      
+
       ROS::geometry_msgs::Quaternion q = pose.getorientation();
       const Quaterniond q_b(this->b_X_a.rotation()
-			    * Quaterniond(q.getw(), q.getx(), q.gety(), q.getz()));
+                            * Quaterniond(q.getw(), q.getx(), q.gety(), q.getz()));
       q.setw(q_b.w());
       q.setx(q_b.x());
       q.sety(q_b.y());
@@ -138,22 +138,22 @@ namespace Gnc {
       pose.setorientation(q);
       poseCov.setpose(pose);
       Odometry.setpose(poseCov);
-      
+
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
       if (this->doRotV) {
-	  ROS::geometry_msgs::Vector3 lin = twist.getlinear();
-	  const Vector3d lin_b = this->b_X_a.rotation()
-	    * Vector3d(lin.getx(), lin.gety(), lin.getz());
-	  lin.setx(lin_b(0));
-	  lin.sety(lin_b(1));
-	  lin.setz(lin_b(2));
-	  twist.setlinear(lin);
+          ROS::geometry_msgs::Vector3 lin = twist.getlinear();
+          const Vector3d lin_b = this->b_X_a.rotation()
+              * Vector3d(lin.getx(), lin.gety(), lin.getz());
+          lin.setx(lin_b(0));
+          lin.sety(lin_b(1));
+          lin.setz(lin_b(2));
+          twist.setlinear(lin);
       }
 
       ROS::geometry_msgs::Vector3 ang = twist.getangular();
       const Vector3d ang_b = this->b_X_a.rotation()
-	* Vector3d(ang.getx(), ang.gety(), ang.getz());
+          * Vector3d(ang.getx(), ang.gety(), ang.getz());
       ang.setx(ang_b(0));
       ang.sety(ang_b(1));
       ang.setz(ang_b(2));
@@ -174,20 +174,20 @@ namespace Gnc {
       ROS::geometry_msgs::PoseWithCovariance poseCov = Odometry.getpose();
       ROS::geometry_msgs::Pose pose = poseCov.getpose();
       if (this->doRotX) {
-	  ROS::geometry_msgs::Point p = pose.getposition();
-	  const Vector3d p_a = this->a_X_b * Vector3d(p.getx(), p.gety(), p.getz());
-	  p.setx(p_a(0));
-	  p.sety(p_a(1));
-	  p.setz(p_a(2));
-	  pose.setposition(p);
+          ROS::geometry_msgs::Point p = pose.getposition();
+          const Vector3d p_a = this->a_X_b * Vector3d(p.getx(), p.gety(), p.getz());
+          p.setx(p_a(0));
+          p.sety(p_a(1));
+          p.setz(p_a(2));
+          pose.setposition(p);
       }
       /* NOTE(mereweth) - could account for offset from A to B
        * if both are body, but would need to know world_q_a or world_q_b
        */
-      
+
       ROS::geometry_msgs::Quaternion q = pose.getorientation();
       const Quaterniond q_a(this->a_X_b.rotation()
-			    * Quaterniond(q.getw(), q.getx(), q.gety(), q.getz()));
+          * Quaterniond(q.getw(), q.getx(), q.gety(), q.getz()));
       q.setw(q_a.w());
       q.setx(q_a.x());
       q.sety(q_a.y());
@@ -195,22 +195,22 @@ namespace Gnc {
       pose.setorientation(q);
       poseCov.setpose(pose);
       Odometry.setpose(poseCov);
-      
+
       ROS::geometry_msgs::TwistWithCovariance twistCov = Odometry.gettwist();
       ROS::geometry_msgs::Twist twist = twistCov.gettwist();
       if (this->doRotV) {
-	  ROS::geometry_msgs::Vector3 lin = twist.getlinear();
-	  const Vector3d lin_a = this->a_X_b.rotation()
-	    * Vector3d(lin.getx(), lin.gety(), lin.getz());
-	  lin.setx(lin_a(0));
-	  lin.sety(lin_a(1));
-	  lin.setz(lin_a(2));
-	  twist.setlinear(lin);
+          ROS::geometry_msgs::Vector3 lin = twist.getlinear();
+          const Vector3d lin_a = this->a_X_b.rotation()
+              * Vector3d(lin.getx(), lin.gety(), lin.getz());
+          lin.setx(lin_a(0));
+          lin.sety(lin_a(1));
+          lin.setz(lin_a(2));
+          twist.setlinear(lin);
       }
 
       ROS::geometry_msgs::Vector3 ang = twist.getangular();
       const Vector3d ang_a = this->a_X_b.rotation()
-	* Vector3d(ang.getx(), ang.gety(), ang.getz());
+          * Vector3d(ang.getx(), ang.gety(), ang.getz());
       ang.setx(ang_a(0));
       ang.sety(ang_a(1));
       ang.setz(ang_a(2));

@@ -80,6 +80,8 @@ namespace SnapdragonFlight {
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
+      int spawnChild(); //!< forks another process
+
       //! Destroy object MVCam
       //!
       ~MVCamComponentImpl(void);

@@ -84,7 +84,7 @@ namespace Gnc {
     printf("prm %d updated\n", id);
 #endif
   }
-  
+
   void Se3CtrlComponentImpl ::
     parametersLoaded()
   {
@@ -93,15 +93,15 @@ namespace Gnc {
       int stat;
 
       quest_gnc::RigidBodyModel rigidBody = {paramGet_mass(valid[0]),
-					     paramGet_I_xx(valid[1]),
-					     paramGet_I_yy(valid[2]),
-					     paramGet_I_zz(valid[3]),
-					     paramGet_I_xy(valid[4]),
-					     paramGet_I_xz(valid[5]),
-					     paramGet_I_yz(valid[6])};
-      
+                                             paramGet_I_xx(valid[1]),
+                                             paramGet_I_yy(valid[2]),
+                                             paramGet_I_zz(valid[3]),
+                                             paramGet_I_xy(valid[4]),
+                                             paramGet_I_xz(valid[5]),
+                                             paramGet_I_yz(valid[6])};
+
       quest_gnc::Se3Model se3Model = {rigidBody,
-				      paramGet_force_z(valid[7])};
+                                      paramGet_force_z(valid[7])};
 
       for (U32 i = 0; i < 8; i++) {
           if (Fw::PARAM_VALID != valid[i]) {  return;  }
@@ -171,7 +171,7 @@ namespace Gnc {
   }
 
   // ----------------------------------------------------------------------
-  // Command handler implementations 
+  // Command handler implementations
   // ----------------------------------------------------------------------
 
   void Se3CtrlComponentImpl ::
@@ -180,7 +180,7 @@ namespace Gnc {
         const U32 cmdSeq,
         PosCtrlMode mode
     )
-  {    
+  {
       if (!paramsInited &&
           mode != POSCTRL_DISABLED) {
           this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
@@ -191,26 +191,26 @@ namespace Gnc {
       }
 
       if ((ATTCTRL_DISABLED == this->attCtrlMode) &&
-	  (POSCTRL_DISABLED == mode))              {
-	  using namespace ROS::geometry_msgs;
+          (POSCTRL_DISABLED == mode))              {
+          using namespace ROS::geometry_msgs;
           // TODO(mereweth) - convert frame id
           ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"body"*/);
           WrenchStamped u_b__comm(h,
-				  Wrench(Vector3(0.0, 0.0, 0.0),
-					 Vector3(0.0, 0.0, 0.0)));
+                                  Wrench(Vector3(0.0, 0.0, 0.0),
+                                  Vector3(0.0, 0.0, 0.0)));
           if (this->isConnected_controls_OutputPort(0)) {
               this->controls_out(0, u_b__comm);
           }
       }
   }
- 
+
   void Se3CtrlComponentImpl ::
     SE3CTRL_SetAttCtrlMode_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq,
         AttCtrlMode mode
     )
-  {    
+  {
       if (!paramsInited &&
           mode != ATTCTRL_DISABLED) {
           this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_EXECUTION_ERROR);
@@ -226,8 +226,8 @@ namespace Gnc {
           // TODO(mereweth) - convert frame id
           ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"body"*/);
           WrenchStamped u_b__comm(h,
-				  Wrench(Vector3(0.0, 0.0, 0.0),
-					 Vector3(0.0, 0.0, 0.0)));
+                                  Wrench(Vector3(0.0, 0.0, 0.0),
+                                  Vector3(0.0, 0.0, 0.0)));
           if (this->isConnected_controls_OutputPort(0)) {
               this->controls_out(0, u_b__comm);
           }
@@ -271,8 +271,8 @@ namespace Gnc {
       this->w_q_b__des.setz(w_q_b__z);
       this->w_q_b__des.setw(w_q_b__w);
       this->omega_b__des.set(omega_b__x,
-			     omega_b__y,
-			     omega_b__z);
+                             omega_b__y,
+                             omega_b__z);
       this->alpha_b__des.set(0.0, 0.0, 0.0);
 
       this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
@@ -305,12 +305,12 @@ namespace Gnc {
       this->x_w__des = Se3FeedForward.getposition();
       this->v_w__des = Se3FeedForward.getvelocity();
       this->a_w__des = Se3FeedForward.getacceleration();
-      
+
       this->w_q_b__des = Se3FeedForward.getattitude();
       this->omega_b__des = Se3FeedForward.getangular_rates();
       this->alpha_b__des = Se3FeedForward.getangular_acceleration();
   }
-  
+
   void Se3CtrlComponentImpl ::
     odometry_handler(
         const NATIVE_INT_TYPE portNum,
@@ -347,7 +347,7 @@ namespace Gnc {
                                                               this->a_w__des.gety(),
                                                               this->a_w__des.getz()));
           }
-	  else if (POS_LINVEL == this->posCtrlMode) {
+          else if (POS_LINVEL == this->posCtrlMode) {
               this->se3Control.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
                                                               this->x_w__des.gety(),
                                                               this->x_w__des.getz()),
@@ -372,10 +372,10 @@ namespace Gnc {
               // don't use position
               this->se3Control.GetAccelCommand(&a_w__comm, true);
           }
-	  else if (POS_LINVEL == this->posCtrlMode) {
+          else if (POS_LINVEL == this->posCtrlMode) {
               this->se3Control.GetAccelCommand(&a_w__comm, false);
           }
-	  
+
           using ROS::geometry_msgs::Vector3;
 
           Eigen::Vector3d force_b__comm;
@@ -387,21 +387,21 @@ namespace Gnc {
 
               bool rpVelOnly = false;
               bool yawVelOnly = false;
-	      bool doSaturation = true;
+              bool doSaturation = true;
 
               if (RPRATE_YAW == this->attCtrlMode) {
                   rpVelOnly = true;
               }
-              
+
               if (ATTRATE == this->attCtrlMode) {
                   rpVelOnly = true;
                   yawVelOnly = true;
               }
 
-	      if (YAW_ONLY == this->attCtrlMode) {
-		  doSaturation = false;
-	      }
-            
+              if (YAW_ONLY == this->attCtrlMode) {
+                  doSaturation = false;
+              }
+
               Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
                                                                   this->w_q_b__des.getx(),
                                                                   this->w_q_b__des.gety(),
@@ -416,7 +416,7 @@ namespace Gnc {
                                                   this->alpha_b__des.gety(),
                                                   this->alpha_b__des.getz()),
                                               rpVelOnly, yawVelOnly,
-					      doSaturation);
+                                              doSaturation);
           }
 
           // set angular feedback
@@ -430,7 +430,7 @@ namespace Gnc {
                                                  this->omega_b.gety(),
                                                  this->omega_b.getz()));
 
-	  force_b__comm = this->mass * (_w_q_b.inverse() * a_w__comm);
+          force_b__comm = this->mass * (_w_q_b.inverse() * a_w__comm);
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
           if (RPRATE_YAW == this->attCtrlMode) {
@@ -440,7 +440,7 @@ namespace Gnc {
               this->se3Control.GetAngAccelCommand(&alpha_b__comm, true, true);
           }
           else if (YAW_ONLY == this->attCtrlMode) {
-	      this->se3Control.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<2);
+              this->se3Control.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<2);
           }
           else if (ATT_ATTRATE == this->attCtrlMode) {
               this->se3Control.GetAngAccelCommand(&alpha_b__comm);
@@ -448,23 +448,23 @@ namespace Gnc {
 
           Eigen::Vector3d moment_b__comm = this->J_b * alpha_b__comm;
 
-	  // NOTE(mereweth) - double-checking that zero if disabled
-	  if (POSCTRL_DISABLED == this->posCtrlMode) {
-	      force_b__comm = Eigen::Vector3d(0.0, 0.0, 0.0);
-	  }
-	  if (ATTCTRL_DISABLED == this->attCtrlMode) {
-	      moment_b__comm = Eigen::Vector3d(0.0, 0.0, 0.0);
-	  }
-	  
+          // NOTE(mereweth) - double-checking that zero if disabled
+          if (POSCTRL_DISABLED == this->posCtrlMode) {
+              force_b__comm = Eigen::Vector3d(0.0, 0.0, 0.0);
+          }
+          if (ATTCTRL_DISABLED == this->attCtrlMode) {
+              moment_b__comm = Eigen::Vector3d(0.0, 0.0, 0.0);
+          }
+
           // TODO(mereweth) - convert frame id
           ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"body"*/);
           ROS::geometry_msgs::WrenchStamped u_b__comm(h,
-		 ROS::geometry_msgs::Wrench(
-					    Vector3(force_b__comm(0), force_b__comm(1), force_b__comm(2)),
-					    Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2))));
+              ROS::geometry_msgs::Wrench(
+                  Vector3(force_b__comm(0), force_b__comm(1), force_b__comm(2)),
+                  Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2))));
           if (this->isConnected_controls_OutputPort(0) &&
               ((ATTCTRL_DISABLED != this->attCtrlMode) ||
-	       (POSCTRL_DISABLED != this->posCtrlMode))) {
+               (POSCTRL_DISABLED != this->posCtrlMode))) {
               this->controls_out(0, u_b__comm);
           }
 
@@ -473,7 +473,7 @@ namespace Gnc {
                                       Vector3(alpha_b__comm(0), alpha_b__comm(1), alpha_b__comm(2))));
           if (this->isConnected_accelCommand_OutputPort(0) &&
               ((ATTCTRL_DISABLED != this->attCtrlMode) ||
-	       (POSCTRL_DISABLED != this->posCtrlMode))) {
+               (POSCTRL_DISABLED != this->posCtrlMode))) {
               this->accelCommand_out(0, accel__comm);
           }
 
@@ -490,7 +490,7 @@ namespace Gnc {
           this->tlmWrite_SE3CTRL_XThrustComm(this->u_tlm[0]);
           this->tlmWrite_SE3CTRL_YThrustComm(this->u_tlm[1]);
           this->tlmWrite_SE3CTRL_ZThrustComm(this->u_tlm[2]);
-	  
+
           this->tlmWrite_SE3CTRL_MomentCommX(this->u_tlm[3]);
           this->tlmWrite_SE3CTRL_MomentCommY(this->u_tlm[4]);
           this->tlmWrite_SE3CTRL_MomentCommZ(this->u_tlm[5]);
@@ -498,12 +498,12 @@ namespace Gnc {
           this->tlmWrite_SE3CTRL_w_q_b__des(this->w_q_b__des);
           this->tlmWrite_SE3CTRL_w_q_b(this->w_q_b);
 
-	  this->tlmWrite_SE3CTRL_Error_x_w(this->x_w__des.getx()
-					   - this->x_w.getx());
-	  this->tlmWrite_SE3CTRL_Error_y_w(this->x_w__des.gety()
-					   - this->x_w.gety());
-	  this->tlmWrite_SE3CTRL_Error_z_w(this->x_w__des.getz()
-					   - this->x_w.getz());
+          this->tlmWrite_SE3CTRL_Error_x_w(this->x_w__des.getx()
+                                           - this->x_w.getx());
+          this->tlmWrite_SE3CTRL_Error_y_w(this->x_w__des.gety()
+                                           - this->x_w.gety());
+          this->tlmWrite_SE3CTRL_Error_z_w(this->x_w__des.getz()
+                                           - this->x_w.getz());
       }
       else {
           // TODO(mereweth) - assert invalid port

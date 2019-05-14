@@ -72,7 +72,6 @@ UTILS_MODULES := \
 
 # dependent on turbojpeg and zmq
 SVC_EXTRA_MODULES := \
-	Svc/ImgComp \
 	Svc/ImgTlm
 
 SVC_MODULES := \
@@ -165,8 +164,11 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/BlspSerialDriver \
 	SnapdragonFlight/BlspGpioDriver \
 	SnapdragonFlight/BlspSpiDriver \
+	SnapdragonFlight/BlspI2CDriver \
+	SnapdragonFlight/BlspPwmDriver \
 	SnapdragonFlight/SnapdragonHealth \
 	SnapdragonFlight/MVCam \
+	SnapdragonFlight/StereoCam \
 	SnapdragonFlight/HiresCam \
 	SnapdragonFlight/MVVislam
 
@@ -177,7 +179,8 @@ HEXAGON_MODULES := \
 QUEST_GNC_ROSIFACE_MODULES := \
 	Gnc/Ctrl/MultirotorCtrlIface \
 	Gnc/Utils/AckermannIface \
-	Gnc/Est/FilterIface
+	Gnc/Est/FilterIface \
+	Gnc/Est/GroundTruthIface
 
 QUEST_GNC_MODULES := \
 	Gnc/Ctrl/LeeCtrl \
@@ -188,6 +191,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
 	Gnc/Utils/FixedAxisSe3Adapter \
+	Gnc/Utils/AckermannConverter \
 	Gnc/Utils/FrameTransform \
 	Gnc/Utils/ImuProc \
 	Gnc/quest_gnc/src/diffeo \
@@ -272,6 +276,84 @@ Ref_MODULES := \
 	$(SVC_MODULES) \
 	\
 	$(DRV_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+BLIMPREF_DEPLOYMENT_MODULES := \
+	BLIMPREF/Top
+
+BLIMPREF_MODULES := \
+	\
+	$(BLIMPREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	Drv/IMU/MPU9250 \
+	\
+	$(ZMQ_MODULES) \
+	\
+	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
+	\
+	$(SNAPDRAGON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
+	\
+	$(DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
+	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+	$(CFDP_MODULES) \
+	\
+	$(UTILS_MODULES)
+
+CARREF_DEPLOYMENT_MODULES := \
+	CARREF/Top
+
+CARREF_MODULES := \
+	\
+	$(CARREF_DEPLOYMENT_MODULES) \
+	\
+	Drv/ForceTorque/ATINetbox \
+	Drv/IMU/MPU9250 \
+	\
+	$(ZMQ_MODULES) \
+	\
+	$(HLPROC_MODULES) \
+	$(HLPROC_ROS_MODULES) \
+	\
+	$(COMMON_MODULES) \
+	\
+	$(QUEST_GNC_MODULES) \
+	$(QUEST_GNC_HW_MODULES) \
+	$(QUEST_GNC_ROSIFACE_MODULES) \
+	\
+	$(SNAPDRAGON_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(SVC_EXTRA_MODULES) \
+	\
+	$(DRV_MODULES) \
+	\
+	$(ROS_MODULES) \
 	\
 	$(FW_MODULES) \
 	\
@@ -379,12 +461,14 @@ HEXREF_GENERAL_MODULES := \
 	ROS/Gen/nav_msgs/Ports           \
 	ROS/Gen/mav_msgs/Ports		 \
 	ROS/Gen/sensor_msgs/Ports	\
+	ROS/Gen/ackermann_msgs/Ports	\
 	\
 	ROS/Gen/std_msgs/Types  \
 	ROS/Gen/geometry_msgs/Types      \
 	ROS/Gen/nav_msgs/Types           \
 	ROS/Gen/mav_msgs/Types		 \
 	ROS/Gen/sensor_msgs/Types	\
+	ROS/Gen/ackermann_msgs/Types	\
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
@@ -630,7 +714,7 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF
 
 # Location of ground/gse software. Autocoded dictionary elements are copied here.
 GDS_MODULE := Gse

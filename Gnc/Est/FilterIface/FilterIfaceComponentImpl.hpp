@@ -25,6 +25,7 @@
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
 #include "mav_msgs/ImuStateUpdate.h"
+#include "sensor_msgs/Imu.h"
 #include "tf/transform_broadcaster.h"
 
 #include "Os/Task.hpp"
@@ -93,6 +94,24 @@ namespace Gnc {
 
         }; // end class ImuStateUpdateHandler
 
+        class ImuHandler
+        {
+          public:
+              ImuHandler(FilterIfaceComponentImpl* compPtr,
+                         int portNum);
+
+              ~ImuHandler();
+
+              void imuCallback(const sensor_msgs::Imu::ConstPtr& msg);
+
+          PRIVATE:
+
+              FilterIfaceComponentImpl* compPtr;
+
+              const unsigned int portNum;
+
+        }; // end class ImuHandler
+
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
@@ -145,7 +164,14 @@ namespace Gnc {
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
-    
+
+        struct ImuSet {
+            Os::Mutex mutex; //! Mutex lock to guard odometry object
+            ROS::sensor_msgs::ImuNoCov imu; //! message object
+            bool fresh; //! Whether object has been updated
+            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
+        } m_imuSet[NUM_IMU_OUTPUT_PORTS];    
+
     };
 
 } // end namespace

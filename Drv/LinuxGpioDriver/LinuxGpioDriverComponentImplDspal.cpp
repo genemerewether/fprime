@@ -97,8 +97,8 @@ namespace Drv {
 	   * read value was large number, odd or even to indicate state.
 	   * even is low, odd is high
 	   */
-	state = (val % 2);
-	DEBUG_PRINT("GPIO %u value %u read; state %u",this->m_fd, val, state);
+          state = (val % 2);
+          DEBUG_PRINT("GPIO %u value %u read; state %u",this->m_fd, val, state);
       }
   }
 
@@ -187,6 +187,7 @@ namespace Drv {
 
       for (NATIVE_INT_TYPE port = 0; port < compPtr->getNum_intOut_OutputPorts(); port++) {
           if (compPtr->isConnected_intOut_OutputPort(port)) {
+              DEBUG_PRINT("gpio int %d\n", port);
               compPtr->intOut_out(port,timerVal);
           }
       }
@@ -208,6 +209,10 @@ namespace Drv {
           close(this->m_fd);
           this->m_fd = -1;
       }
+  }
+  
+  void LinuxGpioDriverComponentImpl ::
+    joinThread(void **value_ptr) {
   }
 
   LinuxGpioDriverComponentImpl ::

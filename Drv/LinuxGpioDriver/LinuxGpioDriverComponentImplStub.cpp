@@ -64,4 +64,8 @@ namespace Drv {
   void LinuxGpioDriverComponentImpl ::
     exitThread(void) {
   }
+  
+  void LinuxGpioDriverComponentImpl ::
+    joinThread(void **value_ptr) {
+  }
 } // end namespace Drv

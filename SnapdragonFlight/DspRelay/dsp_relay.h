@@ -35,7 +35,7 @@ __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_write)(int fd, int v
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_read)(int fd) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_start_int)(int gpio, int fd) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_isr_wait)(int gpio, int fd) __QAIC_HEADER_ATTRIBUTE;
-__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_quit)(int gpio) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_quit)(int gpio, int fd) __QAIC_HEADER_ATTRIBUTE;
 typedef struct _dsp_relay_dataBuffer__seq_octet _dsp_relay_dataBuffer__seq_octet;
 typedef _dsp_relay_dataBuffer__seq_octet dsp_relay_dataBuffer;
 struct _dsp_relay_dataBuffer__seq_octet {
@@ -53,6 +53,20 @@ __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_open)(int device) __Q
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_configure)(int fd, int clock) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_read_write)(int fd, const unsigned char* write_data, int write_dataLen, unsigned char* read_data, int read_dataLen) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_spi_relay_close)(int fd) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_open)(int device) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_configure)(int fd, int busSpeed, int slaveAddr, int timeout) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_read_write)(int fd, const unsigned char* write_data, int write_dataLen, unsigned char* read_data, int read_dataLen) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_i2c_relay_close)(int fd) __QAIC_HEADER_ATTRIBUTE;
+typedef struct _dsp_relay_configBuffer__seq_unsignedLong _dsp_relay_configBuffer__seq_unsignedLong;
+typedef _dsp_relay_configBuffer__seq_unsignedLong dsp_relay_configBuffer;
+struct _dsp_relay_configBuffer__seq_unsignedLong {
+   unsigned int* data;
+   int dataLen;
+};
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_pwm_relay_open)(int device) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_pwm_relay_configure)(int fd, uint64* handle, const unsigned int* channel, int channelLen, unsigned int period_in_usecs) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_pwm_relay_set_duty)(uint64 handle, const unsigned int* pulse_width_in_usecs, int pulse_width_in_usecsLen, unsigned int bitmask) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_pwm_relay_close)(int fd) __QAIC_HEADER_ATTRIBUTE;
 #ifdef __cplusplus
 }
 #endif

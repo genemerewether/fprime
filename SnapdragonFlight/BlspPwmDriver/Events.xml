@@ -1,0 +1,79 @@
+<events>
+    <event id="0" name="PWM_OpenError" severity="WARNING_HI" format_string = "Error opening PWM chip %d, line %d: %d" >
+        <comment>
+        Open error
+        </comment>
+        <args>
+            <arg name="chip" type="I32">
+                <comment>The PWM chip</comment>
+            </arg>
+            <arg name="line" type="I32">
+                <comment>The PWM line</comment>
+            </arg>
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>          
+        </args>
+    </event>
+    <event id="1" name="PWM_ConfigError" severity="WARNING_HI" format_string = "Error configuring PWM chip %d, line %d: %d" >
+        <comment>
+        PWM configure error
+        </comment>
+        <args>
+            <arg name="chip" type="I32">
+                <comment>The PWM chip</comment>
+            </arg>
+            <arg name="line" type="I32">
+                <comment>The PWM line</comment>
+            </arg>          
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>          
+        </args>
+    </event>
+    <event id="2" name="PWM_WriteError" severity="WARNING_HI" format_string = "Error writing PWM chip %d, line %d: %d"  throttle = "5">
+        <comment>
+        PWM write error
+        </comment>
+        <args>
+            <arg name="chip" type="I32">
+                <comment>The PWM chip</comment>
+            </arg>
+            <arg name="line" type="I32">
+                <comment>The PWM line</comment>
+            </arg>          
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>          
+        </args>
+    </event>
+    <event id="3" name="PWM_ReadError" severity="WARNING_HI" format_string = "Error reading PWM chip %d, line %d: %d" throttle = "5">
+        <comment>
+        PWM read error
+        </comment>
+        <args>
+            <arg name="chip" type="I32">
+                <comment>The PWM chip</comment>
+            </arg>
+            <arg name="line" type="I32">
+                <comment>The PWM line</comment>
+            </arg>          
+            <arg name="error" type="I32">
+                <comment>The error code</comment>
+            </arg>          
+        </args>
+    </event>
+    <event id="4" name="PWM_PortOpened" severity="ACTIVITY_HI" format_string = "PWM chip %d, line %d configured" >
+        <comment>
+        PWM opened notification
+        </comment>
+        <args>
+            <arg name="chip" type="I32">
+                <comment>The PWM chip</comment>
+            </arg>
+            <arg name="line" type="I32">
+                <comment>The PWM line</comment>
+            </arg>          
+        </args>
+    </event>
+</events>

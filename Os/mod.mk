@@ -87,10 +87,10 @@ SRC_SDFLIGHT =  Posix/IPCQueue.cpp \
 				Posix/LocklessQueue.cpp \
 				Linux/FileSystem.cpp	
 
-SRC_DSPAL =  Pthreads/Queue.cpp \
-	 	Pthreads/BufferQueueCommon.cpp \
-                Pthreads/PriorityBufferQueue.cpp \
-                Pthreads/MaxHeap/MaxHeap.cpp \
+SRC_DSPAL =     Pthreads/Queue.cpp \
+				Pthreads/BufferQueueCommon.cpp \
+				Pthreads/PriorityBufferQueue.cpp \
+				Pthreads/MaxHeap/MaxHeap.cpp \
 				Dspal/FileStub.cpp \
 				Dspal/IPCQueueStub.cpp \
 				Dspal/Task.cpp \

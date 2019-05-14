@@ -28,6 +28,7 @@ void exitTasks(void);
 #include <SnapdragonFlight/SnapdragonHealth/SnapdragonHealthComponentImpl.hpp>
 
 #include <SnapdragonFlight/MVCam/MVCamComponentImpl.hpp>
+#include <SnapdragonFlight/StereoCam/StereoCamComponentImpl.hpp>
 #include <SnapdragonFlight/MVVislam/MVVislamComponentImpl.hpp>
 #include <SnapdragonFlight/HiresCam/HiresCamComponentImpl.hpp>
 
@@ -77,6 +78,7 @@ extern Svc::PrmDbImpl* prmDb_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;
+extern SnapdragonFlight::StereoCamComponentImpl* stereoCam_ptr;
 extern SnapdragonFlight::MVVislamComponentImpl* mvVislam_ptr;
 extern SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
@@ -92,7 +94,9 @@ extern Svc::ImgTlmComponentImpl* imgTlm_ptr;
 
 extern Svc::BufferLogger* buffLogMVCamUnproc_ptr;
 extern Svc::BufferLogger* buffLogHiresCamUnproc_ptr;
+extern Svc::BufferLogger* buffLogStereoCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr;
+extern Svc::BufferAccumulator* buffAccumStereoCamUnproc_ptr;
 
 #endif

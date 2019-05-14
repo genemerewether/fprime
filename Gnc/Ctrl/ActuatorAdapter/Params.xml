@@ -10,104 +10,104 @@
     </parameter>
 
     <parameter id="10" set_opcode="40" save_opcode="41" name="a1_addr" data_type="U32" >
-      <comment>actuator 1 address (I2C)</comment>
+      <comment>actuator 1 address</comment>
+    </parameter>
+    <parameter id="11" set_opcode="42" save_opcode="43" name="a1_inputActIdx" data_type="U8" >
+      <comment>actuator 1 input index</comment>
     </parameter>
     <parameter id="15" set_opcode="50" save_opcode="51" name="a1_reverse" data_type="bool" >
       <comment>actuator 1 reverse direction flag</comment>
-    </parameter>
-    <parameter id="16" set_opcode="52" save_opcode="53" name="a1_type" data_type="U8" >
-      <comment>actuator 1 type</comment>
     </parameter>
     <parameter id="18" set_opcode="56" save_opcode="57" name="a1_parmSlot" data_type="U8" >
       <comment>actuator 1 which param set</comment>
     </parameter>
 
     <parameter id="20" set_opcode="60" save_opcode="61" name="a2_addr" data_type="U32" >
-      <comment>actuator 2 address (I2C)</comment>
+      <comment>actuator 2 address</comment>
+    </parameter>
+    <parameter id="21" set_opcode="62" save_opcode="63" name="a2_inputActIdx" data_type="U8" >
+      <comment>actuator 2 input index</comment>
     </parameter>
     <parameter id="25" set_opcode="70" save_opcode="71" name="a2_reverse" data_type="bool" >
       <comment>actuator 2 reverse direction flag</comment>
-    </parameter>
-    <parameter id="26" set_opcode="72" save_opcode="73" name="a2_type" data_type="U8" >
-      <comment>actuator 2 type</comment>
     </parameter>
     <parameter id="28" set_opcode="76" save_opcode="77" name="a2_parmSlot" data_type="U8" >
       <comment>actuator 2 which param set</comment>
     </parameter>
 
     <parameter id="30" set_opcode="80" save_opcode="81" name="a3_addr" data_type="U32" >
-      <comment>actuator 3 address (I2C)</comment>
+      <comment>actuator 3 address</comment>
+    </parameter>
+    <parameter id="31" set_opcode="82" save_opcode="83" name="a3_inputActIdx" data_type="U8" >
+      <comment>actuator 3 input index</comment>
     </parameter>
     <parameter id="35" set_opcode="90" save_opcode="91" name="a3_reverse" data_type="bool" >
       <comment>actuator 3 reverse direction flag</comment>
-    </parameter>
-    <parameter id="36" set_opcode="92" save_opcode="93" name="a3_type" data_type="U8" >
-      <comment>actuator 3 type</comment>
     </parameter>
     <parameter id="38" set_opcode="96" save_opcode="97" name="a3_parmSlot" data_type="U8" >
       <comment>actuator 3 which param set</comment>
     </parameter>
 
     <parameter id="40" set_opcode="100" save_opcode="101" name="a4_addr" data_type="U32" >
-      <comment>actuator 4 address (I2C)</comment>
+      <comment>actuator 4 address</comment>
+    </parameter>
+    <parameter id="41" set_opcode="102" save_opcode="103" name="a4_inputActIdx" data_type="U8" >
+      <comment>actuator 4 input index</comment>
     </parameter>
     <parameter id="45" set_opcode="110" save_opcode="111" name="a4_reverse" data_type="bool" >
       <comment>actuator 4 reverse direction flag</comment>
-    </parameter>
-    <parameter id="46" set_opcode="112" save_opcode="113" name="a4_type" data_type="U8" >
-      <comment>actuator 4 type</comment>
     </parameter>
     <parameter id="48" set_opcode="116" save_opcode="117" name="a4_parmSlot" data_type="U8" >
       <comment>actuator 4 which param set</comment>
     </parameter>
 
     <parameter id="50" set_opcode="120" save_opcode="121" name="a5_addr" data_type="U32" >
-      <comment>actuator 5 address (I2C)</comment>
+      <comment>actuator 5 address</comment>
+    </parameter>
+    <parameter id="51" set_opcode="122" save_opcode="123" name="a5_inputActIdx" data_type="U8" >
+      <comment>actuator 5 input index</comment>
     </parameter>
     <parameter id="55" set_opcode="130" save_opcode="131" name="a5_reverse" data_type="bool" >
       <comment>actuator 5 reverse direction flag</comment>
-    </parameter>
-    <parameter id="56" set_opcode="132" save_opcode="133" name="a5_type" data_type="U8" >
-      <comment>actuator 5 type</comment>
     </parameter>
     <parameter id="58" set_opcode="136" save_opcode="137" name="a5_parmSlot" data_type="U8" >
       <comment>actuator 5 which param set</comment>
     </parameter>
 
     <parameter id="60" set_opcode="140" save_opcode="141" name="a6_addr" data_type="U32" >
-      <comment>actuator 6 address (I2C)</comment>
+      <comment>actuator 6 address</comment>
+    </parameter>
+    <parameter id="61" set_opcode="142" save_opcode="143" name="a6_inputActIdx" data_type="U8" >
+      <comment>actuator 6 input index</comment>
     </parameter>
     <parameter id="65" set_opcode="150" save_opcode="151" name="a6_reverse" data_type="bool" >
       <comment>actuator 6 reverse direction flag</comment>
-    </parameter>
-    <parameter id="66" set_opcode="152" save_opcode="153" name="a6_type" data_type="U8" >
-      <comment>actuator 6 type</comment>
     </parameter>
     <parameter id="68" set_opcode="156" save_opcode="157" name="a6_parmSlot" data_type="U8" >
       <comment>actuator 6 which param set</comment>
     </parameter>
 
     <parameter id="70" set_opcode="160" save_opcode="161" name="a7_addr" data_type="U32" >
-      <comment>actuator 7 address (I2C)</comment>
+      <comment>actuator 7 address</comment>
+    </parameter>
+    <parameter id="71" set_opcode="162" save_opcode="163" name="a7_inputActIdx" data_type="U8" >
+      <comment>actuator 7 input index</comment>
     </parameter>
     <parameter id="75" set_opcode="170" save_opcode="171" name="a7_reverse" data_type="bool" >
       <comment>actuator 7 reverse direction flag</comment>
-    </parameter>
-    <parameter id="76" set_opcode="172" save_opcode="173" name="a7_type" data_type="U8" >
-      <comment>actuator 7 type</comment>
     </parameter>
     <parameter id="78" set_opcode="176" save_opcode="177" name="a7_parmSlot" data_type="U8" >
       <comment>actuator 7 which param set</comment>
     </parameter>
 
     <parameter id="80" set_opcode="180" save_opcode="181" name="a8_addr" data_type="U32" >
-      <comment>actuator 8 address (I2C)</comment>
+      <comment>actuator 8 address</comment>
+    </parameter>
+    <parameter id="81" set_opcode="182" save_opcode="183" name="a8_inputActIdx" data_type="U8" >
+      <comment>actuator 8 input index</comment>
     </parameter>
     <parameter id="85" set_opcode="190" save_opcode="191" name="a8_reverse" data_type="bool" >
       <comment>actuator 8 reverse direction flag</comment>
-    </parameter>
-    <parameter id="86" set_opcode="192" save_opcode="193" name="a8_type" data_type="U8" >
-      <comment>actuator 8 type</comment>
     </parameter>
     <parameter id="88" set_opcode="196" save_opcode="197" name="a8_parmSlot" data_type="U8" >
       <comment>actuator 8 which param set</comment>
@@ -119,11 +119,11 @@
     <parameter id="101" set_opcode="222" save_opcode="223" name="p1_maxCmd" data_type="F64" >
       <comment>parm slot 1 maximum command</comment>
     </parameter>
-    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="I64" >
-      <comment>parm slot 1 minimum output (interpret as float for some types)</comment>
+    <parameter id="102" set_opcode="224" save_opcode="225" name="p1_minOut" data_type="F64" >
+      <comment>parm slot 1 minimum output</comment>
     </parameter>
-    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="I64" >
-      <comment>parm slot 1 maximum output (interpret as float for some types)</comment>
+    <parameter id="103" set_opcode="226" save_opcode="227" name="p1_maxOut" data_type="F64" >
+      <comment>parm slot 1 maximum output</comment>
     </parameter>
     <parameter id="104" set_opcode="228" save_opcode="229" name="p1_counts" data_type="U32" >
       <comment>parm slot 1 counts per rev</comment>
@@ -153,6 +153,9 @@
     <parameter id="112" set_opcode="244" save_opcode="245" name="p1_map_Vnom" data_type="F64" >
       <comment>parm slot 1 voltage at which mapping was determined</comment>
     </parameter>
+    <parameter id="113" set_opcode="246" save_opcode="247" name="p1_map_offset" data_type="F64" default="0.0" >
+      <comment>parm slot 1 output range zero offset</comment>
+    </parameter>
 
     <parameter id="120" set_opcode="260" save_opcode="261" name="p1_ctrlType" data_type="U8" >
       <comment>parm slot 1 error control type</comment>
@@ -162,5 +165,73 @@
     </parameter>
     <parameter id="122" set_opcode="264" save_opcode="265" name="p1_ctrl_kp" data_type="F64" >
       <comment>parm slot 1 proportional gain on error</comment>
+    </parameter>
+
+    <parameter id="130" set_opcode="280" save_opcode="281" name="p1_outputType" data_type="U8" >
+      <comment>parm slot 1 actuator output type</comment>
+    </parameter>
+    <parameter id="131" set_opcode="282" save_opcode="283" name="p1_inputActType" data_type="U8" >
+      <comment>parm slot 1 actuator input type</comment>
+    </parameter>
+    
+    <parameter id="140" set_opcode="300" save_opcode="301" name="p2_minCmd" data_type="F64" >
+      <comment>parm slot 2 minimum command</comment>
+    </parameter>
+    <parameter id="141" set_opcode="302" save_opcode="303" name="p2_maxCmd" data_type="F64" >
+      <comment>parm slot 2 maximum command</comment>
+    </parameter>
+    <parameter id="142" set_opcode="304" save_opcode="305" name="p2_minOut" data_type="F64" >
+      <comment>parm slot 2 minimum output</comment>
+    </parameter>
+    <parameter id="143" set_opcode="306" save_opcode="307" name="p2_maxOut" data_type="F64" >
+      <comment>parm slot 2 maximum output</comment>
+    </parameter>
+    <parameter id="144" set_opcode="308" save_opcode="309" name="p2_counts" data_type="U32" >
+      <comment>parm slot 2 counts per rev</comment>
+    </parameter>
+
+    <parameter id="145" set_opcode="310" save_opcode="311" name="p2_mapType" data_type="U8" >
+      <comment>parm slot 2 mapping from command to output</comment>
+    </parameter>
+    <parameter id="146" set_opcode="312" save_opcode="313" name="p2_map_x0" data_type="F64" >
+      <comment>parm slot 2 first break in piecewise linear</comment>
+    </parameter>
+    <parameter id="147" set_opcode="314" save_opcode="315" name="p2_map_x1" data_type="F64" >
+      <comment>parm slot 2 second break in piecewise linear</comment>
+    </parameter>
+    <parameter id="148" set_opcode="316" save_opcode="317" name="p2_map_k0" data_type="F64" >
+      <comment>parm slot 2 first slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="149" set_opcode="318" save_opcode="319" name="p2_map_k1" data_type="F64" >
+      <comment>parm slot 2 second slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="150" set_opcode="320" save_opcode="321" name="p2_map_k2" data_type="F64" >
+      <comment>parm slot 2 third slope in piecewise linear</comment>
+    </parameter>
+    <parameter id="151" set_opcode="322" save_opcode="323" name="p2_map_b" data_type="F64" >
+      <comment>parm slot 2 y intercept in piecewise linear</comment>
+    </parameter>
+    <parameter id="152" set_opcode="324" save_opcode="325" name="p2_map_Vnom" data_type="F64" >
+      <comment>parm slot 2 voltage at which mapping was determined</comment>
+    </parameter>
+    <parameter id="153" set_opcode="326" save_opcode="327" name="p2_map_offset" data_type="F64" default="0.0" >
+      <comment>parm slot 2 output range zero offset</comment>
+    </parameter>
+
+    <parameter id="160" set_opcode="340" save_opcode="341" name="p2_ctrlType" data_type="U8" >
+      <comment>parm slot 2 error control type</comment>
+    </parameter>
+    <parameter id="161" set_opcode="342" save_opcode="343" name="p2_ctrl_maxErr" data_type="F64" >
+      <comment>parm slot 2 max delta from controller</comment>
+    </parameter>
+    <parameter id="162" set_opcode="344" save_opcode="345" name="p2_ctrl_kp" data_type="F64" >
+      <comment>parm slot 2 proportional gain on error</comment>
+    </parameter>
+
+    <parameter id="170" set_opcode="360" save_opcode="361" name="p2_outputType" data_type="U8" >
+      <comment>parm slot 2 actuator output type</comment>
+    </parameter>
+    <parameter id="171" set_opcode="362" save_opcode="363" name="p2_inputActType" data_type="U8" >
+      <comment>parm slot 2 actuator input type</comment>
     </parameter>
 </parameters>

@@ -229,7 +229,6 @@ namespace SnapdragonFlight {
             // wait for data
             int sizeRead = 0;
             unsigned int portNum = 0;
-            bool waiting = true;
 
             timespec stime;
             (void)clock_gettime(CLOCK_REALTIME,&stime);
@@ -238,37 +237,17 @@ namespace SnapdragonFlight {
 
             int stat = 0;
 
-            while (waiting) {
-                stat = rpc_relay_port_read(reinterpret_cast<unsigned char*>(buff),
-                                           HR_RPC_READ_SIZE, &sizeRead);
-                // setBuffLen to sizeRead called below
+            // NOTE(mereweth) - blocking
+            stat = rpc_relay_port_read(reinterpret_cast<unsigned char*>(buff),
+                                       HR_RPC_READ_SIZE, &sizeRead);
+            // setBuffLen to sizeRead called below
 
-                timespec stime;
-                (void)clock_gettime(CLOCK_REALTIME,&stime);
-                DEBUG_PRINT("After rpc_relay_port_read() at %d %d; quit? %d\n",
-                            stime.tv_sec, stime.tv_nsec, comp->m_quitReadThreads);
-
-                // TODO(mereweth) - is this the best strategy for performance? Favor the DSP
-                // check for timeout
-                if ((stat == KR_RTN_OK) &&
-                    (sizeRead == 0))     {
-                    if (comp->m_quitReadThreads) {
-                        waiting = false;
-                        break;
-                    }
-                    usleep(HR_NO_MSG_SLEEP_US);
-                } else { // quit if other error or if data received
-                    waiting = false;
-                }
-            }
+            (void)clock_gettime(CLOCK_REALTIME,&stime);
+            DEBUG_PRINT("After rpc_relay_port_read() at %d %d; quit? %d\n",
+                        stime.tv_sec, stime.tv_nsec, comp->m_quitReadThreads);
 
             if (comp->m_quitReadThreads) {
-#ifdef BUILD_SDFLIGHT
-                rpcmem_free(buff);
-#else
-                free(buff);
-#endif
-                return;
+                break;
             }
 
             // TODO(mereweth) - make EVRs for exit

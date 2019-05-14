@@ -75,6 +75,7 @@ Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 
 SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
 SnapdragonFlight::MVCamComponentImpl* mvCam_ptr = 0;
+SnapdragonFlight::StereoCamComponentImpl* stereoCam_ptr = 0;
 SnapdragonFlight::MVVislamComponentImpl* mvVislam_ptr = 0;
 SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
@@ -96,8 +97,10 @@ Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
 
 Svc::BufferLogger* buffLogMVCamUnproc_ptr = 0;
 Svc::BufferLogger* buffLogHiresCamUnproc_ptr = 0;
+Svc::BufferLogger* buffLogStereoCamUnproc_ptr = 0;
 Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr = 0;
 Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr = 0;
+Svc::BufferAccumulator* buffAccumStereoCamUnproc_ptr = 0;
 
 void allocComps() {
     // Component instance pointers
@@ -163,7 +166,7 @@ void allocComps() {
                         ("SERLOG")
 #endif
 ;
-    
+
     linuxTime_ptr = new Svc::LinuxTimeImpl
 #if FW_OBJECT_NAMES == 1
                         ("LTIME")
@@ -207,10 +210,16 @@ void allocComps() {
                         ("SDHEALTH")
 #endif
 ;
-    
+
     mvCam_ptr = new SnapdragonFlight::MVCamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("MVCAM")
+#endif
+;
+
+    stereoCam_ptr = new SnapdragonFlight::StereoCamComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SCAM")
 #endif
 ;
 
@@ -219,13 +228,13 @@ void allocComps() {
                         ("MVVISLAM")
 #endif
 ;
-    
+
     ipcRelay_ptr = new Svc::IPCRelayComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("IPCRELAY")
 #endif
 ;
-    
+
     hiresCam_ptr = new SnapdragonFlight::HiresCamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HIRESCAM")
@@ -250,17 +259,29 @@ void allocComps() {
 #endif
 ;
 
+    buffLogStereoCamUnproc_ptr = new Svc::BufferLogger
+#if FW_OBJECT_NAMES == 1
+                        ("BUFLOG_S_U")
+#endif
+;
+
     buffAccumMVCamUnproc_ptr = new Svc::BufferAccumulator
 #if FW_OBJECT_NAMES == 1
                         ("BUFACC_M_U")
 #endif
 ;
+
     buffAccumHiresCamUnproc_ptr = new Svc::BufferAccumulator
 #if FW_OBJECT_NAMES == 1
                         ("BUFACC_H_U")
 #endif
 ;
 
+    buffAccumStereoCamUnproc_ptr = new Svc::BufferAccumulator
+#if FW_OBJECT_NAMES == 1
+                        ("BUFACC_S_U")
+#endif
+;
 
     hexRouter_ptr = new SnapdragonFlight::HexRouterComponentImpl
 #if FW_OBJECT_NAMES == 1
@@ -279,7 +300,7 @@ void allocComps() {
                         ("ATINETBOX")
 #endif
 ;
-    
+
     serialDriverLL_ptr = new Drv::LinuxSerialDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SERIALDRVLL")
@@ -361,7 +382,7 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct() {  
+void manualConstruct() {
 #ifndef LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -373,9 +394,9 @@ void manualConstruct() {
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
-    
+
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1, hexRouter_ptr->get_Sched_InputPort(0));
-    
+
     mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
@@ -399,7 +420,7 @@ void manualConstruct() {
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
-    
+
     mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
@@ -410,10 +431,10 @@ void manualConstruct() {
 
     cmdSeq2_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(8));
     llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
-    
+
     mrCtrlIface_ptr->set_boolStamped_OutputPort(0, llRouter_ptr->get_KraitPortsIn_InputPort(9));
 #endif
-    
+
     hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
     // doesn't matter which compCmdStat port # for cmdDisp
     ipcRelay_ptr->set_proc2Out_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
@@ -435,17 +456,40 @@ void manualConstruct() {
 
     hiresCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(5));
     ipcRelay_ptr->set_proc2Out_OutputPort(5, buffAccumHiresCamUnproc_ptr->get_bufferSendInFill_InputPort(0));
+
+
+    stereoCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(6));
+    // doesn't matter which compCmdStat port # for cmdDisp
+    ipcRelay_ptr->set_proc2Out_OutputPort(6, cmdDisp_ptr->get_compCmdStat_InputPort(0));
+
+    stereoCam_ptr->set_Tlm_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(7));
+    // doesn't matter which TlmRecv port # for pktTlm
+    ipcRelay_ptr->set_proc2Out_OutputPort(7, chanTlm_ptr->get_TlmRecv_InputPort(0));
+
+    stereoCam_ptr->set_Log_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(8));
+    // doesn't matter which LogRecv port # for eventLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(8, eventLogger_ptr->get_LogRecv_InputPort(0));
+
+    stereoCam_ptr->set_LogText_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(9));
+    // doesn't matter which TextLogger port # for textLogger
+    ipcRelay_ptr->set_proc2Out_OutputPort(9, textLogger_ptr->get_TextLogger_InputPort(0));
+
+    /*stereoCam_ptr->set_ProcSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(10));
+      ipcRelay_ptr->set_proc2Out_OutputPort(10, buffAccumstereoCamProc_ptr->get_bufferSendInFill_InputPort(0));*/
+
+    stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
+    ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
-		  char* udp_recv_string, char* udp_send_string,
-		  char* zmq_image_string,
-		  char* hostname,
+                  char* udp_recv_string, char* udp_send_string,
+                  char* zmq_image_string,
+                  char* hostname,
                   unsigned int boot_count,
-		  bool &isChild,
-		  bool startSocketNow) {
+                  bool &isHiresChild, bool &isStereoChild,
+                  bool startSocketNow) {
     allocComps();
-  
+
     localTargetInit();
 
 #if FW_PORT_TRACING
@@ -488,7 +532,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_DYNAMIC);
 
     atiNetbox_ptr->init();
-    
+
     sockGndIf_ptr->init(0);
     sockGndIfLL_ptr->init(1);
 
@@ -501,26 +545,29 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     buffLogMVCamUnproc_ptr->init(60, 0);
     buffLogHiresCamUnproc_ptr->init(60, 0);
+    buffLogStereoCamUnproc_ptr->init(60, 0);
     buffAccumMVCamUnproc_ptr->init(60, 0);
     buffAccumHiresCamUnproc_ptr->init(60, 0);
+    buffAccumStereoCamUnproc_ptr->init(60, 0);
 
     mvCam_ptr->init(60, 0);
     mvVislam_ptr->init(2000, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
+    stereoCam_ptr->init(60, 0);
     hexRouter_ptr->init(60, 1000); // message size
     sdRosIface_ptr->init(0);
     mrCtrlIface_ptr->init(0);
     filterIface_ptr->init(0);
     rosSeq_ptr->init(0);
-    
+
     serialTextConv_ptr->init(60,0);
     llRouter_ptr->init(60,SERIAL_BUFFER_SIZE,0);
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
 
     udpReceiver_ptr->init(0);
-    
+
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
@@ -534,9 +581,9 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                                 tempMinOpcode,
                                 tempMaxOpcode);
     cmdSeq2_ptr->setOpCodeRanges(2,
-				 tempPortNum,
-				 tempMinOpcode,
-				 tempMaxOpcode);
+                                 tempPortNum,
+                                 tempMinOpcode,
+                                 tempMaxOpcode);
 
     /* Register commands */
     sockGndIf_ptr->regCommands();
@@ -550,6 +597,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     prmDb_ptr->regCommands();
     snapHealth_ptr->regCommands();
     mvCam_ptr->regCommands();
+    stereoCam_ptr->regCommands();
     mvVislam_ptr->regCommands();
     hiresCam_ptr->regCommands();
     atiNetbox_ptr->regCommands();
@@ -557,12 +605,14 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     buffLogMVCamUnproc_ptr->regCommands();
     buffLogHiresCamUnproc_ptr->regCommands();
+    buffLogStereoCamUnproc_ptr->regCommands();
     buffAccumMVCamUnproc_ptr->regCommands();
     buffAccumHiresCamUnproc_ptr->regCommands();
-    
+    buffAccumStereoCamUnproc_ptr->regCommands();
+
     llRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
-    
+
     // initialize file logs
     fileLogger_ptr->initLog("/log/");
 
@@ -575,7 +625,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvCam_ptr->loadParameters();
     mvVislam_ptr->loadParameters();
     atiNetbox_ptr->loadParameters();
-    
+    stereoCam_ptr->loadParameters();
+
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);
     serialTextConv_ptr->set_log_file(logFileName, 100*1024, 0);
@@ -589,18 +640,25 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                         NCAM_IMG_LP_BUFFER_ENOUGH);
     COMPILE_TIME_ASSERT(10 <= SnapdragonFlight::HIRESCAM_MAX_NUM_BUFFERS,
                         RCAM_BUFFER_ENOUGH);
+    COMPILE_TIME_ASSERT(200 <= SnapdragonFlight::SCAM_IMG_LP_BUFFER_POOL_SIZE,
+                        SCAM_IMG_LP_BUFFER_ENOUGH);
     #pragma GCC diagnostic pop
 
     mvCam_ptr->allocateBuffers(0, buffMallocator,
-			       SnapdragonFlight::MVCAM_IMG_HP_BUFFER_POOL_SIZE,
-			       200);
+                               SnapdragonFlight::MVCAM_IMG_HP_BUFFER_POOL_SIZE,
+                               200);
     hiresCam_ptr->allocateBuffers(0, hiresMallocator, 10);
+    stereoCam_ptr->allocateBuffers(0, hiresMallocator,
+                                   SnapdragonFlight::SCAM_IMG_HP_BUFFER_POOL_SIZE,
+                                   200);
 
     // buffAccum doesn't own the buffers, so it's not the limiting factor
     buffAccumMVCamUnproc_ptr->allocateQueue(0,buffMallocator,
                                             SnapdragonFlight::MVCAM_IMG_MAX_NUM_BUFFERS);
     buffAccumHiresCamUnproc_ptr->allocateQueue(0,buffMallocator,
                                                SnapdragonFlight::HIRESCAM_MAX_NUM_BUFFERS);
+    buffAccumStereoCamUnproc_ptr->allocateQueue(0,buffMallocator,
+                                                SnapdragonFlight::SCAM_IMG_MAX_NUM_BUFFERS);
 
     static const NATIVE_UINT_TYPE maxLogSize = 25U * 1000U * 1000U;
     buffLogMVCamUnproc_ptr->initLog("/img/mvcam_", ".upbin", maxLogSize, sizeof(U32),
@@ -609,15 +667,20 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     buffLogHiresCamUnproc_ptr->initLog("/img/hirescam_",".upbin", maxLogSize, sizeof(U32),
                                        0, // 0 means unlimited number of buffers
                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+    buffLogStereoCamUnproc_ptr->initLog("/img/stereocam_",".upbin", maxLogSize, sizeof(U32),
+                                        0, // 0 means unlimited number of buffers
+                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
     buffLogMVCamUnproc_ptr->setBaseName("");
     buffLogHiresCamUnproc_ptr->setBaseName("");
+    buffLogStereoCamUnproc_ptr->setBaseName("");
 
-    isChild = false;
+    isHiresChild = false;
+    isStereoChild = false;
 // fork works just fine on Darwin; just haven't got POSIX mq for IPC ports
 #if defined TGT_OS_TYPE_LINUX
     int childPID = hiresCam_ptr->spawnChild();
     if (childPID == 0) { // we are in the child process
-        isChild = true;
+        isHiresChild = true;
 #endif
 
         hiresCam_ptr->start(0,40,5*1000*1024, CORE_CAM);
@@ -626,10 +689,23 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         return; // don't start any other threads in the child
     }
 #endif
-    
+
+#if defined TGT_OS_TYPE_LINUX
+    childPID = stereoCam_ptr->spawnChild();
+    if (childPID == 0) { // we are in the child process
+        isStereoChild = true;
+#endif
+
+        stereoCam_ptr->start(0,40,5*1000*1024, CORE_CAM);
+
+#if defined TGT_OS_TYPE_LINUX
+        return; // don't start any other threads in the child
+    }
+#endif
+
     // NOTE(mereweth) - putting this near the top in case we want to fork in ipcRelay instead
-    ipcRelay_ptr->start(0,30,20*1024);
-    
+    ipcRelay_ptr->start(0,30,20*1024, CORE_CAM);
+
     // Active component startup
     // start rate groups
     rgTlm_ptr->start(0, 50, 20*1024);
@@ -656,14 +732,16 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     buffLogMVCamUnproc_ptr->start(0, 20, 20*1024);
     buffLogHiresCamUnproc_ptr->start(0, 20, 20*1024);
+    buffLogStereoCamUnproc_ptr->start(0, 20, 20*1024);
     buffAccumMVCamUnproc_ptr->start(0, 20, 20*1024);
     buffAccumHiresCamUnproc_ptr->start(0, 20, 20*1024);
+    buffAccumStereoCamUnproc_ptr->start(0, 20, 20*1024);
 
     llRouter_ptr->start(0, 85, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
 
     fileLogger_ptr->start(0,50,20*1024);
-    
+
     hexRouter_ptr->startPortReadThread(90,20*1024, CORE_RPC);
     //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_RPC);
 
@@ -681,7 +759,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                         Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                         Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                         true);
-    
+
     serialDriverDebug_ptr->open(
 #ifdef BUILD_SDFLIGHT
                            "/dev/ttyHS2",
@@ -694,29 +772,29 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                            Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                            Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                            true);
-    
+
     /* ---------- Done opening devices, now start device threads ---------- */
     serialDriverLL_ptr->startReadThread(98, 20*1024);
     serialDriverDebug_ptr->startReadThread(40, 20*1024);
 #endif
-    
+
     atiNetbox_ptr->set_thread_attr(0, 30, 20*1024, true, CORE_GNC);
     atiNetbox_ptr->open("192.168.2.20", "192.168.2.10",
-			Drv::ATINetboxComponentImpl::ATINETBOX_RDP_PORT);
-    
+                        Drv::ATINetboxComponentImpl::ATINETBOX_RDP_PORT);
+
     // Initialize socket server
     if (port_number && hostname) {
         if (startSocketNow) {
-	    sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-	    sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
     if (ll_port_number && hostname) {
         if (startSocketNow) {
-  	    sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIfLL_ptr->startSocketTask(40, 20*1024, ll_port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-  	    sockGndIfLL_ptr->setSocketTaskProperties(40, 20*1024, ll_port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIfLL_ptr->setSocketTaskProperties(40, 20*1024, ll_port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
 
@@ -724,7 +802,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         udpReceiver_ptr->open(udp_recv_string);
         udpReceiver_ptr->startThread(85,20*1024);
     }
-    
+
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -753,34 +831,51 @@ void runcycles(NATIVE_INT_TYPE cycles) {
     }
 }
 
-void exitTasks(bool isChild) {
+void exitTasks(bool isHiresChild, bool isStereoChild) {
 #if defined TGT_OS_TYPE_LINUX
-    if (isChild) {
+    if (isHiresChild) {
 #endif
         hiresCam_ptr->exit();
         hiresCam_ptr->deallocateBuffers(hiresMallocator);
         hiresCam_ptr->join(NULL);
+        DEBUG_PRINT("After hires thread quit\n");
+#if defined TGT_OS_TYPE_LINUX
+        return;
+    }
+#endif
+
+#if defined TGT_OS_TYPE_LINUX
+    if (isStereoChild) {
+#endif
+        stereoCam_ptr->exit();
+        stereoCam_ptr->deallocateBuffers(hiresMallocator);
+        stereoCam_ptr->join(NULL);
+        DEBUG_PRINT("After stereo thread quit\n");
 #if defined TGT_OS_TYPE_LINUX
         return;
     }
 #endif
 
     ipcRelay_ptr->exit();
+    DEBUG_PRINT("After IPCRelay thread quit\n");
 
     mvCam_ptr->exit();
     mvCam_ptr->deallocateBuffers(buffMallocator);
     mvCam_ptr->join(NULL);
+    DEBUG_PRINT("After mvcam thread quit\n");
     hexRouter_ptr->quitReadThreads();
+    DEBUG_PRINT("After HexRouter read thread quit\n");
 
     buffAccumMVCamUnproc_ptr->deallocateQueue(buffMallocator);
     buffAccumHiresCamUnproc_ptr->deallocateQueue(buffMallocator);
-    
+    buffAccumStereoCamUnproc_ptr->deallocateQueue(buffMallocator);
+
 #ifdef LLROUTER_DEVICES
     serialDriverLL_ptr->quitReadThread();
     serialDriverDebug_ptr->quitReadThread();
 #endif
     atiNetbox_ptr->stop();
-		    
+
     imgTlm_ptr->exit();
 
     buffLogMVCamUnproc_ptr->exit();
@@ -788,11 +883,10 @@ void exitTasks(bool isChild) {
     buffAccumMVCamUnproc_ptr->exit();
     buffAccumHiresCamUnproc_ptr->exit();
 
-    mvVislam_ptr->exit();    
+    mvVislam_ptr->exit();
     llRouter_ptr->exit();
     serialTextConv_ptr->exit();
-    
-    DEBUG_PRINT("After HexRouter read thread quit\n");
+
     snapHealth_ptr->exit();
     rgTlm_ptr->exit();
     rgXfer_ptr->exit();
@@ -811,18 +905,18 @@ void exitTasks(bool isChild) {
 
 void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
-		  "-p\tport_number\n"
-		  "-x\tll_port_number\n"
-		  "-u\tUDP recv port string\n"
-		  "-t\tUDP transmit port string\n"
-		  "-z\tZMQ image send string\n"
-		  "-a\thostname/IP address\n"
-		  "-l\tFor time-based cycles\n"
-		  "-i\tto disable init\n"
-		  "-f\tto disable fini\n"
-		  "-o to run # cycles instead of continuously\n"
-		  "-b\tBoot count\n"
-		  "-s\tStart socket immediately\n");
+                  "-p\tport_number\n"
+                  "-x\tll_port_number\n"
+                  "-u\tUDP recv port string\n"
+                  "-t\tUDP transmit port string\n"
+                  "-z\tZMQ image send string\n"
+                  "-a\thostname/IP address\n"
+                  "-l\tFor time-based cycles\n"
+                  "-i\tto disable init\n"
+                  "-f\tto disable fini\n"
+                  "-o\tto run # cycles instead of continuously\n"
+                  "-b\tBoot count\n"
+                  "-s\tStart socket immediately\n");
 }
 
 
@@ -860,7 +954,8 @@ int main(int argc, char* argv[]) {
     char* udp_send_string = 0;
     char* zmq_image_string = 0;
     bool local_cycle = true;
-    bool isChild = false;
+    bool isHiresChild = false;
+    bool isStereoChild = false;
     bool startSocketNow = false;
     U32 boot_count = 0;
 
@@ -936,17 +1031,18 @@ int main(int argc, char* argv[]) {
         hexref_init();
     }
 #endif
-    
+
     constructApp(port_number, ll_port_number,
-		 udp_recv_string, udp_send_string, zmq_image_string,
-		 hostname, boot_count,
-		 isChild, startSocketNow);
+                 udp_recv_string, udp_send_string, zmq_image_string,
+                 hostname, boot_count,
+                 isHiresChild, isStereoChild,
+                 startSocketNow);
     //dumparch();
 
     Os::Task task;
     Os::Task waiter;
-    
-    if (!isChild) {
+
+    if (!isHiresChild && !isStereoChild) {
         ros::start();
 
         sdRosIface_ptr->startIntTask(30, 5*1000*1024);
@@ -959,7 +1055,7 @@ int main(int argc, char* argv[]) {
         filterIface_ptr->startPub();
         rosSeq_ptr->startPub();
 
-	ros::console::shutdown();
+        ros::console::shutdown();
 
         Os::TaskString waiter_task_name("WAITER");
 #ifdef BUILD_SDFLIGHT
@@ -968,29 +1064,29 @@ int main(int argc, char* argv[]) {
         if (hexCycle) {
             Os::TaskString task_name("HEXRPC");
             DEBUG_PRINT("Starting cycler on hexagon\n");
-	    if (Os::Task::TASK_OK !=
-		task.start(task_name, 0, 10, 20*1024,
-			   (Os::Task::taskRoutine) hexref_run, NULL)) {
+            if (Os::Task::TASK_OK !=
+                task.start(task_name, 0, 10, 20*1024,
+                           (Os::Task::taskRoutine) hexref_run, NULL)) {
                 DEBUG_PRINT("Error starting up DSP RUN task\n");
-		terminate = 1;
-	    }
+                terminate = 1;
+            }
         }
-	if (Os::Task::TASK_OK !=
-	    waiter.start(waiter_task_name, 0, 10, 20*1024,
-			 (Os::Task::taskRoutine) hexref_wait, NULL)) {
-	    DEBUG_PRINT("Error starting up DSP WAIT task\n");
-	    terminate = 1;
-	}
+        if (Os::Task::TASK_OK !=
+            waiter.start(waiter_task_name, 0, 10, 20*1024,
+                         (Os::Task::taskRoutine) hexref_wait, NULL)) {
+            DEBUG_PRINT("Error starting up DSP WAIT task\n");
+            terminate = 1;
+        }
 #else
         if (hexCycle) {
             Os::TaskString task_name("DUMMY");
-	    FW_ASSERT(Os::Task::TASK_OK ==
-		      task.start(task_name, 0, 10, 20*1024,
-				 (Os::Task::taskRoutine) dummy, NULL));
+            FW_ASSERT(Os::Task::TASK_OK ==
+                      task.start(task_name, 0, 10, 20*1024,
+                                 (Os::Task::taskRoutine) dummy, NULL));
         }
-	FW_ASSERT(Os::Task::TASK_OK ==
-		  waiter.start(waiter_task_name, 0, 10, 20*1024,
-			       (Os::Task::taskRoutine) dummy, NULL));
+        FW_ASSERT(Os::Task::TASK_OK ==
+                  waiter.start(waiter_task_name, 0, 10, 20*1024,
+                               (Os::Task::taskRoutine) dummy, NULL));
 #endif //BUILD_SDFLIGHT
 
 #ifdef BUILD_SDFLIGHT
@@ -999,61 +1095,64 @@ int main(int argc, char* argv[]) {
             hexref_cycle(numKraitCycles);
         }
 #endif //BUILD_SDFLIGHT
-	
-    } //!isChild
+
+    } //!isHiresChild && !isStereoChild
 
     int cycle = 0;
 
     while (!terminate) {
-        if (isChild) {
-	    //DEBUG_PRINT("Child Cycle %d\n",cycle);
-	}
-	else {
-	    //DEBUG_PRINT("Parent Cycle %d\n",cycle);
-	}
-	if (local_cycle && !isChild) {
-	    runcycles(1);
-	} else {
-	    Os::Task::delay(1000);
-	}
-	cycle++;
+        if (isHiresChild) {
+            //DEBUG_PRINT("Hires Child Cycle %d\n",cycle);
+        }
+        else if (isStereoChild) {
+            //DEBUG_PRINT("Stereo Child Cycle %d\n",cycle);
+        }
+        else {
+            //DEBUG_PRINT("Parent Cycle %d\n",cycle);
+        }
+        if (local_cycle && !isHiresChild && !isStereoChild) {
+            runcycles(1);
+        } else {
+            Os::Task::delay(1000);
+        }
+        cycle++;
     }
 
-    if (!isChild) {
+    if (!isHiresChild && !isStereoChild) {
 #ifdef BUILD_SDFLIGHT
-	if (!noFini) {
-	    DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
-	    hexref_fini();
-	}
+        if (!noFini) {
+            DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
+            hexref_fini();
+        }
 #endif //BUILD_SDFLIGHT
 
-	// stop tasks
-	DEBUG_PRINT("Stopping tasks\n");
-	ros::shutdown();
-    } // !isChild
-    
-    exitTasks(isChild);
+        // stop tasks
+        DEBUG_PRINT("Stopping tasks\n");
+        ros::shutdown();
+    } // !isHiresChild && !isStereoChild
 
-    if (!isChild) {
-	if (hexCycle) {
-	    DEBUG_PRINT("Waiting for the runner to return\n");
-	    FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
-	}
+    exitTasks(isHiresChild, isStereoChild);
 
-	DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
-	FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
-    } // !isChild
+    if (!isHiresChild && !isStereoChild) {
+        if (hexCycle) {
+            DEBUG_PRINT("Waiting for the runner to return\n");
+            FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
+        }
+
+        DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
+        FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
+    } // !isHiresChild && !isStereoChild
 
     // Give time for threads to exit
 #if defined TGT_OS_TYPE_LINUX
-    if (!isChild) {
+    if (!isHiresChild && !isStereoChild) {
         (void) printf("Waiting for child...\n");
         wait(NULL);
 #endif
-	(void) printf("Waiting for threads...\n");
-	Os::Task::delay(1000);
+        (void) printf("Waiting for threads...\n");
+        Os::Task::delay(1000);
 
-	(void) printf("Exiting...\n");
+        (void) printf("Exiting...\n");
 #if defined TGT_OS_TYPE_LINUX
     }
 #endif

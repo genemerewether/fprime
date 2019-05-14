@@ -1,0 +1,12 @@
+<telemetry>
+    <channel id="0" name="I2C_ReadBytes" data_type="U32">
+        <comment>
+        Bytes Received
+        </comment>
+    </channel>
+    <channel id="1" name="I2C_WriteBytes" data_type="U32">
+        <comment>
+        Bytes Sent
+        </comment>
+    </channel>
+</telemetry>

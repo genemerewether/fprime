@@ -2,7 +2,6 @@
 
 
 #include <Fw/Types/Assert.hpp>
-#include <HEXREF/Top/TargetInit.hpp>
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
@@ -32,6 +31,7 @@
 //#undef DEBUG_PRINT
 //#define DEBUG_PRINT(x,...)
 
+#define DECOUPLE_RG
 #define DECOUPLE_ACTUATORS
 
 // Registry
@@ -131,7 +131,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 16};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 2};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -326,7 +326,14 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(void) {  
+void manualConstruct(void) {
+#ifdef DECOUPLE_RG
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(1, rgDecouple_ptr->get_CycleIn_InputPort(0));
+    rgDecouple_ptr->set_CycleOut_OutputPort(0, rgGncDrv_ptr->get_CycleIn_InputPort(0));
+#else
+    rgDcplDrv_ptr->set_CycleOut_OutputPort(1, rgGncDrv_ptr->get_CycleIn_InputPort(0));
+#endif
+  
     // Manual connections
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
@@ -336,7 +343,8 @@ void manualConstruct(void) {
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
-    actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
+    // TODO(mereweth) - too much data?
+    //actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, attFilter_ptr->get_ImuStateUpdate_InputPort(0));
 #ifdef DECOUPLE_ACTUATORS
@@ -387,8 +395,6 @@ void manualConstruct(void) {
 void constructApp() {
     allocComps();
 
-    localTargetInit();
-
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
 #endif
@@ -417,7 +423,9 @@ void constructApp() {
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
 
-    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
+    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
+
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ);
     
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
@@ -439,7 +447,7 @@ void constructApp() {
     cmdDisp_ptr->init(0);
     tlmChan_ptr->init(0);
 
-    kraitRouter_ptr->init(50, 1000);
+    kraitRouter_ptr->init(200, 1000);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -486,7 +494,8 @@ void constructApp() {
     
     // TODO(mereweth) - hardware enable pin
 
-    // TODO(mereweth) - I2C port
+    // J10, SSC I2C 2, sonar pinout
+    i2cDrv_ptr->open(2, Drv::I2C_FREQUENCY_400KHZ);
 
     // TODO(mereweth) - Spektrum UART and binding GPIO
     // TODO(mereweth) - PWM pins
@@ -495,15 +504,19 @@ void constructApp() {
 
     // Active component startup
     imuDecouple_ptr->start(0, 91, 20*1024);
-    // NOTE(mereweth) - GNC att & pos loops run in this thread:
+#ifdef DECOUPLE_RG
+    // NOTE(mereweth) - GNC att & pos loops run in this thread on 801:
     rgDecouple_ptr->start(0, 90, 20*1024);
+#endif
+#ifdef DECOUPLE_ACTUATORS
     // NOTE(mereweth) - ESC I2C calls happen in this thread:
     actDecouple_ptr->start(0, 89, 20*1024);
-    
+#endif
+
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
-
+    
 #if FW_OBJECT_REGISTRATION == 1
     //simpleReg.dump();
 #endif
@@ -530,39 +543,28 @@ int hexref_rpc_relay_port_write(const unsigned char* buff, int buffLen) {
 }
 
 void run1backupCycle(void) {
+#ifdef DECOUPLE_RG
     // call interrupt to emulate a clock
     Svc::InputCyclePort* port = rgDecouple_ptr->get_BackupCycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(10);
-
-#ifndef BUILD_DSPAL // stress test
-    for (int i = 0; i < 45; i++) {
-        Fw::ExternalSerializeBuffer bufObj;
-        char buf[996] = {"hi"};
-        bufObj.setExtBuffer((U8*) buf, sizeof(buf));
-        bufObj.setBuffLen(sizeof(buf));
-        Fw::InputSerializePort* serPort = kraitRouter_ptr->get_HexPortsIn_InputPort(1);
-        serPort->invokeSerial(bufObj);
-    }
 #endif
-
-#ifndef BUILD_DSPAL
-    U8 readBuf[4096*1000];
-    int len = 0;
-    hexref_rpc_relay_port_read(readBuf, sizeof(readBuf), &len);
-#endif
+    Os::Task::delay(100);
 }
 
 void exitTasks(void) {
+    kraitRouter_ptr->quit();
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->exit();
+#endif
     imuDecouple_ptr->exit();
+#ifdef DECOUPLE_ACTUATORS
     actDecouple_ptr->exit();
+#endif
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif
-    kraitRouter_ptr->exit();
 }
 
 volatile bool terminate = false;
@@ -577,60 +579,6 @@ int hexref_arm() {
         return -1;
     }
 
-    /*
-    U8 buf[16] = {0};
-    buf[2+4] = 0x01;
-    buf[3+4] = 0xA1;
-
-    Fw::CmdPacket cmdPkt;
-    Fw::ComBuffer dat0(&buf[0], sizeof(buf));
-    Fw::SerializeStatus stat = cmdPkt.deserialize(dat0);
-    Fw::InputCmdPort* p2 = leeCtrl_ptr->get_CmdDisp_InputPort(0);
-    p2->invoke(0x1a1,0,cmdPkt.getArgBuffer());
-    usleep(50000);
-    DEBUG_PRINT("hexref_arm after sleep\n");
-    */
-
-    /*
-    Fw::InputComPort* port = cmdDisp_ptr->get_seqCmdBuff_InputPort(0);
-    usleep(50000);
-    Fw::ComBuffer dat(buf, sizeof(buf));
-    port->invoke(dat, 0);
-    usleep(50000);
-    DEBUG_PRINT("hexref_arm after sleep\n");
-    */
-
-    /*
-    Drv::InputI2CConfigPort* confPort = i2cDrv_ptr->get_I2CConfig_InputPort(0);
-    Drv::InputI2CReadWritePort* rwPort = i2cDrv_ptr->get_I2CReadWrite_InputPort(0);
-    for (U32 i = 0; i < 35; i++) {
-        DEBUG_PRINT("arm %u", i);
-        for (U32 j = 11; j <= 14; j++) {
-            confPort->invoke(400, j, 100);
-            U8 readBuf[1] = { 0 };
-            U8 writeBuf[1] = { 0 };
-            Fw::Buffer writeObj = Fw::Buffer(0, 0, (U64) writeBuf, 1);
-            Fw::Buffer readObj = Fw::Buffer(0, 0, (U64) readBuf, 1);
-            rwPort->invoke(writeObj,
-                           readObj);
-            usleep(2500);
-        }
-    }
-    */
-
-    // NOTE(mereweth) - test code for PWM with servos - DON'T USE WITH ESCs
-    /*
-    Drv::InputPwmSetDutyCycleDataPort * port = escPwm_ptr->get_pwmSetDuty_InputPort(0);
-    static F32 d1 = 0.05;
-    static F32 d2 = 0.1;
-    F32 duty[4] = {d1, d2, d1, d2};
-    Drv::PwmSetDutyCycle config(duty, 4, 0x0f);
-    port->invoke(config);
-    d1 += 0.005;
-    if (d1 > 0.1) {  d1 = 0.05;  }
-    d2 -= 0.005;
-    if (d2 < 0.05) {  d2 = 0.1;  }
-    */
     return 0;
 }
 
@@ -646,10 +594,31 @@ int hexref_init(void) {
 
     //dumparch();
 
-    Os::Task::delay(1000);
     preinit = false;
 
     return 0;
+}
+
+void start_mpu9250() {
+    int imuCycle = 0;
+    while (!mpu9250_ptr->isReady()) {
+        DEBUG_PRINT("starting imu cycle %d\n", imuCycle++);
+        Svc::TimerVal cycleStart;
+        cycleStart.take();
+#if 0
+        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
+        port->invoke(cycleStart);
+#else
+        Fw::InputSerializePort* serPort = imuDecouple_ptr->get_DataIn_InputPort(0);
+        Fw::ExternalSerializeBuffer bufObj;
+        char buf[18];
+        bufObj.setExtBuffer((U8*) buf, sizeof(buf));
+        bufObj.serialize(cycleStart);
+        serPort->invokeSerial(bufObj);
+#endif
+        
+        Os::Task::delay(10);
+    }
 }
 
 int hexref_run(void) {
@@ -659,24 +628,22 @@ int hexref_run(void) {
         return -1;
     }
     
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
+    start_mpu9250();
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(true);
+#endif
     
     int backupCycle = 0;
 
     while (!terminate) {
+        DEBUG_PRINT("running cycle %d\n", backupCycle++);
         run1backupCycle();
-        backupCycle++;
     }
 
     // stop tasks
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(false);
+#endif
     exitTasks();
     // Give time for threads to exit
     DEBUG_PRINT("Waiting for threads...\n");
@@ -693,21 +660,18 @@ int hexref_cycle(unsigned int backupCycles) {
         DEBUG_PRINT("hexref_cycle preinit - returning\n");
         return -1;
     }
-    
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
 
+    start_mpu9250();
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(true);
+#endif
     for (unsigned int i = 0; i < backupCycles; i++) {
         if (terminate) break;
         run1backupCycle();
     }
+#ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(false);
+#endif
     DEBUG_PRINT("hexref_cycle returning\n");
 
     return 0;

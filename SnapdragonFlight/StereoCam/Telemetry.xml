@@ -1,0 +1,46 @@
+    <telemetry>
+        <channel id="0" name="SCAM_ImagesAcquired" data_type="U32">
+            <comment>
+            Number of images acquired
+            </comment>
+        </channel>
+        <channel id="1" name="SCAM_Exposure" data_type="U32" update="on_change">
+            <comment>
+            Exposure time setting
+            </comment>
+        </channel>
+        <channel id="2" name="SCAM_Gain" data_type="U32" update="on_change">
+            <comment>
+            Gain setting
+            </comment>
+        </channel>
+        <channel id="3" name="SCAM_ExposureCalc" data_type="F32" update="on_change">
+            <comment>
+            Calculated exposure time setting (before int cast)
+            </comment>
+        </channel>
+        <channel id="4" name="SCAM_GainCalc" data_type="F32" update="on_change">
+            <comment>
+            Calculated gain setting (before int cast)
+            </comment>
+        </channel>
+        <channel id="5" name="SCAM_ImageRate" data_type="U32" update="on_change" format_string="%dFPS">
+            <comment>
+            Number of frames per second
+            </comment>
+        </channel>
+        <channel id="6" name="SCAM_ImageTimeoutLeft" data_type="U32" update="on_change" format_string="%ds">
+            <comment>
+            Number of seconds remaining on image timeout
+            </comment>
+        </channel>
+        <channel id="7" name="SCAM_NumNoHPBuffers" data_type="U32" update="on_change">
+        </channel>
+        <channel id="8" name="SCAM_NumNoLPBuffers" data_type="U32" update="on_change">
+        </channel>
+        <channel id="9" name="SCAM_NumLoRate" data_type="U32" update="on_change">
+        </channel>
+        <channel id="10" name="SCAM_NumGncBufferReturnQueueErrs" data_type="U32"/>
+        <channel id="11" name="SCAM_NumMaxExpDelta" data_type="U32" update="on_change">
+        </channel>
+    </telemetry>

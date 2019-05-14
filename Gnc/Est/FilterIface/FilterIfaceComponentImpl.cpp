@@ -31,6 +31,8 @@
 
 #include <ros/callback_queue.h>
 
+#define DO_TIME_CONV
+
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
@@ -52,11 +54,16 @@ namespace Gnc {
     m_rosInited(false),
     m_nodeHandle(NULL),
     m_trBroad(NULL),
-    m_imuStateUpdateSet() // zero-initialize instead of default-initializing
+    m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
+    m_imuSet() // zero-initialize instead of default-initializing
   {
       for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuStateUpdateSet); i++) {
           m_imuStateUpdateSet[i].fresh = false;
           m_imuStateUpdateSet[i].overflows = 0u;
+      }
+      for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuSet); i++) {
+          m_imuSet[i].fresh = false;
+          m_imuSet[i].overflows = 0u;
       }
   }
 
@@ -79,7 +86,7 @@ namespace Gnc {
         // TODO(mereweth) - prevent calling twice
         FW_ASSERT(m_nodeHandle);
         ros::NodeHandle* n = this->m_nodeHandle;
-	this->m_trBroad = new tf::TransformBroadcaster();
+        this->m_trBroad = new tf::TransformBroadcaster();
 
         char buf[32];
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
@@ -95,7 +102,7 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-	this->m_nodeHandle = new ros::NodeHandle();
+        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, FilterIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -119,7 +126,6 @@ namespace Gnc {
             m_imuStateUpdateSet[i].mutex.lock();
             if (m_imuStateUpdateSet[i].fresh) {
                 if (this->isConnected_ImuStateUpdate_OutputPort(i)) {
-                    // mimics driver hardware getting and sending sensor data
                     this->ImuStateUpdate_out(i, m_imuStateUpdateSet[i].imuStateUpdate);
                 }
                 else {
@@ -130,6 +136,21 @@ namespace Gnc {
             // TODO(mereweth) - notify that no new odometry received?
             m_imuStateUpdateSet[i].mutex.unLock();
         }
+
+        for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_imuSet); i++) {
+            m_imuSet[i].mutex.lock();
+            if (m_imuSet[i].fresh) {
+                if (this->isConnected_Imu_OutputPort(i)) {
+                    this->Imu_out(i, m_imuSet[i].imu);
+                }
+                else {
+                    DEBUG_PRINT("IMU port %d not connected\n", i);
+                }
+                m_imuSet[i].fresh = false;
+            }
+            // TODO(mereweth) - notify that no new odometry received?
+            m_imuSet[i].mutex.unLock();
+        }
     }
 
     void FilterIfaceComponentImpl ::
@@ -137,11 +158,12 @@ namespace Gnc {
           const NATIVE_INT_TYPE portNum,
           ROS::nav_msgs::OdometryNoCov &Odometry
       )
-    {        
+    {
         nav_msgs::Odometry msg;
 
         ROS::std_msgs::Header header = Odometry.getheader();
         Fw::Time stamp = header.getstamp();
+#ifdef DO_TIME_CONV
 
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
@@ -180,10 +202,15 @@ namespace Gnc {
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
-	stamp.set((U32) (usecRos / 1000LL / 1000LL),
-	 	  (U32) (usecRos % (1000LL * 1000LL)));
-	header.setstamp(stamp);
+        stamp.set((U32) (usecRos / 1000LL / 1000LL),
+                  (U32) (usecRos % (1000LL * 1000LL)));
+        header.setstamp(stamp);
         Odometry.setheader(header);
+#else
+        msg.header.stamp.sec = stamp.getSeconds();
+        msg.header.stamp.nsec = stamp.getUSeconds() * 1000LL;
+#endif // ifdef DO_TIME_CONV
+
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -200,11 +227,11 @@ namespace Gnc {
 
             this->FileLogger_out(0,fileBuff);
         }
-	
+
         if (!m_rosInited) {
             return;
         }
-	
+
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
@@ -230,20 +257,20 @@ namespace Gnc {
         msg.twist.twist.angular.x = vec.getx();
         msg.twist.twist.angular.y = vec.gety();
         msg.twist.twist.angular.z = vec.getz();
-	
+
         m_odomPub[portNum].publish(msg);
 
-	tf::Transform tfo;
-	tf::poseMsgToTF(msg.pose.pose, tfo);
-	
-	tf::StampedTransform tfoStamp;
-	tfoStamp.stamp_ = msg.header.stamp;
-	tfoStamp.child_frame_id_ = msg.child_frame_id;
-	tfoStamp.frame_id_ = msg.header.frame_id;
-	tfoStamp.setData(tfo);
-	
-	FW_ASSERT(this->m_trBroad);
-	this->m_trBroad->sendTransform(tfoStamp);
+        tf::Transform tfo;
+        tf::poseMsgToTF(msg.pose.pose, tfo);
+
+        tf::StampedTransform tfoStamp;
+        tfoStamp.stamp_ = msg.header.stamp;
+        tfoStamp.child_frame_id_ = msg.child_frame_id;
+        tfoStamp.frame_id_ = msg.header.frame_id;
+        tfoStamp.setData(tfo);
+
+        FW_ASSERT(this->m_trBroad);
+        this->m_trBroad->sendTransform(tfoStamp);
     }
 
     void FilterIfaceComponentImpl ::
@@ -255,7 +282,7 @@ namespace Gnc {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
     }
-   
+
 
     // ----------------------------------------------------------------------
     // Member function definitions
@@ -272,17 +299,22 @@ namespace Gnc {
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
         ros::NodeHandle* n = compPtr->m_nodeHandle;
-	FW_ASSERT(n);
+        FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
         ImuStateUpdateHandler updateHandler(compPtr, 0);
+        ImuHandler imuHandler(compPtr, 0);
 
         ros::Subscriber updateSub = n->subscribe("imu_state_update", 10,
                                                 &ImuStateUpdateHandler::imuStateUpdateCallback,
                                                 &updateHandler,
                                                 ros::TransportHints().tcpNoDelay());
-        
+
+        ros::Subscriber imuSub = n->subscribe("ext_imu", 100,
+                                              &ImuHandler::imuCallback,
+                                              &imuHandler,
+                                              ros::TransportHints().tcpNoDelay());
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -312,12 +344,13 @@ namespace Gnc {
 
         DEBUG_PRINT("imuStateUpdate port handler %d\n", this->portNum);
 
-	if (!std::isfinite(msg->header.stamp.sec) ||
-	    !std::isfinite(msg->header.stamp.nsec)) {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
-	    
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
+#ifdef DO_TIME_CONV
         //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
         I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
@@ -355,37 +388,42 @@ namespace Gnc {
                           0,
                           (U32) (usecDsp / 1000 / 1000),
                           (U32) (usecDsp % (1000 * 1000)));
-
+#else
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (msg->header.stamp.sec),
+                          (U32) (msg->header.stamp.nsec / 1000));
+#endif //DO_TIME_CONV
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
-	if (!std::isfinite(msg->pose.pose.position.x) ||
-	    !std::isfinite(msg->pose.pose.position.y) ||
-	    !std::isfinite(msg->pose.pose.position.z) ||
-	    
-	    !std::isfinite(msg->pose.pose.orientation.x) ||
+        if (!std::isfinite(msg->pose.pose.position.x) ||
+            !std::isfinite(msg->pose.pose.position.y) ||
+            !std::isfinite(msg->pose.pose.position.z) ||
+
+            !std::isfinite(msg->pose.pose.orientation.x) ||
             !std::isfinite(msg->pose.pose.orientation.y) ||
-	    !std::isfinite(msg->pose.pose.orientation.z) ||
-	    !std::isfinite(msg->pose.pose.orientation.w) ||
-	    
+            !std::isfinite(msg->pose.pose.orientation.z) ||
+            !std::isfinite(msg->pose.pose.orientation.w) ||
+
             !std::isfinite(msg->twist.twist.linear.x) ||
-	    !std::isfinite(msg->twist.twist.linear.y) ||
-	    !std::isfinite(msg->twist.twist.linear.z) ||
-	    
-	    !std::isfinite(msg->twist.twist.angular.x) ||
-	    !std::isfinite(msg->twist.twist.angular.y) ||
-	    !std::isfinite(msg->twist.twist.angular.z) ||
-	    
-	    !std::isfinite(msg->angular_velocity_bias.x) ||
-	    !std::isfinite(msg->angular_velocity_bias.y) ||
-	    !std::isfinite(msg->angular_velocity_bias.z) ||
-	    
-	    !std::isfinite(msg->linear_acceleration_bias.x) ||
-	    !std::isfinite(msg->linear_acceleration_bias.y) ||
-	    !std::isfinite(msg->linear_acceleration_bias.z)) {
-	  //TODO(mereweth) - EVR
-	  return;
-	}
-	
+            !std::isfinite(msg->twist.twist.linear.y) ||
+            !std::isfinite(msg->twist.twist.linear.z) ||
+
+            !std::isfinite(msg->twist.twist.angular.x) ||
+            !std::isfinite(msg->twist.twist.angular.y) ||
+            !std::isfinite(msg->twist.twist.angular.z) ||
+
+            !std::isfinite(msg->angular_velocity_bias.x) ||
+            !std::isfinite(msg->angular_velocity_bias.y) ||
+            !std::isfinite(msg->angular_velocity_bias.z) ||
+
+            !std::isfinite(msg->linear_acceleration_bias.x) ||
+            !std::isfinite(msg->linear_acceleration_bias.y) ||
+            !std::isfinite(msg->linear_acceleration_bias.z)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
@@ -419,14 +457,138 @@ namespace Gnc {
             ); // end ImuStateUpdate constructor
 
             this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.lock();
-	    if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
-		this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
-		DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
-	    }
-	    this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
-	    this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
-	}
-	this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
+            if (this->compPtr->m_imuStateUpdateSet[this->portNum].fresh) {
+                this->compPtr->m_imuStateUpdateSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting imuStateUpdate port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_imuStateUpdateSet[this->portNum].imuStateUpdate = imuStateUpdate;
+            this->compPtr->m_imuStateUpdateSet[this->portNum].fresh = true;
+        }
+        this->compPtr->m_imuStateUpdateSet[this->portNum].mutex.unLock();
     }
-  
+
+    FilterIfaceComponentImpl :: ImuHandler ::
+      ImuHandler(FilterIfaceComponentImpl* compPtr,
+                      int portNum) :
+      compPtr(compPtr),
+      portNum(portNum)
+    {
+        FW_ASSERT(compPtr);
+        FW_ASSERT(portNum < NUM_IMU_OUTPUT_PORTS); //compPtr->getNum_Imu_OutputPorts());
+    }
+
+    FilterIfaceComponentImpl :: ImuHandler :: ~ImuHandler()
+    {
+
+    }
+
+    void FilterIfaceComponentImpl :: ImuHandler ::
+      imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
+    {
+        FW_ASSERT(this->compPtr);
+        FW_ASSERT(this->portNum < NUM_IMU_OUTPUT_PORTS);
+
+        DEBUG_PRINT("imu port handler %d\n", this->portNum);
+
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
+#ifdef DO_TIME_CONV
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+
+        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
+                      + (I64) msg->header.stamp.nsec / 1000LL;
+        Os::File::Status stat = Os::File::OTHER_ERROR;
+        Os::File file;
+        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+        if (stat != Os::File::OP_OK) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        char buff[255];
+        NATIVE_INT_TYPE size = sizeof(buff);
+        stat = file.read(buff, size, false);
+        file.close();
+        if ((stat != Os::File::OP_OK) ||
+            !size) {
+            // TODO(mereweth) - EVR
+            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+            return;
+        }
+        // Make sure buffer is null-terminated:
+        buff[sizeof(buff)-1] = 0;
+        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+
+        if (walltimeDspLeadUs > usecRos) {
+            // TODO(mereweth) - EVR; can't have difference greater than time
+            printf("linux-dsp diff %lld greater than message time %lu\n",
+                   walltimeDspLeadUs, usecRos);
+            return;
+        }
+        I64 usecDsp = usecRos - walltimeDspLeadUs;
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (usecDsp / 1000 / 1000),
+                          (U32) (usecDsp % (1000 * 1000)));
+#else
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (msg->header.stamp.sec),
+                          (U32) (msg->header.stamp.nsec / 1000));
+#endif //DO_TIME_CONV
+        //TODO(mereweth) - END convert time instead using HLTimeConv
+
+        if (!std::isfinite(msg->orientation.x) ||
+            !std::isfinite(msg->orientation.y) ||
+            !std::isfinite(msg->orientation.z) ||
+            !std::isfinite(msg->orientation.w) ||
+
+            !std::isfinite(msg->linear_acceleration.x) ||
+            !std::isfinite(msg->linear_acceleration.y) ||
+            !std::isfinite(msg->linear_acceleration.z) ||
+
+            !std::isfinite(msg->angular_velocity.x) ||
+            !std::isfinite(msg->angular_velocity.y) ||
+            !std::isfinite(msg->angular_velocity.z)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
+        {
+            using namespace ROS::std_msgs;
+            using namespace ROS::sensor_msgs;
+            using namespace ROS::geometry_msgs;
+
+            ImuNoCov imu(
+              Header(msg->header.seq,
+                     convTime,
+                     // TODO(mereweth) - convert frame id
+                     0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
+              Quaternion(msg->orientation.x,
+                         msg->orientation.y,
+                         msg->orientation.z,
+                         msg->orientation.w),
+              Vector3(msg->angular_velocity.x,
+                      msg->angular_velocity.y,
+                      msg->angular_velocity.z),
+              Vector3(msg->linear_acceleration.x,
+                      msg->linear_acceleration.y,
+                      msg->linear_acceleration.z)
+            ); // end Imu constructor
+
+            this->compPtr->m_imuSet[this->portNum].mutex.lock();
+            if (this->compPtr->m_imuSet[this->portNum].fresh) {
+                this->compPtr->m_imuSet[this->portNum].overflows++;
+                DEBUG_PRINT("Overwriting imu port %d before Sched\n", this->portNum);
+            }
+            this->compPtr->m_imuSet[this->portNum].imu = imu;
+            this->compPtr->m_imuSet[this->portNum].fresh = true;
+        }
+        this->compPtr->m_imuSet[this->portNum].mutex.unLock();
+    }
+
 } // end namespace

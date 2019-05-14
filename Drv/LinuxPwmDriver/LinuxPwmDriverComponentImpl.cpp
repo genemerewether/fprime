@@ -164,6 +164,7 @@ channel that was exported. The following properties will then be available:
       open(NATIVE_UINT_TYPE pwmchip,
            NATIVE_UINT_TYPE * channel,
            NATIVE_UINT_TYPE channelSize,
+           F32 * initDutyCycle,
            NATIVE_UINT_TYPE period_in_usecs) {
         // TODO check for invalid pwm device?
 

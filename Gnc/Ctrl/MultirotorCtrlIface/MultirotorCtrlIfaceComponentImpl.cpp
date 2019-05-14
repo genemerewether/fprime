@@ -31,6 +31,8 @@
 
 #include <ros/callback_queue.h>
 
+#define DO_TIME_CONV
+
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
@@ -132,7 +134,7 @@ namespace Gnc {
             // TODO(mereweth) - notify that no new msg received?
             m_boolStampedSet[i].mutex.unLock();
         }
-      
+
         for (int i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_flatOutSet); i++) {
             m_flatOutSet[i].mutex.lock();
             if (m_flatOutSet[i].fresh) {
@@ -210,11 +212,11 @@ namespace Gnc {
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
 
-	stamp.set((U32) (usecRos / 1000LL / 1000LL),
-	 	  (U32) (usecRos % (1000LL * 1000LL)));
-	header.setstamp(stamp);
+        stamp.set((U32) (usecRos / 1000LL / 1000LL),
+                         (U32) (usecRos % (1000LL * 1000LL)));
+        header.setstamp(stamp);
         AccelStamped.setheader(header);
-	
+
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -241,7 +243,7 @@ namespace Gnc {
     {
         // TODO(mereweth) - check that message-wait task is OK if we add one
         this->pingOut_out(portNum, key);
-    }  
+    }
 
     // ----------------------------------------------------------------------
     // Member function definitions
@@ -258,29 +260,29 @@ namespace Gnc {
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
         ros::NodeHandle* n = compPtr->m_nodeHandle;
-	FW_ASSERT(n);
+          FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
-	BoolStampedHandler boolStampedHandler(compPtr, 0);
+        BoolStampedHandler boolStampedHandler(compPtr, 0);
         FlatOutputHandler flatoutHandler(compPtr, 0);
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
-	
+
         ros::Subscriber flatoutSub = n->subscribe("flat_output_setpoint", 1,
-                                                 &FlatOutputHandler::flatOutputCallback,
-                                                 &flatoutHandler,
-                                                 ros::TransportHints().tcpNoDelay());
-	
-	ros::Subscriber boolStampedSub = n->subscribe("flysafe", 1,
-						      &BoolStampedHandler::boolStampedCallback,
-						      &boolStampedHandler,
-						      ros::TransportHints().tcpNoDelay());
+                                                  &FlatOutputHandler::flatOutputCallback,
+                                                  &flatoutHandler,
+                                                  ros::TransportHints().tcpNoDelay());
+
+        ros::Subscriber boolStampedSub = n->subscribe("flysafe", 1,
+                                                      &BoolStampedHandler::boolStampedCallback,
+                                                      &boolStampedHandler,
+                                                      ros::TransportHints().tcpNoDelay());
 
         ros::Subscriber attRateThrustSub = n->subscribe("attitude_rate_thrust_setpoint", 10,
-                                                       &AttitudeRateThrustHandler::attitudeRateThrustCallback,
-                                                       &attRateThrustHandler,
-                                                       ros::TransportHints().tcpNoDelay());
-        
+                                                        &AttitudeRateThrustHandler::attitudeRateThrustCallback,
+                                                        &attRateThrustHandler,
+                                                        ros::TransportHints().tcpNoDelay());
+
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -290,7 +292,7 @@ namespace Gnc {
     // Bool stamped constructor/destructor/callback
     MultirotorCtrlIfaceComponentImpl :: BoolStampedHandler ::
       BoolStampedHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
-			 int portNum) :
+                         int portNum) :
       compPtr(compPtr),
       portNum(portNum)
     {
@@ -311,13 +313,14 @@ namespace Gnc {
 
         DEBUG_PRINT("bool stamped port handler %d\n", this->portNum);
 
-	if (!std::isfinite(msg->header.stamp.sec) ||
-	    !std::isfinite(msg->header.stamp.nsec)) {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
 
-	//TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+#ifdef DO_TIME_CONV
+        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
 
         I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
                       + (I64) msg->header.stamp.nsec / 1000LL;
@@ -354,15 +357,21 @@ namespace Gnc {
                           0,
                           (U32) (usecDsp / 1000 / 1000),
                           (U32) (usecDsp % (1000 * 1000)));
+#else
+        Fw::Time convTime(TB_WORKSTATION_TIME,
+                          0,
+                          (U32) (msg->header.stamp.sec),
+                          (U32) (msg->header.stamp.nsec / 1000));
+#endif //DO_TIME_CONV
 
         //TODO(mereweth) - END convert time instead using HLTimeConv
-	
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             BoolStamped boolStamped(
               Header(msg->header.seq,
-		     convTime,
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
 
@@ -380,7 +389,7 @@ namespace Gnc {
             this->compPtr->m_boolStampedSet[this->portNum].mutex.unLock();
         }
     }
-  
+
     // Flat output constructor/destructor/callback
     MultirotorCtrlIfaceComponentImpl :: FlatOutputHandler ::
       FlatOutputHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
@@ -405,29 +414,29 @@ namespace Gnc {
 
         DEBUG_PRINT("Flat output port handler %d\n", this->portNum);
 
-	if (!std::isfinite(msg->header.stamp.sec) ||
-	    !std::isfinite(msg->header.stamp.nsec)) {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
-	
-	if (!std::isfinite(msg->position.x) ||
-	    !std::isfinite(msg->position.y) ||
-	    !std::isfinite(msg->position.z) ||
-	    
-	    !std::isfinite(msg->velocity.x) ||
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
+        if (!std::isfinite(msg->position.x) ||
+            !std::isfinite(msg->position.y) ||
+            !std::isfinite(msg->position.z) ||
+
+            !std::isfinite(msg->velocity.x) ||
             !std::isfinite(msg->velocity.y) ||
-	    !std::isfinite(msg->velocity.z) ||
-	    
+            !std::isfinite(msg->velocity.z) ||
+
             !std::isfinite(msg->acceleration.x) ||
-	    !std::isfinite(msg->acceleration.y) ||
-	    !std::isfinite(msg->acceleration.z) ||
-	    
-	    !std::isfinite(msg->yaw)) {
-	  //TODO(mereweth) - EVR
-	  return;
-	}
-	
+            !std::isfinite(msg->acceleration.y) ||
+            !std::isfinite(msg->acceleration.z) ||
+
+            !std::isfinite(msg->yaw)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
@@ -482,32 +491,32 @@ namespace Gnc {
 
         DEBUG_PRINT("Attitude rate thrust output port handler %d\n", this->portNum);
 
-	if (!std::isfinite(msg->header.stamp.sec) ||
-	    !std::isfinite(msg->header.stamp.nsec)) {
-	    //TODO(mereweth) - EVR
-	    return;
-	}
+        if (!std::isfinite(msg->header.stamp.sec) ||
+            !std::isfinite(msg->header.stamp.nsec)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
 
-	if (!std::isfinite(msg->attitude.x) ||
-	    !std::isfinite(msg->attitude.y) ||
-	    !std::isfinite(msg->attitude.z) ||
-	    !std::isfinite(msg->attitude.w) ||
-	    
-	    !std::isfinite(msg->angular_rates.x) ||
+        if (!std::isfinite(msg->attitude.x) ||
+            !std::isfinite(msg->attitude.y) ||
+            !std::isfinite(msg->attitude.z) ||
+            !std::isfinite(msg->attitude.w) ||
+
+            !std::isfinite(msg->angular_rates.x) ||
             !std::isfinite(msg->angular_rates.y) ||
-	    !std::isfinite(msg->angular_rates.z) ||
-	    
-	    !std::isfinite(msg->angular_acceleration.x) ||
+            !std::isfinite(msg->angular_rates.z) ||
+
+            !std::isfinite(msg->angular_acceleration.x) ||
             !std::isfinite(msg->angular_acceleration.y) ||
-	    !std::isfinite(msg->angular_acceleration.z) ||
-	    
+            !std::isfinite(msg->angular_acceleration.z) ||
+
             !std::isfinite(msg->thrust.x) ||
-	    !std::isfinite(msg->thrust.y) ||
-	    !std::isfinite(msg->thrust.z)) {
-	  //TODO(mereweth) - EVR
-	  return;
-	}
-	
+            !std::isfinite(msg->thrust.y) ||
+            !std::isfinite(msg->thrust.z)) {
+            //TODO(mereweth) - EVR
+            return;
+        }
+
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
@@ -537,5 +546,5 @@ namespace Gnc {
             this->compPtr->m_attRateThrustSet[this->portNum].mutex.unLock();
         }
     }
-  
+
 } // end namespace
