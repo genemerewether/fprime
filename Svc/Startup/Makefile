@@ -42,4 +42,8 @@ load_sdref: load
 	@adb push deployment_sdref.bash /startup/deployment.bash
 	$(call VALIDATE,deployment_sdref.bash,/startup/deployment.bash)
 
-.PHONY: load load_sdref load_test test #$(foreach FILE,$(STARTUP_TEST),$(FILE:.bats=))
+load_carref: load
+	@adb push deployment_carref.bash /startup/deployment.bash
+	$(call VALIDATE,deployment_carref.bash,/startup/deployment.bash)
+
+.PHONY: load load_sdref load_carref load_test test #$(foreach FILE,$(STARTUP_TEST),$(FILE:.bats=))
