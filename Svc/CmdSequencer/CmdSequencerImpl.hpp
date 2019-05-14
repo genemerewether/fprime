@@ -786,6 +786,7 @@ namespace Svc {
         U32 port;
         FwOpcodeType min;
         FwOpcodeType max;
+        bool valid;
       } m_portOpcodeCorr[NUM_COMCMDOUT_OUTPUT_PORTS];
     
       //! The command time timer

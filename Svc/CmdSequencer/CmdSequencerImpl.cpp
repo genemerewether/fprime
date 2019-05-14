@@ -52,6 +52,7 @@ namespace Svc {
             m_portOpcodeCorr[i].port = 0u;
             m_portOpcodeCorr[i].min = 0u;
             m_portOpcodeCorr[i].max = 0u;
+            m_portOpcodeCorr[i].valid = false;
         }
     }
 
@@ -73,10 +74,11 @@ namespace Svc {
         FW_ASSERT(NULL != minOpCode, (U64) minOpCode);
         FW_ASSERT(NULL != maxOpCode, (U64) maxOpCode);
 
-        for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr); i++) {
+        for (U32 i = 0; i < FW_MIN(numRanges, FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr)); i++) {
             m_portOpcodeCorr[i].port = portNum[i];
             m_portOpcodeCorr[i].min = minOpCode[i];
             m_portOpcodeCorr[i].max = maxOpCode[i];
+            m_portOpcodeCorr[i].valid = true;
 
             FW_ASSERT(this->isConnected_comCmdOut_OutputPort(i),
                       this->isConnected_comCmdOut_OutputPort(i));
@@ -129,7 +131,8 @@ namespace Svc {
     U32 CmdSequencerComponentImpl::portFromOpcode(FwOpcodeType opcode) {
         for (U32 i = 0; i < FW_NUM_ARRAY_ELEMENTS(m_portOpcodeCorr); i++) {
             if ((opcode >= m_portOpcodeCorr[i].min) &&
-                (opcode < m_portOpcodeCorr[i].max)) {
+                (opcode < m_portOpcodeCorr[i].max)  &&
+                m_portOpcodeCorr[i].valid)           {
                 return m_portOpcodeCorr[i].port;
             }
         }
