@@ -154,7 +154,7 @@ namespace SnapdragonFlight {
 
   void BlspGpioDriverComponentImpl ::
     exitThread(void) {
-      dsp_relay_gpio_relay_quit(this->m_gpio);
+      dsp_relay_gpio_relay_quit(this->m_gpio, this->m_fd);
       this->m_quitThread = true;
   }
 

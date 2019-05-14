@@ -33,7 +33,7 @@ interface dsp_relay
    long gpio_relay_read(in long fd);
    long gpio_relay_start_int(in long gpio, in long fd);
    long gpio_relay_isr_wait(in long gpio, in long fd);
-   long gpio_relay_quit(in long gpio);
+   long gpio_relay_quit(in long gpio, in long fd);
    
    // UART interfaces
    

@@ -35,7 +35,7 @@ __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_write)(int fd, int v
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_read)(int fd) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_start_int)(int gpio, int fd) __QAIC_HEADER_ATTRIBUTE;
 __QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_isr_wait)(int gpio, int fd) __QAIC_HEADER_ATTRIBUTE;
-__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_quit)(int gpio) __QAIC_HEADER_ATTRIBUTE;
+__QAIC_HEADER_EXPORT int __QAIC_HEADER(dsp_relay_gpio_relay_quit)(int gpio, int fd) __QAIC_HEADER_ATTRIBUTE;
 typedef struct _dsp_relay_dataBuffer__seq_octet _dsp_relay_dataBuffer__seq_octet;
 typedef _dsp_relay_dataBuffer__seq_octet dsp_relay_dataBuffer;
 struct _dsp_relay_dataBuffer__seq_octet {

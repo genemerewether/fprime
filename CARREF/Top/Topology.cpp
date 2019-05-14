@@ -26,6 +26,10 @@ enum {
 #include <ctype.h>
 #endif
 
+#if defined TGT_OS_TYPE_LINUX
+#include <sys/wait.h>
+#endif
+
 #include <unistd.h>
 
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
@@ -262,7 +266,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 5};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 1};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -270,7 +274,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
 
-    NATIVE_INT_TYPE rgGncDivs[] = {1, 10};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 50};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -1054,9 +1058,18 @@ int main(int argc, char* argv[]) {
     exitTasks(isHiresChild, isStereoChild);
 
     // Give time for threads to exit
-    (void) printf("Waiting for threads...\n");
-    Os::Task::delay(1000);
+#if defined TGT_OS_TYPE_LINUX
+    if (!isHiresChild && !isStereoChild) {
+        (void) printf("Waiting for child...\n");
+        wait(NULL);
+#endif
+        (void) printf("Waiting for threads...\n");
+        Os::Task::delay(1000);
 
-    (void) printf("Exiting...\n");
+        (void) printf("Exiting...\n");
+
+#if defined TGT_OS_TYPE_LINUX
+    }
+#endif
     return 0;
 }
