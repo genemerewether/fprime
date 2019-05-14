@@ -8,12 +8,12 @@
     <import_port_type>Fw/Com/ComPortAi.xml</import_port_type>
     <comment>A component for dispatching commands</comment>
     <ports>
-        <port name="compCmdSend" data_type="Fw::Cmd" kind="output" max_number="$CmdDispatcherComponentCommandPorts">
+        <port name="compCmdSend" data_type="Fw::Cmd" kind="output" max_number="80">
             <comment>
             Command dispatch port
             </comment>
         </port>
-        <port name="compCmdReg" data_type="Fw::CmdReg" kind="sync_input" max_number = "$CmdDispatcherComponentCommandPorts">
+        <port name="compCmdReg" data_type="Fw::CmdReg" kind="sync_input" max_number = "80">
             <comment>
             Command Registration Port. max_number should match dispatch port.
             </comment>
@@ -23,18 +23,18 @@
             Input Command Status Port
             </comment>
         </port>
-        <port name="seqCmdStatus" data_type="Fw::CmdResponse" kind="output" max_number = "$CmdDispatcherSequencePorts">
+        <port name="seqCmdStatus" data_type="Fw::CmdResponse" kind="output" max_number = "5">
             <comment>
             Output Command Status Port
             </comment>
         </port>
-        <port name="seqCmdBuff" data_type="Fw::Com" kind="sync_input"  max_number = "$CmdDispatcherSequencePorts">
+        <port name="seqCmdBuff" data_type="Fw::Com" kind="sync_input"  max_number = "5">
             <comment>
             Command buffer input port for sequencers or other sources of command buffers
             </comment>
         </port>
     </ports>
-    <commands opcode_base="$CmdDispatcherOpcodeBase">
+    <commands>
         <!-- NO-OP command -->
         <command kind="sync" opcode="0" mnemonic="CMD_NO_OP" >
             <comment>
@@ -75,7 +75,7 @@
             </comment>
         </command>
     </commands>
-    <events event_base="$CmdDispatcherEventsBase">
+    <events>
         <event id="0" name="OpCodeRegistered" severity="DIAGNOSTIC" format_string = "Opcode 0x%04X registered to port %d slot %d" >
             <comment>
             Op code registered event
@@ -207,7 +207,7 @@
            </args>       
         </event>
     </events>
-    <telemetry telemetry_base="$CmdDispatcherTelemetryBase">
+    <telemetry>
         <channel id="0" name="CommandsDispatched" data_type="U32" update="on_change" abbrev="T002-1100">
             <comment>
             Number of commands dispatched

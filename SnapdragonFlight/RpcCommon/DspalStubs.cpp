@@ -26,7 +26,7 @@ void block_indefinite(void)
   sem_wait(&forever);
 }
   
-#ifdef TARGET_8096
+#ifdef SOC_8096
 
 void __cxa_atexit(void)
 {
@@ -37,6 +37,12 @@ void __cxa_atexit(void)
 #else
   
 void _Read_uleb(void)
+{
+  DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
+  block_indefinite();
+}
+ 
+void _Dbl(void)
 {
   DEBUG_PRINT("Error: Calling unresolved symbol stub[%s]", __FUNCTION__);
   block_indefinite();

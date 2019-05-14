@@ -24,19 +24,19 @@
         <port name="FileLogger" data_type="Svc::ActiveFileLogPort" kind="output">
         </port>
 
-        <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="async_input"    max_number="1">
+        <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="async_input"    max_number="1" full="drop">
         </port>
 
         <port name="ImuFwd" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="1">
         </port>
 
-        <port name="ImageIn" data_type="ROS::sensor_msgs::Image"  kind="async_input"    max_number="1">
+        <port name="ImageIn" data_type="ROS::sensor_msgs::Image"  kind="async_input"    max_number="1" full="drop">
         </port>
 
         <port name="ImageBufferReturn" data_type="Fw::BufferSend"  kind="output"    max_number="1">
         </port>
 
-        <port name="sched" data_type="Svc::Sched"  kind="async_input"    max_number="1">
+        <port name="sched" data_type="Svc::Sched"  kind="async_input"    max_number="1" full="drop">
         </port>
 
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
@@ -48,7 +48,7 @@
         <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">
         </port>
 
-        <port name="pingIn" data_type="Svc::Ping"  kind="async_input"    max_number="1">
+        <port name="pingIn" data_type="Svc::Ping"  kind="async_input"    max_number="1" full="drop">
         </port>
     </ports>
 

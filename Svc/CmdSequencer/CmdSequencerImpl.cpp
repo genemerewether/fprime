@@ -187,6 +187,22 @@ namespace Svc {
 
     }
 
+    void CmdSequencerComponentImpl ::
+      seqCancelIn_handler(
+	  const NATIVE_INT_TYPE portNum
+      )
+    {
+        if (RUNNING == this->m_runMode) {
+            this->performCmd_Cancel();
+            Fw::LogStringArg logStringArg(this->m_fileName);
+            this->log_ACTIVITY_HI_CS_SequenceCanceled(logStringArg);
+            ++this->m_cancelCmdCount;
+            this->tlmWrite_CS_CancelCommands(this->m_cancelCmdCount);
+        } else {
+            this->log_WARNING_LO_CS_NoSequenceActive();
+        }
+    }
+
     //! Handler for input port seqRunIn
     void CmdSequencerComponentImpl::seqRunIn_handler(
            NATIVE_INT_TYPE portNum, /*!< The port number*/

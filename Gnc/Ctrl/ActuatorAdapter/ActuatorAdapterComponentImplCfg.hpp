@@ -23,10 +23,15 @@
 namespace Gnc {
 
 enum {
-    AA_MAX_ACTUATORS = 8,
-    AA_ARM_COUNT = 35
+    ACTADAP_MAX_ACTUATORS = 8,
+    ACTADAP_ARM_COUNT = 35
 };
 
+enum {
+    ACTADAP_SCHED_CONTEXT_TLM,
+    ACTADAP_SCHED_CONTEXT_ARM
+};
+  
 }
 
 #endif //ActuatorAdapterCfg_HPP

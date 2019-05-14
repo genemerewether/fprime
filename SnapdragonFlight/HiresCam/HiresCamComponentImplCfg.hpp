@@ -9,7 +9,7 @@
 #define HIRESCAM_HIRESCAMCOMPONENTIMPLCFG_HPP
 
 // for serializable size
-#include <Svc/ImgComp/CameraFrameSerializableAc.hpp>
+#include <Svc/CameraFrame/CameraFrameSerializableAc.hpp>
 
 #include "Common/Cfg/QuestConstants.hpp"
 

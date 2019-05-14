@@ -36,6 +36,10 @@ else
 FULLVER := $(shell $(STARTUP_DIR)/patch/mkver.bash -d $(DEPLOYMENT) -v $(VER))
 endif
 
+# TODO(mereweth) - remove once nested namespace serializable Gse is working
+rosser:
+	touch $(BUILD_ROOT)/Gse/generated/$(DEPLOYMENT)/serializable/ROS/__init__.py
+
 # For switching fsw partition between read-only and read-write
 rwfsw:
 	$(BUILD_ROOT)/Svc/Startup/patch/remount_fsw_rw.sh
@@ -116,7 +120,7 @@ setcur: check-env
 	$(STARTUP_DIR)/patch/setup_folder.bash -d $(DEPLOYMENT) -f $(FULLVER) -t setcur
 
 # Only load a new FSW version
-release: mkver $(__DEFAULT_BUILD)
+release: mkver $(__DEFAULT_BUILD) gseload
 
 ifdef NOLOAD
 	$(STARTUP_DIR)/patch/setup_folder.bash -i ./$(__DEFAULT_BUILD_OUT) -d $(DEPLOYMENT) -f $(FULLVER) -t load -n
@@ -162,7 +166,7 @@ cur: release
 	$(STARTUP_DIR)/patch/setup_folder.bash -d $(DEPLOYMENT) -f $(FULLVER) -t setcur
 
 # Load the golden FSW version
-gold: $(__DEFAULT_BUILD)
+gold: $(__DEFAULT_BUILD) gsegold
 	$(STARTUP_DIR)/patch/setup_folder.bash -i ./$(__DEFAULT_BUILD_OUT) -d $(DEPLOYMENT) -t gold
 
 ifneq ($(FSW_RUN_SCRIPT),)

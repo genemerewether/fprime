@@ -62,9 +62,9 @@ Svc::RateGroupDriverImpl rgGncDrv(
 
 static NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
-    SIMREF::RSDRV_SCHED_CONTEXT_ATT,
-    Gnc::ATTFILTER_SCHED_CONTEXT_ATT,
-    Gnc::SIGGEN_SCHED_CONTEXT_ATT,
+    SIMREF::RSDRV_SCHED_CONTEXT_OP,
+    Gnc::ATTFILTER_SCHED_CONTEXT_FILT,
+    Gnc::SIGGEN_SCHED_CONTEXT_OP,
     Gnc::LCTRL_SCHED_CONTEXT_ATT,
 };
 Svc::PassiveRateGroupImpl rgAtt(
@@ -76,9 +76,9 @@ Svc::PassiveRateGroupImpl rgAtt(
 
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     // TODO(mereweth) - add sched contexts here - keep in sync with MD model
-    SIMREF::RSDRV_SCHED_CONTEXT_POS,
-    Gnc::ATTFILTER_SCHED_CONTEXT_POS,
-    Gnc::SIGGEN_SCHED_CONTEXT_POS,
+    SIMREF::RSDRV_SCHED_CONTEXT_OP,
+    Gnc::ATTFILTER_SCHED_CONTEXT_FILT,
+    Gnc::SIGGEN_SCHED_CONTEXT_OP,
     Gnc::LCTRL_SCHED_CONTEXT_POS,
 };
 Svc::PassiveRateGroupImpl rgPos(
@@ -121,9 +121,15 @@ Svc::ActiveFileLoggerImpl fileLogger
 #endif
 ;
 
-Svc::LinuxTimeImpl linuxTime
+ROS::RosTimeImpl rosTime
 #if FW_OBJECT_NAMES == 1
-                    ("LTIME")
+                    ("ROSTIME")
+#endif
+;
+
+ROS::RosSeqComponentImpl rosSeq
+#if FW_OBJECT_NAMES == 1
+                    ("ROSSEQ")
 #endif
 ;
 
@@ -139,6 +145,18 @@ ROS::RosCycleComponentImpl rosCycle
 SIMREF::RotorSDrvComponentImpl rotorSDrv
 #if FW_OBJECT_NAMES == 1
                     ("ROTORSDRV")
+#endif
+;
+
+Gnc::MultirotorCtrlIfaceComponentImpl mrCtrlIface
+#if FW_OBJECT_NAMES == 1
+                        ("MRCTRLIFACE")
+#endif
+;
+
+Gnc::FilterIfaceComponentImpl filterIface
+#if FW_OBJECT_NAMES == 1
+                        ("FILTIFACE")
 #endif
 ;
 
@@ -259,9 +277,12 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     rosCycle.init(0);
 
     rotorSDrv.init(0);
+    mrCtrlIface.init(0);
+    filterIface.init(0);
     gzManipIf.init(0);
 
-    linuxTime.init(0);
+    rosTime.init(0);
+    rosSeq.init(0);
 
     chanTlm.init(10,0);
 
@@ -426,6 +447,9 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
+    // needs to be before constructApp so RosTime is ready
+    ros::start();
+
     constructApp(port_number, udp_string, hostname);
 
     if (!local_cycle) {
@@ -433,17 +457,25 @@ int main(int argc, char* argv[]) {
     }
     //dumparch();
 
-    ros::start();
-
     Os::Task::TaskStatus stat = rosCycle.startIntTask(90, 20*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
-    rotorSDrv.startPub();
     stat = rotorSDrv.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
-    gzManipIf.startPub();
+    stat = mrCtrlIface.startIntTask(50, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    stat = filterIface.startIntTask(50, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
     stat = gzManipIf.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    stat = rosSeq.startIntTask(70, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+
+    rotorSDrv.startPub();
+    mrCtrlIface.startPub();
+    filterIface.startPub();
+    gzManipIf.startPub();
+    rosSeq.startPub();
 
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);

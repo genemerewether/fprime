@@ -2,4 +2,4 @@
 # mod.mk
 # ---------------------------------------------------------------------- 
 
-SRC = CmdSeqInPortAi.xml
+SRC = CmdSeqInPortAi.xml CmdSeqCancelPortAi.xml

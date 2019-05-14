@@ -21,7 +21,18 @@
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
-//#include <Eigen/Eigen>
+#include <stdio.h>
+
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+//#undef DEBUG_PRINT
+//#define DEBUG_PRINT(x,...)
 
 namespace Gnc {
 
@@ -76,12 +87,11 @@ namespace Gnc {
       Fw::ParamValid valid[4];
       this->numRotors = paramGet_numRotors(valid[0]);
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
-      if (this->numRotors >= BM_MAX_ACTUATORS) {  return;  }
-      Eigen::MatrixXd mixer;
-      mixer.resize(4, this->numRotors);
+      if (this->numRotors > quest_gnc::multirotor::kBasicMixerMaxActuators) {  return;  }
+      quest_gnc::multirotor::BasicMixer::MixMatrix mixer;
 
       // TODO(mereweth) - macro-ize the param get calls?
-      for (U32 i = 0; i < mixer.cols(); i++) {
+      for (U32 i = 0; i < this->numRotors; i++) {
           switch (i) {
               case 0:
                   mixer.col(i) << paramGet_m_x__1(valid[0]),
@@ -119,6 +129,18 @@ namespace Gnc {
                                   paramGet_m_z__6(valid[2]),
                                   paramGet_t__6(valid[3]);
                   break;
+              case 6:
+                  mixer.col(i) << paramGet_m_x__7(valid[0]),
+                                  paramGet_m_y__7(valid[1]),
+                                  paramGet_m_z__7(valid[2]),
+                                  paramGet_t__7(valid[3]);
+                  break;
+              case 7:
+                  mixer.col(i) << paramGet_m_x__8(valid[0]),
+                                  paramGet_m_y__8(valid[1]),
+                                  paramGet_m_z__8(valid[2]),
+                                  paramGet_t__8(valid[3]);
+                  break;
               default:
                   FW_ASSERT(0, i);
           }
@@ -128,7 +150,7 @@ namespace Gnc {
           }
       }
 
-      (void) basicMixer.SetMixer(mixer);
+      (void) basicMixer.SetMixer(mixer, this->numRotors);
 
       this->paramsInited = true;
   }
@@ -160,11 +182,11 @@ namespace Gnc {
                                             thrust_b.getx(),
                                             thrust_b.gety(),
                                             thrust_b.getz()));
-      Eigen::VectorXd rotorVel;
+      quest_gnc::multirotor::BasicMixer::MixOutput rotorVel;
       this->basicMixer.GetRotorVelCommand(&rotorVel);
 
-      FW_ASSERT(BM_MAX_ACTUATORS > this->numRotors, this->numRotors);
-      F64 angVel[BM_MAX_ACTUATORS] = { 0.0 };
+      FW_ASSERT(quest_gnc::multirotor::kBasicMixerMaxActuators > this->numRotors, this->numRotors);
+      F64 angVel[quest_gnc::multirotor::kBasicMixerMaxActuators] = { 0.0 };
       F64 angles[0], normalized[0];
       for (U32 i = 0; i < this->numRotors; i ++) {
           angVel[i] = rotorVel(i);
@@ -174,7 +196,7 @@ namespace Gnc {
       ROS::std_msgs::Header h = TorqueThrust.getheader();
       ROS::mav_msgs::Actuators rotorVel__comm(h,
                                               angles, 0, 0,
-                                              angVel, BM_MAX_ACTUATORS, this->numRotors,
+                                              angVel, quest_gnc::multirotor::kBasicMixerMaxActuators, this->numRotors,
                                               normalized, 0, 0);
       if (this->isConnected_motor_OutputPort(0)) {
           this->motor_out(0, rotorVel__comm);
@@ -187,13 +209,15 @@ namespace Gnc {
         NATIVE_UINT_TYPE context
     )
   {
-      COMPILE_TIME_ASSERT(BM_MAX_ACTUATORS >= 6, BM_MAX_ACT_VS_TLM);
+      COMPILE_TIME_ASSERT(quest_gnc::multirotor::kBasicMixerMaxActuators >= 8, BM_MAX_ACT_VS_TLM);
       this->tlmWrite_BMIX_Rot0(angVelTlm[0]);
       this->tlmWrite_BMIX_Rot1(angVelTlm[1]);
       this->tlmWrite_BMIX_Rot2(angVelTlm[2]);
       this->tlmWrite_BMIX_Rot3(angVelTlm[3]);
       this->tlmWrite_BMIX_Rot4(angVelTlm[4]);
       this->tlmWrite_BMIX_Rot5(angVelTlm[5]);
+      this->tlmWrite_BMIX_Rot6(angVelTlm[6]);
+      this->tlmWrite_BMIX_Rot7(angVelTlm[7]);
   }
 
   // ----------------------------------------------------------------------

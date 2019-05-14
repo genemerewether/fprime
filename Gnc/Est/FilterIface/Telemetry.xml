@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="FILTIFACE_Dummy" data_type="U32">
+        <comment>
+            FILTIFACE dummy channel
+        </comment>
+    </channel>
+</telemetry>

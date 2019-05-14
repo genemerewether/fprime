@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEP_ENV="export ROS_HOME=/eng/ros; . /opt/ros/indigo/setup.bash || true"
+DEP_ENV="export ROS_HOME=/eng/ros; . /opt/ros/indigo/setup.bash; . /eng/load/set_ip_snap.bash"
 DEPLOYMENT=SDREF
 
 # boot counter is filled in by expand_fsw_args in startup.bash

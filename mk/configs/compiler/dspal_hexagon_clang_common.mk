@@ -39,7 +39,9 @@ DSPAL_HEX_COMMON := -fPIC \
 	-D _HAS_C9X \
 	-D restrict=__restrict__ \
 	-D noreturn_function= \
-	-D__CUSTOM_FILE_IO__
+	-D__CUSTOM_FILE_IO__ \
+	-D SOC_$(TARGET_SOC) \
+	-D DSPAL_$(TARGET_DSP)
 
 DSPAL_HEX_CLANG_CFLAGS := $(DSPAL_FLAGS_COMMON) \
 		    $(COMMON_DEFINES) \

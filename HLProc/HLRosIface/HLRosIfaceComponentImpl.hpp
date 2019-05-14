@@ -23,12 +23,8 @@
 #include "HLProc/HLRosIface/HLRosIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
 #include "sensor_msgs/Imu.h"
 #include "mav_msgs/Actuators.h"
-#include "mav_msgs/AttitudeRateThrust.h"
-#include "mav_msgs/FlatOutput.h"
-#include "mav_msgs/ImuStateUpdate.h"
 #include <image_transport/image_transport.h>
 
 #include "Os/Task.hpp"
@@ -97,61 +93,6 @@ namespace HLProc {
 
         }; // end class ActuatorsHandler
 
-        class ImuStateUpdateHandler
-        {
-          public:
-              ImuStateUpdateHandler(HLRosIfaceComponentImpl* compPtr,
-                              int portNum);
-
-              ~ImuStateUpdateHandler();
-
-              void imuStateUpdateCallback(const mav_msgs::ImuStateUpdate::ConstPtr& msg);
-
-          PRIVATE:
-
-              HLRosIfaceComponentImpl* compPtr;
-
-              const unsigned int portNum;
-
-        }; // end class ImuStateUpdateHandler
-
-    
-        class FlatOutputHandler
-        {
-          public:
-              FlatOutputHandler(HLRosIfaceComponentImpl* compPtr,
-                              int portNum);
-
-              ~FlatOutputHandler();
-
-              void flatOutputCallback(const mav_msgs::FlatOutput::ConstPtr& msg);
-
-          PRIVATE:
-
-              HLRosIfaceComponentImpl* compPtr;
-
-              const unsigned int portNum;
-
-        }; // end class FlatOutputHandler
-
-        class AttitudeRateThrustHandler
-        {
-          public:
-              AttitudeRateThrustHandler(HLRosIfaceComponentImpl* compPtr,
-                                        int portNum);
-
-              ~AttitudeRateThrustHandler();
-
-              void attitudeRateThrustCallback(const mav_msgs::AttitudeRateThrust::ConstPtr& msg);
-
-          PRIVATE:
-
-              HLRosIfaceComponentImpl* compPtr;
-
-              const unsigned int portNum;
-
-        }; // end class AttitudeRateThrustHandler
-
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
@@ -168,20 +109,6 @@ namespace HLProc {
       void sched_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
-      );
-
-      //! Handler implementation for Odometry
-      //!
-      void Odometry_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::nav_msgs::OdometryNoCov &Odometry
-      );
-
-      //! Handler implementation for AccelCommand
-      //!
-      void AccelCommand_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::geometry_msgs::AccelStamped &AccelStamped
       );
 
       //! Handler implementation for pingIn
@@ -208,10 +135,7 @@ namespace HLProc {
         //!
         ros::Publisher m_imuPub[NUM_IMU_INPUT_PORTS];
 
-        //! Publishers for Odometry data
-        //!
-        ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
-
+        ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;
         image_transport::Publisher m_imagePub;
 
@@ -222,13 +146,6 @@ namespace HLProc {
         //!
         Os::Task m_intTask;
 
-        struct ImuStateUpdateSet {
-            Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::mav_msgs::ImuStateUpdateNoCov imuStateUpdate; //! message object
-            bool fresh; //! Whether object has been updated
-            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_imuStateUpdateSet[NUM_IMUSTATEUPDATE_OUTPUT_PORTS];
-
         struct ActuatorsSet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object
             ROS::mav_msgs::Actuators actuators; //! message object
@@ -236,21 +153,6 @@ namespace HLProc {
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_actuatorsSet[NUM_ACTUATORSDATA_OUTPUT_PORTS];
     
-        struct FlatOutSet {
-            Os::Mutex mutex; //! Mutex lock to guard flat output object
-            ROS::mav_msgs::FlatOutput flatOutput; //! flat output object
-            bool fresh; //! Whether object has been updated
-            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_flatOutSet[NUM_FLATOUTPUT_OUTPUT_PORTS];
-
-        struct AttRateThrustSet {
-            Os::Mutex mutex; //! Mutex lock to guard object
-            ROS::mav_msgs::AttitudeRateThrust attRateThrust; //! Attitude, rate, and thrust object
-            bool fresh; //! Whether object has been updated
-            NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
-        } m_attRateThrustSet[NUM_ATTRATETHRUST_OUTPUT_PORTS];
-
-        Fw::Time m_lastLLImuTime;
     };
 
 } // end namespace

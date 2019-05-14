@@ -21,8 +21,8 @@
 #define BasicMixer_HPP
 
 #include "Gnc/Ctrl/BasicMixer/BasicMixerComponentAc.hpp"
-#include "Gnc/Ctrl/BasicMixer/BasicMixerComponentImplCfg.hpp"
 #include "quest_gnc/mixer/basic_mixer.h"
+#include "quest_gnc/mixer/basic_mixer_cfg.h"
 
 namespace Gnc {
 
@@ -100,7 +100,7 @@ namespace Gnc {
 
       U32 numRotors;
 
-      F64 angVelTlm[BM_MAX_ACTUATORS];
+      F64 angVelTlm[quest_gnc::multirotor::kBasicMixerMaxActuators];
 
     };
 

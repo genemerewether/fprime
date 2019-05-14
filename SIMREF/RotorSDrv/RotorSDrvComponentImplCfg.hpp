@@ -5,8 +5,7 @@ namespace SIMREF {
 
 enum {
     RSDRV_SCHED_CONTEXT_TLM,
-    RSDRV_SCHED_CONTEXT_POS,
-    RSDRV_SCHED_CONTEXT_ATT,
+    RSDRV_SCHED_CONTEXT_OP
 };
 
 } // namespace SIMREF

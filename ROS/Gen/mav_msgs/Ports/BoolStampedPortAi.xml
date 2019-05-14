@@ -1,0 +1,6 @@
+<interface name="BoolStamped" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="BoolStamped" pass_by="reference" type="ROS::mav_msgs::BoolStamped"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/BoolStampedSerializableAi.xml</import_serializable_type>
+</interface>

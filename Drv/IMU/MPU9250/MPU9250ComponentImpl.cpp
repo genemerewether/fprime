@@ -33,12 +33,6 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif // BUILD_DSPAL
 
-#if defined BUILD_SDFLIGHT || defined BUILD_DSPAL || defined BUILD_TIR5
-#define BIG_ENDIAN
-#else // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
-#define LITTLE_ENDIAN
-#endif // defined BUILD_SDFLIGHT || defined BUILD_DSPAL
-
 #undef DEBUG_PRINT
 #define DEBUG_PRINT(x,...)
 
@@ -61,6 +55,7 @@ namespace Drv {
 #endif
                              ),
         m_initState(INIT_RESET),
+        m_outMode(OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ),
         m_opMode(OPMODE_INTERRUPT),
         m_gyroRawToRadS(0.0f),
         m_accelRawToMS2(0.0f),
@@ -88,6 +83,11 @@ namespace Drv {
       isReady()
     {
         return (INIT_COMPLETE == m_initState) ? true : false;
+    }
+
+    void MPU9250ComponentImpl ::
+      setOutputMode(OutputMode mode) {
+        m_outMode = mode;
     }
 
   // ----------------------------------------------------------------------
@@ -130,7 +130,8 @@ namespace Drv {
                     // Offset returned data by one half-word
                     readBufOffset = readBuf + 2;
 #endif
-                    //DEBUG_PRINT("MPU9250 before read\n");
+                    DEBUG_PRINT("MPU9250 before read at %u.%06u\n",
+                                ImuNow.getSeconds(), ImuNow.getUSeconds());
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     timer.stop();
                     DEBUG_PRINT("reg read %d bytes in %u usec\n",
@@ -154,20 +155,7 @@ namespace Drv {
                     NATIVE_UINT_TYPE sIdx;
                     NATIVE_UINT_TYPE sBase = 1;
                     // read starts at index 1 in read buffer
-#ifdef LITTLE_ENDIAN // little-endian - x86
-                    for (sIdx = 0; sIdx < 3; sIdx++) {
-                        accel[sIdx] = ((int16_t) readBufOffset[2*sIdx+1+sBase]) << 8 |
-                                        (int16_t) readBufOffset[2*sIdx+sBase];
-                    }
-                    sBase += 6;
-                    temp = ((int16_t) readBufOffset[1+sBase]) << 8 |
-                           (int16_t) readBufOffset[sBase];
-                    sBase += 2;
-                    for (sIdx = 0; sIdx < 3; sIdx++) {
-                        gyro[sIdx] = ((int16_t) readBufOffset[2*sIdx+1+sBase]) << 8 |
-                                        (int16_t) readBufOffset[2*sIdx+sBase];
-                    }
-#else // big endian - ARM & Hexagon
+
                     for (sIdx = 0; sIdx < 3; sIdx++) {
                         accel[sIdx] = ((int16_t) readBufOffset[2*sIdx+sBase]) << 8 |
                                         (int16_t) readBufOffset[1+2*sIdx+sBase];
@@ -180,7 +168,6 @@ namespace Drv {
                         gyro[sIdx] = ((int16_t) readBufOffset[2*sIdx+sBase]) << 8 |
                                         (int16_t) readBufOffset[1+2*sIdx+sBase];
                     }
-#endif
 
                     F64 accelX = m_accelRawToMS2 * (float) accel[0];
                     F64 accelY = m_accelRawToMS2 * (float) accel[1];
@@ -238,12 +225,7 @@ namespace Drv {
                     readBufObj.setsize(3);
                     this->SpiReadWrite_out(0, writeBufObj, readBufObj);
                     readBufObj.setsize(2); // reset for everyone else
-                    // TODO(mereweth) - add endianness check to Fw - FIFO_COUNT_H first
-#ifdef LITTLE_ENDIAN // little-endian - x86
-                    uint16_t fifoLen = ((uint16_t) readBuf[2]) << 8 | (uint16_t) readBuf[1];
-#else // big endian - ARM & Hexagon
                     uint16_t fifoLen = ((uint16_t) readBuf[1]) << 8 | (uint16_t) readBuf[2];
-#endif
                     // get config execution time
                     timer.stop();
                     DEBUG_PRINT("FIFO count %u; low 0x%x, high 0x%x; calc in %u usec\n",
@@ -345,9 +327,15 @@ namespace Drv {
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_CONFIG | SPI_BITS_WRITE;
                     // temperature & gyro DLPF, FIFO mode
-                    // 184Hz low-pass gives data output at 1 kHz
-                    writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_184HZ | //MPU9250_BITS_GYRO_DLPF_CFG_250HZ |
-                                  MPU9250_BITS_CONFIG_FIFO_MODE_STOP; // MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
+                    if (OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ == m_outMode) {
+                        // 184Hz low-pass gives data output at 1 kHz
+                        writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_184HZ | //MPU9250_BITS_GYRO_DLPF_CFG_250HZ |
+                                      MPU9250_BITS_CONFIG_FIFO_MODE_STOP; // MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
+                    }
+                    if (OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ == m_outMode) {
+                        writeBuf[1] = MPU9250_BITS_GYRO_DLPF_CFG_3600HZ | //MPU9250_BITS_GYRO_DLPF_CFG_250HZ |
+                                      MPU9250_BITS_CONFIG_FIFO_MODE_STOP; // MPU9250_BITS_CONFIG_FIFO_MODE_OVERWRITE;
+                    }
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
                     m_initState = INIT_GYRO_CONFIG;
                     break;
@@ -376,11 +364,17 @@ namespace Drv {
                     DEBUG_PRINT("MPU9250 enter INIT_ACCEL_CONFIG_2\n");
                     this->SpiConfig_out(0, MPU9250_SPI_CONFIG_HZ);
                     writeBuf[0] = MPU9250_REG_ACCEL_CONFIG2 | SPI_BITS_WRITE;
-                    // TODO(mereweth) - better performance with DLPF?
-                    // 184Hz low-pass gives data output at 1 kHz
-                    writeBuf[1] = MPU9250_BITS_ACCEL_BW_LTE_460HZ |
-                                  MPU9250_BITS_ACCEL_DLPF_CFG_460HZ;
-                    //writeBuf[1] = MPU9250_BITS_ACCEL_BW_1130HZ;
+
+                    if (OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ == m_outMode) {
+                        // TODO(mereweth) - better performance with DLPF?
+                        // 460Hz low-pass gives data output at 1 kHz
+                        writeBuf[1] = MPU9250_BITS_ACCEL_BW_LTE_460HZ |
+                                      MPU9250_BITS_ACCEL_DLPF_CFG_460HZ;
+                    }
+                    if (OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ == m_outMode) {
+                        // NOTE(mereweth) - dlpf cfg ignored with this bandwidth
+                        writeBuf[1] = MPU9250_BITS_ACCEL_BW_1130HZ;
+                    }
                     this->SpiReadWrite_out(0, writeBufObj, dummyReadBufObj);
                     m_initState = INIT_MAG_CONFIG;
                     break;

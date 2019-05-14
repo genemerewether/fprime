@@ -1,0 +1,6 @@
+<interface name="Se3FeedForward" namespace="ROS::mav_msgs">
+  <args>
+    <arg name="Se3FeedForward" pass_by="reference" type="ROS::mav_msgs::Se3FeedForward"/>
+  </args>
+  <import_serializable_type>ROS/Gen/mav_msgs/Types/Se3FeedForwardSerializableAi.xml</import_serializable_type>
+</interface>

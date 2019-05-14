@@ -11,7 +11,7 @@
     <ports>
 
         <!-- Rate group input port -->
-        <port name="SchedIn" data_type="Svc::Sched" kind="async_input">
+        <port name="SchedIn" data_type="Svc::Sched" kind="async_input" full="drop">
             <comment>
                 The rate group scheduler input port, which is called at 1 Hz.
             </comment>

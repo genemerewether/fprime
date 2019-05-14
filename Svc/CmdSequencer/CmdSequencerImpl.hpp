@@ -216,6 +216,12 @@ namespace Svc {
                     NATIVE_UINT_TYPE order //!< The call order
                     );
 
+	    //! Handler implementation for seqCancelIn
+	    //!
+	    void seqCancelIn_handler(
+		const NATIVE_INT_TYPE portNum /*!< The port number*/
+	    );
+
             //! Handler for input port seqRunIn
             void seqRunIn_handler(
                    NATIVE_INT_TYPE portNum, /*!< The port number*/

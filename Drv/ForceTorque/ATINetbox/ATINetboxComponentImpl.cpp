@@ -339,6 +339,19 @@ namespace Drv {
     Ty = rec.Ty / this->m_cpt;
     Tz = rec.Tz / this->m_cpt;
 
+    packet.resetSer();
+    packet.serialize((U8) AFL_ATINETBOX_WRENCH);
+    ROS::std_msgs::Header h(rec.ft_seq, this->getTime(), 0/*"body"*/);
+    ROS::geometry_msgs::WrenchStamped wrench(h,
+        ROS::geometry_msgs::Wrench(
+	    ROS::geometry_msgs::Vector3(Fx, Fy, Fz),
+	    ROS::geometry_msgs::Vector3(Tx, Ty, Tz)));
+    wrench.serialize(packet);
+
+    if (isConnected_ATINetboxLog_OutputPort(0)) {
+        this->ATINetboxLog_out(0, packet);
+    }
+
     // antialias filter only the data we send every cycle
     // TODO(mereweth)
 	
@@ -347,14 +360,16 @@ namespace Drv {
       if ((this->m_numPackets % FT_DECIMATE) == 0) {
 
         if (this->isConnected_ATINetboxData_OutputPort(0)) {
-          //this->ATINetboxData_out(0, ftsAA, ts);
+  	    // TODO(mereweth) - set AA-filtered elements
+            this->ATINetboxData_out(0, wrench);
         }
 
         /* TODO(mereweth@jpl.nasa.gov) - what format for FTS antialiasing log?
          * and does it need to be optional?
          */
         packet.resetSer();
-        //packet.serialize((U8) AFL_FORCE_TORQUE_ANTIALIAS);
+        packet.serialize((U8) AFL_ATINETBOX_WRENCH_AA);
+	wrench.serialize(packet);
 
         if (isConnected_ATINetboxLog_OutputPort(0)) {
           this->ATINetboxLog_out(0, packet);
@@ -452,15 +467,6 @@ namespace Drv {
     // write health word
     U32 health = rec.stat;
     this->tlmWrite_ATINET_Health(health);
-
-    packet.resetSer();
-    //packet.serialize(health);
-
-    if (isConnected_ATINetboxLog_OutputPort(0)) {
-      //this->ATINetboxLog_out(0, packet);
-    }
-
-
   }
 
   void ATINetboxComponentImpl::ATINET_BIAS_cmdHandler(FwOpcodeType opCode,

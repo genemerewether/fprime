@@ -1,0 +1,58 @@
+<telemetry>
+  
+    <channel id="1" name="SE3CTRL_MomentCommX" data_type="F32" format_string="%.6fNm">
+        <comment>
+            SE3 Control commanded moment in x
+        </comment>
+    </channel>
+    <channel id="2" name="SE3CTRL_MomentCommY" data_type="F32" format_string="%.6fNm">
+        <comment>
+            SE3 Control commanded moment in y
+        </comment>
+    </channel>
+    <channel id="3" name="SE3CTRL_MomentCommZ" data_type="F32" format_string="%.6fNm">
+        <comment>
+            SE3 Control commanded moment in z
+        </comment>
+    </channel>
+    <channel id="4" name="SE3CTRL_Error_x_w" data_type="F32" format_string="%.3fm">
+        <comment>
+            SE3 Control x error
+        </comment>
+    </channel>
+    <channel id="5" name="SE3CTRL_Error_y_w" data_type="F32" format_string="%.3fm">
+        <comment>
+            SE3 Control y error
+        </comment>
+    </channel>
+    <channel id="6" name="SE3CTRL_Error_z_w" data_type="F32" format_string="%.3fm">
+        <comment>
+            SE3 Control z error
+        </comment>
+    </channel>
+    <channel id="7" name="SE3CTRL_XThrustComm" data_type="F32" format_string="%.3fN">
+        <comment>
+            SE3 Control commanded thrust in x direction
+        </comment>
+    </channel>
+    <channel id="8" name="SE3CTRL_YThrustComm" data_type="F32" format_string="%.3fN">
+        <comment>
+            SE3 Control commanded thrust in x direction
+        </comment>
+    </channel>
+    <channel id="9" name="SE3CTRL_ZThrustComm" data_type="F32" format_string="%.3fN">
+        <comment>
+            SE3 Control commanded thrust in z direction
+        </comment>
+    </channel>
+    <channel id="10" name="SE3CTRL_w_q_b__des" data_type="ROS::geometry_msgs::Quaternion">
+        <comment>
+            SE3 Control desired orientation
+        </comment>
+    </channel>
+    <channel id="11" name="SE3CTRL_w_q_b" data_type="ROS::geometry_msgs::Quaternion">
+        <comment>
+            SE3 Control orientation
+        </comment>
+    </channel>
+</telemetry>
