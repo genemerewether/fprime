@@ -22,10 +22,19 @@ P1_MAP_K1_PRM_SET, 0.286
 P1_MAP_K2_PRM_SET, 0.467
 P1_MAP_B_PRM_SET, -100.0
 
+P1_MAP_OFFSET_PRM_SET, 0.0
+# simple I2C protocol
+P1_OUTPUTTYPE_PRM_SET, 3
+# get angular velocity field
+P1_INPUTACTTYPE_PRM_SET, 2
+
 # proportional feedback control
 P1_CTRLTYPE_PRM_SET, 1
 # output units max delta from open loop mapping
 P1_CTRL_MAXERR_PRM_SET, 10.0
 P1_CTRL_KP_PRM_SET, 0.05
+
+FLYSAFECYCLES_PRM_SET, 0
+FLYSAFETIME_PRM_SET, -1.0
 
 ACTADAP_InitParams
