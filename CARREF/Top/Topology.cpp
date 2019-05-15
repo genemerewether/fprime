@@ -612,7 +612,7 @@ void constructApp(unsigned int port_number,
     prmDb_ptr->init(60,0);
     snapHealth_ptr->init(60,0);
     snapHealth_ptr->setBootCount(boot_count);
-    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_OFF);
+    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_RAPID);
     sockGndIf_ptr->init(0);
 
     hlRosIface_ptr->init(0);
@@ -854,6 +854,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
         hiresCam_ptr->exit();
         hiresCam_ptr->deallocateBuffers(hiresMallocator);
         hiresCam_ptr->join(NULL);
+        DEBUG_PRINT("after hires exit\n");
 #if defined TGT_OS_TYPE_LINUX
         return;
     }
@@ -865,12 +866,14 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
         stereoCam_ptr->exit();
         stereoCam_ptr->deallocateBuffers(hiresMallocator);
         stereoCam_ptr->join(NULL);
+        DEBUG_PRINT("after stereo exit\n");
 #if defined TGT_OS_TYPE_LINUX
         return;
     }
 #endif
 
     ipcRelay_ptr->exit();
+    DEBUG_PRINT("after IPCRelay exit\n");
 
     mvCam_ptr->exit();
     mvCam_ptr->deallocateBuffers(buffMallocator);
@@ -883,6 +886,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     imuDRInt_ptr->exitThread();
     imuDRInt_ptr->joinThread(NULL);
 #endif
+    DEBUG_PRINT("after dataready intr thread join\n");
 
     rgDecouple_ptr->exit();
     imuDecouple_ptr->exit();
@@ -899,7 +903,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
 
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n"
+    (void) printf("Usage: ./CARREF [options]\n"
                   "-p\tport_number\n"
                   "-a\thostname/IP address\n"
                   "-i\tUse odometry from internal IMU propagation\n"
@@ -939,7 +943,7 @@ int main(int argc, char* argv[]) {
     bool isStereoChild = false;
 
     // Removes ROS cmdline args as a side-effect
-    ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
+    ros::init(argc,argv,"CARREF", ros::init_options::NoSigintHandler);
 
     while ((option = getopt(argc, argv, "hisp:a:b:u:z:")) != -1){
         switch(option) {

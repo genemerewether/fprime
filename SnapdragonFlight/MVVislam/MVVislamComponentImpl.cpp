@@ -172,33 +172,33 @@ namespace SnapdragonFlight {
       Os::File file;
       stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
       if (stat != Os::File::OP_OK) {
-	  // TODO(mereweth) - EVR
-	  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-	  return;
+          // TODO(mereweth) - EVR
+          printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+          return;
       }
       char buff[255];
       NATIVE_INT_TYPE size = sizeof(buff);
       stat = file.read(buff, size, false);
       file.close();
       if ((stat != Os::File::OP_OK) ||
-	  !size) {
-	  // TODO(mereweth) - EVR
-	  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-	  return;
+          !size) {
+          // TODO(mereweth) - EVR
+          printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+          return;
       }
       // Make sure buffer is null-terminated:
       buff[sizeof(buff)-1] = 0;
       const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
       if (-walltimeDspLeadUs > usecDsp) {
-	  // TODO(mereweth) - EVR; can't have difference greater than time
-	  printf("linux-dsp diff %lld negative; greater than message time %lu\n",
-		 walltimeDspLeadUs, usecDsp);
-	  return;
+          // TODO(mereweth) - EVR; can't have difference greater than time
+          printf("linux-dsp diff %lld negative; greater than message time %lu\n",
+                 walltimeDspLeadUs, usecDsp);
+          return;
       }
       const I64 usecRos = usecDsp + walltimeDspLeadUs;
       stamp.set((U32) (usecRos / 1000LL / 1000LL),
-		(U32) (usecRos % (1000LL * 1000LL)));
+                (U32) (usecRos % (1000LL * 1000LL)));
       h.setstamp(stamp);
       imu.setheader(h);
 
@@ -261,7 +261,7 @@ namespace SnapdragonFlight {
 	  
 	  this->m_errorCode = vio_pose.errorCode;
           if ((!this->m_errorCode) &&
-	      (MV_TRACKING_STATE_HIGH_QUALITY == vio_pose.poseQuality)) {
+              (MV_TRACKING_STATE_HIGH_QUALITY == vio_pose.poseQuality)) {
               using namespace Eigen;
               using namespace ROS::std_msgs;
               using namespace ROS::mav_msgs;
@@ -270,7 +270,13 @@ namespace SnapdragonFlight {
               grav.normalize();
               Transform<float,3,Affine> odom_to_imu(AngleAxisf(3.14159, Vector3f::UnitY())
                                                     * AngleAxisf(acos(grav.dot(Vector3f::UnitZ())),
-								 grav.cross(Vector3f::UnitZ())));
+                                                                 grav.cross(Vector3f::UnitZ())));
+              // NOTE(Mereweth) - odom_to_imu is odom_to_imu-start (MV spatial) here,
+              // and velocity is expressed in MV spatial, so this is correct to get
+              // to odom frame
+              Vector3f vel(vio_pose.velocity[0], vio_pose.velocity[1], vio_pose.velocity[2]);
+              vel = odom_to_imu * vel;
+              
               Transform<float,3,Affine> imu_start_to_imu;
               imu_start_to_imu.matrix() << vio_pose.bodyPose.matrix[0][0],
                 vio_pose.bodyPose.matrix[0][1],
@@ -286,80 +292,79 @@ namespace SnapdragonFlight {
                 vio_pose.bodyPose.matrix[2][3],
                 0.0, 0.0, 0.0, 1.0;
               odom_to_imu = odom_to_imu * imu_start_to_imu;
-              Vector3f vel(vio_pose.velocity[0], vio_pose.velocity[1], vio_pose.velocity[2]);
-              vel = odom_to_imu * vel;
+              
               const Quaternionf odom_to_imu_q(odom_to_imu.rotation());
               const Vector3f odom_to_imu_v(odom_to_imu.translation());
 
-	      //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-	      Os::File::Status stat = Os::File::OTHER_ERROR;
-	      Os::File file;
-	      stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-	      if (stat != Os::File::OP_OK) {
-		  // TODO(mereweth) - EVR
-		  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-		  return;
-	      }
-	      char buff[255];
-	      NATIVE_INT_TYPE size = sizeof(buff);
-	      stat = file.read(buff, size, false);
-	      file.close();
-	      if ((stat != Os::File::OP_OK) ||
-		  !size) {
-		  // TODO(mereweth) - EVR
-		  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-		  return;
-	      }
-	      // Make sure buffer is null-terminated:
-	      buff[sizeof(buff)-1] = 0;
-	      I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+              //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+              Os::File::Status stat = Os::File::OTHER_ERROR;
+              Os::File file;
+              stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
+              if (stat != Os::File::OP_OK) {
+                  // TODO(mereweth) - EVR
+                  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+                  return;
+              }
+              char buff[255];
+              NATIVE_INT_TYPE size = sizeof(buff);
+              stat = file.read(buff, size, false);
+              file.close();
+              if ((stat != Os::File::OP_OK) ||
+                  !size) {
+                  // TODO(mereweth) - EVR
+                  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
+                  return;
+              }
+              // Make sure buffer is null-terminated:
+              buff[sizeof(buff)-1] = 0;
+              I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
-	      if (walltimeDspLeadUs > usecRos) {
-		  // TODO(mereweth) - EVR; can't have difference greater than time
-		  printf("linux-dsp diff %lld greater than message time %lu\n",
-			 walltimeDspLeadUs, usecRos);
-		  return;
-	      }
-	      I64 usecDsp = usecRos - walltimeDspLeadUs;
-	      Fw::Time convTime(TB_WORKSTATION_TIME,
-				0,
-				(U32) (usecDsp / 1000 / 1000),
-				(U32) (usecDsp % (1000 * 1000)));
+              if (walltimeDspLeadUs > usecRos) {
+                  // TODO(mereweth) - EVR; can't have difference greater than time
+                  printf("linux-dsp diff %lld greater than message time %lu\n",
+                         walltimeDspLeadUs, usecRos);
+                  return;
+              }
+              I64 usecDsp = usecRos - walltimeDspLeadUs;
+              Fw::Time convTime(TB_WORKSTATION_TIME,
+                                0,
+                                (U32) (usecDsp / 1000 / 1000),
+                                (U32) (usecDsp % (1000 * 1000)));
 
-	      DEBUG_PRINT("usecRos %lld, lead %lld, convTime %u.%06u\n",
-			  usecRos,
-			  walltimeDspLeadUs,
-			  convTime.getSeconds(),
-			  convTime.getUSeconds());
+              DEBUG_PRINT("usecRos %lld, lead %lld, convTime %u.%06u\n",
+                          usecRos,
+                          walltimeDspLeadUs,
+                          convTime.getSeconds(),
+                          convTime.getUSeconds());
 
-	      //TODO(mereweth) - END convert time instead using HLTimeConv
+              //TODO(mereweth) - END convert time instead using HLTimeConv
 	      
               ImuStateUpdateNoCov update(
-			   Header(Image.getheader().getseq(),
-				  convTime,
-				  0),
-                           0, // TODO(mereweth) - child id
-                           Pose(Point(odom_to_imu_v(0),
-                                      odom_to_imu_v(1),
-                                      odom_to_imu_v(2)),
-                                ROS::geometry_msgs::Quaternion(odom_to_imu_q.x(),
-                                                               odom_to_imu_q.y(),
-                                                               odom_to_imu_q.z(),
-                                                               odom_to_imu_q.w())),
-                           Twist(Vector3(vel(0), vel(1), vel(2)),
-                                 Vector3(vio_pose.angularVelocity[0],
-                                         vio_pose.angularVelocity[1],
-                                         vio_pose.angularVelocity[2])),
-                           Vector3(vio_pose.wBias[0],
-                                   vio_pose.wBias[1],
-                                   vio_pose.wBias[2]),
-                           Vector3(vio_pose.aBias[0],
-                                   vio_pose.aBias[1],
-                                   vio_pose.aBias[2])
+                  Header(Image.getheader().getseq(),
+                         convTime,
+                         0),
+                  0, // TODO(mereweth) - child id
+                  Pose(Point(odom_to_imu_v(0),
+                             odom_to_imu_v(1),
+                             odom_to_imu_v(2)),
+                       ROS::geometry_msgs::Quaternion(odom_to_imu_q.x(),
+                                                      odom_to_imu_q.y(),
+                                                      odom_to_imu_q.z(),
+                                                      odom_to_imu_q.w())),
+                  Twist(Vector3(vel(0), vel(1), vel(2)),
+                        Vector3(vio_pose.angularVelocity[0],
+                                vio_pose.angularVelocity[1],
+                                vio_pose.angularVelocity[2])),
+                  Vector3(vio_pose.wBias[0],
+                          vio_pose.wBias[1],
+                          vio_pose.wBias[2]),
+                  Vector3(vio_pose.aBias[0],
+                          vio_pose.aBias[1],
+                          vio_pose.aBias[2])
               ); // end ImuStateUpdate constructor
 
               if (isConnected_ImuStateUpdate_OutputPort(0)) {
-		  ImuStateUpdate_out(0, update);
+                  ImuStateUpdate_out(0, update);
               }
           } // if !errorCode
 
@@ -436,7 +441,7 @@ namespace SnapdragonFlight {
       }
       else {
           m_activated = false;
-	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
+    	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
       }
   }
   
@@ -448,12 +453,12 @@ namespace SnapdragonFlight {
   {
       if (m_initialized) {
 #ifdef BUILD_SDFLIGHT
-  	  mvVISLAM_Reset(m_mvVISLAMPtr, true);
+      	  mvVISLAM_Reset(m_mvVISLAMPtr, true);
 #endif //BUILD_SDFLIGHT
           this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_OK);
       }
       else {
-	  this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
+	      this->cmdResponse_out(opCode, cmdSeq, Fw::COMMAND_EXECUTION_ERROR);
       }
   }
 
