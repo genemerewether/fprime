@@ -38,8 +38,9 @@ pushd .
 
 if [ -e ${QUEST_DEV_ROOT}/cross_toolchain ]; then
     cd ${QUEST_DEV_ROOT}/cross_toolchain
-    
-    ./installsdk.sh --APQ8096 --arm-gcc ${SDFLIGHT_TOOLS_ROOT}
+
+    # NOTE(mereweth) - need to install aarch64 cross toolchain
+    ./installsdk.sh --APQ8096 ${SDFLIGHT_TOOLS_ROOT}
 
     PTHREAD_FILE=${SDFLIGHT_TOOLS_ROOT}/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/usr/lib/libpthread.so
     echo "/* GNU ld script" > ${PTHREAD_FILE}
