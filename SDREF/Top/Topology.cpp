@@ -77,6 +77,7 @@ SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr = 0;
 SnapdragonFlight::MVCamComponentImpl* mvCam_ptr = 0;
 SnapdragonFlight::StereoCamComponentImpl* stereoCam_ptr = 0;
 SnapdragonFlight::MVVislamComponentImpl* mvVislam_ptr = 0;
+SnapdragonFlight::MVDFSComponentImpl* mvDFS_ptr = 0;
 SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
@@ -226,6 +227,12 @@ void allocComps() {
     mvVislam_ptr = new SnapdragonFlight::MVVislamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("MVVISLAM")
+#endif
+;
+
+    mvDFS_ptr = new SnapdragonFlight::MVDFSComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("MVDFS")
 #endif
 ;
 
@@ -552,6 +559,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     mvCam_ptr->init(60, 0);
     mvVislam_ptr->init(2000, 0);
+    mvDFS_ptr->init(60, 0);
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
     stereoCam_ptr->init(60, 0);
@@ -599,6 +607,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvCam_ptr->regCommands();
     stereoCam_ptr->regCommands();
     mvVislam_ptr->regCommands();
+    mvDFS_ptr->regCommands();
     hiresCam_ptr->regCommands();
     atiNetbox_ptr->regCommands();
     fatalHandler_ptr->regCommands();
@@ -624,6 +633,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     prmDb_ptr->readParamFile();
     mvCam_ptr->loadParameters();
     mvVislam_ptr->loadParameters();
+    mvDFS_ptr->loadParameters();
     atiNetbox_ptr->loadParameters();
     stereoCam_ptr->loadParameters();
 
@@ -726,6 +736,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
     mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_GNC);
+    mvDFS_ptr->start(0, 79, 5*1000*1024, CORE_GNC);
     hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
 
     imgTlm_ptr->start(0, 20, 20*1024, CORE_GNC);
@@ -884,6 +895,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     buffAccumHiresCamUnproc_ptr->exit();
 
     mvVislam_ptr->exit();
+    mvDFS_ptr->exit();
     llRouter_ptr->exit();
     serialTextConv_ptr->exit();
 

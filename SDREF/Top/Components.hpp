@@ -30,6 +30,7 @@ void exitTasks(void);
 #include <SnapdragonFlight/MVCam/MVCamComponentImpl.hpp>
 #include <SnapdragonFlight/StereoCam/StereoCamComponentImpl.hpp>
 #include <SnapdragonFlight/MVVislam/MVVislamComponentImpl.hpp>
+#include <SnapdragonFlight/MVDFS/MVDFSComponentImpl.hpp>
 #include <SnapdragonFlight/HiresCam/HiresCamComponentImpl.hpp>
 
 #include <SnapdragonFlight/HexRouter/HexRouterComponentImpl.hpp>
@@ -80,6 +81,7 @@ extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;
 extern SnapdragonFlight::StereoCamComponentImpl* stereoCam_ptr;
 extern SnapdragonFlight::MVVislamComponentImpl* mvVislam_ptr;
+extern SnapdragonFlight::MVDFSComponentImpl* mvDFS_ptr;
 extern SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr;
 extern SnapdragonFlight::HexRouterComponentImpl* hexRouter_ptr;
 extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
