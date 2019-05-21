@@ -1,7 +1,7 @@
 // ====================================================================== 
-// \title  ActuatorControlsImpl.cpp
+// \title  GPSPosAdapterImpl.cpp
 // \author mereweth
-// \brief  cpp file for ActuatorControls component implementation class
+// \brief  cpp file for GPSPosAdapter component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -18,29 +18,8 @@
 // ====================================================================== 
 
 
-#include <Drv/Mavlink/ActuatorControls/ActuatorControlsComponentImpl.hpp>
+#include <Drv/Mavlink/GPSPosAdapter/GPSPosAdapterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
-
-#define MAVLINK_NO_CONVERSION_HELPERS
-
-#ifdef BUILD_TIR5
-
-#ifndef __GNUC__
-#define __GNUC__
-#include <Drv/Mavlink/c_library_v2/mavlink_types.h>
-#undef __GNUC__
-#endif //__GNUC__
-
-#else //BUILD_TIR5
-
-#include <Drv/Mavlink/c_library_v2/mavlink_types.h>
-
-#endif //BUILD_TIR5
-
-
-extern mavlink_system_t mavlink_system;
-
-#include <Drv/Mavlink/c_library_v2/standard/mavlink.h>
 
 namespace Drv {
 
@@ -48,29 +27,29 @@ namespace Drv {
   // Construction, initialization, and destruction 
   // ----------------------------------------------------------------------
 
-  ActuatorControlsComponentImpl ::
+  GPSPosAdapterComponentImpl ::
 #if FW_OBJECT_NAMES == 1
-    ActuatorControlsComponentImpl(
+    GPSPosAdapterComponentImpl(
         const char *const compName
     ) :
-      ActuatorControlsComponentBase(compName)
+      GPSPosAdapterComponentBase(compName)
 #else
-    ActuatorControlsImpl(void)
+    GPSPosAdapterImpl(void)
 #endif
   {
 
   }
 
-  void ActuatorControlsComponentImpl ::
+  void GPSPosAdapterComponentImpl ::
     init(
         const NATIVE_INT_TYPE instance
     ) 
   {
-    ActuatorControlsComponentBase::init(instance);
+    GPSPosAdapterComponentBase::init(instance);
   }
 
-  ActuatorControlsComponentImpl ::
-    ~ActuatorControlsComponentImpl(void)
+  GPSPosAdapterComponentImpl ::
+    ~GPSPosAdapterComponentImpl(void)
   {
 
   }
@@ -79,7 +58,34 @@ namespace Drv {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void ActuatorControlsComponentImpl ::
+  void GPSPosAdapterComponentImpl ::
+    Guid_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::FlatOutput &FlatOutput
+    )
+  {
+    // TODO
+  }
+
+  void GPSPosAdapterComponentImpl ::
+    Nav_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::FlatOutput &FlatOutput
+    )
+  {
+    // TODO
+  }
+
+  void GPSPosAdapterComponentImpl ::
+    sched_handler(
+        const NATIVE_INT_TYPE portNum,
+        NATIVE_UINT_TYPE context
+    )
+  {
+    // TODO
+  }
+
+  void GPSPosAdapterComponentImpl ::
     SerReadPort_handler(
         const NATIVE_INT_TYPE portNum,
         Fw::Buffer &serBuffer,
@@ -87,24 +93,6 @@ namespace Drv {
     )
   {
     // TODO
-  }
-  
-  void ActuatorControlsComponentImpl ::
-    pwmSetDuty_handler(
-        const NATIVE_INT_TYPE portNum,
-        PwmSetDutyCycle pwmSetDutyCycle
-    )
-  {
-    // TODO (mereweth) - store duty cycle commands
-  }
-
-  void ActuatorControlsComponentImpl ::
-    sched_handler(
-        const NATIVE_INT_TYPE portNum,
-        NATIVE_UINT_TYPE context
-    )
-  {
-    // TODO (mereweth) - assemble mavlink message and send on uart port
   }
 
 } // end namespace Drv

@@ -1,7 +1,7 @@
 // ====================================================================== 
-// \title  ActuatorControlsImpl.hpp
+// \title  GPSPosAdapterImpl.hpp
 // \author mereweth
-// \brief  hpp file for ActuatorControls component implementation class
+// \brief  hpp file for GPSPosAdapter component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
@@ -17,15 +17,15 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
-#ifndef ActuatorControls_HPP
-#define ActuatorControls_HPP
+#ifndef GPSPosAdapter_HPP
+#define GPSPosAdapter_HPP
 
-#include "Drv/Mavlink/ActuatorControls/ActuatorControlsComponentAc.hpp"
+#include "Drv/Mavlink/GPSPosAdapter/GPSPosAdapterComponentAc.hpp"
 
 namespace Drv {
 
-  class ActuatorControlsComponentImpl :
-    public ActuatorControlsComponentBase
+  class GPSPosAdapterComponentImpl :
+    public GPSPosAdapterComponentBase
   {
 
     public:
@@ -34,9 +34,9 @@ namespace Drv {
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
 
-      //! Construct object ActuatorControls
+      //! Construct object GPSPosAdapter
       //!
-      ActuatorControlsComponentImpl(
+      GPSPosAdapterComponentImpl(
 #if FW_OBJECT_NAMES == 1
           const char *const compName /*!< The component name*/
 #else
@@ -44,15 +44,15 @@ namespace Drv {
 #endif
       );
 
-      //! Initialize object ActuatorControls
+      //! Initialize object GPSPosAdapter
       //!
       void init(
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
-      //! Destroy object ActuatorControls
+      //! Destroy object GPSPosAdapter
       //!
-      ~ActuatorControlsComponentImpl(void);
+      ~GPSPosAdapterComponentImpl(void);
 
     PRIVATE:
 
@@ -60,19 +60,18 @@ namespace Drv {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
-      //! Handler implementation for SerReadPort
+      //! Handler implementation for Guid
       //!
-      void SerReadPort_handler(
+      void Guid_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
-          SerialReadStatus &status /*!< Status of read*/
+          ROS::mav_msgs::FlatOutput &FlatOutput 
       );
-    
-      //! Handler implementation for pwmSetDuty
+
+      //! Handler implementation for Nav
       //!
-      void pwmSetDuty_handler(
+      void Nav_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          PwmSetDutyCycle pwmSetDutyCycle 
+          ROS::mav_msgs::FlatOutput &FlatOutput 
       );
 
       //! Handler implementation for sched
@@ -80,6 +79,14 @@ namespace Drv {
       void sched_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
+      );
+
+      //! Handler implementation for SerReadPort
+      //!
+      void SerReadPort_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+          SerialReadStatus &status /*!< Status of read*/
       );
 
 

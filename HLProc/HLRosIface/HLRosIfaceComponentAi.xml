@@ -48,10 +48,10 @@
         <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="ImageRecv" data_type="ROS::sensor_msgs::Image"  kind="sync_input"  max_number="1" >
+        <port name="ImageRecv" data_type="ROS::sensor_msgs::Image"  kind="sync_input"  max_number="2" >
         </port>
 
-        <port name="ImageForward" data_type="Fw::BufferSend"  kind="output"    max_number="1">	
+        <port name="ImageForward" data_type="Fw::BufferSend"  kind="output"    max_number="2">	
         </port>
     </ports>
 

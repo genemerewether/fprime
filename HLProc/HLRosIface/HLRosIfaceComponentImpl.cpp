@@ -89,7 +89,10 @@ namespace HLProc {
             m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
         }
 
-        m_imagePub = m_imageXport->advertise("image_raw", 1);
+        for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_%d", i);
+            m_imagePub[i] = m_imageXport->advertise(buf, 1);
+        }
 
         m_rosInited = true;
     }
@@ -214,11 +217,17 @@ namespace HLProc {
                                Image.getwidth(),
                                Image.getstep(),
                                ptr);
-        msg.header.frame_id = "dfc";
+        // TODO(mereweth) - add second image publisher from stereo camera
+        if (0 == portNum) {
+            msg.header.frame_id = "dfc";
+        }
+        else {
+            msg.header.frame_id = "stereo";
+        }
         msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
         msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
         msg.is_bigendian = 0;
-        m_imagePub.publish(msg);
+        m_imagePub[portNum].publish(msg);
 
         Fw::Buffer temp = Image.getdata();
         this->ImageForward_out(0, temp);

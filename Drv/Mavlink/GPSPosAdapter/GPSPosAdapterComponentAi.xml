@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<component name="ActuatorControls" kind="passive" namespace="Drv">
+<component name="GPSPosAdapter" kind="passive" namespace="Drv">
 
     <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
     <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
-    <import_port_type>Drv/PwmDriverPorts/PwmSetDutyCyclePortAi.xml</import_port_type>
 
     <!--import_dictionary>Gnc/Ctrl/ActuatorAdapter/Telemetry.xml</import_dictionary>
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Events.xml</import_dictionary>
@@ -18,9 +18,12 @@
 
     <ports>
 
-        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycleData"  kind="sync_input"    max_number="1">
+        <port name="Guid" data_type="ROS::mav_msgs::FlatOutput"  kind="sync_input"    max_number="1">
         </port>
 
+        <port name="Nav" data_type="ROS::mav_msgs::FlatOutput"  kind="sync_input"    max_number="1">
+        </port>
+        
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>
 

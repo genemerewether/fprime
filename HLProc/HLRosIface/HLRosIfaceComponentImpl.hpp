@@ -122,7 +122,7 @@ namespace HLProc {
       //!
       void ImageRecv_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-	  ROS::sensor_msgs::Image &Image
+          ROS::sensor_msgs::Image &Image
       );
 
       // ----------------------------------------------------------------------
@@ -137,7 +137,7 @@ namespace HLProc {
 
         ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;
-        image_transport::Publisher m_imagePub;
+        image_transport::Publisher m_imagePub[NUM_IMAGERECV_INPUT_PORTS];
 
         //! Entry point for task waiting for interrupt
         static void intTaskEntry(void * ptr);

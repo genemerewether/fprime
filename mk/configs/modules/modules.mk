@@ -170,7 +170,8 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/MVCam \
 	SnapdragonFlight/StereoCam \
 	SnapdragonFlight/HiresCam \
-	SnapdragonFlight/MVVislam
+	SnapdragonFlight/MVVislam \
+	SnapdragonFlight/MVDFS
 
 HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
@@ -371,6 +372,7 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	Drv/Mavlink/GPSPosAdapter \
 	Drv/ForceTorque/ATINetbox \
 	\
 	$(ZMQ_MODULES) \
