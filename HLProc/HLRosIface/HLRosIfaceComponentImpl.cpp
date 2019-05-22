@@ -209,28 +209,29 @@ namespace HLProc {
           ROS::sensor_msgs::Image &Image
       )
     {
-        sensor_msgs::Image msg;
-        const U8* ptr = (const U8*) Image.getdata().getdata();
-        sensor_msgs::fillImage(msg,
-                               sensor_msgs::image_encodings::MONO8,
-                               Image.getheight(),
-                               Image.getwidth(),
-                               Image.getstep(),
-                               ptr);
-        // TODO(mereweth) - add second image publisher from stereo camera
-        if (0 == portNum) {
-            msg.header.frame_id = "dfc";
+        if (m_rosInited) {
+            sensor_msgs::Image msg;
+            const U8* ptr = (const U8*) Image.getdata().getdata();
+            sensor_msgs::fillImage(msg,
+                                   sensor_msgs::image_encodings::MONO8,
+                                   Image.getheight(),
+                                   Image.getwidth(),
+                                   Image.getstep(),
+                                   ptr);
+            // TODO(mereweth) - add second image publisher from stereo camera
+            if (0 == portNum) {
+                msg.header.frame_id = "dfc";
+            }
+            else {
+                msg.header.frame_id = "stereo";
+            }
+            msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
+            msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
+            msg.is_bigendian = 0;
+            m_imagePub[portNum].publish(msg);
         }
-        else {
-            msg.header.frame_id = "stereo";
-        }
-        msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
-        msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
-        msg.is_bigendian = 0;
-        m_imagePub[portNum].publish(msg);
-
         Fw::Buffer temp = Image.getdata();
-        this->ImageForward_out(0, temp);
+        this->ImageForward_out(portNum, temp);
     }
 
 

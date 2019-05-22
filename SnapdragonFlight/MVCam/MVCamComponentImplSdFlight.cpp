@@ -409,9 +409,14 @@ namespace SnapdragonFlight {
       // correct for exposure time - report middle of frame
       // NOTE(mereweth) - assumes that capture params from last callback have
       // taken effect; may be more delay than that
-      //float correction = 1e3 * ((float)m_exposureTargetTrunc * MVCAM_DEFAULT_ROW_PERIOD_US / 2.f);
-      //uint64_t timestamp_ns = (uint64_t) ((float) frame->timeStamp - correction);
-
+#ifdef SOC_8074
+      uint64_t timestamp_ns = frame->timeStamp
+        - m_exposureTargetTrunc * MVCAM_DEFAULT_ROW_HALF_PERIOD_NS;
+#else
+      uint64_t timestamp_ns = frame->timeStamp
+        + m_params.getFrameExposureTime(frame) / 2;
+#endif
+      
       struct timespec monotonic_now;
       clock_gettime(CLOCK_MONOTONIC, &monotonic_now);
 
@@ -419,7 +424,7 @@ namespace SnapdragonFlight {
       clock_gettime(CLOCK_REALTIME, &realtime_now);
 
       // TODO(mereweth) - update this when image struct changes
-      F64 timestamp_realtime = (F64) (frame->timeStamp/*timestamp_ns*/ + realtime_now.tv_nsec - monotonic_now.tv_nsec) * 1.0e-9
+      F64 timestamp_realtime = (F64) (/*frame->timeStamp*/ timestamp_ns + realtime_now.tv_nsec - monotonic_now.tv_nsec) * 1.0e-9
             + (F64) realtime_now.tv_sec - (F64) monotonic_now.tv_sec;
 
       DEBUG_PRINT("\ncorrection %.9f, timestamp_realtime (s) %.9f\n",

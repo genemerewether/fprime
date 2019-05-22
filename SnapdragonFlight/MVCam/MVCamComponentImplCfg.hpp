@@ -53,9 +53,9 @@ enum {
 
   MVCAM_10BIT_CALLBACK_SIZE = MVCAM_IMAGE_SIZE * 10 / 8,
   MVCAM_8BIT_CALLBACK_SIZE = MVCAM_IMAGE_SIZE,
-};
 
-const float MVCAM_DEFAULT_ROW_PERIOD_US = 19.3333; // This is used to compute the total exposure time.
+  MVCAM_DEFAULT_ROW_HALF_PERIOD_NS = 9667,
+};
 
 } // end namespace SnapdragonFlight
 

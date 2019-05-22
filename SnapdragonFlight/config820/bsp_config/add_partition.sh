@@ -4,7 +4,7 @@ set -e
 
 mkpart() {
     adb shell "mkdir -p /data/$MOUNT_POINT"
-    adb shell "ln -s /data/$MOUNT_POINT /$MOUNT_POINT"
+    #adb shell "ln -s /data/$MOUNT_POINT /$MOUNT_POINT"
 }
 
 MOUNT_POINT="seq"

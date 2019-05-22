@@ -74,19 +74,24 @@ namespace SnapdragonFlight {
   void MVVislamComponentImpl ::
     preamble(void)
   {
-#ifndef SOC_8096
       initHelper();
-#endif
   }
 
 
   void MVVislamComponentImpl ::
     initHelper(void)
   {
+#ifdef SOC_8074
       // NOTE(mereweth) - x,y,z, offsets in meters
       F32 tbc[] = { 0.005, 0.0150, 0.0 };
       // NOTE(mereweth) - axis-angle rep; rotation of 90 deg about Z
       F32 ombc[] = { 0.0, 0.0, 1.57 };
+#else
+      // NOTE(mereweth) - x,y,z, offsets in meters
+      F32 tbc[] = { -0.051, 0.015, 0.011 };
+      // NOTE(mereweth) - axis-angle rep; 
+      F32 ombc[] = { 0.6149, -0.6149, -1.4817 };
+#endif
 
       F32 std0Tbc[] = { 0.005, 0.005, 0.005 };
       F32 std0Ombc[] = { 0.04, 0.04, 0.04 };
@@ -115,7 +120,11 @@ namespace SnapdragonFlight {
                             0.0f, //readoutTime
                             tbc,
                             ombc,
+#ifdef SOC_8074
+                            -0.0068, //delta
+#else
                             0.002f, //delta
+#endif
                             std0Tbc,
                             std0Ombc,
                             0.001f, //std0Delta
@@ -236,30 +245,30 @@ namespace SnapdragonFlight {
           mvVISLAM_AddImage(m_mvVISLAMPtr, usecRos * 1000LL, (U8*) (data.getdata()));
           mvVISLAMPose vio_pose = mvVISLAM_GetPose(m_mvVISLAMPtr);
 	  
-	  /*
-	    - \b 0:  Reset: cov not pos definite
-	    - \b 1:  Reset: IMU exceeded range
-	    - \b 2:  Reset: IMU bandwidth too low
-	    - \b 3:  Reset: not stationary at initialization
-	    - \b 4:  Reset: no features for x seconds
-	    - \b 5:  Reset: insufficient constraints from features
-	    - \b 6:  Reset: failed to add new features
-	    - \b 7:  Reset: exceeded instant velocity uncertainty
-	    - \b 8:  Reset: exceeded velocity uncertainty over window
-	    - \b 10:  Dropped IMU samples
-	    - \b 11:  Intrinsic camera cal questionable
-	    - \b 12:  Insufficient number of good features to initialize
-	    - \b 13:  Dropped camera frame
-	    - \b 14:  Dropped GPS velocity sample
-	    - \b 15:  Sensor measurements with uninitialized time stamps or uninitialized uncertainty (set to 0)
-	  */
+          /*
+            - \b 0:  Reset: cov not pos definite
+            - \b 1:  Reset: IMU exceeded range
+            - \b 2:  Reset: IMU bandwidth too low
+            - \b 3:  Reset: not stationary at initialization
+            - \b 4:  Reset: no features for x seconds
+            - \b 5:  Reset: insufficient constraints from features
+            - \b 6:  Reset: failed to add new features
+            - \b 7:  Reset: exceeded instant velocity uncertainty
+            - \b 8:  Reset: exceeded velocity uncertainty over window
+            - \b 10:  Dropped IMU samples
+            - \b 11:  Intrinsic camera cal questionable
+            - \b 12:  Insufficient number of good features to initialize
+            - \b 13:  Dropped camera frame
+            - \b 14:  Dropped GPS velocity sample
+            - \b 15:  Sensor measurements with uninitialized time stamps or uninitialized uncertainty (set to 0)
+          */
 
-	  //TODO(mereweth) - move these after transform
-	  this->x_b.setx(vio_pose.bodyPose.matrix[0][3]);
-	  this->x_b.sety(vio_pose.bodyPose.matrix[1][3]);
-	  this->x_b.setz(vio_pose.bodyPose.matrix[2][3]);
-	  
-	  this->m_errorCode = vio_pose.errorCode;
+          //TODO(mereweth) - move these after transform
+          this->x_b.setx(vio_pose.bodyPose.matrix[0][3]);
+          this->x_b.sety(vio_pose.bodyPose.matrix[1][3]);
+          this->x_b.setz(vio_pose.bodyPose.matrix[2][3]);
+
+          this->m_errorCode = vio_pose.errorCode;
           if ((!this->m_errorCode) &&
               (MV_TRACKING_STATE_HIGH_QUALITY == vio_pose.poseQuality)) {
               using namespace Eigen;

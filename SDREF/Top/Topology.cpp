@@ -10,9 +10,9 @@ enum {
     CORE_3 = 3,
 
     CORE_CDH = CORE_0,
-    CORE_RPC = CORE_1,
-    CORE_CAM = CORE_2,
-    CORE_GNC = CORE_3
+    CORE_GNC = CORE_1,
+    CORE_DEV = CORE_2,
+    CORE_PRCP = CORE_3
 };
 
 #include <Fw/Types/Assert.hpp>
@@ -486,6 +486,8 @@ void manualConstruct() {
 
     stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
     ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));
+
+    // TODO(mereweth) - buffer return port for stereocam sync gncbuffer return
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
@@ -693,7 +695,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         isHiresChild = true;
 #endif
 
-        hiresCam_ptr->start(0,40,5*1000*1024, CORE_CAM);
+        hiresCam_ptr->start(0,40,5*1000*1024, CORE_PRCP);
 
 #if defined TGT_OS_TYPE_LINUX
         return; // don't start any other threads in the child
@@ -706,7 +708,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         isStereoChild = true;
 #endif
 
-        stereoCam_ptr->start(0,40,5*1000*1024, CORE_CAM);
+        stereoCam_ptr->start(0,50,5*1000*1024, CORE_PRCP);
 
 #if defined TGT_OS_TYPE_LINUX
         return; // don't start any other threads in the child
@@ -714,7 +716,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #endif
 
     // NOTE(mereweth) - putting this near the top in case we want to fork in ipcRelay instead
-    ipcRelay_ptr->start(0,30,20*1024, CORE_CAM);
+    ipcRelay_ptr->start(0,30,20*1024, CORE_DEV);
 
     // Active component startup
     // start rate groups
@@ -734,12 +736,12 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     snapHealth_ptr->start(0,40,20*1024);
 
-    mvCam_ptr->start(0, 80, 5*1000*1024, CORE_CAM);
+    mvCam_ptr->start(0, 80, 5*1000*1024, CORE_DEV);
     mvVislam_ptr->start(0, 80, 5*1000*1024, CORE_GNC);
-    mvDFS_ptr->start(0, 79, 5*1000*1024, CORE_GNC);
-    hexRouter_ptr->start(0, 90, 20*1024, CORE_RPC);
+    mvDFS_ptr->start(0, 79, 5*1000*1024, CORE_PRCP);
+    hexRouter_ptr->start(0, 90, 20*1024, CORE_DEV);
 
-    imgTlm_ptr->start(0, 20, 20*1024, CORE_GNC);
+    imgTlm_ptr->start(0, 1, 20*1024);
 
     buffLogMVCamUnproc_ptr->start(0, 20, 20*1024);
     buffLogHiresCamUnproc_ptr->start(0, 20, 20*1024);
@@ -753,8 +755,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     fileLogger_ptr->start(0,50,20*1024);
 
-    hexRouter_ptr->startPortReadThread(90,20*1024, CORE_RPC);
-    //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_RPC);
+    hexRouter_ptr->startPortReadThread(90,20*1024, CORE_DEV);
+    //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_DEV);
 
 #ifdef LLROUTER_DEVICES
     // Must start serial drivers after tasks that setup the buffers for the driver:
