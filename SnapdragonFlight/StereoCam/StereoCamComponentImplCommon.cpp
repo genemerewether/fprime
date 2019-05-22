@@ -443,6 +443,49 @@ namespace SnapdragonFlight {
     }
 
     void StereoCamComponentImpl ::
+      GncBufferAsyncReturn_handler(
+          const NATIVE_INT_TYPE portNum,
+          Fw::Buffer &fwBuffer
+      )
+    {
+#ifdef DEBUG_MODE
+        struct timeval tv;
+        gettimeofday(&tv,NULL);
+        DEBUG_PRINT("\nTaking m_bufferLock in GncBufferAsyncReturn_handler at time %f",
+                    tv.tv_sec + tv.tv_usec / 1000000.0);
+#endif // DEBUG_MODE
+
+        // NOTE(mereweth) always high-priority type
+        const NATIVE_UINT_TYPE buffType = SCAM_HP_BUFFER;
+
+        this->m_bufferLock.lock();
+        bool found = false;
+        // search for open entry
+        for (NATIVE_UINT_TYPE entry = 0; entry < SCAM_IMG_MAX_NUM_BUFFERS; entry++) {
+            // Look for slots to fill. "Available" is from
+            // the perspective of the driver thread looking for
+            // buffers to fill, so add the buffer and make it available.
+            if (not this->m_buffSet[buffType][entry].available) {
+                FW_ASSERT(buffType < FW_NUM_ARRAY_ELEMENTS(this->m_buffSet), buffType);
+                FW_ASSERT(entry < FW_NUM_ARRAY_ELEMENTS(this->m_buffSet[buffType]), entry);
+                this->m_buffSet[buffType][entry].readBuffer = fwBuffer;
+                this->m_buffSet[buffType][entry].available = true;
+                found = true;
+                break;
+            }
+        }
+        this->m_bufferLock.unLock();
+
+        FW_ASSERT(found,fwBuffer.getbufferID(),fwBuffer.getmanagerID());
+
+#ifdef DEBUG_MODE
+        gettimeofday(&tv,NULL);
+        DEBUG_PRINT("\nReleasing m_bufferLock in ImageBufferIn_handler at time %f",
+                    tv.tv_sec + tv.tv_usec / 1000000.0);
+#endif // DEBUG_MODE
+    }
+
+    void StereoCamComponentImpl ::
       parameterUpdated(FwPrmIdType id)
     {
         DEBUG_PRINT("prm %d updated\n", id);
