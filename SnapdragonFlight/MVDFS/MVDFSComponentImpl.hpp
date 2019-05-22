@@ -119,7 +119,11 @@ namespace SnapdragonFlight {
       struct mvDFS* m_mvDFSPtr;
     
       mvCameraConfiguration m_depthCameraIntrinsics;
+
+      mvStereoConfiguration m_camCfg;
 #endif
+
+      float* m_invDepth;
 
       bool m_initialized;
       

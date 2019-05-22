@@ -43,7 +43,10 @@ namespace SnapdragonFlight {
 #endif
 #ifdef BUILD_SDFLIGHT
       ,m_mvDFSPtr(NULL)
+      ,m_depthCameraIntrinsics()
+      ,m_camCfg()
 #endif
+      ,m_invDepth(NULL)
       ,m_initialized(false)
       ,m_activated(false)
       ,m_imagesProcessed(0u)
@@ -70,56 +73,59 @@ namespace SnapdragonFlight {
     preamble(void)
   {
       initHelper();
+      m_invDepth = new float[640 * 480];
+      if (NULL == m_invDepth) {
+          // TODO(mereweth) - EVR
+          m_initialized = false;
+      }
   }
-
 
   void MVDFSComponentImpl ::
     initHelper(void)
   {
 #ifdef BUILD_SDFLIGHT
-      mvStereoConfiguration camCfg;
-      memset(&camCfg, 0, sizeof(camCfg)); // important!
-      camCfg.camera[0].pixelWidth = 640;
-      camCfg.camera[0].pixelHeight = 480;
+      memset(&m_camCfg, 0, sizeof(m_camCfg)); // important!
+      m_camCfg.camera[0].pixelWidth = 640;
+      m_camCfg.camera[0].pixelHeight = 480;
       // NOTE(mereweth) - saves the copy to separate joined rows
-      camCfg.camera[0].memoryStride = 1280;
-      camCfg.camera[1].pixelWidth = 640;
-      camCfg.camera[1].pixelHeight = 480;
+      m_camCfg.camera[0].memoryStride = 1280;
+      m_camCfg.camera[1].pixelWidth = 640;
+      m_camCfg.camera[1].pixelHeight = 480;
       // NOTE(mereweth) - saves the copy to separate joined rows
-      camCfg.camera[1].memoryStride = 1280;
+      m_camCfg.camera[1].memoryStride = 1280;
 
-      camCfg.camera[0].principalPoint[0] = 320.0;
-      camCfg.camera[0].principalPoint[1] = 240.0;
-      camCfg.camera[0].focalLength[0] = 275.0;
-      camCfg.camera[0].focalLength[1] = 275.0;
-      camCfg.camera[0].uvOffset = 0;
-      camCfg.camera[0].distortionModel = 10;
-      camCfg.camera[0].distortion[0] = .003908;
-      camCfg.camera[0].distortion[1] = -0.009574;
-      camCfg.camera[0].distortion[2] = 0.010173;
-      camCfg.camera[0].distortion[3] = -0.003329;
+      m_camCfg.camera[0].principalPoint[0] = 320.0;
+      m_camCfg.camera[0].principalPoint[1] = 240.0;
+      m_camCfg.camera[0].focalLength[0] = 435.0;
+      m_camCfg.camera[0].focalLength[1] = 435.0;
+      m_camCfg.camera[0].uvOffset = 0;
+      m_camCfg.camera[0].distortionModel = 4;
+      m_camCfg.camera[0].distortion[0] = 0.045;
+      m_camCfg.camera[0].distortion[1] = -0.12;
+      m_camCfg.camera[0].distortion[2] = 0.001;
+      m_camCfg.camera[0].distortion[3] = 0.0;
 
-      camCfg.camera[1].principalPoint[0] = 320.0;
-      camCfg.camera[1].principalPoint[1] = 240.0;
-      camCfg.camera[1].focalLength[0] = 275.0;
-      camCfg.camera[1].focalLength[1] = 275.0;
-      camCfg.camera[1].uvOffset = 0;
-      camCfg.camera[1].distortionModel = 10;
-      camCfg.camera[1].distortion[0] = .003908;
-      camCfg.camera[1].distortion[1] = -0.009574;
-      camCfg.camera[1].distortion[2] = 0.010173;
-      camCfg.camera[1].distortion[3] = -0.003329;
+      m_camCfg.camera[1].principalPoint[0] = 320.0;
+      m_camCfg.camera[1].principalPoint[1] = 240.0;
+      m_camCfg.camera[1].focalLength[0] = 435.0;
+      m_camCfg.camera[1].focalLength[1] = 435.0;
+      m_camCfg.camera[1].uvOffset = 0;
+      m_camCfg.camera[1].distortionModel = 4;
+      m_camCfg.camera[1].distortion[0] = 0.045;
+      m_camCfg.camera[1].distortion[1] = -0.12;
+      m_camCfg.camera[1].distortion[2] = 0.001;
+      m_camCfg.camera[1].distortion[3] = 0.0;
       
-      camCfg.translation[0] = 0.0;
-      camCfg.translation[1] = 0.0;
-      camCfg.translation[2] = 0.0;
+      m_camCfg.translation[0] = -0.079395;
+      m_camCfg.translation[1] = 0.000653;
+      m_camCfg.translation[2] = -0.000398;
       // scaled axis-angle
-      camCfg.rotation[0] = 0.0;
-      camCfg.rotation[1] = 0.0;
-      camCfg.rotation[2] = 0.0;
+      m_camCfg.rotation[0] = 0.008761;
+      m_camCfg.rotation[1] = -0.018536;
+      m_camCfg.rotation[2] = -0.026348;
 
       this->m_mvDFSPtr = 
-        mvDFS_Initialize(&camCfg,
+        mvDFS_Initialize(&m_camCfg,
                          MVDFS_MODE_ALG1_GPU,
                          false); //using 10bit input
       if (NULL == m_mvDFSPtr) {
@@ -143,6 +149,10 @@ namespace SnapdragonFlight {
           mvDFS_Deinitialize(m_mvDFSPtr);
       }
 #endif //BUILD_SDFLIGHT
+      
+      if (NULL != m_invDepth) {
+          delete[] m_invDepth;
+      }
   }
   
   // ----------------------------------------------------------------------
@@ -165,8 +175,11 @@ namespace SnapdragonFlight {
                           0, nullptr, //numMasks, masks
                           0, 32, //min, max disparity
                           NULL, // don't need raw disparity values yet
-                          NULL); // TODO(mereweth) - get inverse depth and convert to point cloud
+                          m_invDepth);
 #endif //BUILD_SDFLIGHT
+
+          // generate point cloud and send
+          
       }
       
       ImageBufferReturn_out(0, data);
