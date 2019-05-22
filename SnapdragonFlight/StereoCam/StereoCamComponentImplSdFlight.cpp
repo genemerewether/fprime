@@ -702,6 +702,11 @@ namespace SnapdragonFlight {
                               image.setheight(SCAM_IMAGE_HEIGHT);
                               image.setwidth(SCAM_IMAGE_WIDTH);
                               image.setstep(SCAM_IMAGE_WIDTH);
+#ifdef BUILD_SDFLIGHT
+                              image.setis_bigendian(1);
+#else
+                              image.setis_bigendian(0);
+#endif
                               image.setheader(ROS::std_msgs::Header(m_imagesAcquired,
                                                                     hwTime, 2/*"optic"*/));
                               GncBufferSend_out(0, image);

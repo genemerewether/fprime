@@ -47,6 +47,7 @@ namespace SnapdragonFlight {
       ,m_camCfg()
 #endif
       ,m_invDepth(NULL)
+      ,m_pointCloud(NULL)
       ,m_initialized(false)
       ,m_activated(false)
       ,m_imagesProcessed(0u)
@@ -74,7 +75,9 @@ namespace SnapdragonFlight {
   {
       initHelper();
       m_invDepth = new float[640 * 480];
-      if (NULL == m_invDepth) {
+      m_pointCloud = new float[640 * 480 * 3];
+      if ((NULL == m_invDepth) ||
+          (NULL == m_pointCloud)) {
           // TODO(mereweth) - EVR
           m_initialized = false;
       }
@@ -153,6 +156,10 @@ namespace SnapdragonFlight {
       if (NULL != m_invDepth) {
           delete[] m_invDepth;
       }
+      
+      if (NULL != m_pointCloud) {
+          delete[] m_pointCloud;
+      }
   }
   
   // ----------------------------------------------------------------------
@@ -176,10 +183,35 @@ namespace SnapdragonFlight {
                           0, 32, //min, max disparity
                           NULL, // don't need raw disparity values yet
                           m_invDepth);
-#endif //BUILD_SDFLIGHT
 
           // generate point cloud and send
-          
+          // NOTE(mereweth) - REQUIRES SYNC PORT on other end - true for HLRosIface
+          const U32 width = m_camCfg.camera[0].pixelWidth;
+          const float fx = m_depthCameraIntrinsics.focalLength[0];
+          const float fy = m_depthCameraIntrinsics.focalLength[1];
+          const float cx = m_depthCameraIntrinsics.principalPoint[0];
+          const float cy = m_depthCameraIntrinsics.principalPoint[1];
+          U32 idx = 0u;
+          if (this->isConnected_PointCloud_OutputPort(0)) {
+              for (int i = 0; i < m_camCfg.camera[0].pixelHeight; i++) {
+                  for (int j = 0; j < width; j++) {
+                      const float d = m_invDepth[i * width + j];
+                      if (d < 1e-3) {
+                          continue;
+                      }
+                      const float z = 1.0 / d;
+                      const float x = z * (j - cx) / fx;
+                      const float y = z * (i - cy) / fy;
+                      memcpy(&m_pointCloud[idx], (const void*) &x, sizeof(x));
+                      idx += sizeof(x);
+                      memcpy(&m_pointCloud[idx], (const void*) &y, sizeof(y));
+                      idx += sizeof(y);
+                      memcpy(&m_pointCloud[idx], (const void*) &z, sizeof(z));
+                      idx += sizeof(z);
+                  }
+              }
+          }
+#endif //BUILD_SDFLIGHT
       }
       
       ImageBufferReturn_out(0, data);

@@ -59,7 +59,7 @@ namespace SnapdragonFlight {
       //! Destroy object MVDFS
       //!
       ~MVDFSComponentImpl(void);
-
+    
     PRIVATE:
 
       //! Preamble override
@@ -124,6 +124,8 @@ namespace SnapdragonFlight {
 #endif
 
       float* m_invDepth;
+    
+      float* m_pointCloud;
 
       bool m_initialized;
       

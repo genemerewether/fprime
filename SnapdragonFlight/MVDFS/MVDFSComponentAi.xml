@@ -3,6 +3,7 @@
 
 <component name="MVDFS" kind="active" namespace="SnapdragonFlight" modeler="true">
 
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/PointCloud2PortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
@@ -22,6 +23,9 @@
         </port>
 
         <port name="ImageIn" data_type="ROS::sensor_msgs::Image"  kind="async_input"    max_number="1">
+        </port>
+
+        <port name="PointCloud" data_type="ROS::sensor_msgs::PointCloud2"  kind="output"    max_number="1">
         </port>
 
         <port name="ImageBufferReturn" data_type="Fw::BufferSend"  kind="output"    max_number="1">
