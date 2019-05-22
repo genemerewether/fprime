@@ -28,7 +28,7 @@ enum {
 // TODO (mereweth@jpl.nasa.gov) - change this to a parameter?
 enum {
   SCAM_MIN_RATE_WARN = 28, // EVR when less than this many images per RTI
-  SCAM_FRAME_SKIP = 0, // 2 //For 10 Hz images on ImageSend port
+  SCAM_FRAME_SKIP = 2, //For 10 Hz images on ImageSend port
   SCAM_IMG_WAIT_SEC = 2, // Wait this many sched calls for an image
   SCAM_PARAMS_APPLY_SKIP = 1, // Skip # frames before update gain and exposure due to delay in parameter propagation
   SCAM_MAX_NUM_WAYPOINTS = 100,

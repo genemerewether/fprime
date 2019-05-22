@@ -487,7 +487,8 @@ void manualConstruct() {
     stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
     ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));
 
-    // TODO(mereweth) - buffer return port for stereocam sync gncbuffer return
+    stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
+    ipcRelay_ptr->set_proc2Out_OutputPort(12, mvDFS_ptr->get_ImageIn_InputPort(0));
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
