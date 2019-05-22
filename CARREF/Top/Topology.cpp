@@ -579,6 +579,9 @@ void manualConstruct(bool internalIMUProp) {
 
     /*stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
     ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));*/
+
+    stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
+    ipcRelay_ptr->set_proc2Out_OutputPort(12, hlRosIface_ptr->get_ImageRecv_InputPort(1));
 }
 
 void constructApp(unsigned int port_number,
