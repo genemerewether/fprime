@@ -1,6 +1,6 @@
 NUMROTORS_PRM_SET, 4
 
-# thrust coefficient 2.12e-06 N / (rad/s)^2
+# thrust coefficient 1.4e-06 N / (rad/s)^2
 # moment coefficient 2e-08 N*m / (rad/s)^2
 # front_arm_x 0.0785 m
 # front_arm_y 0.0785 m
@@ -11,25 +11,25 @@ NUMROTORS_PRM_SET, 4
 M_X__1_PRM_SET, -1.66e-7
 M_Y__1_PRM_SET, -1.66e-7
 M_Z__1_PRM_SET, -2e-08
-T__1_PRM_SET, 2.12e-06
+T__1_PRM_SET, 1.4e-06
 
 # back left
 M_X__2_PRM_SET, 1.44e-7
 M_Y__2_PRM_SET, 1.44e-7 
 M_Z__2_PRM_SET, -2e-08
-T__2_PRM_SET, 2.12e-06
+T__2_PRM_SET, 1.4e-06
 
 # front left
 M_X__3_PRM_SET, 1.66e-7
 M_Y__3_PRM_SET, -1.66e-7
 M_Z__3_PRM_SET, 2e-08
-T__3_PRM_SET, 2.12e-06
+T__3_PRM_SET, 1.4e-06
 
 # back right
 M_X__4_PRM_SET, -1.44e-7
 M_Y__4_PRM_SET, 1.44e-7
 M_Z__4_PRM_SET, 2e-08
-T__4_PRM_SET, 2.12e-06
+T__4_PRM_SET, 1.4e-06
 
 BMIX_InitParams
 
@@ -84,18 +84,18 @@ P1_COUNTS_PRM_SET, 42
 P1_MAPTYPE_PRM_SET, 4
 # mapping determined at 11.1 volts
 P1_MAP_VNOM_PRM_SET, 11.1
-P1_MAP_X0_PRM_SET, 1200.0
+P1_MAP_X0_PRM_SET, 1000.0
 P1_MAP_X1_PRM_SET, 1900.0
-P1_MAP_K0_PRM_SET, 0.167
-P1_MAP_K1_PRM_SET, 0.286
-P1_MAP_K2_PRM_SET, 0.467
+P1_MAP_K0_PRM_SET, 0.3
+P1_MAP_K1_PRM_SET, 0.55
+P1_MAP_K2_PRM_SET, 0.8
 P1_MAP_B_PRM_SET, -100.0
 
 # proportional feedback control
 P1_CTRLTYPE_PRM_SET, 1
 # output units max delta from open loop mapping
-P1_CTRL_MAXERR_PRM_SET, 50.0
-P1_CTRL_KP_PRM_SET, 0.1
+P1_CTRL_MAXERR_PRM_SET, 300.0
+P1_CTRL_KP_PRM_SET, 0.3
 
 # simple I2C protocol
 P1_OUTPUTTYPE_PRM_SET, 3
