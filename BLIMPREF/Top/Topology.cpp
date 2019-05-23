@@ -633,7 +633,7 @@ void constructApp(unsigned int port_number,
     hwEnablePinSnap_ptr->open(28, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_IN);
 
     // J15, BLSP9
-    i2cDrvSnap_ptr->open(9, SnapdragonFlight::I2C_FREQUENCY_400KHZ);
+    i2cDrvSnap_ptr->open(9);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
