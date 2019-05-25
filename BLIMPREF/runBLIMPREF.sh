@@ -16,6 +16,5 @@ screen -S "BLIMPREF" -X log
 screen -r "BLIMPREF" -X stuff "export ROS_HOME=/eng/ros\n"
 screen -r "BLIMPREF" -X stuff ". /eng/load/set_ip_snap.bash || true\n"
 screen -r "BLIMPREF" -X stuff ". /opt/ros/indigo/setup.bash || true\n"
-screen -r "BLIMPREF" -X stuff "rostopic list || roscore &\n"
 screen -r "BLIMPREF" -X stuff "$(pwd)/BLIMPREF0 -p 50100 -a localhost -s imu_state_update:=rovio_odom \n"
 screen -r "BLIMPREF"
