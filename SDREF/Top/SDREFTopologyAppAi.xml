@@ -396,6 +396,14 @@
 	 <source component = "mvVislam" port = "ImuFwd" type = "ImuNoCov" num = "0"/>
  	 <target component = "sdRosIface" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
+<connection name = "Connection66a">
+	 <source component = "mvDFS" port = "PointCloud" type = "PointCloud2" num = "0"/>
+ 	 <target component = "sdRosIface" port = "PointCloud" type = "PointCloud2" num = "0"/>
+</connection>
+<connection name = "Connection66b">
+	 <source component = "mvVislam" port = "PointCloud" type = "PointCloud2" num = "0"/>
+ 	 <target component = "sdRosIface" port = "PointCloud" type = "PointCloud2" num = "1"/>
+</connection>
 <connection name = "Connection67">
 	 <source component = "atiNetbox" port = "ParamSet" type = "PrmSet" num = "0"/>
  	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>

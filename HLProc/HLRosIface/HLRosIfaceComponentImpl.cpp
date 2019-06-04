@@ -97,7 +97,7 @@ namespace HLProc {
 
         for (int i = 0; i < NUM_POINTCLOUD_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "pointcloud_%d", i);
-            m_pointCloudPub[i] = n->advertise<sensor_msgs::Imu>(buf, 1);
+            m_pointCloudPub[i] = n->advertise<sensor_msgs::PointCloud2>(buf, 1);
         }
 
         m_rosInited = true;
@@ -267,6 +267,9 @@ namespace HLProc {
             
             if (0 == portNum) {
                 msg.header.frame_id = "stereo";
+            }
+            else if (1 == portNum) { // from vislam
+                msg.header.frame_id = "world";
             }
             else {
                 msg.header.frame_id = "unknown";

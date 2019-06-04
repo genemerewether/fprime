@@ -185,14 +185,15 @@ namespace SnapdragonFlight {
                           m_invDepth);
 
           // generate point cloud and send
-          // NOTE(mereweth) - REQUIRES SYNC PORT on other end - true for HLRosIface
           const U32 width = m_camCfg.camera[0].pixelWidth;
           const float fx = m_depthCameraIntrinsics.focalLength[0];
           const float fy = m_depthCameraIntrinsics.focalLength[1];
           const float cx = m_depthCameraIntrinsics.principalPoint[0];
           const float cy = m_depthCameraIntrinsics.principalPoint[1];
           U32 idx = 0u;
+          U32 numPoints = 0u;
           if (this->isConnected_PointCloud_OutputPort(0)) {
+              using namespace ROS::sensor_msgs;
               for (int i = 0; i < m_camCfg.camera[0].pixelHeight; i++) {
                   for (int j = 0; j < width; j++) {
                       const float d = m_invDepth[i * width + j];
@@ -202,14 +203,31 @@ namespace SnapdragonFlight {
                       const float z = 1.0 / d;
                       const float x = z * (j - cx) / fx;
                       const float y = z * (i - cy) / fy;
-                      memcpy(&m_pointCloud[idx], (const void*) &x, sizeof(x));
-                      idx += sizeof(x);
-                      memcpy(&m_pointCloud[idx], (const void*) &y, sizeof(y));
-                      idx += sizeof(y);
-                      memcpy(&m_pointCloud[idx], (const void*) &z, sizeof(z));
-                      idx += sizeof(z);
+                      memcpy(&m_pointCloud[idx++], (const void*) &x, sizeof(x));
+                      memcpy(&m_pointCloud[idx++], (const void*) &y, sizeof(y));
+                      memcpy(&m_pointCloud[idx++], (const void*) &z, sizeof(z));
+
+                      numPoints++;
                   }
               }
+              // NOTE(mereweth) - REQUIRES SYNC PORT on other end - true for HLRosIface
+              // TODO(mereweth) - get cycling buffers ?
+              Fw::Buffer data(0, 0, (U64) m_pointCloud, numPoints * 3 * sizeof(F32));
+              PointField fields[3];
+              // NOTE(Mereweth) - have to keep pointfield type in sync manually
+              fields[0] = PointField("x", 0, 7, 1);
+              fields[1] = PointField("y", sizeof(F32), 7, 1);
+              fields[2] = PointField("z", 2 * sizeof(F32), 7, 1);
+              PointCloud2 pc2 = PointCloud2(Image.getheader(),
+                                            1, numPoints,
+                                            fields, FW_NUM_ARRAY_ELEMENTS(fields), FW_NUM_ARRAY_ELEMENTS(fields),
+                                            0, // little endian -> is_bigendian
+                                            3 * sizeof(F32), // 3x F32
+                                            numPoints * 3 * sizeof(F32), // unorganized pointcloud
+                                            data,
+                                            1 /* is_dense */);
+
+              PointCloud_out(0, pc2);
           }
 #endif //BUILD_SDFLIGHT
       }
