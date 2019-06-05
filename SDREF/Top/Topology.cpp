@@ -661,9 +661,11 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                                SnapdragonFlight::MVCAM_IMG_HP_BUFFER_POOL_SIZE,
                                200);
     hiresCam_ptr->allocateBuffers(0, hiresMallocator, 10);
+#ifdef SOC_8096
     stereoCam_ptr->allocateBuffers(0, hiresMallocator,
                                    SnapdragonFlight::SCAM_IMG_HP_BUFFER_POOL_SIZE,
                                    200);
+#endif
 
     // buffAccum doesn't own the buffers, so it's not the limiting factor
     buffAccumMVCamUnproc_ptr->allocateQueue(0,buffMallocator,
@@ -862,7 +864,9 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     if (isStereoChild) {
 #endif
         stereoCam_ptr->exit();
+#ifdef SOC_8096
         stereoCam_ptr->deallocateBuffers(hiresMallocator);
+#endif
         stereoCam_ptr->join(NULL);
         DEBUG_PRINT("After stereo thread quit\n");
 #if defined TGT_OS_TYPE_LINUX

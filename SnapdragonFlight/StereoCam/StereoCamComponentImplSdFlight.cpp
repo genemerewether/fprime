@@ -102,6 +102,9 @@ namespace SnapdragonFlight {
       }
 
 #ifndef SOC_8096
+      // TODO(mereweth) - remove
+      return;
+      
       bool found = false;
 
       for (NATIVE_INT_TYPE i = 0; i < numCameras; i++) {
