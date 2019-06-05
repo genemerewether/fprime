@@ -80,6 +80,16 @@ namespace Drv {
   // ----------------------------------------------------------------------
 
   void ActuatorControlsComponentImpl ::
+    SerReadPort_handler(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &serBuffer,
+        SerialReadStatus &status
+    )
+  {
+    // TODO
+  }
+  
+  void ActuatorControlsComponentImpl ::
     pwmSetDuty_handler(
         const NATIVE_INT_TYPE portNum,
         PwmSetDutyCycle pwmSetDutyCycle

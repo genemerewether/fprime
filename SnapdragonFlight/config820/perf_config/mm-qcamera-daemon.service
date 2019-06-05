@@ -1,0 +1,13 @@
+[Unit]
+Description= MM Camera Daemon Service
+SourcePath=/system/bin/mm-qcamera-daemon
+
+[Service]
+Restart=always
+ExecStart=/system/bin/mm-qcamera-daemon
+CPUSchedulingPolicy=rr
+CPUSchedulingPriority=80
+CPUAffinity=1
+
+[Install]
+WantedBy=multi-user.target

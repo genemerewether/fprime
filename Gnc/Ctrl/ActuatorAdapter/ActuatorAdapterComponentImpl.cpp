@@ -795,6 +795,7 @@ namespace Gnc {
                           break;
                       }
 
+		      if (pwm.reverse) {  out = -out;  }
                       duty[pwm.addr] = out + cmdOutputMap.offset;
                       U32 bitmask = 1 << pwm.addr;
                       DEBUG_PRINT("pwm esc idx %u, offset %f, duty %f\n",

@@ -30,6 +30,9 @@ print_targets:
 hash: $(SEQ_BIN)
 	$(foreach SEQ,$(SEQ_BIN),md5sum $(SEQ); )
 
+local: $(SEQ_BIN)
+	$(foreach SEQ,$(SEQ_BIN),cp $(SEQ) /seq/; md5sum $(SEQ); md5sum /seq/$(notdir $(SEQ));)
+
 load: $(SEQ_BIN)
 	$(foreach SEQ,$(SEQ_BIN),adb push $(SEQ) /seq/; md5sum $(SEQ); adb shell md5sum /seq/$(notdir $(SEQ));)
 	adb shell sync

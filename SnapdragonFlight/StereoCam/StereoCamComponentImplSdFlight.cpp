@@ -102,6 +102,9 @@ namespace SnapdragonFlight {
       }
 
 #ifndef SOC_8096
+      // TODO(mereweth) - remove
+      return;
+      
       bool found = false;
 
       for (NATIVE_INT_TYPE i = 0; i < numCameras; i++) {
@@ -632,14 +635,14 @@ namespace SnapdragonFlight {
                    (m_flightMode == SCAM_MODE_FLIGHT))                    ||
 
                   ((i == SCAM_UNPROC_OUT) && (m_logMode != LOGGING_OFF) &&
-		   isConnected_UnprocSend_OutputPort(0) &&
+                   isConnected_UnprocSend_OutputPort(0) &&
                    (((m_lpImageSkipCount >= m_lpImageSkip) &&
                      ((m_logMode == LOGGING_ALL) || (m_logMode == LOGGING_UNPROC)))
                      ||
                     m_saveNextFrameUnproc))                               ||
 
                   ((i == SCAM_PROC_OUT) && (m_logMode != LOGGING_OFF) &&
-		   isConnected_ProcSend_OutputPort(0) &&
+                   isConnected_ProcSend_OutputPort(0) &&
                    (((m_lpImageSkipCount >= m_lpImageSkip) &&
                      ((m_logMode == LOGGING_ALL) || (m_logMode == LOGGING_PROC)))
                      ||
@@ -695,17 +698,22 @@ namespace SnapdragonFlight {
                                       tempUsec);
                       switch (i) {
                           case SCAM_GNC_OUT:
-			  {
+                          {
                               DEBUG_PRINT("\nStereoCam Sending image out on GNC image port; i = %d\n", i);
                               ROS::sensor_msgs::Image image;
                               image.setdata(buff);
                               image.setheight(SCAM_IMAGE_HEIGHT);
                               image.setwidth(SCAM_IMAGE_WIDTH);
                               image.setstep(SCAM_IMAGE_WIDTH);
+#ifdef BUILD_SDFLIGHT
+                              image.setis_bigendian(1);
+#else
+                              image.setis_bigendian(0);
+#endif
                               image.setheader(ROS::std_msgs::Header(m_imagesAcquired,
                                                                     hwTime, 2/*"optic"*/));
                               GncBufferSend_out(0, image);
-			  }
+                          }
                               break;
                           case SCAM_UNPROC_OUT:
                           case SCAM_PROC_OUT:

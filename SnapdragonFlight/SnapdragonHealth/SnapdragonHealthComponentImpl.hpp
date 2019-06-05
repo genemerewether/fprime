@@ -171,7 +171,8 @@ namespace SnapdragonFlight {
                 GOVERNOR_TYPE_USERSPACE,
                 GOVERNOR_TYPE_CONSERVATIVE,
                 GOVERNOR_TYPE_ONDEMAND,
-                GOVERNOR_TYPE_MAX = GOVERNOR_TYPE_ONDEMAND
+                GOVERNOR_TYPE_INTERACTIVE,
+                GOVERNOR_TYPE_MAX = GOVERNOR_TYPE_INTERACTIVE
             };
 
             enum FreqType {

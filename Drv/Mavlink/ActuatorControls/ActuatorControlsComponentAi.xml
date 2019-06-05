@@ -3,7 +3,8 @@
 
 <component name="ActuatorControls" kind="passive" namespace="Drv">
 
-
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
@@ -21,6 +22,17 @@
         </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="SerReadPort" data_type="Drv::SerialRead" kind="sync_input" >
+            <comment>
+            Input port from serial driver to read accumulated data
+            </comment>
+        </port>
+        <port name="SerWritePort" data_type="Drv::SerialWrite" kind="output" >
+            <comment>
+            Output port to serial driver to write data
+            </comment>
         </port>
 
         <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

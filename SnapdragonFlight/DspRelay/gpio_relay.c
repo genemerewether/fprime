@@ -77,12 +77,12 @@ int dsp_relay_gpio_relay_open(int gpio) {
     }
 
 }
-
+      
 int dsp_relay_gpio_relay_close(int fd) {
     LOG_INFO("Closing GPIO device %d",fd);
+    
     return close(fd);
 }
-
 
 int dsp_relay_gpio_relay_configure(int fd, int type) {
     // skip input/output setting if it is an interrupt input.
@@ -161,7 +161,8 @@ void *gpio_int_isr(DSPAL_GPIO_INT_ISR_CTX context)
 
 	return NULL;
 }
-long dsp_relay_gpio_relay_quit(int gpio) {
+ 
+long dsp_relay_gpio_relay_quit(int gpio, int fd) {
 
     gpioInfo[gpio].quitRequested = 1;
     int stat = sem_post(&gpioInfo[gpio].semId);
@@ -169,6 +170,16 @@ long dsp_relay_gpio_relay_quit(int gpio) {
         LOG_ERR("Error posting semaphore for device %d: %s",gpio,strerror(errno));
         return -1;
     }
+
+    struct dspal_gpio_ioctl_reg_int int_config = {
+		.trigger = DSPAL_GPIOINT_TRIGGER_RISING,
+		.isr = (DSPAL_GPIO_INT_ISR) &gpio_int_isr,
+		.isr_ctx = (DSPAL_GPIO_INT_ISR_CTX) gpio,
+	};
+	stat = ioctl(fd, DSPAL_GPIO_IOCTL_CONFIG_DEREG_INT, (void *)&int_config);
+	if (stat != 0) {
+		LOG_ERR("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_DEREG_INT failed for device %d: %s",fd,strerror(errno));
+	}
 
     return 0;
 }
@@ -196,7 +207,7 @@ long dsp_relay_gpio_relay_start_int(int gpio, int fd) {
 
 	stat = ioctl(fd, DSPAL_GPIO_IOCTL_CONFIG_REG_INT, (void *)&int_config);
 	if (stat != 0) {
-		LOG_ERR("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_REG_INT failed for device %d: %s",gpio,strerror(stat));
+		LOG_ERR("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_REG_INT failed for device %d: %s",gpio,strerror(errno));
 		return -1;
 	}
 

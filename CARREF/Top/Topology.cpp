@@ -25,6 +25,10 @@ enum {
 #include <ctype.h>
 #endif
 
+#if defined TGT_OS_TYPE_LINUX
+#include <sys/wait.h>
+#endif
+
 #include <unistd.h>
 
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
@@ -261,7 +265,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgDcplDivs[] = {1, 5};
+    NATIVE_INT_TYPE rgDcplDivs[] = {1, 1};
 
     rgDcplDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -269,7 +273,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
 
-    NATIVE_INT_TYPE rgGncDivs[] = {1, 10};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 50};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -574,6 +578,9 @@ void manualConstruct(bool internalIMUProp) {
 
     /*stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
     ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));*/
+
+    stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
+    ipcRelay_ptr->set_proc2Out_OutputPort(12, hlRosIface_ptr->get_ImageRecv_InputPort(1));
 }
 
 void constructApp(unsigned int port_number,
@@ -605,7 +612,7 @@ void constructApp(unsigned int port_number,
     prmDb_ptr->init(60,0);
     snapHealth_ptr->init(60,0);
     snapHealth_ptr->setBootCount(boot_count);
-    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_OFF);
+    snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_RAPID);
     sockGndIf_ptr->init(0);
 
     hlRosIface_ptr->init(0);
@@ -847,6 +854,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
         hiresCam_ptr->exit();
         hiresCam_ptr->deallocateBuffers(hiresMallocator);
         hiresCam_ptr->join(NULL);
+        DEBUG_PRINT("after hires exit\n");
 #if defined TGT_OS_TYPE_LINUX
         return;
     }
@@ -858,12 +866,14 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
         stereoCam_ptr->exit();
         stereoCam_ptr->deallocateBuffers(hiresMallocator);
         stereoCam_ptr->join(NULL);
+        DEBUG_PRINT("after stereo exit\n");
 #if defined TGT_OS_TYPE_LINUX
         return;
     }
 #endif
 
     ipcRelay_ptr->exit();
+    DEBUG_PRINT("after IPCRelay exit\n");
 
     mvCam_ptr->exit();
     mvCam_ptr->deallocateBuffers(buffMallocator);
@@ -876,6 +886,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     imuDRInt_ptr->exitThread();
     imuDRInt_ptr->joinThread(NULL);
 #endif
+    DEBUG_PRINT("after dataready intr thread join\n");
 
     rgDecouple_ptr->exit();
     imuDecouple_ptr->exit();
@@ -892,7 +903,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
 
 
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n"
+    (void) printf("Usage: ./CARREF [options]\n"
                   "-p\tport_number\n"
                   "-a\thostname/IP address\n"
                   "-i\tUse odometry from internal IMU propagation\n"
@@ -932,7 +943,7 @@ int main(int argc, char* argv[]) {
     bool isStereoChild = false;
 
     // Removes ROS cmdline args as a side-effect
-    ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
+    ros::init(argc,argv,"CARREF", ros::init_options::NoSigintHandler);
 
     while ((option = getopt(argc, argv, "hisp:a:b:u:z:")) != -1){
         switch(option) {
@@ -1051,9 +1062,18 @@ int main(int argc, char* argv[]) {
     exitTasks(isHiresChild, isStereoChild);
 
     // Give time for threads to exit
-    (void) printf("Waiting for threads...\n");
-    Os::Task::delay(1000);
+#if defined TGT_OS_TYPE_LINUX
+    if (!isHiresChild && !isStereoChild) {
+        (void) printf("Waiting for child...\n");
+        wait(NULL);
+#endif
+        (void) printf("Waiting for threads...\n");
+        Os::Task::delay(1000);
 
-    (void) printf("Exiting...\n");
+        (void) printf("Exiting...\n");
+
+#if defined TGT_OS_TYPE_LINUX
+    }
+#endif
     return 0;
 }

@@ -1,0 +1,6 @@
+<parameters>
+    <parameter id="0" set_opcode="20" save_opcode="21" name="dfsAlgorithm"
+               data_type="U8" default="2">
+      <comment>which dfs algorithm to run - see mvDFS.h header</comment>
+    </parameter>
+</parameters>

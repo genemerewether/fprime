@@ -380,7 +380,7 @@ namespace Gnc {
 
               bool rpVelOnly = false;
               bool yawVelOnly = false;
-	      bool doSaturation = true;
+              bool doSaturation = true;
 
               if (RPRATE_YAW_THRUST == this->ctrlMode) {
                   rpVelOnly = true;
@@ -394,12 +394,12 @@ namespace Gnc {
                   yawVelOnly = true;
               }
 
-	      if ((ROLL_ONLY == this->ctrlMode)  ||
-		  (PITCH_ONLY == this->ctrlMode) ||
-		  (YAW_ONLY == this->ctrlMode)   ||
-		  (RP_ONLY == this->ctrlMode))   {
-		  doSaturation = false;
-	      }
+              if ((ROLL_ONLY == this->ctrlMode)  ||
+                  (PITCH_ONLY == this->ctrlMode) ||
+                  (YAW_ONLY == this->ctrlMode)   ||
+                  (RP_ONLY == this->ctrlMode))   {
+                  doSaturation = false;
+              }
             
               Eigen::Quaterniond _w_q_b__des = Eigen::Quaterniond(this->w_q_b__des.getw(),
                                                                   this->w_q_b__des.getx(),
@@ -411,7 +411,7 @@ namespace Gnc {
                                                   this->omega_b__des.gety(),
                                                   this->omega_b__des.getz()),
                                               rpVelOnly, yawVelOnly,
-					      doSaturation);
+                                              doSaturation);
               thrust_b__comm = Eigen::Vector3d(this->thrust_b__des.getx(),
                                                this->thrust_b__des.gety(),
                                                this->thrust_b__des.getz());

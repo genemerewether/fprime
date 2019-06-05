@@ -23,21 +23,6 @@
 #include "SnapdragonFlight/BlspI2CDriver/BlspI2CDriverComponentAc.hpp"
 
 namespace SnapdragonFlight {
-
-    /**
-     * This was taken from the dspal_tester example
-     *
-     * Supported SPI frequency to talk to MPU9x50 slave device
-     * MPU9x50 SPI interface supports upto 20MHz frequency. However 20MHz is not
-     * reliable in our test and corrupted data is observed.
-     */
-    enum I2CFrequency
-    {
-       I2C_FREQUENCY_100KHZ = 100UL,
-       I2C_FREQUENCY_400KHZ = 400UL,
-       I2C_FREQUENCY_1MHZ = 1000UL,
-    };
-
     class BlspI2CDriverComponentImpl: public BlspI2CDriverComponentBase {
 
         public:
@@ -66,7 +51,7 @@ namespace SnapdragonFlight {
             ~BlspI2CDriverComponentImpl(void);
 
             //! Open device
-            void open(NATIVE_INT_TYPE device, I2CFrequency clock);
+            void open(NATIVE_INT_TYPE device);
 
         PRIVATE:
 
