@@ -131,8 +131,6 @@ namespace Fw {
             SerializeStatus setBuffLen(NATIVE_UINT_TYPE length); //!< sets buffer length manually after filling with data
             SerializeStatus copyRaw(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
             SerializeStatus copyRawOffset(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
-                                                                                      // Will increment deserialization pointer
-            SerializeStatus copyRawOffset(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
                                                                                     // Will increment deserialization pointer
 
 
