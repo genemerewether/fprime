@@ -9,7 +9,6 @@ enum {
 };
 
 #include <Fw/Types/Assert.hpp>
-#include <BLIMPREF/Top/TargetInit.hpp>
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
@@ -234,7 +233,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
  
-    NATIVE_INT_TYPE rgGncDivs[] = {1, 50};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 100};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -422,8 +421,10 @@ void manualConstruct(bool internalIMUProp,
     }
 
     // imu decoupler
-    rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
-    imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
+    if (!externalIMU) {
+        rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
+        imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
+    }
 
     // passive data passer
     if (externalIMU) {
@@ -506,8 +507,6 @@ void constructApp(unsigned int port_number,
                   bool internalIMUProp,
                   bool externalIMU) {
     allocComps();
-
-    localTargetInit();
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
@@ -633,7 +632,7 @@ void constructApp(unsigned int port_number,
     hwEnablePinSnap_ptr->open(28, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_IN);
 
     // J15, BLSP9
-    i2cDrvSnap_ptr->open(9, SnapdragonFlight::I2C_FREQUENCY_400KHZ);
+    i2cDrvSnap_ptr->open(9);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
@@ -683,13 +682,22 @@ void constructApp(unsigned int port_number,
 
 }
 
+void run1cycle(void) {
+    // call interrupt to emulate a gnc cycle
+    Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+    Svc::TimerVal cycleStart;
+    cycleStart.take();
+    port->invoke(cycleStart);
+    Os::Task::delay(10);
+}
+
 void run1testCycle(void) {
-    // call interrupt to emulate a clock
+    // call interrupt to emulate a imu strobe
     Svc::InputCyclePort* port = rgDcplDrv_ptr->get_CycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(1);
+    Os::Task::delay(10);
 }
 
 void run1backupCycle(void) {
@@ -825,31 +833,38 @@ int main(int argc, char* argv[]) {
 
     ros::console::shutdown();
 
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
+    if (!externalIMU) {
+        while (!mpu9250_ptr->isReady()) {
+            Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
+            Svc::TimerVal cycleStart;
+            cycleStart.take();
+            port->invoke(cycleStart);
+            Os::Task::delay(10);
+        }
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
-    imuDRIntSnap_ptr->startIntTask(99);
+        imuDRIntSnap_ptr->startIntTask(99);
 #else
    
 #ifdef LINUX_DEV
-    imuDRInt_ptr->startIntTask(99);
+        imuDRInt_ptr->startIntTask(99);
 #endif // LINUX_DEV
 #endif
+    }
     rgDecouple_ptr->setEnabled(true);
     
     int backupCycle = 0;
 
     while (!terminate) {
-        run1backupCycle();
-        backupCycle++;
+        if (externalIMU) {
+            run1cycle();
+        }
+        else {
+            run1backupCycle();
+            backupCycle++;
 #if !defined(LINUX_DEV) and !defined(BUILD_SDFLIGHT)
-    run1testCycle();
+            run1testCycle();
 #endif // LINUX_DEV
+        }
     }
 
     rgDecouple_ptr->setEnabled(false);

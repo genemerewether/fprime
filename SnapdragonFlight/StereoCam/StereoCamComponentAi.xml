@@ -45,6 +45,9 @@
 
         <port name="GncBufferReturn" data_type="Fw::BufferSend"  kind="sync_input"    max_number="1">
         </port>
+
+        <port name="GncBufferAsyncReturn" data_type="Fw::BufferSend"  kind="async_input"    max_number="1">
+        </port>
         
         <port name="Tlm" data_type="Fw::Tlm"  kind="output" role="Telemetry"    max_number="1">
         </port>

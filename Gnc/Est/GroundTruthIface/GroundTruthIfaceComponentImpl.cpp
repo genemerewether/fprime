@@ -28,7 +28,7 @@
 
 #include <Os/File.hpp>
 
-#define DO_TIME_CONV
+//#define DO_TIME_CONV
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)

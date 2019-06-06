@@ -38,7 +38,7 @@ endif
 
 # TODO(mereweth) - remove once nested namespace serializable Gse is working
 rosser:
-	touch $(BUILD_ROOT)/Gse/generated/$(DEPLOYMENT)/serializable/ROS/__init__.py
+	touch $(BUILD_ROOT)/$(DEPLOYMENT)/py_dict/serializable/ROS/__init__.py
 
 # For switching fsw partition between read-only and read-write
 rwfsw:
@@ -96,7 +96,7 @@ endif
 	adb shell mkdir $(FULLVER)
 
 gsetar: dict_install
-	tar -C $(BUILD_ROOT)/Gse/generated/$(DEPLOYMENT) -czf ./$(__DEFAULT_BUILD_OUT)/$(GSE_FILENAME) .
+	tar -C $(BUILD_ROOT)/$(DEPLOYMENT)/py_dict -czf ./$(__DEFAULT_BUILD_OUT)/$(GSE_FILENAME) .
 
 gseload: gsetar
 	adb push ./$(__DEFAULT_BUILD_OUT)/$(GSE_FILENAME) $(FULLVER)/$(GSE_FILENAME)

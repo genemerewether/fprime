@@ -131,6 +131,13 @@ namespace SnapdragonFlight {
           Fw::Buffer &fwBuffer
       );
 
+      //! Handler implementation for GncBufferAsyncReturn
+      //!
+      void GncBufferAsyncReturn_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &fwBuffer 
+      );
+
       //! Handler implementation for ImageBufferIn
       //!
       void ImageBufferIn_handler(

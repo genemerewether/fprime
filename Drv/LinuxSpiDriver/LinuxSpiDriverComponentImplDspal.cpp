@@ -147,7 +147,7 @@ namespace Drv {
         this->tlmWrite_SPI_Bytes(this->m_bytes);
     }
 
-    void LinuxSpiDriverComponentImpl::open(NATIVE_INT_TYPE device,
+    bool LinuxSpiDriverComponentImpl::open(NATIVE_INT_TYPE device,
                                            NATIVE_INT_TYPE select,
                                            SpiFrequency clock) {
         this->m_device = device;
@@ -167,7 +167,7 @@ namespace Drv {
         if (fd == -1) {
             DEBUG_PRINT("open SPI device %d.%d failed. %d\n",device,select,errno);
             this->log_WARNING_HI_SPI_OpenError(device,select,fd);
-            return;
+            return false;
         } else {
             DEBUG_PRINT("Successfully opened SPI device %s fd %d\n",devName,fd);
         }

@@ -6,8 +6,8 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|FH_ENABLE_ASSERT|0 (0x0)|Enable/Disable asserts| | |   
-| | | |enable|AssertEnable|Enable/Disable asserts|                    
+|FH_ENABLE_ASSERT|0 (0x0)|Enable/Disable asserts| | |
+| | | |enable|AssertEnable|Enable/Disable asserts|
 
 
 ## Event List

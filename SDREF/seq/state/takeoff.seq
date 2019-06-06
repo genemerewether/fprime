@@ -1,0 +1,4 @@
+R00:00:00 cmdSeq2_CS_Run, "/seq/negthrust.bin"
+R00:00:00 cmdSeq2_CS_Run, "/seq/attrate.bin"
+R00:00:00 cmdSeq2_CS_Run, "/seq/vislam_on.bin"
+R00:00:00 cmdSeq2_CS_Run, "/seq/arm.bin"

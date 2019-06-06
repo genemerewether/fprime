@@ -31,6 +31,7 @@
 
 #include <ros/callback_queue.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/fill_image.h>
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
@@ -89,7 +90,15 @@ namespace HLProc {
             m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
         }
 
-        m_imagePub = m_imageXport->advertise("image_raw", 1);
+        for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_%d", i);
+            m_imagePub[i] = m_imageXport->advertise(buf, 1);
+        }
+
+        for (int i = 0; i < NUM_POINTCLOUD_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "pointcloud_%d", i);
+            m_pointCloudPub[i] = n->advertise<sensor_msgs::PointCloud2>(buf, 1);
+        }
 
         m_rosInited = true;
     }
@@ -206,25 +215,83 @@ namespace HLProc {
           ROS::sensor_msgs::Image &Image
       )
     {
-        sensor_msgs::Image msg;
-        const U8* ptr = (const U8*) Image.getdata().getdata();
-        sensor_msgs::fillImage(msg,
-                               sensor_msgs::image_encodings::MONO8,
-                               Image.getheight(),
-                               Image.getwidth(),
-                               Image.getstep(),
-                               ptr);
-        msg.header.frame_id = "dfc";
-        msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
-        msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
-        msg.is_bigendian = 0;
-        m_imagePub.publish(msg);
-
+        if (m_rosInited) {
+            sensor_msgs::Image msg;
+            const U8* ptr = (const U8*) Image.getdata().getdata();
+            sensor_msgs::fillImage(msg,
+                                   sensor_msgs::image_encodings::MONO8,
+                                   Image.getheight(),
+                                   Image.getwidth(),
+                                   Image.getstep(),
+                                   ptr);
+            if (0 == portNum) {
+                msg.header.frame_id = "dfc";
+            }
+            else {
+                msg.header.frame_id = "stereo";
+            }
+            msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
+            msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
+            msg.is_bigendian = Image.getis_bigendian();
+            m_imagePub[portNum].publish(msg);
+        }
         Fw::Buffer temp = Image.getdata();
-        this->ImageForward_out(0, temp);
+        this->ImageForward_out(portNum, temp);
     }
 
+    void HLRosIfaceComponentImpl ::
+      PointCloud_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::sensor_msgs::PointCloud2 &PointCloud2
+      )
+    {
+        if (m_rosInited) {
+            using namespace ROS::sensor_msgs;
+            
+            sensor_msgs::PointCloud2 msg;
+            const U8* ptr = (const U8*) PointCloud2.getdata().getdata();
+            U32 uSize = PointCloud2.getdata().getsize();
+            msg.data.resize(uSize);
+            memcpy(&msg.data[0], ptr, uSize);
 
+            int size = 0;
+            const PointField *fields = PointCloud2.getfields(size);
+            size = FW_MIN(size, PointCloud2.getfields_count());
+            msg.fields.resize(size);
+            for (int i = 0; i < size; i++) {
+                msg.fields[i].name = fields[i].getname().toChar();
+                msg.fields[i].offset = fields[i].getoffset();
+                msg.fields[i].datatype = fields[i].getdatatype();
+                msg.fields[i].count = fields[i].getcount();
+            }
+            
+            if (0 == portNum) {
+                msg.header.frame_id = "stereo";
+            }
+            else if (1 == portNum) { // from vislam
+                msg.header.frame_id = "world";
+            }
+            else {
+                msg.header.frame_id = "unknown";
+            }
+            msg.header.stamp.sec = PointCloud2.getheader().getstamp().getSeconds();
+            msg.header.stamp.nsec = PointCloud2.getheader().getstamp().getUSeconds() * 1000L;
+            msg.height = PointCloud2.getheight();
+            msg.width = PointCloud2.getwidth();
+            msg.is_bigendian = PointCloud2.getis_bigendian();
+            msg.point_step = PointCloud2.getpoint_step();
+            msg.row_step = PointCloud2.getrow_step();
+            msg.is_dense = PointCloud2.getis_dense();
+            
+            m_pointCloudPub[portNum].publish(msg);
+        }
+        Fw::Buffer temp = PointCloud2.getdata();
+        // NOTE(Mereweth) - when we change to cycling pointcloud buffers, remove isConnected
+        if (this->isConnected_PointCloudForward_OutputPort(0)) {
+            this->PointCloudForward_out(portNum, temp);
+        }
+    }
+  
     // ----------------------------------------------------------------------
     // Member function definitions
     // ----------------------------------------------------------------------

@@ -6,26 +6,26 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|SE3CTRL_SetPosCtrlMode|0 (0x0)|Set position controller mode| | |   
-| | | |mode|PosCtrlMode||                    
-|SE3CTRL_SetAttCtrlMode|1 (0x1)|Set attitude controller mode| | |   
-| | | |mode|AttCtrlMode||                    
-|SE3CTRL_LinearSetpoint|2 (0x2)|| | |   
-| | | |x_w__x|F64||                    
-| | | |x_w__y|F64||                    
-| | | |x_w__z|F64||                    
-| | | |v_w__x|F64||                    
-| | | |v_w__y|F64||                    
-| | | |v_w__z|F64||                    
-|SE3CTRL_AngularSetpoint|3 (0x3)|| | |   
-| | | |w_q_b__x|F64||                    
-| | | |w_q_b__y|F64||                    
-| | | |w_q_b__z|F64||                    
-| | | |w_q_b__w|F64||                    
-| | | |omega_b__x|F64||                    
-| | | |omega_b__y|F64||                    
-| | | |omega_b__z|F64||                    
-|SE3CTRL_InitParams|4 (0x4)|| | |   
+|SE3CTRL_SetPosCtrlMode|0 (0x0)|Set position controller mode| | |
+| | | |mode|PosCtrlMode||
+|SE3CTRL_SetAttCtrlMode|1 (0x1)|Set attitude controller mode| | |
+| | | |mode|AttCtrlMode||
+|SE3CTRL_LinearSetpoint|2 (0x2)|| | |
+| | | |x_w__x|F64||
+| | | |x_w__y|F64||
+| | | |x_w__z|F64||
+| | | |v_w__x|F64||
+| | | |v_w__y|F64||
+| | | |v_w__z|F64||
+|SE3CTRL_AngularSetpoint|3 (0x3)|| | |
+| | | |w_q_b__x|F64||
+| | | |w_q_b__y|F64||
+| | | |w_q_b__z|F64||
+| | | |w_q_b__w|F64||
+| | | |omega_b__x|F64||
+| | | |omega_b__y|F64||
+| | | |omega_b__z|F64||
+|SE3CTRL_InitParams|4 (0x4)|| | |
 
 ## Telemetry Channel List
 

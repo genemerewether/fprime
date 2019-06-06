@@ -327,6 +327,12 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct(void) {
+#ifdef SOC_8074
+    actuatorAdapter_ptr->set_outputEnable_OutputPort(0, hwEnablePin_ptr->get_gpioRead_InputPort(0));
+#else // SOC_8074
+    // TODO(mereweth) - connect when we add enable pin
+#endif
+  
 #ifdef DECOUPLE_RG
     rgDcplDrv_ptr->set_CycleOut_OutputPort(1, rgDecouple_ptr->get_CycleIn_InputPort(0));
     rgDecouple_ptr->set_CycleOut_OutputPort(0, rgGncDrv_ptr->get_CycleIn_InputPort(0));

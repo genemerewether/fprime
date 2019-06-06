@@ -1,5 +1,5 @@
 <parameters>
-    <parameter id="0" set_opcode="50" save_opcode="51" name="exposureMode"
+    <parameter id="0" set_opcode="50" save_opcode="51" name="scam_exposureMode"
         data_type="ENUM" default="EXPOSURE_AUTO_HISTOGRAM">
         <enum name="ExposureMode">
             <item name="EXPOSURE_FIXED"/>
@@ -10,37 +10,37 @@
             Fixed or auto-exposure
         </comment>
     </parameter>
-    <parameter id="1" set_opcode="52" save_opcode="53" name="exposureFixed"
+    <parameter id="1" set_opcode="52" save_opcode="53" name="scam_exposureFixed"
         data_type="U32" default="0">
         <comment>
             fixed exposure setpoint
         </comment>
     </parameter>
-    <parameter id="2" set_opcode="54" save_opcode="55" name="gainFixed"
+    <parameter id="2" set_opcode="54" save_opcode="55" name="scam_gainFixed"
         data_type="U32" default="0">
         <comment>
             fixed gain setpoint
         </comment>
     </parameter>
-    <parameter id="3" set_opcode="56" save_opcode="57" name="brightness"
+    <parameter id="3" set_opcode="56" save_opcode="57" name="scam_brightness"
         data_type="U8" default="3">
         <comment>
             software brightness setpoint for 8bit callback
         </comment>
     </parameter>
-    <parameter id="4" set_opcode="58" save_opcode="59" name="contrast"
+    <parameter id="4" set_opcode="58" save_opcode="59" name="scam_contrast"
         data_type="U8" default="3">
         <comment>
             software contrast setpoint for 8bit callback
         </comment>
     </parameter>
-    <parameter id="5" set_opcode="60" save_opcode="61" name="sharpness"
+    <parameter id="5" set_opcode="60" save_opcode="61" name="scam_sharpness"
         data_type="U8" default="0">
         <comment>
             software sharpness setpoint for 8bit callback
         </comment>
     </parameter>
-    <parameter id="6" set_opcode="62" save_opcode="63" name="ISO"
+    <parameter id="6" set_opcode="62" save_opcode="63" name="scam_ISO"
         data_type="ENUM" default="ISO100">
             <enum name="PostProcISO">
                 <item name="ISO_AUTO"/>
@@ -56,151 +56,151 @@
             software ISO setpoint for 8bit callback
         </comment>
     </parameter>
-    <parameter id="7" set_opcode="64" save_opcode="65" name="maxDelta"
+    <parameter id="7" set_opcode="64" save_opcode="65" name="scam_maxDelta"
         data_type="U32" default="5">
         <comment>
             max frame-to-frame delta for autoexposure
         </comment>
     </parameter>
-    <parameter id="8" set_opcode="66" save_opcode="67" name="exposureChangeThreshold"
+    <parameter id="8" set_opcode="66" save_opcode="67" name="scam_exposureChangeThreshold"
         data_type="U32" default="1">
         <comment>
             desired change before parameter set command is issued
         </comment>
     </parameter>
-    <parameter id="9" set_opcode="68" save_opcode="69" name="gainChangeThreshold"
+    <parameter id="9" set_opcode="68" save_opcode="69" name="scam_gainChangeThreshold"
         data_type="U32" default="1">
         <comment>
             desired change before parameter set command is issued
         </comment>
     </parameter>
-    <parameter id="10" set_opcode="70" save_opcode="71" name="exposureMin"
+    <parameter id="10" set_opcode="70" save_opcode="71" name="scam_exposureMin"
         data_type="U32" default="0">
         <comment>
             min value for exposure range
         </comment>
     </parameter>
-    <parameter id="11" set_opcode="72" save_opcode="73" name="exposureMax"
+    <parameter id="11" set_opcode="72" save_opcode="73" name="scam_exposureMax"
         data_type="U32" default="500">
         <comment>
             max value for exposure range
         </comment>
     </parameter>
-    <parameter id="12" set_opcode="74" save_opcode="75" name="gainMin"
+    <parameter id="12" set_opcode="74" save_opcode="75" name="scam_gainMin"
         data_type="U32" default="0">
         <comment>
             min value for gain range
         </comment>
     </parameter>
-    <parameter id="13" set_opcode="76" save_opcode="77" name="gainMax"
+    <parameter id="13" set_opcode="76" save_opcode="77" name="scam_gainMax"
         data_type="U32" default="200">
         <comment>
             max value for gain range
         </comment>
     </parameter>
-    <parameter id="14" set_opcode="78" save_opcode="79" name="exposureCost"
+    <parameter id="14" set_opcode="78" save_opcode="79" name="scam_exposureCost"
         data_type="F32" default="0.03">
         <comment>
             cost to increasing exposure time (cost-based)
         </comment>
     </parameter>
-    <parameter id="15" set_opcode="80" save_opcode="81" name="gainCost"
+    <parameter id="15" set_opcode="80" save_opcode="81" name="scam_gainCost"
         data_type="F32" default="2.96">
         <comment>
             cost to increasing analog gain (cost-based)
         </comment>
     </parameter>
-    <parameter id="16" set_opcode="82" save_opcode="83" name="filterSize"
+    <parameter id="16" set_opcode="82" save_opcode="83" name="scam_filterSize"
         data_type="U8" default="0">
         <comment>
             internal exponential filter size (cost-based)
         </comment>
     </parameter>
-    <parameter id="17" set_opcode="84" save_opcode="85" name="exposureStart"
+    <parameter id="17" set_opcode="84" save_opcode="85" name="scam_exposureStart"
         data_type="F32" default="0.36">
         <comment>
             initial exposure, 0.0 to 1.0 range (cost-based)
         </comment>
     </parameter>
-    <parameter id="18" set_opcode="86" save_opcode="87" name="gainStart"
+    <parameter id="18" set_opcode="86" save_opcode="87" name="scam_gainStart"
         data_type="F32" default="0.35">
         <comment>
             initial gain, 0.0 to 1.0 range (cost-based)
         </comment>
     </parameter>
-    <parameter id="19" set_opcode="88" save_opcode="89" name="enableHistogramCost"
+    <parameter id="19" set_opcode="88" save_opcode="89" name="scam_enableHistogramCost"
         data_type="U8" default="1">
         <comment>
             enable extra saturation protection (cost-based)
         </comment>
     </parameter>
-    <parameter id="20" set_opcode="90" save_opcode="91" name="thresholdUnderflowed"
+    <parameter id="20" set_opcode="90" save_opcode="91" name="scam_thresholdUnderflowed"
         data_type="U8" default="5">
         <comment>
             underexposure threshold on mean brightness of single block (cost-based)
         </comment>
     </parameter>
-    <parameter id="21" set_opcode="92" save_opcode="93" name="thresholdSaturated"
+    <parameter id="21" set_opcode="92" save_opcode="93" name="scam_thresholdSaturated"
         data_type="U8" default="250">
         <comment>
             overexposure threshold on mean brightness of single block (cost-based)
         </comment>
     </parameter>
-    <parameter id="22" set_opcode="94" save_opcode="95" name="systemBrightnessMargin"
+    <parameter id="22" set_opcode="94" save_opcode="95" name="scam_systemBrightnessMargin"
         data_type="F32" default="5.0">
         <comment>
             range above and below default goal of 128 that target can vary (cost-based)
         </comment>
     </parameter>
-    <parameter id="23" set_opcode="96" save_opcode="97" name="exposureMinHist"
+    <parameter id="23" set_opcode="96" save_opcode="97" name="scam_exposureMinHist"
         data_type="F32" default="0.001">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="24" set_opcode="98" save_opcode="99" name="exposureSoftMaxHist"
+    <parameter id="24" set_opcode="98" save_opcode="99" name="scam_exposureSoftMaxHist"
         data_type="F32" default="0.2">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="25" set_opcode="100" save_opcode="101" name="exposureMaxHist"
+    <parameter id="25" set_opcode="100" save_opcode="101" name="scam_exposureMaxHist"
         data_type="F32" default="0.2">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="26" set_opcode="102" save_opcode="103" name="gainMinHist"
+    <parameter id="26" set_opcode="102" save_opcode="103" name="scam_gainMinHist"
         data_type="F32" default="0.001">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="27" set_opcode="104" save_opcode="105" name="gainSoftMaxHist"
+    <parameter id="27" set_opcode="104" save_opcode="105" name="scam_gainSoftMaxHist"
         data_type="F32" default="0.3">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="28" set_opcode="106" save_opcode="107" name="gainMaxHist"
+    <parameter id="28" set_opcode="106" save_opcode="107" name="scam_gainMaxHist"
         data_type="F32" default="1.0">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="29" set_opcode="108" save_opcode="109" name="logEGPStepSizeMin"
+    <parameter id="29" set_opcode="108" save_opcode="109" name="scam_logEGPStepSizeMin"
         data_type="F32" default="0.001">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="30" set_opcode="110" save_opcode="111" name="logEGPStepSizeMax"
+    <parameter id="30" set_opcode="110" save_opcode="111" name="scam_logEGPStepSizeMax"
         data_type="F32" default="1.0">
         <comment>
             see MVCPA documentation
         </comment>
     </parameter>
-    <parameter id="31" set_opcode="112" save_opcode="113" name="callback"
+    <parameter id="31" set_opcode="112" save_opcode="113" name="scam_callback"
         data_type="ENUM" default="CALLBACK_8BIT">
         <enum name="CallbackType">
             <item name="CALLBACK_8BIT"/>

@@ -1,0 +1,15 @@
+/*
+ * ${name}Port.hpp
+ *
+ *  Created on: ${date}
+ *  Author:     ${user}
+ *
+ */
+#if $namespace_list != None
+\#ifndef #for $namespace in $namespace_list#${namespace.upper()}_#end for#${name.upper()}_PORT_HPP_
+\#define #for $namespace in $namespace_list#${namespace.upper()}_#end for#${name.upper()}_PORT_HPP_
+#else
+\#ifndef ${name.upper()}_PORT_HPP_
+\#define ${name.upper()}_PORT_HPP_
+#end if
+
