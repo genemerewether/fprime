@@ -6,7 +6,7 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|FTFO_InitParams|0 (0x0)|| | |   
+|FTFO_InitParams|0 (0x0)|| | |
 
 
 ## Event List

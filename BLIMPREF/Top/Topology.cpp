@@ -9,7 +9,6 @@ enum {
 };
 
 #include <Fw/Types/Assert.hpp>
-#include <BLIMPREF/Top/TargetInit.hpp>
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
@@ -508,8 +507,6 @@ void constructApp(unsigned int port_number,
                   bool internalIMUProp,
                   bool externalIMU) {
     allocComps();
-
-    localTargetInit();
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);

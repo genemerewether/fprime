@@ -2,6 +2,17 @@
 
 set -e
 
+cd DSPRELAY
+make gen_make
+make
+cd ../
+tar -czvf DSPRELAY.tar.gz \
+    DSPRELAY/dspal-hex-clang-cross-opt-dspal-bin/DSPRELAY
+
+cd MINRPC
+make gen_make
+make
+cd ../
 cd TESTRPC
 make gen_make
 make
@@ -10,55 +21,55 @@ cd HEXREF/Top
 make clean
 cd ..
 make
-make dict_install
+make dict_install rosser
 cd Rpc
 make ut_nocov_SDFLIGHT
 cd ../..
-touch Gse/generated/HEXREF/serializable/ROS/__init__.py
 tar -czvf HEXREF.tar.gz \
-    Gse/generated/HEXREF \
+    HEXREF/py_dict \
+    MINRPC/dspal-hex-clang-cross-opt-dspal-bin/MINRPC \
     TESTRPC/dspal-hex-clang-cross-opt-dspal-bin/TESTRPC \
     HEXREF/Rpc/test/ut/linux-linaro-cross-arm-ut-nocov-gnu-bin/test_ut \
     HEXREF/dspal-hex-clang-cross-opt-dspal-bin/HEXREF
-
-cd ROS/RosCycle
-make clean
-cd ../../
-cd SIMREF/Top
-make clean
-cd ../RotorSDrv/
-make clean
-cd ..
-#mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_16.04_kinetic
-make
-mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_18.04_melodic
-#mv linux-linux-x86-debug-gnu-bin linux-linux-x86-debug-gnu-bin_14.04_jade
-make dict_install
-cd ..
-touch Gse/generated/SIMREF/serializable/ROS/__init__.py
-tar -czvf SIMREF.tar.gz \
-    Gse/generated/SIMREF \
-    SIMREF/*PrmDb.dat \
-    SIMREF/linux-linux-x86-debug-gnu-bin_*_*/SIMREF
 
 cd R5REF/Top
 make clean
 cd ..
 make
-make dict_install
+make dict_install rosser
 cd ..
-touch Gse/generated/R5REF/serializable/ROS/__init__.py
 tar -czvf R5REF.tar.gz \
-    Gse/generated/R5REF \
+    R5REF/py_dict \
     R5REF/tir5-nortos-tms570lc43x-debug-opt-ccs7.0-bin/R5REF.out
 
 cd SDREF/Top
 make clean
 cd ..
 make
-make dict_install
+make dict_install rosser
 cd ..
-touch Gse/generated/SDREF/serializable/ROS/__init__.py
 tar -czvf SDREF.tar.gz \
-    Gse/generated/SDREF \
+    SDREF/py_dict \
     SDREF/linux-linaro-cross-arm-opt-gnu-bin/SDREF
+
+cd BLIMPREF/Top
+make clean
+cd ..
+make
+make dict_install rosser
+cd ..
+tar -czvf BLIMPREF.tar.gz \
+    BLIMPREF/py_dict \
+    BLIMPREF/*PrmDb*.dat \
+    BLIMPREF/linux-linaro-cross-arm-opt-gnu-bin/BLIMPREF
+
+cd CARREF/Top
+make clean
+cd ..
+make
+make dict_install rosser
+cd ..
+tar -czvf CARREF.tar.gz \
+    CARREF/py_dict \
+    CARREF/*PrmDb*.dat \
+    CARREF/linux-linaro-cross-arm-opt-gnu-bin/CARREF

@@ -6,8 +6,8 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|SnapdragonHealth_SetPowerSaver|0 (0x0)|Turn on/off power-saving features| | |   
-| | | |Mode|PowerSaverMode||                    
+|SnapdragonHealth_SetPowerSaver|0 (0x0)|Turn on/off power-saving features| | |
+| | | |Mode|PowerSaverMode||
 
 ## Telemetry Channel List
 
@@ -62,16 +62,16 @@
 |Event Name|ID|Description|Arg Name|Arg Type|Arg Size|Description
 |---|---|---|---|---|---|---|
 |SH_FileOpenError|0 (0x0)|Opening a file failed.| | | | |
-| | | |type|I32||File type|    
-| | | |stat|I32||File error status|    
+| | | |type|I32||File type|
+| | | |stat|I32||File error status|
 |SH_FileReadError|1 (0x1)|Reading, seeking, etc of a file failed.| | | | |
-| | | |type|I32||File type|    
-| | | |stat|I32||File error status|    
+| | | |type|I32||File type|
+| | | |stat|I32||File error status|
 |SH_FileWriteError|2 (0x2)|Writing a file failed.| | | | |
-| | | |type|I32||File type|    
-| | | |stat|I32||File error status|    
+| | | |type|I32||File type|
+| | | |stat|I32||File error status|
 |SH_FswVersion|3 (0x3)|FSW version info| | | | |
-| | | |hash|U32||FSW GIT hash|    
-| | | |branch|Fw::LogStringArg&|80|FSW GIT branch|    
+| | | |hash|U32||FSW GIT hash|
+| | | |branch|Fw::LogStringArg&|80|FSW GIT branch|
 |SH_PowerSaver|4 (0x4)|Power saver state changed| | | | |
-| | | |Mode|PowerSaverModeEvr|||    
+| | | |Mode|PowerSaverModeEvr|||

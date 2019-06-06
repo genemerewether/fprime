@@ -30,6 +30,9 @@
 #error Unsupported OS!
 #endif
 
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace Svc {
 
     /////////////////////////////////////////////////////////////////////
@@ -165,7 +168,7 @@ namespace Svc {
         close(this->m_udpFd);
         close(this->m_socketFd);
         if ((this->m_socketFd = socket(AF_INET, SOCK_STREAM, 0)) == ERROR) {
-            (void) printf("Socket error: %s\n",strerror(errno));
+            DEBUG_PRINT("Socket error: %s\n",strerror(errno));
             return;
         }
 
@@ -177,7 +180,7 @@ namespace Svc {
             if (-1 == this->m_udpFd) {
                 //Was already open
                 close(this->m_socketFd);
-                (void) printf("UDP Socket error: %s\n",strerror(errno));
+                DEBUG_PRINT("UDP Socket error: %s\n",strerror(errno));
                 return;
             }
 
@@ -195,7 +198,7 @@ namespace Svc {
         // set socket write to timeout after 1 sec
         if (setsockopt (this->m_socketFd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout,
                         sizeof(timeout)) < 0) {
-            (void)printf("setsockopt error: %s\n",strerror(errno));
+            DEBUG_PRINT("setsockopt error: %s\n",strerror(errno));
         }
 
         // Fill in data structure with server information
@@ -219,7 +222,7 @@ namespace Svc {
             struct hostent *he;
             struct in_addr **addr_list;
             if ((he = gethostbyname(this->hostname)) == NULL) {
-                (void)printf("Unable to get hostname\n");
+                DEBUG_PRINT("Unable to get hostname\n");
                 //Force connect to close
                 close(this->m_udpFd);
                 close(this->m_socketFd);
@@ -248,11 +251,11 @@ namespace Svc {
 #else
         if (socketWrite(this->m_socketFd, (U8*)buf, strnlen(buf, 13)) < 0) {
 #endif
-            (void) printf("write error on port %d \n", port);
+            DEBUG_PRINT("write error on port %d \n", port);
             return;
         }
         this->log_ACTIVITY_HI_ConnectedToServer(port);
-        (void) printf("Sent register FSW string to ground\n");
+        DEBUG_PRINT("Sent register FSW string to ground\n");
         //m_connectionFd is set so m_socketFd can register ISF before other tasks try to write data to ground
         this->m_connectionFd = this->m_socketFd;
     }
@@ -292,7 +295,7 @@ namespace Svc {
                 // first, read packet delimiter
                 bytesRead = socketRead(comp->m_socketFd,(U8*)&packetDelimiter,sizeof(packetDelimiter));
                 if( -1 == bytesRead ) {
-                    (void) printf("Delim read error: %s",strerror(errno));
+                    DEBUG_PRINT("Delim read error: %s",strerror(errno));
                     break;
                 }
 
@@ -302,17 +305,17 @@ namespace Svc {
                 }
 
                 if (bytesRead != sizeof(packetDelimiter)) {
-                    (void) printf("Didn't get right pd size: %ld\n",(long int)bytesRead);
+                    DEBUG_PRINT("Didn't get right pd size: %ld\n",(long int)bytesRead);
                 }
                 // correct for network order
                 packetDelimiter = ntohl(packetDelimiter);
 
                 // if magic number to quit, exit loop
                 if (packetDelimiter == 0xA5A5A5A5) {
-                    (void) printf("packetDelimiter = 0x%x\n", packetDelimiter);
+                    DEBUG_PRINT("packetDelimiter = 0x%x\n", packetDelimiter);
                     break;
                 } else if (packetDelimiter != SocketGndIfImpl::PKT_DELIM) {
-                    (void) printf("Unexpected delimiter 0x%08X\n",packetDelimiter);
+                    DEBUG_PRINT("Unexpected delimiter 0x%08X\n",packetDelimiter);
                     // just keep reading until a delimiter is found
                     continue;
                 }
@@ -320,7 +323,7 @@ namespace Svc {
                 // now read packet size
                 bytesRead = socketRead(comp->m_connectionFd,(U8*)&packetSize,sizeof(packetSize));
                 if( -1 == bytesRead ) {
-                    (void) printf("Size read error: %s",strerror(errno));
+                    DEBUG_PRINT("Size read error: %s",strerror(errno));
                     break;
                 }
 
@@ -330,7 +333,7 @@ namespace Svc {
                 }
 
                 if (bytesRead != sizeof(packetSize)) {
-                    (void) printf("Didn't get right ps size!\n");
+                    DEBUG_PRINT("Didn't get right ps size!\n");
                 }
 
                 // correct for network order
@@ -348,7 +351,7 @@ namespace Svc {
                         // check size of command
                         if (packetSize > FW_COM_BUFFER_MAX_SIZE) {
 			  comp->log_WARNING_HI_GNDIF_ReceiveError(GNDIF_PacketTooBig, comp->port_number);
-                            (void) printf("Packet to large! :%d\n",packetSize);
+                            DEBUG_PRINT("Packet to large! :%d\n",packetSize);
                             // might as well wait for the next packet
                             break;
                         }
@@ -357,7 +360,7 @@ namespace Svc {
                         bytesRead = socketRead(comp->m_socketFd,(U8*)buf+sizeof(packetDesc),packetSize-sizeof(packetDesc));
                         if (-1 == bytesRead) {
 			  comp->log_WARNING_HI_GNDIF_ReceiveError(GNDIF_PacketReadError, comp->port_number);
-                            (void) printf("Size read error: %s\n",strerror(errno));
+                            DEBUG_PRINT("Size read error: %s\n",strerror(errno));
                             break;
                         }
 
@@ -377,7 +380,7 @@ namespace Svc {
                         // check read size
                         if (bytesRead != (ssize_t)packetSize) {
 			  comp->log_WARNING_HI_GNDIF_ReceiveError(GNDIF_ReadSizeMismatch, comp->port_number);
-                            (void) printf("Read size mismatch: A: %ld E: %d\n",(long int)bytesRead,packetSize);
+                            DEBUG_PRINT("Read size mismatch: A: %ld E: %d\n",(long int)bytesRead,packetSize);
                         }
 
 
@@ -399,12 +402,12 @@ namespace Svc {
                         bytesRead = socketRead(comp->m_socketFd, data_ptr, packetSize - sizeof(packetDesc));
                         if (-1 == bytesRead) {
 			  comp->log_WARNING_HI_GNDIF_ReceiveError(GNDIF_PacketReadError, comp->port_number);
-                            (void) printf("Size read error: %s\n",strerror(errno));
+                            DEBUG_PRINT("Size read error: %s\n",strerror(errno));
                             break;
                         }
 
                         // for(uint32_t i =0; i < bytesRead; i++){
-                        //     (void) printf("IN_DATA:%02x\n", data_ptr[i]);
+                        //     DEBUG_PRINT("IN_DATA:%02x\n", data_ptr[i]);
                         // }
 
                         if (comp->isConnected_fileUplinkBufferSendOut_OutputPort(0)) {
@@ -428,7 +431,8 @@ namespace Svc {
                 comp->log_WARNING_LO_LostConnectionToServer(comp->port_number);
                 while (comp->m_connectionFd == -1){
                     Os::Task::delay(5000);
-                	comp->openSocket(comp->port_number);
+                    DEBUG_PRINT("Reopen socket\n");
+                    comp->openSocket(comp->port_number);
                 }
             }
             else {
@@ -441,7 +445,7 @@ namespace Svc {
 
     void SocketGndIfImpl::fileDownlinkBufferSendIn_handler(
         NATIVE_INT_TYPE portNum, /*!< The port number*/
-        Fw::Buffer& fwBuffer
+        Fw::Buffer &fwBuffer
     ) {
 
         char buf[256];
@@ -472,10 +476,10 @@ namespace Svc {
         (void)socketWrite(this->m_connectionFd,(U8*)buf, packet_size);
         //Send msg
         (void)socketWrite(this->m_connectionFd,(U8*)fwBuffer.getdata(), buffer_size);
-        //printf("PACKET BYTES SENT: %d\n", bytes_sent);
+        //DEBUG_PRINT("PACKET BYTES SENT: %d\n", bytes_sent);
 
         // for(uint32_t i = 0; i < bytes_sent; i++){
-        //     printf("%02x\n",((U8*)fwBuffer.getdata())[i]);
+        //     DEBUG_PRINT("%02x\n",((U8*)fwBuffer.getdata())[i]);
         // }
         this->fileDownlinkBufferSendOut_out(0,fwBuffer);
 
@@ -495,7 +499,7 @@ namespace Svc {
         data_net_size = htonl(data.getBuffLength());
         // check to see if someone is connected
         if (this->m_connectionFd != -1) {
-            //(void) printf("Trying to send %ld bytes to ground.\n",data.getBuffLength() + header_size + sizeof(data_size));
+            //DEBUG_PRINT("Trying to send %ld bytes to ground.\n",data.getBuffLength() + header_size + sizeof(data_size));
             if (this->useDefaultHeader) {
                 strncpy(buf, "A5A5 GUI ", sizeof(buf));
             }
@@ -519,13 +523,13 @@ namespace Svc {
                         sizeof(m_servAddr));
             }
             if (bytes_sent < 0) {
-            	(void) printf("write error on port %d: %s\n", this->port_number, strerror(errno));
+            	DEBUG_PRINT("write error on port %d: %s\n", this->port_number, strerror(errno));
             	return;
             }
             else if (bytes_sent != (I32)(header_size + data_size + sizeof(data_size))) {
-                (void) printf("Not all data sent. E: %lu A: %d\n", (long unsigned int)(header_size + data_size + sizeof(data_size)), bytes_sent);
+                DEBUG_PRINT("Not all data sent. E: %lu A: %d\n", (long unsigned int)(header_size + data_size + sizeof(data_size)), bytes_sent);
             } else {
-//                (void) printf("Sent %d bytes to ground.\n",bytes_sent);
+//                DEBUG_PRINT("Sent %d bytes to ground.\n",bytes_sent);
             }
         }
     }

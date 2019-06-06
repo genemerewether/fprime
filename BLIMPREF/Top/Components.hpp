@@ -23,7 +23,6 @@ void exitTasks(void);
 #include <Svc/RateGroupDecoupler/RateGroupDecouplerComponentImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
-#include <BLIMPREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include <Svc/ActiveDecoupler/ActiveDecouplerComponentImpl.hpp>

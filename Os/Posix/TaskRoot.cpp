@@ -27,8 +27,8 @@ namespace Os {
 
     Task::TaskStatus Task::start(const Fw::StringBase &name, NATIVE_INT_TYPE identifier, NATIVE_INT_TYPE priority, NATIVE_INT_TYPE stackSize, taskRoutine routine, void* arg, NATIVE_INT_TYPE cpuAffinity) {
 
-        // for linux, task names can only be of length 15, so just setting it to the name:
-        this->m_name = name;
+    	// for linux, task names can only be of length 15, so just setting it to the name:
+    	this->m_name = name;
         this->m_identifier = identifier;
 
         Task::TaskStatus tStat = TASK_OK;
@@ -40,7 +40,7 @@ namespace Os {
         I32 stat = pthread_attr_init(&att);
         if (stat != 0) {
             printf("pthread_attr_init: (%d)(%d): %s\n",stat,errno,strerror(stat));
-            return TASK_INVALID_PARAMS;
+        	return TASK_INVALID_PARAMS;
         }
 
         stat = pthread_attr_setstacksize(&att,stackSize);
@@ -51,21 +51,21 @@ namespace Os {
         stat = pthread_attr_setschedpolicy(&att,SCHED_RR);
 
         if (stat != 0) {
-            printf("pthread_attr_setschedpolicy: %s\n",strerror(stat));
+            printf("pthread_attr_setschedpolicy: %s\n",strerror(errno));
             return TASK_INVALID_PARAMS;
         }
         stat = pthread_attr_setinheritsched(&att,PTHREAD_EXPLICIT_SCHED); // may not need this
         if (stat != 0) {
-            printf("pthread_attr_setinheritsched: %s\n",strerror(stat));
-             return TASK_INVALID_PARAMS;
+            printf("pthread_attr_setinheritsched: %s\n",strerror(errno));
+         	return TASK_INVALID_PARAMS;
         }
         sched_param schedParam;
         memset(&schedParam,0,sizeof(sched_param));
         schedParam.sched_priority = priority;
         stat = pthread_attr_setschedparam(&att,&schedParam);
         if (stat != 0) {
-            printf("pthread_attr_setschedparam: %s\n",strerror(stat));
-            return TASK_INVALID_PARAMS;
+            printf("pthread_attr_setschedparam: %s\n",strerror(errno));
+        	return TASK_INVALID_PARAMS;
         }
 
         // Set affinity before creating thread:
@@ -98,7 +98,7 @@ namespace Os {
                 break;
             case EINVAL:
                 delete tid;
-                printf("pthread_create: %s\n",strerror(stat));
+                printf("pthread_create: %s\n",strerror(errno));
                 tStat = TASK_INVALID_PARAMS;
                 break;
             default:
@@ -159,9 +159,9 @@ namespace Os {
 
 
     Task::~Task() {
-        if (this->m_handle) {
-            delete (pthread_t*)this->m_handle;
-        }
+    	if (this->m_handle) {
+    		delete (pthread_t*)this->m_handle;
+    	}
         // If a registry has been registered, remove task
         if (Task::s_taskRegistry) {
             Task::s_taskRegistry->removeTask(this);
@@ -192,7 +192,7 @@ namespace Os {
         stat = pthread_join(*((pthread_t*) this->m_handle), value_ptr);
 
         if (stat != 0) {
-            DEBUG_PRINT("join: %s\n", strerror(stat));
+            DEBUG_PRINT("join: %s\n", strerror(errno));
             return TASK_JOIN_ERROR;
         }
         else {

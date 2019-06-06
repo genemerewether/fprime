@@ -65,9 +65,9 @@ namespace Os {
          *
          */
         handle = mq_open(this->m_name.toChar(),
-			 O_RDWR | O_CREAT | O_EXCL,
-			 S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP,
-			 &att);
+                         O_RDWR | O_CREAT | O_EXCL,
+                         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP,
+                         &att);
 
         // If queue already exists, then unlink it and try again.
         if (-1 == (NATIVE_INT_TYPE) handle) {

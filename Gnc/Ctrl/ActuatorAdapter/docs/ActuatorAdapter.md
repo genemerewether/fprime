@@ -6,12 +6,12 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|ACTADAP_Arm|0 (0x0)|| | |   
-| | | |armState|bool||                    
-|ACTADAP_InitParams|1 (0x1)|| | |   
-|ACTADAP_SetVoltAct|2 (0x2)|| | |   
-| | | |actIdx|U8||                    
-| | | |voltage|F64||                    
+|ACTADAP_Arm|0 (0x0)|| | |
+| | | |armState|bool||
+|ACTADAP_InitParams|1 (0x1)|| | |
+|ACTADAP_SetVoltAct|2 (0x2)|| | |
+| | | |actIdx|U8||
+| | | |voltage|F64||
 
 ## Telemetry Channel List
 
@@ -50,6 +50,6 @@
 |---|---|---|---|---|---|---|
 |ACTADAP_AlreadyArmed|0 (0x0)|| | | | |
 |ACTADAP_Error|1 (0x1)|| | | | |
-| | | |error|ErrorType||The error code|    
+| | | |error|ErrorType||The error code|
 |ACTADAP_NotFlySafe|2 (0x2)|| | | | |
-| | | |reason|NotFlySafeType||The error code|    
+| | | |reason|NotFlySafeType||The error code|

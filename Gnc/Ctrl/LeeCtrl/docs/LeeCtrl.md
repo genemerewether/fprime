@@ -6,23 +6,23 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|LCTRL_SetCtrlMode|0 (0x0)|Set controller mode| | |   
-| | | |mode|CtrlMode||                    
-|LCTRL_FlatOutputSetpoint|1 (0x1)|| | |   
-| | | |x_w__x|F64||                    
-| | | |x_w__y|F64||                    
-| | | |x_w__z|F64||                    
-| | | |v_w__x|F64||                    
-| | | |v_w__y|F64||                    
-| | | |v_w__z|F64||                    
-| | | |yaw|F64||                    
-|LCTRL_AttThrustSetpoint|2 (0x2)|| | |   
-| | | |thrust|F64||                    
-| | | |w_q_b__x|F64||                    
-| | | |w_q_b__y|F64||                    
-| | | |w_q_b__z|F64||                    
-| | | |w_q_b__w|F64||                    
-|LCTRL_InitParams|3 (0x3)|| | |   
+|LCTRL_SetCtrlMode|0 (0x0)|Set controller mode| | |
+| | | |mode|CtrlMode||
+|LCTRL_FlatOutputSetpoint|1 (0x1)|| | |
+| | | |x_w__x|F64||
+| | | |x_w__y|F64||
+| | | |x_w__z|F64||
+| | | |v_w__x|F64||
+| | | |v_w__y|F64||
+| | | |v_w__z|F64||
+| | | |yaw|F64||
+|LCTRL_AttThrustSetpoint|2 (0x2)|| | |
+| | | |thrust|F64||
+| | | |w_q_b__x|F64||
+| | | |w_q_b__y|F64||
+| | | |w_q_b__z|F64||
+| | | |w_q_b__w|F64||
+|LCTRL_InitParams|3 (0x3)|| | |
 
 ## Telemetry Channel List
 

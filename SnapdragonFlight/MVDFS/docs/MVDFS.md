@@ -6,9 +6,9 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|MVDFS_Reinit|0 (0x0)|| | |   
-|MVDFS_Activate|1 (0x1)|| | |   
-| | | |enable|bool||                    
+|MVDFS_Reinit|0 (0x0)|| | |
+|MVDFS_Activate|1 (0x1)|| | |
+| | | |enable|bool||
 
 ## Telemetry Channel List
 

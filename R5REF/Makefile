@@ -8,5 +8,7 @@ default_build: TIR5
 
 include $(BUILD_ROOT)/mk/makefiles/deployment_makefile.mk
 
+include $(BUILD_ROOT)/Svc/Startup/patch/patch.mk
+
 rebuild_r5:
 	make gen_make TIR5_clean TIR5

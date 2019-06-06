@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="../../Autocoders/Python/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 
 <component name="CmdSequencer" kind="active" namespace="Svc" modeler="true">
 
@@ -59,12 +59,13 @@
 
         <port name="seqCancelIn" data_type="Svc::CmdSeqCancel"  kind="async_input"    max_number="1">
         </port>
-
+        
         <port name="logOut" data_type="Fw::Log"  kind="output" role="LogEvent"    max_number="1">
         </port>
 
         <port name="seqDone" data_type="Fw::CmdResponse"  kind="output"    max_number="1">
         </port>
+
     </ports>
 
 </component>

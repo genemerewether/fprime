@@ -46,7 +46,6 @@ void exitTasks(void);
 #include <Svc/ImgTlm/ImgTlmComponentImpl.hpp>
 
 #include <Svc/IPCRelay/IPCRelayComponentImpl.hpp>
-#include <SDREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 

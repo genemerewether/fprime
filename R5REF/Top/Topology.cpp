@@ -84,7 +84,7 @@ void allocComps() {
 
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
-        Gnc::IMUINTEG_SCHED_CONTEXT_ATT, // imuInteg
+        Gnc::IMUINTEG_SCHED_CONTEXT_FILT, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
         0, //mixer
         0, //logQueue
@@ -101,10 +101,10 @@ void allocComps() {
     ;
 
     NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
-        0, //TODO(mereweth) - IMU?
-        Gnc::IMUINTEG_SCHED_CONTEXT_POS, // imuInteg
+        0, //TODO(mereweth) - actuatoradapter arm
         Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
-        0, //mixer
+        0,
+        0,
         0, //logQueue
         LLProc::HLRTR_SCHED_UART_SEND,
         LLProc::HLRTR_SCHED_UART_RECEIVE,
