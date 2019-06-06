@@ -55,7 +55,8 @@ LINK_BIN_FLAGS := 	-mv7R5 \
 					--warn_sections \
 					--retain=resetEntry # Needed to populate .intvecs
 
-POST_LINK_BIN := $(BUILD_ROOT)/Bootloader/out2bin.sh 
+# TODO(mereweth)
+#POST_LINK_BIN := $(BUILD_ROOT)/Bootloader/out2bin.sh 
 POST_LINK_POST_ARGS = $(subst .out,.bin,$@) 					
 
 FILE_SIZE := $(LS) $(LS_SIZE)

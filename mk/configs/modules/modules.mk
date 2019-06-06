@@ -599,6 +599,7 @@ R5REF_MODULES := \
 	Svc/Sched \
 	Svc/Time \
 	Svc/Cycle \
+	Svc/Fatal \
 	\
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \

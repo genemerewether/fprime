@@ -8,5 +8,3 @@
 # There are some standard files that are included for reference
 
 SRC = FatalEventPortAi.xml
-		
-		
