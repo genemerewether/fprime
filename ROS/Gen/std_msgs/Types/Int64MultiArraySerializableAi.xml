@@ -2,6 +2,7 @@
   <members>
     <member name="layout" type="MultiArrayLayout"/>
     <member name="data" size="100" type="I64"/>
+    <member name="data_count" type="U32"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/MultiArrayLayoutSerializableAi.xml</import_serializable_type>
 </serializable>
