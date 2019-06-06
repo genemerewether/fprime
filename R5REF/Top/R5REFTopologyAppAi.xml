@@ -167,7 +167,7 @@
  	 <target component = "rgTlm" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection23">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection24">
@@ -313,10 +313,6 @@
 <connection name = "Connection59">
 	 <source component = "leeCtrl" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection60">
-	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection61">
 	 <source component = "imuInteg" port = "Log" type = "Log" num = "0"/>
