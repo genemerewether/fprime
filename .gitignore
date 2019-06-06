@@ -19,9 +19,6 @@ RemoteSystemsTempFiles
 *.stackdump
 Dict
 *.core
-*_IDTableLog.txt
-*TopologyAppID.csv
-
 
 *.gcov
 !**/test/ut/output/*.gcov
@@ -64,10 +61,3 @@ core
 py_dict
 .settings
 
-.vagrant
-
-*.map
-*_dead_funcs.xml
-*_linkInfo.xml
-
-*~

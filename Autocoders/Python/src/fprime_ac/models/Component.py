@@ -126,3 +126,5 @@ class Component(object):
         return self.__base_id
     def get_base_id_window(self):
         return self.__base_id_window
+
+

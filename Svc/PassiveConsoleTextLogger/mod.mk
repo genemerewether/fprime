@@ -16,8 +16,6 @@ SRC_SDFLIGHT = Stub/PrintfLoggerImplStub.cpp
 
 SRC_DSPAL = Dspal/DspalLoggerImpl.cpp
 
-SRC_TIMSP430 = MSP/TextLoggerImplMsp.cpp
-
 SRC_DARWIN = Stub/PrintfLoggerImplStub.cpp
 
 SRC_RASPIAN = Stub/PrintfLoggerImplStub.cpp

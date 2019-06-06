@@ -127,9 +127,6 @@ F Prime has the following key features:
 
 F Primeâ€™s component-based architecture enables a high degree of modularity and software reuse. 
 
-<<<<<<< HEAD
-Updated contributor list. No code changes. 
-=======
 ### Rapid Deployment
 
 F Prime provides a complete development ecosystem, including modeling tools, testing tools, and a ground data system. Developers use the modeling tools to write high-level specifications, automatically generate implementations in C++, and fill in the implementations with domain-specific code. The framework and the code generators provide all the boilerplate code required in an F Prime deployment, including code for thread management, code for communication between components, and code for handling commands, telemetry, and parameters. The testing tools and the ground data system simplify software testing, both on workstations and on flight hardware in the lab.
@@ -188,4 +185,3 @@ The continous integration system performs builds and unit-test check on any pull
 * UdpSender and UdpReceiver components added
 * Purged inaccurate ITAR and Copyright notices
 * Misc. bug fixes
->>>>>>> upstream-pub-fprime/master

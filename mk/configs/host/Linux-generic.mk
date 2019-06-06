@@ -20,11 +20,8 @@ JOBS := -j `nproc`
 
 CRC := $(BUILD_ROOT)/mk/bin/run_file_crc.sh
 
-<<<<<<< HEAD
-=======
 
 export PI_TOOLS := /opt/tools/rpi
 
 
->>>>>>> upstream-pub-fprime/master
 SYMBOL_CHECK := echo

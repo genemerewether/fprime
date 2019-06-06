@@ -2,9 +2,6 @@
  #for $namespace in $namespace_list:
 } // end namespace $namespace
  #end for
-\#endif /* #for $namespace in $namespace_list#${namespace.upper()}_#end for#${name.upper()}_SERIALIZABLE_HPP_ */
-#else
-\#endif /* ${name.upper()}_SERIALIZABLE_HPP_ */
 #end if
-
+\#endif /* ${name.upper()}_HPP_ */
 

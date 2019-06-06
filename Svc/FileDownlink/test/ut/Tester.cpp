@@ -315,6 +315,15 @@ namespace Svc {
     this->pushFromPortEntry_pingOut(key);
   }
 
+  void Tester ::
+    from_pingOut_handler(
+        const NATIVE_INT_TYPE portNum,
+        U32 key
+    )
+  {
+    this->pushFromPortEntry_pingOut(key);
+  }
+
   // ----------------------------------------------------------------------
   // Private instance methods
   // ----------------------------------------------------------------------

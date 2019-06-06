@@ -1,11 +1,3 @@
 #!/bin/sh
-<<<<<<< HEAD
-cd ${BUILD_ROOT}/Svc/BufferAccumulator/test/ut
-rm darwin-darwin-x86-ut-llvm-bin/*.gcda
-echo "Running ${BUILD_ROOT}/Svc/BufferAccumulator/test/ut/$1/test_ut"
-${BUILD_ROOT}/Svc/BufferAccumulator/test/ut/$1/test_ut
-
-=======
 
 $(dirname "$0")/runtest_all $1
->>>>>>> upstream-pub-fprime/master

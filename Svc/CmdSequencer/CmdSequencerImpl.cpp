@@ -123,7 +123,7 @@ namespace Svc {
     CmdSequencerComponentImpl::~CmdSequencerComponentImpl(void) {
 
     }
-  
+
     // ----------------------------------------------------------------------
     // Handler implementations
     // ----------------------------------------------------------------------

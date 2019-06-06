@@ -98,6 +98,7 @@ SVC_MODULES := \
 	Svc/Time \
 	Svc/Cycle \
 	Svc/LinuxTime \
+	Svc/LinuxTimer \
 	Svc/ActiveLogger \
 	Svc/Fatal \
 	Svc/PolyIf \
@@ -702,10 +703,71 @@ ACDEVTEST_MODULES := \
     \
 	Autocoders/Python/templates
 
+ACDEVTEST_MODULES := \
+	Autocoders/Python/test/active_tester \
+	Autocoders/Python/test/app1 \
+	Autocoders/Python/test/app2 \
+	Autocoders/Python/test/cnt_only \
+	Autocoders/Python/test/command1 \
+	Autocoders/Python/test/command2 \
+	Autocoders/Python/test/command_res \
+	Autocoders/Python/test/command_multi_inst \
+	Autocoders/Python/test/command_string \
+	Autocoders/Python/test/command_tester \
+	Autocoders/Python/test/comp_diff_namespace \
+	Autocoders/Python/test/comp_no_namespace \
+	Autocoders/Python/test/enum1port \
+	Autocoders/Python/test/enum_return_port \
+	Autocoders/Python/test/event1 \
+	Autocoders/Python/test/event2 \
+	Autocoders/Python/test/event_throttle \
+	Autocoders/Python/test/event_enum \
+	Autocoders/Python/test/event_multi_inst \
+	Autocoders/Python/test/event_string \
+	Autocoders/Python/test/ext_dict \
+	Autocoders/Python/test/log1 \
+	Autocoders/Python/test/log_tester \
+	Autocoders/Python/test/main \
+	Autocoders/Python/test/noargport \
+	Autocoders/Python/test/param1 \
+	Autocoders/Python/test/param2 \
+	Autocoders/Python/test/param_enum \
+	Autocoders/Python/test/param_multi_inst \
+	Autocoders/Python/test/param_string \
+	Autocoders/Python/test/param_tester \
+	Autocoders/Python/test/time_tester \
+	#Autocoders/Python/test/queued1 \
+	\ # Autocoders/Python/test/partition \
+	Autocoders/Python/test/pass_by_attrib \
+	\ # Autocoders/Python/test/passive \
+	Autocoders/Python/test/port_nogen \
+	Autocoders/Python/test/port_return_type \
+	Autocoders/Python/test/serialize_enum \
+	Autocoders/Python/test/serialize_stringbuffer \
+	Autocoders/Python/test/serialize_template \
+	Autocoders/Python/test/serialize_user \
+	Autocoders/Python/test/serialize1 \
+	Autocoders/Python/test/serialize2 \
+	Autocoders/Python/test/serialize3 \
+	Autocoders/Python/test/stress \
+	Autocoders/Python/test/string_port \
+	Autocoders/Python/test/telem_tester \
+	Autocoders/Python/test/tlm_enum \
+	Autocoders/Python/test/tlm_string \
+	Autocoders/Python/test/tlm1 \
+	Autocoders/Python/test/tlm2 \
+	Autocoders/Python/test/tlm_onchange \
+	Autocoders/Python/test/tlm_multi_inst \
+	Autocoders/Python/test/interface1 \
+	Autocoders/Python/test/port_loopback \
+	Autocoders/Python/test/serial_passive \
+    \
+	Autocoders/Python/templates
+	
 RPI_APP_MODULES := \
 	RPI/Top \
 	RPI/RpiDemo
-
+	
 RPI_MODULES := \
 	\
 	$(RPI_APP_MODULES) \
@@ -742,5 +804,3 @@ OTHER_MODULES := \
 
 DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF RPI
 
-# Location of ground/gse software. Autocoded dictionary elements are copied here.
-GDS_MODULE := Gse

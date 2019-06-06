@@ -77,7 +77,21 @@ SRC_CYGWIN =    Pthreads/Queue.cpp \
 				Linux/IntervalTimer.cpp \
 				Posix/Mutex.cpp \
 				Linux/FileSystem.cpp \
-				Posix/LocklessQueue.cpp
+                Posix/LocklessQueue.cpp
+
+SRC_RASPIAN =   Pthreads/Queue.cpp \
+                Pthreads/BufferQueueCommon.cpp \
+                Pthreads/PriorityBufferQueue.cpp \
+                Pthreads/MaxHeap/MaxHeap.cpp \
+                Linux/File.cpp \
+                Posix/Task.cpp \
+                LogPrintf.cpp \
+                Linux/InterruptLock.cpp \
+                Linux/WatchdogTimer.cpp \
+                X86/IntervalTimer.cpp \
+                Linux/IntervalTimer.cpp \
+                Posix/Mutex.cpp \
+                Linux/FileSystem.cpp
 
 SRC_SDFLIGHT =  Posix/IPCQueue.cpp \
                 Pthreads/Queue.cpp \
