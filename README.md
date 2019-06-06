@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # QUEST
 
 ## One-time setup:
@@ -106,10 +105,7 @@ echo "export TARGET_8096=1" >> ~/.bashrc
 * Garmin LidarLite v3
 * SimonK ESC firmware over I2C, two different protocols: https://github.com/genemerewether/tgy
 
-# fprime
-=======
 # F Prime: A Flight-Proven, Multi-Platform, Open-Source Flight Software Framework
->>>>>>> upstream-pub-fprime/master
 
 F Prime (FÊ¹) is a component-driven framework that enables rapid development and deployment of spaceflight and other embedded software applications. Originally developed at the Jet Propulsion Laboratory, F Prime has been successfully deployed on several space applications. It is tailored, but not limited, to small-scale spaceflight systems such as CubeSats, SmallSats, and instruments. 
 
