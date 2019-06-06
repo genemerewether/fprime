@@ -11,3 +11,5 @@ SRC_CYGWIN = BlspI2CDriverComponentImplStub.cpp
 HDR = BlspI2CDriverComponentImpl.hpp
 
 SRC_LINUXRT = BlspI2CDriverComponentImplStub.cpp
+
+SUBDIRS=test

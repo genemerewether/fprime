@@ -22,7 +22,7 @@
 
 namespace SnapdragonFlight {
 
-    void BlspI2CDriverComponentImpl::open(NATIVE_INT_TYPE device, I2CFrequency clock) {
+    void BlspI2CDriverComponentImpl::open(NATIVE_INT_TYPE device) {
 
     }
 

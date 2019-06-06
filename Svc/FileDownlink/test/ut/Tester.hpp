@@ -6,15 +6,8 @@
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
-// acknowledged. Any commercial use must be negotiated with the Office
-// of Technology Transfer at the California Institute of Technology.
+// acknowledged.
 // 
-// This software may be subject to U.S. export control laws and
-// regulations.  By accepting this document, the user agrees to comply
-// with all U.S. export laws and regulations.  User has the
-// responsibility to obtain export licenses, or other export authority
-// as may be required before exporting such information to foreign
-// countries or providing access to foreign persons.
 // ====================================================================== 
 
 #ifndef TESTER_HPP
@@ -22,10 +15,8 @@
 
 #include <Svc/FileDownlink/FileDownlink.hpp>
 #include <Fw/Types/Assert.hpp>
-#include <Fw/Test/UnitTest.hpp>
 #include "GTestBase.hpp"
 
-#define MAX_HISTORY_SIZE 10
 #define FILE_BUFFER_CAPACITY 100
 
 namespace Svc {
@@ -128,25 +119,12 @@ namespace Svc {
       //!
       void cancelInIdleMode(void);
 
-      //! Create a file F
-      //! Downlink partial F
-      //! Verify that the downlinked file matches F
-      //!
-      void downlinkPartial(void);
-
     private:
 
       // ----------------------------------------------------------------------
       // Handlers for from ports
       // ----------------------------------------------------------------------
 
-      //! Handler for from_buffSendOutReturn
-      //!
-      void from_buffSendOutReturn_handler(
-          const NATIVE_INT_TYPE portNum, //!< The port number
-          Fw::Buffer fwBuffer 
-      );
-      
       //! Handler for from_bufferGetCaller
       //!
       Fw::Buffer from_bufferGetCaller_handler(
@@ -158,16 +136,17 @@ namespace Svc {
       //!
       void from_bufferSendOut_handler(
           const NATIVE_INT_TYPE portNum, //!< The port number
-          Fw::Buffer buffer 
+          Fw::Buffer& buffer
       );
 
-      //! Handler for from_faultOut
+      //! Handler for from_pingOut
       //!
-      void from_faultOut_handler(
-          const NATIVE_INT_TYPE portNum, //!< The port number
-          U32 FaultID, //!<  Some comment here 
-          U32 eventContext //!<  Some comment here 
+      void from_pingOut_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          U32 key /*!< Value to return to pinger*/
       );
+
+
 
     private:
 
@@ -190,17 +169,6 @@ namespace Svc {
           const char *const sourceFileName, //!< The source file name
           const char *const destFileName, //!< The destination file name
           const Fw::CommandResponse response //!< The expected command response
-      );
-
-      //! Command the FileDownlink component to send a file
-      //! Assert a command response
-      //!
-      void sendFilePartial(
-          const char *const sourceFileName, //!< The source file name
-          const char *const destFileName, //!< The destination file name
-          const Fw::CommandResponse response, //!< The expected command response
-          U32 startIndex, //!< The starting index
-          U32 length //!< The amount of bytes to downlink
       );
 
       //! Command the FileDownlink component to cancel a file downlink
@@ -227,8 +195,7 @@ namespace Svc {
         History<Fw::FilePacket::DataPacket>& historyOut, //!< The outgoing history
         const Fw::FilePacket::Type endPacketType, //!< The expected ending packet type
         const size_t numPackets, //!< The expected number of packets
-        const CFDP::Checksum& checksum, //!< The expected checksum,
-        U32 startOffset //!< Starting byte offset
+        const CFDP::Checksum& checksum //!< The expected checksum
       );
 
       //! Validate a file packet buffer and convert it to a file packet
@@ -286,8 +253,7 @@ namespace Svc {
       //! The current sequence index
       //!
       U32 sequenceIndex;
-   
-      bool buff_returned;
+
   };
 
 } // end namespace Svc

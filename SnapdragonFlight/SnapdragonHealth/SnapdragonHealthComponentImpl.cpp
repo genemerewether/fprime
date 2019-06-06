@@ -206,7 +206,8 @@ extern "C" {
             "powersave",
             "userspace",
             "conservative",
-            "ondemand"
+            "ondemand",
+            "interactive"
         };
 
         FW_ASSERT((type >= GOVERNOR_TYPE_MIN) &&
@@ -597,10 +598,10 @@ extern "C" {
                 saverModeTlm = SAVER_RAPID_TLM;
                 this->tlmWrite_SnapdragonPowerSaver(SAVER_RAPID_TLM);
                 //polySetVal = Common::COMMON_POLYDB_SAVER_OFF;
-                this->gov_setpoint[0] = GOVERNOR_TYPE_ONDEMAND;
-                this->gov_setpoint[1] = GOVERNOR_TYPE_ONDEMAND;
-                this->gov_setpoint[2] = GOVERNOR_TYPE_ONDEMAND;
-                this->gov_setpoint[3] = GOVERNOR_TYPE_ONDEMAND;
+                this->gov_setpoint[0] = GOVERNOR_TYPE_PERFORMANCE;
+                this->gov_setpoint[1] = GOVERNOR_TYPE_PERFORMANCE;
+                this->gov_setpoint[2] = GOVERNOR_TYPE_PERFORMANCE;
+                this->gov_setpoint[3] = GOVERNOR_TYPE_PERFORMANCE;
 
                 this->l2_power_setpoint = L2_POWER_TYPE_0;
                 break;

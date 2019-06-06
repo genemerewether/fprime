@@ -1,0 +1,12 @@
+<events>
+    <event id="0" name="MVDFS_Activated" severity="ACTIVITY_HI" format_string = "MVDFS image proc started" >
+        <comment>
+        MVDFS began processing images
+        </comment>
+    </event>
+    <event id="1" name="MVDFS_Deactivated" severity="ACTIVITY_HI" format_string = "MVDFS image proc stopped" >
+        <comment>
+        MVDFS stopped processing images
+        </comment>
+    </event>
+</events>

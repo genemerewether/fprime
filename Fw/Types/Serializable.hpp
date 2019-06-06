@@ -30,6 +30,11 @@ namespace Fw {
 #if FW_SERIALIZABLE_TO_STRING || BUILD_UT
             virtual void toString(StringBase& text) const; //!< generate text from serializable
 #endif
+
+#ifdef BUILD_UT
+            friend std::ostream& operator<<(std::ostream& os, const Serializable& val);
+#endif
+
         protected:
             Serializable(); //!< Default constructor
             virtual ~Serializable(); //!< destructor
@@ -114,6 +119,7 @@ namespace Fw {
             void resetSer(void); //!< reset to beginning of buffer to reuse for serialization
             void resetDeser(void); //!< reset deserialization to beginning
 
+            SerializeStatus deserializeSkip(NATIVE_UINT_TYPE numBytesToSkip); //!< Skips the number of specified bytes for deserialization
             virtual NATIVE_UINT_TYPE getBuffCapacity(void) const = 0; //!< returns capacity, not current size, of buffer
             NATIVE_UINT_TYPE getBuffLength() const; //!< returns current buffer size
             NATIVE_UINT_TYPE getBuffLeft() const; //!< returns how much deserialization buffer is left
@@ -126,6 +132,10 @@ namespace Fw {
             SerializeStatus copyRaw(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
             SerializeStatus copyRawOffset(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
                                                                                       // Will increment deserialization pointer
+            SerializeStatus copyRawOffset(SerializeBufferBase& dest, NATIVE_UINT_TYPE size); //!< directly copies buffer without looking for a size in the stream.
+                                                                                    // Will increment deserialization pointer
+
+
 
             //!< Dangerous - setup a temporary buffer with a piece of ourselves and shift deserialization pointer
             SerializeStatus deserializeNoCopy(ExternalSerializeBuffer& val);

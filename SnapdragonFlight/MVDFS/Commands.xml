@@ -1,0 +1,9 @@
+<commands>
+    <command kind="async" opcode="0" mnemonic="MVDFS_Reinit" />
+    
+    <command kind="async" opcode="1" mnemonic="MVDFS_Activate" >
+        <args>
+            <arg type="bool" name="enable" />
+        </args>
+    </command>
+</commands>

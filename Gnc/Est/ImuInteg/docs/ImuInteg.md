@@ -6,7 +6,7 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|IMUINTEG_InitParams|0 (0x0)|| | |   
+|IMUINTEG_InitParams|0 (0x0)|| | |
 
 ## Telemetry Channel List
 

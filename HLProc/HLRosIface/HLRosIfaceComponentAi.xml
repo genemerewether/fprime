@@ -14,7 +14,8 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
-
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/PointCloud2PortAi.xml</import_port_type>
+    
     <import_dictionary>HLProc/HLRosIface/Telemetry.xml</import_dictionary>
     
     <ports>
@@ -24,6 +25,12 @@
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
         </port>
 
+        <!-- NOTE(mereweth) - other components, including MVDFS, assume this is sync -->
+        <port name="PointCloud" data_type="ROS::sensor_msgs::PointCloud2"  kind="sync_input"    max_number="2">
+        </port>
+        <port name="PointCloudForward" data_type="Fw::BufferSend"  kind="output"    max_number="2">	
+        </port>
+        
         <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
         </port>
 
@@ -48,10 +55,10 @@
         <port name="pingIn" data_type="Svc::Ping"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="ImageRecv" data_type="ROS::sensor_msgs::Image"  kind="sync_input"  max_number="1" >
+        <port name="ImageRecv" data_type="ROS::sensor_msgs::Image"  kind="sync_input"  max_number="2" >
         </port>
 
-        <port name="ImageForward" data_type="Fw::BufferSend"  kind="output"    max_number="1">	
+        <port name="ImageForward" data_type="Fw::BufferSend"  kind="output"    max_number="2">	
         </port>
     </ports>
 

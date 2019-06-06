@@ -20,7 +20,6 @@ void exitTasks(void);
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 #include <Svc/UdpReceiver/UdpReceiverComponentImpl.hpp>
 
-#include <SIMREF/Top/TargetInit.hpp>
 #include <Svc/AssertFatalAdapter/AssertFatalAdapterComponentImpl.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 

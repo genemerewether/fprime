@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="MVDFS_ImageCount" data_type="U32" >
+        <comment>
+            MVDFS images processed
+        </comment>
+    </channel>
+</telemetry>

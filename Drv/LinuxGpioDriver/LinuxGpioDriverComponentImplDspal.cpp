@@ -142,7 +142,8 @@ namespace Drv {
               };
 
               if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_REG_INT, (void *)&int_config) != 0) {
-                  this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+                  Fw::LogStringArg arg = strerror(errno);
+                  this->log_WARNING_HI_GP_OpenError(gpio,errno,arg);
                   DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_REG_INT failed\n");
                   return false;
               }
@@ -153,7 +154,8 @@ namespace Drv {
               // NOTE(mereweth) - direction set to input above; fall through to finish handling
           case GPIO_IN:
               if (ioctl(this->m_fd, DSPAL_GPIO_IOCTL_CONFIG_IO, (void *)&config) != 0) {
-                  this->log_WARNING_HI_GP_OpenError(gpio,this->m_fd);
+                  Fw::LogStringArg arg = strerror(errno);
+                  this->log_WARNING_HI_GP_OpenError(gpio,errno,arg);
                   DEBUG_PRINT("error: ioctl DSPAL_GPIO_IOCTL_CONFIG_IO failed\n");
                   return false;
               }

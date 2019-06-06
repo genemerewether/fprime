@@ -98,6 +98,7 @@ SVC_MODULES := \
 	Svc/Time \
 	Svc/Cycle \
 	Svc/LinuxTime \
+	Svc/LinuxTimer \
 	Svc/ActiveLogger \
 	Svc/Fatal \
 	Svc/PolyIf \
@@ -121,9 +122,12 @@ SVC_MODULES := \
 	Svc/CameraFrame \
 	Svc/IPCRelay
 
-DRV_MODULES := \
+DEMO_DRV_MODULES := \
 	Drv/DataTypes \
 	Drv/BlockDriver \
+	Drv/GpioDriverPorts
+
+LINUX_DRV_MODULES := \
 	Drv/LinuxGpioDriver \
 	Drv/LinuxPwmDriver \
 	Drv/LinuxSerialDriver \
@@ -133,7 +137,9 @@ DRV_MODULES := \
 	Drv/PwmDriverPorts \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
-	Drv/I2CDriverPorts \
+	Drv/I2CDriverPorts
+
+DEV_DRV_MODULES := \
 	Drv/Altimeter/AltimeterPorts \
 	Drv/Altimeter/AltimeterTypes
 
@@ -170,7 +176,8 @@ SNAPDRAGON_MODULES := \
 	SnapdragonFlight/MVCam \
 	SnapdragonFlight/StereoCam \
 	SnapdragonFlight/HiresCam \
-	SnapdragonFlight/MVVislam
+	SnapdragonFlight/MVVislam \
+	SnapdragonFlight/MVDFS
 
 HEXAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
@@ -275,7 +282,7 @@ Ref_MODULES := \
 	\
 	$(SVC_MODULES) \
 	\
-	$(DRV_MODULES) \
+	$(DEMO_DRV_MODULES) \
 	\
 	$(FW_MODULES) \
 	\
@@ -312,7 +319,7 @@ BLIMPREF_MODULES := \
 	\
 	$(SVC_EXTRA_MODULES) \
 	\
-	$(DRV_MODULES) \
+	$(LINUX_DRV_MODULES) \
 	\
 	$(ROS_MODULES) \
 	\
@@ -351,7 +358,7 @@ CARREF_MODULES := \
 	\
 	$(SVC_EXTRA_MODULES) \
 	\
-	$(DRV_MODULES) \
+	$(LINUX_DRV_MODULES) \
 	\
 	$(ROS_MODULES) \
 	\
@@ -371,6 +378,7 @@ SDREF_MODULES := \
 	\
 	$(SDREF_DEPLOYMENT_MODULES) \
 	\
+	Drv/Mavlink/GPSPosAdapter \
 	Drv/ForceTorque/ATINetbox \
 	\
 	$(ZMQ_MODULES) \
@@ -390,7 +398,7 @@ SDREF_MODULES := \
 	\
 	$(SVC_EXTRA_MODULES) \
 	\
-	$(DRV_MODULES) \
+	$(LINUX_DRV_MODULES) \
 	\
 	$(ROS_MODULES) \
 	\
@@ -415,7 +423,7 @@ BASEREF_MODULES := \
 	\
 	$(SVC_MODULES) \
 	\
-	$(DRV_MODULES) \
+	$(LINUX_DRV_MODULES) \
 	\
 	$(ROS_MODULES) \
 	\
@@ -436,7 +444,7 @@ SIMREF_GENERAL_MODULES := \
 	\
 	$(SVC_MODULES) \
 	\
-	$(DRV_MODULES) \
+	$(LINUX_DRV_MODULES) \
 	\
 	$(ROS_MODULES) \
 	\
@@ -634,67 +642,147 @@ R5RELAY_MODULES := \
 	\
 	$(UTILS_MODULES)
 
+ACDEVTEST_MODULES := \
+	Autocoders/Python/test/active_tester \
+	Autocoders/Python/test/app1 \
+	Autocoders/Python/test/app2 \
+	Autocoders/Python/test/cnt_only \
+	Autocoders/Python/test/command1 \
+	Autocoders/Python/test/command2 \
+	Autocoders/Python/test/command_res \
+	Autocoders/Python/test/command_multi_inst \
+	Autocoders/Python/test/command_string \
+	Autocoders/Python/test/command_tester \
+	Autocoders/Python/test/comp_diff_namespace \
+	Autocoders/Python/test/comp_no_namespace \
+	Autocoders/Python/test/enum1port \
+	Autocoders/Python/test/enum_return_port \
+	Autocoders/Python/test/event1 \
+	Autocoders/Python/test/event2 \
+	Autocoders/Python/test/event_throttle \
+	Autocoders/Python/test/event_enum \
+	Autocoders/Python/test/event_multi_inst \
+	Autocoders/Python/test/event_string \
+	Autocoders/Python/test/ext_dict \
+	Autocoders/Python/test/log1 \
+	Autocoders/Python/test/log_tester \
+	Autocoders/Python/test/main \
+	Autocoders/Python/test/noargport \
+	Autocoders/Python/test/param1 \
+	Autocoders/Python/test/param2 \
+	Autocoders/Python/test/param_enum \
+	Autocoders/Python/test/param_multi_inst \
+	Autocoders/Python/test/param_string \
+	Autocoders/Python/test/param_tester \
+	Autocoders/Python/test/time_tester \
+	#Autocoders/Python/test/queued1 \
+	\ # Autocoders/Python/test/partition \
+	Autocoders/Python/test/pass_by_attrib \
+	\ # Autocoders/Python/test/passive \
+	Autocoders/Python/test/port_nogen \
+	Autocoders/Python/test/port_return_type \
+	Autocoders/Python/test/serialize_enum \
+	Autocoders/Python/test/serialize_stringbuffer \
+	Autocoders/Python/test/serialize_template \
+	Autocoders/Python/test/serialize_user \
+	Autocoders/Python/test/serialize1 \
+	Autocoders/Python/test/serialize2 \
+	Autocoders/Python/test/serialize3 \
+	Autocoders/Python/test/stress \
+	Autocoders/Python/test/string_port \
+	Autocoders/Python/test/telem_tester \
+	Autocoders/Python/test/tlm_enum \
+	Autocoders/Python/test/tlm_string \
+	Autocoders/Python/test/tlm1 \
+	Autocoders/Python/test/tlm2 \
+	Autocoders/Python/test/tlm_onchange \
+	Autocoders/Python/test/tlm_multi_inst \
+	Autocoders/Python/test/interface1 \
+	Autocoders/Python/test/port_loopback \
+	Autocoders/Python/test/serial_passive \
+    \
+	Autocoders/Python/templates
 
 ACDEVTEST_MODULES := \
-	Autocoders/test/active_tester \
-	Autocoders/test/app1 \
-	Autocoders/test/app2 \
-	Autocoders/test/cnt_only \
-	Autocoders/test/command1 \
-	Autocoders/test/command2 \
-	Autocoders/test/command_res \
-	Autocoders/test/command_multi_inst \
-	Autocoders/test/command_string \
-	Autocoders/test/command_tester \
-	Autocoders/test/comp_diff_namespace \
-	Autocoders/test/comp_no_namespace \
-	Autocoders/test/enum1port \
-	Autocoders/test/enum_return_port \
-	Autocoders/test/event1 \
-	Autocoders/test/event2 \
-	Autocoders/test/event_throttle \
-	Autocoders/test/event_enum \
-	Autocoders/test/event_multi_inst \
-	Autocoders/test/event_string \
-	Autocoders/test/ext_dict \
-	Autocoders/test/log1 \
-	Autocoders/test/log_tester \
-	Autocoders/test/main \
-	Autocoders/test/noargport \
-	Autocoders/test/param1 \
-	Autocoders/test/param2 \
-	Autocoders/test/param_enum \
-	Autocoders/test/param_multi_inst \
-	Autocoders/test/param_string \
-	Autocoders/test/param_tester \
-	Autocoders/test/time_tester \
-	#Autocoders/test/queued1 \
-	\ # Autocoders/test/partition \
-	Autocoders/test/pass_by_attrib \
-	\ # Autocoders/test/passive \
-	Autocoders/test/port_nogen \
-	Autocoders/test/port_return_type \
-	Autocoders/test/serialize_enum \
-	Autocoders/test/serialize_stringbuffer \
-	Autocoders/test/serialize_template \
-	Autocoders/test/serialize_user \
-	Autocoders/test/serialize1 \
-	Autocoders/test/serialize2 \
-	Autocoders/test/serialize3 \
-	Autocoders/test/stress \
-	Autocoders/test/string_port \
-	Autocoders/test/telem_tester \
-	Autocoders/test/tlm_enum \
-	Autocoders/test/tlm_string \
-	Autocoders/test/tlm1 \
-	Autocoders/test/tlm2 \
-	Autocoders/test/tlm_onchange \
-	Autocoders/test/tlm_multi_inst \
-	Autocoders/test/interface1 \
-	Autocoders/test/port_loopback \
-	Autocoders/test/serial_passive \
+	Autocoders/Python/test/active_tester \
+	Autocoders/Python/test/app1 \
+	Autocoders/Python/test/app2 \
+	Autocoders/Python/test/cnt_only \
+	Autocoders/Python/test/command1 \
+	Autocoders/Python/test/command2 \
+	Autocoders/Python/test/command_res \
+	Autocoders/Python/test/command_multi_inst \
+	Autocoders/Python/test/command_string \
+	Autocoders/Python/test/command_tester \
+	Autocoders/Python/test/comp_diff_namespace \
+	Autocoders/Python/test/comp_no_namespace \
+	Autocoders/Python/test/enum1port \
+	Autocoders/Python/test/enum_return_port \
+	Autocoders/Python/test/event1 \
+	Autocoders/Python/test/event2 \
+	Autocoders/Python/test/event_throttle \
+	Autocoders/Python/test/event_enum \
+	Autocoders/Python/test/event_multi_inst \
+	Autocoders/Python/test/event_string \
+	Autocoders/Python/test/ext_dict \
+	Autocoders/Python/test/log1 \
+	Autocoders/Python/test/log_tester \
+	Autocoders/Python/test/main \
+	Autocoders/Python/test/noargport \
+	Autocoders/Python/test/param1 \
+	Autocoders/Python/test/param2 \
+	Autocoders/Python/test/param_enum \
+	Autocoders/Python/test/param_multi_inst \
+	Autocoders/Python/test/param_string \
+	Autocoders/Python/test/param_tester \
+	Autocoders/Python/test/time_tester \
+	#Autocoders/Python/test/queued1 \
+	\ # Autocoders/Python/test/partition \
+	Autocoders/Python/test/pass_by_attrib \
+	\ # Autocoders/Python/test/passive \
+	Autocoders/Python/test/port_nogen \
+	Autocoders/Python/test/port_return_type \
+	Autocoders/Python/test/serialize_enum \
+	Autocoders/Python/test/serialize_stringbuffer \
+	Autocoders/Python/test/serialize_template \
+	Autocoders/Python/test/serialize_user \
+	Autocoders/Python/test/serialize1 \
+	Autocoders/Python/test/serialize2 \
+	Autocoders/Python/test/serialize3 \
+	Autocoders/Python/test/stress \
+	Autocoders/Python/test/string_port \
+	Autocoders/Python/test/telem_tester \
+	Autocoders/Python/test/tlm_enum \
+	Autocoders/Python/test/tlm_string \
+	Autocoders/Python/test/tlm1 \
+	Autocoders/Python/test/tlm2 \
+	Autocoders/Python/test/tlm_onchange \
+	Autocoders/Python/test/tlm_multi_inst \
+	Autocoders/Python/test/interface1 \
+	Autocoders/Python/test/port_loopback \
+	Autocoders/Python/test/serial_passive \
     \
-	Autocoders/templates
+	Autocoders/Python/templates
+	
+RPI_APP_MODULES := \
+	RPI/Top \
+	RPI/RpiDemo
+	
+RPI_MODULES := \
+	\
+	$(RPI_APP_MODULES) \
+	\
+	$(SVC_MODULES) \
+	\
+	$(LINUX_DRV_MODULES) \
+	\
+	$(CFDP_MODULES) \
+  	\
+	$(FW_MODULES) \
+	\
+	$(OS_MODULES) \
+	\
+  	$(UTILS_MODULES)
 
 acdev_MODULES := \
 	$(FW_MODULES) \
@@ -714,7 +802,5 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF
+DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF RPI
 
-# Location of ground/gse software. Autocoded dictionary elements are copied here.
-GDS_MODULE := Gse

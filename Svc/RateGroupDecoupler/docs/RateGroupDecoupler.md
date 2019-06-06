@@ -16,10 +16,10 @@
 |Event Name|ID|Description|Arg Name|Arg Type|Arg Size|Description
 |---|---|---|---|---|---|---|
 |RgDecoupCycleSlip|0 (0x0)|Warning event that rate group has had a cycle slip| | | | |
-| | | |cycle|U32||The cycle where the cycle occurred|    
+| | | |cycle|U32||The cycle where the cycle occurred|
 |RgDecoupBackupCycle|1 (0x1)|Warning event that backup cycle is happening| | | | |
-| | | |backupCycle|U32||The cycle where the cycle occurred|    
-| | | |cycle|U32||The cycle where the cycle occurred|    
+| | | |backupCycle|U32||The cycle where the cycle occurred|
+| | | |cycle|U32||The cycle where the cycle occurred|
 |RgDecoupRegularCycle|2 (0x2)|Event that regular cycle is happening again| | | | |
-| | | |backupCycle|U32||The cycle where the cycle occurred|    
-| | | |cycle|U32||The cycle where the cycle occurred|    
+| | | |backupCycle|U32||The cycle where the cycle occurred|
+| | | |cycle|U32||The cycle where the cycle occurred|

@@ -6,7 +6,7 @@
 
 |Mnemonic|ID|Description|Arg Name|Arg Type|Comment
 |---|---|---|---|---|---|
-|IMUPROC_InitParams|0 (0x0)|| | |   
+|IMUPROC_InitParams|0 (0x0)|| | |
 
 ## Telemetry Channel List
 

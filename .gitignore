@@ -9,9 +9,6 @@ test_harness/src/test_harness-C/application.out
 lib*.a
 *-bin
 ac_dep
-yacgen.log
-.accurev
-.acignore
 *~
 .metadata
 RemoteSystemsTempFiles
@@ -22,9 +19,6 @@ RemoteSystemsTempFiles
 *.stackdump
 Dict
 *.core
-*_IDTableLog.txt
-*TopologyAppID.csv
-
 
 *.gcov
 !**/test/ut/output/*.gcov
@@ -54,12 +48,16 @@ logs
 test_harness/.autotools
 core
 
-.swp
+*.swp4
 
-.vagrant
+./Gds/logs/*
+./Gds/docs/doxy
 
-*.map
-*_dead_funcs.xml
-*_linkInfo.xml
+*AppDictionary.xml
+*TopologyAppID.csv 
+*TopologyAppAi_IDTableLog.txt
 
-*~
+.vscode
+py_dict
+.settings
+

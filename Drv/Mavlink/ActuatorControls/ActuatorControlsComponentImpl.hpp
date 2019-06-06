@@ -60,6 +60,14 @@ namespace Drv {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      //! Handler implementation for SerReadPort
+      //!
+      void SerReadPort_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+          SerialReadStatus &status /*!< Status of read*/
+      );
+    
       //! Handler implementation for pwmSetDuty
       //!
       void pwmSetDuty_handler(

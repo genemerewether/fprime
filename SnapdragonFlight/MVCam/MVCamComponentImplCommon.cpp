@@ -463,9 +463,9 @@ namespace SnapdragonFlight {
                     }
 
         switch (id) {
-            case PARAMID_EXPOSUREMODE:
+            case PARAMID_MVCAM_EXPOSUREMODE:
             {
-                ExposureMode temp = paramGet_exposureMode(valid);
+                ExposureMode temp = paramGet_mvcam_exposureMode(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
                     if (m_initialized) {
@@ -500,9 +500,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSUREFIXED:
+            case PARAMID_MVCAM_EXPOSUREFIXED:
                 if (EXPOSURE_FIXED == m_exposureMode) {
-                    U32 exposure = paramGet_exposureFixed(valid);
+                    U32 exposure = paramGet_mvcam_exposureFixed(valid);
                     if ((Fw::PARAM_VALID != valid) &&
                         (Fw::PARAM_DEFAULT != valid)) {
                         // TODO(mereweth) - issue EVR
@@ -522,9 +522,9 @@ namespace SnapdragonFlight {
                     }
                 }
                 break;
-            case PARAMID_GAINFIXED:
+            case PARAMID_MVCAM_GAINFIXED:
                 if (EXPOSURE_FIXED == m_exposureMode) {
-                    U32 gain = paramGet_gainFixed(valid);
+                    U32 gain = paramGet_mvcam_gainFixed(valid);
                     if ((Fw::PARAM_VALID != valid) &&
                         (Fw::PARAM_DEFAULT != valid)) {
                         // TODO(mereweth) - issue EVR
@@ -544,9 +544,9 @@ namespace SnapdragonFlight {
                     }
                 }
                 break;
-            case PARAMID_BRIGHTNESS:
+            case PARAMID_MVCAM_BRIGHTNESS:
             {
-                U8 temp = paramGet_brightness(valid);
+                U8 temp = paramGet_mvcam_brightness(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -563,9 +563,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_CONTRAST:
+            case PARAMID_MVCAM_CONTRAST:
             {
-                U8 temp = paramGet_contrast(valid);
+                U8 temp = paramGet_mvcam_contrast(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -582,9 +582,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_SHARPNESS:
+            case PARAMID_MVCAM_SHARPNESS:
             {
-                U8 temp = paramGet_sharpness(valid);
+                U8 temp = paramGet_mvcam_sharpness(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -601,9 +601,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_ISO:
+            case PARAMID_MVCAM_ISO:
             {
-                PostProcISO temp = paramGet_ISO(valid);
+                PostProcISO temp = paramGet_mvcam_ISO(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -620,9 +620,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_MAXDELTA:
+            case PARAMID_MVCAM_MAXDELTA:
             {
-                U32 temp = paramGet_maxDelta(valid);
+                U32 temp = paramGet_mvcam_maxDelta(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -637,9 +637,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSURECHANGETHRESHOLD:
+            case PARAMID_MVCAM_EXPOSURECHANGETHRESHOLD:
             {
-                U32 temp = paramGet_exposureChangeThreshold(valid);
+                U32 temp = paramGet_mvcam_exposureChangeThreshold(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -654,9 +654,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINCHANGETHRESHOLD:
+            case PARAMID_MVCAM_GAINCHANGETHRESHOLD:
             {
-                U32 temp = paramGet_gainChangeThreshold(valid);
+                U32 temp = paramGet_mvcam_gainChangeThreshold(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -671,9 +671,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSUREMIN:
+            case PARAMID_MVCAM_EXPOSUREMIN:
             {
-                U32 temp = paramGet_exposureMin(valid);
+                U32 temp = paramGet_mvcam_exposureMin(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -694,9 +694,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSUREMAX:
+            case PARAMID_MVCAM_EXPOSUREMAX:
             {
-                U32 temp = paramGet_exposureMax(valid);
+                U32 temp = paramGet_mvcam_exposureMax(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -717,9 +717,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINMIN:
+            case PARAMID_MVCAM_GAINMIN:
             {
-                U32 temp = paramGet_gainMin(valid);
+                U32 temp = paramGet_mvcam_gainMin(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -740,9 +740,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINMAX:
+            case PARAMID_MVCAM_GAINMAX:
             {
-                U32 temp = paramGet_gainMax(valid);
+                U32 temp = paramGet_mvcam_gainMax(valid);
                 if ((Fw::PARAM_VALID != valid) &&
                     (Fw::PARAM_DEFAULT != valid)) {
                     // TODO(mereweth) - issue EVR
@@ -763,9 +763,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSURECOST:
+            case PARAMID_MVCAM_EXPOSURECOST:
             {
-                F32 temp = paramGet_exposureCost(valid);
+                F32 temp = paramGet_mvcam_exposureCost(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -778,9 +778,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINCOST:
+            case PARAMID_MVCAM_GAINCOST:
             {
-                F32 temp = paramGet_gainCost(valid);
+                F32 temp = paramGet_mvcam_gainCost(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -793,9 +793,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_FILTERSIZE:
+            case PARAMID_MVCAM_FILTERSIZE:
             {
-                U8 temp = paramGet_filterSize(valid);
+                U8 temp = paramGet_mvcam_filterSize(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -808,9 +808,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSURESTART:
+            case PARAMID_MVCAM_EXPOSURESTART:
             {
-                F32 temp = paramGet_exposureStart(valid);
+                F32 temp = paramGet_mvcam_exposureStart(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -823,9 +823,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINSTART:
+            case PARAMID_MVCAM_GAINSTART:
             {
-                F32 temp = paramGet_gainStart(valid);
+                F32 temp = paramGet_mvcam_gainStart(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -838,9 +838,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_ENABLEHISTOGRAMCOST:
+            case PARAMID_MVCAM_ENABLEHISTOGRAMCOST:
             {
-                bool temp = paramGet_enableHistogramCost(valid);
+                bool temp = paramGet_mvcam_enableHistogramCost(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -853,9 +853,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_THRESHOLDUNDERFLOWED:
+            case PARAMID_MVCAM_THRESHOLDUNDERFLOWED:
             {
-                U8 temp = paramGet_thresholdUnderflowed(valid);
+                U8 temp = paramGet_mvcam_thresholdUnderflowed(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -868,9 +868,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_THRESHOLDSATURATED:
+            case PARAMID_MVCAM_THRESHOLDSATURATED:
             {
-                U8 temp = paramGet_thresholdSaturated(valid);
+                U8 temp = paramGet_mvcam_thresholdSaturated(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -883,9 +883,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_SYSTEMBRIGHTNESSMARGIN:
+            case PARAMID_MVCAM_SYSTEMBRIGHTNESSMARGIN:
             {
-                F32 temp = paramGet_systemBrightnessMargin(valid);
+                F32 temp = paramGet_mvcam_systemBrightnessMargin(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -898,9 +898,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSUREMINHIST:
+            case PARAMID_MVCAM_EXPOSUREMINHIST:
             {
-                F32 temp = paramGet_exposureMinHist(valid);
+                F32 temp = paramGet_mvcam_exposureMinHist(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -913,9 +913,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSURESOFTMAXHIST:
+            case PARAMID_MVCAM_EXPOSURESOFTMAXHIST:
             {
-                F32 temp = paramGet_exposureSoftMaxHist(valid);
+                F32 temp = paramGet_mvcam_exposureSoftMaxHist(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -928,9 +928,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_EXPOSUREMAXHIST:
+            case PARAMID_MVCAM_EXPOSUREMAXHIST:
             {
-                F32 temp = paramGet_exposureMaxHist(valid);
+                F32 temp = paramGet_mvcam_exposureMaxHist(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -943,9 +943,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINMINHIST:
+            case PARAMID_MVCAM_GAINMINHIST:
             {
-                F32 temp = paramGet_gainMinHist(valid);
+                F32 temp = paramGet_mvcam_gainMinHist(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -958,9 +958,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINSOFTMAXHIST:
+            case PARAMID_MVCAM_GAINSOFTMAXHIST:
             {
-                F32 temp = paramGet_gainSoftMaxHist(valid);
+                F32 temp = paramGet_mvcam_gainSoftMaxHist(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -973,9 +973,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_GAINMAXHIST:
+            case PARAMID_MVCAM_GAINMAXHIST:
             {
-                F32 temp = paramGet_gainMaxHist(valid);
+                F32 temp = paramGet_mvcam_gainMaxHist(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -988,9 +988,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_LOGEGPSTEPSIZEMIN:
+            case PARAMID_MVCAM_LOGEGPSTEPSIZEMIN:
             {
-                F32 temp = paramGet_logEGPStepSizeMin(valid);
+                F32 temp = paramGet_mvcam_logEGPStepSizeMin(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -1003,9 +1003,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_LOGEGPSTEPSIZEMAX:
+            case PARAMID_MVCAM_LOGEGPSTEPSIZEMAX:
             {
-                F32 temp = paramGet_logEGPStepSizeMax(valid);
+                F32 temp = paramGet_mvcam_logEGPStepSizeMax(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
@@ -1018,9 +1018,9 @@ namespace SnapdragonFlight {
                 }
             }
                 break;
-            case PARAMID_CALLBACK:
+            case PARAMID_MVCAM_CALLBACK:
             {
-                CallbackType temp = paramGet_callback(valid);
+                CallbackType temp = paramGet_mvcam_callback(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
                     if (m_waitingImage || m_activated) {

@@ -19,15 +19,15 @@
 |Event Name|ID|Description|Arg Name|Arg Type|Arg Size|Description
 |---|---|---|---|---|---|---|
 |HR_DataReceiveError|0 (0x0)|FastRPC or memory error| | | | |
-| | | |error|HR_ReceiveError||The receive error code|    
-| | | |stat|I32||Status code - depends on error type|    
+| | | |error|HR_ReceiveError||The receive error code|
+| | | |stat|I32||Status code - depends on error type|
 |HR_InvalidPortNum|1 (0x1)|Input data packet had a invalid port number, ie port number is not connected.| | | | |
-| | | |PortType|HR_PortType||Type of port that was not connected|    
-| | | |portNum|U8|||    
+| | | |PortType|HR_PortType||Type of port that was not connected|
+| | | |portNum|U8|||
 |HR_BadSerialPortCall|2 (0x2)|Bad status returned from output Serial port call, ie HexPortsOut() call had issues deserializing the buffer.| | | | |
-| | | |status|I32|||    
-| | | |portNum|U8|||    
+| | | |status|I32|||
+| | | |portNum|U8|||
 |HR_MemoryError|3 (0x3)|Allocate or deallocate error| | | | |
-| | | |error|HR_MemoryError||Type of memory operation that failed|    
+| | | |error|HR_MemoryError||Type of memory operation that failed|
 |HR_WriteError|4 (0x4)|Send error in calling FastRPC write function| | | | |
-| | | |error|I32||The error code|    
+| | | |error|I32||The error code|

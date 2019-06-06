@@ -9,7 +9,6 @@ enum {
 };
 
 #include <Fw/Types/Assert.hpp>
-#include <BLIMPREF/Top/TargetInit.hpp>
 #include <Os/Task.hpp>
 #include <Os/Log.hpp>
 #include <Fw/Types/MallocAllocator.hpp>
@@ -234,7 +233,7 @@ void allocComps() {
 #endif
                         rgDcplDivs,FW_NUM_ARRAY_ELEMENTS(rgDcplDivs));
  
-    NATIVE_INT_TYPE rgGncDivs[] = {1, 50};
+    NATIVE_INT_TYPE rgGncDivs[] = {1, 100};
 
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
 #if FW_OBJECT_NAMES == 1
@@ -411,7 +410,8 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(bool internalIMUProp) {  
+void manualConstruct(bool internalIMUProp,
+                     bool externalIMU) {  
     // switch based on command line options
     if (internalIMUProp) {
         attFilter_ptr->set_odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
@@ -421,12 +421,19 @@ void manualConstruct(bool internalIMUProp) {
     }
 
     // imu decoupler
-    rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
-    imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
+    if (!externalIMU) {
+        rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));
+        imuDecouple_ptr->set_DataOut_OutputPort(0, rgDev_ptr->get_CycleIn_InputPort(0));
+    }
 
     // passive data passer
-    imuProc_ptr->set_DownsampledImu_OutputPort(0, passiveDataPasser_ptr->get_DataIn_InputPort(0));
-    passiveDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+    if (externalIMU) {
+        filterIface_ptr->set_Imu_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+    }
+    else {
+        imuProc_ptr->set_DownsampledImu_OutputPort(0, passiveDataPasser_ptr->get_DataIn_InputPort(0));
+        passiveDataPasser_ptr->set_DataOut_OutputPort(0, attFilter_ptr->get_Imu_InputPort(0));
+    }
 
     // TODO(Mereweth) - all connections into passive rgs from another thread
     const U32 NUM_CMD_PORTS = Svc::CommandDispatcherImpl::NUM_CMD_PORTS;
@@ -494,13 +501,12 @@ void manualConstruct(bool internalIMUProp) {
 }
 
 void constructApp(unsigned int port_number,
-          char* hostname,
+                  char* hostname,
                   unsigned int boot_count,
-          bool startSocketNow,
-          bool internalIMUProp) {
+                  bool startSocketNow,
+                  bool internalIMUProp,
+                  bool externalIMU) {
     allocComps();
-
-    localTargetInit();
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
@@ -556,8 +562,8 @@ void constructApp(unsigned int port_number,
     attFilter_ptr->init(0);
     mpu9250_ptr->init(0);
     
-    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ);
-    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ);
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_100HZ_DLPF_ACCEL_41HZ_GYRO_41HZ);
+    //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_50HZ_DLPF_ACCEL_20HZ_GYRO_20HZ);
 
     spiDrvSnap_ptr->init(0);
     i2cDrvSnap_ptr->init(0);
@@ -579,7 +585,8 @@ void constructApp(unsigned int port_number,
     // Connect rate groups to rate group driver
     constructBLIMPREFArchitecture();
 
-    manualConstruct(internalIMUProp);
+    manualConstruct(internalIMUProp,
+                    externalIMU);
 
     /* Register commands */
     fatalHandler_ptr->regCommands();
@@ -625,7 +632,7 @@ void constructApp(unsigned int port_number,
     hwEnablePinSnap_ptr->open(28, SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_IN);
 
     // J15, BLSP9
-    i2cDrvSnap_ptr->open(9, SnapdragonFlight::I2C_FREQUENCY_400KHZ);
+    i2cDrvSnap_ptr->open(9);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);
@@ -663,9 +670,9 @@ void constructApp(unsigned int port_number,
     // Initialize socket server
     if (port_number && hostname) {
         if (startSocketNow) {
-        sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->startSocketTask(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         } else {
-        sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
+            sockGndIf_ptr->setSocketTaskProperties(40, 20*1024, port_number, hostname, Svc::SocketGndIfImpl::SEND_TCP);
         }
     }
     
@@ -675,13 +682,22 @@ void constructApp(unsigned int port_number,
 
 }
 
+void run1cycle(void) {
+    // call interrupt to emulate a gnc cycle
+    Svc::InputCyclePort* port = rgDecouple_ptr->get_CycleIn_InputPort(0);
+    Svc::TimerVal cycleStart;
+    cycleStart.take();
+    port->invoke(cycleStart);
+    Os::Task::delay(10);
+}
+
 void run1testCycle(void) {
-    // call interrupt to emulate a clock
+    // call interrupt to emulate a imu strobe
     Svc::InputCyclePort* port = rgDcplDrv_ptr->get_CycleIn_InputPort(0);
     Svc::TimerVal cycleStart;
     cycleStart.take();
     port->invoke(cycleStart);
-    Os::Task::delay(1);
+    Os::Task::delay(10);
 }
 
 void run1backupCycle(void) {
@@ -720,7 +736,7 @@ void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
           "-p\tport_number\n"
           "-a\thostname/IP address\n"
-          "-i\tUse odometry from internal IMU propagation\n"
+          "-i\tUse internal IMU\n"
           "-b\tBoot count\n"
           "-s\tStart socket immediately\n");
 }
@@ -752,7 +768,8 @@ int main(int argc, char* argv[]) {
     char *hostname = NULL;
     bool startSocketNow = false;
     U32 boot_count = 0;
-    bool internalIMUProp = false;
+    bool internalIMUProp = true;
+    bool externalIMU = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
@@ -776,7 +793,7 @@ int main(int argc, char* argv[]) {
                 startSocketNow = true;
                 break;
             case 'i':
-                internalIMUProp = true;
+                externalIMU = false;
                 break;
             case '?':
                 return 1;
@@ -794,9 +811,10 @@ int main(int argc, char* argv[]) {
     (void) printf("Hit Ctrl-C to quit\n");
     
     constructApp(port_number,
-         hostname, boot_count,
-         startSocketNow,
-         internalIMUProp);
+                 hostname, boot_count,
+                 startSocketNow,
+                 internalIMUProp,
+                 externalIMU);
     //dumparch();
     
     ros::start();
@@ -815,31 +833,38 @@ int main(int argc, char* argv[]) {
 
     ros::console::shutdown();
 
-    while (!mpu9250_ptr->isReady()) {
-        Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
-        Svc::TimerVal cycleStart;
-        cycleStart.take();
-        port->invoke(cycleStart);
-        Os::Task::delay(10);
-    }
+    if (!externalIMU) {
+        while (!mpu9250_ptr->isReady()) {
+            Svc::InputCyclePort* port = rgDev_ptr->get_CycleIn_InputPort(0);
+            Svc::TimerVal cycleStart;
+            cycleStart.take();
+            port->invoke(cycleStart);
+            Os::Task::delay(10);
+        }
 #ifdef BUILD_SDFLIGHT // SDFLIGHT vs LINUX
-    imuDRIntSnap_ptr->startIntTask(99);
+        imuDRIntSnap_ptr->startIntTask(99);
 #else
    
 #ifdef LINUX_DEV
-    imuDRInt_ptr->startIntTask(99);
+        imuDRInt_ptr->startIntTask(99);
 #endif // LINUX_DEV
 #endif
+    }
     rgDecouple_ptr->setEnabled(true);
     
     int backupCycle = 0;
 
     while (!terminate) {
-        run1backupCycle();
-        backupCycle++;
+        if (externalIMU) {
+            run1cycle();
+        }
+        else {
+            run1backupCycle();
+            backupCycle++;
 #if !defined(LINUX_DEV) and !defined(BUILD_SDFLIGHT)
-    run1testCycle();
+            run1testCycle();
 #endif // LINUX_DEV
+        }
     }
 
     rgDecouple_ptr->setEnabled(false);

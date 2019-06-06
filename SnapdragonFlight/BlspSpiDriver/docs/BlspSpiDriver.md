@@ -13,13 +13,13 @@
 |Event Name|ID|Description|Arg Name|Arg Type|Arg Size|Description
 |---|---|---|---|---|---|---|
 |SPI_OpenError|0 (0x0)|SPI open error| | | | |
-| | | |device|I32||The device|    
-| | | |error|I32||The error code|    
+| | | |device|I32||The device|
+| | | |error|I32||The error code|
 |SPI_ConfigError|1 (0x1)|SPI config error| | | | |
-| | | |device|I32||The device|    
-| | | |error|I32||The error code|    
+| | | |device|I32||The device|
+| | | |error|I32||The error code|
 |SPI_WriteError|2 (0x2)|SPI write error| | | | |
-| | | |device|I32||The device|    
-| | | |error|I32||The error code|    
+| | | |device|I32||The device|
+| | | |error|I32||The error code|
 |SPI_PortOpened|4 (0x4)|SPI open notification| | | | |
-| | | |device|I32||The device|    
+| | | |device|I32||The device|
