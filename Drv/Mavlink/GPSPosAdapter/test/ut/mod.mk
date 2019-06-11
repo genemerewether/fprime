@@ -1,13 +1,19 @@
 TEST_SRC = 	TesterBase.cpp \
-			Tester.cpp
-
-#main.cpp
+		GTestBase.cpp \
+			Tester.cpp \
+			main.cpp
 
 TEST_MODS = Drv/Mavlink/GPSPosAdapter \
 			Drv/SerialDriverPorts \
 			ROS/Gen/mav_msgs/Types \
 			ROS/Gen/mav_msgs/Ports \
+			ROS/Gen/std_msgs/Types \
+			ROS/Gen/std_msgs/Ports \
+			ROS/Gen/geometry_msgs/Types \
+			ROS/Gen/geometry_msgs/Ports \
 			Svc/Cycle \
+			Svc/Sched \
+			Fw/Buffer \
 			Fw/Tlm \
 			Fw/Comp \
 			Fw/Cmd \

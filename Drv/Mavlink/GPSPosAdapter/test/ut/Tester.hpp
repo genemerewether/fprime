@@ -49,9 +49,9 @@ namespace Drv {
       // Tests
       // ---------------------------------------------------------------------- 
 
-      //! To do
+      //! Read/write from connected Pixhawk over UART
       //!
-      void toDo(void);
+      void uartConnTest(void);
 
     private:
 
