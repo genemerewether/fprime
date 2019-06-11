@@ -12,9 +12,14 @@ Or, after cloning, run:
 git submodule update --init --recursive 
 ```
 
-To get the F’ dependencies on Ubuntu (all dependencies are available through Homebrew on Mac):
+To get the F’ dependencies on Ubuntu:
 ```
 sudo apt-get install pkg-config g++ python-pip python-lxml python-tk python-dev
+```
+
+To get F’ dependencies on Mac:
+```
+brew install tcl-tk libxml2
 ```
 
 On all platforms (modify the pip command if you don’t want a global install)
