@@ -5,6 +5,10 @@ echo RELATED > /sys/bus/msm_subsys/devices/subsys4/restart_level
 insmod /golden/dsp-offset_taskset_cpustat_mqueue.ko
 sysctl -w kernel.sched_rt_runtime_us=-1
 
+export SHLVL=2
+export TERM=linux
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 export ROS_HOME=/eng/ros
 export ROS_PACKAGE_PATH=/home/root/quest_ws/src:/opt/ros/indigo/share:/opt/ros/indigo/stacks
 export PYTHONPATH=/home/root/quest_ws/devel/lib/python2.7/site-packages:/opt/ros/indigo/lib/python2.7/site-packages

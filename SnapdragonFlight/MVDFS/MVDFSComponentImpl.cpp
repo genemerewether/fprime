@@ -97,35 +97,35 @@ namespace SnapdragonFlight {
       // NOTE(mereweth) - saves the copy to separate joined rows
       m_camCfg.camera[1].memoryStride = 1280;
 
-      m_camCfg.camera[0].principalPoint[0] = 320.0;
-      m_camCfg.camera[0].principalPoint[1] = 240.0;
-      m_camCfg.camera[0].focalLength[0] = 435.0;
-      m_camCfg.camera[0].focalLength[1] = 435.0;
+      m_camCfg.camera[0].principalPoint[0] = 327.25028370506277;
+      m_camCfg.camera[0].principalPoint[1] = 240.52747319394973;
+      m_camCfg.camera[0].focalLength[0] = 434.0397908576731;
+      m_camCfg.camera[0].focalLength[1] = 433.8185119766046;
       m_camCfg.camera[0].uvOffset = 0;
       m_camCfg.camera[0].distortionModel = 4;
-      m_camCfg.camera[0].distortion[0] = 0.045;
-      m_camCfg.camera[0].distortion[1] = -0.12;
-      m_camCfg.camera[0].distortion[2] = 0.001;
-      m_camCfg.camera[0].distortion[3] = 0.0;
+      m_camCfg.camera[0].distortion[0] = 0.010214217031416842;
+      m_camCfg.camera[0].distortion[1] = -0.04651010371555157;
+      m_camCfg.camera[0].distortion[2] = -0.0017014074768636185;
+      m_camCfg.camera[0].distortion[3] = 0.0013863895250307325;
 
-      m_camCfg.camera[1].principalPoint[0] = 320.0;
-      m_camCfg.camera[1].principalPoint[1] = 240.0;
-      m_camCfg.camera[1].focalLength[0] = 435.0;
-      m_camCfg.camera[1].focalLength[1] = 435.0;
+      m_camCfg.camera[1].principalPoint[0] = 320.34588249858376;
+      m_camCfg.camera[1].principalPoint[1] = 244.4353351783047;
+      m_camCfg.camera[1].focalLength[0] = 436.7596303746942;
+      m_camCfg.camera[1].focalLength[1] = 436.4226057245768;
       m_camCfg.camera[1].uvOffset = 0;
       m_camCfg.camera[1].distortionModel = 4;
-      m_camCfg.camera[1].distortion[0] = 0.045;
-      m_camCfg.camera[1].distortion[1] = -0.12;
-      m_camCfg.camera[1].distortion[2] = 0.001;
-      m_camCfg.camera[1].distortion[3] = 0.0;
+      m_camCfg.camera[1].distortion[0] = 0.0014070626511820305;
+      m_camCfg.camera[1].distortion[1] = -0.03208074310964145;
+      m_camCfg.camera[1].distortion[2] = -0.0021471073082785313;
+      m_camCfg.camera[1].distortion[3] = 0.0008696973644813725;
       
-      m_camCfg.translation[0] = -0.079395;
-      m_camCfg.translation[1] = 0.000653;
-      m_camCfg.translation[2] = -0.000398;
+      m_camCfg.translation[0] = -0.08057393152744473;
+      m_camCfg.translation[1] = 0.0028380369090344037;
+      m_camCfg.translation[2] = -0.00025007902285991877;
       // scaled axis-angle
-      m_camCfg.rotation[0] = 0.008761;
-      m_camCfg.rotation[1] = -0.018536;
-      m_camCfg.rotation[2] = -0.026348;
+      m_camCfg.rotation[0] = -0.0022546;
+      m_camCfg.rotation[1] = -0.0086814;
+      m_camCfg.rotation[2] = -0.0749294;
 
       this->m_mvDFSPtr = 
         mvDFS_Initialize(&m_camCfg,
