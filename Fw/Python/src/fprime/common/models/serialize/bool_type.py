@@ -25,7 +25,7 @@ class BoolType(type_base.BaseType):
 
     def _check_val(self, val):
         # Make sure deserialize can set val
-        if val is not None and self.__do_check:
+        if val is not None and hasattr(self, '__do_check') and self.__do_check:
             if not type(val) == type(bool()):
                 raise TypeMismatchException(type(bool()),type(val))
 
