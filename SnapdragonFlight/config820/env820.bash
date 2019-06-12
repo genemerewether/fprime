@@ -10,8 +10,8 @@ export TERM=linux
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 export ROS_HOME=/eng/ros
-export ROS_PACKAGE_PATH=/home/root/quest_ws/src:/opt/ros/indigo/share:/opt/ros/indigo/stacks
-export PYTHONPATH=/home/root/quest_ws/devel/lib/python2.7/site-packages:/opt/ros/indigo/lib/python2.7/site-packages
+export ROS_PACKAGE_PATH=/opt/ros/indigo/share:/opt/ros/indigo/stacks
+export PYTHONPATH=/opt/ros/indigo/lib/python2.7/site-packages
 export ROS_ETC_DIR=/opt/ros/indigo/etc/ros
 export ROS_ROOT=/opt/ros
 export ROS_DISTRO=indigo
