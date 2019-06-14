@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../xml/ISF_Component_Schema.rnc" type="compact"?>
+
+<component name="TimeSyncOffset" kind="active" namespace="Svc">
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Com/ComPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Drv/GpioDriverPorts/GpioWritePortAi.xml</import_port_type>
+    
+    <comment>A component that logs messages to a file</comment>
+    <ports>
+        <!-- Input scheduler port -->
+        <port name="SchedIn" data_type="Sched" kind="async_input" max_number="1">
+            <comment>
+            The rate group scheduler input
+            </comment>
+        </port>
+
+        <port name="LLTime" data_type="Fw::Time" kind="async_input" max_number="1">
+            <comment>
+	        low level time input port
+            </comment>
+        </port>
+
+        <port name="GPIOPulse" data_type="Drv::GpioWrite" kind="output" max_number="1">
+            <comment>
+            output port to send gpio pulse from host computer
+            </comment>
+        </port>
+
+        <port name="Offset" data_type="Fw::Time" kind="output" max_number="1">
+            <comment>
+            output port to send measured time sync offset
+            </comment>
+        </port>
+    </ports>
+
+    <telemetry>
+        <channel id="0" name="LLOffset" data_type="F64">
+            <comment>
+            offset tlm in seconds
+            </comment>
+        </channel>
+    </telemetry>
+             
+</component>

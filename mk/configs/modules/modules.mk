@@ -120,7 +120,8 @@ SVC_MODULES := \
 	Svc/UdpSender \
 	Svc/UdpReceiver \
 	Svc/CameraFrame \
-	Svc/IPCRelay
+	Svc/IPCRelay \
+	Svc/TimeSyncOffset
 
 DEMO_DRV_MODULES := \
 	Drv/DataTypes \
