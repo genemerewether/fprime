@@ -122,8 +122,14 @@ namespace Gnc {
           INPUTACT_VALID_MAX = INPUTACT_NORMALIZED
       };
 
+      enum I2CProtocol {
+        I2CProtoSimple,
+        I2CProtoShort,
+        I2CProtoLong
+      };
+    
       bool setupI2C(U32 actuator, I2CMetadata meta,
-                    bool useSimple,
+                    I2CProtocol i2cProto,
                     InputActuatorType inputActType, U32 inputActIdx);
 
       bool setupPwm(U32 actuator, PwmMetadata meta,
@@ -198,7 +204,8 @@ namespace Gnc {
           OUTPUT_PWM = OUTPUT_VALID_MIN,
           OUTPUT_I2C = 2,
           OUTPUT_I2C_SIMPLE = 3,
-          OUTPUT_VALID_MAX = OUTPUT_I2C_SIMPLE
+          OUTPUT_I2C_SHORT = 4,
+          OUTPUT_VALID_MAX = OUTPUT_I2C_SHORT
       };
 
       struct Feedback {
@@ -222,7 +229,7 @@ namespace Gnc {
               I2CMetadata i2cMeta;
           };
           InputActuatorType inputActType;
-     U32 inputActIdx;
+          U32 inputActIdx;
           Feedback feedback;
       } outputInfo[ACTADAP_MAX_ACTUATORS];
 
