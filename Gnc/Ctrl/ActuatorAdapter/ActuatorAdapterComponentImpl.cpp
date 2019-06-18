@@ -457,7 +457,7 @@ namespace Gnc {
                           i2cProto = I2CProtoLong; \
                           break; \
                       default: \
-                        return false; \
+                        return; \
                   } \
                   if (!setupI2C(i, i2c, i2cProto, \
                                 inputActType, inputActIdx)) { \
