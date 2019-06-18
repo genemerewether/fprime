@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/Python/schema/ISF/interface_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<interface name="ConvertTime" namespace="Fw">
+    <include_header>Fw/Time/Time.hpp</include_header>
+    <comment>
+        Time convert port
+    </comment>
+    <args>
+        <arg name="time" type="Fw::Time" pass_by="value">
+            <comment>The time to convert</comment>
+        </arg>
+        <arg name="timeBase" type="U32" pass_by="value">
+            <comment>TimeBase to convert to</comment>
+        </arg>
+        <arg name="timeContext" type="U32" pass_by="value">
+            <comment>TimeContext to convert to</comment>
+        </arg>
+    </args>
+    <return type="Fw::Time" pass_by="value"/>
+</interface>
