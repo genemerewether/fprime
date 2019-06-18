@@ -47,21 +47,9 @@ namespace Svc {
   // ----------------------------------------------------------------------
 
   void Tester ::
-    timeSyncTest(void) 
+    toDo(void) 
   {
     // TODO
-
-    // ASSERT_TLM_SIZE
-    // ASSERT_TLM_LLOffset_SIZE
-    // ASSERT_TLM_LLOffset
-
-    // ASSERT_FROM_PORT_HISTORY_SIZE
-    // ASSERT_from_GPIOPulse_SIZE
-    // ASSERT_from_GPIOPulse
-    // ASSERT_from_Offset_SIZE
-    // ASSERT_from_Offset
-
-    
   }
 
   // ----------------------------------------------------------------------
@@ -78,12 +66,13 @@ namespace Svc {
   }
 
   void Tester ::
-    from_Offset_handler(
+    from_ClockTimes_handler(
         const NATIVE_INT_TYPE portNum,
-        Fw::Time &time
+        Fw::Time time1,
+        Fw::Time time2
     )
   {
-    this->pushFromPortEntry_Offset(time);
+    this->pushFromPortEntry_ClockTimes(time1, time2);
   }
 
   // ----------------------------------------------------------------------
@@ -112,10 +101,10 @@ namespace Svc {
         this->get_from_GPIOPulse(0)
     );
 
-    // Offset
-    this->component.set_Offset_OutputPort(
+    // ClockTimes
+    this->component.set_ClockTimes_OutputPort(
         0, 
-        this->get_from_Offset(0)
+        this->get_from_ClockTimes(0)
     );
 
     // Tlm

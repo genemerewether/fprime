@@ -23,11 +23,17 @@
 #define ASSERT_TLM_SIZE(size) \
   this->assertTlm_size(__FILE__, __LINE__, size)
 
-#define ASSERT_TLM_LLOffset_SIZE(size) \
-  this->assertTlm_LLOffset_size(__FILE__, __LINE__, size)
+#define ASSERT_TLM_LLTime_SIZE(size) \
+  this->assertTlm_LLTime_size(__FILE__, __LINE__, size)
 
-#define ASSERT_TLM_LLOffset(index, value) \
-  this->assertTlm_LLOffset(__FILE__, __LINE__, index, value)
+#define ASSERT_TLM_LLTime(index, value) \
+  this->assertTlm_LLTime(__FILE__, __LINE__, index, value)
+
+#define ASSERT_TLM_HLTime_SIZE(size) \
+  this->assertTlm_HLTime_size(__FILE__, __LINE__, size)
+
+#define ASSERT_TLM_HLTime(index, value) \
+  this->assertTlm_HLTime(__FILE__, __LINE__, index, value)
 
 // ----------------------------------------------------------------------
 // Macros for typed user from port history assertions
@@ -62,30 +68,39 @@
     << "  Actual:   " << _e.state << "\n"; \
   }
 
-#define ASSERT_from_Offset_SIZE(size) \
-  this->assert_from_Offset_size(__FILE__, __LINE__, size)
+#define ASSERT_from_ClockTimes_SIZE(size) \
+  this->assert_from_ClockTimes_size(__FILE__, __LINE__, size)
 
-#define ASSERT_from_Offset(index, _time) \
+#define ASSERT_from_ClockTimes(index, _time1, _time2) \
   { \
-    ASSERT_GT(this->fromPortHistory_Offset->size(), static_cast<U32>(index)) \
+    ASSERT_GT(this->fromPortHistory_ClockTimes->size(), static_cast<U32>(index)) \
     << "\n" \
     << "  File:     " << __FILE__ << "\n" \
     << "  Line:     " << __LINE__ << "\n" \
-    << "  Value:    Index into history of from_Offset\n" \
+    << "  Value:    Index into history of from_ClockTimes\n" \
     << "  Expected: Less than size of history (" \
-    << this->fromPortHistory_Offset->size() << ")\n" \
+    << this->fromPortHistory_ClockTimes->size() << ")\n" \
     << "  Actual:   " << index << "\n"; \
-    const FromPortEntry_Offset& _e = \
-      this->fromPortHistory_Offset->at(index); \
-    ASSERT_EQ(_time, _e.time) \
+    const FromPortEntry_ClockTimes& _e = \
+      this->fromPortHistory_ClockTimes->at(index); \
+    ASSERT_EQ(_time1, _e.time1) \
     << "\n" \
     << "  File:     " << __FILE__ << "\n" \
     << "  Line:     " << __LINE__ << "\n" \
-    << "  Value:    Value of argument time at index " \
+    << "  Value:    Value of argument time1 at index " \
     << index \
-    << " in history of from_Offset\n" \
-    << "  Expected: " << _time << "\n" \
-    << "  Actual:   " << _e.time << "\n"; \
+    << " in history of from_ClockTimes\n" \
+    << "  Expected: " << _time1 << "\n" \
+    << "  Actual:   " << _e.time1 << "\n"; \
+    ASSERT_EQ(_time2, _e.time2) \
+    << "\n" \
+    << "  File:     " << __FILE__ << "\n" \
+    << "  Line:     " << __LINE__ << "\n" \
+    << "  Value:    Value of argument time2 at index " \
+    << index \
+    << " in history of from_ClockTimes\n" \
+    << "  Expected: " << _time2 << "\n" \
+    << "  Actual:   " << _e.time2 << "\n"; \
   }
 
 namespace Svc {
@@ -135,18 +150,39 @@ namespace Svc {
     protected:
 
       // ----------------------------------------------------------------------
-      // Channel: LLOffset
+      // Channel: LLTime
       // ----------------------------------------------------------------------
 
       //! Assert telemetry value in history at index
       //!
-      void assertTlm_LLOffset_size(
+      void assertTlm_LLTime_size(
           const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
           const U32 __callSiteLineNumber, /*!< The line number of the call site*/
           const U32 size /*!< The asserted size*/
       ) const;
 
-      void assertTlm_LLOffset(
+      void assertTlm_LLTime(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 __index, /*!< The index*/
+          const F64& val /*!< The channel value*/
+      ) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Channel: HLTime
+      // ----------------------------------------------------------------------
+
+      //! Assert telemetry value in history at index
+      //!
+      void assertTlm_HLTime_size(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 size /*!< The asserted size*/
+      ) const;
+
+      void assertTlm_HLTime(
           const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
           const U32 __callSiteLineNumber, /*!< The line number of the call site*/
           const U32 __index, /*!< The index*/
@@ -180,10 +216,10 @@ namespace Svc {
     protected:
 
       // ----------------------------------------------------------------------
-      // From port: Offset
+      // From port: ClockTimes
       // ----------------------------------------------------------------------
 
-      void assert_from_Offset_size(
+      void assert_from_ClockTimes_size(
           const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
           const U32 __callSiteLineNumber, /*!< The line number of the call site*/
           const U32 size /*!< The asserted size*/

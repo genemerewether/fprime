@@ -7,6 +7,7 @@
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePairPortAi.xml</import_port_type>  
     <import_port_type>Drv/GpioDriverPorts/GpioWritePortAi.xml</import_port_type>
     
     <comment>A component that logs messages to a file</comment>
@@ -30,17 +31,25 @@
             </comment>
         </port>
 
-        <port name="Offset" data_type="Fw::Time" kind="output" max_number="1">
+        <port name="ClockTimes" data_type="Fw::TimePair" kind="output" max_number="1">
             <comment>
-            output port to send measured time sync offset
+            output port to send high level and low level measured times
             </comment>
         </port>
     </ports>
 
     <telemetry>
-        <channel id="0" name="LLOffset" data_type="F64">
+        <channel id="0" name="LLTime" data_type="F64">
             <comment>
-            offset tlm in seconds
+            low level time tlm in seconds
+            </comment>
+        </channel>
+    </telemetry>
+
+    <telemetry>
+        <channel id="1" name="HLTime" data_type="F64">
+            <comment>
+            high level time tlm in seconds
             </comment>
         </channel>
     </telemetry>

@@ -76,11 +76,11 @@ namespace Svc {
           const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
-      //! Get the port that receives input from Offset
+      //! Get the port that receives input from ClockTimes
       //!
-      //! \return from_Offset[portNum]
+      //! \return from_ClockTimes[portNum]
       //!
-      Fw::InputTimePort* get_from_Offset(
+      Fw::InputTimePairPort* get_from_ClockTimes(
           const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
@@ -221,18 +221,20 @@ namespace Svc {
           bool state 
       );
 
-      //! Handler prototype for from_Offset
+      //! Handler prototype for from_ClockTimes
       //!
-      virtual void from_Offset_handler(
+      virtual void from_ClockTimes_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Time &time /*!< The U32 cmd argument*/
+          Fw::Time time1, /*!< first time*/
+          Fw::Time time2 /*!< second time*/
       ) = 0;
 
-      //! Handler base function for from_Offset
+      //! Handler base function for from_ClockTimes
       //!
-      void from_Offset_handlerBase(
+      void from_ClockTimes_handlerBase(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Time &time /*!< The U32 cmd argument*/
+          Fw::Time time1, /*!< first time*/
+          Fw::Time time2 /*!< second time*/
       );
 
     protected:
@@ -265,21 +267,23 @@ namespace Svc {
       History<FromPortEntry_GPIOPulse>
         *fromPortHistory_GPIOPulse;
 
-      //! Push an entry on the history for from_Offset
-      void pushFromPortEntry_Offset(
-          Fw::Time &time /*!< The U32 cmd argument*/
+      //! Push an entry on the history for from_ClockTimes
+      void pushFromPortEntry_ClockTimes(
+          Fw::Time time1, /*!< first time*/
+          Fw::Time time2 /*!< second time*/
       );
 
-      //! A history entry for from_Offset
+      //! A history entry for from_ClockTimes
       //!
       typedef struct {
-        Fw::Time time;
-      } FromPortEntry_Offset;
+        Fw::Time time1;
+        Fw::Time time2;
+      } FromPortEntry_ClockTimes;
 
-      //! The history for from_Offset
+      //! The history for from_ClockTimes
       //!
-      History<FromPortEntry_Offset>
-        *fromPortHistory_Offset;
+      History<FromPortEntry_ClockTimes>
+        *fromPortHistory_ClockTimes;
 
     protected:
 
@@ -325,11 +329,11 @@ namespace Svc {
       //!
       NATIVE_INT_TYPE getNum_from_GPIOPulse(void) const;
 
-      //! Get the number of from_Offset ports
+      //! Get the number of from_ClockTimes ports
       //!
-      //! \return The number of from_Offset ports
+      //! \return The number of from_ClockTimes ports
       //!
-      NATIVE_INT_TYPE getNum_from_Offset(void) const;
+      NATIVE_INT_TYPE getNum_from_ClockTimes(void) const;
 
       //! Get the number of from_Tlm ports
       //!
@@ -390,27 +394,52 @@ namespace Svc {
     protected:
 
       // ----------------------------------------------------------------------
-      // Channel: LLOffset
+      // Channel: LLTime
       // ----------------------------------------------------------------------
 
-      //! Handle channel LLOffset
+      //! Handle channel LLTime
       //!
-      virtual void tlmInput_LLOffset(
+      virtual void tlmInput_LLTime(
           const Fw::Time& timeTag, /*!< The time*/
           const F64& val /*!< The channel value*/
       );
 
-      //! A telemetry entry for channel LLOffset
+      //! A telemetry entry for channel LLTime
       //!
       typedef struct {
         Fw::Time timeTag;
         F64 arg;
-      } TlmEntry_LLOffset;
+      } TlmEntry_LLTime;
 
-      //! The history of LLOffset values
+      //! The history of LLTime values
       //!
-      History<TlmEntry_LLOffset>
-        *tlmHistory_LLOffset;
+      History<TlmEntry_LLTime>
+        *tlmHistory_LLTime;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Channel: HLTime
+      // ----------------------------------------------------------------------
+
+      //! Handle channel HLTime
+      //!
+      virtual void tlmInput_HLTime(
+          const Fw::Time& timeTag, /*!< The time*/
+          const F64& val /*!< The channel value*/
+      );
+
+      //! A telemetry entry for channel HLTime
+      //!
+      typedef struct {
+        Fw::Time timeTag;
+        F64 arg;
+      } TlmEntry_HLTime;
+
+      //! The history of HLTime values
+      //!
+      History<TlmEntry_HLTime>
+        *tlmHistory_HLTime;
 
     protected:
 
@@ -448,9 +477,9 @@ namespace Svc {
       //!
       Drv::InputGpioWritePort m_from_GPIOPulse[1];
 
-      //! From port connected to Offset
+      //! From port connected to ClockTimes
       //!
-      Fw::InputTimePort m_from_Offset[1];
+      Fw::InputTimePairPort m_from_ClockTimes[1];
 
       //! From port connected to Tlm
       //!
@@ -474,12 +503,13 @@ namespace Svc {
           bool state 
       );
 
-      //! Static function for port from_Offset
+      //! Static function for port from_ClockTimes
       //!
-      static void from_Offset_static(
+      static void from_ClockTimes_static(
           Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Time &time /*!< The U32 cmd argument*/
+          Fw::Time time1, /*!< first time*/
+          Fw::Time time2 /*!< second time*/
       );
 
       //! Static function for port from_Tlm

@@ -64,27 +64,27 @@ namespace Svc {
   }
 
   // ----------------------------------------------------------------------
-  // Channel: LLOffset
+  // Channel: LLTime
   // ----------------------------------------------------------------------
 
   void TimeSyncOffsetGTestBase ::
-    assertTlm_LLOffset_size(
+    assertTlm_LLTime_size(
         const char *const __callSiteFileName,
         const U32 __callSiteLineNumber,
         const U32 size
     ) const
   {
-    ASSERT_EQ(this->tlmHistory_LLOffset->size(), size)
+    ASSERT_EQ(this->tlmHistory_LLTime->size(), size)
       << "\n"
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
-      << "  Value:    Size of history for telemetry channel LLOffset\n"
+      << "  Value:    Size of history for telemetry channel LLTime\n"
       << "  Expected: " << size << "\n"
-      << "  Actual:   " << this->tlmHistory_LLOffset->size() << "\n";
+      << "  Actual:   " << this->tlmHistory_LLTime->size() << "\n";
   }
 
   void TimeSyncOffsetGTestBase ::
-    assertTlm_LLOffset(
+    assertTlm_LLTime(
         const char *const __callSiteFileName,
         const U32 __callSiteLineNumber,
         const U32 __index,
@@ -92,23 +92,73 @@ namespace Svc {
     )
     const
   {
-    ASSERT_LT(__index, this->tlmHistory_LLOffset->size())
+    ASSERT_LT(__index, this->tlmHistory_LLTime->size())
       << "\n"
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
-      << "  Value:    Index into history of telemetry channel LLOffset\n"
+      << "  Value:    Index into history of telemetry channel LLTime\n"
       << "  Expected: Less than size of history ("
-      << this->tlmHistory_LLOffset->size() << ")\n"
+      << this->tlmHistory_LLTime->size() << ")\n"
       << "  Actual:   " << __index << "\n";
-    const TlmEntry_LLOffset& e =
-      this->tlmHistory_LLOffset->at(__index);
+    const TlmEntry_LLTime& e =
+      this->tlmHistory_LLTime->at(__index);
     ASSERT_EQ(val, e.arg)
       << "\n"
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
       << "  Value:    Value at index "
       << __index
-      << " on telmetry channel LLOffset\n"
+      << " on telmetry channel LLTime\n"
+      << "  Expected: " << val << "\n"
+      << "  Actual:   " << e.arg << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // Channel: HLTime
+  // ----------------------------------------------------------------------
+
+  void TimeSyncOffsetGTestBase ::
+    assertTlm_HLTime_size(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(this->tlmHistory_HLTime->size(), size)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Size of history for telemetry channel HLTime\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->tlmHistory_HLTime->size() << "\n";
+  }
+
+  void TimeSyncOffsetGTestBase ::
+    assertTlm_HLTime(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 __index,
+        const F64& val
+    )
+    const
+  {
+    ASSERT_LT(__index, this->tlmHistory_HLTime->size())
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Index into history of telemetry channel HLTime\n"
+      << "  Expected: Less than size of history ("
+      << this->tlmHistory_HLTime->size() << ")\n"
+      << "  Actual:   " << __index << "\n";
+    const TlmEntry_HLTime& e =
+      this->tlmHistory_HLTime->at(__index);
+    ASSERT_EQ(val, e.arg)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Value at index "
+      << __index
+      << " on telmetry channel HLTime\n"
       << "  Expected: " << val << "\n"
       << "  Actual:   " << e.arg << "\n";
   }
@@ -154,23 +204,23 @@ namespace Svc {
   }
 
   // ----------------------------------------------------------------------
-  // From port: Offset
+  // From port: ClockTimes
   // ----------------------------------------------------------------------
 
   void TimeSyncOffsetGTestBase ::
-    assert_from_Offset_size(
+    assert_from_ClockTimes_size(
         const char *const __callSiteFileName,
         const U32 __callSiteLineNumber,
         const U32 size
     ) const
   {
-    ASSERT_EQ(size, this->fromPortHistory_Offset->size())
+    ASSERT_EQ(size, this->fromPortHistory_ClockTimes->size())
       << "\n"
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
-      << "  Value:    Size of history for from_Offset\n"
+      << "  Value:    Size of history for from_ClockTimes\n"
       << "  Expected: " << size << "\n"
-      << "  Actual:   " << this->fromPortHistory_Offset->size() << "\n";
+      << "  Actual:   " << this->fromPortHistory_ClockTimes->size() << "\n";
   }
 
 } // end namespace Svc

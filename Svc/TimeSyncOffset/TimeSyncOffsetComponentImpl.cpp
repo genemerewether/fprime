@@ -59,72 +59,57 @@ namespace Svc {
     )
   {
     // TODO
-
-    // output low pulse on port 0, does port num matter?
-    // how do i make the sendpulsetime a global within the class?
-    // do I init gpio out high in the constructor?
-    const int PORT_NUM = 0;
-    Fw::Time SendPulseTime = this->getTime();
-    this->GPIOPulse_out(PORT_NUM, false);
+    if (GPIOFlag == false)
+    {
+      num_sched_calls++;
+    }
+    else
+    {
+      num_sched_calls = 0;
+    }
+    
+    if (num_sched_calls > sched_timeout)
+    {
+      // trigger event
+    }
+    this->GPIOPulse_out(0, true);
+    GPIOFlag = true;
+    HLTime = this->getTime();
+    this->GPIOPulse_out(0, false);
+    GPIOFlag = false;
   }
 
   void TimeSyncOffsetComponentImpl ::
     LLTime_handler(
         const NATIVE_INT_TYPE portNum,
-        Fw::Time &time
+        Fw::Time &LLTime
     )
   {
     // TODO
 
-    // calculate time offset
-    // make sendpulsetime global???
-    Fw::Time offset = this->SendPulseTime - time;
-    this->Offset_out(offset);
+    // // should i just rename this above???
+    // Fw::Time LLTime = time;
+
+    // output HL and LL times
+    this->ClockTimes_out(0, LLTime, HLTime);
+
+    // // compute times in F64 for tlm channels
+    // U32 LLsec = LLTime.getSeconds();
+    // U32 LLusec = LLTime.getUSeconds();
+
+    // U32 HLsec = HLTime.getSeconds();
+    // U32 HLusec = HLTime.getUSeconds();
+
+    double LLTimeF64 = (double)LLTime.getSeconds() + (double)LLTime.getUSeconds() * 1.0e-6;
+    double HLTimeF64 = (double)HLTime.getSeconds() + (double)HLTime.getUSeconds() * 1.0e-6;
 
     // send tlm message, takes F64
-    // (float) offset
-    this->tlmWrite_LLOffset((float) offset);
+    this->tlmWrite_LLTime(LLTimeF64);
+    this->tlmWrite_HLTime(HLTimeF64);
 
     // reset gpio pulse high
     this->GPIOPulse_out(0, true);
-
-
-    // MathOpTlm opTlm;
-    // MathOperation opPort;
-    // MathOpEv opEv;
-    // switch (operation) {
-    //   case ADD:
-    //       opTlm = ADD_TLM;
-    //       opPort = MATH_ADD;
-    //       opEv = ADD_EV;
-    //       break;
-    //   case SUBTRACT:
-    //       opTlm = SUB_TLM;
-    //       opPort = MATH_SUB;
-    //       opEv = SUB_EV;
-    //       break;
-    //   case MULTIPLY:
-    //       opTlm = MULT_TLM;
-    //       opPort = MATH_MULTIPLY;
-    //       opEv = MULT_EV;
-    //       break;
-    //   case DIVIDE:
-    //       opTlm = DIV_TLM;
-    //       opPort = MATH_DIVIDE;
-    //       opEv = DIV_EV;
-    //       break;
-    //   default:
-    //       FW_ASSERT(0,operation);
-    //       break;
-    // }
-    // this->tlmWrite_MS_OP(opTlm);
-    // this->tlmWrite_MS_VAL1(val1);
-    // this->tlmWrite_MS_VAL2(val2);
-    // this->log_ACTIVITY_LO_MS_COMMAND_RECV(val1,val2,opEv);
-    // this->mathOut_out(0,val1,val2,opPort);
-    // // reply with completion status
-    // this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
-
+    GPIOFlag = true;
   }
 
 } // end namespace Svc

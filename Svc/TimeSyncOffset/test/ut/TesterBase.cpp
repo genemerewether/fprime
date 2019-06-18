@@ -36,13 +36,15 @@ namespace Svc {
 #endif
   {
     // Initialize telemetry histories
-    this->tlmHistory_LLOffset =
-      new History<TlmEntry_LLOffset>(maxHistorySize);
+    this->tlmHistory_LLTime =
+      new History<TlmEntry_LLTime>(maxHistorySize);
+    this->tlmHistory_HLTime =
+      new History<TlmEntry_HLTime>(maxHistorySize);
     // Initialize histories for typed user output ports
     this->fromPortHistory_GPIOPulse =
       new History<FromPortEntry_GPIOPulse>(maxHistorySize);
-    this->fromPortHistory_Offset =
-      new History<FromPortEntry_Offset>(maxHistorySize);
+    this->fromPortHistory_ClockTimes =
+      new History<FromPortEntry_ClockTimes>(maxHistorySize);
     // Clear history
     this->clearHistory();
   }
@@ -51,7 +53,8 @@ namespace Svc {
     ~TimeSyncOffsetTesterBase(void)
   {
     // Destroy telemetry histories
-    delete this->tlmHistory_LLOffset;
+    delete this->tlmHistory_LLTime;
+    delete this->tlmHistory_HLTime;
   }
 
   void TimeSyncOffsetTesterBase ::
@@ -93,31 +96,31 @@ namespace Svc {
 
     }
 
-    // Attach input port Offset
+    // Attach input port ClockTimes
 
     for (
         NATIVE_INT_TYPE _port = 0;
-        _port < this->getNum_from_Offset();
+        _port < this->getNum_from_ClockTimes();
         ++_port
     ) {
 
-      this->m_from_Offset[_port].init();
-      this->m_from_Offset[_port].addCallComp(
+      this->m_from_ClockTimes[_port].init();
+      this->m_from_ClockTimes[_port].addCallComp(
           this,
-          from_Offset_static
+          from_ClockTimes_static
       );
-      this->m_from_Offset[_port].setPortNum(_port);
+      this->m_from_ClockTimes[_port].setPortNum(_port);
 
 #if FW_OBJECT_NAMES == 1
       char _portName[80];
       (void) snprintf(
           _portName,
           sizeof(_portName),
-          "%s_from_Offset[%d]",
+          "%s_from_ClockTimes[%d]",
           this->m_objName,
           _port
       );
-      this->m_from_Offset[_port].setObjName(_portName);
+      this->m_from_ClockTimes[_port].setObjName(_portName);
 #endif
 
     }
@@ -251,9 +254,9 @@ namespace Svc {
   }
 
   NATIVE_INT_TYPE TimeSyncOffsetTesterBase ::
-    getNum_from_Offset(void) const
+    getNum_from_ClockTimes(void) const
   {
-    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_Offset);
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_ClockTimes);
   }
 
   NATIVE_INT_TYPE TimeSyncOffsetTesterBase ::
@@ -352,11 +355,11 @@ namespace Svc {
     return &this->m_from_GPIOPulse[portNum];
   }
 
-  Fw::InputTimePort *TimeSyncOffsetTesterBase ::
-    get_from_Offset(const NATIVE_INT_TYPE portNum)
+  Fw::InputTimePairPort *TimeSyncOffsetTesterBase ::
+    get_from_ClockTimes(const NATIVE_INT_TYPE portNum)
   {
-    FW_ASSERT(portNum < this->getNum_from_Offset(),static_cast<AssertArg>(portNum));
-    return &this->m_from_Offset[portNum];
+    FW_ASSERT(portNum < this->getNum_from_ClockTimes(),static_cast<AssertArg>(portNum));
+    return &this->m_from_ClockTimes[portNum];
   }
 
   Fw::InputTlmPort *TimeSyncOffsetTesterBase ::
@@ -394,18 +397,19 @@ namespace Svc {
   }
 
   void TimeSyncOffsetTesterBase ::
-    from_Offset_static(
+    from_ClockTimes_static(
         Fw::PassiveComponentBase *const callComp,
         const NATIVE_INT_TYPE portNum,
-        Fw::Time &time
+        Fw::Time time1,
+        Fw::Time time2
     )
   {
     FW_ASSERT(callComp);
     TimeSyncOffsetTesterBase* _testerBase =
       static_cast<TimeSyncOffsetTesterBase*>(callComp);
-    _testerBase->from_Offset_handlerBase(
+    _testerBase->from_ClockTimes_handlerBase(
         portNum,
-        time
+        time1, time2
     );
   }
 
@@ -444,7 +448,7 @@ namespace Svc {
   {
     this->fromPortHistorySize = 0;
     this->fromPortHistory_GPIOPulse->clear();
-    this->fromPortHistory_Offset->clear();
+    this->fromPortHistory_ClockTimes->clear();
   }
 
   // ----------------------------------------------------------------------
@@ -464,18 +468,19 @@ namespace Svc {
   }
 
   // ----------------------------------------------------------------------
-  // From port: Offset
+  // From port: ClockTimes
   // ----------------------------------------------------------------------
 
   void TimeSyncOffsetTesterBase ::
-    pushFromPortEntry_Offset(
-        Fw::Time &time
+    pushFromPortEntry_ClockTimes(
+        Fw::Time time1,
+        Fw::Time time2
     )
   {
-    FromPortEntry_Offset _e = {
-      time
+    FromPortEntry_ClockTimes _e = {
+      time1, time2
     };
-    this->fromPortHistory_Offset->push_back(_e);
+    this->fromPortHistory_ClockTimes->push_back(_e);
     ++this->fromPortHistorySize;
   }
 
@@ -497,15 +502,16 @@ namespace Svc {
   }
 
   void TimeSyncOffsetTesterBase ::
-    from_Offset_handlerBase(
+    from_ClockTimes_handlerBase(
         const NATIVE_INT_TYPE portNum,
-        Fw::Time &time
+        Fw::Time time1,
+        Fw::Time time2
     )
   {
-    FW_ASSERT(portNum < this->getNum_from_Offset(),static_cast<AssertArg>(portNum));
-    this->from_Offset_handler(
+    FW_ASSERT(portNum < this->getNum_from_ClockTimes(),static_cast<AssertArg>(portNum));
+    this->from_ClockTimes_handler(
         portNum,
-        time
+        time1, time2
     );
   }
 
@@ -549,15 +555,27 @@ namespace Svc {
 
     switch (id - idBase) {
 
-      case TimeSyncOffsetComponentBase::CHANNELID_LLOFFSET:
+      case TimeSyncOffsetComponentBase::CHANNELID_LLTIME:
       {
         F64 arg;
         const Fw::SerializeStatus _status = val.deserialize(arg);
         if (_status != Fw::FW_SERIALIZE_OK) {
-          printf("Error deserializing LLOffset: %d\n", _status);
+          printf("Error deserializing LLTime: %d\n", _status);
           return;
         }
-        this->tlmInput_LLOffset(timeTag, arg);
+        this->tlmInput_LLTime(timeTag, arg);
+        break;
+      }
+
+      case TimeSyncOffsetComponentBase::CHANNELID_HLTIME:
+      {
+        F64 arg;
+        const Fw::SerializeStatus _status = val.deserialize(arg);
+        if (_status != Fw::FW_SERIALIZE_OK) {
+          printf("Error deserializing HLTime: %d\n", _status);
+          return;
+        }
+        this->tlmInput_HLTime(timeTag, arg);
         break;
       }
 
@@ -574,21 +592,37 @@ namespace Svc {
     clearTlm(void)
   {
     this->tlmSize = 0;
-    this->tlmHistory_LLOffset->clear();
+    this->tlmHistory_LLTime->clear();
+    this->tlmHistory_HLTime->clear();
   }
 
   // ----------------------------------------------------------------------
-  // Channel: LLOffset
+  // Channel: LLTime
   // ----------------------------------------------------------------------
 
   void TimeSyncOffsetTesterBase ::
-    tlmInput_LLOffset(
+    tlmInput_LLTime(
         const Fw::Time& timeTag,
         const F64& val
     )
   {
-    TlmEntry_LLOffset e = { timeTag, val };
-    this->tlmHistory_LLOffset->push_back(e);
+    TlmEntry_LLTime e = { timeTag, val };
+    this->tlmHistory_LLTime->push_back(e);
+    ++this->tlmSize;
+  }
+
+  // ----------------------------------------------------------------------
+  // Channel: HLTime
+  // ----------------------------------------------------------------------
+
+  void TimeSyncOffsetTesterBase ::
+    tlmInput_HLTime(
+        const Fw::Time& timeTag,
+        const F64& val
+    )
+  {
+    TlmEntry_HLTime e = { timeTag, val };
+    this->tlmHistory_HLTime->push_back(e);
     ++this->tlmSize;
   }
 

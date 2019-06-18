@@ -44,7 +44,7 @@ namespace Svc {
 
       //! To do
       //!
-      void timeSyncTest(void);
+      void toDo(void);
 
     private:
 
@@ -59,11 +59,12 @@ namespace Svc {
           bool state 
       );
 
-      //! Handler for from_Offset
+      //! Handler for from_ClockTimes
       //!
-      void from_Offset_handler(
+      void from_ClockTimes_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Time &time /*!< The U32 cmd argument*/
+          Fw::Time time1, /*!< first time*/
+          Fw::Time time2 /*!< second time*/
       );
 
     private:

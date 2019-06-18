@@ -68,6 +68,13 @@ namespace Svc {
           Fw::Time &time /*!< The U32 cmd argument*/
       );
 
+    // hold on to trigger time
+    Fw::Time HLTime;
+    
+    // num of sched calls timeout to reset GPIO pin if we never recieve LLTime
+    int sched_timeout = 1;
+    bool GPIOFlag = true;
+    int num_sched_calls = 0;
 
     };
 
