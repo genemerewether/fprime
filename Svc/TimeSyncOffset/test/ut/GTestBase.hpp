@@ -36,6 +36,19 @@
   this->assertTlm_HLTime(__FILE__, __LINE__, index, value)
 
 // ----------------------------------------------------------------------
+// Macros for event history assertions
+// ----------------------------------------------------------------------
+
+#define ASSERT_EVENTS_SIZE(size) \
+  this->assertEvents_size(__FILE__, __LINE__, size)
+
+#define ASSERT_EVENTS_SchedIn_Timeout_SIZE(size) \
+  this->assertEvents_SchedIn_Timeout_size(__FILE__, __LINE__, size)
+
+#define ASSERT_EVENTS_SchedIn_Timeout(index, _sched_timeout) \
+  this->assertEvents_SchedIn_Timeout(__FILE__, __LINE__, index, _sched_timeout)
+
+// ----------------------------------------------------------------------
 // Macros for typed user from port history assertions
 // ----------------------------------------------------------------------
 
@@ -187,6 +200,37 @@ namespace Svc {
           const U32 __callSiteLineNumber, /*!< The line number of the call site*/
           const U32 __index, /*!< The index*/
           const F64& val /*!< The channel value*/
+      ) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Events
+      // ----------------------------------------------------------------------
+
+      void assertEvents_size(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 size /*!< The asserted size*/
+      ) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event: SchedIn_Timeout
+      // ----------------------------------------------------------------------
+
+      void assertEvents_SchedIn_Timeout_size(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 size /*!< The asserted size*/
+      ) const;
+
+      void assertEvents_SchedIn_Timeout(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 __index, /*!< The index*/
+          const U8 sched_timeout 
       ) const;
 
     protected:
