@@ -24,9 +24,9 @@ namespace ROS {
 
         ros::Time now = ros::Time::now();
 
-	time.set(TB_ROS_TIME, 0,
-		 now.sec,
-		 now.nsec / 1000);
+        time.set(TB_ROS_TIME, 0,
+                 now.sec,
+                 now.nsec / 1000);
     }
 
     void RosTimeImpl::init(NATIVE_INT_TYPE instance) {
