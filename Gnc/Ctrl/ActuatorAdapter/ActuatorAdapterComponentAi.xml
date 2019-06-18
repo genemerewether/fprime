@@ -26,13 +26,13 @@
         <port name="outputEnable" data_type="Drv::GpioRead"  kind="output"    max_number="1">
         </port>
 	
-        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycleData"  kind="output"    max_number="1">
+        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycleData"  kind="output"    max_number="2">
         </port>
 
-        <port name="escConfig" data_type="Drv::I2CConfig"  kind="output"    max_number="1">
+        <port name="escConfig" data_type="Drv::I2CConfig"  kind="output"    max_number="2">
         </port>
 
-        <port name="escReadWrite" data_type="Drv::I2CWriteRead"  kind="output"    max_number="1">
+        <port name="escReadWrite" data_type="Drv::I2CWriteRead"  kind="output"    max_number="2">
         </port>
 
         <port name="flySafe" data_type="ROS::mav_msgs::BoolStamped"  kind="sync_input" max_number="1">

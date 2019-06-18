@@ -100,12 +100,14 @@ namespace Gnc {
 
       struct PwmMetadata {
           U32 addr;
+          U32 port;
           bool reverse;
           CmdOutputMapMetadata cmdOutputMap;
       };
 
       struct I2CMetadata {
           U32 addr;
+          U32 port;
           bool reverse;
           FeedbackMetadata fbMeta;
           CmdOutputMapMetadata cmdOutputMap;

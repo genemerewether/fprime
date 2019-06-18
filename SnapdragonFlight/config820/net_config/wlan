@@ -68,22 +68,28 @@ do_ctrl_cld_ll () {
             exit 1
         fi
 
-        if [ $start_ap1 -eq 1 ]; then
-            echo "Adding second AP interface(wlan1)" > $DUMP_TO_KMSG
-            iw dev wlan0 interface add wlan1 type __ap
-            ifconfig wlan1 up 2> /dev/null
-            wpa_supplicant -Dnl80211 -iwlan1 -c /data/misc/wifi/wpa_supplicant.conf&
-            /usr/sbin/dhcpcd wlan1 -t 0 -o domain_name_servers --noipv4ll -h -b
-        fi
-
         mode="softap"
         if [ -f "$WLAN_CONF_FILE" ]; then
             read mode < $WLAN_CONF_FILE
         fi
 
         echo "Wlan bootup mode is $mode" > $DUMP_TO_KMSG
+        
+        if [ $start_ap1 -eq 1 ]; then
+            echo "Adding second interface(wlan1)" > $DUMP_TO_KMSG
+            iw dev wlan0 interface add wlan1 type __ap
+            if [ "$mode" == "sta,ap" ] || [ "$mode" == "sta" ]; then
+                echo "After adding second interface(wlan1)" > $DUMP_TO_KMSG
+                ifconfig wlan1 up 2> /dev/null
+                echo "After bringing second interface up(wlan1)" > $DUMP_TO_KMSG
+                wpa_supplicant -Dnl80211 -iwlan1 -c /data/misc/wifi/wpa_supplicant.conf&
+                echo "After starting wpa on (wlan1)" > $DUMP_TO_KMSG
+                /usr/sbin/dhcpcd wlan1 -t 0 -o domain_name_servers --noipv4ll -h -b
+                echo "After getting dhcp lease on (wlan1)" > $DUMP_TO_KMSG
+            fi
+        fi
 
-        if [ "$mode" == "softap" ] || [ "$mode" == "ap" ] || [ "$mode" == "sap" ]; then
+        if [ "$mode" == "sta,ap" ] || [ "$mode" == "ap" ]; then
             #start_ap
             echo "Starting hostapd and DHCP server" > $DUMP_TO_KMSG
             hostapd /data/misc/wifi/hostapd.conf &

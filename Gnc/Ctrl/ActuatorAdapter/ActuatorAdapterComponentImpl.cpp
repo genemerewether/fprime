@@ -105,8 +105,8 @@ namespace Gnc {
                       break;
                   case OUTPUT_PWM:
                   {
-                      if (this->isConnected_pwmSetDuty_OutputPort(0)) {
-                          PwmMetadata pwm = this->outputInfo[i].pwmMeta;
+                      PwmMetadata pwm = this->outputInfo[i].pwmMeta;
+                      if (this->isConnected_pwmSetDuty_OutputPort(pwm.port)) {
 
                           F32 duty[ACTADAP_MAX_ACTUATORS] = { 0.0 };
                           if (pwm.addr >= FW_NUM_ARRAY_ELEMENTS(duty)) {
@@ -117,7 +117,7 @@ namespace Gnc {
                           duty[pwm.addr] = this->outputInfo[i].pwmMeta.cmdOutputMap.offset;
                           U32 bitmask = 1 << pwm.addr;
                           Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
-                          this->pwmSetDuty_out(0, dutySer);
+                          this->pwmSetDuty_out(pwm.port, dutySer);
                       }
                       else {
                           //TODO(mereweth) - issue error
@@ -127,22 +127,23 @@ namespace Gnc {
                   case OUTPUT_I2C:
                   case OUTPUT_I2C_SIMPLE:
                   {
-                      if (this->isConnected_escConfig_OutputPort(0) &&
-                          this->isConnected_escReadWrite_OutputPort(0)) {
+                      I2CMetadata i2c = this->outputInfo[i].i2cMeta;
+                      if (this->isConnected_escConfig_OutputPort(i2c.port) &&
+                          this->isConnected_escReadWrite_OutputPort(i2c.port)) {
                           // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                          this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
+                          this->escConfig_out(i2c.port, 400, i2c.addr, 500);
 
                           Fw::Buffer readBufObj(0, 0, 0, 0); // no read
                           if (OUTPUT_I2C == this->outputInfo[i].type) {
                               // MSB is reverse bit
                               U8 writeBuf[3] = { 0 };
                               Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                              this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                           }
                           else { // simple protocol
                               U8 writeBuf[2] = { 0 };
                               Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                              this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                           }
                       }
                       else {
@@ -375,6 +376,11 @@ namespace Gnc {
                       if (Fw::PARAM_VALID != valid[j]) {  return;  } \
                   } \
                   \
+                  pwm.port = paramGet_a ## XXX ## _port(valid[0]); \
+                  if ((Fw::PARAM_VALID   != valid[0])  && \
+                      (Fw::PARAM_DEFAULT != valid[0])) { \
+                      return; \
+                  } \
                   /* TODO(mereweth) - update when number of parm slots updates */ \
                   switch (parmSlot) { \
                       case 0: \
@@ -405,6 +411,11 @@ namespace Gnc {
                       if (Fw::PARAM_VALID != valid[j]) {  return;  } \
                   } \
                   \
+                  i2c.port = paramGet_a ## XXX ## _port(valid[0]); \
+                  if ((Fw::PARAM_VALID   != valid[0])  && \
+                      (Fw::PARAM_DEFAULT != valid[0])) { \
+                      return; \
+                  } \
                   /* TODO(mereweth) - update when number of parm slots updates */ \
                   switch (parmSlot) { \
                       case 0: \
@@ -781,9 +792,9 @@ namespace Gnc {
                   break;
               case OUTPUT_PWM:
               {
-                  if (this->isConnected_pwmSetDuty_OutputPort(0)) {
+                  PwmMetadata pwm = this->outputInfo[i].pwmMeta;
+                  if (this->isConnected_pwmSetDuty_OutputPort(pwm.port)) {
                       Fw::Time cmdTime = this->getTime();
-                      PwmMetadata pwm = this->outputInfo[i].pwmMeta;
                       
                       if (out > pwm.cmdOutputMap.maxOut) {  out = pwm.cmdOutputMap.maxOut;  }
                       if (out < pwm.cmdOutputMap.minOut) {  out = pwm.cmdOutputMap.minOut;  }
@@ -795,13 +806,13 @@ namespace Gnc {
                           break;
                       }
 
-		      if (pwm.reverse) {  out = -out;  }
+                      if (pwm.reverse) {  out = -out;  }
                       duty[pwm.addr] = out + cmdOutputMap.offset;
                       U32 bitmask = 1 << pwm.addr;
                       DEBUG_PRINT("pwm esc idx %u, offset %f, duty %f\n",
                                   i, cmdOutputMap.offset, duty[pwm.addr]);
                       Drv::PwmSetDutyCycle dutySer(duty, FW_NUM_ARRAY_ELEMENTS(duty), bitmask);
-                      this->pwmSetDuty_out(0, dutySer);
+                      this->pwmSetDuty_out(pwm.port, dutySer);
                       this->outputInfo[i].feedback.cmdIn   = inVal;
                       this->outputInfo[i].feedback.cmd     = duty[pwm.addr];
                       this->outputInfo[i].feedback.cmdSec  = cmdTime.getSeconds();
@@ -815,13 +826,13 @@ namespace Gnc {
               case OUTPUT_I2C:
               case OUTPUT_I2C_SIMPLE:
               {
-                  if (this->isConnected_escConfig_OutputPort(0) &&
-                      this->isConnected_escReadWrite_OutputPort(0)) {
+                  I2CMetadata i2c = this->outputInfo[i].i2cMeta;
+                  if (this->isConnected_escConfig_OutputPort(i2c.port) &&
+                      this->isConnected_escReadWrite_OutputPort(i2c.port)) {
                       Fw::Time cmdTime = this->getTime();
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                      I2CMetadata i2c = this->outputInfo[i].i2cMeta;
-                      this->escConfig_out(0, 400, i2c.addr, 500);
+                      this->escConfig_out(i2c.port, 400, i2c.addr, 500);
 
                       I64 outInt = (I64) out;
                       if (outInt > i2c.cmdOutputMap.maxOut) {  outInt = i2c.cmdOutputMap.maxOut;  }
@@ -831,7 +842,7 @@ namespace Gnc {
                       if (OUTPUT_I2C == this->outputInfo[i].type) {
                           if (i2c.reverse) {  outInt = -outInt;  }
 
-                          I8 outI8[2] = { outInt >> 8, outInt };
+                          I8 outI8[2] = { (I8) (outInt >> 8), (I8) outInt };
                           U8 outU8[2] = { 0 };
                           memcpy(outU8, outI8, 2);
                           // MSB is reverse bit
@@ -842,13 +853,13 @@ namespace Gnc {
 
                           U8 writeBuf[3] = { 0x00, outU8[0], outU8[1] };
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                       }
                       else { // simple protocol
                           if (outInt < 0) {  outInt = 0;  }
                           U8 writeBuf[2] = { (U8) (outInt / 8), (U8) (outInt % 8) };
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                       }
 
                       this->outputInfo[i].feedback.cmdIn   = inVal;
@@ -877,15 +888,16 @@ namespace Gnc {
               case OUTPUT_I2C:
               case OUTPUT_I2C_SIMPLE:
               {
-                  if (this->isConnected_escConfig_OutputPort(0) &&
-                      this->isConnected_escReadWrite_OutputPort(0)) {
+                  I2CMetadata i2c = this->outputInfo[i].i2cMeta;
+                  if (this->isConnected_escConfig_OutputPort(i2c.port) &&
+                      this->isConnected_escReadWrite_OutputPort(i2c.port)) {
                       Fw::Time fbTime = this->getTime();
                       F64 fbTimeLast = (F64) this->outputInfo[i].feedback.fbSec +
                                        (F64) this->outputInfo[i].feedback.fbUsec * 0.001 * 0.001;
                       U32 countsLast = this->outputInfo[i].feedback.counts;
 
                       // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                      this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
+                      this->escConfig_out(i2c.port, 400, i2c.addr, 500);
 
                       U8 readBuf[9] = { 0 };
 
@@ -893,12 +905,12 @@ namespace Gnc {
                           U8 writeBuf[1] = { 0x02 }; // start at rev_count_h
                           Fw::Buffer readBufObj(0, 0, (U64) readBuf, FW_NUM_ARRAY_ELEMENTS(readBuf));
                           Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                       }
                       else { // simple protocol
                           Fw::Buffer readBufObj(0, 0, (U64) readBuf, 2);
                           Fw::Buffer writeBufObj(0, 0, 0, 0); // no write in simple protocol
-                          this->escReadWrite_out(0, writeBufObj, readBufObj);
+                          this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                       }
 
                       if ((0xab == readBuf[8]) ||
@@ -1101,22 +1113,23 @@ namespace Gnc {
                   case OUTPUT_I2C:
                   case OUTPUT_I2C_SIMPLE:
                   {
-                      if (this->isConnected_escConfig_OutputPort(0) &&
-                          this->isConnected_escReadWrite_OutputPort(0)) {
+                      I2CMetadata i2c = this->outputInfo[i].i2cMeta;
+                      if (this->isConnected_escConfig_OutputPort(i2c.port) &&
+                          this->isConnected_escReadWrite_OutputPort(i2c.port)) {
                           // TODO(mereweth) - put the I2C clock speed in config header? separate config ports?
-                          this->escConfig_out(0, 400, this->outputInfo[i].i2cMeta.addr, 500);
+                          this->escConfig_out(i2c.port, 400, i2c.addr, 500);
 
                           Fw::Buffer readBufObj(0, 0, 0, 0); // no read
                           if (OUTPUT_I2C == this->outputInfo[i].type) {
                               // MSB is reverse bit
                               U8 writeBuf[3] = { 0 };
                               Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                              this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                           }
                           else { // simple protocol
                               U8 writeBuf[1] = { 0 };
                               Fw::Buffer writeBufObj(0, 0, (U64) writeBuf, FW_NUM_ARRAY_ELEMENTS(writeBuf));
-                              this->escReadWrite_out(0, writeBufObj, readBufObj);
+                              this->escReadWrite_out(i2c.port, writeBufObj, readBufObj);
                           }
                       }
                       else {

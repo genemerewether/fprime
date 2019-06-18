@@ -21,6 +21,8 @@
 #include <Drv/Mavlink/GPSPosAdapter/GPSPosAdapterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <stdio.h>
+
 namespace Drv {
 
   // ----------------------------------------------------------------------
@@ -92,7 +94,12 @@ namespace Drv {
         SerialReadStatus &status
     )
   {
-    // TODO
+    U8* buf = (U8*) serBuffer.getdata();
+    U32 size = serBuffer.getsize();
+
+    for (int i = 0; i < size; i++) {
+      printf("%x\n", buf[i]);
+    }
   }
 
 } // end namespace Drv

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import fprime.gse.utils.PortFinder as PortFinder
+import utils.PortFinder
 import sys
 import subprocess
 import os
@@ -13,24 +13,20 @@ def main(argv=None):
     start_port = 50000
     end_port = 50100
     used_port = None
-    nobin = True
-
-    hostname = os.uname()[1]
-    if (hostname == "dieb-sse.jpl.nasa.gov") :
-        addr = "192.168.0.1"
-    else :
-        addr = "127.0.0.1"
-
-    python_bin = os.environ["PYTHON_BASE"] + "/bin/python"
+    addr = "127.0.0.1" 
+    nobin = False
     
-    found_port = False
+    #if len(sys.argv) > 1:
+    #    if sys.argv[1] == "-nobin":
+    #        print("Not starting binary.")
+    #        nobin = True
+    
+    python_bin = "python"
+    
     for port in range(start_port,end_port):
-        if not found_port and not PortFinder.IsPortUsed(port):
+        if not utils.PortFinder.IsPortUsed(port):
             used_port = port
-            found_port = True
-            continue;
-        if not PortFinder.IsPortUsed(port):
-            used_stream_port = port
+            print("Using port %d"%used_port)
             break;
         
     if (used_port == None):
@@ -41,25 +37,18 @@ def main(argv=None):
     
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="port", action="store", type="int", help="Set the threaded TCP socket server port [default: %default]", default=used_port)
-    parser.add_option("-s", "--stream_port", dest="stream_port", action="store", type="int", help="Set the streaming server port [default: %default]", default=used_stream_port)
     parser.add_option("-a", "--addr", dest="addr", action="store", type="string", help="set the threaded TCP socket server address [default: %default]", default=addr)
     parser.add_option("-n", "--nobin", dest="nobin", action="store_true", help="Disables the binary app from starting [default: %default]", default=False)
     parser.add_option("-t", "--twin", dest="twin", action="store_true", help="Runs Threaed TCP Server in window, otherwise backgrounds [default: %default]", default=False)
 
     (opts, args) = parser.parse_args(argv)
     used_port = opts.port
-    print("Using port %d"%used_port)
-    used_stream_port = opts.stream_port
-    print("Using stream port %d"%used_stream_port)
     nobin = opts.nobin
     addr = opts.addr
     twin = opts.twin
-    print 'nobin =', nobin
+#     print 'nobin =', nobin
 #     print 'port = ', used_port
 #     print 'addr = ', addr 
-
-    print("Using port %d"%used_port)
-    print ("Using address %s"%addr)
 
     # run ThreadedTCPServer
     if twin:
@@ -67,37 +56,38 @@ def main(argv=None):
         TTS = subprocess.Popen(TTS_args)
     else:
         tts_log = open("ThreadedTCP.log",'w')
-        TTS_args = [python_bin, "-u", "%s/Gse/bin/ThreadedTCPServer.py"%build_root,"--port","%d"%used_port, "--host",addr]
+        TTS_args = [python_bin,"%s/Gse/bin/ThreadedTCPServer.py"%build_root,"--port","%d"%used_port, "--host",addr]
         TTS = subprocess.Popen(TTS_args,stdout=tts_log,stderr=subprocess.STDOUT)
     
     # wait for TCP Server to start
     time.sleep(2)
     
     # run Gse GUI
-    GUI_args = [python_bin,"%s/Gse/bin/gse.py"%build_root,"--port","%d"%used_port,"--stream_port","%d"%used_stream_port,"--dictionary","%s/Gse/generated/SDREF"%build_root,"--connect","--addr",addr,"-L","%s/SDREF/logs"%build_root]
-    #print ("GUI: %s"%" ".join(GUI_args))
+    GUI_args = [python_bin,"%s/Gse/bin/gse.py"%build_root,"--port","%d"%used_port,"--dictionary","%s/SDREF/py_dict"%build_root,"--connect","--addr",addr,"-L","%s/SDREF/logs"%build_root]
+    
     GUI = subprocess.Popen(GUI_args)
     
-    # run SDREF app
+    # run Ref app
     
     op_sys = os.uname()[0]
     
-    BIN = "%s/SDREF/%s/SDREF"%(build_root,os.environ["OUTPUT_DIR"])
+    bin_path = "%s/SDREF/%s/SDREF"%(build_root,os.environ["OUTPUT_DIR"])
     
+    # run as root
     if not nobin:
-        SDREF_args = [python_bin,"%s/Gse/bin/pexpect_runner.py"%build_root,"SDREF.log","SDREF Application",BIN,"-p","%d"%used_port,"-a",addr,"-l"]
-        SDREF = subprocess.Popen(SDREF_args)
+        bin_args = [python_bin, "%s/Gse/bin/pexpect_runner.py"%build_root,"SDREF.log","SDREF Application","sudo",bin_path,"-p","%d"%used_port,"-a",addr]
+        bin = subprocess.Popen(bin_args)
     
     GUI.wait()
 
     if not nobin:
         try:
-            SDREF.send_signal(signal.SIGTERM)
+            REF.send_signal(signal.SIGTERM)
         except:
             pass
             
         try:
-            SDREF.wait()
+            REF.wait()
         except:
             pass
             

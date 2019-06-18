@@ -76,6 +76,7 @@ Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 
 SnapdragonFlight::BlspSpiDriverComponentImpl* spiDrvSnap_ptr = 0;
 SnapdragonFlight::BlspI2CDriverComponentImpl* i2cDrvSnap_ptr = 0;
+SnapdragonFlight::BlspI2CDriverComponentImpl* i2cDrvSnap2_ptr = 0;
 SnapdragonFlight::BlspGpioDriverComponentImpl* imuDRIntSnap_ptr = 0;
 SnapdragonFlight::BlspGpioDriverComponentImpl* hwEnablePinSnap_ptr = 0;
 SnapdragonFlight::BlspPwmDriverComponentImpl* escPwmSnap_ptr = 0;
@@ -346,6 +347,12 @@ void allocComps() {
 #endif
 ;
 
+    i2cDrvSnap2_ptr = new SnapdragonFlight::BlspI2CDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                    ("SNAPI2C2DRV")
+#endif
+;
+
     imuDRIntSnap_ptr = new SnapdragonFlight::BlspGpioDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SNAPDRINT")
@@ -567,6 +574,7 @@ void constructApp(unsigned int port_number,
 
     spiDrvSnap_ptr->init(0);
     i2cDrvSnap_ptr->init(0);
+    i2cDrvSnap2_ptr->init(0);
     hwEnablePinSnap_ptr->init(1);
     imuDRIntSnap_ptr->init(0);
     escPwmSnap_ptr->init(0);
@@ -633,6 +641,8 @@ void constructApp(unsigned int port_number,
 
     // J15, BLSP9
     i2cDrvSnap_ptr->open(9);
+    // J9, BLSP2
+    i2cDrvSnap2_ptr->open(2);
 #else 
     // /dev/spi-10 on 820; connected to MPU9250
     spiDrvSnap_ptr->open(10, SnapdragonFlight::SPI_FREQUENCY_1MHZ);

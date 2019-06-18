@@ -69,6 +69,7 @@ extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 
 extern SnapdragonFlight::BlspSpiDriverComponentImpl* spiDrvSnap_ptr;
 extern SnapdragonFlight::BlspI2CDriverComponentImpl* i2cDrvSnap_ptr;
+extern SnapdragonFlight::BlspI2CDriverComponentImpl* i2cDrvSnap2_ptr;
 extern SnapdragonFlight::BlspGpioDriverComponentImpl* imuDRIntSnap_ptr;
 extern SnapdragonFlight::BlspGpioDriverComponentImpl* hwEnablePinSnap_ptr;
 extern SnapdragonFlight::BlspPwmDriverComponentImpl* escPwmSnap_ptr;
