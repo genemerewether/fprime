@@ -1,8 +1,8 @@
 <serializable name="Quaternion" namespace="ROS::geometry_msgs">
   <members>
-    <member name="x" type="F64" format="%.4f" />
-    <member name="y" type="F64" format="%.4f" />
-    <member name="z" type="F64" format="%.4f" />
-    <member name="w" type="F64" format="%.4f" />
+    <member name="x" type="F64"/>
+    <member name="y" type="F64"/>
+    <member name="z" type="F64"/>
+    <member name="w" type="F64"/>
   </members>
 </serializable>

@@ -2,7 +2,8 @@
   <members>
     <member name="seq" type="U32"/>
     <member name="stamp" type="Fw::Time"/>
-    <member name="frame_id" type="U32"/>
+    <member name="frame_id" type="Fw::EightyCharString"/>
   </members>
   <include_header>Fw/Time/Time.hpp</include_header>
+  <include_header>Fw/Types/EightyCharString.hpp</include_header>
 </serializable>

@@ -17,10 +17,14 @@
 // countries or providing access to foreign persons.
 // ====================================================================== 
 
+
 #ifndef GPSPosAdapter_HPP
 #define GPSPosAdapter_HPP
 
 #include "Drv/Mavlink/GPSPosAdapter/GPSPosAdapterComponentAc.hpp"
+#include <Drv/Mavlink/GPSPosAdapter/mavlink/include/mavlink/v2.0/common/mavlink.h>
+#include <Drv/Mavlink/GPSPosAdapter/mavlink/include/mavlink/v2.0/mavlink_types.h>
+#include <Drv/Mavlink/GPSPosAdapter/mavlink/include/mavlink/v2.0/mavlink_helpers.h>
 
 namespace Drv {
 
@@ -29,6 +33,10 @@ namespace Drv {
   {
 
     public:
+
+      // Declare member variables
+      mavlink_local_position_ned_t pos;
+      mavlink_attitude_t att;
 
       // ----------------------------------------------------------------------
       // Construction, initialization, and destruction

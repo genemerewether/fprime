@@ -1,18 +1,18 @@
      INSTANCE NAME      | BASE ID (HEX) | REQUESTED WINDOW SIZE | DIFFERENCED ID WINDOW SIZE | LARGEST COMPONENT INTERNAL ID | MAX AMOUNT OF IDS
-     fatalHandler       |    1 (0x1)    |          20           |             20             |             None              |         0        
-    rateGroup1Comp      |   21 (0x15)   |          20           |             20             |               2               |         2        
+     fatalHandler       |    1 (0x1)    |          20           |             20             |               2               |         2        
+    rateGroup1Comp      |   21 (0x15)   |          20           |             20             |               3               |         3        
        pingRcvr         |   41 (0x29)   |          20           |             20             |               2               |         2        
         chanTlm         |   61 (0x3d)   |          20           |             20             |             None              |         0        
      sendBuffComp       |   81 (0x51)   |          20           |             20             |              14               |         9        
      recvBuffComp       |  101 (0x65)   |          20           |             20             |               5               |         9        
         cmdDisp         |  121 (0x79)   |          20           |             20             |              10               |        10        
          prmDb          |  141 (0x8d)   |          20           |             20             |               8               |         8        
-    rateGroup2Comp      |  161 (0xa1)   |          20           |             20             |               2               |         2        
+    rateGroup2Comp      |  161 (0xa1)   |          20           |             20             |               3               |         3        
           SG1           |  181 (0xb5)   |          20           |             20             |               3               |         3        
           SG3           |  201 (0xc9)   |          20           |             20             |               3               |         3        
           SG2           |  221 (0xdd)   |          20           |             20             |               3               |         3        
-    rateGroup3Comp      |  241 (0xf1)   |          20           |             20             |               2               |         2        
-      fileUplink        |  261 (0x105)  |          20           |             20             |               8               |         8        
+    rateGroup3Comp      |  241 (0xf1)   |          20           |             20             |               3               |         3        
+      fileUplink        |  261 (0x105)  |          20           |             20             |               9               |         9        
           SG5           |  281 (0x119)  |          20           |             20             |               3               |         3        
 fileUplinkBufferManager |  301 (0x12d)  |          20           |             20             |               3               |         3        
           SG4           |  321 (0x141)  |          20           |             20             |               3               |         3        
@@ -25,9 +25,9 @@ fileDownlinkBufferManag |  401 (0x191)  |          20           |             20
        linuxTime        |  441 (0x1b9)  |          20           |             20             |             None              |         0        
   rateGroupDriverComp   |  461 (0x1cd)  |          20           |             20             |             None              |         0        
        blockDrv         |  481 (0x1e1)  |          20           |             20             |               1               |         1        
-     fileDownlink       |  501 (0x1f5)  |          20           |             20             |               4               |         4        
+     fileDownlink       |  501 (0x1f5)  |          20           |             20             |               9               |         9        
       textLogger        |  521 (0x209)  |          20           |             20             |             None              |         0        
-        cmdSeq          |  541 (0x21d)  |          23           |            inf.            |              23               |        23        
+        cmdSeq          |  541 (0x21d)  |          23           |            inf.            |              24               |        24        
 -------------------------------------------------------------------------------------------------------------------------------------
 | INSTANCE NAME                 - Name of the instance object.                                                                      |
 | BASE ID (HEX)                 - Base ID set for the instance.                                                                     |
