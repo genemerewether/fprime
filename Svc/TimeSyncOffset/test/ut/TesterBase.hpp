@@ -100,6 +100,24 @@ namespace Svc {
           const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
+      //! Get the port that receives input from Log
+      //!
+      //! \return from_Log[portNum]
+      //!
+      Fw::InputLogPort* get_from_Log(
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
+      );
+
+#if FW_ENABLE_TEXT_LOGGING == 1
+      //! Get the port that receives input from LogText
+      //!
+      //! \return from_LogText[portNum]
+      //!
+      Fw::InputLogTextPort* get_from_LogText(
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
+      );
+#endif
+
     protected:
 
       // ----------------------------------------------------------------------
@@ -347,6 +365,20 @@ namespace Svc {
       //!
       NATIVE_INT_TYPE getNum_from_Time(void) const;
 
+      //! Get the number of from_Log ports
+      //!
+      //! \return The number of from_Log ports
+      //!
+      NATIVE_INT_TYPE getNum_from_Log(void) const;
+
+#if FW_ENABLE_TEXT_LOGGING == 1
+      //! Get the number of from_LogText ports
+      //!
+      //! \return The number of from_LogText ports
+      //!
+      NATIVE_INT_TYPE getNum_from_LogText(void) const;
+#endif
+
     protected:
 
       // ----------------------------------------------------------------------
@@ -368,6 +400,95 @@ namespace Svc {
       bool isConnected_to_LLTime(
           const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event dispatch
+      // ----------------------------------------------------------------------
+
+      //! Dispatch an event
+      //!
+      void dispatchEvents(
+          const FwEventIdType id, /*!< The event ID*/
+          Fw::Time& timeTag, /*!< The time*/
+          const Fw::LogSeverity severity, /*!< The severity*/
+          Fw::LogBuffer& args /*!< The serialized arguments*/
+      );
+
+      //! Clear event history
+      //!
+      void clearEvents(void);
+
+      //! The total number of events seen
+      //!
+      U32 eventsSize;
+
+#if FW_ENABLE_TEXT_LOGGING
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Text events
+      // ----------------------------------------------------------------------
+
+      //! Handle a text event
+      //!
+      virtual void textLogIn(
+          const FwEventIdType id, /*!< The event ID*/
+          Fw::Time& timeTag, /*!< The time*/
+          const Fw::TextLogSeverity severity, /*!< The severity*/
+          const Fw::TextLogString& text /*!< The event string*/
+      );
+
+      //! A history entry for the text log
+      //!
+      typedef struct {
+        U32 id;
+        Fw::Time timeTag;
+        Fw::TextLogSeverity severity;
+        Fw::TextLogString text;
+      } TextLogEntry;
+
+      //! The history of text log events
+      //!
+      History<TextLogEntry> *textLogHistory;
+
+      //! Print a text log history entry
+      //!
+      static void printTextLogHistoryEntry(
+          const TextLogEntry& e,
+          FILE* file
+      );
+
+      //! Print the text log history
+      //!
+      void printTextLogHistory(FILE *const file);
+
+#endif
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event: SchedIn_Timeout
+      // ----------------------------------------------------------------------
+
+      //! Handle event SchedIn_Timeout
+      //!
+      virtual void logIn_WARNING_LO_SchedIn_Timeout(
+          U8 sched_timeout 
+      );
+
+      //! A history entry for event SchedIn_Timeout
+      //!
+      typedef struct {
+        U8 sched_timeout;
+      } EventEntry_SchedIn_Timeout;
+
+      //! The history of SchedIn_Timeout events
+      //!
+      History<EventEntry_SchedIn_Timeout>
+        *eventHistory_SchedIn_Timeout;
 
     protected:
 
@@ -489,6 +610,16 @@ namespace Svc {
       //!
       Fw::InputTimePort m_from_Time[1];
 
+      //! From port connected to Log
+      //!
+      Fw::InputLogPort m_from_Log[1];
+
+#if FW_ENABLE_TEXT_LOGGING == 1
+      //! From port connected to LogText
+      //!
+      Fw::InputLogTextPort m_from_LogText[1];
+#endif
+
     private:
 
       // ----------------------------------------------------------------------
@@ -529,6 +660,30 @@ namespace Svc {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           Fw::Time &time /*!< The U32 cmd argument*/
       );
+
+      //! Static function for port from_Log
+      //!
+      static void from_Log_static(
+          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          FwEventIdType id, /*!< Log ID*/
+          Fw::Time &timeTag, /*!< Time Tag*/
+          Fw::LogSeverity severity, /*!< The severity argument*/
+          Fw::LogBuffer &args /*!< Buffer containing serialized log entry*/
+      );
+
+#if FW_ENABLE_TEXT_LOGGING == 1
+      //! Static function for port from_LogText
+      //!
+      static void from_LogText_static(
+          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          FwEventIdType id, /*!< Log ID*/
+          Fw::Time &timeTag, /*!< Time Tag*/
+          Fw::TextLogSeverity severity, /*!< The severity argument*/
+          Fw::TextLogString &text /*!< Text of log message*/
+      );
+#endif
 
     private:
 

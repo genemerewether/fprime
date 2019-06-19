@@ -59,24 +59,15 @@ namespace Svc {
     )
   {
     // TODO
-    if (GPIOFlag == false)
+    num_sched_calls++;    
+    if (num_sched_calls >= sched_timeout)
     {
-      num_sched_calls++;
-    }
-    else
-    {
-      num_sched_calls = 0;
-    }
-    
-    if (num_sched_calls > sched_timeout)
-    {
-      // trigger event
+      // if timeout, send warning event
+      this->log_WARNING_LO_SchedIn_Timeout(num_sched_calls);
     }
     this->GPIOPulse_out(0, true);
-    GPIOFlag = true;
     HLTime = this->getTime();
     this->GPIOPulse_out(0, false);
-    GPIOFlag = false;
   }
 
   void TimeSyncOffsetComponentImpl ::
@@ -86,6 +77,9 @@ namespace Svc {
     )
   {
     // TODO
+
+    // reset sched call counter
+    num_sched_calls = 0;
 
     // // should i just rename this above???
     // Fw::Time LLTime = time;
@@ -109,7 +103,6 @@ namespace Svc {
 
     // reset gpio pulse high
     this->GPIOPulse_out(0, true);
-    GPIOFlag = true;
   }
 
 } // end namespace Svc

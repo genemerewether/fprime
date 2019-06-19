@@ -72,9 +72,8 @@ namespace Svc {
     Fw::Time HLTime;
     
     // num of sched calls timeout to reset GPIO pin if we never recieve LLTime
-    int sched_timeout = 1;
-    bool GPIOFlag = true;
-    int num_sched_calls = 0;
+    U8 sched_timeout = 2;
+    U8 num_sched_calls = 0;
 
     };
 

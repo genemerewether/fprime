@@ -38,6 +38,17 @@
         </port>
     </ports>
 
+    <events>
+        <event id="0" name="SchedIn_Timeout" severity="WARNING_LO" format_string="SchedIn Timeout, no LLTime recieved after %d sched calls">
+            <comment>
+            event warning when no LL time is recieved after timeout num of sched calls
+            </comment>
+            <args>
+                <arg name="sched_timeout" type="U8"/>
+            </args>
+        </event>
+    </events>
+
     <telemetry>
         <channel id="0" name="LLTime" data_type="F64">
             <comment>

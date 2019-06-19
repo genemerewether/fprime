@@ -164,6 +164,75 @@ namespace Svc {
   }
 
   // ----------------------------------------------------------------------
+  // Events
+  // ----------------------------------------------------------------------
+
+  void TimeSyncOffsetGTestBase ::
+    assertEvents_size(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->eventsSize)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Total size of all event histories\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->eventsSize << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: SchedIn_Timeout
+  // ----------------------------------------------------------------------
+
+  void TimeSyncOffsetGTestBase ::
+    assertEvents_SchedIn_Timeout_size(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->eventHistory_SchedIn_Timeout->size())
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Size of history for event SchedIn_Timeout\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->eventHistory_SchedIn_Timeout->size() << "\n";
+  }
+
+  void TimeSyncOffsetGTestBase ::
+    assertEvents_SchedIn_Timeout(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 __index,
+        const U8 sched_timeout
+    ) const
+  {
+    ASSERT_GT(this->eventHistory_SchedIn_Timeout->size(), __index)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Index into history of event SchedIn_Timeout\n"
+      << "  Expected: Less than size of history ("
+      << this->eventHistory_SchedIn_Timeout->size() << ")\n"
+      << "  Actual:   " << __index << "\n";
+    const EventEntry_SchedIn_Timeout& e =
+      this->eventHistory_SchedIn_Timeout->at(__index);
+    ASSERT_EQ(sched_timeout, e.sched_timeout)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Value of argument sched_timeout at index "
+      << __index
+      << " in history of event SchedIn_Timeout\n"
+      << "  Expected: " << sched_timeout << "\n"
+      << "  Actual:   " << e.sched_timeout << "\n";
+  }
+
+  // ----------------------------------------------------------------------
   // From ports
   // ----------------------------------------------------------------------
 
