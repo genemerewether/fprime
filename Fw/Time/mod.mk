@@ -18,8 +18,9 @@ SRC = \
 	TimePortAi.xml \
 	SetTimePortAi.xml \
 	StartTimePortAi.xml \
-	TimePairPortAi.xml
-	
+    TimePairPortAi.xml \
+    ConvertTimePortAi.xml
+
 HDR = \	
 	Time.hpp
 

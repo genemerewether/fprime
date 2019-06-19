@@ -91,7 +91,14 @@ Drv::ATINetboxComponentImpl* atiNetbox_ptr = 0;
 
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
+SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverLL_ptr = 0;
+SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverDebug_ptr = 0;
+Drv::LinuxGpioDriverComponentImpl* gpioTimeSync_ptr = 0;
+SnapdragonFlight::BlspGpioDriverComponentImpl* blspGpioTimeSync_ptr = 0;
 Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
+
+Svc::TimeOffsetComponentImpl* llTimeSync_ptr = 0;
+SnapdragonFlight::DspOffset* dspTimeSync_ptr = 0;
 
 Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
 
@@ -316,6 +323,42 @@ void allocComps() {
     serialDriverDebug_ptr = new Drv::LinuxSerialDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SERIALDRVDBUG")
+#endif
+;
+
+    blspSerialDriverLL_ptr = new SnapdragonFlight::BlspSerialDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("BSERDRVLL")
+#endif
+;
+
+    blspSerialDriverDebug_ptr = new SnapdragonFlight::BlspSerialDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("BSERDRVDBUG")
+#endif
+;
+
+    gpioTimeSync_ptr = new Drv::LinuxGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("GSYNC")
+#endif
+;
+
+    blspGpioTimeSync_ptr = new SnapdragonFlight::BlspGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("BGSYNC")
+#endif
+;
+
+    llTimeSync_ptr = new Svc::TimeOffsetComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("LLSYNC")
+#endif
+;
+
+    dspTimeSync_ptr = new SnapdragonFlight::DspOffset
+#if FW_OBJECT_NAMES == 1
+                        ("DSPSYNC")
 #endif
 ;
 
@@ -574,6 +617,13 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
 
+    blspSerialDriverLL_ptr->init();
+    blspSerialDriverDebug_ptr->init();
+    gpioTimeSync_ptr->init();
+    blspGpioTimeSync_ptr->init();
+    llTimeSync_ptr->init();
+    dspTimeSync_ptr->init();
+
     udpReceiver_ptr->init(0);
 
     // Connect rate groups to rate group driver
@@ -759,36 +809,47 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_DEV);
 
 #ifdef LLROUTER_DEVICES
+#ifdef BUILD_SDFLIGHT
     // Must start serial drivers after tasks that setup the buffers for the driver:
     serialDriverLL_ptr->open(
-#ifdef BUILD_SDFLIGHT
-                        "/dev/ttyHS3",
-#elif defined BUILD_LINUX
-                        "/dev/ttyUSB0",
+#ifdef SOC_8096
+                             7, // tty 3, J10, SONAR_UART, BLSP7
 #else
-                        "/dev/ttyUSB0",
 #endif
-                        Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
-                        Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
-                        Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
-                        true);
-
+                             SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
+                             SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
+                             true);
+    
     serialDriverDebug_ptr->open(
-#ifdef BUILD_SDFLIGHT
-                           "/dev/ttyHS2",
-#elif defined BUILD_LINUX
-                           "/dev/ttyUSB1",
+#ifdef SOC_8096
+                                5, // tty 1, J12, ESC_UART, BLSP5
 #else
-                           "/dev/ttyUSB1",
 #endif
-                           Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
-                           Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
-                           Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
-                           true);
+                                SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
+                                SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
+                                true);
+
+    /* ---------- Done opening devices, now start device threads ---------- */
+    blspSerialDriverLL_ptr->startReadThread(98, 20*1024);
+    blspSerialDriverDebug_ptr->startReadThread(40, 20*1024);
+#else //not BUILD_SDFLIGHT
+    // Must start serial drivers after tasks that setup the buffers for the driver:
+    serialDriverLL_ptr->open("/dev/ttyUSB0",
+                             Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                             Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                             Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                             true);
+
+    serialDriverDebug_ptr->open("/dev/ttyUSB1",
+                                Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                                Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                                Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                                true);
 
     /* ---------- Done opening devices, now start device threads ---------- */
     serialDriverLL_ptr->startReadThread(98, 20*1024);
     serialDriverDebug_ptr->startReadThread(40, 20*1024);
+#endif //BUILD_SDFLIGHT
 #endif
 
     atiNetbox_ptr->set_thread_attr(0, 30, 20*1024, true, CORE_GNC);

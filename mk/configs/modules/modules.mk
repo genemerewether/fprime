@@ -121,7 +121,8 @@ SVC_MODULES := \
 	Svc/UdpReceiver \
 	Svc/CameraFrame \
 	Svc/IPCRelay \
-	Svc/TimeSyncOffset
+	Svc/TimeSyncOffset \
+	Svc/TimeConvert
 
 DEMO_DRV_MODULES := \
 	Drv/DataTypes \
