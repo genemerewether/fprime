@@ -1,0 +1,10 @@
+<serializable name="RunSeqAction" namespace="ROS::fprime_msgs">
+  <members>
+    <member name="action_goal" type="RunSeqActionGoal"/>
+    <member name="action_result" type="RunSeqActionResult"/>
+    <member name="action_feedback" type="RunSeqActionFeedback"/>
+  </members>
+  <import_serializable_type>ROS/Gen/fprime_msgs/Types/RunSeqActionGoalSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/fprime_msgs/Types/RunSeqActionResultSerializableAi.xml</import_serializable_type>
+  <import_serializable_type>ROS/Gen/fprime_msgs/Types/RunSeqActionFeedbackSerializableAi.xml</import_serializable_type>
+</serializable>

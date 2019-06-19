@@ -1,0 +1,5 @@
+<serializable name="RunSeqResult" namespace="ROS::fprime_msgs">
+  <members>
+    <member name="success" type="U8"/>
+  </members>
+</serializable>

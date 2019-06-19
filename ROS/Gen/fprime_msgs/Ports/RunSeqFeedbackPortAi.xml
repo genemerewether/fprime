@@ -1,0 +1,6 @@
+<interface name="RunSeqFeedback" namespace="ROS::fprime_msgs">
+  <args>
+    <arg name="RunSeqFeedback" pass_by="reference" type="ROS::fprime_msgs::RunSeqFeedback"/>
+  </args>
+  <import_serializable_type>ROS/Gen/fprime_msgs/Types/RunSeqFeedbackSerializableAi.xml</import_serializable_type>
+</interface>
