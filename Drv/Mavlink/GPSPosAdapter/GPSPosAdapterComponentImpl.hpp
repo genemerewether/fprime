@@ -22,9 +22,9 @@
 #define GPSPosAdapter_HPP
 
 #include "Drv/Mavlink/GPSPosAdapter/GPSPosAdapterComponentAc.hpp"
-#include <Drv/Mavlink/GPSPosAdapter/mavlink/include/mavlink/v2.0/common/mavlink.h>
-#include <Drv/Mavlink/GPSPosAdapter/mavlink/include/mavlink/v2.0/mavlink_types.h>
-#include <Drv/Mavlink/GPSPosAdapter/mavlink/include/mavlink/v2.0/mavlink_helpers.h>
+#include <Drv/Mavlink/c_library_v2/common/mavlink.h>
+#include <Drv/Mavlink/c_library_v2/mavlink_types.h>
+#include <Drv/Mavlink/c_library_v2/mavlink_helpers.h>
 
 namespace Drv {
 
@@ -33,10 +33,6 @@ namespace Drv {
   {
 
     public:
-
-      // Declare member variables
-      mavlink_local_position_ned_t pos;
-      mavlink_attitude_t att;
 
       // ----------------------------------------------------------------------
       // Construction, initialization, and destruction
@@ -63,6 +59,10 @@ namespace Drv {
       ~GPSPosAdapterComponentImpl(void);
 
     PRIVATE:
+
+      // Member variables for position and attitude frmo Pixhawk
+      mavlink_local_position_ned_t pos;
+      mavlink_attitude_t att;
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
