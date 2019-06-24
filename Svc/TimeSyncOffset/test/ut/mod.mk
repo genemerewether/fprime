@@ -5,6 +5,8 @@ TEST_SRC =       main.cpp \
 
 TEST_MODS =         Svc/TimeSyncOffset \
                     Fw/Cmd \
+		    Svc/Sched \
+		    Drv/GpioDriverPorts \
                     Fw/Comp \
                     Fw/Port \
                     Fw/Prm \

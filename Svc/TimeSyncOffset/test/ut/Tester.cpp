@@ -51,38 +51,53 @@ namespace Svc {
   {
     // TODO
 
+    // check initial conditions
     ASSERT_FROM_PORT_HISTORY_SIZE(0);
-    this->assertTlm_size(0,0,0);
-    this->assertEvents_size(0,0,0);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
 
-    // this->invoke_to_SchedIn(0,0);
+    // ASSERT_TLM_LLTime(index, value);
+    // ASSERT_TLM_HLTime(index, value);
+    // ASSERT_EVENTS_SchedIn_Timeout(index, _sched_timeout)
+
+    // ASSERT_from_GPIOPulse_SIZE(size);
+    // ASSERT_from_GPIOPulse(index, _state);
+
+
+
+
+    this->invoke_to_SchedIn(0,0);
+    // this->component.doDispatch();
+    // // this->dispatchAll();
+
+    
     // // Fw::Time LLTime = this->getTime();
     // // this->setTestTime(const Fw::Time& timeTag);
     // Fw::Time LLTime(69,666666);
     // this->invoke_to_LLTime(0, LLTime);
+
+    // // check initial conditions
+    // ASSERT_FROM_PORT_HISTORY_SIZE(0);
+    // ASSERT_TLM_SIZE(0);
+    // ASSERT_TLM_LLTime_SIZE(0);
+    // ASSERT_TLM_HLTime_SIZE(0);
+    // ASSERT_EVENTS_SIZE(0);
+    // ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+
+    // this->component.doDispatch();
+    // // this->dispatchAll();
+
+    // // check initial conditions
+    // ASSERT_FROM_PORT_HISTORY_SIZE(0);
+    // ASSERT_TLM_SIZE(0);
+    // ASSERT_TLM_LLTime_SIZE(0);
+    // ASSERT_TLM_HLTime_SIZE(0);
+    // ASSERT_EVENTS_SIZE(0);
+    // ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
     
-
-    // GTESTBASE
-    // ASSERT_FROM_PORT_HISTORY_SIZE(size)
-    // ASSERT_from_GPIOPulse_SIZE(size)
-    // ASSERT_from_GPIOPulse(index, _state)
-    // ASSERT_from_ClockTimes_SIZE(size)
-    // ASSERT_from_ClockTimes(index, _time1, _time2)
-    // assertTlm_size
-    // assertTlm_LLTime_size
-    // assertTlm_LLTime
-    // assertTlm_HLTime_size
-    // assertTlm_HLTime
-    // assertEvents_size
-    // assertEvents_SchedIn_Timeout_size
-    // assertEvents_SchedIn_Timeout
-    // assertFromPortHistory_size
-    // assert_from_GPIOPulse_size
-    // assert_from_ClockTimes_size
-
-    // TESTER
-    // from_GPIOPulse_handler
-    // from_ClockTimes_handler
 
   }
 
