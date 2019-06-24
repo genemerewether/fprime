@@ -16,6 +16,9 @@
         <arg name="timeContext" type="U32" pass_by="value">
             <comment>TimeContext to convert to</comment>
         </arg>
+        <arg name="success" type="bool" pass_by="reference">
+            <comment>whether time conversion was successful</comment>
+        </arg>
     </args>
     <return type="Fw::Time" pass_by="value"/>
 </interface>

@@ -45,6 +45,8 @@ namespace Svc {
       //! To do
       //!
       void SendPulseRecieveTimeTest(void);
+      void RecieveTimeNoPulseSentTest(void);
+      void SendPulseNoRecieveTimeTest(void);
 
     private:
 

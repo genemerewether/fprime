@@ -1,6 +1,6 @@
 // ======================================================================
 // \title  TimeConvertComponentImpl.hpp
-// \author mereweth
+// \author kedelson
 // \brief  hpp file for TimeConvert component implementation class
 //
 // \copyright
@@ -74,9 +74,13 @@ namespace Svc {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           Fw::Time time, /*!< The time to convert*/
           U32 timeBase, /*!< TimeBase to convert to*/
-          U32 timeContext /*!< TimeContext to convert to*/
+          U32 timeContext, /*!< TimeContext to convert to*/
+          bool& success /*!< Whether time conversion was successful */
       );
 
+    Fw::Time ProcTime;
+    Fw::Time WsTime;
+    Fw::Time RosTime;
 
     };
 
