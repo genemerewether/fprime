@@ -99,7 +99,7 @@ Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
 
 Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
 Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr = 0;
-SnapdragonFlight::DspOffset* dspTimeSync_ptr = 0;
+SnapdragonFlight::DspOffsetComponentImpl* dspTimeSync_ptr = 0;
 
 Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
 
@@ -363,7 +363,7 @@ void allocComps() {
 #endif
 ;
 
-    dspTimeSync_ptr = new SnapdragonFlight::DspOffset
+    dspTimeSync_ptr = new SnapdragonFlight::DspOffsetComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("DSPSYNC")
 #endif
@@ -646,8 +646,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     gpioTimeSync_ptr->init();
     blspGpioTimeSync_ptr->init();
     timeConvert_ptr->init();
-    llTimeSync_ptr->init();
-    dspTimeSync_ptr->init();
+    llTimeSync_ptr->init(60, 0);
+    dspTimeSync_ptr->init(60, 0);
 
     udpReceiver_ptr->init(0);
 

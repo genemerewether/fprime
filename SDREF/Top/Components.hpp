@@ -52,6 +52,7 @@ void exitTasks(void);
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <SnapdragonFlight/BlspSerialDriver/BlspSerialDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspGpioDriver/BlspGpioDriverComponentImpl.hpp>
 #include <Drv/ForceTorque/ATINetbox/ATINetboxComponentImpl.hpp>
 
 #include <Svc/TimeConvert/TimeConvertComponentImpl.hpp>
@@ -71,7 +72,7 @@ extern HLProc::EventExpanderComponentImpl* eventExp_ptr;
 
 extern Svc::TimeConvertComponentImpl* timeConvert_ptr;
 extern Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr;
-extern SnapdragonFlight::DspOffset* dspTimeSync_ptr;
+extern SnapdragonFlight::DspOffsetComponentImpl* dspTimeSync_ptr;
 
 extern Svc::RateGroupDriverImpl* rgDrv_ptr;
 extern Svc::ActiveRateGroupImpl* rgTlm_ptr;

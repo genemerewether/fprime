@@ -167,6 +167,7 @@ HLPROC_ROS_MODULES := \
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/DspOffset \
 	SnapdragonFlight/DspRpcAllocator \
 	SnapdragonFlight/DspRelay \
 	SnapdragonFlight/BlspSerialDriver \
