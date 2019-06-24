@@ -16,7 +16,7 @@ void exitTasks(void);
 #include <Gnc/Est/GroundTruthIface/GroundTruthIfaceComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
-
+#include <Svc/TimeConvert/TimeConvertComponentImpl.hpp>
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
@@ -88,6 +88,7 @@ extern Svc::TlmChanImpl* chanTlm_ptr;
 extern Svc::PrmDbImpl* prmDb_ptr;
 extern Svc::SocketGndIfImpl* sockGndIf_ptr;
 extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
+extern Svc::TimeConvertComponentImpl* timeConvert_ptr;
 
 extern HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr;
 extern Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr;

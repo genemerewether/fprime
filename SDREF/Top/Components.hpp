@@ -54,6 +54,7 @@ void exitTasks(void);
 #include <SnapdragonFlight/BlspSerialDriver/BlspSerialDriverComponentImpl.hpp>
 #include <Drv/ForceTorque/ATINetbox/ATINetboxComponentImpl.hpp>
 
+#include <Svc/TimeConvert/TimeConvertComponentImpl.hpp>
 #include <Svc/TimeSyncOffset/TimeSyncOffsetComponentImpl.hpp>
 #include <SnapdragonFlight/DspOffset/DspOffsetComponentImpl.hpp>
 
@@ -68,7 +69,8 @@ extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
 extern HLProc::LLRouterComponentImpl* llRouter_ptr;
 extern HLProc::EventExpanderComponentImpl* eventExp_ptr;
 
-extern Svc::TimeOffsetComponentImpl* llTimeSync_ptr;
+extern Svc::TimeConvertComponentImpl* timeConvert_ptr;
+extern Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr;
 extern SnapdragonFlight::DspOffset* dspTimeSync_ptr;
 
 extern Svc::RateGroupDriverImpl* rgDrv_ptr;

@@ -352,6 +352,8 @@ void manualConstruct(void) {
     // TODO(mereweth) - too much data?
     //actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
 
+    // NOTE(mereweth) - port 7 used for timesync with LL proc, so skip that HexPortsIn index
+
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, attFilter_ptr->get_ImuStateUpdate_InputPort(0));
 #ifdef DECOUPLE_ACTUATORS
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(9, actDecouple_ptr->get_DataIn_InputPort(2));

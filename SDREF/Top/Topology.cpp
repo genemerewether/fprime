@@ -97,7 +97,8 @@ Drv::LinuxGpioDriverComponentImpl* gpioTimeSync_ptr = 0;
 SnapdragonFlight::BlspGpioDriverComponentImpl* blspGpioTimeSync_ptr = 0;
 Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
 
-Svc::TimeOffsetComponentImpl* llTimeSync_ptr = 0;
+Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
+Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr = 0;
 SnapdragonFlight::DspOffset* dspTimeSync_ptr = 0;
 
 Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
@@ -350,7 +351,13 @@ void allocComps() {
 #endif
 ;
 
-    llTimeSync_ptr = new Svc::TimeOffsetComponentImpl
+    timeConvert_ptr = new Svc::TimeConvertComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TIMECONV")
+#endif
+;
+
+    llTimeSync_ptr = new Svc::TimeSyncOffsetComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("LLSYNC")
 #endif
@@ -443,8 +450,10 @@ void manualConstruct() {
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+    // port 7 only used with LLRouter (timesync)
 
-    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1, hexRouter_ptr->get_Sched_InputPort(0));
+    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                  hexRouter_ptr->get_Sched_InputPort(0));
 
     mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
@@ -458,7 +467,11 @@ void manualConstruct() {
     hexRouter_ptr->set_HexPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
     mrCtrlIface_ptr->set_boolStamped_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(9));
-#else
+
+    rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                 dspTimeSync_ptr->get_SchedIn_InputPort(0));
+    dspTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
+#else //LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
@@ -469,6 +482,7 @@ void manualConstruct() {
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
 
     mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
@@ -482,7 +496,17 @@ void manualConstruct() {
     llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
     mrCtrlIface_ptr->set_boolStamped_OutputPort(0, llRouter_ptr->get_KraitPortsIn_InputPort(9));
-#endif
+
+    rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                 llTimeSync_ptr->get_SchedIn_InputPort(0));
+    llTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
+#ifdef BUILD_SDFLIGHT
+    llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
+#else // BUILD_SDFLIGHT
+    llTimeSync_ptr->set_GPIOPulse_OutputPort(0, gpioTimeSync_ptr->get_gpioWrite_InputPort(0));
+#endif //BUILD_SDFLIGHT
+
+#endif //LLROUTER_DEVICES
 
     hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
     // doesn't matter which compCmdStat port # for cmdDisp
@@ -621,6 +645,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     blspSerialDriverDebug_ptr->init();
     gpioTimeSync_ptr->init();
     blspGpioTimeSync_ptr->init();
+    timeConvert_ptr->init();
     llTimeSync_ptr->init();
     dspTimeSync_ptr->init();
 
@@ -686,6 +711,16 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvDFS_ptr->loadParameters();
     atiNetbox_ptr->loadParameters();
     stereoCam_ptr->loadParameters();
+
+    // set static time offset
+    // TODO(mereweth) - change this if we start timing out on correspondences
+    // TODO(mereweth) - check to make sure we are not using ROS sim time
+    {
+        Fw::InputTimePairPort* port = timeConvert_ptr->get_ClockTimes_InputPort(0);
+        Fw::Time t1(TB_ROS_TIME, 0, 0, 0);
+        Fw::Time t2(TB_WORKSTATION_TIME, 0, 0, 0);
+        port->invoke(t1, t2);
+    }
 
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);
@@ -784,6 +819,9 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     prmDb_ptr->start(0,50,20*1024);
     textLogger_ptr->start(0,30,20*1024);
 
+    dspTimeSync_ptr->start(0,30,20*1024);
+    llTimeSync_ptr->start(0,30,20*1024);
+
     snapHealth_ptr->start(0,40,20*1024);
 
     mvCam_ptr->start(0, 80, 5*1000*1024, CORE_DEV);
@@ -810,6 +848,8 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
 #ifdef LLROUTER_DEVICES
 #ifdef BUILD_SDFLIGHT
+    blspGpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+
     // Must start serial drivers after tasks that setup the buffers for the driver:
     serialDriverLL_ptr->open(
 #ifdef SOC_8096
@@ -833,6 +873,9 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     blspSerialDriverLL_ptr->startReadThread(98, 20*1024);
     blspSerialDriverDebug_ptr->startReadThread(40, 20*1024);
 #else //not BUILD_SDFLIGHT
+    // NOTE - need a GPIO for timesync - will assert when gpio is used!!
+    //gpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+
     // Must start serial drivers after tasks that setup the buffers for the driver:
     serialDriverLL_ptr->open("/dev/ttyUSB0",
                              Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
