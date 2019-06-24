@@ -24,14 +24,9 @@
 #include <Svc/ActiveFileLogger/ActiveFileLoggerPacket.hpp>
 #include <Svc/ActiveFileLogger/ActiveFileLoggerStreams.hpp>
 
-#include <Os/File.hpp>
-
-#include <math.h>
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
-
-#define DO_TIME_CONV
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -177,44 +172,19 @@ namespace Gnc {
         ROS::std_msgs::Header header = AccelStamped.getheader();
         Fw::Time stamp = header.getstamp();
 
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
 
-        const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
         }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
-        if (-walltimeDspLeadUs > usecDsp) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
-                   walltimeDspLeadUs, usecDsp);
-            return;
-        }
-        const I64 usecRos = usecDsp + walltimeDspLeadUs;
-
-        //TODO(mereweth) - END convert time instead using HLTimeConv
-
-        stamp.set((U32) (usecRos / 1000LL / 1000LL),
-                         (U32) (usecRos % (1000LL * 1000LL)));
-        header.setstamp(stamp);
+        header.setstamp(convTime);
         AccelStamped.setheader(header);
 
         if (this->isConnected_FileLogger_OutputPort(0)) {
@@ -289,6 +259,12 @@ namespace Gnc {
         }
     }
 
+    MultirotorCtrlIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
+    }
+  
     // Bool stamped constructor/destructor/callback
     MultirotorCtrlIfaceComponentImpl :: BoolStampedHandler ::
       BoolStampedHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
@@ -319,52 +295,21 @@ namespace Gnc {
             return;
         }
 
-#ifdef DO_TIME_CONV
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec * 1000);
 
-        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
-                      + (I64) msg->header.stamp.nsec / 1000LL;
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
 
-        if (walltimeDspLeadUs > usecRos) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld greater than message time %lu\n",
-                   walltimeDspLeadUs, usecRos);
-            return;
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
         }
-        I64 usecDsp = usecRos - walltimeDspLeadUs;
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (usecDsp / 1000 / 1000),
-                          (U32) (usecDsp % (1000 * 1000)));
-#else
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (msg->header.stamp.sec),
-                          (U32) (msg->header.stamp.nsec / 1000));
-#endif //DO_TIME_CONV
-
-        //TODO(mereweth) - END convert time instead using HLTimeConv
 
         {
             using namespace ROS::std_msgs;

@@ -52,6 +52,8 @@ rm $INHIBIT_COOKIE 2> /dev/null || evr 4 "$INHIBIT_COOKIE not present"
 
 up_signify_action &
 
+${CP_BIN} ${KERNLOG_SRC} ${KERNEL_LOG}$BOOT_COUNTER_RTN &
+
 ############################# Try to run RUN_ONCE #############################
 evr 3 "checking RUN_ONCE $DEPLOYMENT"
 get_valid_bin BIN_NAME_DEST $RUN_ONCE_SYMLINK $DEPLOYMENT

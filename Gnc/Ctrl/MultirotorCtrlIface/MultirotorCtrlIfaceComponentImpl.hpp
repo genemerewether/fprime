@@ -75,7 +75,15 @@ namespace Gnc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class BoolStampedHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+          PROTECTED:
+              TimeBase tbDes;
+        };
+    
+        class BoolStampedHandler : public TimeBaseHolder
         {
           public:
               BoolStampedHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
@@ -93,7 +101,7 @@ namespace Gnc {
 
         }; // end class BoolStampedHandler
     
-        class FlatOutputHandler
+        class FlatOutputHandler : public TimeBaseHolder
         {
           public:
               FlatOutputHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
@@ -111,7 +119,7 @@ namespace Gnc {
 
         }; // end class FlatOutputHandler
 
-        class AttitudeRateThrustHandler
+        class AttitudeRateThrustHandler : public TimeBaseHolder
         {
           public:
               AttitudeRateThrustHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
