@@ -1,6 +1,6 @@
 // ======================================================================
 // \title  TimeConvertComponentImpl.cpp
-// \author mereweth
+// \author kedelson
 // \brief  cpp file for TimeConvert component implementation class
 //
 // \copyright
@@ -68,6 +68,8 @@ namespace Svc {
     )
   {
     // TODO
+    ProcTime = time1;
+    WsTime = time2;
   }
 
   Fw::Time TimeConvertComponentImpl ::
@@ -75,10 +77,13 @@ namespace Svc {
         const NATIVE_INT_TYPE portNum,
         Fw::Time time,
         U32 timeBase,
-        U32 timeContext
+        U32 timeContext,
+        bool& success
     )
   {
     // TODO
+
+    //Time_out(0, ConvertedTime);
   }
 
 } // end namespace Svc

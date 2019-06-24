@@ -52,6 +52,7 @@ namespace Svc {
     // TODO
 
     // check initial conditions
+    // i guess this makes sense
     ASSERT_FROM_PORT_HISTORY_SIZE(0);
     ASSERT_TLM_SIZE(0);
     ASSERT_TLM_LLTime_SIZE(0);
@@ -59,46 +60,181 @@ namespace Svc {
     ASSERT_EVENTS_SIZE(0);
     ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
 
-    // ASSERT_TLM_LLTime(index, value);
+    // ASSERT_from_GPIOPulse_SIZE(size);
+    // ASSERT_from_GPIOPulse(index, _state);
+
+    // do i need this?
+    Fw::Time TestTime(66,666666);
+    this->setTestTime(TestTime);
+
+    // WHY DO I NEED TO DODISPATCH? WHEN DO I NOT WANT TO DODISPATCH?
+    this->invoke_to_SchedIn(0,1);
+    this->component.doDispatch();
+
+    // WHY PUT 2 HERE?
+    ASSERT_FROM_PORT_HISTORY_SIZE(2);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+    
+    // this->getTime does not work here
+    Fw::Time LLTime(99,999999);
+    this->invoke_to_LLTime(0, LLTime);
+    this->component.doDispatch();
+
+    // WHY PUT 4 HERE?
+    // each call adds 2...
+    ASSERT_FROM_PORT_HISTORY_SIZE(4);
+    ASSERT_TLM_SIZE(2);
+    ASSERT_TLM_LLTime_SIZE(1);
+    ASSERT_TLM_HLTime_SIZE(1);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+
+    // how do i check tlm is working?
+    // double LLTimeF64 = (double)LLTime.getSeconds() + (double)LLTime.getUSeconds() * 1.0e-6;
+    // ASSERT_TLM_LLTime(0, LLTimeF64);
     // ASSERT_TLM_HLTime(index, value);
-    // ASSERT_EVENTS_SchedIn_Timeout(index, _sched_timeout)
+
+    std::cout << LLTime << std::endl;
+    std::cout << this->component.HLTime << std::endl;
+
+    this->clearHistory();
+
+    // check the clear
+    ASSERT_FROM_PORT_HISTORY_SIZE(0);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+  }
+
+  void Tester ::
+    RecieveTimeNoPulseSentTest(void) 
+  {
+    // TODO
+
+    // check initial conditions
+    // i guess this makes sense
+    ASSERT_FROM_PORT_HISTORY_SIZE(0);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
 
     // ASSERT_from_GPIOPulse_SIZE(size);
     // ASSERT_from_GPIOPulse(index, _state);
 
+    // do i need this?
+    // Fw::Time TestTime(66,666666);
+    // this->setTestTime(TestTime);
 
-
-
-    this->invoke_to_SchedIn(0,0);
+    // WHY DO I NEED TO DODISPATCH? WHEN DO I NOT WANT TO DODISPATCH?
+    // this->invoke_to_SchedIn(0,1);
     // this->component.doDispatch();
-    // // this->dispatchAll();
 
     
-    // // Fw::Time LLTime = this->getTime();
-    // // this->setTestTime(const Fw::Time& timeTag);
-    // Fw::Time LLTime(69,666666);
-    // this->invoke_to_LLTime(0, LLTime);
+    // this->getTime does not work here
+    Fw::Time LLTime(99,999999);
+    this->invoke_to_LLTime(0, LLTime);
+    this->component.doDispatch();
 
-    // // check initial conditions
-    // ASSERT_FROM_PORT_HISTORY_SIZE(0);
-    // ASSERT_TLM_SIZE(0);
-    // ASSERT_TLM_LLTime_SIZE(0);
-    // ASSERT_TLM_HLTime_SIZE(0);
-    // ASSERT_EVENTS_SIZE(0);
-    // ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+    // WHY PUT 2 HERE?
+    ASSERT_FROM_PORT_HISTORY_SIZE(2);
+    ASSERT_TLM_SIZE(2);
+    ASSERT_TLM_LLTime_SIZE(1);
+    ASSERT_TLM_HLTime_SIZE(1);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
 
-    // this->component.doDispatch();
-    // // this->dispatchAll();
+    // how do i check tlm is working?
+    // double LLTimeF64 = (double)LLTime.getSeconds() + (double)LLTime.getUSeconds() * 1.0e-6;
+    // ASSERT_TLM_LLTime(0, LLTimeF64);
+    // ASSERT_TLM_HLTime(index, value);
 
-    // // check initial conditions
-    // ASSERT_FROM_PORT_HISTORY_SIZE(0);
-    // ASSERT_TLM_SIZE(0);
-    // ASSERT_TLM_LLTime_SIZE(0);
-    // ASSERT_TLM_HLTime_SIZE(0);
-    // ASSERT_EVENTS_SIZE(0);
-    // ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
-    
+    std::cout << LLTime << std::endl;
+    std::cout << this->component.HLTime << std::endl;
 
+    this->clearHistory();
+
+    // check the clear
+    ASSERT_FROM_PORT_HISTORY_SIZE(0);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+  }
+
+  void Tester ::
+    SendPulseNoRecieveTimeTest(void) 
+  {
+    // TODO
+
+    // check initial conditions
+    // i guess this makes sense
+    ASSERT_FROM_PORT_HISTORY_SIZE(0);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+
+    // ASSERT_from_GPIOPulse_SIZE(size);
+    // ASSERT_from_GPIOPulse(index, _state);
+
+    // do i need this?
+    Fw::Time TestTime(66,666666);
+    this->setTestTime(TestTime);
+
+    // WHY DO I NEED TO DODISPATCH? WHEN DO I NOT WANT TO DODISPATCH?
+    this->invoke_to_SchedIn(0,1);
+    this->component.doDispatch();
+
+    // WHY PUT 2 HERE?
+    ASSERT_FROM_PORT_HISTORY_SIZE(2);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
+
+    // WHY DO I NEED TO DODISPATCH? WHEN DO I NOT WANT TO DODISPATCH?
+    this->invoke_to_SchedIn(0,1);
+    this->component.doDispatch();
+
+    // WHY PUT 2 HERE?
+    ASSERT_FROM_PORT_HISTORY_SIZE(4);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(1);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(1);
+
+    // WHY DO I NEED TO DODISPATCH? WHEN DO I NOT WANT TO DODISPATCH?
+    this->invoke_to_SchedIn(0,1);
+    this->component.doDispatch();
+
+    // WHY PUT 2 HERE?
+    ASSERT_FROM_PORT_HISTORY_SIZE(6);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(2);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(2);
+
+    this->clearHistory();
+    // check the clear
+    ASSERT_FROM_PORT_HISTORY_SIZE(0);
+    ASSERT_TLM_SIZE(0);
+    ASSERT_TLM_LLTime_SIZE(0);
+    ASSERT_TLM_HLTime_SIZE(0);
+    ASSERT_EVENTS_SIZE(0);
+    ASSERT_EVENTS_SchedIn_Timeout_SIZE(0);
   }
 
   // ----------------------------------------------------------------------
