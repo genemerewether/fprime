@@ -1,0 +1,6 @@
+<interface name="RunSeqGoal" namespace="ROS::fprime_msgs">
+  <args>
+    <arg name="RunSeqGoal" pass_by="reference" type="ROS::fprime_msgs::RunSeqGoal"/>
+  </args>
+  <import_serializable_type>ROS/Gen/fprime_msgs/Types/RunSeqGoalSerializableAi.xml</import_serializable_type>
+</interface>

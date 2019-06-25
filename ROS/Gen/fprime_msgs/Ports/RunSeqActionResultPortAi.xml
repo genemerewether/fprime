@@ -1,0 +1,6 @@
+<interface name="RunSeqActionResult" namespace="ROS::fprime_msgs">
+  <args>
+    <arg name="RunSeqActionResult" pass_by="reference" type="ROS::fprime_msgs::RunSeqActionResult"/>
+  </args>
+  <import_serializable_type>ROS/Gen/fprime_msgs/Types/RunSeqActionResultSerializableAi.xml</import_serializable_type>
+</interface>

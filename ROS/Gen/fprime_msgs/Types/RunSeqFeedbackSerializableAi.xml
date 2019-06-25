@@ -1,0 +1,6 @@
+<serializable name="RunSeqFeedback" namespace="ROS::fprime_msgs">
+  <members>
+    <member name="cmdsCompleted" type="U32"/>
+    <member name="cmdsTotal" type="U32"/>
+  </members>
+</serializable>
