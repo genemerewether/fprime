@@ -7,23 +7,36 @@
     <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
 
-    <!--import_dictionary>Gnc/Ctrl/ActuatorAdapter/Telemetry.xml</import_dictionary>
-    <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Events.xml</import_dictionary>
-    <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Commands.xml</import_dictionary-->
+    <import_dictionary>Drv/Mavlink/GPSPosAdapter/Telemetry.xml</import_dictionary>
+    <!--import_dictionary>Drv/Mavlink/GPSPosAdapter/Events.xml</import_dictionary>
+    <import_dictionary>Drv/Mavlink/GPSPosAdapter/Commands.xml</import_dictionary-->
 
     <ports>
 
         <port name="Guid" data_type="ROS::mav_msgs::FlatOutput"  kind="sync_input"    max_number="1">
+            <comment>
+            Input port from guidance component, provides the next desired setpoint
+            </comment>
         </port>
 
         <port name="Nav" data_type="ROS::mav_msgs::FlatOutput"  kind="sync_input"    max_number="1">
+            <comment>
+            Input port from navigation component, provides the current pose estimate
+            </comment>
         </port>
         
+        <!--port name="PX4" data_type="ROS::mav_msgs::FlatOutput"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="Des" data_type="ROS::mav_msgs::FlatOutput"  kind="output"    max_number="1">
+        </port-->
+
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>
 

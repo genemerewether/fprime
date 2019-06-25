@@ -3,4 +3,3 @@ SRC = 	GPSPosAdapterComponentAi.xml \
 
 HDR = GPSPosAdapterComponentImpl.hpp
 
-SUBDIRS=test
