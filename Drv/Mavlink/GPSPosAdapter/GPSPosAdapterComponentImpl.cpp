@@ -139,8 +139,7 @@ namespace Drv {
         NATIVE_UINT_TYPE context
     )
   {
-    // PX4Flat = FlatOutput;
-    // PX4_new = true;
+    // Nothing to do here?
   }
 
   void GPSPosAdapterComponentImpl ::
