@@ -67,86 +67,65 @@ namespace Svc {
         Fw::Time time2
     )
   {
-    // TODO
+    U32 TimeBase1 = time1.getTimeBase();
+    U32 TimeBase2 = time2.getTimeBase();
 
-    if {time1.getTimeBase() == WS_TB}
-    {
-      int idx1 = 0;
-    } else if {time1.getTimeBase() == PROC_TB}
-    {
-      int idx1 = 1;
-    } else if {time1.getTimeBase() == ROS_TB}
-    {
-      int idx1 = 2;
-    } else {
-      // error out or ignore this
-    }
-
-    if {time2.getTimeBase() == WS_TB}
-    {
-      int idx1 = 0;
-    } else if {time2.getTimeBase() == PROC_TB}
-    {
-      int idx1 = 1;
-    } else if {time2.getTimeBase() == ROS_TB}
-    {
-      int idx1 = 2;
-    } else {
-      // error out or ignore this
-    }
-
+    I64 time1_usec = (I64)time1.getSeconds() * 1000LL * 1000LL + (I64)time1.getUSeconds();
+    I64 time2_usec = (I64)time2.getSeconds() * 1000LL * 1000LL + (I64)time2.getUSeconds();
+ 
     // adjacency graph
-    // 0 - WS_TB, 1 - PROC_TB, 2 - ROS_TB
-    // row = from, col = to
-    // Graph[idx_from][idx_to]
+    // Graph[from][to]
     // from + edge_weight = to
-    Graph[idx1][idx2] = time2 - time1;
-    Graph[idx2][idx1] = time1 - time2;
-
+    adjGraph[TimeBase1][TimeBase2] = time2_usec - time1_usec;
+    adjGraph[TimeBase2][TimeBase1] = time1_usec - time2_usec;
+    boolAdjGraph[TimeBase1][TimeBase2] = true;
+    boolAdjGraph[TimeBase2][TimeBase1] = true;
   }
 
   Fw::Time TimeConvertComponentImpl ::
     ConvertTime_handler(
         const NATIVE_INT_TYPE portNum,
         Fw::Time time,
-        TimeBase timeBase,
-        FwTimeContextStoreType timeContext,
+        U32 timeBase,
+        U32 timeContext,
         bool& success
     )
   {
-    // TODO
 
-    if {time.getTimeBase() == WS_TB}
+    U32 fromTimeBase = time.getTimeBase();
+
+    if (fromTimeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph) / FW_NUM_ARRAY_ELEMENTS(adjGraph[0]))
     {
-      int idx_from = 0;
-    } else if {time.getTimeBase() == PROC_TB}
-    {
-      int idx_from = 1;
-    } else if {time.getTimeBase() == ROS_TB}
-    {
-      int idx_from = 2;
-    } else {
-      // error out or ignore this
+      success = false;
+      // TODO: event to user
+      return Fw::Time();
     }
 
-    if {timeBase == WS_TB}
+    if (timeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph))
     {
-      int idx_to = 0;
-    } else if {timeBase == PROC_TB}
-    {
-      int idx_to = 1;
-    } else if {timeBase == ROS_TB}
-    {
-      int idx_to = 2;
-    } else {
-      // error out or ignore this
+      success = false;
+      // TODO: event to user
+      return Fw::Time();
     }
-    
-    ConvertedTime = time + Graph[idx_from][idx_to];
-    // ConvertedTime.setTimeBase(timeBase);
-    // ConvertedTime.setTimeContext(timeContext);
-    this->Time_out(0, ConvertedTime);
-    // what do i do with the success flag????
+
+    I64 time_usec = (I64)time.getSeconds() * 1000LL * 1000LL + (I64)time.getUSeconds();
+
+    if (boolAdjGraph[fromTimeBase][timeBase])
+    {
+      I64 convertedTime_usec = time_usec + adjGraph[fromTimeBase][timeBase];
+      Fw::Time convertedTime = Fw::Time((TimeBase)timeBase, (FwTimeContextStoreType)timeContext, 
+                                (U32)(convertedTime_usec / 1000LL / 1000LL), 
+                                (U32)(convertedTime_usec % (1000LL * 1000LL)));
+      success = true;
+      return convertedTime;
+    }
+    else 
+    {
+      success = false;
+      // TODO: event to user
+      return Fw::Time();
+    }
+  
   }
 
 } // end namespace Svc
