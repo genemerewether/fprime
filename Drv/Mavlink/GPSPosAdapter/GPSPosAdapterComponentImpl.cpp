@@ -180,7 +180,7 @@ namespace Drv {
     mavlink_msg_set_position_target_local_ned_encode(system_id, autopilot_id, &message, &sp);
 
 
-    Fw::Buffer &buffer; //setup buffer and its size? What should it be
+    char buffer[300]; //setup buffer and its size? What should it be
 
     //unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
     mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
@@ -211,6 +211,12 @@ namespace Drv {
       {
         
         current_message = message;
+        // capture system and companion ids
+        system_id = message.sysid;
+        autopilot_id = message.compid;
+
+        // set received gps flag to true
+        receivedGPS = true;
 
         // Handle Message ID for position and attitude
         switch (message.msgid)
@@ -218,22 +224,22 @@ namespace Drv {
         case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
         {
           // decode position
-          mavlink_local_position_ned_t posNew;
-          mavlink_msg_local_position_ned_decode(&message, &posNew);
+          mavlink_local_position_ned_t posNewGPS;
+          mavlink_msg_local_position_ned_decode(&message, &posNewGPS);
           // assign coordinates to member variables
-          pos.x = posNew.x;
-          pos.y = posNew.y;
-          pos.z = posNew.z;
+          posGPS.x = posNewGPS.x;
+          posGPS.y = posNewGPS.y;
+          posGPS.z = posNewGPS.z;
           break;
         }
 
         case MAVLINK_MSG_ID_ATTITUDE:
         {
           // decode attitude
-          mavlink_attitude_t attNew;
-          mavlink_msg_attitude_decode(&message, &attNew);
+          mavlink_attitude_t attNewGPS;
+          mavlink_msg_attitude_decode(&message, &attNewGPS);
           //assign yaw to member variable
-          att.yaw = attNew.yaw;
+          attGPS.yaw = attNewGPS.yaw;
           break;
         }
 
@@ -243,8 +249,36 @@ namespace Drv {
           break;
         }
         }
-        printf("CURRENT POSITION XYZ & YAW = [ % .4f , % .4f , % .4f, % .4f ] \n", pos.x, pos.y, pos.z, att.yaw);
+        // example use sendPosDesGPS function: send drone to the moon
+        sendPosDesGPS(1.0, 2.0,posGPS.z + .1, attGPS.yaw);
       }
     }
   }
+
+  void GPSPosAdapterComponentImpl::sendPosDesGPS(float xDesGPS, float yDesGPS, float zDesGPS, float yawDesGPS) {
+    // write desired pos to GPS
+    printf("DESIRED POSITION XYZ & YAW GPS = [ % .4f , % .4f , % .4f, % .4f ] \n", xDesGPS, yDesGPS, zDesGPS, yawDesGPS);
+    
+    // declare and update setpoint struct with target XYZ in local NED frame in meters
+    mavlink_set_position_target_local_ned_t sp;
+    sp.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION;
+    sp.coordinate_frame = MAV_FRAME_LOCAL_NED;
+    sp.x = xDesGPS;
+    sp.y = yDesGPS;
+    sp.z = zDesGPS;
+
+    // update yaw target
+    sp.type_mask &= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE ;
+    sp.yaw = yawDesGPS;
+
+    // PACK PAYLOAD
+	  //   ENCODE
+    mavlink_message_t message;
+    companion_id = 0; // companion computer component id
+    mavlink_msg_set_position_target_local_ned_encode(system_id, companion_id, &message, &sp);
+    }
+
+    //   WRITE
+    // TO DO: write message
+
 } // end namespace Drv
