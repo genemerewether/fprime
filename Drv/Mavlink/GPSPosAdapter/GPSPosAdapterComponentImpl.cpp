@@ -142,16 +142,15 @@ namespace Drv {
           break;
         }
         }
-        // example use sendPosDesGPS function: send drone to the moon
-        sendPosDesGPS(1.0, 2.0,posGPS.z + .1, attGPS.yaw);
       }
     }
   }
 
-  void GPSPosAdapterComponentImpl::sendPosDesGPS(float xDesGPS, float yDesGPS, float zDesGPS, float yawDesGPS) {
+  void GPSPosAdapterComponentImpl::sendPosDesGPS(float xDesGPS, float yDesGPS, float zDesGPS, float yawDesGPS)
+  {
     // write desired pos to GPS
     printf("DESIRED POSITION XYZ & YAW GPS = [ % .4f , % .4f , % .4f, % .4f ] \n", xDesGPS, yDesGPS, zDesGPS, yawDesGPS);
-    
+
     // declare and update setpoint struct with target XYZ in local NED frame in meters
     mavlink_set_position_target_local_ned_t sp;
     sp.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION;
@@ -161,17 +160,24 @@ namespace Drv {
     sp.z = zDesGPS;
 
     // update yaw target
-    sp.type_mask &= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE ;
+    sp.type_mask &= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
     sp.yaw = yawDesGPS;
 
     // PACK PAYLOAD
-	  //   ENCODE
+    //   ENCODE
     mavlink_message_t message;
     companion_id = 0; // companion computer component id
     mavlink_msg_set_position_target_local_ned_encode(system_id, companion_id, &message, &sp);
-    }
 
     //   WRITE
-    // TO DO: write message
+    char buf[300];
+
+    //  Translate message to buffer
+    //unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buf, &message);
+    int len = mavlink_msg_to_send_buffer((uint8_t *)buf, &message);
+
+    // TO DO
+    // Write buffer to serial port
+  }
 
 } // end namespace Drv
