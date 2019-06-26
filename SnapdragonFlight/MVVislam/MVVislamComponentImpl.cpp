@@ -52,6 +52,7 @@ namespace SnapdragonFlight {
       ,m_errorCode(0u)
       ,w_q_b(0.0, 0.0, 0.0, 1.0)
       ,x_b(0.0, 0.0, 0.0)
+      ,m_tbDes(TB_NONE)
   {
 
   }
@@ -71,6 +72,11 @@ namespace SnapdragonFlight {
 
   }
 
+  void MVVislamComponentImpl ::
+    setTBDes(TimeBase tbDes) {
+      this->m_tbDes = tbDes;
+  }
+  
   void MVVislamComponentImpl ::
     preamble(void)
   {
@@ -172,54 +178,32 @@ namespace SnapdragonFlight {
         ROS::sensor_msgs::ImuNoCov &imu
     )
   {
-      //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-
       ROS::std_msgs::Header h = imu.getheader();
       Fw::Time stamp = h.getstamp();
-      const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
-      Os::File::Status stat = Os::File::OTHER_ERROR;
-      Os::File file;
-      stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-      if (stat != Os::File::OP_OK) {
-          // TODO(mereweth) - EVR
-          printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-          return;
-      }
-      char buff[255];
-      NATIVE_INT_TYPE size = sizeof(buff);
-      stat = file.read(buff, size, false);
-      file.close();
-      if ((stat != Os::File::OP_OK) ||
-          !size) {
-          // TODO(mereweth) - EVR
-          printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-          return;
-      }
-      // Make sure buffer is null-terminated:
-      buff[sizeof(buff)-1] = 0;
-      const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
-      if (-walltimeDspLeadUs > usecDsp) {
-          // TODO(mereweth) - EVR; can't have difference greater than time
-          printf("linux-dsp diff %lld negative; greater than message time %lu\n",
-                 walltimeDspLeadUs, usecDsp);
-          return;
+      // if port is not connected, default to no conversion
+      Fw::Time convTime = stamp;
+
+      if (this->isConnected_convertTime_OutputPort(0)) {
+          bool success = false;
+          convTime = this->convertTime_out(0, stamp, TB_WORKSTATION_TIME, 0, success);
+          if (!success) {
+              // TODO(Mereweth) - EVR
+              return;
+          }
       }
-      const I64 usecRos = usecDsp + walltimeDspLeadUs;
-      stamp.set((U32) (usecRos / 1000LL / 1000LL),
-                (U32) (usecRos % (1000LL * 1000LL)));
-      h.setstamp(stamp);
+      
+      h.setstamp(convTime);
       imu.setheader(h);
-
-      //TODO(mereweth) - END convert time instead using HLTimeConv
-    
+      
+      const I64 usecHLOS = (I64) convTime.getSeconds() * 1000LL * 1000LL + (I64) convTime.getUSeconds();
       if (m_initialized && m_activated) {
 #ifdef BUILD_SDFLIGHT
-          mvVISLAM_AddAccel(m_mvVISLAMPtr, usecRos * 1000LL,
+          mvVISLAM_AddAccel(m_mvVISLAMPtr, usecHLOS * 1000LL,
                             imu.getlinear_acceleration().getx(),
                             imu.getlinear_acceleration().gety(),
                             imu.getlinear_acceleration().getz());
-          mvVISLAM_AddGyro(m_mvVISLAMPtr, usecRos * 1000LL,
+          mvVISLAM_AddGyro(m_mvVISLAMPtr, usecHLOS * 1000LL,
                            imu.getangular_velocity().getx(),
                            imu.getangular_velocity().gety(),
                            imu.getangular_velocity().getz());
@@ -240,9 +224,9 @@ namespace SnapdragonFlight {
       Fw::Buffer data = Image.getdata();
       if (m_initialized && m_activated) {
 #ifdef BUILD_SDFLIGHT
-          Fw::Time t = Image.getheader().getstamp();
-          I64 usecRos = t.getSeconds() * 1000LL * 1000LL + t.getUSeconds();
-          mvVISLAM_AddImage(m_mvVISLAMPtr, usecRos * 1000LL, (U8*) (data.getdata()));
+          Fw::Time hlosTime = Image.getheader().getstamp();
+          I64 usecHLOS = hlosTime.getSeconds() * 1000LL * 1000LL + hlosTime.getUSeconds();
+          mvVISLAM_AddImage(m_mvVISLAMPtr, usecHLOS * 1000LL, (U8*) (data.getdata()));
           mvVISLAMPose vio_pose = mvVISLAM_GetPose(m_mvVISLAMPtr);
 	  
           /*
@@ -305,48 +289,17 @@ namespace SnapdragonFlight {
               const Quaternionf odom_to_imu_q(odom_to_imu.rotation());
               const Vector3f odom_to_imu_v(odom_to_imu.translation());
 
-              //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-              Os::File::Status stat = Os::File::OTHER_ERROR;
-              Os::File file;
-              stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-              if (stat != Os::File::OP_OK) {
-                  // TODO(mereweth) - EVR
-                  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-                  return;
-              }
-              char buff[255];
-              NATIVE_INT_TYPE size = sizeof(buff);
-              stat = file.read(buff, size, false);
-              file.close();
-              if ((stat != Os::File::OP_OK) ||
-                  !size) {
-                  // TODO(mereweth) - EVR
-                  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-                  return;
-              }
-              // Make sure buffer is null-terminated:
-              buff[sizeof(buff)-1] = 0;
-              I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+              // if port is not connected, default to no conversion
+              Fw::Time convTime = hlosTime;
 
-              if (walltimeDspLeadUs > usecRos) {
-                  // TODO(mereweth) - EVR; can't have difference greater than time
-                  printf("linux-dsp diff %lld greater than message time %lu\n",
-                         walltimeDspLeadUs, usecRos);
-                  return;
+              if (this->isConnected_convertTime_OutputPort(0)) {
+                  bool success = false;
+                  convTime = this->convertTime_out(0, hlosTime, this->m_tbDes, 0, success);
+                  if (!success) {
+                      // TODO(Mereweth) - EVR
+                      return;
+                  }
               }
-              I64 usecDsp = usecRos - walltimeDspLeadUs;
-              Fw::Time convTime(TB_WORKSTATION_TIME,
-                                0,
-                                (U32) (usecDsp / 1000 / 1000),
-                                (U32) (usecDsp % (1000 * 1000)));
-
-              DEBUG_PRINT("usecRos %lld, lead %lld, convTime %u.%06u\n",
-                          usecRos,
-                          walltimeDspLeadUs,
-                          convTime.getSeconds(),
-                          convTime.getUSeconds());
-
-              //TODO(mereweth) - END convert time instead using HLTimeConv
 	      
               ImuStateUpdateNoCov update(
                   Header(Image.getheader().getseq(),

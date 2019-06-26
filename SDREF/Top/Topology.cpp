@@ -712,6 +712,12 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     atiNetbox_ptr->loadParameters();
     stereoCam_ptr->loadParameters();
 
+    // NOTE(mereweth) - convert to TB_PROC_TIME for F' outputs of components with time conversion
+    mrCtrlIface_ptr->setTBDes(TB_PROC_TIME);
+    sdRosIface_ptr->setTBDes(TB_PROC_TIME);
+    filterIface_ptr->setTBDes(TB_PROC_TIME);
+    mvVislam_ptr->setTBDes(TB_PROC_TIME);
+    
     // set static time offset
     // TODO(mereweth) - change this if we start timing out on correspondences
     // TODO(mereweth) - check to make sure we are not using ROS sim time

@@ -28,8 +28,6 @@
 
 #include <Os/File.hpp>
 
-//#define DO_TIME_CONV
-
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
 
@@ -49,6 +47,7 @@ namespace Gnc {
     GroundTruthIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_odometrySet() // zero-initialize instead of default-initializing
   {
@@ -79,6 +78,11 @@ namespace Gnc {
         ros::NodeHandle* n = this->m_nodeHandle;
 
         m_rosInited = true;
+    }
+
+    void GroundTruthIfaceComponentImpl ::
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
     }
 
     Os::Task::TaskStatus GroundTruthIfaceComponentImpl ::
@@ -154,6 +158,7 @@ namespace Gnc {
         n->setCallbackQueue(&localCallbacks);
 
         OdometryHandler updateHandler(compPtr, 0);
+        updateHandler.tbDes = compPtr->m_tbDes;
 
         ros::Subscriber updateSub = n->subscribe("odom_in", 10,
                                                  &OdometryHandler::odometryCallback,
@@ -166,6 +171,12 @@ namespace Gnc {
         }
     }
 
+    GroundTruthIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
+    }
+  
     GroundTruthIfaceComponentImpl :: OdometryHandler ::
       OdometryHandler(GroundTruthIfaceComponentImpl* compPtr,
                       int portNum) :
@@ -195,52 +206,6 @@ namespace Gnc {
             return;
         }
 
-#ifdef DO_TIME_CONV
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-
-        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
-                      + (I64) msg->header.stamp.nsec / 1000LL;
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
-
-        if (walltimeDspLeadUs > usecRos) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld greater than message time %lu\n",
-                   walltimeDspLeadUs, usecRos);
-            return;
-        }
-        I64 usecDsp = usecRos - walltimeDspLeadUs;
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (usecDsp / 1000 / 1000),
-                          (U32) (usecDsp % (1000 * 1000)));
-#else
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (msg->header.stamp.sec),
-                          (U32) (msg->header.stamp.nsec / 1000));
-#endif //DO_TIME_CONV
-        //TODO(mereweth) - END convert time instead using HLTimeConv
-
         if (!std::isfinite(msg->pose.pose.position.x) ||
             !std::isfinite(msg->pose.pose.position.y) ||
             !std::isfinite(msg->pose.pose.position.z) ||
@@ -261,6 +226,22 @@ namespace Gnc {
             return;
         }
 
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec * 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+        
         {
             using namespace ROS::std_msgs;
             using namespace ROS::nav_msgs;

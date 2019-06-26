@@ -65,7 +65,7 @@ namespace SnapdragonFlight {
     )
   {
       Fw::Time hlosTime = this->getTime();
-      I64 usecHLOS = (I64) hlosTime.getSeconds() * 1000LL * 1000LL + (I64) hlosTime.getUSeconds();
+      const I64 usecHLOS = (I64) hlosTime.getSeconds() * 1000LL * 1000LL + (I64) hlosTime.getUSeconds();
         
       Os::File::Status stat = Os::File::OTHER_ERROR;
       Os::File file;
@@ -95,7 +95,7 @@ namespace SnapdragonFlight {
                  walltimeDspLeadUs, usecHLOS);
           return;
       }
-      I64 usecDsp = usecHLOS - walltimeDspLeadUs;
+      const I64 usecDsp = usecHLOS - walltimeDspLeadUs;
       Fw::Time dspTime(TB_WORKSTATION_TIME,
                        0,
                        (U32) (usecDsp / 1000 / 1000),

@@ -53,6 +53,7 @@ namespace HLProc {
     HLRosIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_imageXport(NULL),
     m_actuatorsSet() // zero-initialize instead of default-initializing
@@ -77,6 +78,11 @@ namespace HLProc {
 
     }
 
+    void HLRosIfaceComponentImpl ::
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
+    }
+  
     void HLRosIfaceComponentImpl ::
       startPub() {
         // TODO(mereweth) - prevent calling twice; free imageXport
@@ -132,6 +138,21 @@ namespace HLProc {
         ROS::std_msgs::Header header = Imu.getheader();
         Fw::Time stamp = header.getstamp();
 
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
+
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+
+        header.setstamp(convTime);
+        Imu.setheader(header);
+        
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -312,12 +333,14 @@ namespace HLProc {
         n->setCallbackQueue(&localCallbacks);
 
         ActuatorsHandler actuatorsHandler0(compPtr, 0);
+        actuatorsHandler0.tbDes = compPtr->m_tbDes;
         ros::Subscriber actuatorsSub0 = n->subscribe("flight_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler0,
                                             ros::TransportHints().tcpNoDelay());
 
         ActuatorsHandler actuatorsHandler1(compPtr, 1);
+        actuatorsHandler1.tbDes = compPtr->m_tbDes;
         ros::Subscriber actuatorsSub1 = n->subscribe("aux_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler1,
@@ -327,6 +350,12 @@ namespace HLProc {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
+    }
+
+    HLRosIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
     }
 
     HLRosIfaceComponentImpl :: ActuatorsHandler ::
@@ -361,10 +390,25 @@ namespace HLProc {
                 //TODO(mereweth) - EVR
                 return;
             }
+
+            Fw::Time rosTime(TB_ROS_TIME, 0,
+                             msg->header.stamp.sec,
+                             msg->header.stamp.nsec * 1000);
+
+            // if port is not connected, default to no conversion
+            Fw::Time convTime = rosTime;
+
+            if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+                bool success = false;
+                convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+                if (!success) {
+                    // TODO(Mereweth) - EVR
+                    return;
+                }
+            }
+            
             Header head(msg->header.seq,
-                        Fw::Time(TB_ROS_TIME, 0,
-                                 msg->header.stamp.sec,
-                                 msg->header.stamp.nsec / 1000),
+                        convTime,
                         // TODO(mereweth) - convert frame id
                         0/*Fw::EightyCharString(msg->header.frame_id.data())*/);
 

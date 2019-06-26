@@ -12,11 +12,15 @@
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/ackermann_msgs/Ports/AckermannDriveStampedPortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/ConvertTimePortAi.xml</import_port_type>
 
     <import_dictionary>Gnc/Utils/AckermannIface/Telemetry.xml</import_dictionary>
     
     <ports>
         <port name="FileLogger" data_type="Svc::ActiveFileLogPort" kind="output">
+        </port>
+
+        <port name="convertTime" data_type="Fw::ConvertTime"  kind="output"    max_number="1">
         </port>
 
         <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

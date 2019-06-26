@@ -47,6 +47,7 @@ namespace Gnc {
     MultirotorCtrlIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_boolStampedSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
@@ -89,12 +90,17 @@ namespace Gnc {
         m_rosInited = true;
     }
 
+    void MultirotorCtrlIfaceComponentImpl ::
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
+    }
+
     Os::Task::TaskStatus MultirotorCtrlIfaceComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("MRCTRLIFACE");
-	this->m_nodeHandle = new ros::NodeHandle();
+        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, MultirotorCtrlIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -235,8 +241,11 @@ namespace Gnc {
         n->setCallbackQueue(&localCallbacks);
 
         BoolStampedHandler boolStampedHandler(compPtr, 0);
+        boolStampedHandler.tbDes = compPtr->m_tbDes;
         FlatOutputHandler flatoutHandler(compPtr, 0);
+        flatoutHandler.tbDes = compPtr->m_tbDes;
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
+        attRateThrustHandler.tbDes = compPtr->m_tbDes;
 
         ros::Subscriber flatoutSub = n->subscribe("flat_output_setpoint", 1,
                                                   &FlatOutputHandler::flatOutputCallback,
@@ -382,15 +391,29 @@ namespace Gnc {
             return;
         }
 
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec * 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+        
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
             FlatOutput flatOutput(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
 
@@ -462,15 +485,29 @@ namespace Gnc {
             return;
         }
 
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec * 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+        
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
             AttitudeRateThrust attRateThrust(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
 

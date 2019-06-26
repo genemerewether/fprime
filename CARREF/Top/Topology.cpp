@@ -713,6 +713,12 @@ void constructApp(unsigned int port_number,
     mvCam_ptr->loadParameters();
     stereoCam_ptr->loadParameters();
 
+    // NOTE(mereweth) - convert to TB_WORKSTATION_TIME for F' outputs of components with time conversion
+    ackermannIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    hlRosIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    filterIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    gtIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    
     // set static time offset
     // TODO(mereweth) - change this if we start timing out on correspondences
     // TODO(mereweth) - check to make sure we are not using ROS sim time

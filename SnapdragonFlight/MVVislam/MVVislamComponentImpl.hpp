@@ -60,6 +60,8 @@ namespace SnapdragonFlight {
       //!
       ~MVVislamComponentImpl(void);
 
+      void setTBDes(TimeBase tbDes);
+    
     PRIVATE:
 
       //! Preamble override
@@ -142,6 +144,8 @@ namespace SnapdragonFlight {
       ROS::geometry_msgs::Quaternion w_q_b;
     
       ROS::geometry_msgs::Vector3 x_b;
+
+      TimeBase m_tbDes;
 
     };
 

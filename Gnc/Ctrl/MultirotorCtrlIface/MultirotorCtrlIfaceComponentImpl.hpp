@@ -62,6 +62,8 @@ namespace Gnc {
       //!
       ~MultirotorCtrlIfaceComponentImpl(void);
 
+      void setTBDes(TimeBase tbDes);
+    
       void startPub();
 
       //! Start interrupt task
@@ -79,7 +81,6 @@ namespace Gnc {
         {
           public:
               TimeBaseHolder();
-          PROTECTED:
               TimeBase tbDes;
         };
     
@@ -167,6 +168,8 @@ namespace Gnc {
       // ----------------------------------------------------------------------
 
         bool m_rosInited;
+
+        TimeBase m_tbDes;
 
         ros::NodeHandle* m_nodeHandle;
 
