@@ -214,6 +214,9 @@ QUEST_GNC_MODULES := \
 QUEST_GNC_HW_MODULES := \
 	Gnc/Ctrl/ActuatorAdapter
 
+QUEST_EXTERNAL_MODULES := \
+	Gnc/quest_external/traj/ewok
+
 REF_MODULES := \
 	Ref/Top \
 	Ref/RecvBuffApp \
