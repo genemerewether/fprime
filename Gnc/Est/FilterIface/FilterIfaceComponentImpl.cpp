@@ -176,6 +176,7 @@ namespace Gnc {
             convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
             if (!success) {
                 // TODO(Mereweth) - EVR
+                DEBUG_PRINT("Failed to convert time in Odometry handler\n");
                 return;
             }
         }
@@ -360,7 +361,7 @@ namespace Gnc {
 
         Fw::Time rosTime(TB_ROS_TIME, 0,
                          msg->header.stamp.sec,
-                         msg->header.stamp.nsec * 1000);
+                         msg->header.stamp.nsec / 1000);
 
         // if port is not connected, default to no conversion
         Fw::Time convTime = rosTime;
@@ -369,6 +370,7 @@ namespace Gnc {
             bool success = false;
             convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
             if (!success) {
+                DEBUG_PRINT("Failed to convert time in ImuStateUpdate handler\n");
                 // TODO(Mereweth) - EVR
                 return;
             }
@@ -464,7 +466,7 @@ namespace Gnc {
         
         Fw::Time rosTime(TB_ROS_TIME, 0,
                          msg->header.stamp.sec,
-                         msg->header.stamp.nsec * 1000);
+                         msg->header.stamp.nsec / 1000);
 
         // if port is not connected, default to no conversion
         Fw::Time convTime = rosTime;
@@ -473,6 +475,7 @@ namespace Gnc {
             bool success = false;
             convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
             if (!success) {
+                DEBUG_PRINT("Failed to convert time in Imu handler\n");
                 // TODO(Mereweth) - EVR
                 return;
             }

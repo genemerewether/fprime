@@ -306,7 +306,7 @@ namespace Gnc {
 
         Fw::Time rosTime(TB_ROS_TIME, 0,
                          msg->header.stamp.sec,
-                         msg->header.stamp.nsec * 1000);
+                         msg->header.stamp.nsec / 1000);
 
         // if port is not connected, default to no conversion
         Fw::Time convTime = rosTime;
@@ -393,7 +393,7 @@ namespace Gnc {
 
         Fw::Time rosTime(TB_ROS_TIME, 0,
                          msg->header.stamp.sec,
-                         msg->header.stamp.nsec * 1000);
+                         msg->header.stamp.nsec / 1000);
 
         // if port is not connected, default to no conversion
         Fw::Time convTime = rosTime;
@@ -487,7 +487,7 @@ namespace Gnc {
 
         Fw::Time rosTime(TB_ROS_TIME, 0,
                          msg->header.stamp.sec,
-                         msg->header.stamp.nsec * 1000);
+                         msg->header.stamp.nsec / 1000);
 
         // if port is not connected, default to no conversion
         Fw::Time convTime = rosTime;
