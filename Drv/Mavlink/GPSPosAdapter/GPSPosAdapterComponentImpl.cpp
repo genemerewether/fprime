@@ -170,9 +170,9 @@ namespace Drv {
     mavlink_msg_set_position_target_local_ned_encode(system_id, companion_id, &message, &sp);
 
     //   WRITE
-    char buf[300];
 
     //  Translate message to buffer
+    char buf[300];
     unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buf, &message);
 
     // TO DO
