@@ -173,8 +173,7 @@ namespace Drv {
     char buf[300];
 
     //  Translate message to buffer
-    //unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buf, &message);
-    int len = mavlink_msg_to_send_buffer((uint8_t *)buf, &message);
+    unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buf, &message);
 
     // TO DO
     // Write buffer to serial port
