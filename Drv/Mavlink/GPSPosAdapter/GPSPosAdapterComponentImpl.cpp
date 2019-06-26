@@ -138,7 +138,55 @@ namespace Drv {
         NATIVE_UINT_TYPE context
     )
   {
-    // Nothing to do here?
+    // Should this be done here?
+
+    mavlink_message_t message;
+    mavlink_set_position_target_local_ned_t sp;
+
+    //set_position(des_x, des_y, des_z, sp);
+	 //sp.type_mask &=
+  	 sp.type_mask =
+  	 	MAVLINK_MSG_SET_FLATOUTPUT_TARGET_LOCAL_NED_POSITION;
+  	 sp.coordinate_frame = MAV_FRAME_LOCAL_NED;
+  	 sp.x   = des_x;
+  	 sp.y   = des_y;
+  	 sp.z   = des_z;
+  	 printf("POSITION SETPOINT XYZ = [ %.4f , %.4f , %.4f ] \n", sp.x, sp.y, sp.z);
+    
+
+    //set_yaw(des_psi, sp);
+	 //sp.type_mask &=
+	 //	MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE ;
+	 sp.yaw = des_psi;
+	 printf("POSITION SETPOINT YAW = %.4f \n", sp.yaw);
+
+   
+    //update_setpoint(sp);
+    if( not sp.time_boot_ms)
+    {
+       sp.time_boot_ms = (uint32_t) (GuidFlat.getheader().getstamp().nsec/1000);
+    }
+    if( not system_id)
+    {
+       system_id = current_message.sysid;
+       sp.target_system = system_id;
+    }
+    if( not autopilot_id)
+    {
+       autopilot_id = current_message.compid;
+       sp.target_component = autopilot_id;
+    }
+
+    mavlink_msg_set_position_target_local_ned_encode(system_id, autopilot_id, &message, &sp);
+
+
+    Fw::Buffer &buffer; //setup buffer and its size? What should it be
+
+    //unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
+    mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
+
+    SerWritePort_out(0, buffer);
+
   }
 
   void GPSPosAdapterComponentImpl ::
@@ -155,11 +203,14 @@ namespace Drv {
     // declare Mavlink parsing variable
     mavlink_message_t message;
     mavlink_status_t status_comm;
+
     for (int i = 0; i < size; i++)
     {
       // parse message checking for result
       if (mavlink_parse_char(MAVLINK_COMM_1, buf[i], &message, &status_comm))
       {
+        
+        current_message = message;
 
         // Handle Message ID for position and attitude
         switch (message.msgid)
