@@ -26,6 +26,9 @@
 #include <Drv/Mavlink/c_library_v2/mavlink_types.h>
 #include <Drv/Mavlink/c_library_v2/mavlink_helpers.h>
 
+#define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION     0b0000110111111000
+#define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE    0b0000100111111111
+
 namespace Drv {
 
   class GPSPosAdapterComponentImpl :
@@ -33,7 +36,6 @@ namespace Drv {
   {
 
     public:
-
       // ----------------------------------------------------------------------
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
@@ -59,10 +61,16 @@ namespace Drv {
       ~GPSPosAdapterComponentImpl(void);
 
     PRIVATE:
+      // Member variables for position and attitude from Pixhawk
+      mavlink_local_position_ned_t posGPS;
+      mavlink_attitude_t attGPS;
+      bool receivedGPS = false;
+      int system_id; // system id
+	    int autopilot_id; // autopilot component id
+	    int companion_id; // companion computer component id
 
-      // Member variables for position and attitude frmo Pixhawk
-      mavlink_local_position_ned_t pos;
-      mavlink_attitude_t att;
+      // member function to send  desired GPS coordinates through output port
+      void sendPosDesGPS(float xDesGPS, float yDesGPS, float zDesGPS, float yawDesGPS);
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -96,7 +104,6 @@ namespace Drv {
           Fw::Buffer &serBuffer, /*!< Buffer containing data*/
           SerialReadStatus &status /*!< Status of read*/
       );
-
 
     };
 
