@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define PI 3.14159265
+//#define PI 3.14159265
 
 namespace Drv {
 
@@ -67,14 +67,9 @@ namespace Drv {
     using namespace ROS::mav_msgs;
     using namespace ROS::geometry_msgs;
     
-    if(Guid_new && Nav_new && PX4_new)
+    if(Guid_new && Nav_new && receivedGPS)
     {
-      // if (!std::isfinite(GuidFlat.getHeader().stamp.sec) ||
-      //     !std::isfinite(GuidFlat.getHeader().stamp.nsec)) {
-      //     //TODO(mereweth) - EVR
-      //     return;
-      // }
-  
+
       if (!__builtin_isfinite(GuidFlat.getposition().getx()) ||
           !__builtin_isfinite(GuidFlat.getposition().gety()) ||
           !__builtin_isfinite(GuidFlat.getposition().getz()) ||
@@ -84,41 +79,31 @@ namespace Drv {
           !__builtin_isfinite(NavFlat.getposition().gety()) ||
           !__builtin_isfinite(NavFlat.getposition().getz()) ||
           !__builtin_isfinite(NavFlat.getyaw())) {
-          //TODO(mereweth) - EVR
           return;
       }
 
       if(init_offset)
       {
-        dpsi = att.yaw - NavFlat.getyaw();
-        dz = pos.z - NavFlat.getposition().getz();
-        dx = pos.x - (NavFlat.getposition().getx()*cos(PI*dpsi/180.) - NavFlat.getposition().gety()*sin(PI*dpsi/180.));
-        dy = pos.y - (NavFlat.getposition().getx()*sin(PI*dpsi/180.) + NavFlat.getposition().gety()*cos(PI*dpsi/180.));
+        dpsi = attGPS.yaw - NavFlat.getyaw();
+        dz = posGPS.z - NavFlat.getposition().getz();
+        dx = posGPS.x - (NavFlat.getposition().getx()*cos(dpsi) - NavFlat.getposition().gety()*sin(dpsi));
+        dy = posGPS.y - (NavFlat.getposition().getx()*sin(dpsi) + NavFlat.getposition().gety()*cos(dpsi));
 
         init_offset = false;
       }
       
-      des_x = GuidFlat.getposition().getx()*cos(PI*dpsi/180.) - GuidFlat.getposition().gety()*sin(PI*dpsi/180.) - dx;
-      des_y = GuidFlat.getposition().getx()*sin(PI*dpsi/180.) + GuidFlat.getposition().gety()*cos(PI*dpsi/180.) - dy;
+      des_x = GuidFlat.getposition().getx()*cos(dpsi) - GuidFlat.getposition().gety()*sin(dpsi) - dx;
+      des_y = GuidFlat.getposition().getx()*sin(dpsi) + GuidFlat.getposition().gety()*cos(dpsi) - dy;
       des_z = GuidFlat.getposition().getz() - dz;
       des_psi = GuidFlat.getyaw() - dpsi;
       
-      // Header h = GuidFlat.getheader();
-      // 
-      // FlatOutput DesFlat(Header(h.getseq(),
-      //    Fw::Time(TB_ROS_TIME,0,msg->header.stamp.sec,msg->header.stamp.nsec/1000),0),
-      //    Point(des_x,des_y,des_z),
-      //    Vector3(0.0,0.0,0.0),
-      //    Vector3(0.0,0.0,0.0),
-      //    des_psi);
-
       Guid_new = false;
       Nav_new = false;
       PX4_new = false;
     }
 
-    // // Output the desired Pose in GPS_PX4 frame
-    // GPSPosAdapterComponentBase::Des_out(0,DesFlat);
+    // Send desired flatoutput to the Pixhawk
+    sendPosDesGPS(des_x, des_y, des_z, des_psi);
 
   }
 
@@ -138,55 +123,7 @@ namespace Drv {
         NATIVE_UINT_TYPE context
     )
   {
-    // Should this be done here?
-
-    mavlink_message_t message;
-    mavlink_set_position_target_local_ned_t sp;
-
-    //set_position(des_x, des_y, des_z, sp);
-	 //sp.type_mask &=
-  	 sp.type_mask =
-  	 	MAVLINK_MSG_SET_FLATOUTPUT_TARGET_LOCAL_NED_POSITION;
-  	 sp.coordinate_frame = MAV_FRAME_LOCAL_NED;
-  	 sp.x   = des_x;
-  	 sp.y   = des_y;
-  	 sp.z   = des_z;
-  	 printf("POSITION SETPOINT XYZ = [ %.4f , %.4f , %.4f ] \n", sp.x, sp.y, sp.z);
-    
-
-    //set_yaw(des_psi, sp);
-	 //sp.type_mask &=
-	 //	MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE ;
-	 sp.yaw = des_psi;
-	 printf("POSITION SETPOINT YAW = %.4f \n", sp.yaw);
-
-   
-    //update_setpoint(sp);
-    if( not sp.time_boot_ms)
-    {
-       sp.time_boot_ms = (uint32_t) (GuidFlat.getheader().getstamp().nsec/1000);
-    }
-    if( not system_id)
-    {
-       system_id = current_message.sysid;
-       sp.target_system = system_id;
-    }
-    if( not autopilot_id)
-    {
-       autopilot_id = current_message.compid;
-       sp.target_component = autopilot_id;
-    }
-
-    mavlink_msg_set_position_target_local_ned_encode(system_id, autopilot_id, &message, &sp);
-
-
-    char buffer[300]; //setup buffer and its size? What should it be
-
-    //unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
-    mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
-
-    SerWritePort_out(0, buffer);
-
+    // TODO
   }
 
   void GPSPosAdapterComponentImpl ::
@@ -249,8 +186,6 @@ namespace Drv {
           break;
         }
         }
-        // example use sendPosDesGPS function: send drone to the moon
-        sendPosDesGPS(1.0, 2.0,posGPS.z + .1, attGPS.yaw);
       }
     }
   }
@@ -280,5 +215,8 @@ namespace Drv {
 
     //   WRITE
     // TO DO: write message
+    char buffer[300]; //setup buffer
+    mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
+    SerWritePort_out(0, buffer);
 
 } // end namespace Drv
