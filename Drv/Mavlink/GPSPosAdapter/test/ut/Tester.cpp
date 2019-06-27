@@ -140,21 +140,21 @@ namespace Drv {
      ROS::mav_msgs::InputFlatOutputPort flatNav_p;
      ROS::mav_msgs::InputFlatOutputPort flatGuid_p;
      
-     Fw::Time time__t(TB_WORKSTATION_TIME,10,11);
-     //time__t.set(1000,1000);
+     Fw::Time time__t;//(TB_WORKSTATION_TIME,10,11);
+     time__t.set(1000,1000);
      printf("Time: %lu\n",time__t.getSeconds());
 
      printf("Firstv1\n");
-     ROS::std_msgs::Header header(10,time__t,0);
+     ROS::std_msgs::Header header(10,time__t,(char) 0);
      
      printf("Firstv2\n");
      ROS::mav_msgs::FlatOutput flatNav_t(header,ROS::geometry_msgs::Point(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),0.0);
      ROS::mav_msgs::FlatOutput flatGuid_t(header,ROS::geometry_msgs::Point(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),0.0);
      
-     printf("Second\n");
+     //printf("Second\n");
      //this->connect_to_Nav(0,&flatNav_p);
      
-     printf("Third\n");
+     //printf("Third\n");
      //this->connect_to_Guid(1,&flatGuid_p);
      
      printf("Fourth\n");

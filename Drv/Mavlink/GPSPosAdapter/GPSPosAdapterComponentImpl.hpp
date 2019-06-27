@@ -142,8 +142,8 @@ namespace Drv {
       ROS::mav_msgs::FlatOutput NavFlat;
       
       // Flags for received data and transform initiation
-      bool Guid_new = false, Nav_new = false, receivedGPS = false, 
-      bool init_offset = true;
+      bool Guid_new = false, Nav_new = false, receivedGPS = false;
+      bool initOffset = true;
       
       // Delta values for transforms
       double dpsi = 0.0, dz = 0.0, dx = 0.0, dy = 0.0; 

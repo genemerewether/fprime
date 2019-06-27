@@ -82,14 +82,14 @@ namespace Drv {
           return;
       }
 
-      if(init_offset)
+      if(initOffset)
       {
         dpsi = attGPS.yaw - NavFlat.getyaw();
         dz = posGPS.z - NavFlat.getposition().getz();
         dx = posGPS.x - (NavFlat.getposition().getx()*cos(dpsi) - NavFlat.getposition().gety()*sin(dpsi));
         dy = posGPS.y - (NavFlat.getposition().getx()*sin(dpsi) + NavFlat.getposition().gety()*cos(dpsi));
 
-        init_offset = false;
+        initOffset = false;
       }
       
       des_x = GuidFlat.getposition().getx()*cos(dpsi) - GuidFlat.getposition().gety()*sin(dpsi) - dx;
@@ -99,7 +99,7 @@ namespace Drv {
       
       Guid_new = false;
       Nav_new = false;
-      PX4_new = false;
+      //PX4_new = false;
     }
 
     // Send desired flatoutput to the Pixhawk
@@ -215,8 +215,8 @@ namespace Drv {
 
     //   WRITE
     // TO DO: write message
-    char buffer[300]; //setup buffer
-    mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
-    SerWritePort_out(0, buffer);
+    //char buffer[300]; //setup buffer
+    //mavlink_msg_to_send_buffer((uint8_t*)buffer, &message);
+    //SerWritePort_out(0, buffer);
 
 } // end namespace Drv
