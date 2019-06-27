@@ -94,14 +94,14 @@ namespace Svc {
 
     U32 fromTimeBase = time.getTimeBase();
 
-    if (fromTimeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph) / FW_NUM_ARRAY_ELEMENTS(adjGraph[0]))
+    if (fromTimeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph))
     {
       success = false;
       // TODO: event to user
       return Fw::Time();
     }
 
-    if (timeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph))
+    if (timeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph[0]))
     {
       success = false;
       // TODO: event to user

@@ -229,7 +229,7 @@ namespace Gnc {
             bool success = false;
             convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
             if (!success) {
-                // TODO(Mereweth) - EVR
+                DEBUG_PRINT("failed to convert time in ackermannDriveStamped\n");
                 return;
             }
         }
