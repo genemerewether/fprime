@@ -714,6 +714,8 @@ namespace SnapdragonFlight {
 #endif
                               image.setheader(ROS::std_msgs::Header(m_imagesAcquired,
                                                                     hwTime, 2/*"optic"*/));
+                              image.setexposure(m_exposureTargetTrunc);
+                              image.setgain(m_gainTargetTrunc);
                               GncBufferSend_out(0, image);
                           }
                               break;

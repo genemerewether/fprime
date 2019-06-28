@@ -33,6 +33,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/fill_image.h>
+#include "std_msgs/Float32.h"
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -90,7 +91,7 @@ namespace HLProc {
         ros::NodeHandle* n = this->m_nodeHandle;
         m_imageXport = new image_transport::ImageTransport(*n);
 
-        char buf[32];
+        char buf[512];
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
             m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
@@ -99,6 +100,12 @@ namespace HLProc {
         for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_%d", i);
             m_imagePub[i] = m_imageXport->advertise(buf, 1);
+            
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_exposure_%d", i);
+            m_exposurePub[i] = n->advertise<std_msgs::Float32>(buf, 1);
+            
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_gain_%d", i);
+            m_gainPub[i] = n->advertise<std_msgs::Float32>(buf, 1);
         }
 
         for (int i = 0; i < NUM_POINTCLOUD_INPUT_PORTS; i++) {
@@ -254,6 +261,13 @@ namespace HLProc {
             msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
             msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
             msg.is_bigendian = Image.getis_bigendian();
+            std_msgs::Float32 gain;
+            gain.data = Image.getgain();
+            m_gainPub[portNum].publish(gain);
+            std_msgs::Float32 exposure;
+            exposure.data = Image.getexposure();
+            m_exposurePub[portNum].publish(exposure);
+            
             m_imagePub[portNum].publish(msg);
         }
         Fw::Buffer temp = Image.getdata();
