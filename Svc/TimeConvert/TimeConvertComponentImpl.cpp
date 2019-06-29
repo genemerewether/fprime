@@ -86,6 +86,20 @@ namespace Svc {
     adjGraph[TimeBase2][TimeBase1] = time1_usec - time2_usec;
     boolAdjGraph[TimeBase1][TimeBase2] = true;
     boolAdjGraph[TimeBase2][TimeBase1] = true;
+
+    // TODO(mereweth) - non brute-force method for finding paths, support length longer than 2 hops
+    for (int ii = 0; ii < FW_NUM_ARRAY_ELEMENTS(adjGraph); ii++) {
+        for (int jj = 0; jj < FW_NUM_ARRAY_ELEMENTS(adjGraph); jj++) {
+            for (int kk = 0; kk < FW_NUM_ARRAY_ELEMENTS(adjGraph[0]); kk++) {
+                if (boolAdjGraph[ii][jj] && boolAdjGraph[jj][kk] && !boolAdjGraph[ii][kk]) {
+                    boolAdjGraph[ii][kk] = true;
+                    boolAdjGraph[kk][ii] = true;
+                    adjGraph[ii][kk] = adjGraph[ii][jj] + adjGraph[jj][kk];
+                    adjGraph[kk][ii] = -adjGraph[ii][kk];
+                }
+            }
+        }
+    }
   }
 
   Fw::Time TimeConvertComponentImpl ::
