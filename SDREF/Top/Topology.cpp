@@ -500,14 +500,30 @@ void manualConstruct() {
     rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
                                                  llTimeSync_ptr->get_SchedIn_InputPort(0));
     llTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
+
 #ifdef BUILD_SDFLIGHT
     llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
 #else // BUILD_SDFLIGHT
     llTimeSync_ptr->set_GPIOPulse_OutputPort(0, gpioTimeSync_ptr->get_gpioWrite_InputPort(0));
 #endif //BUILD_SDFLIGHT
-
 #endif //LLROUTER_DEVICES
 
+#ifdef BUILD_SDFLIGHT
+    llRouter_ptr->set_SerialBufferSend_OutputPort(0, blspSerialDriverLL_ptr->get_readBufferSend_InputPort(0));
+    llRouter_ptr->set_SerWritePort_OutputPort(0, blspSerialDriverLL_ptr->get_serialSend_InputPort(0));
+    blspSerialDriverLL_ptr->set_serialRecv_OutputPort(0, llRouter_ptr->get_SerReadPort_InputPort(0));
+    
+    serialTextConv_ptr->set_SerialBufferSend_OutputPort(0, blspSerialDriverDebug_ptr->get_readBufferSend_InputPort(0));
+    blspSerialDriverDebug_ptr->set_serialRecv_OutputPort(0, serialTextConv_ptr->get_SerReadPort_InputPort(0));
+#else // BUILD_SDFLIGHT
+    llRouter_ptr->set_SerialBufferSend_OutputPort(0, serialDriverLL_ptr->get_readBufferSend_InputPort(0));
+    llRouter_ptr->set_SerWritePort_OutputPort(0, serialDriverLL_ptr->get_serialSend_InputPort(0));
+    serialDriverLL_ptr->set_serialRecv_OutputPort(0, llRouter_ptr->get_SerReadPort_InputPort(0));
+    
+    serialTextConv_ptr->set_SerialBufferSend_OutputPort(0, serialDriverDebug_ptr->get_readBufferSend_InputPort(0));
+    serialDriverDebug_ptr->set_serialRecv_OutputPort(0, serialTextConv_ptr->get_SerReadPort_InputPort(0));
+#endif //BUILD_SDFLIGHT
+    
     hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
     // doesn't matter which compCmdStat port # for cmdDisp
     ipcRelay_ptr->set_proc2Out_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
