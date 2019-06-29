@@ -12,6 +12,7 @@
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/ConvertTimePortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
@@ -22,6 +23,9 @@
     
     <ports>
         <port name="FileLogger" data_type="Svc::ActiveFileLogPort" kind="output">
+        </port>
+
+        <port name="convertTime" data_type="Fw::ConvertTime"  kind="output"    max_number="1">
         </port>
 
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="async_input"    max_number="1" full="drop">

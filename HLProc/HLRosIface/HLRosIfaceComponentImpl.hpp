@@ -62,6 +62,8 @@ namespace HLProc {
       //!
       ~HLRosIfaceComponentImpl(void);
 
+      void setTBDes(TimeBase tbDes);
+    
       void startPub();
 
       //! Start interrupt task
@@ -75,7 +77,14 @@ namespace HLProc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class ActuatorsHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+              TimeBase tbDes;
+        };
+    
+        class ActuatorsHandler : public TimeBaseHolder
         {
           public:
               ActuatorsHandler(HLRosIfaceComponentImpl* compPtr,
@@ -138,6 +147,8 @@ namespace HLProc {
 
         bool m_rosInited;
 
+        TimeBase m_tbDes;
+
         //! Publishers for IMU data
         //!
         ros::Publisher m_imuPub[NUM_IMU_INPUT_PORTS];
@@ -145,6 +156,8 @@ namespace HLProc {
         ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;
         image_transport::Publisher m_imagePub[NUM_IMAGERECV_INPUT_PORTS];
+        ros::Publisher m_exposurePub[NUM_IMAGERECV_INPUT_PORTS];
+        ros::Publisher m_gainPub[NUM_IMAGERECV_INPUT_PORTS];
     
         ros::Publisher m_pointCloudPub[NUM_POINTCLOUD_INPUT_PORTS];
 

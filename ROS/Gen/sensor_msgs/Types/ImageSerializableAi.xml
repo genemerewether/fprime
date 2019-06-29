@@ -7,6 +7,8 @@
     <member name="is_bigendian" type="U8"/>
     <member name="step" type="U32"/>
     <member name="data" type="Fw::Buffer"/>
+    <member name="exposure" type="F32"/>
+    <member name="gain" type="F32"/>
   </members>
   <import_serializable_type>Fw/Buffer/BufferSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>

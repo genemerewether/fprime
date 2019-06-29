@@ -91,7 +91,15 @@ Drv::ATINetboxComponentImpl* atiNetbox_ptr = 0;
 
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
+SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverLL_ptr = 0;
+SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverDebug_ptr = 0;
+Drv::LinuxGpioDriverComponentImpl* gpioTimeSync_ptr = 0;
+SnapdragonFlight::BlspGpioDriverComponentImpl* blspGpioTimeSync_ptr = 0;
 Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
+
+Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
+Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr = 0;
+SnapdragonFlight::DspOffsetComponentImpl* dspTimeSync_ptr = 0;
 
 Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
 
@@ -319,6 +327,48 @@ void allocComps() {
 #endif
 ;
 
+    blspSerialDriverLL_ptr = new SnapdragonFlight::BlspSerialDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("BSERDRVLL")
+#endif
+;
+
+    blspSerialDriverDebug_ptr = new SnapdragonFlight::BlspSerialDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("BSERDRVDBUG")
+#endif
+;
+
+    gpioTimeSync_ptr = new Drv::LinuxGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("GSYNC")
+#endif
+;
+
+    blspGpioTimeSync_ptr = new SnapdragonFlight::BlspGpioDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("BGSYNC")
+#endif
+;
+
+    timeConvert_ptr = new Svc::TimeConvertComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TIMECONV")
+#endif
+;
+
+    llTimeSync_ptr = new Svc::TimeSyncOffsetComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("LLSYNC")
+#endif
+;
+
+    dspTimeSync_ptr = new SnapdragonFlight::DspOffsetComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("DSPSYNC")
+#endif
+;
+
     serialTextConv_ptr = new Svc::SerialTextConverterComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("STCONVERTER")
@@ -400,8 +450,10 @@ void manualConstruct() {
     hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+    // port 7 only used with LLRouter (timesync)
 
-    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1, hexRouter_ptr->get_Sched_InputPort(0));
+    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                  hexRouter_ptr->get_Sched_InputPort(0));
 
     mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
@@ -415,7 +467,11 @@ void manualConstruct() {
     hexRouter_ptr->set_HexPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
     mrCtrlIface_ptr->set_boolStamped_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(9));
-#else
+
+    rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                 dspTimeSync_ptr->get_SchedIn_InputPort(0));
+    dspTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
+#else //LLROUTER_DEVICES
     // Sequence Com buffer and cmd response
     cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
@@ -426,6 +482,7 @@ void manualConstruct() {
     llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
     llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+    llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
 
     mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
     sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
@@ -439,8 +496,34 @@ void manualConstruct() {
     llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
     mrCtrlIface_ptr->set_boolStamped_OutputPort(0, llRouter_ptr->get_KraitPortsIn_InputPort(9));
-#endif
 
+    rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                 llTimeSync_ptr->get_SchedIn_InputPort(0));
+    llTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
+
+#ifdef BUILD_SDFLIGHT
+    llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
+#else // BUILD_SDFLIGHT
+    llTimeSync_ptr->set_GPIOPulse_OutputPort(0, gpioTimeSync_ptr->get_gpioWrite_InputPort(0));
+#endif //BUILD_SDFLIGHT
+#endif //LLROUTER_DEVICES
+
+#ifdef BUILD_SDFLIGHT
+    llRouter_ptr->set_SerialBufferSend_OutputPort(0, blspSerialDriverLL_ptr->get_readBufferSend_InputPort(0));
+    llRouter_ptr->set_SerWritePort_OutputPort(0, blspSerialDriverLL_ptr->get_serialSend_InputPort(0));
+    blspSerialDriverLL_ptr->set_serialRecv_OutputPort(0, llRouter_ptr->get_SerReadPort_InputPort(0));
+    
+    serialTextConv_ptr->set_SerialBufferSend_OutputPort(0, blspSerialDriverDebug_ptr->get_readBufferSend_InputPort(0));
+    blspSerialDriverDebug_ptr->set_serialRecv_OutputPort(0, serialTextConv_ptr->get_SerReadPort_InputPort(0));
+#else // BUILD_SDFLIGHT
+    llRouter_ptr->set_SerialBufferSend_OutputPort(0, serialDriverLL_ptr->get_readBufferSend_InputPort(0));
+    llRouter_ptr->set_SerWritePort_OutputPort(0, serialDriverLL_ptr->get_serialSend_InputPort(0));
+    serialDriverLL_ptr->set_serialRecv_OutputPort(0, llRouter_ptr->get_SerReadPort_InputPort(0));
+    
+    serialTextConv_ptr->set_SerialBufferSend_OutputPort(0, serialDriverDebug_ptr->get_readBufferSend_InputPort(0));
+    serialDriverDebug_ptr->set_serialRecv_OutputPort(0, serialTextConv_ptr->get_SerReadPort_InputPort(0));
+#endif //BUILD_SDFLIGHT
+    
     hiresCam_ptr->set_CmdStatus_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(0));
     // doesn't matter which compCmdStat port # for cmdDisp
     ipcRelay_ptr->set_proc2Out_OutputPort(0, cmdDisp_ptr->get_compCmdStat_InputPort(0));
@@ -574,6 +657,14 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
 
+    blspSerialDriverLL_ptr->init();
+    blspSerialDriverDebug_ptr->init();
+    gpioTimeSync_ptr->init();
+    blspGpioTimeSync_ptr->init();
+    timeConvert_ptr->init();
+    llTimeSync_ptr->init(60, 0);
+    dspTimeSync_ptr->init(60, 0);
+
     udpReceiver_ptr->init(0);
 
     // Connect rate groups to rate group driver
@@ -636,6 +727,22 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     mvDFS_ptr->loadParameters();
     atiNetbox_ptr->loadParameters();
     stereoCam_ptr->loadParameters();
+
+    // NOTE(mereweth) - convert to TB_PROC_TIME for F' outputs of components with time conversion
+    mrCtrlIface_ptr->setTBDes(TB_PROC_TIME);
+    sdRosIface_ptr->setTBDes(TB_PROC_TIME);
+    filterIface_ptr->setTBDes(TB_PROC_TIME);
+    mvVislam_ptr->setTBDes(TB_PROC_TIME);
+    
+    // set static time offset
+    // TODO(mereweth) - change this if we start timing out on correspondences
+    // TODO(mereweth) - check to make sure we are not using ROS sim time
+    {
+        Fw::InputTimePairPort* port = timeConvert_ptr->get_ClockTimes_InputPort(0);
+        Fw::Time t1(TB_ROS_TIME, 0, 0, 0);
+        Fw::Time t2(TB_WORKSTATION_TIME, 0, 0, 0);
+        port->invoke(t1, t2);
+    }
 
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/STC_%u.txt", boot_count % 10);
@@ -702,7 +809,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     }
 #endif
 
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
     childPID = stereoCam_ptr->spawnChild();
     if (childPID == 0) { // we are in the child process
         isStereoChild = true;
@@ -710,7 +817,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
         stereoCam_ptr->start(0,50,5*1000*1024, CORE_PRCP);
 
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
         return; // don't start any other threads in the child
     }
 #endif
@@ -733,6 +840,9 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     chanTlm_ptr->start(0,60,20*1024);
     prmDb_ptr->start(0,50,20*1024);
     textLogger_ptr->start(0,30,20*1024);
+
+    dspTimeSync_ptr->start(0,30,20*1024);
+    llTimeSync_ptr->start(0,30,20*1024);
 
     snapHealth_ptr->start(0,40,20*1024);
 
@@ -759,37 +869,53 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_DEV);
 
 #ifdef LLROUTER_DEVICES
+#ifdef BUILD_SDFLIGHT
+    blspGpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+
     // Must start serial drivers after tasks that setup the buffers for the driver:
     serialDriverLL_ptr->open(
-#ifdef BUILD_SDFLIGHT
-                        "/dev/ttyHS3",
-#elif defined BUILD_LINUX
-                        "/dev/ttyUSB0",
+#ifdef SOC_8096
+                             7, // tty 3, J10, SONAR_UART, BLSP7
 #else
-                        "/dev/ttyUSB0",
 #endif
-                        Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
-                        Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
-                        Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
-                        true);
-
+                             SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
+                             SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
+                             true);
+    
     serialDriverDebug_ptr->open(
-#ifdef BUILD_SDFLIGHT
-                           "/dev/ttyHS2",
-#elif defined BUILD_LINUX
-                           "/dev/ttyUSB1",
+#ifdef SOC_8096
+                                5, // tty 1, J12, ESC_UART, BLSP5
 #else
-                           "/dev/ttyUSB1",
 #endif
-                           Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
-                           Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
-                           Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
-                           true);
+                                SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
+                                SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
+                                true);
+
+    /* ---------- Done opening devices, now start device threads ---------- */
+    blspSerialDriverLL_ptr->startReadThread(98, 20*1024);
+    blspSerialDriverDebug_ptr->startReadThread(40, 20*1024);
+#else //not BUILD_SDFLIGHT
+    // NOTE - need a GPIO for timesync - will assert when gpio is used!!
+    //gpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+
+    // Must start serial drivers after tasks that setup the buffers for the driver:
+    serialDriverLL_ptr->open("/dev/ttyUSB0",
+                             Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                             Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                             Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                             true);
+
+    serialDriverDebug_ptr->open("/dev/ttyUSB1",
+                                Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                                Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                                Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                                true);
 
     /* ---------- Done opening devices, now start device threads ---------- */
     serialDriverLL_ptr->startReadThread(98, 20*1024);
     serialDriverDebug_ptr->startReadThread(40, 20*1024);
-#endif
+#endif //BUILD_SDFLIGHT
+#endif //LLROUTER_DEVICES
 
     atiNetbox_ptr->set_thread_attr(0, 30, 20*1024, true, CORE_GNC);
     atiNetbox_ptr->open("192.168.2.20", "192.168.2.10",
@@ -857,7 +983,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     }
 #endif
 
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
     if (isStereoChild) {
 #endif
         stereoCam_ptr->exit();
@@ -866,7 +992,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
 #endif
         stereoCam_ptr->join(NULL);
         DEBUG_PRINT("After stereo thread quit\n");
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
         return;
     }
 #endif
@@ -886,8 +1012,13 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     buffAccumStereoCamUnproc_ptr->deallocateQueue(buffMallocator);
 
 #ifdef LLROUTER_DEVICES
+#ifdef BUILD_SDFLIGHT
+    blspSerialDriverLL_ptr->quitReadThread();
+    blspSerialDriverDebug_ptr->quitReadThread();
+#else //BUILD_SDFLIGHT
     serialDriverLL_ptr->quitReadThread();
     serialDriverDebug_ptr->quitReadThread();
+#endif //BUILD_SDFLIGHT
 #endif
     atiNetbox_ptr->stop();
 

@@ -50,6 +50,7 @@ namespace Gnc {
     AckermannIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_ackermannDriveStampedSet() // zero-initialize instead of default-initializing
   {
@@ -80,6 +81,11 @@ namespace Gnc {
         ros::NodeHandle* n = this->m_nodeHandle;
 
         m_rosInited = true;
+    }
+  
+    void AckermannIfaceComponentImpl ::
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
     }
 
     Os::Task::TaskStatus AckermannIfaceComponentImpl ::
@@ -155,6 +161,7 @@ namespace Gnc {
         n->setCallbackQueue(&localCallbacks);
 
         AckermannDriveStampedHandler updateHandler(compPtr, 0);
+        updateHandler.tbDes = compPtr->m_tbDes;
 
         ros::Subscriber updateSub = n->subscribe("ackermann_cmd", 10,
                                                 &AckermannDriveStampedHandler::ackermannDriveStampedCallback,
@@ -166,7 +173,13 @@ namespace Gnc {
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
     }
-
+  
+    AckermannIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
+    }
+  
     AckermannIfaceComponentImpl :: AckermannDriveStampedHandler ::
       AckermannDriveStampedHandler(AckermannIfaceComponentImpl* compPtr,
                       int portNum) :
@@ -205,15 +218,29 @@ namespace Gnc {
             return;
         }
 
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec / 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                DEBUG_PRINT("failed to convert time in ackermannDriveStamped\n");
+                return;
+            }
+        }
+        
         {
             using namespace ROS::std_msgs;
             using namespace ROS::ackermann_msgs;
 
             AckermannDriveStamped ackermannDriveStamped(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               AckermannDrive(msg->drive.steering_angle,

@@ -50,14 +50,29 @@ void exitTasks(void);
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
+#include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspSerialDriver/BlspSerialDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspGpioDriver/BlspGpioDriverComponentImpl.hpp>
 #include <Drv/ForceTorque/ATINetbox/ATINetboxComponentImpl.hpp>
+
+#include <Svc/TimeConvert/TimeConvertComponentImpl.hpp>
+#include <Svc/TimeSyncOffset/TimeSyncOffsetComponentImpl.hpp>
+#include <SnapdragonFlight/DspOffset/DspOffsetComponentImpl.hpp>
 
 extern Drv::ATINetboxComponentImpl* atiNetbox_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
+extern SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverLL_ptr;
+extern SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverDebug_ptr;
+extern Drv::LinuxGpioDriverComponentImpl* gpioTimeSync_ptr;
+extern SnapdragonFlight::BlspGpioDriverComponentImpl* blspGpioTimeSync_ptr;
 extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
 extern HLProc::LLRouterComponentImpl* llRouter_ptr;
 extern HLProc::EventExpanderComponentImpl* eventExp_ptr;
+
+extern Svc::TimeConvertComponentImpl* timeConvert_ptr;
+extern Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr;
+extern SnapdragonFlight::DspOffsetComponentImpl* dspTimeSync_ptr;
 
 extern Svc::RateGroupDriverImpl* rgDrv_ptr;
 extern Svc::ActiveRateGroupImpl* rgTlm_ptr;

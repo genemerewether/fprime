@@ -61,6 +61,8 @@ namespace Gnc {
       //!
       ~GroundTruthIfaceComponentImpl(void);
 
+      void setTBDes(TimeBase tbDes);
+
       void startPub();
 
       //! Start interrupt task
@@ -74,7 +76,14 @@ namespace Gnc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class OdometryHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+              TimeBase tbDes;
+        };
+    
+        class OdometryHandler : public TimeBaseHolder
         {
           public:
               OdometryHandler(GroundTruthIfaceComponentImpl* compPtr,
@@ -115,6 +124,8 @@ namespace Gnc {
       // ----------------------------------------------------------------------
 
         bool m_rosInited;
+
+        TimeBase m_tbDes;
 
         ros::NodeHandle* m_nodeHandle;
 

@@ -167,7 +167,11 @@ cur: release
 
 # Load the golden FSW version
 gold: $(__DEFAULT_BUILD) gsegold
+ifdef NOLOAD
+	$(STARTUP_DIR)/patch/setup_folder.bash -i ./$(__DEFAULT_BUILD_OUT) -d $(DEPLOYMENT) -t gold -n
+else
 	$(STARTUP_DIR)/patch/setup_folder.bash -i ./$(__DEFAULT_BUILD_OUT) -d $(DEPLOYMENT) -t gold
+endif
 
 ifneq ($(FSW_RUN_SCRIPT),)
 	adb push $(FSW_RUN_SCRIPT) /golden/$(FSW_RUN_SCRIPT)

@@ -120,7 +120,9 @@ SVC_MODULES := \
 	Svc/UdpSender \
 	Svc/UdpReceiver \
 	Svc/CameraFrame \
-	Svc/IPCRelay
+	Svc/IPCRelay \
+	Svc/TimeSyncOffset \
+	Svc/TimeConvert
 
 DEMO_DRV_MODULES := \
 	Drv/DataTypes \
@@ -165,6 +167,7 @@ HLPROC_ROS_MODULES := \
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/DspOffset \
 	SnapdragonFlight/DspRpcAllocator \
 	SnapdragonFlight/DspRelay \
 	SnapdragonFlight/BlspSerialDriver \
@@ -210,6 +213,9 @@ QUEST_GNC_MODULES := \
 
 QUEST_GNC_HW_MODULES := \
 	Gnc/Ctrl/ActuatorAdapter
+
+QUEST_EXTERNAL_MODULES := \
+	Gnc/quest_external/traj/ewok
 
 REF_MODULES := \
 	Ref/Top \

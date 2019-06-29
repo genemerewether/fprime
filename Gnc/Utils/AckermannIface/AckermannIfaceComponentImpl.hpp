@@ -60,6 +60,8 @@ namespace Gnc {
       //!
       ~AckermannIfaceComponentImpl(void);
 
+      void setTBDes(TimeBase tbDes);
+    
       void startPub();
 
       //! Start interrupt task
@@ -73,7 +75,14 @@ namespace Gnc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class AckermannDriveStampedHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+              TimeBase tbDes;
+        };
+    
+        class AckermannDriveStampedHandler : public TimeBaseHolder
         {
           public:
               AckermannDriveStampedHandler(AckermannIfaceComponentImpl* compPtr,
@@ -114,6 +123,8 @@ namespace Gnc {
       // ----------------------------------------------------------------------
 
         bool m_rosInited;
+    
+        TimeBase m_tbDes;
 
         ros::NodeHandle* m_nodeHandle;
 

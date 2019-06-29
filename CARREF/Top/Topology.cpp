@@ -57,7 +57,7 @@ Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::PrmDbImpl* prmDb_ptr = 0;
 Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
-
+Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr = 0;
 Gnc::AckermannIfaceComponentImpl* ackermannIface_ptr = 0;
 Gnc::FilterIfaceComponentImpl* filterIface_ptr = 0;
@@ -149,6 +149,12 @@ void allocComps() {
     snapHealth_ptr = new SnapdragonFlight::SnapdragonHealthComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SDHEALTH")
+#endif
+;
+
+    timeConvert_ptr = new Svc::TimeConvertComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TIMECONV")
 #endif
 ;
 
@@ -614,6 +620,7 @@ void constructApp(unsigned int port_number,
     snapHealth_ptr->setBootCount(boot_count);
     snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_RAPID);
     sockGndIf_ptr->init(0);
+    timeConvert_ptr->init();
 
     hlRosIface_ptr->init(0);
     ackermannIface_ptr->init(0);
@@ -705,6 +712,22 @@ void constructApp(unsigned int port_number,
 
     mvCam_ptr->loadParameters();
     stereoCam_ptr->loadParameters();
+
+    // NOTE(mereweth) - convert to TB_WORKSTATION_TIME for F' outputs of components with time conversion
+    ackermannIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    hlRosIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    filterIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    gtIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    
+    // set static time offset
+    // TODO(mereweth) - change this if we start timing out on correspondences
+    // TODO(mereweth) - check to make sure we are not using ROS sim time
+    {
+        Fw::InputTimePairPort* port = timeConvert_ptr->get_ClockTimes_InputPort(0);
+        Fw::Time t1(TB_ROS_TIME, 0, 0, 0);
+        Fw::Time t2(TB_WORKSTATION_TIME, 0, 0, 0);
+        port->invoke(t1, t2);
+    }
 
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);

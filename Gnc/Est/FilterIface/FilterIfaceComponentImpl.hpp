@@ -62,6 +62,8 @@ namespace Gnc {
       //! Destroy object FilterIface
       //!
       ~FilterIfaceComponentImpl(void);
+    
+      void setTBDes(TimeBase tbDes);
 
       void startPub();
 
@@ -76,7 +78,14 @@ namespace Gnc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class ImuStateUpdateHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+              TimeBase tbDes;
+        };
+    
+        class ImuStateUpdateHandler : public TimeBaseHolder
         {
           public:
               ImuStateUpdateHandler(FilterIfaceComponentImpl* compPtr,
@@ -94,7 +103,7 @@ namespace Gnc {
 
         }; // end class ImuStateUpdateHandler
 
-        class ImuHandler
+        class ImuHandler : public TimeBaseHolder
         {
           public:
               ImuHandler(FilterIfaceComponentImpl* compPtr,
@@ -142,6 +151,8 @@ namespace Gnc {
       // ----------------------------------------------------------------------
 
         bool m_rosInited;
+
+        TimeBase m_tbDes;
 
         //! Publishers for Odometry data
         //!
