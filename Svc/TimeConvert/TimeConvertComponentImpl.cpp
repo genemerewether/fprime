@@ -14,6 +14,11 @@
 #include <Svc/TimeConvert/TimeConvertComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <stdio.h>
+
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace Svc {
 
   // ----------------------------------------------------------------------
@@ -69,6 +74,7 @@ namespace Svc {
   {
     U32 TimeBase1 = time1.getTimeBase();
     U32 TimeBase2 = time2.getTimeBase();
+    DEBUG_PRINT("TimeConvert add edge from %d to %d\n", TimeBase1, TimeBase2);
 
     I64 time1_usec = (I64)time1.getSeconds() * 1000LL * 1000LL + (I64)time1.getUSeconds();
     I64 time2_usec = (I64)time2.getSeconds() * 1000LL * 1000LL + (I64)time2.getUSeconds();
@@ -97,6 +103,7 @@ namespace Svc {
     if (fromTimeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph))
     {
       success = false;
+      DEBUG_PRINT("TimeConvert fromTimeBase %d too big\n", fromTimeBase);
       // TODO: event to user
       return Fw::Time();
     }
@@ -104,6 +111,7 @@ namespace Svc {
     if (timeBase >= FW_NUM_ARRAY_ELEMENTS(adjGraph[0]))
     {
       success = false;
+      DEBUG_PRINT("TimeConvert timeBase %d too big\n", timeBase);
       // TODO: event to user
       return Fw::Time();
     }
@@ -121,6 +129,7 @@ namespace Svc {
     }
     else 
     {
+      DEBUG_PRINT("TimeConvert no edge from %d to %d\n", fromTimeBase, timeBase);
       success = false;
       // TODO: event to user
       return Fw::Time();

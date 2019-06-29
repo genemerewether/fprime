@@ -809,7 +809,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     }
 #endif
 
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
     childPID = stereoCam_ptr->spawnChild();
     if (childPID == 0) { // we are in the child process
         isStereoChild = true;
@@ -817,7 +817,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
         stereoCam_ptr->start(0,50,5*1000*1024, CORE_PRCP);
 
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
         return; // don't start any other threads in the child
     }
 #endif
@@ -915,7 +915,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     serialDriverLL_ptr->startReadThread(98, 20*1024);
     serialDriverDebug_ptr->startReadThread(40, 20*1024);
 #endif //BUILD_SDFLIGHT
-#endif
+#endif //LLROUTER_DEVICES
 
     atiNetbox_ptr->set_thread_attr(0, 30, 20*1024, true, CORE_GNC);
     atiNetbox_ptr->open("192.168.2.20", "192.168.2.10",
@@ -983,7 +983,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     }
 #endif
 
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
     if (isStereoChild) {
 #endif
         stereoCam_ptr->exit();
@@ -992,7 +992,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
 #endif
         stereoCam_ptr->join(NULL);
         DEBUG_PRINT("After stereo thread quit\n");
-#if defined TGT_OS_TYPE_LINUX
+#ifdef SOC_8096
         return;
     }
 #endif
@@ -1012,8 +1012,13 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     buffAccumStereoCamUnproc_ptr->deallocateQueue(buffMallocator);
 
 #ifdef LLROUTER_DEVICES
+#ifdef BUILD_SDFLIGHT
+    blspSerialDriverLL_ptr->quitReadThread();
+    blspSerialDriverDebug_ptr->quitReadThread();
+#else //BUILD_SDFLIGHT
     serialDriverLL_ptr->quitReadThread();
     serialDriverDebug_ptr->quitReadThread();
+#endif //BUILD_SDFLIGHT
 #endif
     atiNetbox_ptr->stop();
 
