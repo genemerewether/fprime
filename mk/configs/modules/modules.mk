@@ -46,6 +46,7 @@ R5_MODULES := \
 	R5/UartDrv \
 	R5/I2CDrv \
 	R5/R5EventCapture \
+	R5/R5Rti \
 	\
 	R5/TiHal \
 	R5/R5FlashApi
@@ -637,6 +638,9 @@ R5RELAY_MODULES := \
 	\
 	Os \
 	\
+	$(ROS_TYPE_PORT_MODULES_ALL) \
+	\
+	R5RELAY/ImuSplitter \
 	R5RELAY/Top \
 	\
 	$(FW_MODULES) \
