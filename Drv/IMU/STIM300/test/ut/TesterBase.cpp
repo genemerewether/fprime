@@ -6,15 +6,8 @@
 // \copyright
 // Copyright 2009-2016, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
-// acknowledged. Any commercial use must be negotiated with the Office
-// of Technology Transfer at the California Institute of Technology.
+// acknowledged.
 //
-// This software may be subject to U.S. export control laws and
-// regulations.  By accepting this document, the user agrees to comply
-// with all U.S. export laws and regulations.  User has the
-// responsibility to obtain export licenses, or other export authority
-// as may be required before exporting such information to foreign
-// countries or providing access to foreign persons.
 // ======================================================================
 
 #include <stdlib.h>
@@ -43,11 +36,9 @@ namespace Drv {
 #endif
   {
     // Initialize telemetry histories
-    this->tlmHistory_NumPackets = 
+    this->tlmHistory_NumPackets =
       new History<TlmEntry_NumPackets>(maxHistorySize);
-    this->tlmHistory_ImuPacket = 
-      new History<TlmEntry_ImuPacket>(maxHistorySize);
-    this->tlmHistory_TimeSyncStatus = 
+    this->tlmHistory_TimeSyncStatus =
       new History<TlmEntry_TimeSyncStatus>(maxHistorySize);
     // Initialize event histories
 #if FW_ENABLE_TEXT_LOGGING
@@ -69,11 +60,10 @@ namespace Drv {
   }
 
   STIM300TesterBase ::
-    ~STIM300TesterBase(void) 
+    ~STIM300TesterBase(void)
   {
     // Destroy telemetry histories
     delete this->tlmHistory_NumPackets;
-    delete this->tlmHistory_ImuPacket;
     delete this->tlmHistory_TimeSyncStatus;
     // Destroy event histories
 #if FW_ENABLE_TEXT_LOGGING
@@ -378,14 +368,14 @@ namespace Drv {
 #endif
 
   // ----------------------------------------------------------------------
-  // Connectors for to ports 
+  // Connectors for to ports
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
     connect_to_sched(
         const NATIVE_INT_TYPE portNum,
         Svc::InputSchedPort *const sched
-    ) 
+    )
   {
     FW_ASSERT(portNum < this->getNum_to_sched(),static_cast<AssertArg>(portNum));
     this->m_to_sched[portNum].addCallPort(sched);
@@ -423,7 +413,7 @@ namespace Drv {
   // ----------------------------------------------------------------------
   // Getters for from ports
   // ----------------------------------------------------------------------
- 
+
   ROS::sensor_msgs::InputImuNoCovPort *STIM300TesterBase ::
     get_from_IMU(const NATIVE_INT_TYPE portNum)
   {
@@ -487,7 +477,7 @@ namespace Drv {
     )
   {
     FW_ASSERT(callComp);
-    STIM300TesterBase* _testerBase = 
+    STIM300TesterBase* _testerBase =
       static_cast<STIM300TesterBase*>(callComp);
     _testerBase->from_IMU_handlerBase(
         portNum,
@@ -503,7 +493,7 @@ namespace Drv {
     )
   {
     FW_ASSERT(callComp);
-    STIM300TesterBase* _testerBase = 
+    STIM300TesterBase* _testerBase =
       static_cast<STIM300TesterBase*>(callComp);
     _testerBase->from_packetTime_handlerBase(
         portNum,
@@ -520,7 +510,7 @@ namespace Drv {
     )
   {
     FW_ASSERT(callComp);
-    STIM300TesterBase* _testerBase = 
+    STIM300TesterBase* _testerBase =
       static_cast<STIM300TesterBase*>(callComp);
     _testerBase->from_serialRead_handlerBase(
         portNum,
@@ -599,9 +589,9 @@ namespace Drv {
     this->fromPortHistory_serialRead->clear();
   }
 
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
   // From port: IMU
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
     pushFromPortEntry_IMU(
@@ -615,9 +605,9 @@ namespace Drv {
     ++this->fromPortHistorySize;
   }
 
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
   // From port: packetTime
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
     pushFromPortEntry_packetTime(
@@ -631,9 +621,9 @@ namespace Drv {
     ++this->fromPortHistorySize;
   }
 
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
   // From port: serialRead
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
     pushFromPortEntry_serialRead(
@@ -693,7 +683,7 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
-  // History 
+  // History
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -746,18 +736,6 @@ namespace Drv {
         break;
       }
 
-      case STIM300ComponentBase::CHANNELID_IMUPACKET:
-      {
-        ROS::sensor_msgs::ImuNoCov arg;
-        const Fw::SerializeStatus _status = val.deserialize(arg);
-        if (_status != Fw::FW_SERIALIZE_OK) {
-          printf("Error deserializing ImuPacket: %d\n", _status);
-          return;
-        }
-        this->tlmInput_ImuPacket(timeTag, arg);
-        break;
-      }
-
       case STIM300ComponentBase::CHANNELID_TIMESYNCSTATUS:
       {
         FwEnumStoreType TimeSyncStatusarg;
@@ -766,7 +744,7 @@ namespace Drv {
           printf("Error deserializing TimeSyncStatus: %d\n", _status);
           return;
         }
-        STIM300ComponentBase::STIM300TimeSync arg = 
+        STIM300ComponentBase::STIM300TimeSync arg =
           static_cast<STIM300ComponentBase::STIM300TimeSync>(TimeSyncStatusarg);
         this->tlmInput_TimeSyncStatus(timeTag, arg);
         break;
@@ -786,13 +764,12 @@ namespace Drv {
   {
     this->tlmSize = 0;
     this->tlmHistory_NumPackets->clear();
-    this->tlmHistory_ImuPacket->clear();
     this->tlmHistory_TimeSyncStatus->clear();
   }
 
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
   // Channel: NumPackets
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
     tlmInput_NumPackets(
@@ -805,24 +782,9 @@ namespace Drv {
     ++this->tlmSize;
   }
 
-  // ---------------------------------------------------------------------- 
-  // Channel: ImuPacket
-  // ---------------------------------------------------------------------- 
-
-  void STIM300TesterBase ::
-    tlmInput_ImuPacket(
-        const Fw::Time& timeTag,
-        const ROS::sensor_msgs::ImuNoCov& val
-    )
-  {
-    TlmEntry_ImuPacket e = { timeTag, val };
-    this->tlmHistory_ImuPacket->push_back(e);
-    ++this->tlmSize;
-  }
-
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
   // Channel: TimeSyncStatus
-  // ---------------------------------------------------------------------- 
+  // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
     tlmInput_TimeSyncStatus(
@@ -854,7 +816,7 @@ namespace Drv {
     FW_ASSERT(id >= idBase, id, idBase);
     switch (id - idBase) {
 
-      case STIM300ComponentBase::EVENTID_BUFFERFULL: 
+      case STIM300ComponentBase::EVENTID_BUFFERFULL:
       {
 
 #if FW_AMPCS_COMPATIBLE
@@ -866,14 +828,14 @@ namespace Drv {
             _zero_status == Fw::FW_SERIALIZE_OK,
             static_cast<AssertArg>(_zero_status)
         );
-#endif    
+#endif
         this->logIn_WARNING_HI_BufferFull();
 
         break;
 
       }
 
-      case STIM300ComponentBase::EVENTID_UARTERROR: 
+      case STIM300ComponentBase::EVENTID_UARTERROR:
       {
 
 #if FW_AMPCS_COMPATIBLE
@@ -885,14 +847,14 @@ namespace Drv {
             _zero_status == Fw::FW_SERIALIZE_OK,
             static_cast<AssertArg>(_zero_status)
         );
-#endif    
+#endif
         this->logIn_WARNING_HI_UartError();
 
         break;
 
       }
 
-      case STIM300ComponentBase::EVENTID_NOEVENTS: 
+      case STIM300ComponentBase::EVENTID_NOEVENTS:
       {
 
 #if FW_AMPCS_COMPATIBLE
@@ -904,14 +866,14 @@ namespace Drv {
             _zero_status == Fw::FW_SERIALIZE_OK,
             static_cast<AssertArg>(_zero_status)
         );
-#endif    
+#endif
         this->logIn_WARNING_HI_NoEvents();
 
         break;
 
       }
 
-      case STIM300ComponentBase::EVENTID_INVALIDCOUNTER: 
+      case STIM300ComponentBase::EVENTID_INVALIDCOUNTER:
       {
 
         Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
@@ -925,8 +887,8 @@ namespace Drv {
         );
         // verify they match expected.
         FW_ASSERT(_numArgs == 2,_numArgs,2);
-        
-#endif    
+
+#endif
         U32 actualCount;
 #if FW_AMPCS_COMPATIBLE
         {
@@ -939,7 +901,7 @@ namespace Drv {
           );
           FW_ASSERT(_argSize == sizeof(U32),_argSize,sizeof(U32));
         }
-#endif      
+#endif
         _status = args.deserialize(actualCount);
         FW_ASSERT(
             _status == Fw::FW_SERIALIZE_OK,
@@ -958,7 +920,7 @@ namespace Drv {
           );
           FW_ASSERT(_argSize == sizeof(U32),_argSize,sizeof(U32));
         }
-#endif      
+#endif
         _status = args.deserialize(expectedCount);
         FW_ASSERT(
             _status == Fw::FW_SERIALIZE_OK,
@@ -971,7 +933,7 @@ namespace Drv {
 
       }
 
-      case STIM300ComponentBase::EVENTID_TOOMANYEVENTS: 
+      case STIM300ComponentBase::EVENTID_TOOMANYEVENTS:
       {
 
         Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
@@ -985,8 +947,8 @@ namespace Drv {
         );
         // verify they match expected.
         FW_ASSERT(_numArgs == 1,_numArgs,1);
-        
-#endif    
+
+#endif
         U32 maxEvents;
 #if FW_AMPCS_COMPATIBLE
         {
@@ -999,7 +961,7 @@ namespace Drv {
           );
           FW_ASSERT(_argSize == sizeof(U32),_argSize,sizeof(U32));
         }
-#endif      
+#endif
         _status = args.deserialize(maxEvents);
         FW_ASSERT(
             _status == Fw::FW_SERIALIZE_OK,
@@ -1012,7 +974,7 @@ namespace Drv {
 
       }
 
-      case STIM300ComponentBase::EVENTID_BADTIMESYNC: 
+      case STIM300ComponentBase::EVENTID_BADTIMESYNC:
       {
 
 #if FW_AMPCS_COMPATIBLE
@@ -1024,14 +986,14 @@ namespace Drv {
             _zero_status == Fw::FW_SERIALIZE_OK,
             static_cast<AssertArg>(_zero_status)
         );
-#endif    
+#endif
         this->logIn_WARNING_HI_BadTimeSync();
 
         break;
 
       }
 
-      case STIM300ComponentBase::EVENTID_SYNCCOMPLETE: 
+      case STIM300ComponentBase::EVENTID_SYNCCOMPLETE:
       {
 
 #if FW_AMPCS_COMPATIBLE
@@ -1043,7 +1005,7 @@ namespace Drv {
             _zero_status == Fw::FW_SERIALIZE_OK,
             static_cast<AssertArg>(_zero_status)
         );
-#endif    
+#endif
         this->logIn_ACTIVITY_LO_SyncComplete();
 
         break;
@@ -1075,7 +1037,7 @@ namespace Drv {
 #if FW_ENABLE_TEXT_LOGGING
 
   // ----------------------------------------------------------------------
-  // Text events 
+  // Text events
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -1138,11 +1100,11 @@ namespace Drv {
   }
 
   void STIM300TesterBase ::
-    printTextLogHistory(FILE *file) 
+    printTextLogHistory(FILE *file)
   {
     for (U32 i = 0; i < this->textLogHistory->size(); ++i) {
       this->printTextLogHistoryEntry(
-          this->textLogHistory->at(i), 
+          this->textLogHistory->at(i),
           file
       );
     }
@@ -1151,7 +1113,7 @@ namespace Drv {
 #endif
 
   // ----------------------------------------------------------------------
-  // Event: BufferFull 
+  // Event: BufferFull
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -1164,7 +1126,7 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
-  // Event: UartError 
+  // Event: UartError
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -1177,7 +1139,7 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
-  // Event: NoEvents 
+  // Event: NoEvents
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -1190,7 +1152,7 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
-  // Event: InvalidCounter 
+  // Event: InvalidCounter
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -1207,7 +1169,7 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
-  // Event: TooManyEvents 
+  // Event: TooManyEvents
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -1223,7 +1185,7 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
-  // Event: BadTimeSync 
+  // Event: BadTimeSync
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::
@@ -1236,7 +1198,7 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
-  // Event: SyncComplete 
+  // Event: SyncComplete
   // ----------------------------------------------------------------------
 
   void STIM300TesterBase ::

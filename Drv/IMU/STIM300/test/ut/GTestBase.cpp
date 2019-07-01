@@ -6,15 +6,8 @@
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
-// acknowledged. Any commercial use must be negotiated with the Office
-// of Technology Transfer at the California Institute of Technology.
+// acknowledged.
 //
-// This software may be subject to U.S. export control laws and
-// regulations.  By accepting this document, the user agrees to comply
-// with all U.S. export laws and regulations.  User has the
-// responsibility to obtain export licenses, or other export authority
-// as may be required before exporting such information to foreign
-// countries or providing access to foreign persons.
 // ======================================================================
 
 #include "GTestBase.hpp"
@@ -33,7 +26,7 @@ namespace Drv {
 #else
         const U32 maxHistorySize
 #endif
-    ) : 
+    ) :
         STIM300TesterBase (
 #if FW_OBJECT_NAMES == 1
             compName,
@@ -104,7 +97,7 @@ namespace Drv {
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
       << "  Value:    Index into history of telemetry channel NumPackets\n"
-      << "  Expected: Less than size of history (" 
+      << "  Expected: Less than size of history ("
       << this->tlmHistory_NumPackets->size() << ")\n"
       << "  Actual:   " << __index << "\n";
     const TlmEntry_NumPackets& e =
@@ -116,56 +109,6 @@ namespace Drv {
       << "  Value:    Value at index "
       << __index
       << " on telmetry channel NumPackets\n"
-      << "  Expected: " << val << "\n"
-      << "  Actual:   " << e.arg << "\n";
-  }
-
-  // ----------------------------------------------------------------------
-  // Channel: ImuPacket
-  // ----------------------------------------------------------------------
-
-  void STIM300GTestBase ::
-    assertTlm_ImuPacket_size(
-        const char *const __callSiteFileName,
-        const U32 __callSiteLineNumber,
-        const U32 size
-    ) const
-  {
-    ASSERT_EQ(this->tlmHistory_ImuPacket->size(), size)
-      << "\n"
-      << "  File:     " << __callSiteFileName << "\n"
-      << "  Line:     " << __callSiteLineNumber << "\n"
-      << "  Value:    Size of history for telemetry channel ImuPacket\n"
-      << "  Expected: " << size << "\n"
-      << "  Actual:   " << this->tlmHistory_ImuPacket->size() << "\n";
-  }
-
-  void STIM300GTestBase ::
-    assertTlm_ImuPacket(
-        const char *const __callSiteFileName,
-        const U32 __callSiteLineNumber,
-        const U32 __index,
-        const ROS::sensor_msgs::ImuNoCov& val
-    )
-    const
-  {
-    ASSERT_LT(__index, this->tlmHistory_ImuPacket->size())
-      << "\n"
-      << "  File:     " << __callSiteFileName << "\n"
-      << "  Line:     " << __callSiteLineNumber << "\n"
-      << "  Value:    Index into history of telemetry channel ImuPacket\n"
-      << "  Expected: Less than size of history (" 
-      << this->tlmHistory_ImuPacket->size() << ")\n"
-      << "  Actual:   " << __index << "\n";
-    const TlmEntry_ImuPacket& e =
-      this->tlmHistory_ImuPacket->at(__index);
-    ASSERT_EQ(val, e.arg)
-      << "\n"
-      << "  File:     " << __callSiteFileName << "\n"
-      << "  Line:     " << __callSiteLineNumber << "\n"
-      << "  Value:    Value at index "
-      << __index
-      << " on telmetry channel ImuPacket\n"
       << "  Expected: " << val << "\n"
       << "  Actual:   " << e.arg << "\n";
   }
@@ -204,7 +147,7 @@ namespace Drv {
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
       << "  Value:    Index into history of telemetry channel TimeSyncStatus\n"
-      << "  Expected: Less than size of history (" 
+      << "  Expected: Less than size of history ("
       << this->tlmHistory_TimeSyncStatus->size() << ")\n"
       << "  Actual:   " << __index << "\n";
     const TlmEntry_TimeSyncStatus& e =
@@ -334,7 +277,7 @@ namespace Drv {
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
       << "  Value:    Index into history of event InvalidCounter\n"
-      << "  Expected: Less than size of history (" 
+      << "  Expected: Less than size of history ("
       << this->eventHistory_InvalidCounter->size() << ")\n"
       << "  Actual:   " << __index << "\n";
     const EventEntry_InvalidCounter& e =
@@ -392,7 +335,7 @@ namespace Drv {
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
       << "  Value:    Index into history of event TooManyEvents\n"
-      << "  Expected: Less than size of history (" 
+      << "  Expected: Less than size of history ("
       << this->eventHistory_TooManyEvents->size() << ")\n"
       << "  Actual:   " << __index << "\n";
     const EventEntry_TooManyEvents& e =

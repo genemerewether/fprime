@@ -6,15 +6,8 @@
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
-// acknowledged. Any commercial use must be negotiated with the Office
-// of Technology Transfer at the California Institute of Technology.
+// acknowledged.
 //
-// This software may be subject to U.S. export control laws and
-// regulations.  By accepting this document, the user agrees to comply
-// with all U.S. export laws and regulations.  User has the
-// responsibility to obtain export licenses, or other export authority
-// as may be required before exporting such information to foreign
-// countries or providing access to foreign persons.
 // ======================================================================
 
 #ifndef STIM300_GTEST_BASE_HPP
@@ -36,12 +29,6 @@
 #define ASSERT_TLM_NumPackets(index, value) \
   this->assertTlm_NumPackets(__FILE__, __LINE__, index, value)
 
-#define ASSERT_TLM_ImuPacket_SIZE(size) \
-  this->assertTlm_ImuPacket_size(__FILE__, __LINE__, size)
-
-#define ASSERT_TLM_ImuPacket(index, value) \
-  this->assertTlm_ImuPacket(__FILE__, __LINE__, index, value)
-
 #define ASSERT_TLM_TimeSyncStatus_SIZE(size) \
   this->assertTlm_TimeSyncStatus_size(__FILE__, __LINE__, size)
 
@@ -49,7 +36,7 @@
   this->assertTlm_TimeSyncStatus(__FILE__, __LINE__, index, value)
 
 // ----------------------------------------------------------------------
-// Macros for event history assertions 
+// Macros for event history assertions
 // ----------------------------------------------------------------------
 
 #define ASSERT_EVENTS_SIZE(size) \
@@ -244,27 +231,6 @@ namespace Drv {
     protected:
 
       // ----------------------------------------------------------------------
-      // Channel: ImuPacket
-      // ----------------------------------------------------------------------
-
-      //! Assert telemetry value in history at index
-      //!
-      void assertTlm_ImuPacket_size(
-          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
-          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
-          const U32 size /*!< The asserted size*/
-      ) const;
-
-      void assertTlm_ImuPacket(
-          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
-          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
-          const U32 __index, /*!< The index*/
-          const ROS::sensor_msgs::ImuNoCov& val /*!< The channel value*/
-      ) const;
-
-    protected:
-
-      // ----------------------------------------------------------------------
       // Channel: TimeSyncStatus
       // ----------------------------------------------------------------------
 
@@ -397,7 +363,7 @@ namespace Drv {
     protected:
 
       // ----------------------------------------------------------------------
-      // From ports 
+      // From ports
       // ----------------------------------------------------------------------
 
       void assertFromPortHistory_size(
@@ -409,7 +375,7 @@ namespace Drv {
     protected:
 
       // ----------------------------------------------------------------------
-      // From port: IMU 
+      // From port: IMU
       // ----------------------------------------------------------------------
 
       void assert_from_IMU_size(
@@ -421,7 +387,7 @@ namespace Drv {
     protected:
 
       // ----------------------------------------------------------------------
-      // From port: packetTime 
+      // From port: packetTime
       // ----------------------------------------------------------------------
 
       void assert_from_packetTime_size(
@@ -433,7 +399,7 @@ namespace Drv {
     protected:
 
       // ----------------------------------------------------------------------
-      // From port: serialRead 
+      // From port: serialRead
       // ----------------------------------------------------------------------
 
       void assert_from_serialRead_size(

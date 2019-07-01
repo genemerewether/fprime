@@ -6,15 +6,8 @@
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
-// acknowledged. Any commercial use must be negotiated with the Office
-// of Technology Transfer at the California Institute of Technology.
+// acknowledged.
 //
-// This software may be subject to U.S. export control laws and
-// regulations.  By accepting this document, the user agrees to comply
-// with all U.S. export laws and regulations.  User has the
-// responsibility to obtain export licenses, or other export authority
-// as may be required before exporting such information to foreign
-// countries or providing access to foreign persons.
 // ======================================================================
 
 #ifndef STIM300_TESTER_BASE_HPP
@@ -164,10 +157,10 @@ namespace Drv {
           //!
           History(
               const U32 maxSize /*!< The maximum history size*/
-          ) : 
-              numEntries(0), 
-              maxSize(maxSize) 
-          { 
+          ) :
+              numEntries(0),
+              maxSize(maxSize)
+          {
             this->entries = new T[maxSize];
           }
 
@@ -304,7 +297,7 @@ namespace Drv {
 
       //! The history for from_IMU
       //!
-      History<FromPortEntry_IMU> 
+      History<FromPortEntry_IMU>
         *fromPortHistory_IMU;
 
       //! Push an entry on the history for from_packetTime
@@ -320,7 +313,7 @@ namespace Drv {
 
       //! The history for from_packetTime
       //!
-      History<FromPortEntry_packetTime> 
+      History<FromPortEntry_packetTime>
         *fromPortHistory_packetTime;
 
       //! Push an entry on the history for from_serialRead
@@ -338,7 +331,7 @@ namespace Drv {
 
       //! The history for from_serialRead
       //!
-      History<FromPortEntry_serialRead> 
+      History<FromPortEntry_serialRead>
         *fromPortHistory_serialRead;
 
     protected:
@@ -560,7 +553,7 @@ namespace Drv {
 
       //! The history of InvalidCounter events
       //!
-      History<EventEntry_InvalidCounter> 
+      History<EventEntry_InvalidCounter>
         *eventHistory_InvalidCounter;
 
     protected:
@@ -583,7 +576,7 @@ namespace Drv {
 
       //! The history of TooManyEvents events
       //!
-      History<EventEntry_TooManyEvents> 
+      History<EventEntry_TooManyEvents>
         *eventHistory_TooManyEvents;
 
     protected:
@@ -662,33 +655,8 @@ namespace Drv {
 
       //! The history of NumPackets values
       //!
-      History<TlmEntry_NumPackets> 
+      History<TlmEntry_NumPackets>
         *tlmHistory_NumPackets;
-
-    protected:
-
-      // ----------------------------------------------------------------------
-      // Channel: ImuPacket
-      // ----------------------------------------------------------------------
-
-      //! Handle channel ImuPacket
-      //!
-      virtual void tlmInput_ImuPacket(
-          const Fw::Time& timeTag, /*!< The time*/
-          const ROS::sensor_msgs::ImuNoCov& val /*!< The channel value*/
-      );
-
-      //! A telemetry entry for channel ImuPacket
-      //!
-      typedef struct {
-        Fw::Time timeTag;
-        ROS::sensor_msgs::ImuNoCov arg;
-      } TlmEntry_ImuPacket;
-
-      //! The history of ImuPacket values
-      //!
-      History<TlmEntry_ImuPacket> 
-        *tlmHistory_ImuPacket;
 
     protected:
 
@@ -712,7 +680,7 @@ namespace Drv {
 
       //! The history of TimeSyncStatus values
       //!
-      History<TlmEntry_TimeSyncStatus> 
+      History<TlmEntry_TimeSyncStatus>
         *tlmHistory_TimeSyncStatus;
 
     protected:
@@ -745,7 +713,7 @@ namespace Drv {
 
       //! From port connected to IMU
       //!
-      ROS::sensor_msgs::InputImuNoCovPort m_from_IMU[1];
+      ROS::sensor_msgs::InputImuNoCovPort m_from_IMU[2];
 
       //! From port connected to packetTime
       //!
