@@ -46,6 +46,7 @@ R5_MODULES := \
 	R5/UartDrv \
 	R5/I2CDrv \
 	R5/R5EventCapture \
+	R5/R5TimeForward \
 	R5/R5Rti \
 	\
 	R5/TiHal \
