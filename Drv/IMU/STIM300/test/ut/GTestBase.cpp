@@ -429,6 +429,26 @@ namespace Drv {
   }
 
   // ----------------------------------------------------------------------
+  // Event: SyncComplete
+  // ----------------------------------------------------------------------
+
+  void STIM300GTestBase ::
+    assertEvents_SyncComplete_size(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->eventsSize_SyncComplete)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Size of history for event SyncComplete\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->eventsSize_SyncComplete << "\n";
+  }
+
+  // ----------------------------------------------------------------------
   // From ports
   // ----------------------------------------------------------------------
 
@@ -486,6 +506,26 @@ namespace Drv {
       << "  Value:    Size of history for from_packetTime\n"
       << "  Expected: " << size << "\n"
       << "  Actual:   " << this->fromPortHistory_packetTime->size() << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // From port: serialRead
+  // ----------------------------------------------------------------------
+
+  void STIM300GTestBase ::
+    assert_from_serialRead_size(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->fromPortHistory_serialRead->size())
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Size of history for from_serialRead\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->fromPortHistory_serialRead->size() << "\n";
   }
 
 } // end namespace Drv

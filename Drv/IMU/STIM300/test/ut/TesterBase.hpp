@@ -61,13 +61,6 @@ namespace Drv {
           Svc::InputSchedPort *const sched /*!< The port*/
       );
 
-      //! Connect serialRead to to_serialRead[portNum]
-      //!
-      void connect_to_serialRead(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Drv::InputSerialReadPort *const serialRead /*!< The port*/
-      );
-
     public:
 
       // ----------------------------------------------------------------------
@@ -88,6 +81,14 @@ namespace Drv {
       //! \return from_packetTime[portNum]
       //!
       Fw::InputTimePort* get_from_packetTime(
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
+      );
+
+      //! Get the port that receives input from serialRead
+      //!
+      //! \return from_serialRead[portNum]
+      //!
+      Drv::InputSerialReadPort* get_from_serialRead(
           const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
@@ -260,6 +261,22 @@ namespace Drv {
           Fw::Time &time /*!< The U32 cmd argument*/
       );
 
+      //! Handler prototype for from_serialRead
+      //!
+      virtual void from_serialRead_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+          SerialReadStatus &status /*!< Status of read*/
+      ) = 0;
+
+      //! Handler base function for from_serialRead
+      //!
+      void from_serialRead_handlerBase(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+          SerialReadStatus &status /*!< Status of read*/
+      );
+
     protected:
 
       // ----------------------------------------------------------------------
@@ -306,6 +323,24 @@ namespace Drv {
       History<FromPortEntry_packetTime> 
         *fromPortHistory_packetTime;
 
+      //! Push an entry on the history for from_serialRead
+      void pushFromPortEntry_serialRead(
+          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+          SerialReadStatus &status /*!< Status of read*/
+      );
+
+      //! A history entry for from_serialRead
+      //!
+      typedef struct {
+        Fw::Buffer serBuffer;
+        SerialReadStatus status;
+      } FromPortEntry_serialRead;
+
+      //! The history for from_serialRead
+      //!
+      History<FromPortEntry_serialRead> 
+        *fromPortHistory_serialRead;
+
     protected:
 
       // ----------------------------------------------------------------------
@@ -317,14 +352,6 @@ namespace Drv {
       void invoke_to_sched(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           NATIVE_UINT_TYPE context /*!< The call order*/
-      );
-
-      //! Invoke the to port connected to serialRead
-      //!
-      void invoke_to_serialRead(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
-          SerialReadStatus &status /*!< Status of read*/
       );
 
     public:
@@ -351,11 +378,11 @@ namespace Drv {
       //!
       NATIVE_INT_TYPE getNum_from_packetTime(void) const;
 
-      //! Get the number of to_serialRead ports
+      //! Get the number of from_serialRead ports
       //!
-      //! \return The number of to_serialRead ports
+      //! \return The number of from_serialRead ports
       //!
-      NATIVE_INT_TYPE getNum_to_serialRead(void) const;
+      NATIVE_INT_TYPE getNum_from_serialRead(void) const;
 
       //! Get the number of from_Tlm ports
       //!
@@ -394,14 +421,6 @@ namespace Drv {
       //! Whether to_sched[portNum] is connected
       //!
       bool isConnected_to_sched(
-          const NATIVE_INT_TYPE portNum /*!< The port number*/
-      );
-
-      //! Check whether port is connected
-      //!
-      //! Whether to_serialRead[portNum] is connected
-      //!
-      bool isConnected_to_serialRead(
           const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
@@ -586,6 +605,22 @@ namespace Drv {
     protected:
 
       // ----------------------------------------------------------------------
+      // Event: SyncComplete
+      // ----------------------------------------------------------------------
+
+      //! Handle event SyncComplete
+      //!
+      virtual void logIn_ACTIVITY_LO_SyncComplete(
+          void
+      );
+
+      //! Size of history for event SyncComplete
+      //!
+      U32 eventsSize_SyncComplete;
+
+    protected:
+
+      // ----------------------------------------------------------------------
       // Telemetry dispatch
       // ----------------------------------------------------------------------
 
@@ -702,10 +737,6 @@ namespace Drv {
       //!
       Svc::OutputSchedPort m_to_sched[1];
 
-      //! To port connected to serialRead
-      //!
-      Drv::OutputSerialReadPort m_to_serialRead[1];
-
     private:
 
       // ----------------------------------------------------------------------
@@ -719,6 +750,10 @@ namespace Drv {
       //! From port connected to packetTime
       //!
       Fw::InputTimePort m_from_packetTime[1];
+
+      //! From port connected to serialRead
+      //!
+      Drv::InputSerialReadPort m_from_serialRead[1];
 
       //! From port connected to Tlm
       //!
@@ -758,6 +793,15 @@ namespace Drv {
           Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           Fw::Time &time /*!< The U32 cmd argument*/
+      );
+
+      //! Static function for port from_serialRead
+      //!
+      static void from_serialRead_static(
+          Fw::PassiveComponentBase *const callComp, /*!< The component instance*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+          SerialReadStatus &status /*!< Status of read*/
       );
 
       //! Static function for port from_Tlm

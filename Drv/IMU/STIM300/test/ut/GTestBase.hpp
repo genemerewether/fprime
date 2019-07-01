@@ -79,6 +79,9 @@
 #define ASSERT_EVENTS_BadTimeSync_SIZE(size) \
   this->assertEvents_BadTimeSync_size(__FILE__, __LINE__, size)
 
+#define ASSERT_EVENTS_SyncComplete_SIZE(size) \
+  this->assertEvents_SyncComplete_size(__FILE__, __LINE__, size)
+
 // ----------------------------------------------------------------------
 // Macros for typed user from port history assertions
 // ----------------------------------------------------------------------
@@ -136,6 +139,41 @@
     << " in history of from_packetTime\n" \
     << "  Expected: " << _time << "\n" \
     << "  Actual:   " << _e.time << "\n"; \
+  }
+
+#define ASSERT_from_serialRead_SIZE(size) \
+  this->assert_from_serialRead_size(__FILE__, __LINE__, size)
+
+#define ASSERT_from_serialRead(index, _serBuffer, _status) \
+  { \
+    ASSERT_GT(this->fromPortHistory_serialRead->size(), static_cast<U32>(index)) \
+    << "\n" \
+    << "  File:     " << __FILE__ << "\n" \
+    << "  Line:     " << __LINE__ << "\n" \
+    << "  Value:    Index into history of from_serialRead\n" \
+    << "  Expected: Less than size of history (" \
+    << this->fromPortHistory_serialRead->size() << ")\n" \
+    << "  Actual:   " << index << "\n"; \
+    const FromPortEntry_serialRead& _e = \
+      this->fromPortHistory_serialRead->at(index); \
+    ASSERT_EQ(_serBuffer, _e.serBuffer) \
+    << "\n" \
+    << "  File:     " << __FILE__ << "\n" \
+    << "  Line:     " << __LINE__ << "\n" \
+    << "  Value:    Value of argument serBuffer at index " \
+    << index \
+    << " in history of from_serialRead\n" \
+    << "  Expected: " << _serBuffer << "\n" \
+    << "  Actual:   " << _e.serBuffer << "\n"; \
+    ASSERT_EQ(_status, _e.status) \
+    << "\n" \
+    << "  File:     " << __FILE__ << "\n" \
+    << "  Line:     " << __LINE__ << "\n" \
+    << "  Value:    Value of argument status at index " \
+    << index \
+    << " in history of from_serialRead\n" \
+    << "  Expected: " << _status << "\n" \
+    << "  Actual:   " << _e.status << "\n"; \
   }
 
 namespace Drv {
@@ -347,6 +385,18 @@ namespace Drv {
     protected:
 
       // ----------------------------------------------------------------------
+      // Event: SyncComplete
+      // ----------------------------------------------------------------------
+
+      void assertEvents_SyncComplete_size(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 size /*!< The asserted size*/
+      ) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
       // From ports 
       // ----------------------------------------------------------------------
 
@@ -375,6 +425,18 @@ namespace Drv {
       // ----------------------------------------------------------------------
 
       void assert_from_packetTime_size(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 size /*!< The asserted size*/
+      ) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // From port: serialRead 
+      // ----------------------------------------------------------------------
+
+      void assert_from_serialRead_size(
           const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
           const U32 __callSiteLineNumber, /*!< The line number of the call site*/
           const U32 size /*!< The asserted size*/

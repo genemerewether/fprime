@@ -102,6 +102,7 @@ namespace Drv {
     ROS::sensor_msgs::ImuNoCov tempImuPkt;
     U8 stimPktBuffer[256];
     U32 stimPktLen;
+    U32 totalLen;
     Fw::Time eventTime;
 
     // Send one packet
@@ -110,11 +111,11 @@ namespace Drv {
     model.generatePkts(tempImuPkt, eventTime, stimPktBuffer, stimPktLen);
 
     this->m_expPkts.queue(&tempImuPkt);
-    this->m_eventLatchedRB.queue(&eventTime);
+    this->m_eventRB.queue(&eventTime);
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
     this->m_uartFwBuffer.setsize(stimPktLen);
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     // Seed the packet counter correctly
     this->component.m_pktCounter = (tempImuPkt.getheader().getseq() - 1) % 256;
@@ -132,11 +133,11 @@ namespace Drv {
     model.generatePkts(tempImuPkt, eventTime, stimPktBuffer, stimPktLen);
 
     this->m_expPkts.queue(&tempImuPkt);
-    this->m_eventLatchedRB.queue(&eventTime);
+    this->m_eventRB.queue(&eventTime);
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
     this->m_uartFwBuffer.setsize(stimPktLen);
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->invoke_to_sched(0, 0);
 
@@ -151,20 +152,18 @@ namespace Drv {
     model.generatePkts(tempImuPkt, eventTime, stimPktBuffer, stimPktLen);
 
     this->m_expPkts.queue(&tempImuPkt);
-    this->m_eventLatchedRB.queue(&eventTime);
-    this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
-    this->m_uartFwBuffer.setsize(stimPktLen);
+    this->m_eventRB.queue(&eventTime);
+    totalLen = stimPktLen;
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
-
-    model.generatePkts(tempImuPkt, eventTime, stimPktBuffer, stimPktLen);
+    model.generatePkts(tempImuPkt, eventTime, &stimPktBuffer[stimPktLen], stimPktLen);
 
     this->m_expPkts.queue(&tempImuPkt);
-    this->m_eventLatchedRB.queue(&eventTime);
+    this->m_eventRB.queue(&eventTime);
+    totalLen += stimPktLen;
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
-    this->m_uartFwBuffer.setsize(stimPktLen);
+    this->m_uartFwBuffer.setsize(totalLen);
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->invoke_to_sched(0, 0);
 
@@ -179,20 +178,20 @@ namespace Drv {
     model.generatePkts(tempImuPkt, eventTime, stimPktBuffer, stimPktLen);
 
     this->m_expPkts.queue(&tempImuPkt);
-    this->m_eventLatchedRB.queue(&eventTime);
-    this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
-    this->m_uartFwBuffer.setsize(stimPktLen);
+    this->m_eventRB.queue(&eventTime);
+    totalLen = stimPktLen;
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
-    model.generatePkts(tempImuPkt, eventTime, stimPktBuffer, stimPktLen);
+    model.generatePkts(tempImuPkt, eventTime, &stimPktBuffer[stimPktLen], stimPktLen);
 
     this->m_expPkts.queue(&tempImuPkt);
-    this->m_eventLatchedRB.queue(&eventTime);
+    this->m_eventRB.queue(&eventTime);
+    totalLen += stimPktLen;
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
-    this->m_uartFwBuffer.setsize(stimPktLen - 4);
+    this->m_uartFwBuffer.setsize(totalLen - 4);
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->invoke_to_sched(0, 0);
 
@@ -203,10 +202,10 @@ namespace Drv {
 
     // Send 0.5 packets
     this->clearHistory();
-    memmove(&stimPktBuffer[0], &stimPktBuffer[stimPktLen-4], 4);
+    memmove(&stimPktBuffer[0], &stimPktBuffer[totalLen-4], 4);
     this->m_uartFwBuffer.setsize(4);
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->invoke_to_sched(0, 0);
 
@@ -220,11 +219,11 @@ namespace Drv {
     model.generatePkts(tempImuPkt, eventTime, stimPktBuffer, stimPktLen);
 
     this->m_expPkts.queue(&tempImuPkt);
-    this->m_eventLatchedRB.queue(&eventTime);
+    this->m_eventRB.queue(&eventTime);
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
     this->m_uartFwBuffer.setsize(stimPktLen-4);
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->invoke_to_sched(0, 0);
 
@@ -238,7 +237,7 @@ namespace Drv {
     memmove(&stimPktBuffer[0], &stimPktBuffer[stimPktLen-4], 4);
     this->m_uartFwBuffer.setsize(4);
 
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->invoke_to_sched(0, 0);
 
@@ -249,6 +248,9 @@ namespace Drv {
 
     // Send 0 packets
     this->clearHistory();
+
+    this->m_uartFwBuffer.setsize(0);
+
     this->invoke_to_sched(0, 0);
 
     ASSERT_from_IMU_SIZE(0);
@@ -264,7 +266,7 @@ namespace Drv {
     using namespace std::placeholders;
 
     const int iterations = 10000;
-    const int uart_per_sched = 4;
+    //const int uart_per_sched = 4;
     const int uart_period_us = 2000;
 
     bool firstPass = true;
@@ -288,18 +290,6 @@ namespace Drv {
 
         this->clearHistory();
 
-        // Latch in all received events to mimic deployment behavior
-        {
-            std::lock_guard<std::mutex> lock(this->m_modelMutex);
-
-            while (this->m_eventRB.size() > 0) {
-                Fw::Time temp;
-                this->m_eventRB.dequeue(&temp);
-                this->m_eventLatchedRB.queue(&temp);
-            }
-
-        }
-
         {
             std::lock_guard<std::mutex> lock(this->m_modelMutex);
 
@@ -314,21 +304,17 @@ namespace Drv {
             this->m_uartFwBuffer.setsize(this->m_uartExtBuffer.getBuffLength());
 
             Drv::SerialReadStatus readStat = Drv::SER_OK;
-            this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+            //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
-            this->m_uartExtBuffer.resetSer();
+            int numExpPkts = this->m_expPkts.size();
+            this->invoke_to_sched(0, 0);
 
-            if (i % uart_per_sched == 0) {
-                int numExpPkts = this->m_expPkts.size();
-                this->invoke_to_sched(0, 0);
+            ASSERT_from_IMU_SIZE(numExpPkts);
 
-                ASSERT_from_IMU_SIZE(numExpPkts);
+            ASSERT_EQ(0, this->m_expPkts.size());
 
-                ASSERT_EQ(0, this->m_expPkts.size());
-
-                if (this->component.m_uartBufferIdx != 0) {
-                    this->m_partialPkts++;
-                }
+            if (this->component.m_pktBufferIdx != 0) {
+                this->m_partialPkts++;
             }
         }
 
@@ -396,7 +382,7 @@ namespace Drv {
                 this->m_uartFwBuffer.setsize(this->m_uartExtBuffer.getBuffLength());
 
                 Drv::SerialReadStatus readStat = Drv::SER_OK;
-                this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+                //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
                 this->m_uartExtBuffer.resetSer();
             }
@@ -416,7 +402,7 @@ namespace Drv {
                 // Push uart data to component
                 this->m_uartFwBuffer.setsize(this->m_uartExtBuffer.getBuffLength());
                 Drv::SerialReadStatus readStat = Drv::SER_OK;
-                this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+                //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
                 this->m_uartExtBuffer.resetSer();
 
                 if (i % uart_per_sched == 0) {
@@ -634,7 +620,7 @@ namespace Drv {
     this->m_eventLatchedRB.queue(&eventTime);
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
     this->m_uartFwBuffer.setsize(5);
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->clearHistory();
     this->invoke_to_sched(0, 0);
@@ -644,7 +630,7 @@ namespace Drv {
     // Send the rest of the packet
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[5]));
     this->m_uartFwBuffer.setsize(stimPktLen - 5);
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->sendPktsFromModel(model, 4);
 
@@ -697,7 +683,7 @@ namespace Drv {
     // Send the uart data
     this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
     this->m_uartFwBuffer.setsize(stimPktLen);
-    this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+    //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
 
     this->sendPktsFromModel(model, 4);
 
@@ -734,18 +720,18 @@ namespace Drv {
   {
     ROS::sensor_msgs::ImuNoCov imuPkt;
     Fw::Time eventTime;
-    U8 stimPktBuffer[256];
     U32 stimPktLen;
     Drv::SerialReadStatus readStat = Drv::SER_OK;
 
     for (int i = 0; i < numPkts; i++) {
-        model.generatePkts(imuPkt, eventTime, &stimPktBuffer[0], stimPktLen);
+        model.generatePkts(imuPkt, eventTime, &this->m_uartBufferData[this->m_uartFwBuffer.getsize()], stimPktLen);
         this->m_expPkts.queue(&imuPkt);
-        this->m_eventLatchedRB.queue(&eventTime);
-        this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&stimPktBuffer[0]));
-        this->m_uartFwBuffer.setsize(stimPktLen);
-        this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+        this->m_eventRB.queue(&eventTime);
+        this->m_uartFwBuffer.setsize(this->m_uartFwBuffer.getsize() + stimPktLen);
+        //this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
     }
+
+    this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&this->m_uartBufferData[0]));
   }
 
 
@@ -768,7 +754,6 @@ namespace Drv {
     this->m_expPkts.dequeue(&expImuPkt);
 
     compareImuPkts(ImuNoCov, expImuPkt);
-
   }
 
   void Tester ::
@@ -779,12 +764,32 @@ namespace Drv {
   {
     this->pushFromPortEntry_packetTime(time);
 
-    if (this->m_eventLatchedRB.size() > 0) {
-        this->m_eventLatchedRB.dequeue(&time);
+    if (this->m_eventRB.size() > 0) {
+        this->m_eventRB.dequeue(&time);
     } else {
         time = Fw::Time();
     }
-        
+  }
+
+  void Tester ::
+    from_serialRead_handler(
+        const NATIVE_INT_TYPE portNum, /*!< The port number*/
+        Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+        SerialReadStatus &status /*!< Status of read*/
+    )
+  {
+      ASSERT_GT(serBuffer.getsize(), this->m_uartFwBuffer.getsize());
+
+      memcpy(reinterpret_cast<U8*>(serBuffer.getdata()),
+             reinterpret_cast<U8*>(this->m_uartFwBuffer.getdata()),
+             this->m_uartFwBuffer.getsize());
+
+      serBuffer.setsize(this->m_uartFwBuffer.getsize());
+
+      this->m_uartFwBuffer.setsize(0);
+      this->m_uartExtBuffer.resetSer();
+
+      status = Drv::SER_OK;
   }
 
   // ----------------------------------------------------------------------
@@ -802,9 +807,9 @@ namespace Drv {
     );
 
     // serialRead
-    this->connect_to_serialRead(
+    this->component.set_serialRead_OutputPort(
         0,
-        this->component.get_serialRead_InputPort(0)
+        this->get_from_serialRead(0)
     );
 
     // IMU

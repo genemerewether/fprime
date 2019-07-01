@@ -62,6 +62,8 @@ namespace Drv {
       new History<FromPortEntry_IMU>(maxHistorySize);
     this->fromPortHistory_packetTime =
       new History<FromPortEntry_packetTime>(maxHistorySize);
+    this->fromPortHistory_serialRead =
+      new History<FromPortEntry_serialRead>(maxHistorySize);
     // Clear history
     this->clearHistory();
   }
@@ -145,6 +147,35 @@ namespace Drv {
           _port
       );
       this->m_from_packetTime[_port].setObjName(_portName);
+#endif
+
+    }
+
+    // Attach input port serialRead
+
+    for (
+        NATIVE_INT_TYPE _port = 0;
+        _port < this->getNum_from_serialRead();
+        ++_port
+    ) {
+
+      this->m_from_serialRead[_port].init();
+      this->m_from_serialRead[_port].addCallComp(
+          this,
+          from_serialRead_static
+      );
+      this->m_from_serialRead[_port].setPortNum(_port);
+
+#if FW_OBJECT_NAMES == 1
+      char _portName[80];
+      (void) snprintf(
+          _portName,
+          sizeof(_portName),
+          "%s_from_serialRead[%d]",
+          this->m_objName,
+          _port
+      );
+      this->m_from_serialRead[_port].setObjName(_portName);
 #endif
 
     }
@@ -290,29 +321,6 @@ namespace Drv {
 
     }
 
-    // Initialize output port serialRead
-
-    for (
-        NATIVE_INT_TYPE _port = 0;
-        _port < this->getNum_to_serialRead();
-        ++_port
-    ) {
-      this->m_to_serialRead[_port].init();
-
-#if FW_OBJECT_NAMES == 1
-      char _portName[80];
-      snprintf(
-          _portName,
-          sizeof(_portName),
-          "%s_to_serialRead[%d]",
-          this->m_objName,
-          _port
-      );
-      this->m_to_serialRead[_port].setObjName(_portName);
-#endif
-
-    }
-
   }
 
   // ----------------------------------------------------------------------
@@ -338,9 +346,9 @@ namespace Drv {
   }
 
   NATIVE_INT_TYPE STIM300TesterBase ::
-    getNum_to_serialRead(void) const
+    getNum_from_serialRead(void) const
   {
-    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_to_serialRead);
+    return (NATIVE_INT_TYPE) FW_NUM_ARRAY_ELEMENTS(this->m_from_serialRead);
   }
 
   NATIVE_INT_TYPE STIM300TesterBase ::
@@ -383,16 +391,6 @@ namespace Drv {
     this->m_to_sched[portNum].addCallPort(sched);
   }
 
-  void STIM300TesterBase ::
-    connect_to_serialRead(
-        const NATIVE_INT_TYPE portNum,
-        Drv::InputSerialReadPort *const serialRead
-    ) 
-  {
-    FW_ASSERT(portNum < this->getNum_to_serialRead(),static_cast<AssertArg>(portNum));
-    this->m_to_serialRead[portNum].addCallPort(serialRead);
-  }
-
 
   // ----------------------------------------------------------------------
   // Invocation functions for to ports
@@ -411,20 +409,6 @@ namespace Drv {
     );
   }
 
-  void STIM300TesterBase ::
-    invoke_to_serialRead(
-        const NATIVE_INT_TYPE portNum,
-        Fw::Buffer &serBuffer,
-        SerialReadStatus &status
-    )
-  {
-    FW_ASSERT(portNum < this->getNum_to_serialRead(),static_cast<AssertArg>(portNum));
-    FW_ASSERT(portNum < this->getNum_to_serialRead(),static_cast<AssertArg>(portNum));
-    this->m_to_serialRead[portNum].invoke(
-        serBuffer, status
-    );
-  }
-
   // ----------------------------------------------------------------------
   // Connection status for to ports
   // ----------------------------------------------------------------------
@@ -434,13 +418,6 @@ namespace Drv {
   {
     FW_ASSERT(portNum < this->getNum_to_sched(), static_cast<AssertArg>(portNum));
     return this->m_to_sched[portNum].isConnected();
-  }
-
-  bool STIM300TesterBase ::
-    isConnected_to_serialRead(const NATIVE_INT_TYPE portNum)
-  {
-    FW_ASSERT(portNum < this->getNum_to_serialRead(), static_cast<AssertArg>(portNum));
-    return this->m_to_serialRead[portNum].isConnected();
   }
 
   // ----------------------------------------------------------------------
@@ -459,6 +436,13 @@ namespace Drv {
   {
     FW_ASSERT(portNum < this->getNum_from_packetTime(),static_cast<AssertArg>(portNum));
     return &this->m_from_packetTime[portNum];
+  }
+
+  Drv::InputSerialReadPort *STIM300TesterBase ::
+    get_from_serialRead(const NATIVE_INT_TYPE portNum)
+  {
+    FW_ASSERT(portNum < this->getNum_from_serialRead(),static_cast<AssertArg>(portNum));
+    return &this->m_from_serialRead[portNum];
   }
 
   Fw::InputTlmPort *STIM300TesterBase ::
@@ -524,6 +508,23 @@ namespace Drv {
     _testerBase->from_packetTime_handlerBase(
         portNum,
         time
+    );
+  }
+
+  void STIM300TesterBase ::
+    from_serialRead_static(
+        Fw::PassiveComponentBase *const callComp,
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &serBuffer,
+        SerialReadStatus &status
+    )
+  {
+    FW_ASSERT(callComp);
+    STIM300TesterBase* _testerBase = 
+      static_cast<STIM300TesterBase*>(callComp);
+    _testerBase->from_serialRead_handlerBase(
+        portNum,
+        serBuffer, status
     );
   }
 
@@ -595,6 +596,7 @@ namespace Drv {
     this->fromPortHistorySize = 0;
     this->fromPortHistory_IMU->clear();
     this->fromPortHistory_packetTime->clear();
+    this->fromPortHistory_serialRead->clear();
   }
 
   // ---------------------------------------------------------------------- 
@@ -629,6 +631,23 @@ namespace Drv {
     ++this->fromPortHistorySize;
   }
 
+  // ---------------------------------------------------------------------- 
+  // From port: serialRead
+  // ---------------------------------------------------------------------- 
+
+  void STIM300TesterBase ::
+    pushFromPortEntry_serialRead(
+        Fw::Buffer &serBuffer,
+        SerialReadStatus &status
+    )
+  {
+    FromPortEntry_serialRead _e = {
+      serBuffer, status
+    };
+    this->fromPortHistory_serialRead->push_back(_e);
+    ++this->fromPortHistorySize;
+  }
+
   // ----------------------------------------------------------------------
   // Handler base functions for from ports
   // ----------------------------------------------------------------------
@@ -656,6 +675,20 @@ namespace Drv {
     this->from_packetTime_handler(
         portNum,
         time
+    );
+  }
+
+  void STIM300TesterBase ::
+    from_serialRead_handlerBase(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &serBuffer,
+        SerialReadStatus &status
+    )
+  {
+    FW_ASSERT(portNum < this->getNum_from_serialRead(),static_cast<AssertArg>(portNum));
+    this->from_serialRead_handler(
+        portNum,
+        serBuffer, status
     );
   }
 
@@ -998,6 +1031,25 @@ namespace Drv {
 
       }
 
+      case STIM300ComponentBase::EVENTID_SYNCCOMPLETE: 
+      {
+
+#if FW_AMPCS_COMPATIBLE
+        // For AMPCS, decode zero arguments
+        Fw::SerializeStatus _zero_status = Fw::FW_SERIALIZE_OK;
+        U8 _noArgs;
+        _zero_status = args.deserialize(_noArgs);
+        FW_ASSERT(
+            _zero_status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_zero_status)
+        );
+#endif    
+        this->logIn_ACTIVITY_LO_SyncComplete();
+
+        break;
+
+      }
+
       default: {
         FW_ASSERT(0, id);
         break;
@@ -1017,6 +1069,7 @@ namespace Drv {
     this->eventHistory_InvalidCounter->clear();
     this->eventHistory_TooManyEvents->clear();
     this->eventsSize_BadTimeSync = 0;
+    this->eventsSize_SyncComplete = 0;
   }
 
 #if FW_ENABLE_TEXT_LOGGING
@@ -1179,6 +1232,19 @@ namespace Drv {
     )
   {
     ++this->eventsSize_BadTimeSync;
+    ++this->eventsSize;
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: SyncComplete 
+  // ----------------------------------------------------------------------
+
+  void STIM300TesterBase ::
+    logIn_ACTIVITY_LO_SyncComplete(
+        void
+    )
+  {
+    ++this->eventsSize_SyncComplete;
     ++this->eventsSize;
   }
 

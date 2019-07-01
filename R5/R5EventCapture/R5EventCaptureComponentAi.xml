@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5EventCapture" kind="passive" namespace="R5" modeler="true">
+
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <ports>
+    
+
+        <port name="time" data_type="Fw::Time"  kind="sync_input"    max_number="1">
+        </port>
+    </ports>
+
+</component>

@@ -43,8 +43,10 @@ namespace Drv {
 #else
     STIM300Impl(void) :
 #endif
+      m_pktBuffer(),
+      m_pktBufferIdx(),
+      m_uartFwBuffer(),
       m_uartBuffer(),
-      m_uartBufferIdx(),
       m_pktCounter(0),
       m_timeSyncState(S300_TS_CLEAR),
       m_numReceivedPkts(0),
@@ -59,6 +61,8 @@ namespace Drv {
     ) 
   {
     STIM300ComponentBase::init(instance);
+
+    this->m_uartFwBuffer.setdata(reinterpret_cast<U64>(&this->m_uartBuffer[0]));
   }
 
   STIM300ComponentImpl ::
@@ -132,10 +136,13 @@ namespace Drv {
     Fw::Time eventTime;
 
     // Clear Uart buffer
-    this->m_uartBufferIdx = 0;
+    this->m_pktBufferIdx = 0;
 
     // Gather all events. Ignore errors
     (void)this->gatherEvents();
+
+    this->readUartBytes();
+    this->m_pktBufferIdx = 0;
 
     this->m_eventsRing.reset();
 
@@ -150,6 +157,7 @@ namespace Drv {
     Fw::Time eventTime;
     STIM300FindPktStatus findPktStat;
     STIM300GatherStatus gatherStat;
+    STIM300ReadUartStatus readStat;
 
     gatherStat = this->gatherEvents();
     if (gatherStat == S300_GATHER_DROPPED) {
@@ -158,31 +166,39 @@ namespace Drv {
     } else {
         FW_ASSERT(gatherStat == S300_GATHER_OK, gatherStat);
 
-        findPktStat = findSTIMPkt(&this->m_uartBuffer[bytesRead], this->m_uartBufferIdx, bytesRead, imuPkt);
+        readStat = this->readUartBytes();
 
-        // Shift remaining bytes to the beginning of the uart buffer
-        memmove(this->m_uartBuffer, &this->m_uartBuffer[bytesRead], this->m_uartBufferIdx - bytesRead);
-        this->m_uartBufferIdx -= bytesRead;
+        if (readStat == S300_UART_FULL ||
+            readStat == S300_UART_ERR) {
+            this->m_timeSyncState = S300_TS_CLEAR;
+        } else {
 
-        switch (findPktStat) {
-            case S300_PKT_FOUND:
-                this->m_timeSyncState = S300_TS_CHECK;
-                this->m_pktCounter = imuPkt.getheader().getseq();
-                this->m_tsCheckCount = 0;
+            findPktStat = findSTIMPkt(&this->m_pktBuffer[bytesRead], this->m_pktBufferIdx, bytesRead, imuPkt);
 
-                // Start checking TimeSync
-                this->runTsCheck();
-                break;
-            case S300_PKT_NONE:
-                // Do nothing
-                break;
-            case S300_PKT_LOST_SYNC:
-                // Try to re-sync
-                this->m_timeSyncState = S300_TS_CLEAR;
-                break;
-            default:
-                FW_ASSERT(false, findPktStat);
-                break;
+            // Shift remaining bytes to the beginning of the uart buffer
+            memmove(this->m_pktBuffer, &this->m_pktBuffer[bytesRead], this->m_pktBufferIdx - bytesRead);
+            this->m_pktBufferIdx -= bytesRead;
+
+            switch (findPktStat) {
+                case S300_PKT_FOUND:
+                    this->m_timeSyncState = S300_TS_CHECK;
+                    this->m_pktCounter = imuPkt.getheader().getseq();
+                    this->m_tsCheckCount = 0;
+
+                    // Start checking TimeSync
+                    this->runTsCheck();
+                    break;
+                case S300_PKT_NONE:
+                    // Do nothing
+                    break;
+                case S300_PKT_LOST_SYNC:
+                    // Try to re-sync
+                    this->m_timeSyncState = S300_TS_CLEAR;
+                    break;
+                default:
+                    FW_ASSERT(false, findPktStat);
+                    break;
+            }
         }
     }
   }
@@ -190,13 +206,14 @@ namespace Drv {
   void STIM300ComponentImpl ::
     runTsCheck()
   {
-    FW_ASSERT(this->m_uartBufferIdx <= STIM_UART_BUFFER_SIZE);
+    FW_ASSERT(this->m_pktBufferIdx <= STIM_PKT_BUFFER_SIZE);
 
     Fw::Time eventTime;
     ROS::sensor_msgs::ImuNoCov imuPkt;
     U32 totalBytesRead = 0;
     STIM300FindPktStatus findPktStat;
     STIM300GatherStatus gatherStat;
+    STIM300ReadUartStatus readStat;
 
     gatherStat = this->gatherEvents();
     if (gatherStat == S300_GATHER_DROPPED) {
@@ -205,40 +222,50 @@ namespace Drv {
     } else {
         FW_ASSERT(gatherStat == S300_GATHER_OK, gatherStat);
 
-        // Find all packets in the current buffer
-        do {
-            U32 bytesRead = 0;
+        readStat = this->readUartBytes();
 
-            findPktStat = findSTIMPkt(&this->m_uartBuffer[totalBytesRead], this->m_uartBufferIdx - totalBytesRead, bytesRead, imuPkt);
+        if (readStat == S300_UART_FULL ||
+            readStat == S300_UART_ERR) {
+            this->m_timeSyncState = S300_TS_CLEAR;
+        } else {
+            FW_ASSERT(readStat == S300_UART_OK, readStat);
 
-            if (findPktStat == S300_PKT_FOUND) {
+            // Find all packets in the current buffer
+            do {
+                U32 bytesRead = 0;
 
-                if (imuPkt.getheader().getseq() != ((this->m_pktCounter + 1) % 256)) {
-                    // Unexpected sequence number
-                    findPktStat = S300_PKT_LOST_SYNC;
-                } else {
-                    this->m_pktCounter = (this->m_pktCounter + 1) % 256;
+                findPktStat = findSTIMPkt(&this->m_pktBuffer[totalBytesRead], this->m_pktBufferIdx - totalBytesRead, bytesRead, imuPkt);
+
+                if (findPktStat == S300_PKT_FOUND) {
+
+                    if (imuPkt.getheader().getseq() != ((this->m_pktCounter + 1) % 256)) {
+                        // Unexpected sequence number
+                        findPktStat = S300_PKT_LOST_SYNC;
+                    } else {
+                        this->m_pktCounter = (this->m_pktCounter + 1) % 256;
+                    }
                 }
+
+                totalBytesRead += bytesRead;
+            } while (findPktStat == S300_PKT_FOUND);
+
+            FW_ASSERT(totalBytesRead <= this->m_pktBufferIdx, totalBytesRead, this->m_pktBufferIdx);
+
+            // Shift remaining bytes to the beginning of the uart buffer
+            if (totalBytesRead < this->m_pktBufferIdx) {
+                memmove(this->m_pktBuffer, &this->m_pktBuffer[totalBytesRead], this->m_pktBufferIdx - totalBytesRead);
             }
+            this->m_pktBufferIdx -= totalBytesRead;
 
-            totalBytesRead += bytesRead;
-        } while (findPktStat == S300_PKT_FOUND);
-
-        FW_ASSERT(totalBytesRead <= this->m_uartBufferIdx, totalBytesRead, this->m_uartBufferIdx);
-
-        // Shift remaining bytes to the beginning of the uart buffer
-        if (totalBytesRead < this->m_uartBufferIdx) {
-            memmove(this->m_uartBuffer, &this->m_uartBuffer[totalBytesRead], this->m_uartBufferIdx - totalBytesRead);
-        }
-        this->m_uartBufferIdx -= totalBytesRead;
-
-        this->m_tsCheckCount++;
-        if (findPktStat == S300_PKT_LOST_SYNC) {
-            this->m_timeSyncState = S300_TS_CLEAR;
-        } else if (this->verifyConsistency() == S300_CONSISTENCY_INVALID) {
-            this->m_timeSyncState = S300_TS_CLEAR;
-        } else if (this->m_tsCheckCount == STIM_TS_CHECK_CYCLES) {
-            this->m_timeSyncState = S300_TS_SYNCED;
+            this->m_tsCheckCount++;
+            if (findPktStat == S300_PKT_LOST_SYNC) {
+                this->m_timeSyncState = S300_TS_CLEAR;
+            } else if (this->verifyConsistency() == S300_CONSISTENCY_INVALID) {
+                this->m_timeSyncState = S300_TS_CLEAR;
+            } else if (this->m_tsCheckCount == STIM_TS_CHECK_CYCLES) {
+                log_ACTIVITY_LO_SyncComplete();
+                this->m_timeSyncState = S300_TS_SYNCED;
+            }
         }
     }
   }
@@ -247,13 +274,14 @@ namespace Drv {
   void STIM300ComponentImpl ::
     runTsSynced()
   {
-    FW_ASSERT(this->m_uartBufferIdx <= STIM_UART_BUFFER_SIZE);
+    FW_ASSERT(this->m_pktBufferIdx <= STIM_PKT_BUFFER_SIZE);
 
     Fw::Time eventTime;
     ROS::sensor_msgs::ImuNoCov imuPkt;
     U32 totalBytesRead = 0;
     STIM300FindPktStatus findPktStat;
     STIM300GatherStatus gatherStat;
+    STIM300ReadUartStatus readStat;
 
     gatherStat = this->gatherEvents();
     if (gatherStat == S300_GATHER_DROPPED) {
@@ -262,50 +290,62 @@ namespace Drv {
     } else {
         FW_ASSERT(gatherStat == S300_GATHER_OK, gatherStat);
 
-        // Find all packets in the current buffer
-        do {
-            U32 bytesRead = 0;
+        readStat = this->readUartBytes();
 
-            findPktStat = findSTIMPkt(&this->m_uartBuffer[totalBytesRead], this->m_uartBufferIdx - totalBytesRead, bytesRead, imuPkt);
+        if (readStat == S300_UART_FULL) {
+            log_WARNING_HI_BufferFull();
+            this->m_timeSyncState = S300_TS_NOSYNC;
+        } else if (readStat == S300_UART_ERR) {
+            log_WARNING_HI_UartError();
+            this->m_timeSyncState = S300_TS_NOSYNC;
+        } else {
+            FW_ASSERT(readStat == S300_UART_OK, readStat);
 
-            if (findPktStat == S300_PKT_FOUND) {
+            // Find all packets in the current buffer
+            do {
+                U32 bytesRead = 0;
 
-                if (imuPkt.getheader().getseq() != ((this->m_pktCounter + 1) % 256)) {
-                    // Unexpected sequence number
-                    findPktStat = S300_PKT_LOST_SYNC;
-                } else {
+                findPktStat = findSTIMPkt(&this->m_pktBuffer[totalBytesRead], this->m_pktBufferIdx - totalBytesRead, bytesRead, imuPkt);
 
-                    for (int i = 0; i < NUM_IMU_OUTPUT_PORTS; i++) {
-                        if (this->isConnected_IMU_OutputPort(i)) {
-                            this->IMU_out(i, imuPkt);
+                if (findPktStat == S300_PKT_FOUND) {
+
+                    if (imuPkt.getheader().getseq() != ((this->m_pktCounter + 1) % 256)) {
+                        // Unexpected sequence number
+                        findPktStat = S300_PKT_LOST_SYNC;
+                    } else {
+
+                        for (int i = 0; i < NUM_IMU_OUTPUT_PORTS; i++) {
+                            if (this->isConnected_IMU_OutputPort(i)) {
+                                this->IMU_out(i, imuPkt);
+                            }
                         }
-                    }
 
-                    this->m_pktCounter = (this->m_pktCounter + 1) % 256;
-                    this->m_numReceivedPkts++;
-                    this->tlmWrite_ImuPacket(imuPkt);
+                        this->m_pktCounter = (this->m_pktCounter + 1) % 256;
+                        this->m_numReceivedPkts++;
+                        this->tlmWrite_ImuPacket(imuPkt);
+                    }
                 }
+
+                totalBytesRead += bytesRead;
+            } while (findPktStat == S300_PKT_FOUND);
+
+            FW_ASSERT(totalBytesRead <= this->m_pktBufferIdx, totalBytesRead, this->m_pktBufferIdx);
+
+            // Shift remaining bytes to the beginning of the uart buffer
+            if (totalBytesRead < this->m_pktBufferIdx) {
+                memmove(this->m_pktBuffer, &this->m_pktBuffer[totalBytesRead], this->m_pktBufferIdx - totalBytesRead);
             }
 
-            totalBytesRead += bytesRead;
-        } while (findPktStat == S300_PKT_FOUND);
+            this->m_pktBufferIdx -= totalBytesRead;
 
-        FW_ASSERT(totalBytesRead <= this->m_uartBufferIdx, totalBytesRead, this->m_uartBufferIdx);
+            if (findPktStat == S300_PKT_LOST_SYNC) {
+                this->m_timeSyncState = S300_TS_NOSYNC;
+                this->log_WARNING_HI_InvalidCounter(imuPkt.getheader().getseq(), (this->m_pktCounter + 1) % 256);
+            }
 
-        // Shift remaining bytes to the beginning of the uart buffer
-        if (totalBytesRead < this->m_uartBufferIdx) {
-            memmove(this->m_uartBuffer, &this->m_uartBuffer[totalBytesRead], this->m_uartBufferIdx - totalBytesRead);
-        }
-
-        this->m_uartBufferIdx -= totalBytesRead;
-
-        if (findPktStat == S300_PKT_LOST_SYNC) {
-            this->m_timeSyncState = S300_TS_NOSYNC;
-            this->log_WARNING_HI_InvalidCounter(imuPkt.getheader().getseq(), (this->m_pktCounter + 1) % 256);
-        }
-
-        if (this->verifyConsistency() == S300_CONSISTENCY_INVALID) {
-            this->m_timeSyncState = S300_TS_NOSYNC;
+            if (this->verifyConsistency() == S300_CONSISTENCY_INVALID) {
+                this->m_timeSyncState = S300_TS_NOSYNC;
+            }
         }
     }
   }
@@ -322,35 +362,44 @@ namespace Drv {
     // TODO: Dead Reckoning
 
     (void)this->gatherEvents();
-    this->m_uartBufferIdx = 0;
+    this->m_pktBufferIdx = 0;
   }
 
-  void STIM300ComponentImpl ::
-    serialRead_handler(
-        const NATIVE_INT_TYPE portNum,
-        Fw::Buffer &serBuffer,
-        Drv::SerialReadStatus &status
-    )
+  STIM300ComponentImpl::STIM300ReadUartStatus
+      STIM300ComponentImpl::readUartBytes(void)
   {
+    Drv::SerialReadStatus status;
+
+    this->m_uartFwBuffer.setsize(STIM_UART_BUFFER_SIZE);
+
+    this->serialRead_out(0, this->m_uartFwBuffer, status);
+
     if (status == Drv::SER_OK) {
 
-        FW_ASSERT(this->m_uartBufferIdx <= STIM_UART_BUFFER_SIZE);
+        if (this->m_uartFwBuffer.getsize() < (STIM_PKT_BUFFER_SIZE - this->m_pktBufferIdx)) {
+            // We have enough room in the packet buffer
 
-        if ((this->m_uartBufferIdx + serBuffer.getsize()) > STIM_UART_BUFFER_SIZE) {
-            log_WARNING_HI_BufferFull();
+            memcpy(&this->m_pktBuffer[this->m_pktBufferIdx], &this->m_uartBuffer[0], this->m_uartFwBuffer.getsize());
+
+            this->m_pktBufferIdx += this->m_uartFwBuffer.getsize();
         } else {
-            memcpy(&this->m_uartBuffer[this->m_uartBufferIdx],
-                   reinterpret_cast<void*>(serBuffer.getdata()),
-                   serBuffer.getsize());
-            this->m_uartBufferIdx += serBuffer.getsize();
+            // Not enough room. Drop all bytes
+            return S300_UART_FULL;
         }
     } else {
-        log_WARNING_HI_UartError();
+        return S300_UART_ERR;
     }
+
+    return S300_UART_OK;
   }
 
   // TODO: Make buffer const
-  STIM300ComponentImpl::STIM300FindPktStatus STIM300ComponentImpl::findSTIMPkt(U8* buffer, const U32 bufferLength, U32& bytesRead_out, ROS::sensor_msgs::ImuNoCov& pkt_out)
+  STIM300ComponentImpl::STIM300FindPktStatus
+      STIM300ComponentImpl::findSTIMPkt(U8* buffer,
+                                        const U32 bufferLength,
+                                        U32& bytesRead_out,
+                                        ROS::sensor_msgs::ImuNoCov& pkt_out
+      )
   {
     U32 idx = 0;
     U32 pktIdx = 0;
@@ -498,8 +547,8 @@ namespace Drv {
 
     // Not enough consumed uart data.
     // TODO: Should this be an assert?
-    if (this->m_uartBufferIdx > 0) {
-        switch (this->m_uartBuffer[0]) {
+    if (this->m_pktBufferIdx > 0) {
+        switch (this->m_pktBuffer[0]) {
             case 0x90:
                 stimPktLen = sizeof(STIM300Packet_90);
                 break;
@@ -511,7 +560,7 @@ namespace Drv {
                 break;
         }
 
-        if (this->m_uartBufferIdx >= stimPktLen) {
+        if (this->m_pktBufferIdx >= stimPktLen) {
             return S300_CONSISTENCY_INVALID;
         }
     }

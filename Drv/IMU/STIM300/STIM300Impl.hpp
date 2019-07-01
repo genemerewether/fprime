@@ -92,6 +92,12 @@ namespace Drv {
           S300_GATHER_DROPPED
       };
 
+      enum STIM300ReadUartStatus {
+          S300_UART_OK,
+          S300_UART_FULL,
+          S300_UART_ERR
+      };
+
       enum STIM300ConsistencyStatus {
           S300_CONSISTENCY_OK,
           S300_CONSISTENCY_INVALID
@@ -109,28 +115,26 @@ namespace Drv {
           NATIVE_UINT_TYPE context /*!< The call order*/
       );
 
-      //! Handler implementation for serialRead
-      //!
-      void serialRead_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
-          Drv::SerialReadStatus &status /*!< Status of read*/
-      );
-
       void runTsClear();
       void runTsWait();
       void runTsCheck();
       void runTsSynced();
       void runTsNosync();
 
-      STIM300GatherStatus gatherEvents();
+      STIM300GatherStatus gatherEvents(void);
 
-      STIM300ConsistencyStatus verifyConsistency();
+      STIM300ConsistencyStatus verifyConsistency(void);
 
       STIM300FindPktStatus findSTIMPkt(U8* buffer, const U32 bufferLength, U32& bytesRead_out, ROS::sensor_msgs::ImuNoCov& pkt_out);
 
+      STIM300ReadUartStatus readUartBytes(void);
+
+      U8 m_pktBuffer[STIM_PKT_BUFFER_SIZE];
+      U32 m_pktBufferIdx;
+
+      Fw::Buffer m_uartFwBuffer;
+      // Backing datastore for m_uartFwBuffer
       U8 m_uartBuffer[STIM_UART_BUFFER_SIZE];
-      U32 m_uartBufferIdx;
 
       U32 m_pktCounter;
 
@@ -141,6 +145,7 @@ namespace Drv {
       U32 m_tsCheckCount;
 
       quest_gnc::ringbuffer<Fw::Time, STIM_MAX_EVENTS> m_eventsRing;
+
 
     };
 

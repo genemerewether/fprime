@@ -18,5 +18,7 @@
     </event>
     <event id="5" name="BadTimeSync" severity="WARNING_HI" format_string="Inconsistent IMU event time sync data. Lost Sync">
     </event>
+    <event id="6" name="SyncComplete" severity="ACTIVITY_LO" format_string="STIM300 Time Sync Complete">
+    </event>
 
 </events>

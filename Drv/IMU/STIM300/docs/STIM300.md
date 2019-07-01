@@ -23,3 +23,4 @@
 |TooManyEvents|4 (0x4)|| | | | |
 | | | |maxEvents|U32|||
 |BadTimeSync|5 (0x5)|| | | | |
+|SyncComplete|6 (0x6)|| | | | |
