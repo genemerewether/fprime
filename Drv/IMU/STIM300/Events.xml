@@ -1,0 +1,14 @@
+<events>
+    <event id="0" name="BufferFull" severity="WARNING_HI" format_string="STIM300 Uart buffer full. IMU packets will be dropped" throttle="5">
+    </event>
+    <event id="1" name="UartError" severity="WARNING_HI" format_string="STIM300 Received bad uart packet" throttle="5">
+    </event>
+    <event id="2" name="NoEvents" severity="WARNING_HI" format_string="Could not find trigger timestamp" throttle="5">
+    </event>
+    <event id="3" name="InvalidCounter" severity="WARNING_HI" format_string="Unexpected counter value %d. Expected %d" throttle="5">
+        <args>
+            <arg name="actualCount" type="U32"/>
+            <arg name="exptecCount" type="U32"/>
+        </args>
+    </event>
+</events>
