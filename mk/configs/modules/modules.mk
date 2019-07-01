@@ -45,6 +45,7 @@ R5_MODULES := \
 	R5/SpiSlaveDrv \
 	R5/UartDrv \
 	R5/I2CDrv \
+	R5/R5EventCapture \
 	\
 	R5/TiHal \
 	R5/R5FlashApi
