@@ -16,8 +16,12 @@
 
 enum UartInstances {
   HL_UART_INSTANCE = 2,
-  DEBUG_UART_INSTANCE = 1,
-  STIM_UART_INSTANCE = 0,
+  DEBUG_UART_INSTANCE = 0,
+  STIM_UART_INSTANCE = 1,
+};
+
+enum EventCaptuerInstances {
+  STIM_TOV_INSTANCE = 0,
 };
 
 // Component instance pointers
@@ -285,7 +289,7 @@ void manualConstruct() {
     hlRouter_ptr->set_HLPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(0));
 
-    //mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
+    stim300_ptr->set_IMU_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
     //imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
     //leeCtrl_ptr->set_accelCommand_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
@@ -379,7 +383,7 @@ void constructApp() {
     i2c1Drv_ptr->initDriver(128, 128, alloc);
 
     eventCapture_ptr->init(0);
-    eventCapture_ptr->initDriver(64, alloc);
+    eventCapture_ptr->initDriver(STIM_TOV_INSTANCE, 64, alloc);
 
     stim300_ptr->init(0);
 
