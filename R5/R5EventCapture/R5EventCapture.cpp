@@ -10,7 +10,7 @@
 #include <Fw/Types/BasicTypes.hpp>
 #include <Fw/Types/Assert.hpp>
 
-#include <Utils/RingBuffer/RingBuffer.h>
+#include <Gnc/quest_gnc/include/quest_gnc/utils/ringbuffer.h>
 
 #include <string.h>
 
@@ -41,7 +41,7 @@ namespace R5 {
   struct ECPort {
     struct ECConfig config;
 
-    Utils::RingBuffer<struct ECFifoEntry,ECFifoEntryDepth> fifo;
+    quest_gnc::ringbuffer<struct ECFifoEntry,ECFifoEntryDepth> fifo;
 
     // HTU Buffers
     U32* bufferA;
