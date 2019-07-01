@@ -51,7 +51,8 @@ namespace R5 {
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
-      void initDriver(const NATIVE_UINT_TYPE memSize,
+      void initDriver(U32 port,
+                      const NATIVE_UINT_TYPE memSize,
                       Fw::MemAllocator& allocator);
 
       //! Destroy object R5EventCapture

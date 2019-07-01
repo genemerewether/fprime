@@ -52,6 +52,7 @@ namespace R5 {
 
   void R5EventCaptureComponentImpl ::
     initDriver(
+        U32 port,
         const NATIVE_UINT_TYPE memSize,
         Fw::MemAllocator& allocator
     )
@@ -65,7 +66,7 @@ namespace R5 {
     FW_ASSERT(memAPtr != NULL);
     FW_ASSERT(memBPtr != NULL);
 
-    EventCaptureInit(memAPtr, memBPtr, memSize);
+    EventCaptureInit(port, memAPtr, memBPtr, memSize);
   }
 
   R5EventCaptureComponentImpl ::
@@ -87,7 +88,7 @@ namespace R5 {
     ECEvent event;
     bool status;
 
-    status = EventCaptureGetEvent(event);
+    status = EventCaptureGetEvent(portNum, event);
 
     if (status) {
         time.set(TB_PROC_TIME, event.seconds, event.useconds);

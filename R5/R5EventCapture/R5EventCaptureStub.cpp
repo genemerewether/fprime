@@ -1,15 +1,12 @@
 
 namespace R5 {
 
-  void EventCaptureInit(U8* dmaMemoryA, U8* dmaMemoryB, uint32_t dmaMemorySize) {
+  void EventCaptureInit(U32 port, U8* dmaMemoryA, U8* dmaMemoryB, uint32_t dmaMemorySize) {
 
   }
 
-  bool EventCaptureGetEvent(struct ECEvent& event) {
+  bool EventCaptureGetEvent(U32 port, struct ECEvent& event) {
     return false;
   }
 
-  void EventCaptureLatchEvents(void) {
-
-  }
 }

@@ -10,12 +10,9 @@ namespace R5 {
       U32 seconds, useconds;
   };
 
-  void EventCaptureInit(U8* dmaMemoryA, U8* dmaMemoryB, uint32_t dmaMemorySize);
+  void EventCaptureInit(U32 fpPort, U8* dmaMemoryA, U8* dmaMemoryB, uint32_t dmaMemorySize);
 
-  bool EventCaptureGetEvent(struct ECEvent& event);
-
-  void EventCaptureLatchEvents(void);
-
+  bool EventCaptureGetEvent(U32 fpPort, struct ECEvent& event);
 }
 
 #endif

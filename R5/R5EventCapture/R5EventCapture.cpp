@@ -33,24 +33,55 @@ namespace R5 {
     HTU_CP_B
   };
 
-  static Utils::RingBuffer<struct ECFifoEntry,ECFifoEntryDepth> ECFifo;
+  struct ECConfig {
+    U32 DCP;
+    U32 instruction;
+  };
 
-  // HTU Buffers
-  static U32* ECHTUBufferA = nullptr;
-  static U32* ECHTUBufferB = nullptr;
-  static U32 ECHTUBufferSize = 0;
-  static U32 ECHTUBufferEntries = 0;
+  struct ECPort {
+    struct ECConfig config;
 
-  // Active HTU CP
-  static HTUCP activeCP;
+    Utils::RingBuffer<struct ECFifoEntry,ECFifoEntryDepth> fifo;
 
-  // RTI-HET Time sync
-  static RtiTime ECSyncRtiTime;
-  static U32 ECSyncHetTime;
+    // HTU Buffers
+    U32* bufferA;
+    U32* bufferB;
+    U32 bufferSize;
+    U32 bufferEntries;
 
+    // Active HTU CP
+    HTUCP activeCP;
+
+    // RTI-HET Time sync
+    RtiTime rtiTime;
+    U32 hetTime;
+  };
+
+  static const struct ECConfig ECConfigs[ECNumEventPins] = {
+      // Port 0. STIM300 TOV Event
+      {
+          .DCP = 0,
+          .instruction = 1
+      },
+      // Port 1. R5 Time Sync Event
+      {
+          .DCP = 1,
+          .instruction = 2
+      }
+  };
+
+  static struct ECPort ECPorts[ECNumEventPins] = {
+      // Port 0. STIM300 TOV Event
+      {
+          .config = ECConfigs[0]
+      },
+      {
+          .config = ECConfigs[1]
+      }
+  };
 
   // Assumes that het_time is within one het count cycles of last Het Timesync
-  static void ECTransformTime(U32 hetTime, struct ECFifoEntry& entry_out) {
+  static void ECTransformTime(struct ECPort* port, U32 hetTime, struct ECFifoEntry& entry_out) {
 
     U32 hetOffset;
     U32 hetOffsetUsec;
@@ -60,16 +91,16 @@ namespace R5 {
     hetTime = hetTime >> 7;
 
     // TODO: Verify that we don't wrap the HET Counter
-    if (hetTime < ECSyncHetTime) {
-        hetOffset = ECSyncHetTime - hetTime;
+    if (hetTime < port->hetTime) {
+        hetOffset = port->hetTime - hetTime;
     } else {
-        hetOffset = (HET_TIME_MAX - hetTime) + ECSyncHetTime;
+        hetOffset = (HET_TIME_MAX - hetTime) + port->hetTime;
     }
 
     hetOffsetUsec = hetOffset * HET_TICK_PER_US;
     hetOffsetSubseconds = hetOffsetUsec * R5_USEC_DIV;
 
-    RtiTime rtiTemp = ECSyncRtiTime;
+    RtiTime rtiTemp = port->rtiTime;
 
     // If the time from when the event happened to the GetEvent
     // call is too large we cannot convert the time reliably.
@@ -93,7 +124,7 @@ namespace R5 {
     entry_out.useconds = rtiTemp.subseconds / R5_USEC_DIV;
   }
 
-  static bool ECSwitchBuffer() {
+  static bool ECSwitchBuffer(struct ECPort* port) {
 
     U32 timeout = 0;
 
@@ -108,14 +139,14 @@ namespace R5 {
         timeout++;
     }
 
-    if (activeCP == HTU_CP_A) {
+    if (port->activeCP == HTU_CP_A) {
         // No longer busy. Switch to CP B
-        htuREG1->CPENA = HTU_CPENA_CPENA_ENB(HTU_DCP);
-        activeCP = HTU_CP_B;
+        htuREG1->CPENA = HTU_CPENA_CPENA_ENB(port->config.DCP);
+        port->activeCP = HTU_CP_B;
     } else {
         // Switch to CB A
-        htuREG1->CPENA = HTU_CPENA_CPENA_ENA(HTU_DCP);
-        activeCP = HTU_CP_A;
+        htuREG1->CPENA = HTU_CPENA_CPENA_ENA(port->config.DCP);
+        port->activeCP = HTU_CP_A;
     }
 
     // Stop holding the bus
@@ -124,117 +155,127 @@ namespace R5 {
     return true;
   }
 
-  static bool ECReadInactiveBuffer() {
-    U32 bufferEntries;
+  static bool ECReadInactiveBuffer(struct ECPort* port) {
+    //U32 bufferEntries;
     struct ECFifoEntry fifoEntry;
     U32 idx;
     U32* HTUBufferPtr;
 
-    FW_ASSERT(activeCP == HTU_CP_A ||
-              activeCP == HTU_CP_B, activeCP);
+    FW_ASSERT(port->activeCP == HTU_CP_A ||
+              port->activeCP == HTU_CP_B, port->activeCP);
 
-    if (activeCP == HTU_CP_A) {
+    if (port->activeCP == HTU_CP_A) {
         // Read number of frames transfered into B buffer
-        bufferEntries = (htuCDCP1[HTU_DCP].CFCOUNT >> CDCP_CFCOUNT_CFTCTB_SHIFT) &
-                            CDCP_CFCOUNT_CFTCTB_MASK;
-        HTUBufferPtr = ECHTUBufferB;
+        //bufferEntries = (htuCDCP1[port->config.DCP].CFCOUNT >> CDCP_CFCOUNT_CFTCTB_SHIFT) &
+                         //CDCP_CFCOUNT_CFTCTB_MASK;
+        HTUBufferPtr = port->bufferB;
     } else {
         // Read number of frames transfered into A buffer
-        bufferEntries = (htuCDCP1[HTU_DCP].CFCOUNT >> CDCP_CFCOUNT_CFTCTA_SHIFT) &
-                            CDCP_CFCOUNT_CFTCTA_MASK;
-        HTUBufferPtr = ECHTUBufferA;
+        //bufferEntries = (htuCDCP1[port->config.DCP].CFCOUNT >> CDCP_CFCOUNT_CFTCTA_SHIFT) &
+                         //CDCP_CFCOUNT_CFTCTA_MASK;
+        HTUBufferPtr = port->bufferA;
     }
 
     //FW_ASSERT(bufferEntries <= ECHTUBufferEntries, bufferEntries);
 
-    for (idx = 0; idx < ECHTUBufferEntries; idx++) {
+    for (idx = 0; idx < port->bufferEntries; idx++) {
         if (HTUBufferPtr[idx] == 0) {
             break;
         }
         // Read entries and push them to the Fifo
-        ECTransformTime(HTUBufferPtr[idx], fifoEntry);
+        ECTransformTime(port, HTUBufferPtr[idx], fifoEntry);
 
-        if (ECFifo.queue(&fifoEntry) != 0) {
+        if (port->fifo.queue(&fifoEntry) != 0) {
             return false;
         }
     }
 
-    memset(HTUBufferPtr, 0, ECHTUBufferSize);
+    memset(HTUBufferPtr, 0, port->bufferSize);
 
     return true;
   }
 
-  static void ECFifoEntryToEvent(const ECFifoEntry& f_entry, ECEvent& event_out) {
+  static void ECFifoEntryToEvent(struct ECPort* port, const ECFifoEntry& f_entry, ECEvent& event_out) {
     event_out.seconds = f_entry.seconds;
     event_out.useconds = f_entry.useconds;
   }
 
-  static void ECCalcTimeConversion() {
-    rtiGetHighResTime(&ECSyncRtiTime);
+  static void ECCalcTimeConversion(struct ECPort* port) {
+    rtiGetHighResTime(&port->rtiTime);
     // Het time is stored in the upper 25 bits
-    ECSyncHetTime = hetRAM1->Instruction[0].Data >> 7;
+    port->hetTime = hetRAM1->Instruction[0].Data >> 7;
   }
 
-  void EventCaptureInit(U8* dmaMemoryA, U8* dmaMemoryB, uint32_t dmaMemorySize) {
+  void EventCaptureInit(U32 fpPort, U8* dmaMemoryA, U8* dmaMemoryB, uint32_t dmaMemorySize) {
+
+    FW_ASSERT(fpPort < ECNumEventPins, fpPort, ECNumEventPins);
 
     FW_ASSERT(dmaMemoryA != NULL, reinterpret_cast<uint32>(dmaMemoryA));
     FW_ASSERT(dmaMemoryB != NULL, reinterpret_cast<uint32>(dmaMemoryB));
 
-    ECHTUBufferA = reinterpret_cast<U32*>(dmaMemoryA);
-    ECHTUBufferB = reinterpret_cast<U32*>(dmaMemoryB);
-    ECHTUBufferSize = dmaMemorySize;
-    ECHTUBufferEntries = ECHTUBufferSize / sizeof(U32);
+    struct ECPort* port = &ECPorts[fpPort];
 
-    memset(ECHTUBufferA, 0, dmaMemorySize);
-    memset(ECHTUBufferB, 0, dmaMemorySize);
+    port->bufferA = reinterpret_cast<U32*>(dmaMemoryA);
+    port->bufferB = reinterpret_cast<U32*>(dmaMemoryB);
+    port->bufferSize = dmaMemorySize;
+    port->bufferEntries = dmaMemorySize / sizeof(U32);
 
-    ECFifo.reset();
+    memset(port->bufferA, 0, dmaMemorySize);
+    memset(port->bufferB, 0, dmaMemorySize);
+
+    port->fifo.reset();
 
     // Enable Continue On Request Lost
     htuREG1->RLBECTRL = HTU_RLBECTRL_CORL;
 
     // Set HTU Buffer locations
-    htuDCP1[HTU_DCP].IFADDRA = reinterpret_cast<uint32>(ECHTUBufferA);
-    htuDCP1[HTU_DCP].IFADDRB = reinterpret_cast<uint32>(ECHTUBufferB);
+    htuDCP1[port->config.DCP].IFADDRA = reinterpret_cast<uint32>(port->bufferA);
+    htuDCP1[port->config.DCP].IFADDRB = reinterpret_cast<uint32>(port->bufferB);
 
     // (Instruction 1 * 4 entries per Instruction) + Data field offset
-    htuDCP1[HTU_DCP].IHADDRCT = ((1*4) + 2) << DCP_IHADDRCT_IHADDR_SHIFT;
+    htuDCP1[port->config.DCP].IHADDRCT = ((port->config.instruction*4) + 2) << DCP_IHADDRCT_IHADDR_SHIFT;
 
-    htuDCP1[HTU_DCP].ITCOUNT = (1 << DCP_ITCOUNT_IETCOUNT_SHIFT) | // 1 Element per Frame
-                               (ECHTUBufferEntries << DCP_ITCOUNT_IFTCOUNT_SHIFT); // ECBufferLength Frames
+    htuDCP1[port->config.DCP].ITCOUNT = (1 << DCP_ITCOUNT_IETCOUNT_SHIFT) | // 1 Element per Frame
+                                        (port->bufferEntries << DCP_ITCOUNT_IFTCOUNT_SHIFT); // ECBufferLength Frames
 
     // Enable CP 0, buffer A
-    htuREG1->CPENA = HTU_CPENA_CPENA_ENA(HTU_DCP);
-    activeCP = HTU_CP_A;
+    htuREG1->CPENA = HTU_CPENA_CPENA_ENA(port->config.DCP);
+    port->activeCP = HTU_CP_A;
 
     // Enable the HTU
     htuREG1->GC = HTU_GC_HTUEN;
 
     // Enable HTU requests on line 0
-    hetREG1->REQENS = (1 << 0);
+    hetREG1->REQENS = (1 << port->config.DCP);
   }
 
-  bool EventCaptureGetEvent(struct ECEvent& event) {
+  bool EventCaptureGetEvent(U32 fpPort, struct ECEvent& event) {
 
     I32 fifo_stat;
     struct ECFifoEntry f_entry;
 
-    fifo_stat = ECFifo.dequeue(&f_entry);
+    FW_ASSERT(fpPort < ECNumEventPins, fpPort, ECNumEventPins);
+
+    struct ECPort* port = &ECPorts[fpPort];
+
+    FW_ASSERT(port->bufferA != NULL);
+
+    fifo_stat = port->fifo.dequeue(&f_entry);
 
     if (fifo_stat != 0) {
-        ECCalcTimeConversion();
+        ECCalcTimeConversion(port);
 
-        ECSwitchBuffer();
+        ECSwitchBuffer(port);
 
-        ECReadInactiveBuffer();
+        ECReadInactiveBuffer(port);
 
-        fifo_stat = ECFifo.dequeue(&f_entry);
+        fifo_stat = port->fifo.dequeue(&f_entry);
         if (fifo_stat != 0) {
             return false;
         }
     }
 
-    ECFifoEntryToEvent(f_entry, event);
+    ECFifoEntryToEvent(port, f_entry, event);
     return true;
   }
 
