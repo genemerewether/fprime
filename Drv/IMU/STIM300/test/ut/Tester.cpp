@@ -23,7 +23,6 @@
 
 #include "Tester.hpp"
 #include "STIM300Model.hpp"
-#include <Utils/RingBuffer/RingBuffer.h>
 
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 100
@@ -92,15 +91,13 @@ namespace Drv {
   {
     using namespace std::placeholders;
 
-    const int iterations = 2000;
-    const int uart_per_sched = 4;
-    const int uart_period_us = 2000;
-
     STIM300Model model(200,
                        std::bind(&Tester::eventFunc, this, _1),
                        std::bind(&Tester::bytesFunc, this, _1, _2),
                        std::bind(&Tester::expectFunc, this, _1, _2, _3));
                     
+    this->component.m_timeSyncState = STIM300ComponentImpl::S300_TS_SYNCED;
+
     Drv::SerialReadStatus readStat = Drv::SER_OK;
     ROS::sensor_msgs::ImuNoCov tempImuPkt;
     U8 stimPktBuffer[256];
@@ -118,6 +115,9 @@ namespace Drv {
     this->m_uartFwBuffer.setsize(stimPktLen);
 
     this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+
+    // Seed the packet counter correctly
+    this->component.m_pktCounter = (tempImuPkt.getheader().getseq() - 1) % 256;
 
     this->invoke_to_sched(0, 0);
 
@@ -267,12 +267,16 @@ namespace Drv {
     const int uart_per_sched = 4;
     const int uart_period_us = 2000;
 
-    int partialPkts = 0;
+    bool firstPass = true;
 
     STIM300Model model(500,
                        std::bind(&Tester::eventFunc, this, _1),
                        std::bind(&Tester::bytesFunc, this, _1, _2),
                        std::bind(&Tester::expectFunc, this, _1, _2, _3));
+
+    this->component.m_timeSyncState = STIM300ComponentImpl::S300_TS_SYNCED;
+
+    std::cout << "Processing 10000 packets" << std::endl;
 
     std::thread modelThread(&Drv::STIM300Model::run, &model);
 
@@ -283,6 +287,13 @@ namespace Drv {
         {
             std::lock_guard<std::mutex> lock(this->m_modelMutex);
 
+            // Seed the packet counter
+            if (firstPass) {
+                if (this->m_expPkts.size() > 0) {
+                    this->component.m_pktCounter = (this->m_expPkts.get(0)->getheader().getseq() - 1) % 256;
+                    firstPass = false;
+                }
+            }
 
             this->m_uartFwBuffer.setsize(this->m_uartExtBuffer.getBuffLength());
 
@@ -292,13 +303,14 @@ namespace Drv {
             this->m_uartExtBuffer.resetSer();
 
             if (i % uart_per_sched == 0) {
-                //std::cout << "Extra: " << this->component.m_uartBufferIdx << std::endl;
+                int numExpPkts = this->m_expPkts.size();
                 this->invoke_to_sched(0, 0);
+
+                ASSERT_from_IMU_SIZE(numExpPkts);
 
                 ASSERT_EQ(0, this->m_expPkts.size());
 
                 if (this->component.m_uartBufferIdx != 0) {
-                    std::cout << "Extra: " << this->component.m_uartBufferIdx << std::endl;
                     this->m_partialPkts++;
                 }
             }
@@ -313,6 +325,197 @@ namespace Drv {
 
     std::cout << "Processed " << this->m_receivedPkts << " Packets" << std::endl;
     std::cout << "Precessed " << this->m_partialPkts << " Partial Packets" << std::endl;
+  }
+
+  void Tester ::
+    timeSyncTest()
+  {
+    using namespace std::placeholders;
+
+    const int iterations = 10000;
+    const int uart_per_sched = 4;
+    const int uart_period_us = 2000;
+    const int gather_iters = 10;
+    const int synced_iters = 10;
+
+    bool gatherData = true;
+    int gatherCount = 0;
+
+    int syncedCount = 0;
+
+    STIM300ComponentImpl::STIM300TSState expTsState;
+
+
+    STIM300Model model(500,
+                       std::bind(&Tester::eventFunc, this, _1),
+                       std::bind(&Tester::bytesFunc, this, _1, _2),
+                       std::bind(&Tester::expectFunc, this, _1, _2, _3));
+
+    std::thread modelThread(&Drv::STIM300Model::run, &model);
+
+    for (int i = 1; i <= iterations; i++) {
+
+        if (gatherData) {
+
+            {
+                std::lock_guard<std::mutex> lock(this->m_modelMutex);
+
+                this->m_uartFwBuffer.setsize(this->m_uartExtBuffer.getBuffLength());
+
+                Drv::SerialReadStatus readStat = Drv::SER_OK;
+                this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+
+                this->m_uartExtBuffer.resetSer();
+            }
+
+            gatherCount++;
+            if (gatherCount == gather_iters) {
+                gatherData = false;
+                syncedCount = 0;
+                expTsState = STIM300ComponentImpl::S300_TS_CLEAR;
+            }
+        } else {
+            int numExpPkts;
+
+            this->clearHistory();
+
+            {
+                std::lock_guard<std::mutex> lock(this->m_modelMutex);
+
+                this->m_uartFwBuffer.setsize(this->m_uartExtBuffer.getBuffLength());
+
+                Drv::SerialReadStatus readStat = Drv::SER_OK;
+                this->invoke_to_serialRead(0, this->m_uartFwBuffer, readStat);
+
+                this->m_uartExtBuffer.resetSer();
+
+                if (i % uart_per_sched == 0) {
+
+                    int expEventCalls;
+
+                    ASSERT_EQ(expTsState, this->component.m_timeSyncState);
+
+                    switch (expTsState) {
+                        case STIM300ComponentImpl::S300_TS_CLEAR:
+
+                            expEventCalls = this->m_eventRB.size() + 1;
+                            this->invoke_to_sched(0, 0);
+                            ASSERT_from_IMU_SIZE(0);
+
+                            ASSERT_from_packetTime_SIZE(expEventCalls);
+                            this->m_expPkts.reset();
+
+                            ASSERT_EQ(STIM300ComponentImpl::S300_TS_WAIT, this->component.m_timeSyncState);
+
+                            ASSERT_TLM_TimeSyncStatus_SIZE(1);
+                            ASSERT_TLM_TimeSyncStatus(0, STIM300ComponentImpl::STIM300_TS_WAIT);
+
+                            expTsState = STIM300ComponentImpl::S300_TS_WAIT;
+
+                            break;
+                        case STIM300ComponentImpl::S300_TS_WAIT:
+
+                            // Expect that if at least one packet exists it will be used for timesync
+
+                            if (this->m_expPkts.size() > 0) {
+
+                                // We don't pass the first packet after a time sync
+                                this->m_expPkts.remove();
+
+                                numExpPkts = this->m_expPkts.size();
+                                std::cout << "Expect: " << numExpPkts << std::endl;
+
+                                this->invoke_to_sched(0, 0);
+
+                                ASSERT_EQ(STIM300ComponentImpl::S300_TS_SYNCED, this->component.m_timeSyncState);
+
+                                ASSERT_from_IMU_SIZE(numExpPkts);
+
+                                ASSERT_TLM_TimeSyncStatus_SIZE(1);
+                                ASSERT_TLM_TimeSyncStatus(0, STIM300ComponentImpl::STIM300_TS_SYNCED);
+
+                                ASSERT_EQ(0, this->m_expPkts.size());
+
+                                ASSERT_from_packetTime_SIZE(numExpPkts + 1);
+
+                                expTsState = STIM300ComponentImpl::S300_TS_SYNCED;
+                            } else {
+
+                                this->invoke_to_sched(0, 0);
+
+                                ASSERT_EQ(STIM300ComponentImpl::S300_TS_WAIT, this->component.m_timeSyncState);
+
+                                ASSERT_from_IMU_SIZE(0);
+
+                                ASSERT_from_packetTime_SIZE(0);
+
+                                ASSERT_TLM_TimeSyncStatus_SIZE(1);
+                                ASSERT_TLM_TimeSyncStatus(0, STIM300ComponentImpl::STIM300_TS_WAIT);
+                            }
+
+                            break;
+                        case STIM300ComponentImpl::S300_TS_SYNCED:
+
+                            if (syncedCount == synced_iters) {
+                                if (this->m_expPkts.size() >= 2) {
+                                    // "Drop" a bytes
+                                    memmove(&this->component.m_uartBuffer[0],
+                                            &this->component.m_uartBuffer[1],
+                                            this->component.m_uartBufferIdx-1);
+                                    this->component.m_uartBufferIdx--;
+
+                                    this->invoke_to_sched(0, 0);
+
+                                    ASSERT_EQ(STIM300ComponentImpl::S300_TS_CLEAR,
+                                              this->component.m_timeSyncState);
+
+                                    ASSERT_from_IMU_SIZE(0);
+
+                                    ASSERT_from_packetTime_SIZE(1);
+
+                                    ASSERT_TLM_TimeSyncStatus_SIZE(1);
+                                    ASSERT_TLM_TimeSyncStatus(0, STIM300ComponentImpl::STIM300_TS_CLEAR);
+
+                                    ASSERT_EVENTS_InvalidCounter_SIZE(1);
+
+                                    this->component.log_WARNING_HI_InvalidCounter_ThrottleClear();
+
+                                    expTsState = STIM300ComponentImpl::S300_TS_CLEAR;
+
+                                    gatherData = true;
+                                    gatherCount = 0;
+                                } else {
+                                    // Just gather more data. Don't call sched
+                                }
+                            } else {
+
+                                numExpPkts = this->m_expPkts.size();
+                                this->invoke_to_sched(0, 0);
+
+                                ASSERT_from_IMU_SIZE(numExpPkts);
+
+                                ASSERT_TLM_TimeSyncStatus_SIZE(1);
+                                ASSERT_TLM_TimeSyncStatus(0, STIM300ComponentImpl::STIM300_TS_SYNCED);
+
+                                ASSERT_EQ(0, this->m_expPkts.size());
+
+                                syncedCount++;
+                            }
+                            break;
+                        default:
+                            FAIL();
+                            break;
+                    }
+                }
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::microseconds(uart_period_us));
+    }
+
+    model.stop();
+
+    modelThread.join();
   }
 
   void Tester ::
@@ -351,8 +554,6 @@ namespace Drv {
 
     this->m_expPkts.dequeue(&expImuPkt);
 
-    //std::cout << "Seq: " << ImuNoCov.getheader().getseq() << std::endl;
-    //std::cout << "Exp: " << expImuPkt.getheader().getseq() << std::endl; 
     compareImuPkts(ImuNoCov, expImuPkt);
 
   }
@@ -365,7 +566,12 @@ namespace Drv {
   {
     this->pushFromPortEntry_packetTime(time);
 
-    this->m_eventRB.dequeue(&time);
+    if (this->m_eventRB.size() > 0) {
+        this->m_eventRB.dequeue(&time);
+    } else {
+        time = Fw::Time();
+    }
+        
   }
 
   // ----------------------------------------------------------------------

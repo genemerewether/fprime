@@ -1,14 +1,22 @@
 <events>
-    <event id="0" name="BufferFull" severity="WARNING_HI" format_string="STIM300 Uart buffer full. IMU packets will be dropped" throttle="5">
+    <event id="0" name="BufferFull" severity="WARNING_HI" format_string="STIM300 Uart buffer full. IMU packets will be dropped. Lost Sync" throttle="5">
     </event>
-    <event id="1" name="UartError" severity="WARNING_HI" format_string="STIM300 Received bad uart packet" throttle="5">
+    <event id="1" name="UartError" severity="WARNING_HI" format_string="STIM300 Received bad uart packet. Lost Sync" throttle="5">
     </event>
-    <event id="2" name="NoEvents" severity="WARNING_HI" format_string="Could not find trigger timestamp" throttle="5">
+    <event id="2" name="NoEvents" severity="WARNING_HI" format_string="Could not find STIM timestamp. Lost Sync" throttle="5">
     </event>
-    <event id="3" name="InvalidCounter" severity="WARNING_HI" format_string="Unexpected counter value %d. Expected %d" throttle="5">
+    <event id="3" name="InvalidCounter" severity="WARNING_HI" format_string="Unexpected sequence count value %d. Expected %d. Lost Sync" throttle="5">
         <args>
             <arg name="actualCount" type="U32"/>
-            <arg name="exptecCount" type="U32"/>
+            <arg name="expectedCount" type="U32"/>
         </args>
     </event>
+    <event id="4" name="TooManyEvents" severity="WARNING_HI" format_string="Received more events than threshold of %d. Lost Sync" throttle="5">
+        <args>
+            <arg name="maxEvents" type="U32"/>
+        </args>
+    </event>
+    <event id="5" name="BadTimeSync" severity="WARNING_HI" format_string="Inconsistent IMU event time sync data. Lost Sync">
+    </event>
+
 </events>

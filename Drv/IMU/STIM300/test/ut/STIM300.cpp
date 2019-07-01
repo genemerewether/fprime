@@ -33,20 +33,15 @@ TEST(Nominal,Nominal) {
     tester.nominalTest();
 }
 
-TEST(Nominal,ManyPackets) {
+//TEST(Nominal,ManyPackets) {
+    //Drv::Tester tester;
+    //tester.manyPackets();
+//}
+
+TEST(TimeSync,Nominal) {
     Drv::Tester tester;
-    tester.manyPackets();
+    tester.timeSyncTest();
 }
-
-//TEST(TimeSync,Nominal) {
-    //Drv::Tester tester;
-    //tester.timeSyncTest();
-//}
-
-//TEST(InvalidPkt,OffNominal) {
-    //Drv::Tester tester;
-    //tester.invalidPktTest();
-//}
 
 int main(int argc, char* argv[]) {
     ::testing::InitGoogleTest(&argc, argv);

@@ -231,10 +231,6 @@ namespace Drv {
 
     createStimPkt(imuPkt, eventTime, stimData, stimDataLen);
 
-    //for (int i = 0; i < stimDataLen; i++) {
-        //std::cout << std::hex << static_cast<U32>(stimData[i]) << " ";
-    //}
-    //std::cout << std::endl;
   }
 
   void STIM300Model::stop() {

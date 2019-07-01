@@ -28,6 +28,8 @@
 #include <Drv/IMU/STIM300/STIM300ImplCfg.hpp>
 #include <Drv/IMU/STIM300/STIM300Pkt.hpp>
 
+#include <Gnc/quest_gnc/include/quest_gnc/utils/ringbuffer.h>
+
 namespace Drv {
 
   class STIM300ComponentImpl :
@@ -74,13 +76,25 @@ namespace Drv {
       enum STIM300TSState {
           S300_TS_CLEAR,
           S300_TS_WAIT,
-          S300_TS_SYNCED
+          S300_TS_CHECK,
+          S300_TS_SYNCED,
+          S300_TS_NOSYNC
       };
 
       enum STIM300FindPktStatus {
           S300_PKT_FOUND,
           S300_PKT_NONE,
           S300_PKT_LOST_SYNC
+      };
+
+      enum STIM300GatherStatus {
+          S300_GATHER_OK,
+          S300_GATHER_DROPPED
+      };
+
+      enum STIM300ConsistencyStatus {
+          S300_CONSISTENCY_OK,
+          S300_CONSISTENCY_INVALID
       };
 
       // ----------------------------------------------------------------------
@@ -105,7 +119,13 @@ namespace Drv {
 
       void runTsClear();
       void runTsWait();
+      void runTsCheck();
       void runTsSynced();
+      void runTsNosync();
+
+      STIM300GatherStatus gatherEvents();
+
+      STIM300ConsistencyStatus verifyConsistency();
 
       STIM300FindPktStatus findSTIMPkt(U8* buffer, const U32 bufferLength, U32& bytesRead_out, ROS::sensor_msgs::ImuNoCov& pkt_out);
 
@@ -117,6 +137,10 @@ namespace Drv {
       STIM300TSState m_timeSyncState;
 
       U32 m_numReceivedPkts;
+
+      U32 m_tsCheckCount;
+
+      quest_gnc::ringbuffer<Fw::Time, STIM_MAX_EVENTS> m_eventsRing;
 
     };
 

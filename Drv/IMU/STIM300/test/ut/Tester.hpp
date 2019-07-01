@@ -23,7 +23,7 @@
 #include "GTestBase.hpp"
 #include "Drv/IMU/STIM300/STIM300Impl.hpp"
 
-#include <Utils/RingBuffer/RingBuffer.h>
+#include <Gnc/quest_gnc/include/quest_gnc/utils/ringbuffer.h>
 
 namespace Drv {
 
@@ -56,6 +56,8 @@ namespace Drv {
       void nominalTest(void);
 
       void manyPackets(void);
+
+      void timeSyncTest(void);
 
     private:
 
@@ -110,8 +112,8 @@ namespace Drv {
 
       std::mutex m_modelMutex;
 
-      Utils::RingBuffer<Fw::Time, 100> m_eventRB;
-      Utils::RingBuffer<ROS::sensor_msgs::ImuNoCov, 100> m_expPkts;
+      quest_gnc::ringbuffer<Fw::Time, 100> m_eventRB;
+      quest_gnc::ringbuffer<ROS::sensor_msgs::ImuNoCov, 100> m_expPkts;
 
 
       U8 m_uartBufferData[256];
