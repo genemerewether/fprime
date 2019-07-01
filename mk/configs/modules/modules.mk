@@ -596,6 +596,7 @@ R5REF_MODULES := \
 	$(R5_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/IMU/STIM300 \
 	Drv/Mavlink/ActuatorControls \
 	Drv/Altimeter/LIDARLiteV3 \
 	\
