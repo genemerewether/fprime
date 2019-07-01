@@ -46,8 +46,8 @@ R5::R5A2DDriverComponentImpl* a2dDrv_ptr = 0;
 R5::R5PrmComponentImpl* prm_ptr = 0;
 R5::R5I2CDriverComponentImpl* i2c1Drv_ptr = 0;
 R5::R5EventCaptureComponentImpl* eventCapture_ptr = 0;
+R5::R5RtiComponentImpl* rtiWait_ptr = 0;
 
-R5::R5GpioAdapterComponentImpl* rtiGpio_ptr = 0;
 R5::R5GpioAdapterComponentImpl* faultGpio_ptr = 0;
 
 LLProc::ShortLogQueueComponentImpl* logQueue_ptr = 0;
@@ -79,7 +79,7 @@ void allocComps() {
                             rgTlmContext,FW_NUM_ARRAY_ELEMENTS(rgTlmContext));
 ;
 
-    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 1000};
+    NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 500};
     rgGncDrv_ptr = new Svc::RateGroupDriverImpl(
     #if FW_OBJECT_NAMES == 1
                         "RGDRV",
@@ -200,12 +200,6 @@ void allocComps() {
     #endif
     ;
 
-    rtiGpio_ptr = new R5::R5GpioAdapterComponentImpl
-    #if FW_OBJECT_NAMES == 1
-                        ("rtigpio")
-    #endif
-    ;
-
     faultGpio_ptr = new R5::R5GpioAdapterComponentImpl
     #if FW_OBJECT_NAMES == 1
                         ("faultgpio")
@@ -278,6 +272,12 @@ void allocComps() {
 #endif
 ;
 
+    rtiWait_ptr = new R5::R5RtiComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("rti")
+#endif
+;
+
 }
 
 void manualConstruct() {
@@ -338,7 +338,6 @@ void constructApp() {
     // initialize GPIO
     gpio_ptr->init(0);
 
-    rtiGpio_ptr->init(0);
     faultGpio_ptr->init(0);
 
     // inialize SPI drivers
@@ -384,6 +383,8 @@ void constructApp() {
 
     stim300_ptr->init(0);
 
+    rtiWait_ptr->init(0);
+
     // Connect rate groups to rate group driver
     constructR5REFArchitecture();
 
@@ -398,7 +399,6 @@ void constructApp() {
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
 
-    rtiGpio_ptr->waitMapping(R5::GPIO_WAIT_BANK_A, 2);
     faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);
 
     // load parameters from flash
