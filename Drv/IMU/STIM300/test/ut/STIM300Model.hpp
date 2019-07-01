@@ -43,6 +43,7 @@ namespace Drv {
       void stop();
     private:
 
+      ROS::sensor_msgs::ImuNoCov getImuPkt();
 
       int m_rateHz;
 
@@ -51,6 +52,8 @@ namespace Drv {
       std::function<void(U8*,U32,ROS::sensor_msgs::ImuNoCov)> m_pushExpFun;
 
       bool m_should_stop;
+
+      int m_seq_num;
  };
 }
 

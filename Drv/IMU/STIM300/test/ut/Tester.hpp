@@ -25,6 +25,8 @@
 
 #include <Gnc/quest_gnc/include/quest_gnc/utils/ringbuffer.h>
 
+#include "STIM300Model.hpp"
+
 namespace Drv {
 
   class Tester :
@@ -58,6 +60,8 @@ namespace Drv {
       void manyPackets(void);
 
       void timeSyncTest(void);
+
+      void manualTimeSyncTest(void);
 
     private:
 
@@ -100,6 +104,8 @@ namespace Drv {
       void compareImuPkts(ROS::sensor_msgs::ImuNoCov& act,
                           ROS::sensor_msgs::ImuNoCov& exp);
 
+      void sendPktsFromModel(STIM300Model& model, const int numPkts);
+
     private:
 
       // ----------------------------------------------------------------------
@@ -113,6 +119,7 @@ namespace Drv {
       std::mutex m_modelMutex;
 
       quest_gnc::ringbuffer<Fw::Time, 100> m_eventRB;
+      quest_gnc::ringbuffer<Fw::Time, 100> m_eventLatchedRB;
       quest_gnc::ringbuffer<ROS::sensor_msgs::ImuNoCov, 100> m_expPkts;
 
 

@@ -26,7 +26,8 @@ namespace Drv {
 
     const U32 STIM_MAX_EVENTS = 40;
 
-    const U32 STIM_TS_CHECK_CYCLES = 200; // 1 s at 500Hz cycles
+    //const U32 STIM_TS_CHECK_CYCLES = 200; // 1 s at 500Hz cycles
+    const U32 STIM_TS_CHECK_CYCLES = 20; // 1 s at 500Hz cycles
 
     const U32 STIM_UART_BUFFER_SIZE = 1024;
 

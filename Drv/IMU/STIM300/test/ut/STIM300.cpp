@@ -33,14 +33,14 @@ TEST(Nominal,Nominal) {
     tester.nominalTest();
 }
 
-//TEST(Nominal,ManyPackets) {
-    //Drv::Tester tester;
-    //tester.manyPackets();
-//}
+TEST(Nominal,ManyPackets) {
+    Drv::Tester tester;
+    tester.manyPackets();
+}
 
 TEST(TimeSync,Nominal) {
     Drv::Tester tester;
-    tester.timeSyncTest();
+    tester.manualTimeSyncTest();
 }
 
 int main(int argc, char* argv[]) {

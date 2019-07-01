@@ -529,20 +529,59 @@ namespace Drv {
       //!
       virtual void logIn_WARNING_HI_InvalidCounter(
           U32 actualCount, 
-          U32 exptecCount 
+          U32 expectedCount 
       );
 
       //! A history entry for event InvalidCounter
       //!
       typedef struct {
         U32 actualCount;
-        U32 exptecCount;
+        U32 expectedCount;
       } EventEntry_InvalidCounter;
 
       //! The history of InvalidCounter events
       //!
       History<EventEntry_InvalidCounter> 
         *eventHistory_InvalidCounter;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event: TooManyEvents
+      // ----------------------------------------------------------------------
+
+      //! Handle event TooManyEvents
+      //!
+      virtual void logIn_WARNING_HI_TooManyEvents(
+          U32 maxEvents 
+      );
+
+      //! A history entry for event TooManyEvents
+      //!
+      typedef struct {
+        U32 maxEvents;
+      } EventEntry_TooManyEvents;
+
+      //! The history of TooManyEvents events
+      //!
+      History<EventEntry_TooManyEvents> 
+        *eventHistory_TooManyEvents;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event: BadTimeSync
+      // ----------------------------------------------------------------------
+
+      //! Handle event BadTimeSync
+      //!
+      virtual void logIn_WARNING_HI_BadTimeSync(
+          void
+      );
+
+      //! Size of history for event BadTimeSync
+      //!
+      U32 eventsSize_BadTimeSync;
 
     protected:
 

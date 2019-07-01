@@ -140,8 +140,6 @@ namespace Drv {
     this->m_eventsRing.reset();
 
     this->m_timeSyncState = S300_TS_WAIT;
-
-    std::cout << "TS Cleared" << std::endl;
   }
 
   void STIM300ComponentImpl ::
@@ -152,8 +150,6 @@ namespace Drv {
     Fw::Time eventTime;
     STIM300FindPktStatus findPktStat;
     STIM300GatherStatus gatherStat;
-
-    std::cout << "TS Wait" << std::endl;
 
     gatherStat = this->gatherEvents();
     if (gatherStat == S300_GATHER_DROPPED) {
@@ -341,7 +337,6 @@ namespace Drv {
         FW_ASSERT(this->m_uartBufferIdx <= STIM_UART_BUFFER_SIZE);
 
         if ((this->m_uartBufferIdx + serBuffer.getsize()) > STIM_UART_BUFFER_SIZE) {
-            std::cout << "Buffer Full" << std::endl;
             log_WARNING_HI_BufferFull();
         } else {
             memcpy(&this->m_uartBuffer[this->m_uartBufferIdx],
@@ -400,8 +395,6 @@ namespace Drv {
 
                 if (dummyBytes != 0xFF) {
 
-                    //std::cout << "Seq: " << static_cast<U32>(buffer[idx + 31]) << std::endl;
-
                     // Check CRC
                     U32 crc = 0xFFFFFFFF;
 
@@ -422,8 +415,6 @@ namespace Drv {
                         // Found a valid packet
                         foundPkt = true;
                         break;
-                    } else {
-                        std::cout << "Bad CRC on " << static_cast<U32>(buffer[idx + 31]) << "\n";
                     }
                 }
             } else {

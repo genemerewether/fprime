@@ -326,7 +326,7 @@ namespace Drv {
         const U32 __callSiteLineNumber,
         const U32 __index,
         const U32 actualCount,
-        const U32 exptecCount
+        const U32 expectedCount
     ) const
   {
     ASSERT_GT(this->eventHistory_InvalidCounter->size(), __index)
@@ -348,15 +348,84 @@ namespace Drv {
       << " in history of event InvalidCounter\n"
       << "  Expected: " << actualCount << "\n"
       << "  Actual:   " << e.actualCount << "\n";
-    ASSERT_EQ(exptecCount, e.exptecCount)
+    ASSERT_EQ(expectedCount, e.expectedCount)
       << "\n"
       << "  File:     " << __callSiteFileName << "\n"
       << "  Line:     " << __callSiteLineNumber << "\n"
-      << "  Value:    Value of argument exptecCount at index "
+      << "  Value:    Value of argument expectedCount at index "
       << __index
       << " in history of event InvalidCounter\n"
-      << "  Expected: " << exptecCount << "\n"
-      << "  Actual:   " << e.exptecCount << "\n";
+      << "  Expected: " << expectedCount << "\n"
+      << "  Actual:   " << e.expectedCount << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: TooManyEvents
+  // ----------------------------------------------------------------------
+
+  void STIM300GTestBase ::
+    assertEvents_TooManyEvents_size(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->eventHistory_TooManyEvents->size())
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Size of history for event TooManyEvents\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->eventHistory_TooManyEvents->size() << "\n";
+  }
+
+  void STIM300GTestBase ::
+    assertEvents_TooManyEvents(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 __index,
+        const U32 maxEvents
+    ) const
+  {
+    ASSERT_GT(this->eventHistory_TooManyEvents->size(), __index)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Index into history of event TooManyEvents\n"
+      << "  Expected: Less than size of history (" 
+      << this->eventHistory_TooManyEvents->size() << ")\n"
+      << "  Actual:   " << __index << "\n";
+    const EventEntry_TooManyEvents& e =
+      this->eventHistory_TooManyEvents->at(__index);
+    ASSERT_EQ(maxEvents, e.maxEvents)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Value of argument maxEvents at index "
+      << __index
+      << " in history of event TooManyEvents\n"
+      << "  Expected: " << maxEvents << "\n"
+      << "  Actual:   " << e.maxEvents << "\n";
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: BadTimeSync
+  // ----------------------------------------------------------------------
+
+  void STIM300GTestBase ::
+    assertEvents_BadTimeSync_size(
+        const char *const __callSiteFileName,
+        const U32 __callSiteLineNumber,
+        const U32 size
+    ) const
+  {
+    ASSERT_EQ(size, this->eventsSize_BadTimeSync)
+      << "\n"
+      << "  File:     " << __callSiteFileName << "\n"
+      << "  Line:     " << __callSiteLineNumber << "\n"
+      << "  Value:    Size of history for event BadTimeSync\n"
+      << "  Expected: " << size << "\n"
+      << "  Actual:   " << this->eventsSize_BadTimeSync << "\n";
   }
 
   // ----------------------------------------------------------------------

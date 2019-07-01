@@ -35,7 +35,8 @@ namespace Drv {
       m_pushEventFun(push_event_fun),
       m_pushBytesFun(push_bytes_fun),
       m_pushExpFun(push_exp_fun),
-      m_should_stop(false)
+      m_should_stop(false),
+      m_seq_num(0)
   {
   }
 
@@ -162,9 +163,9 @@ namespace Drv {
     eventTime.add(0, 516);
   }
 
-  static ROS::sensor_msgs::ImuNoCov getImuPkt() {
+  ROS::sensor_msgs::ImuNoCov STIM300Model::getImuPkt() {
 
-      static int seq_num = 0;
+      int seq_num = this->m_seq_num;
 
       Fw::Time time;
       ROS::sensor_msgs::ImuNoCov imuPkt;
@@ -186,7 +187,7 @@ namespace Drv {
       accel.set(cos(seq_num*1./3.),cos(seq_num*2./3.),cos(seq_num));
       imuPkt.setlinear_acceleration(accel);
 
-      seq_num++;
+      this->m_seq_num++;
 
       return imuPkt;
   }

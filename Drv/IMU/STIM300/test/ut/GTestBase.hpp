@@ -67,8 +67,17 @@
 #define ASSERT_EVENTS_InvalidCounter_SIZE(size) \
   this->assertEvents_InvalidCounter_size(__FILE__, __LINE__, size)
 
-#define ASSERT_EVENTS_InvalidCounter(index, _actualCount, _exptecCount) \
-  this->assertEvents_InvalidCounter(__FILE__, __LINE__, index, _actualCount, _exptecCount)
+#define ASSERT_EVENTS_InvalidCounter(index, _actualCount, _expectedCount) \
+  this->assertEvents_InvalidCounter(__FILE__, __LINE__, index, _actualCount, _expectedCount)
+
+#define ASSERT_EVENTS_TooManyEvents_SIZE(size) \
+  this->assertEvents_TooManyEvents_size(__FILE__, __LINE__, size)
+
+#define ASSERT_EVENTS_TooManyEvents(index, _maxEvents) \
+  this->assertEvents_TooManyEvents(__FILE__, __LINE__, index, _maxEvents)
+
+#define ASSERT_EVENTS_BadTimeSync_SIZE(size) \
+  this->assertEvents_BadTimeSync_size(__FILE__, __LINE__, size)
 
 // ----------------------------------------------------------------------
 // Macros for typed user from port history assertions
@@ -301,7 +310,38 @@ namespace Drv {
           const U32 __callSiteLineNumber, /*!< The line number of the call site*/
           const U32 __index, /*!< The index*/
           const U32 actualCount, 
-          const U32 exptecCount 
+          const U32 expectedCount 
+      ) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event: TooManyEvents
+      // ----------------------------------------------------------------------
+
+      void assertEvents_TooManyEvents_size(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 size /*!< The asserted size*/
+      ) const;
+
+      void assertEvents_TooManyEvents(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 __index, /*!< The index*/
+          const U32 maxEvents 
+      ) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Event: BadTimeSync
+      // ----------------------------------------------------------------------
+
+      void assertEvents_BadTimeSync_size(
+          const char *const __callSiteFileName, /*!< The name of the file containing the call site*/
+          const U32 __callSiteLineNumber, /*!< The line number of the call site*/
+          const U32 size /*!< The asserted size*/
       ) const;
 
     protected:

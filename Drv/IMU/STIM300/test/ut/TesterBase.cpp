@@ -55,6 +55,8 @@ namespace Drv {
 #endif
     this->eventHistory_InvalidCounter =
       new History<EventEntry_InvalidCounter>(maxHistorySize);
+    this->eventHistory_TooManyEvents =
+      new History<EventEntry_TooManyEvents>(maxHistorySize);
     // Initialize histories for typed user output ports
     this->fromPortHistory_IMU =
       new History<FromPortEntry_IMU>(maxHistorySize);
@@ -76,6 +78,7 @@ namespace Drv {
     delete this->textLogHistory;
 #endif
     delete this->eventHistory_InvalidCounter;
+    delete this->eventHistory_TooManyEvents;
   }
 
   void STIM300TesterBase ::
@@ -910,7 +913,7 @@ namespace Drv {
             static_cast<AssertArg>(_status)
         );
 
-        U32 exptecCount;
+        U32 expectedCount;
 #if FW_AMPCS_COMPATIBLE
         {
           // Deserialize the argument size
@@ -923,13 +926,73 @@ namespace Drv {
           FW_ASSERT(_argSize == sizeof(U32),_argSize,sizeof(U32));
         }
 #endif      
-        _status = args.deserialize(exptecCount);
+        _status = args.deserialize(expectedCount);
         FW_ASSERT(
             _status == Fw::FW_SERIALIZE_OK,
             static_cast<AssertArg>(_status)
         );
 
-        this->logIn_WARNING_HI_InvalidCounter(actualCount, exptecCount);
+        this->logIn_WARNING_HI_InvalidCounter(actualCount, expectedCount);
+
+        break;
+
+      }
+
+      case STIM300ComponentBase::EVENTID_TOOMANYEVENTS: 
+      {
+
+        Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_AMPCS_COMPATIBLE
+        // Deserialize the number of arguments.
+        U8 _numArgs;
+        _status = args.deserialize(_numArgs);
+        FW_ASSERT(
+          _status == Fw::FW_SERIALIZE_OK,
+          static_cast<AssertArg>(_status)
+        );
+        // verify they match expected.
+        FW_ASSERT(_numArgs == 1,_numArgs,1);
+        
+#endif    
+        U32 maxEvents;
+#if FW_AMPCS_COMPATIBLE
+        {
+          // Deserialize the argument size
+          U8 _argSize;
+          _status = args.deserialize(_argSize);
+          FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+          );
+          FW_ASSERT(_argSize == sizeof(U32),_argSize,sizeof(U32));
+        }
+#endif      
+        _status = args.deserialize(maxEvents);
+        FW_ASSERT(
+            _status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_status)
+        );
+
+        this->logIn_WARNING_HI_TooManyEvents(maxEvents);
+
+        break;
+
+      }
+
+      case STIM300ComponentBase::EVENTID_BADTIMESYNC: 
+      {
+
+#if FW_AMPCS_COMPATIBLE
+        // For AMPCS, decode zero arguments
+        Fw::SerializeStatus _zero_status = Fw::FW_SERIALIZE_OK;
+        U8 _noArgs;
+        _zero_status = args.deserialize(_noArgs);
+        FW_ASSERT(
+            _zero_status == Fw::FW_SERIALIZE_OK,
+            static_cast<AssertArg>(_zero_status)
+        );
+#endif    
+        this->logIn_WARNING_HI_BadTimeSync();
 
         break;
 
@@ -952,6 +1015,8 @@ namespace Drv {
     this->eventsSize_UartError = 0;
     this->eventsSize_NoEvents = 0;
     this->eventHistory_InvalidCounter->clear();
+    this->eventHistory_TooManyEvents->clear();
+    this->eventsSize_BadTimeSync = 0;
   }
 
 #if FW_ENABLE_TEXT_LOGGING
@@ -1078,13 +1143,42 @@ namespace Drv {
   void STIM300TesterBase ::
     logIn_WARNING_HI_InvalidCounter(
         U32 actualCount,
-        U32 exptecCount
+        U32 expectedCount
     )
   {
     EventEntry_InvalidCounter e = {
-      actualCount, exptecCount
+      actualCount, expectedCount
     };
     eventHistory_InvalidCounter->push_back(e);
+    ++this->eventsSize;
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: TooManyEvents 
+  // ----------------------------------------------------------------------
+
+  void STIM300TesterBase ::
+    logIn_WARNING_HI_TooManyEvents(
+        U32 maxEvents
+    )
+  {
+    EventEntry_TooManyEvents e = {
+      maxEvents
+    };
+    eventHistory_TooManyEvents->push_back(e);
+    ++this->eventsSize;
+  }
+
+  // ----------------------------------------------------------------------
+  // Event: BadTimeSync 
+  // ----------------------------------------------------------------------
+
+  void STIM300TesterBase ::
+    logIn_WARNING_HI_BadTimeSync(
+        void
+    )
+  {
+    ++this->eventsSize_BadTimeSync;
     ++this->eventsSize;
   }
 
