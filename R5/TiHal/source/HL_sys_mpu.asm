@@ -207,7 +207,7 @@ _mpuInit_
         mov   r0,  #0x000F
         orr   r0,  r0,    #0x1300
         mcr   p15, #0,    r0, c6, c1, #4
-        movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x0B << 1) + (1))
+        movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x0D << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
         ; Setup region 16
         mov   r0,  #15
@@ -242,7 +242,7 @@ r11Base  .word 0x00000000
 r12Base  .word 0x00000000
 r13Base  .word 0x00000000
 r14Base  .word 0x00000000
-r15Base  .word 0x0807F000
+r15Base  .word 0x0807C000
 r16Base  .word 0xFFF80000
     .endasmfunc
 

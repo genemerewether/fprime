@@ -60,6 +60,7 @@
 #include "HL_sci.h"
 #include "HL_adc.h"
 #include "HL_het.h"
+#include "HL_etpwm.h"
 #include "HL_sys_dma.h"
 
 #include <stdio.h>
@@ -89,7 +90,7 @@ int main(void)
 //     pmmTurnOFFLogicPowerDomain(PMM_LOGICPD3);
     pmmTurnOFFLogicPowerDomain(PMM_LOGICPD4);
     pmmTurnOFFLogicPowerDomain(PMM_LOGICPD5);
-    pmmTurnOFFLogicPowerDomain(PMM_LOGICPD6);
+//    pmmTurnOFFLogicPowerDomain(PMM_LOGICPD6);
 
     // Initialize RTI driver
     rtiInit();
@@ -106,6 +107,7 @@ int main(void)
     gioInit();
     adcInit();
     i2cInit();
+    hetInit();
 
     // calibrate ADCs
     adcCalibration(adcREG1);

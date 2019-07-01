@@ -145,8 +145,6 @@ namespace Drv {
       U32 m_tsCheckCount;
 
       quest_gnc::ringbuffer<Fw::Time, STIM_MAX_EVENTS> m_eventsRing;
-
-
     };
 
 } // end namespace 

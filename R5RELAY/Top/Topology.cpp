@@ -136,7 +136,7 @@ void constructApp(int port_number, char* udp_string, char* hostname, char* seria
     activeLogger.start(0, 40, 8192);
 
     serialDrv.open(serial_port,
-                   Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                   Drv::LinuxSerialDriverComponentImpl::BAUD_115K,
                    Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                    Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                    true);

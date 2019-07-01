@@ -18,7 +18,7 @@
 // ====================================================================== 
 
 
-#include <R5/R5EventCapture/R5EventCaptureComponentImpl.hpp>
+#include <R5/R5EventCapture/R5EventCaptureImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
 #include <R5/R5EventCapture/R5EventCapture.hpp>
@@ -48,8 +48,24 @@ namespace R5 {
     ) 
   {
     R5EventCaptureComponentBase::init(instance);
+  }
 
-    EventCaptureInit();
+  void R5EventCaptureComponentImpl ::
+    initDriver(
+        const NATIVE_UINT_TYPE memSize,
+        Fw::MemAllocator& allocator
+    )
+  {
+    U8* memAPtr = 0;
+    U8* memBPtr = 0;
+
+    memAPtr = static_cast<U8*>(allocator.allocate(0, memSize));
+    memBPtr = static_cast<U8*>(allocator.allocate(0, memSize));
+
+    FW_ASSERT(memAPtr != NULL);
+    FW_ASSERT(memBPtr != NULL);
+
+    EventCaptureInit(memAPtr, memBPtr, memSize);
   }
 
   R5EventCaptureComponentImpl ::

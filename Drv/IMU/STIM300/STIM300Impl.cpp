@@ -176,6 +176,7 @@ namespace Drv {
             findPktStat = findSTIMPkt(&this->m_pktBuffer[bytesRead], this->m_pktBufferIdx, bytesRead, imuPkt);
 
             // Shift remaining bytes to the beginning of the uart buffer
+            FW_ASSERT(this->m_pktBufferIdx >= bytesRead, this->m_pktBufferIdx, bytesRead);
             memmove(this->m_pktBuffer, &this->m_pktBuffer[bytesRead], this->m_pktBufferIdx - bytesRead);
             this->m_pktBufferIdx -= bytesRead;
 
@@ -257,7 +258,10 @@ namespace Drv {
             }
             this->m_pktBufferIdx -= totalBytesRead;
 
-            this->m_tsCheckCount++;
+            if (totalBytesRead > 0) {
+                this->m_tsCheckCount++;
+            }
+
             if (findPktStat == S300_PKT_LOST_SYNC) {
                 this->m_timeSyncState = S300_TS_CLEAR;
             } else if (this->verifyConsistency() == S300_CONSISTENCY_INVALID) {
@@ -430,7 +434,7 @@ namespace Drv {
             }
         }
 
-        if (stimPktLen > 0) {
+        if (foundCandidatePkt) {
             // Check that we have enough bytes to calculate CRC
             if (idx + stimPktLen <= bufferLength) {
 
@@ -464,6 +468,8 @@ namespace Drv {
                         // Found a valid packet
                         foundPkt = true;
                         break;
+                    } else {
+                        idx++;
                     }
                 }
             } else {
@@ -471,7 +477,6 @@ namespace Drv {
                 break;
             }
         }
-        idx++;
     }
 
     if (foundPkt) {

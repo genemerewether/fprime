@@ -65,13 +65,13 @@ MEMORY
 
 /* USER CODE BEGIN (3) */
 #endif
-    VECTORS (X)  : origin=0x00200000 length=0x00000020
+    VECTORS (X)  : origin=0x00000000 length=0x00000020
     FLASH0  (RX) : origin=0x00200020 length=0x001FFF20
     FLASH1  (RX) : origin=0x003FFFE0 length=0x20
     STACKS  (RW) : origin=0x08000000 length=0x00020500
-    RAM     (RW) : origin=0x08020500 length=0x0005EB00
+    RAM     (RW) : origin=0x08020500 length=0x0005BB00
 
-    SHAREDRAM (RW) : origin=0x0807F000 length=0x00001000
+    SHAREDRAM (RW) : origin=0x0807C000 length=0x00004000
 /* USER CODE END */
 }
 

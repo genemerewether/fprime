@@ -354,7 +354,7 @@ typedef struct het_config_reg
 								| (uint32)0x00000000U \
 								| (uint32)0x00000000U \
 								| (uint32)0x00008000U \
-								| (uint32)0x00004000U \
+								| (uint32)0x00000000U \
 								| (uint32)0x00002000U \
 								| (uint32)0x00001000U \
 								| (uint32)0x00000800U \
@@ -522,60 +522,19 @@ typedef struct het_config_reg
 
 #define HET1_PFR_CONFIGVALUE      (((uint32)6U << 8U) | (uint32)0U)
 
-
-#define HET1_PRY_CONFIGVALUE     ((uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U)
-
-#define HET1_INTENAC_CONFIGVALUE  ((uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U)
-								
+#define HET1_PRY_CONFIGVALUE      0xFFFFFFFFU
+#define HET1_INTENAC_CONFIGVALUE  0xFFFFFFFFU
 #define HET1_INTENAS_CONFIGVALUE ((uint32)0x00000000U \
-								| (uint32)0x00000000U \
-								| (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
+                                | (uint32)0x00000000U \
 								| (uint32)0x00000000U \
 								| (uint32)0x00000000U \
 								| (uint32)0x00000000U \
@@ -597,12 +556,13 @@ typedef struct het_config_reg
 								| (uint32)0x00000000U \
 								| (uint32)0x00000000U \
 								| (uint32)0x00000000U)
+
 
 #define HET1_PCR_CONFIGVALUE      ((uint32)0x00000005U)
 #define HET1_GCR_CONFIGVALUE      ( 0x00000001U \
 								| (uint32)((uint32)0U << 24U) \
 								| (uint32)((uint32)1U << 16U) \
-								| (0x00020000U))
+								| (0x00000000U))
 
 
 

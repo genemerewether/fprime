@@ -16,7 +16,8 @@
 
 enum UartInstances {
   HL_UART_INSTANCE = 2,
-  DEBUG_UART_INSTANCE = 0,
+  DEBUG_UART_INSTANCE = 1,
+  STIM_UART_INSTANCE = 0,
 };
 
 // Component instance pointers
@@ -32,16 +33,19 @@ Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::ImuIntegComponentImpl* imuInteg_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
+Drv::STIM300ComponentImpl* stim300_ptr = 0;
 Drv::LIDARLiteV3ComponentImpl* lidarLiteV3_ptr = 0;
 
 R5::R5GpioDriverComponentImpl* gpio_ptr = 0;
 R5::R5SpiMasterDriverComponentImpl* spiMaster_ptr = 0;
 R5::R5UartDriverComponentImpl* hlUart_ptr = 0;
 R5::R5UartDriverComponentImpl* debugUart_ptr = 0;
+R5::R5UartDriverComponentImpl* stimUart_ptr = 0;
 R5::R5TimeComponentImpl* r5Time_ptr = 0;
 R5::R5A2DDriverComponentImpl* a2dDrv_ptr = 0;
 R5::R5PrmComponentImpl* prm_ptr = 0;
 R5::R5I2CDriverComponentImpl* i2c1Drv_ptr = 0;
+R5::R5EventCaptureComponentImpl* eventCapture_ptr = 0;
 
 R5::R5GpioAdapterComponentImpl* rtiGpio_ptr = 0;
 R5::R5GpioAdapterComponentImpl* faultGpio_ptr = 0;
@@ -83,6 +87,7 @@ void allocComps() {
                         rgGncDivs,FW_NUM_ARRAY_ELEMENTS(rgGncDivs));
 
     NATIVE_UINT_TYPE rgAttContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
+        0, //STIM300
         Drv::MPU9250_SCHED_CONTEXT_OPERATE,
         Gnc::IMUINTEG_SCHED_CONTEXT_FILT, // imuInteg
         Gnc::LCTRL_SCHED_CONTEXT_ATT, // leeCtrl
@@ -255,6 +260,24 @@ void allocComps() {
 #endif
 ;
 
+    stimUart_ptr = new R5::R5UartDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("stimUart")
+#endif
+;
+
+    stim300_ptr = new Drv::STIM300ComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("stim300")
+#endif
+;
+
+    eventCapture_ptr = new R5::R5EventCaptureComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("eventCapture")
+#endif
+;
+
 }
 
 void manualConstruct() {
@@ -262,12 +285,12 @@ void manualConstruct() {
     hlRouter_ptr->set_HLPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(0));
 
-    mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
+    //mpu9250_ptr->set_Imu_OutputPort(1, hlRouter_ptr->get_LLPortsIn_InputPort(1));
     //imuInteg_ptr->set_odomNoCov_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(2));
-    leeCtrl_ptr->set_accelCommand_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(3));
+    //leeCtrl_ptr->set_accelCommand_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(5));
-    actuatorAdapter_ptr->set_serialDat_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(6));
+    //actuatorAdapter_ptr->set_serialDat_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(6));
 
     // TODO(mereweth)
     //eventGetter_ptr->set_Time_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(7));
@@ -335,6 +358,11 @@ void constructApp() {
                               0,0, // bytes - two cycles worth
                               alloc);
 
+    stimUart_ptr->init(STIM_UART_INSTANCE);
+    stimUart_ptr->initDriver(0,0,
+                             0,1000,
+                             alloc);
+
     DmaDrvInit();
 
     r5Time_ptr->init();
@@ -350,6 +378,11 @@ void constructApp() {
 
     i2c1Drv_ptr->init(0);
     i2c1Drv_ptr->initDriver(128, 128, alloc);
+
+    eventCapture_ptr->init(0);
+    eventCapture_ptr->initDriver(64, alloc);
+
+    stim300_ptr->init(0);
 
     // Connect rate groups to rate group driver
     constructR5REFArchitecture();
@@ -369,11 +402,11 @@ void constructApp() {
     faultGpio_ptr->setMapping(R5::GPIO_SET_BANK_A, 0);
 
     // load parameters from flash
-    prm_ptr->load();
+    //prm_ptr->load();
 }
 
 void cycleForever(void) {
-    while (!mpu9250_ptr->isReady()) {
+    while (!mpu9250_ptr->isReady() && 0) {
         Svc::InputCyclePort* port = rgGncDrv_ptr->get_CycleIn_InputPort(0);
         Svc::TimerVal cycleStart;
         cycleStart.take();

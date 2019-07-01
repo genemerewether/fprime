@@ -21,6 +21,7 @@
 #define R5EventCapture_HPP
 
 #include "R5/R5EventCapture/R5EventCaptureComponentAc.hpp"
+#include <Fw/Types/MemAllocator.hpp>
 
 namespace R5 {
 
@@ -49,6 +50,9 @@ namespace R5 {
       void init(
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
+
+      void initDriver(const NATIVE_UINT_TYPE memSize,
+                      Fw::MemAllocator& allocator);
 
       //! Destroy object R5EventCapture
       //!

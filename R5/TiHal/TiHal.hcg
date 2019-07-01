@@ -12,10 +12,10 @@
   <HET1>
     <FILENAME>
       <HET1ASMHDR>
-        <NAME/>
+        <NAME>..\R5EventCapture\het1_prog.h</NAME>
       </HET1ASMHDR>
       <HET1ASMSRC>
-        <NAME/>
+        <NAME>..\R5EventCapture\het1_prog.c</NAME>
       </HET1ASMSRC>
     </FILENAME>
   </HET1>
@@ -302,10 +302,10 @@
         <NAME>HL_adc.c</NAME>
       </SRCADC>
       <HET1ASMHDR>
-        <NAME/>
+        <NAME>..\R5EventCapture\het1_prog.h</NAME>
       </HET1ASMHDR>
       <HET1ASMSRC>
-        <NAME/>
+        <NAME>..\R5EventCapture\het1_prog.c</NAME>
       </HET1ASMSRC>
       <STDHDRHET>
         <NAME>std_nhet.h</NAME>
@@ -407,7 +407,8 @@
         <NAME>HL_etpwm.h</NAME>
       </HDRETPWM>
       <SRCETPWM>
-        </SRCETPWM>
+        <NAME>HL_etpwm.c</NAME>
+      </SRCETPWM>
       <HDRECAP_R>
         <NAME>HL_reg_ecap.h</NAME>
       </HDRECAP_R>
@@ -638,6 +639,12 @@
       <HDRHTU>
         <PATH>include\HL_htu.h</PATH>
       </HDRHTU>
+      <HET1ASMHDR>
+        <PATH>include\het1_prog.h</PATH>
+      </HET1ASMHDR>
+      <HET1ASMSRC>
+        <PATH>source\het1_prog.c</PATH>
+      </HET1ASMSRC>
     </FILENAMES>
   </HET>
   <I2C>
@@ -757,7 +764,7 @@
         <PATH>include\HL_etpwm.h</PATH>
       </HDRETPWM>
       <SRCETPWM>
-        <PATH></PATH>
+        <PATH>source\HL_etpwm.c</PATH>
       </SRCETPWM>
     </FILENAMES>
   </ETPWM>

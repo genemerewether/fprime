@@ -1,7 +1,7 @@
 # Makefile to run global make.
 DEPLOYMENT := R5RELAY
 BUILD_ROOT ?= $(subst /$(DEPLOYMENT),,$(CURDIR))
-BUILD_SITE := quest
+BUILD_SITE := davinci
 
 export BUILD_ROOT
 
