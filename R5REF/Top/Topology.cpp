@@ -22,6 +22,7 @@ enum UartInstances {
 
 enum EventCaptuerInstances {
   STIM_TOV_INSTANCE = 0,
+  TIME_SYNC_INSTANCE = 1,
 };
 
 // Component instance pointers
@@ -51,6 +52,7 @@ R5::R5PrmComponentImpl* prm_ptr = 0;
 R5::R5I2CDriverComponentImpl* i2c1Drv_ptr = 0;
 R5::R5EventCaptureComponentImpl* eventCapture_ptr = 0;
 R5::R5RtiComponentImpl* rtiWait_ptr = 0;
+R5::R5TimeForwardComponentImpl* tsForward_ptr = 0;
 
 R5::R5GpioAdapterComponentImpl* faultGpio_ptr = 0;
 
@@ -100,7 +102,8 @@ void allocComps() {
         LLProc::HLRTR_SCHED_UART_SEND,
         LLProc::HLRTR_SCHED_UART_RECEIVE,
         0,
-        Drv::LLV3_RG_FAST
+        Drv::LLV3_RG_FAST,
+        0, // Time Forward
     };
     rgAtt_ptr = new Svc::PassiveRateGroupImpl(
     #if FW_OBJECT_NAMES == 1
@@ -281,6 +284,11 @@ void allocComps() {
                         ("rti")
 #endif
 ;
+    tsForward_ptr = new R5::R5TimeForwardComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TSForward")
+#endif
+;
 
 }
 
@@ -295,6 +303,7 @@ void manualConstruct() {
     logQueue_ptr->set_LogSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(5));
     //actuatorAdapter_ptr->set_serialDat_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(6));
+    tsForward_ptr->set_SendEventTime_OutputPort(0,hlRouter_ptr->get_LLPortsIn_InputPort(7));
 
     // TODO(mereweth)
     //eventGetter_ptr->set_Time_OutputPort(0, hlRouter_ptr->get_LLPortsIn_InputPort(7));
@@ -352,7 +361,7 @@ void constructApp() {
                               alloc);
 
     hlUart_ptr->init(HL_UART_INSTANCE);
-    hlUart_ptr->initDriver(0,1000, // bytes - max we could send in one cycle
+    hlUart_ptr->initDriver(0,2000, // bytes - max we could send in one cycle
                            0,1600, // bytes - two cycles worth
                            alloc);
 
@@ -363,7 +372,7 @@ void constructApp() {
 
     stimUart_ptr->init(STIM_UART_INSTANCE);
     stimUart_ptr->initDriver(0,0,
-                             0,1000,
+                             0,2000,
                              alloc);
 
     DmaDrvInit();
@@ -384,10 +393,13 @@ void constructApp() {
 
     eventCapture_ptr->init(0);
     eventCapture_ptr->initDriver(STIM_TOV_INSTANCE, 64, alloc);
+    eventCapture_ptr->initDriver(TIME_SYNC_INSTANCE, 64, alloc);
 
     stim300_ptr->init(0);
 
     rtiWait_ptr->init(0);
+
+    tsForward_ptr->init(0);
 
     // Connect rate groups to rate group driver
     constructR5REFArchitecture();

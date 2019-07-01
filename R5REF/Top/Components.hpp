@@ -24,6 +24,7 @@ void exitTasks();
 #include <R5/R5Time/R5TimeComponentImpl.hpp>
 #include <R5/R5Prm/R5PrmComponentImpl.hpp>
 #include <R5/R5EventCapture/R5EventCaptureImpl.hpp>
+#include <R5/R5TimeForward/R5TimeForwardComponentImpl.hpp>
 #include <R5/R5Rti/R5RtiComponentImpl.hpp>
 
 #include <R5/GpioAdapter/R5GpioAdapterComponentImpl.hpp>
@@ -60,6 +61,7 @@ extern R5::R5PrmComponentImpl* prm_ptr;
 extern R5::R5I2CDriverComponentImpl* i2c1Drv_ptr;
 extern R5::R5EventCaptureComponentImpl* eventCapture_ptr;
 extern R5::R5RtiComponentImpl* rtiWait_ptr;
+extern R5::R5TimeForwardComponentImpl* tsForward_ptr;
 
 extern R5::R5GpioAdapterComponentImpl* rtiGpio_ptr;
 extern R5::R5GpioAdapterComponentImpl* faultGpio_ptr;

@@ -7,7 +7,7 @@
     <ports>
     
 
-        <port name="time" data_type="Fw::Time"  kind="sync_input"    max_number="1">
+        <port name="time" data_type="Fw::Time"  kind="sync_input"    max_number="10">
         </port>
     </ports>
 

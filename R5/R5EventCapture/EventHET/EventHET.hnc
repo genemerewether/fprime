@@ -1,0 +1,18 @@
+
+  .sect ".HETCODE" 
+	.word 0x00002C20 
+	.word 0x01FFFFFF 
+	.word 0x00000000 
+	.word 0x00000000 
+	.word 0x00005700 
+	.word 0x08004E20 
+	.word 0x00000000 
+	.word 0x00000000 
+	.word 0x00807700 
+	.word 0x08007E20 
+	.word 0x00000000 
+	.word 0x00000000 
+	.word 0x00001A00 
+	.word 0x00000000 
+	.word 0x00000000 
+	.word 0x00000000 
