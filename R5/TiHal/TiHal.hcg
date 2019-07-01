@@ -407,8 +407,7 @@
         <NAME>HL_etpwm.h</NAME>
       </HDRETPWM>
       <SRCETPWM>
-        <NAME>HL_etpwm.c</NAME>
-      </SRCETPWM>
+        </SRCETPWM>
       <HDRECAP_R>
         <NAME>HL_reg_ecap.h</NAME>
       </HDRECAP_R>
@@ -764,7 +763,7 @@
         <PATH>include\HL_etpwm.h</PATH>
       </HDRETPWM>
       <SRCETPWM>
-        <PATH>source\HL_etpwm.c</PATH>
+        <PATH></PATH>
       </SRCETPWM>
     </FILENAMES>
   </ETPWM>

@@ -56,7 +56,6 @@
 #include "HL_het.h"
 #include "HL_rti.h"
 #include "HL_i2c.h"
-#include "HL_etpwm.h"
 #include "HL_epc.h"
 #include "HL_sys_dma.h"
 
@@ -221,23 +220,6 @@ void hetNotification(hetBASE_t *het, uint32 offset)
 /* USER CODE BEGIN (46) */
 /* USER CODE END */
 
-#pragma WEAK(etpwmNotification)
-void etpwmNotification(etpwmBASE_t *node)
-{
-/*  enter user code between the USER CODE BEGIN and USER CODE END. */
-/* USER CODE BEGIN (47) */
-/* USER CODE END */
-}
-#pragma WEAK(etpwmTripNotification)
-void etpwmTripNotification(etpwmBASE_t *node,uint16 flags)
-{
-/*  enter user code between the USER CODE BEGIN and USER CODE END. */
-/* USER CODE BEGIN (48) */
-/* USER CODE END */
-}
-
-/* USER CODE BEGIN (49) */
-/* USER CODE END */
 
 /* USER CODE BEGIN (50) */
 /* USER CODE END */
