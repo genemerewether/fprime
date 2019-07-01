@@ -26,8 +26,6 @@
 #include <ROS/Gen/geometry_msgs/Types/QuaternionSerializableAc.hpp>
 #include <ROS/Gen/geometry_msgs/Types/Vector3SerializableAc.hpp>
 
-#include <iostream>
-
 namespace Drv {
 
   // ----------------------------------------------------------------------

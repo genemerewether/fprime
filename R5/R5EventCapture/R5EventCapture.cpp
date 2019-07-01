@@ -12,8 +12,6 @@
 
 #include <Gnc/quest_gnc/include/quest_gnc/utils/ringbuffer.h>
 
-#include <string.h>
-
 #define HTU_DCP 0
 #define HET_TIME_MAX 0x2000000
 
