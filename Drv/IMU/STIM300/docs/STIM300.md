@@ -7,8 +7,7 @@
 |Channel Name|ID|Type|Description|
 |---|---|---|---|
 |NumPackets|0 (0x0)|U32||
-|ImuPacket|1 (0x1)|ROS::sensor_msgs::ImuNoCov||
-|TimeSyncStatus|2 (0x2)|STIM300TimeSync||
+|TimeSyncStatus|1 (0x1)|STIM300TimeSync||
 
 ## Event List
 
