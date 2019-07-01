@@ -630,15 +630,7 @@ R5RELAY_MODULES := \
 	Svc/GndIf \
 	Svc/SocketGndIf \
 	\
-	Svc/Sched \
-	Svc/Cycle \
-	Svc/Ping \
-	Svc/PolyIf \
-	Svc/PolyDb \
-	Svc/Time \
-	Svc/LinuxTime \
-	Svc/ActiveLogger \
-	Svc/Fatal \
+	$(SVC_MODULES) \
 	\
 	HLProc/LLRouter \
 	HLProc/EventExpander \
