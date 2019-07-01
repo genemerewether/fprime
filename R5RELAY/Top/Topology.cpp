@@ -24,6 +24,7 @@ static Fw::SimpleObjRegistry simpleReg;
 static NATIVE_UINT_TYPE rgContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     0, // llRouter
     0, // llRouterDone
+    0,
 };
 
 Svc::PassiveRateGroupImpl rg(
@@ -70,6 +71,30 @@ Svc::ActiveLoggerImpl activeLogger
 #endif
 ;
 
+Svc::SocketGndIfImpl relayGndIf
+#if FW_OBJECT_NAMES == 1
+                    ("RELAYGNDIF")
+#endif
+;
+
+R5RELAY::ImuSplitterComponentImpl imuTelemeter
+#if FW_OBJECT_NAMES == 1
+                    ("IMUTELEMETER")
+#endif
+;
+
+Svc::ActiveLoggerImpl relayLogger
+#if FW_OBJECT_NAMES == 1
+                    ("RELAYLOGGER")
+#endif
+;
+
+Svc::TlmChanImpl relayTlmChan
+#if FW_OBJECT_NAMES == 1
+                    ("RELAYTLMCHAN")
+#endif
+;
+
 //Svc::AssertFatalAdapterComponentImpl fatalAdapter
 //#if FW_OBJECT_NAMES == 1
 //("fatalAdapter")
@@ -99,13 +124,15 @@ void dumpobj(const char* objName) {
 
 void manualConstruct() {
 
+    llRouter.set_LLPortsOut_OutputPort(1, imuTelemeter.get_IMU_InputPort(0));
+
     llRouter.set_LLPortsOut_OutputPort(4, eventExpander.get_LogRecv_InputPort(0));
     llRouter.set_LLPortsOut_OutputPort(5, sockGndIf.get_downlinkPort_InputPort(0));
 
     sockGndIf.set_uplinkPort_OutputPort(0, llRouter.get_HLPortsIn_InputPort(4));
 }
 
-void constructApp(int port_number, char* udp_string, char* hostname, char* serial_port) {
+void constructApp(int port_number, char* udp_string, char* hostname, char* serial_port, int relay_port_number) {
 
 #if FW_PORT_TRACING
     Fw::PortBase::setTrace(false);
@@ -121,6 +148,11 @@ void constructApp(int port_number, char* udp_string, char* hostname, char* seria
     eventExpander.init(0);
     activeLogger.init(100, 0);
 
+    relayGndIf.init(0);
+    imuTelemeter.init(0);
+    relayLogger.init(100, 0);
+    relayTlmChan.init(100, 0);
+
 
     // Connect rate groups to rate group driver
     constructR5RELAYArchitecture();
@@ -132,11 +164,15 @@ void constructApp(int port_number, char* udp_string, char* hostname, char* seria
     // Initialize socket server
     sockGndIf.startSocketTask(40, 20*1024, port_number, hostname);
 
+    relayGndIf.startSocketTask(40, 20*1024, relay_port_number, hostname);
+
     llRouter.start(0, 40, 8192);
     activeLogger.start(0, 40, 8192);
+    relayLogger.start(0, 40, 8192);
+    relayTlmChan.start(0, 40, 8192);
 
     serialDrv.open(serial_port,
-                   Drv::LinuxSerialDriverComponentImpl::BAUD_115K,
+                   Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
                    Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                    Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                    true);
@@ -195,13 +231,14 @@ static void sighandler(int signum) {
 
 int main(int argc, char* argv[]) {
     U32 port_number = 0;
+    U32 relay_port_number = 0;
     I32 option = 0;
     char *hostname = NULL;
     char* udp_string = 0;
     char* serial_port = NULL;
     bool local_cycle = false;
 
-    while ((option = getopt(argc, argv, "hlp:a:u:s:")) != -1){
+    while ((option = getopt(argc, argv, "hlp:r:a:u:s:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -212,6 +249,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'p':
                 port_number = atoi(optarg);
+                break;
+            case 'r':
+                relay_port_number = atoi(optarg);
                 break;
             case 'a':
                 hostname = optarg;
@@ -232,7 +272,7 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
-    constructApp(port_number, udp_string, hostname, serial_port);
+    constructApp(port_number, udp_string, hostname, serial_port, relay_port_number);
 
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);

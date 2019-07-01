@@ -8,4 +8,4 @@ if !($?BUILD_ROOT) then
     cd ${curdir}
 endif
 
-./linux-linux-x86-debug-gnu-bin/R5RELAY -p 50000 -a localhost -l -s /dev/ttyUSB0
+./linux-linux-x86-debug-gnu-bin/R5RELAY -p 50000 -r 50005 -a localhost -l -s /dev/ttyUSB1

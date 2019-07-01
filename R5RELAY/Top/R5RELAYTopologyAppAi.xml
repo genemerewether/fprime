@@ -2,13 +2,24 @@
 <?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <assembly name = "R5RELAY">
 	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
+	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
+	<import_component_type>Svc/TlmChan/TlmChanComponentAi.xml</import_component_type>
 	<import_component_type>Drv/LinuxSerialDriver/LinuxSerialDriverComponentAi.xml</import_component_type>
 	<import_component_type>HLProc/EventExpander/EventExpanderComponentAi.xml</import_component_type>
 	<import_component_type>Svc/PassiveRateGroup/PassiveRateGroupComponentAi.xml</import_component_type>
 	<import_component_type>HLProc/LLRouter/LLRouterComponentAi.xml</import_component_type>
 	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
+	<import_component_type>R5RELAY/ImuSplitter/ImuSplitterComponentAi.xml</import_component_type>
+	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
 
    <instance namespace="Svc" name="activeLogger" type="ActiveLogger"/>
+
+   <instance namespace="Svc" name="linuxTime" type="Time"/>
+
+   <instance namespace="Svc" name="relayLogger" type="ActiveLogger"/>
+
+   <instance namespace="Svc" name="relayTlmChan" type="TlmChan"/>
 
    <instance namespace="Drv" name="serialDrv" type="LinuxSerialDriver"/>
 
@@ -18,6 +29,10 @@
 
    <instance namespace="HLProc" name="llRouter" type="LLRouter"/>
 
+   <instance namespace="Svc" name="relayGndIf" type="GndIf"/>
+
+   <instance namespace="" name="imuTelemeter" type="ImuSplitter"/>
+
    <instance namespace="Svc" name="sockGndIf" type="GndIf"/>
 
 
@@ -26,39 +41,75 @@
  	 <target component = "llRouter" port = "SerReadPort" type = "SerialRead" num = "0"/>
 </connection>
 <connection name = "Connection2">
+	 <source component = "relayGndIf" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection3">
 	 <source component = "eventExpander" port = "LogSend" type = "Log" num = "0"/>
  	 <target component = "activeLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection3">
+<connection name = "Connection4">
+	 <source component = "imuTelemeter" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "relayTlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
+</connection>
+<connection name = "Connection5">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "llRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection4">
+<connection name = "Connection6">
+	 <source component = "relayLogger" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "relayLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection7">
 	 <source component = "llRouter" port = "SerWritePort" type = "SerialWrite" num = "0"/>
  	 <target component = "serialDrv" port = "serialSend" type = "SerialWrite" num = "0"/>
 </connection>
-<connection name = "Connection5">
-	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection6">
-	 <source component = "activeLogger" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection7">
-	 <source component = "activeLogger" port = "PktSend" type = "Com" num = "0"/>
- 	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
-</connection>
 <connection name = "Connection8">
+	 <source component = "relayLogger" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection9">
+	 <source component = "relayTlmChan" port = "PktSend" type = "Com" num = "0"/>
+ 	 <target component = "relayGndIf" port = "downlinkPort" type = "Com" num = "0"/>
+</connection>
+<connection name = "Connection10">
 	 <source component = "llRouter" port = "SerialBufferSend" type = "BufferSend" num = "0"/>
  	 <target component = "serialDrv" port = "readBufferSend" type = "BufferSend" num = "0"/>
 </connection>
-<connection name = "Connection9">
+<connection name = "Connection11">
 	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "llRouter" port = "CycleDone" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection10">
+<connection name = "Connection12">
+	 <source component = "rg" port = "RateGroupMemberOut" type = "Sched" num = "3"/>
+ 	 <target component = "relayTlmChan" port = "Run" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection13">
+	 <source component = "activeLogger" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection14">
+	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection15">
+	 <source component = "activeLogger" port = "PktSend" type = "Com" num = "0"/>
+ 	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
+</connection>
+<connection name = "Connection16">
+	 <source component = "imuTelemeter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection17">
+	 <source component = "relayLogger" port = "PktSend" type = "Com" num = "0"/>
+ 	 <target component = "relayGndIf" port = "downlinkPort" type = "Com" num = "0"/>
+</connection>
+<connection name = "Connection18">
 	 <source component = "eventExpander" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection19">
+	 <source component = "relayGndIf" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "relayLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 </assembly>

@@ -26,6 +26,8 @@ void exitTasks(void);
 #include <HLProc/LLRouter/LLRouterComponentImpl.hpp>
 #include <HLProc/EventExpander/EventExpanderComponentImpl.hpp>
 
+#include <R5RELAY/ImuSplitter/ImuSplitterComponentImpl.hpp>
+
 extern Drv::LinuxSerialDriverComponentImpl serialDrv;
 extern Svc::PassiveRateGroupImpl rg;
 extern HLProc::LLRouterComponentImpl llRouter;
@@ -33,5 +35,11 @@ extern Svc::LinuxTimeImpl linuxTime;
 extern HLProc::EventExpanderComponentImpl eventExpander;
 extern Svc::SocketGndIfImpl sockGndIf;
 extern Svc::ActiveLoggerImpl activeLogger;
+
+extern Svc::SocketGndIfImpl relayGndIf;
+extern R5RELAY::ImuSplitterComponentImpl imuTelemeter;
+extern Svc::ActiveLoggerImpl relayLogger;
+extern Svc::TlmChanImpl relayTlmChan;
+
 
 #endif

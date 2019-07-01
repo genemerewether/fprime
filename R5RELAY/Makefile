@@ -9,3 +9,5 @@ all: LINUX
 
 include $(BUILD_ROOT)/mk/makefiles/deployment_makefile.mk
 
+include $(BUILD_ROOT)/Svc/Startup/patch/patch.mk
+
