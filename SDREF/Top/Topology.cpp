@@ -873,7 +873,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     blspGpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
 
     // Must start serial drivers after tasks that setup the buffers for the driver:
-    serialDriverLL_ptr->open(
+    blspSerialDriverLL_ptr->open(
 #ifdef SOC_8096
                              7, // tty 3, J10, SONAR_UART, BLSP7
 #else
@@ -882,7 +882,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                              SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
                              true);
     
-    serialDriverDebug_ptr->open(
+    blspSerialDriverDebug_ptr->open(
 #ifdef SOC_8096
                                 5, // tty 1, J12, ESC_UART, BLSP5
 #else
