@@ -239,7 +239,7 @@ namespace Drv {
 
                     if (imuPkt.getheader().getseq() != ((this->m_pktCounter + 1) % 256)) {
                         // Unexpected sequence number
-                        findPktStat = S300_PKT_LOST_SYNC;
+                        //findPktStat = S300_PKT_LOST_SYNC;
                     } else {
                         this->m_pktCounter = (this->m_pktCounter + 1) % 256;
                     }
@@ -311,7 +311,7 @@ namespace Drv {
 
                 if (findPktStat == S300_PKT_FOUND) {
 
-                    if (imuPkt.getheader().getseq() != ((this->m_pktCounter + 1) % 256)) {
+                    if (0) { //imuPkt.getheader().getseq() != ((this->m_pktCounter + 1) % 256)) {
                         // Unexpected sequence number
                         this->log_WARNING_HI_InvalidCounter(imuPkt.getheader().getseq(), (this->m_pktCounter + 1) % 256);
                         findPktStat = S300_PKT_LOST_SYNC;

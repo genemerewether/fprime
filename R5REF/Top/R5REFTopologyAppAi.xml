@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<assembly name = "R5REF" generate_pointer="true">
+<assembly name = "R5REF">
 	<import_component_type>Gnc/Est/ImuInteg/ImuIntegComponentAi.xml</import_component_type>
 	<import_component_type>R5/R5TimeForward/R5TimeForwardComponentAi.xml</import_component_type>
 	<import_component_type>Gnc/Sysid/SigGen/SigGenComponentAi.xml</import_component_type>

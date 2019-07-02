@@ -508,7 +508,6 @@ namespace HLProc {
               }
               // call output port
               DEBUG_PRINT("Calling port %d with %d bytes.\n",portNum,entrySize);
-              printf("Calling port %d with %d bytes.\n",portNum,entrySize);
               if (this->isConnected_LLPortsOut_OutputPort(portNum)) {
 
                   if (3 == portNum) { // time GNC call

@@ -35,8 +35,6 @@ enum {
 #include <sys/wait.h>
 #endif
 
-//#define LLROUTER_DEVICES
-
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 //#define DEBUG_PRINT(x,...)
 
@@ -438,72 +436,73 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct() {
-#ifndef LLROUTER_DEVICES
-    // Sequence Com buffer and cmd response
-    cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
+void manualConstruct(bool llRouterDevices) {
+    if (!llRouterDevices) {
+        // Sequence Com buffer and cmd response
+        cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
-    hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
-    // port 7 only used with LLRouter (timesync)
+        hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+        // port 7 only used with LLRouter (timesync)
 
-    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
-                                                  hexRouter_ptr->get_Sched_InputPort(0));
+        rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                      hexRouter_ptr->get_Sched_InputPort(0));
 
-    mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
-    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
-    sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
-    sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
-    mrCtrlIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
-    mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
-    udpReceiver_ptr->set_PortsOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(7));
+        mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
+        sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
+        sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
+        sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
+        mrCtrlIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
+        mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
+        udpReceiver_ptr->set_PortsOut_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(7));
 
-    cmdSeq2_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(8));
-    hexRouter_ptr->set_HexPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
+        cmdSeq2_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(8));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
-    mrCtrlIface_ptr->set_boolStamped_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(9));
+        mrCtrlIface_ptr->set_boolStamped_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(9));
 
-    rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
-                                                 dspTimeSync_ptr->get_SchedIn_InputPort(0));
-    dspTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
-#else //LLROUTER_DEVICES
-    // Sequence Com buffer and cmd response
-    cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
+        rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                     dspTimeSync_ptr->get_SchedIn_InputPort(0));
+        dspTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
+    }
+    else { // llRouterDevices
+        // Sequence Com buffer and cmd response
+        cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
 
-    llRouter_ptr->set_LLPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
-    llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
 
-    mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
-    sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
-    sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
-    sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
-    mrCtrlIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
-    mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
-    udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(7));
+        mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
+        sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
+        sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
+        sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
+        mrCtrlIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
+        mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
+        udpReceiver_ptr->set_PortsOut_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(7));
 
-    cmdSeq2_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(8));
-    llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
+        cmdSeq2_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(8));
+        llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
-    mrCtrlIface_ptr->set_boolStamped_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(9));
+        mrCtrlIface_ptr->set_boolStamped_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(9));
 
-    rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
-                                                 llTimeSync_ptr->get_SchedIn_InputPort(0));
-    llTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
+        rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
+                                                     llTimeSync_ptr->get_SchedIn_InputPort(0));
+        llTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
 
-    //llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
-    llTimeSync_ptr->set_GPIOPulse_OutputPort(0, gpioTimeSync_ptr->get_gpioWrite_InputPort(0));
-#endif //LLROUTER_DEVICES
+        //llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
+        llTimeSync_ptr->set_GPIOPulse_OutputPort(0, gpioTimeSync_ptr->get_gpioWrite_InputPort(0));
+    }//LLROUTER_DEVICES
 
 #ifdef BUILD_SDFLIGHT
     llRouter_ptr->set_SerialBufferSend_OutputPort(0, blspSerialDriverLL_ptr->get_readBufferSend_InputPort(0));
@@ -576,6 +575,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                   char* hostname,
                   unsigned int boot_count,
                   bool &isHiresChild, bool &isStereoChild,
+                  bool llRouterDevices,
                   bool startSocketNow) {
     allocComps();
 
@@ -667,7 +667,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
-    manualConstruct();
+    manualConstruct(llRouterDevices);
 
     const U32 tempPortNum[2] = {1, 0};
     const FwOpcodeType tempMinOpcode[2] = {0, 20000};
@@ -862,62 +862,64 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     fileLogger_ptr->start(0,50,20*1024);
 
-    hexRouter_ptr->startPortReadThread(90,20*1024, CORE_DEV);
-    //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_DEV);
+    if (!llRouterDevices) {
+        hexRouter_ptr->startPortReadThread(90,20*1024, CORE_DEV);
+        //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_DEV);
+    }
 
-#ifdef LLROUTER_DEVICES
+    if (llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-    gpioTimeSync_ptr->open(
+        gpioTimeSync_ptr->open(
 #ifdef SOC_8096
                                88,
 #else
 #endif
                                Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
 
-    // Must start serial drivers after tasks that setup the buffers for the driver:
-    blspSerialDriverLL_ptr->open(
+        // Must start serial drivers after tasks that setup the buffers for the driver:
+        blspSerialDriverLL_ptr->open(
 #ifdef SOC_8096
-                             7, // tty 3, J10, SONAR_UART, BLSP7
+                                     7, // tty 3, J10, SONAR_UART, BLSP7
 #else
 #endif
-                             SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
-                             SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
-                             true);
+                                     SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
+                                     SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
+                                     true);
     
-    blspSerialDriverDebug_ptr->open(
+        blspSerialDriverDebug_ptr->open(
 #ifdef SOC_8096
-                                5, // tty 1, J12, ESC_UART, BLSP5
+                                        5, // tty 1, J12, ESC_UART, BLSP5
 #else
 #endif
-                                SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
-                                SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
-                                true);
+                                        SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
+                                        SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
+                                        true);
 
-    /* ---------- Done opening devices, now start device threads ---------- */
-    blspSerialDriverLL_ptr->startReadThread(98, 20*1024);
-    blspSerialDriverDebug_ptr->startReadThread(40, 20*1024);
+        /* ---------- Done opening devices, now start device threads ---------- */
+        blspSerialDriverLL_ptr->startReadThread(98, 20*1024);
+        blspSerialDriverDebug_ptr->startReadThread(40, 20*1024);
 #else //not BUILD_SDFLIGHT
-    // NOTE - need a GPIO for timesync - will assert when gpio is used!!
-    //gpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+        // NOTE - need a GPIO for timesync - will assert when gpio is used!!
+        //gpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+        
+        // Must start serial drivers after tasks that setup the buffers for the driver:
+        serialDriverLL_ptr->open("/dev/ttyUSB0",
+                                 Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                                 Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                                 Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                                 true);
 
-    // Must start serial drivers after tasks that setup the buffers for the driver:
-    serialDriverLL_ptr->open("/dev/ttyUSB0",
-                             Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
-                             Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
-                             Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
-                             true);
+        serialDriverDebug_ptr->open("/dev/ttyUSB1",
+                                    Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                                    Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                                    Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                                    true);
 
-    serialDriverDebug_ptr->open("/dev/ttyUSB1",
-                                Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
-                                Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
-                                Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
-                                true);
-
-    /* ---------- Done opening devices, now start device threads ---------- */
-    serialDriverLL_ptr->startReadThread(98, 20*1024);
-    serialDriverDebug_ptr->startReadThread(40, 20*1024);
+        /* ---------- Done opening devices, now start device threads ---------- */
+        serialDriverLL_ptr->startReadThread(98, 20*1024);
+        serialDriverDebug_ptr->startReadThread(40, 20*1024);
 #endif //BUILD_SDFLIGHT
-#endif //LLROUTER_DEVICES
+    } //llRouterDevices
 
     atiNetbox_ptr->set_thread_attr(0, 30, 20*1024, true, CORE_GNC);
     atiNetbox_ptr->open("192.168.2.20", "192.168.2.10",
@@ -972,7 +974,8 @@ void runcycles(NATIVE_INT_TYPE cycles) {
     }
 }
 
-void exitTasks(bool isHiresChild, bool isStereoChild) {
+void exitTasks(bool isHiresChild, bool isStereoChild,
+               bool llRouterDevices) {
 #if defined TGT_OS_TYPE_LINUX
     if (isHiresChild) {
 #endif
@@ -1006,22 +1009,24 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
     mvCam_ptr->deallocateBuffers(buffMallocator);
     mvCam_ptr->join(NULL);
     DEBUG_PRINT("After mvcam thread quit\n");
-    hexRouter_ptr->quitReadThreads();
-    DEBUG_PRINT("After HexRouter read thread quit\n");
+    if (!llRouterDevices) {
+        hexRouter_ptr->quitReadThreads();
+        DEBUG_PRINT("After HexRouter read thread quit\n");
+    }
 
     buffAccumMVCamUnproc_ptr->deallocateQueue(buffMallocator);
     buffAccumHiresCamUnproc_ptr->deallocateQueue(buffMallocator);
     buffAccumStereoCamUnproc_ptr->deallocateQueue(buffMallocator);
 
-#ifdef LLROUTER_DEVICES
+    if (llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-    blspSerialDriverLL_ptr->quitReadThread();
-    blspSerialDriverDebug_ptr->quitReadThread();
+        blspSerialDriverLL_ptr->quitReadThread();
+        blspSerialDriverDebug_ptr->quitReadThread();
 #else //BUILD_SDFLIGHT
-    serialDriverLL_ptr->quitReadThread();
-    serialDriverDebug_ptr->quitReadThread();
+        serialDriverLL_ptr->quitReadThread();
+        serialDriverDebug_ptr->quitReadThread();
 #endif //BUILD_SDFLIGHT
-#endif
+    }
     atiNetbox_ptr->stop();
 
     imgTlm_ptr->exit();
@@ -1055,6 +1060,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild) {
 void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
                   "-p\tport_number\n"
+                  "-d\trun on Snapdragon DSP\n"
                   "-x\tll_port_number\n"
                   "-u\tUDP recv port string\n"
                   "-t\tUDP transmit port string\n"
@@ -1107,15 +1113,19 @@ int main(int argc, char* argv[]) {
     bool isStereoChild = false;
     bool startSocketNow = false;
     U32 boot_count = 0;
+    bool llRouterDevices = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "ifhlsp:x:a:u:t:o:b:z:")) != -1){
+    while ((option = getopt(argc, argv, "difhlsp:x:a:u:t:o:b:z:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
                 return 0;
+                break;
+            case 'd':
+                llRouterDevices = false;
                 break;
             case 'l':
                 local_cycle = true;
@@ -1175,16 +1185,18 @@ int main(int argc, char* argv[]) {
 
     (void) printf("Hit Ctrl-C to quit\n");
 
+    if (!llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-    if (!noInit) {
-        hexref_init();
-    }
+        if (!noInit) {
+            hexref_init();
+        }
 #endif
-
+    }
+    
     constructApp(port_number, ll_port_number,
                  udp_recv_string, udp_send_string, zmq_image_string,
                  hostname, boot_count,
-                 isHiresChild, isStereoChild,
+                 isHiresChild, isStereoChild, llRouterDevices,
                  startSocketNow);
     //dumparch();
 
@@ -1207,43 +1219,47 @@ int main(int argc, char* argv[]) {
         ros::console::shutdown();
 
         Os::TaskString waiter_task_name("WAITER");
+        if (!llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-        // TODO(mereweth) - test that calling other functions before init has no effect
-        //hexref_rpc_relay_buff_allocate(10);
-        if (hexCycle) {
-            Os::TaskString task_name("HEXRPC");
-            DEBUG_PRINT("Starting cycler on hexagon\n");
+            // TODO(mereweth) - test that calling other functions before init has no effect
+            //hexref_rpc_relay_buff_allocate(10);
+            if (hexCycle) {
+                Os::TaskString task_name("HEXRPC");
+                DEBUG_PRINT("Starting cycler on hexagon\n");
+                if (Os::Task::TASK_OK !=
+                    task.start(task_name, 0, 10, 20*1024,
+                               (Os::Task::taskRoutine) hexref_run, NULL)) {
+                    DEBUG_PRINT("Error starting up DSP RUN task\n");
+                    terminate = 1;
+                }
+            }
             if (Os::Task::TASK_OK !=
-                task.start(task_name, 0, 10, 20*1024,
-                           (Os::Task::taskRoutine) hexref_run, NULL)) {
-                DEBUG_PRINT("Error starting up DSP RUN task\n");
+                waiter.start(waiter_task_name, 0, 10, 20*1024,
+                             (Os::Task::taskRoutine) hexref_wait, NULL)) {
+                DEBUG_PRINT("Error starting up DSP WAIT task\n");
                 terminate = 1;
             }
-        }
-        if (Os::Task::TASK_OK !=
-            waiter.start(waiter_task_name, 0, 10, 20*1024,
-                         (Os::Task::taskRoutine) hexref_wait, NULL)) {
-            DEBUG_PRINT("Error starting up DSP WAIT task\n");
-            terminate = 1;
-        }
 #else
-        if (hexCycle) {
-            Os::TaskString task_name("DUMMY");
+            if (hexCycle) {
+                Os::TaskString task_name("DUMMY");
+                FW_ASSERT(Os::Task::TASK_OK ==
+                          task.start(task_name, 0, 10, 20*1024,
+                                     (Os::Task::taskRoutine) dummy, NULL));
+            }
             FW_ASSERT(Os::Task::TASK_OK ==
-                      task.start(task_name, 0, 10, 20*1024,
-                                 (Os::Task::taskRoutine) dummy, NULL));
-        }
-        FW_ASSERT(Os::Task::TASK_OK ==
-                  waiter.start(waiter_task_name, 0, 10, 20*1024,
-                               (Os::Task::taskRoutine) dummy, NULL));
+                      waiter.start(waiter_task_name, 0, 10, 20*1024,
+                                   (Os::Task::taskRoutine) dummy, NULL));
 #endif //BUILD_SDFLIGHT
+        } //not LLROUTER_DEVICES
 
+        if (!llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-        if (kraitCycle) {
-            DEBUG_PRINT("Cycling from Krait\n");
-            hexref_cycle(numKraitCycles);
-        }
+            if (kraitCycle) {
+                DEBUG_PRINT("Cycling from Krait\n");
+                hexref_cycle(numKraitCycles);
+            }
 #endif //BUILD_SDFLIGHT
+        }
 
     } //!isHiresChild && !isStereoChild
 
@@ -1268,21 +1284,23 @@ int main(int argc, char* argv[]) {
     }
 
     if (!isHiresChild && !isStereoChild) {
+        if (!llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-        if (!noFini) {
-            DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
-            hexref_fini();
-        }
+            if (!noFini) {
+                DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
+                hexref_fini();
+            }
 #endif //BUILD_SDFLIGHT
+        }
 
         // stop tasks
         DEBUG_PRINT("Stopping tasks\n");
         ros::shutdown();
     } // !isHiresChild && !isStereoChild
 
-    exitTasks(isHiresChild, isStereoChild);
-
-    if (!isHiresChild && !isStereoChild) {
+    exitTasks(isHiresChild, isStereoChild, llRouterDevices);
+    
+    if (!llRouterDevices && !isHiresChild && !isStereoChild) {
         if (hexCycle) {
             DEBUG_PRINT("Waiting for the runner to return\n");
             FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
