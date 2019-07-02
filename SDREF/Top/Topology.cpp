@@ -875,7 +875,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                                88,
 #else
 #endif
-                               Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+                               SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_OUT);
 
     // Must start serial drivers after tasks that setup the buffers for the driver:
     blspSerialDriverLL_ptr->open(
