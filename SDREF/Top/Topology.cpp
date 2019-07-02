@@ -870,7 +870,12 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
 #ifdef LLROUTER_DEVICES
 #ifdef BUILD_SDFLIGHT
-    blspGpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+    blspGpioTimeSync_ptr->open(
+#ifdef SOC_8096
+                               88,
+#else
+#endif
+                               Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
 
     // Must start serial drivers after tasks that setup the buffers for the driver:
     blspSerialDriverLL_ptr->open(
