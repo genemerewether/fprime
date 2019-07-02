@@ -501,11 +501,8 @@ void manualConstruct() {
                                                  llTimeSync_ptr->get_SchedIn_InputPort(0));
     llTimeSync_ptr->set_ClockTimes_OutputPort(0, timeConvert_ptr->get_ClockTimes_InputPort(0));
 
-#ifdef BUILD_SDFLIGHT
-    llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
-#else // BUILD_SDFLIGHT
+    //llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
     llTimeSync_ptr->set_GPIOPulse_OutputPort(0, gpioTimeSync_ptr->get_gpioWrite_InputPort(0));
-#endif //BUILD_SDFLIGHT
 #endif //LLROUTER_DEVICES
 
 #ifdef BUILD_SDFLIGHT
@@ -870,12 +867,12 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
 #ifdef LLROUTER_DEVICES
 #ifdef BUILD_SDFLIGHT
-    blspGpioTimeSync_ptr->open(
+    gpioTimeSync_ptr->open(
 #ifdef SOC_8096
                                88,
 #else
 #endif
-                               SnapdragonFlight::BlspGpioDriverComponentImpl::GPIO_OUT);
+                               Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
 
     // Must start serial drivers after tasks that setup the buffers for the driver:
     blspSerialDriverLL_ptr->open(
