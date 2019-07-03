@@ -871,7 +871,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #ifdef BUILD_SDFLIGHT
         gpioTimeSync_ptr->open(
 #ifdef SOC_8096
-                               84, // J12, pin 6, 5V level
+                               88, // J11, pin 6, 3.3V level
 #else
 #endif
                                Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
