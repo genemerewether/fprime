@@ -135,34 +135,32 @@ namespace Drv {
   {
      printf("In Flatoutput Test\n");
 
-     this->init(); //Do I need this?
+     this->init();
+
      printf("First\n");
+
      ROS::mav_msgs::InputFlatOutputPort flatNav_p;
      ROS::mav_msgs::InputFlatOutputPort flatGuid_p;
      
-     Fw::Time time__t;//(TB_WORKSTATION_TIME,10,11);
-     time__t.set(1000,1000);
-     printf("Time: %lu\n",time__t.getSeconds());
+     Fw::Time time__t;
 
-     printf("Firstv1\n");
-     ROS::std_msgs::Header header(10,time__t,(char) 0);
+     printf("Second\n");
+     ROS::std_msgs::Header header(10,time__t, 0);
      
-     printf("Firstv2\n");
-     ROS::mav_msgs::FlatOutput flatNav_t(header,ROS::geometry_msgs::Point(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),0.0);
-     ROS::mav_msgs::FlatOutput flatGuid_t(header,ROS::geometry_msgs::Point(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),ROS::geometry_msgs::Vector3(0.0,0.0,0.0),0.0);
+     printf("Third\n");
+     ROS::mav_msgs::FlatOutput flatNav_t(header,ROS::geometry_msgs::Point(0.0,0.0,0.0),
+                                              ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                              ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                              0.0*3.14159265359/180.0);
      
-     //printf("Second\n");
-     //this->connect_to_Nav(0,&flatNav_p);
-     
-     //printf("Third\n");
-     //this->connect_to_Guid(1,&flatGuid_p);
+     ROS::mav_msgs::FlatOutput flatGuid_t(header,ROS::geometry_msgs::Point(6.0,6.0,0.0),
+                                               ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                               ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                               -45.0*3.14159265359/180.0);
      
      printf("Fourth\n");
      this->invoke_to_Nav(0,flatNav_t);
      this->invoke_to_Guid(0,flatGuid_t);
-
-     
-
 
   }
 

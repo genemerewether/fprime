@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <math.h>
 
-//#define PI 3.14159265
+#define PI 3.14159265359
 
 namespace Drv {
 
@@ -68,6 +68,7 @@ namespace Drv {
     using namespace ROS::geometry_msgs;
     
     if(Guid_new && Nav_new && receivedGPS)
+    //if(Guid_new && Nav_new)// && receivedGPS)
     {
 
       if (!__builtin_isfinite(GuidFlat.getposition().getx()) ||
@@ -82,6 +83,11 @@ namespace Drv {
           return;
       }
 
+      //posGPS.x = 0.0;
+      //posGPS.y = 0.0;
+      //posGPS.z = 0.0;
+      //attGPS.yaw = 90.0*PI/180.0;
+
       if(initOffset)
       {
         dpsi = attGPS.yaw - NavFlat.getyaw();
@@ -92,15 +98,27 @@ namespace Drv {
         initOffset = false;
       }
       
-      des_x = GuidFlat.getposition().getx()*cos(dpsi) - GuidFlat.getposition().gety()*sin(dpsi) - dx;
-      des_y = GuidFlat.getposition().getx()*sin(dpsi) + GuidFlat.getposition().gety()*cos(dpsi) - dy;
-      des_z = GuidFlat.getposition().getz() - dz;
-      des_psi = GuidFlat.getyaw() - dpsi;
+      des_x = GuidFlat.getposition().getx()*cos(dpsi) - GuidFlat.getposition().gety()*sin(dpsi) + dx;
+      des_y = GuidFlat.getposition().getx()*sin(dpsi) + GuidFlat.getposition().gety()*cos(dpsi) + dy;
+      des_z = GuidFlat.getposition().getz() + dz;
+      des_psi = GuidFlat.getyaw() + dpsi;
       
+      while(des_psi > (2.0*PI))
+      {
+         printf("In loop\n");
+         des_psi = des_psi - (2.0*PI);
+      }
+
       Guid_new = false;
       Nav_new = false;
-      //PX4_new = false;
     }
+   
+    //printf("DELTA VALUES = [ % .4f , % .4f , %.4f , %.4f ] \n", dx, dy, dz, dpsi*180.0/3.14159265359);
+    //printf("PX4 PIXHAWK POSITION XYZ & YAW = [ % .4f , % .4f , % .4f, % .4f ] \n", posGPS.x, posGPS.y,posGPS.z, attGPS.yaw*180.0/3.14159265359);
+    //printf("NAVIGATION POSITION XYZ & YAW = [ % .4f , % .4f , % .4f, % .4f ] \n", NavFlat.getposition().getx(), NavFlat.getposition().gety(), NavFlat.getposition().getz(), NavFlat.getyaw()*180.0/3.14159265359);
+    //printf("GUIDANCE POSITION XYZ & YAW = [ % .4f , % .4f , % .4f, % .4f ] \n", GuidFlat.getposition().getx(), GuidFlat.getposition().gety(), GuidFlat.getposition().getz(), GuidFlat.getyaw()*180.0/3.14159265359);
+    //printf("DESIRED POSITION XYZ & YAW = [ % .4f , % .4f , % .4f, % .4f ] \n", des_x, des_y, des_z, des_psi*180.0/3.14159265359);
+
 
     // Send desired flatoutput to the Pixhawk
     sendPosDesGPS(des_x, des_y, des_z, des_psi);
@@ -192,7 +210,7 @@ namespace Drv {
 
   void GPSPosAdapterComponentImpl::sendPosDesGPS(float xDesGPS, float yDesGPS, float zDesGPS, float yawDesGPS) {
     // write desired pos to GPS
-    printf("DESIRED POSITION XYZ & YAW GPS = [ % .4f , % .4f , % .4f, % .4f ] \n", xDesGPS, yDesGPS, zDesGPS, yawDesGPS);
+    printf("DESIRED POSITION XYZ & YAW GPS = [ % .4f , % .4f , % .4f, % .4f ] \n", xDesGPS, yDesGPS, zDesGPS, yawDesGPS*180.0/3.14159265359);
     
     // declare and update setpoint struct with target XYZ in local NED frame in meters
     mavlink_set_position_target_local_ned_t sp;

@@ -198,6 +198,7 @@ QUEST_GNC_MODULES := \
 	Gnc/Est/AttFilter \
 	Gnc/Sysid/SigGen \
 	Gnc/Utils/FixedAxisSe3Adapter \
+	Gnc/Utils/FlatOutputAdapter \
 	Gnc/Utils/AckermannConverter \
 	Gnc/Utils/FrameTransform \
 	Gnc/Utils/ImuProc \

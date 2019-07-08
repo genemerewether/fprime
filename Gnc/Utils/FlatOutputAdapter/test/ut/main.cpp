@@ -6,16 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-TEST(Nominal, uartConnTest) {
-    Ref::Tester tester;
-    tester.uartConnTest();
-}
-
-TEST(Nominal, inputFlatoutputTest) {
-    Ref::Tester tester;
-    tester.inputFlatoutputTest();
-}
 int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc,argv);
-    return RUN_ALL_TESTS;
+
+    Gnc::Tester tester;
+
+    tester.inputFlatOutputTest();
 }
