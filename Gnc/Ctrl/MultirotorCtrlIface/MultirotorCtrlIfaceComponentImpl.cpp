@@ -386,7 +386,16 @@ namespace Gnc {
             !std::isfinite(msg->acceleration.y) ||
             !std::isfinite(msg->acceleration.z) ||
 
-            !std::isfinite(msg->yaw)) {
+            !std::isfinite(msg->jerk.x) ||
+            !std::isfinite(msg->jerk.y) ||
+            !std::isfinite(msg->jerk.z) ||
+
+            !std::isfinite(msg->snap.x) ||
+            !std::isfinite(msg->snap.y) ||
+            !std::isfinite(msg->snap.z) ||
+
+            !std::isfinite(msg->yaw)    ||
+            !std::isfinite(msg->yawdot)) {
             //TODO(mereweth) - EVR
             return;
         }
@@ -420,8 +429,9 @@ namespace Gnc {
               Point(msg->position.x, msg->position.y, msg->position.z),
               Vector3(msg->velocity.x, msg->velocity.y, msg->velocity.z),
               Vector3(msg->acceleration.x, msg->acceleration.y, msg->acceleration.z),
-              F64(msg->yaw)
-
+              Vector3(msg->jerk.x, msg->jerk.y, msg->jerk.z),
+              Vector3(msg->snap.x, msg->snap.y, msg->snap.z),
+              F64(msg->yaw), F64(msg->yawdot)
             ); // end FlatOutput constructor
 
             this->compPtr->m_flatOutSet[this->portNum].mutex.lock();

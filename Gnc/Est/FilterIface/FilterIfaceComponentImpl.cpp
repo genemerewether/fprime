@@ -26,6 +26,8 @@
 
 #include <Os/File.hpp>
 
+#include "nav_msgs/Odometry.h"
+
 #include <math.h>
 #include <stdio.h>
 
@@ -205,13 +207,21 @@ namespace Gnc {
             return;
         }
 
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
+        
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
         U32 frame_id = header.getframe_id();
         msg.header.frame_id = "world";
 
-        msg.child_frame_id = "quest-base-link";
+        if (0 == portNum) {
+            msg.child_frame_id = "quest-base-link";
+        }
+        else {
+            msg.child_frame_id = "quest-unknown";
+        }
 
         ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
         msg.pose.pose.position.x = p.getx();

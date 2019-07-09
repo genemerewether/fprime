@@ -52,7 +52,7 @@ Svc::RateGroupDecouplerComponentImpl rgDecouple
 ;
 
 //NOTE(mereweth) - change this in sync with RosCycle timeDivMS
-static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 100};
+static NATIVE_INT_TYPE rgGncDivs[] = {1, 1, 100};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGGNCDRV",
@@ -298,6 +298,9 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
 
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
+
+    // TODO(mereweth) - put in MD model
+    leeCtrl.set_setpoint_OutputPort(0, filterIface.get_Odometry_InputPort(1));
     
     udpReceiver.set_PortsOut_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
 

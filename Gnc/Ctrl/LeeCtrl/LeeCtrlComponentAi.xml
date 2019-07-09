@@ -9,7 +9,8 @@
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryAccelPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
@@ -26,7 +27,10 @@
     <import_dictionary>Gnc/Ctrl/LeeCtrl/Events.xml</import_dictionary>
 
     <ports>
-        <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="sync_input" max_number="1">
+        <port name="odometry" data_type="ROS::nav_msgs::OdometryAccel"  kind="sync_input" max_number="1">
+        </port>
+        
+        <port name="setpoint" data_type="ROS::nav_msgs::OdometryNoCov"  kind="output" max_number="1">
         </port>
 
         <port name="flatOutput" data_type="ROS::mav_msgs::FlatOutput"  kind="sync_input" max_number="1">
