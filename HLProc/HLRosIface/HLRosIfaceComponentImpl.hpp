@@ -156,6 +156,8 @@ namespace HLProc {
         ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;
         image_transport::Publisher m_imagePub[NUM_IMAGERECV_INPUT_PORTS];
+        ros::Publisher m_exposurePub[NUM_IMAGERECV_INPUT_PORTS];
+        ros::Publisher m_gainPub[NUM_IMAGERECV_INPUT_PORTS];
     
         ros::Publisher m_pointCloudPub[NUM_POINTCLOUD_INPUT_PORTS];
 

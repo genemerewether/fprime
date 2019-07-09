@@ -9,6 +9,7 @@ CFLAGS := 	$(DEBUG) \
 CXXFLAGS := $(DEBUG) \
 			$(DARWIN_LLVM_CXXFLAGS) \
 			$(DARWIN_LLVM_INCLUDES) \
-			$(UT_FLAGS)
+			$(UT_FLAGS) \
+			-std=c++11
 			
 COMPILER := darwin-x86-ut-nocov-llvm

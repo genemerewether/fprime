@@ -74,7 +74,7 @@ namespace Gnc {
       //!
       void odometry_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::nav_msgs::Odometry &Odometry
+          ROS::nav_msgs::OdometryAccel &Odometry
       );
 
       //! Handler implementation for flatOutput
@@ -174,14 +174,22 @@ namespace Gnc {
       ROS::geometry_msgs::Vector3 omega_b;
 
       ROS::geometry_msgs::Vector3 omega_b__des;
-
+    
+      ROS::geometry_msgs::Vector3 a_b;
+    
       ROS::geometry_msgs::Vector3 a_w__comm;
 
       ROS::geometry_msgs::Vector3 a_w__des;
+    
+      ROS::geometry_msgs::Vector3 j_w__des;
+    
+      ROS::geometry_msgs::Vector3 s_w__des;
 
       ROS::geometry_msgs::Vector3 thrust_b__des;
 
       F64 yaw__des;
+    
+      F64 yawdot__des;
 
       quest_gnc::multirotor::LeeControl leeControl;
 

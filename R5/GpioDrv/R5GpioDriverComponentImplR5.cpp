@@ -141,9 +141,12 @@ namespace R5 {
 
       alreadySet = (0 != gio_flag_reg);
 
-      while(0 == gio_flag_reg) {
-          gio_flag_reg = (mask & gioREG->FLG);
-      }
+      volatile int i;
+      for (i = 0; i < 500; i++);
+
+      //while(0 == gio_flag_reg) {
+          //gio_flag_reg = (mask & gioREG->FLG);
+      //}
 
       gioREG->FLG = gio_flag_reg;
   }

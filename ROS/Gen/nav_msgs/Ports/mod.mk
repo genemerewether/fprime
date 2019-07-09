@@ -1,6 +1,8 @@
 SRC = \
 OdometryNoCovPortAi.xml \
-OdometryPortAi.xml
+OdometryPortAi.xml \
+OdometryAccelNoCovPortAi.xml \
+OdometryAccelPortAi.xml
 
 # GetMapActionFeedbackPortAi.xml \
 # GetMapActionGoalPortAi.xml \

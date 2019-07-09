@@ -43,7 +43,7 @@
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
         </port>
 
-        <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="1">
+        <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="2">
         </port>
 
         <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">

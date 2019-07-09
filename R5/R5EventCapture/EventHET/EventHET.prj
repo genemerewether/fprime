@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<HETProject ProjectName="EventHET" ProjectPath="Z:/Documents/davinci-fsw/R5/R5EventCapture" StimuliVCD="">
+ <Device SelectedPins="11111111111111111111111111111111" MemorySize="256" PinDirections="11111111111111111111111111111111" SimulatorType="N2HET" Name="TMS570LC4357ZWT" SystemDevice="TRUE"/>
+ <Clock LR="1" Frequency="300.000" HR="1"/>
+ <SourceFile Path="Z:/Documents/davinci-fsw/R5/R5EventCapture/EventHET" Breakpoints="" Name="EventHET.het"/>
+ <Registers>
+  <Register Name="NHETGCR" Address="0x0" Value="0x00000001"/>
+  <Register Name="NHETPFR" Address="0x4" Value="0x00000500"/>
+  <Register Name="NHETADDR" Address="0x8" Value="0x00000000"/>
+  <Register Name="NHETOFF1" Address="0xc" Value="0x00000000"/>
+  <Register Name="NHETOFF2" Address="0x10" Value="0x00000000"/>
+  <Register Name="NHETINTENAS" Address="0x14" Value="0x00000000"/>
+  <Register Name="NHETINTENAC" Address="0x18" Value="0x00000000"/>
+  <Register Name="NHETEXC1" Address="0x1c" Value="0x00000000"/>
+  <Register Name="NHETEXC2" Address="0x20" Value="0x00000000"/>
+  <Register Name="NHETPRY" Address="0x24" Value="0x00000000"/>
+  <Register Name="NHETFLG" Address="0x28" Value="0x00000000"/>
+  <Register Name="NHETAND" Address="0x2c" Value="0x00000000"/>
+  <Register Name="NHETHRSH" Address="0x34" Value="0x00000000"/>
+  <Register Name="NHETXOR" Address="0x38" Value="0x00000000"/>
+  <Register Name="NHETREQENS" Address="0x3c" Value="0x00000000"/>
+  <Register Name="NHETREQENC" Address="0x40" Value="0x00000000"/>
+  <Register Name="NHETREQDS" Address="0x44" Value="0x00000000"/>
+  <Register Name="NHETDIR" Address="0x4c" Value="0xffffffff"/>
+  <Register Name="NHETDIN" Address="0x50" Value="0x00000000"/>
+  <Register Name="NHETDOUT" Address="0x54" Value="0xffffffff"/>
+  <Register Name="NHETDSET" Address="0x58" Value="0x00000000"/>
+  <Register Name="NHETDCLR" Address="0x5c" Value="0x00000000"/>
+  <Register Name="NHETPDR" Address="0x60" Value="0x00000000"/>
+  <Register Name="NHETPULDIS" Address="0x64" Value="0x00000000"/>
+  <Register Name="NHETPSL" Address="0x68" Value="0x00000000"/>
+  <Register Name="NHETPCR" Address="0x74" Value="0x00000005"/>
+  <Register Name="NHETPAR" Address="0x78" Value="0x00000000"/>
+  <Register Name="NHETPPR" Address="0x7c" Value="0x00000000"/>
+  <Register Name="NHETSFPRLD" Address="0x8c" Value="0x00000000"/>
+  <Register Name="NHETSFENA" Address="0x84" Value="0x00000000"/>
+  <Register Name="NHETLBPSEL" Address="0x8c" Value="0x00000000"/>
+  <Register Name="NHETLBPDIR" Address="0x90" Value="0x00050000"/>
+  <Register Name="NHETPINDIS" Address="0x94" Value="0x00000000"/>
+ </Registers>
+ <ComplexBreakpoints/>
+ <MemoryTriggers/>
+ <PinTriggers/>
+ <WaveformConfiguration>
+  <Clock TraceVCLK="True" TraceHRCL="True" TraceHET_RES="True"/>
+  <Pins Level1="False" Level2="False" Pins="00000000000000000000000000000000"/>
+  <Fields TraceProgram="False" TraceData="False" TraceControl="False"/>
+  <Registers Addresses=""/>
+  <InternalRegisters/>
+  <Flags/>
+  <Instructions/>
+ </WaveformConfiguration>
+</HETProject>

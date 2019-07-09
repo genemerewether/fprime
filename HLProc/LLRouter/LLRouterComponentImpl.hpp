@@ -29,10 +29,9 @@
 #include <Fw/Types/MemAllocator.hpp>
 #include <limits.h>
 
-
 namespace HLProc {
 
-  const char* BOOTLOADER_MAGIC_STRING = "LeoBoot!";
+  extern const char* BOOTLOADER_MAGIC_STRING;
 
   class LLRouterComponentImpl :
     public LLRouterComponentBase

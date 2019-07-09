@@ -1,0 +1,8 @@
+; Input Time Stamp using WCAP
+; Possible events ={NOCOND | FALL | RISE | BOTH}
+
+L00   CNT { reg=A,max=0x1FFFFFF};
+L01   WCAP { next=L02,reqnum=0,request=GENREQ,hr_lr=LOW,control=OFF,cond_addr=L02,pin=14,event=FALL,reg=A,data=0};
+L02   WCAP { next=L10,reqnum=1,request=GENREQ,hr_lr=LOW,control=OFF,cond_addr=L10,pin=30,event=FALL,reg=A,data=0};
+L10   BR {next=L00, cond_addr=L00, event=NOCOND}
+

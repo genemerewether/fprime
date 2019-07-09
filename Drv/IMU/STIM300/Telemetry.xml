@@ -1,0 +1,15 @@
+<telemetry>
+    <channel id="0" name="NumPackets" data_type="U32">
+    </channel>
+    <channel id="1" name="TimeSyncStatus" data_type="ENUM">
+        <enum name="STIM300TimeSync">
+            <item name="STIM300_TS_CLEAR"/>
+            <item name="STIM300_TS_WAIT"/>
+            <item name="STIM300_TS_CHECK"/>
+            <item name="STIM300_TS_SYNCED"/>
+            <item name="STIM300_TS_NOSYNC"/>
+        </enum>
+    </channel>
+
+
+</telemetry>

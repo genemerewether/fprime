@@ -14,6 +14,7 @@
 #define TimeConvert_HPP
 
 #include "Svc/TimeConvert/TimeConvertComponentAc.hpp"
+#include "Fw/Cfg/Config.hpp"
 
 namespace Svc {
 
@@ -78,9 +79,9 @@ namespace Svc {
           bool& success /*!< Whether time conversion was successful */
       );
 
-    Fw::Time ProcTime;
-    Fw::Time WsTime;
-    Fw::Time RosTime;
+    I64 adjGraph[7][7];
+    // make boolean array to check if TimeOffsetGraph has been populated
+    bool boolAdjGraph[7][7] = {{false}};
 
     };
 

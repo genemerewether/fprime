@@ -26,7 +26,7 @@
 extern "C" {
 #endif  // __cplusplus
 
-#define R5_MEM_SHARED_RAM_SIZE  4096
+#define R5_MEM_SHARED_RAM_SIZE  16384
 
 #define R5_CACHE_LINE_SIZE  32
 

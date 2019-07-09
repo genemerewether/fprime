@@ -64,10 +64,14 @@ namespace Gnc {
       v_w__des(0.0f, 0.0f, 0.0f),
       omega_b(0.0f, 0.0f, 0.0f),
       omega_b__des(0.0f, 0.0f, 0.0f),
+      a_b(0.0f, 0.0f, 0.0f),
       a_w__comm(0.0f, 0.0f, 0.0f),
       a_w__des(0.0f, 0.0f, 0.0f),
+      j_w__des(0.0f, 0.0f, 0.0f),
+      s_w__des(0.0f, 0.0f, 0.0f),
       thrust_b__des(0.0f, 0.0f, 0.0f),
       yaw__des(0.0f),
+      yawdot__des(0.0f),
       leeControl(),
       ctrlMode(CTRL_DISABLED),
       paramsInited(false)
@@ -270,7 +274,7 @@ namespace Gnc {
   void LeeCtrlComponentImpl ::
     odometry_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::nav_msgs::Odometry &Odometry
+        ROS::nav_msgs::OdometryAccel &Odometry
     )
   {
       ROS::std_msgs::Header h = Odometry.getheader();
@@ -282,6 +286,8 @@ namespace Gnc {
 
       this->v_b = Odometry.gettwist().gettwist().getlinear();
       this->omega_b = Odometry.gettwist().gettwist().getangular();
+      
+      this->a_b = Odometry.getaccel().getaccel().getlinear();
   }
 
   void LeeCtrlComponentImpl ::
@@ -293,7 +299,10 @@ namespace Gnc {
       this->x_w__des = FlatOutput.getposition();
       this->v_w__des = FlatOutput.getvelocity();
       this->a_w__des = FlatOutput.getacceleration();
+      this->j_w__des = FlatOutput.getjerk();
+      this->s_w__des = FlatOutput.getsnap();
       this->yaw__des = FlatOutput.getyaw();
+      this->yawdot__des = FlatOutput.getyawdot();
   }
 
   void LeeCtrlComponentImpl ::
@@ -330,7 +339,10 @@ namespace Gnc {
                                                               this->v_w__des.getz()),
                                               Eigen::Vector3d(this->a_w__des.getx(),
                                                               this->a_w__des.gety(),
-                                                              this->a_w__des.getz()));
+                                                              this->a_w__des.getz()),
+                                              Eigen::Vector3d(this->j_w__des.getx(),
+                                                              this->j_w__des.gety(),
+                                                              this->j_w__des.getz()));
           } else {
               this->leeControl.SetPositionDes(Eigen::Vector3d(this->x_w__des.getx(),
                                                               this->x_w__des.gety(),
@@ -340,7 +352,10 @@ namespace Gnc {
                                                               this->v_w__des.getz()),
                                               Eigen::Vector3d(this->a_w__des.getx(),
                                                               this->a_w__des.gety(),
-                                                              this->a_w__des.getz()));
+                                                              this->a_w__des.getz()),
+                                              Eigen::Vector3d(this->j_w__des.getx(),
+                                                              this->j_w__des.gety(),
+                                                              this->j_w__des.getz()));
           }
 
           if (this->leeControl.SetYawDes(this->yaw__des)) {
@@ -348,12 +363,15 @@ namespace Gnc {
           }
 
           // set position feedback
-          this->leeControl.SetPositionLinVel(Eigen::Vector3d(this->x_w.getx(),
-                                                             this->x_w.gety(),
-                                                             this->x_w.getz()),
-                                             Eigen::Vector3d(this->v_b.getx(),
-                                                             this->v_b.gety(),
-                                                             this->v_b.getz()));
+          this->leeControl.SetPositionLinVelAcc(Eigen::Vector3d(this->x_w.getx(),
+                                                                this->x_w.gety(),
+                                                                this->x_w.getz()),
+                                                Eigen::Vector3d(this->v_b.getx(),
+                                                                this->v_b.gety(),
+                                                                this->v_b.getz()),
+                                                Eigen::Vector3d(this->a_b.getx(),
+                                                                this->a_b.gety(),
+                                                                this->a_b.getz()));
 
           Eigen::Vector3d a_w__comm(0, 0, 0);
           if (LIN_VEL == this->ctrlMode) {
@@ -448,16 +466,16 @@ namespace Gnc {
               this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, true);
           }
           else if (ROLL_ONLY == this->ctrlMode) {
-  	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<0);
+              this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<0);
           }
           else if (PITCH_ONLY == this->ctrlMode) {
-	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<1);
+              this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<1);
           }
           else if (YAW_ONLY == this->ctrlMode) {
-	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<2);
+              this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<2);
           }
           else if (RP_ONLY == this->ctrlMode) {
-	      this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, (1<<0) | (1<<1));
+              this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, (1<<0) | (1<<1));
           }
           else {
               this->leeControl.GetAngAccelCommand(&alpha_b__comm);
@@ -481,6 +499,45 @@ namespace Gnc {
           if (this->isConnected_accelCommand_OutputPort(0) &&
               (CTRL_DISABLED != this->ctrlMode)) {
               this->accelCommand_out(0, accel__comm);
+          }
+
+          {
+              using namespace ROS::std_msgs;
+              using namespace ROS::nav_msgs;
+              using namespace ROS::geometry_msgs;
+              
+              Eigen::Vector3d _x_w__des;              
+              Eigen::Quaterniond _w_q_b__des;
+              Eigen::Vector3d v_b__des;
+              Eigen::Vector3d _omega_b__des;
+              this->leeControl.GetDesired(&_x_w__des,
+                                          &_w_q_b__des,
+                                          &v_b__des,
+                                          &_omega_b__des);
+              
+              OdometryNoCov setpoint(
+                Header(this->seq,
+                       this->getTime(),
+                       0/*world*/),
+                0/*body*/,
+                Pose(Point(_x_w__des(0),
+                           _x_w__des(1),
+                           _x_w__des(2)),
+                     Quaternion(_w_q_b__des.x(),
+                                _w_q_b__des.y(),
+                                _w_q_b__des.z(),
+                                _w_q_b__des.w())),
+                Twist(Vector3(v_b__des(0),
+                              v_b__des(1),
+                              v_b__des(2)),
+                      Vector3(_omega_b__des(0),
+                              _omega_b__des(1),
+                              _omega_b__des(2)))
+              ); // end Odometry constructor
+              if (this->isConnected_setpoint_OutputPort(0) &&
+                  (CTRL_DISABLED != this->ctrlMode)) {
+                  this->setpoint_out(0, setpoint);
+              }
           }
 
           this->thrust_x_tlm = thrust_b__comm(0);

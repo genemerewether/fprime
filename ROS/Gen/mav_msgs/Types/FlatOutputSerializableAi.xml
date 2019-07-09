@@ -4,7 +4,10 @@
     <member name="position" type="ROS::geometry_msgs::Point"/>
     <member name="velocity" type="ROS::geometry_msgs::Vector3"/>
     <member name="acceleration" type="ROS::geometry_msgs::Vector3"/>
+    <member name="jerk" type="ROS::geometry_msgs::Vector3"/>
+    <member name="snap" type="ROS::geometry_msgs::Vector3"/>
     <member name="yaw" type="F64"/>
+    <member name="yawdot" type="F64"/>
   </members>
   <import_serializable_type>ROS/Gen/std_msgs/Types/HeaderSerializableAi.xml</import_serializable_type>
   <import_serializable_type>ROS/Gen/geometry_msgs/Types/PointSerializableAi.xml</import_serializable_type>

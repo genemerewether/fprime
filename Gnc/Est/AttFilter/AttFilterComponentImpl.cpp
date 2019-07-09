@@ -148,12 +148,12 @@ namespace Gnc {
       ROS::std_msgs::Header h = ImuStateUpdate.getheader();
       // TODO(mereweth) - EVR about state update from future
       if (h.getstamp() > this->getTime()) {
-  	  DEBUG_PRINT("state update from future: %u.%06u vs. %u.%06u\n",
-		      h.getstamp().getSeconds(),
-		      h.getstamp().getUSeconds(),
-		      this->getTime().getSeconds(),
-		      this->getTime().getUSeconds());
-  	  return;
+          DEBUG_PRINT("state update from future: %u.%06u vs. %u.%06u\n",
+                      h.getstamp().getSeconds(),
+                      h.getstamp().getUSeconds(),
+                      this->getTime().getSeconds(),
+                      this->getTime().getUSeconds());
+          return;
       }
       
       //this->seq = h.getseq();
@@ -201,23 +201,28 @@ namespace Gnc {
           Eigen::Quaterniond w_q_b(1, 0, 0, 0);
           Eigen::Vector3d v_b(0, 0, 0);
           Eigen::Vector3d omega_b(0, 0, 0);
-	  // TODO(mereweth) - get time of latest state and fill header with that
+          Eigen::Vector3d a_b(0, 0, 0);
+          // TODO(mereweth) - get time of latest state and fill header with that
           this->attFilter.GetState(&x_w,
-                                  &w_q_b,
-                                  &v_b,
-                                  &omega_b);
+                                   &w_q_b,
+                                   &v_b,
+                                   &omega_b,
+                                   &a_b);
 
           // TODO(mereweth) - convert frame name to U32 idx
           ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"odom"*/);
-          ROS::nav_msgs::Odometry odom(h, 0/*"body"*/,
+          ROS::nav_msgs::OdometryAccel odom(h, 0/*"body"*/,
               PoseWithCovariance(Pose(Point(x_w(0), x_w(1), x_w(2)),
                                       Quaternion(w_q_b.x(), w_q_b.y(),
                                                  w_q_b.z(), w_q_b.w())),
                                  NULL, 0), // don't use covariance estimates
               TwistWithCovariance(Twist(Vector3(v_b(0), v_b(1), v_b(2)),
                                         Vector3(omega_b(0), omega_b(1), omega_b(2))),
+                                  NULL, 0), // don't use covariance estimates
+              AccelWithCovariance(Accel(Vector3(a_b(0), a_b(1), a_b(2)),
+                                        Vector3(0, 0, 0)),
                                   NULL, 0) // don't use covariance estimates
-              );
+          );
           if (this->isConnected_odometry_OutputPort(0)) {
               this->odometry_out(0, odom);
           }

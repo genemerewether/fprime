@@ -23,7 +23,6 @@
 #include "Gnc/Est/FilterIface/FilterIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
 #include "mav_msgs/ImuStateUpdate.h"
 #include "sensor_msgs/Imu.h"
 #include "tf/transform_broadcaster.h"

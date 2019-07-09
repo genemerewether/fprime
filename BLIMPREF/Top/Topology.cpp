@@ -806,7 +806,7 @@ int main(int argc, char* argv[]) {
     bool externalIMU = true;
 
     // Removes ROS cmdline args as a side-effect
-    ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
+    ros::init(argc,argv,"BLIMPREF", ros::init_options::NoSigintHandler);
 
     while ((option = getopt(argc, argv, "hisp:a:b:")) != -1){
         switch(option) {

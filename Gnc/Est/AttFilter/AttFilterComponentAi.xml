@@ -5,7 +5,7 @@
 
     <import_port_type>ROS/Gen/mav_msgs/Ports/ImuStateUpdateNoCovPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryAccelPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
@@ -22,7 +22,7 @@
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
         </port>
 
-        <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="output"    max_number="1">
+        <port name="odometry" data_type="ROS::nav_msgs::OdometryAccel"  kind="output"    max_number="1">
         </port>
 
         <port name="odomNoCov" data_type="ROS::nav_msgs::OdometryNoCov"  kind="output"    max_number="1">

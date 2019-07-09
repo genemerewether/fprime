@@ -222,6 +222,7 @@ namespace SnapdragonFlight {
     void BlspSerialDriverComponentImpl::quitReadThread(void) {
         this->m_quitReadThread = true;
         dsp_relay_uart_relay_quit(this->m_device);
+        dsp_relay_uart_relay_close(this->m_fd, this->m_device);
     }
 
 } // end namespace Snapdragon

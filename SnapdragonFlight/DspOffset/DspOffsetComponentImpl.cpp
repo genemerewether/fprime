@@ -96,7 +96,7 @@ namespace SnapdragonFlight {
           return;
       }
       const I64 usecDsp = usecHLOS - walltimeDspLeadUs;
-      Fw::Time dspTime(TB_WORKSTATION_TIME,
+      Fw::Time dspTime(TB_PROC_TIME,
                        0,
                        (U32) (usecDsp / 1000 / 1000),
                        (U32) (usecDsp % (1000 * 1000)));

@@ -45,6 +45,9 @@ R5_MODULES := \
 	R5/SpiSlaveDrv \
 	R5/UartDrv \
 	R5/I2CDrv \
+	R5/R5EventCapture \
+	R5/R5TimeForward \
+	R5/R5Rti \
 	\
 	R5/TiHal \
 	R5/R5FlashApi
@@ -598,6 +601,7 @@ R5REF_MODULES := \
 	$(R5_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/IMU/STIM300 \
 	Drv/Mavlink/ActuatorControls \
 	Drv/Altimeter/LIDARLiteV3 \
 	\
@@ -630,21 +634,16 @@ R5RELAY_MODULES := \
 	Svc/GndIf \
 	Svc/SocketGndIf \
 	\
-	Svc/Sched \
-	Svc/Cycle \
-	Svc/Ping \
-	Svc/PolyIf \
-	Svc/PolyDb \
-	Svc/Time \
-	Svc/LinuxTime \
-	Svc/ActiveLogger \
-	Svc/Fatal \
+	$(SVC_MODULES) \
 	\
 	HLProc/LLRouter \
 	HLProc/EventExpander \
 	\
 	Os \
 	\
+	$(ROS_TYPE_PORT_MODULES_ALL) \
+	\
+	R5RELAY/ImuSplitter \
 	R5RELAY/Top \
 	\
 	$(FW_MODULES) \
