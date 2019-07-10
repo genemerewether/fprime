@@ -10,7 +10,7 @@
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/Se3FeedForwardPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryAccelPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/geometry_msgs/Ports/WrenchStampedPortAi.xml</import_port_type>
 
     <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
@@ -25,7 +25,7 @@
     <import_dictionary>Gnc/Ctrl/Se3Ctrl/Events.xml</import_dictionary>
 
     <ports>
-        <port name="odometry" data_type="ROS::nav_msgs::Odometry"  kind="sync_input" max_number="1">
+        <port name="odometry" data_type="ROS::nav_msgs::OdometryAccel"  kind="sync_input" max_number="1">
         </port>
 
 	<port name="se3Cmd" data_type="ROS::mav_msgs::Se3FeedForward"  kind="sync_input" max_number="1">

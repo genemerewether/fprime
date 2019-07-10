@@ -60,10 +60,6 @@ namespace SIMREF {
       //!
       ~GazeboManipIfComponentImpl(void);
 
-      //! Initialize publishers
-      //!
-      void startPub(void);
-
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,

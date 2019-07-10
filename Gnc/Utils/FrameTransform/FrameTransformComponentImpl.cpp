@@ -110,7 +110,7 @@ namespace Gnc {
   void FrameTransformComponentImpl ::
     odomInA_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::nav_msgs::Odometry &Odometry
+        ROS::nav_msgs::OdometryAccel &Odometry
     )
   {
       using namespace Eigen;
@@ -167,7 +167,7 @@ namespace Gnc {
   void FrameTransformComponentImpl ::
     odomInB_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::nav_msgs::Odometry &Odometry
+        ROS::nav_msgs::OdometryAccel &Odometry
     )
   {
       using namespace Eigen;

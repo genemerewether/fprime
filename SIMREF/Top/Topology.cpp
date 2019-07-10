@@ -471,12 +471,6 @@ int main(int argc, char* argv[]) {
     stat = rosSeq.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
-    rotorSDrv.startPub();
-    mrCtrlIface.startPub();
-    filterIface.startPub();
-    gzManipIf.startPub();
-    rosSeq.startPub();
-
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);
 

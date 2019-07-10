@@ -72,15 +72,6 @@ namespace Gnc {
     }
 
     void GroundTruthIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-
-        m_rosInited = true;
-    }
-
-    void GroundTruthIfaceComponentImpl ::
       setTBDes(TimeBase tbDes) {
         this->m_tbDes = tbDes;
     }
@@ -90,7 +81,6 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, GroundTruthIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -152,6 +142,7 @@ namespace Gnc {
         GroundTruthIfaceComponentImpl* compPtr = (GroundTruthIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
@@ -165,6 +156,8 @@ namespace Gnc {
                                                  &updateHandler,
                                                  ros::TransportHints().tcpNoDelay());
 
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
@@ -249,7 +242,7 @@ namespace Gnc {
 
             F64 dummy[36] = { 0.0 };
 
-            Odometry odometry(
+            OdometryAccel odometry(
               Header(msg->header.seq,
                      convTime,
                      // TODO(mereweth) - convert frame id
@@ -262,14 +255,17 @@ namespace Gnc {
                                                  msg->pose.pose.orientation.y,
                                                  msg->pose.pose.orientation.z,
                                                  msg->pose.pose.orientation.w)),
-                                      dummy, FW_NUM_ARRAY_ELEMENTS(dummy)),
+				 dummy, FW_NUM_ARRAY_ELEMENTS(dummy)),
               TwistWithCovariance(Twist(Vector3(msg->twist.twist.linear.x,
                                                 msg->twist.twist.linear.y,
                                                 msg->twist.twist.linear.z),
                                         Vector3(msg->twist.twist.angular.x,
                                                 msg->twist.twist.angular.y,
                                                 msg->twist.twist.angular.z)),
-                                        dummy, FW_NUM_ARRAY_ELEMENTS(dummy))
+				  dummy, FW_NUM_ARRAY_ELEMENTS(dummy)),
+	      AccelWithCovariance(Accel(Vector3(0.0, 0.0, 0.0),
+                                        Vector3(0.0, 0.0, 0.0)),
+				  dummy, FW_NUM_ARRAY_ELEMENTS(dummy))
             ); // end Odometry constructor
 
             this->compPtr->m_odometrySet[this->portNum].mutex.lock();

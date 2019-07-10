@@ -314,7 +314,7 @@ namespace Gnc {
   void Se3CtrlComponentImpl ::
     odometry_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::nav_msgs::Odometry &Odometry
+        ROS::nav_msgs::OdometryAccel &Odometry
     )
   {
       ROS::std_msgs::Header h = Odometry.getheader();

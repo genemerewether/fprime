@@ -1016,20 +1016,12 @@ int main(int argc, char* argv[]) {
     //dumparch();
 
     if (!isHiresChild && !isStereoChild) {
-        ros::start();
-
         hlRosIface_ptr->startIntTask(30, 5*1000*1024);
         ackermannIface_ptr->startIntTask(30, 5*1000*1024);
         filterIface_ptr->startIntTask(30, 5*1000*1024);
         gtIface_ptr->startIntTask(30, 5*1000*1024);
         rosSeq_ptr->startIntTask(30, 5*1000*1024);
-
-        hlRosIface_ptr->startPub();
-        ackermannIface_ptr->startPub();
-        filterIface_ptr->startPub();
-        gtIface_ptr->startPub();
-        rosSeq_ptr->startPub();
-
+	
         ros::console::shutdown();
 
         while (!mpu9250_ptr->isReady()) {

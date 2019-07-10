@@ -64,8 +64,6 @@ namespace Gnc {
     
       void setTBDes(TimeBase tbDes);
 
-      void startPub();
-
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,

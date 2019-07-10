@@ -63,8 +63,6 @@ namespace Gnc {
 
       void setTBDes(TimeBase tbDes);
 
-      void startPub();
-
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,
@@ -138,7 +136,7 @@ namespace Gnc {
 
         struct OdometrySet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::nav_msgs::Odometry odometry; //! message object
+            ROS::nav_msgs::OdometryAccel odometry; //! message object
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_odometrySet[NUM_ODOMETRY_OUTPUT_PORTS];

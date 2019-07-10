@@ -73,15 +73,6 @@ namespace Gnc {
     {
 
     }
-
-    void AckermannIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-
-        m_rosInited = true;
-    }
   
     void AckermannIfaceComponentImpl ::
       setTBDes(TimeBase tbDes) {
@@ -93,7 +84,6 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, AckermannIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -155,6 +145,7 @@ namespace Gnc {
         AckermannIfaceComponentImpl* compPtr = (AckermannIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
@@ -168,6 +159,8 @@ namespace Gnc {
                                                 &updateHandler,
                                                 ros::TransportHints().tcpNoDelay());
 
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));

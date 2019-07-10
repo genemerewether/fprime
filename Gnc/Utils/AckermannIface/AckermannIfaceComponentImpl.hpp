@@ -61,8 +61,6 @@ namespace Gnc {
       ~AckermannIfaceComponentImpl(void);
 
       void setTBDes(TimeBase tbDes);
-    
-      void startPub();
 
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,

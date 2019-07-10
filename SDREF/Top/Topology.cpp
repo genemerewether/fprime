@@ -1204,17 +1204,10 @@ int main(int argc, char* argv[]) {
     Os::Task waiter;
 
     if (!isHiresChild && !isStereoChild) {
-        ros::start();
-
         sdRosIface_ptr->startIntTask(30, 5*1000*1024);
         mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
         filterIface_ptr->startIntTask(30, 5*1000*1024);
         rosSeq_ptr->startIntTask(30, 5*1000*1024);
-
-        sdRosIface_ptr->startPub();
-        mrCtrlIface_ptr->startPub();
-        filterIface_ptr->startPub();
-        rosSeq_ptr->startPub();
 
         ros::console::shutdown();
 
