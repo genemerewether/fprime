@@ -946,7 +946,6 @@ volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
-    ros::shutdown();
 }
 
 void dummy() {
@@ -1071,6 +1070,11 @@ int main(int argc, char* argv[]) {
         rgDecouple_ptr->setEnabled(false);
 
         DEBUG_PRINT("Stopping tasks\n");
+        hlRosIface_ptr->disableRos();
+        ackermannIface_ptr->disableRos();
+        filterIface_ptr->disableRos();
+        gtIface_ptr->disableRos();
+        rosSeq_ptr->disableRos();
         ros::shutdown();
     } // !isHiresChild && !isStereoChild
 

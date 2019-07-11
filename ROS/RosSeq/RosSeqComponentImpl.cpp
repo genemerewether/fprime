@@ -76,6 +76,11 @@ namespace ROS {
         return stat;
     }
 
+    void RosSeqComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -106,6 +111,9 @@ namespace ROS {
         Fw::CommandResponse response
       )
     {
+        if (!m_rosInited) {
+            return;
+        }
         FW_ASSERT(this->m_actionServer);
         if (Fw::COMMAND_OK == response) {
             this->m_actionServer->setSucceeded();
@@ -180,6 +188,10 @@ namespace ROS {
         ros::NodeHandle* const n = compPtr->m_nodeHandle;
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
+
+        if (ros::isShuttingDown()) {
+            return;
+        }
 
         compPtr->m_actionServer = new actionlib::SimpleActionServer<fprime_msgs::RunSeqAction>(*n, "ROSSEQ", false);
         compPtr->m_actionServer->registerGoalCallback(boost::bind(&RosSeqComponentImpl::goalCB, compPtr));

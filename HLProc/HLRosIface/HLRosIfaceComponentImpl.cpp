@@ -98,6 +98,12 @@ namespace HLProc {
 
         return stat;
     }
+  
+    void HLRosIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -314,6 +320,10 @@ namespace HLProc {
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
+        if (ros::isShuttingDown()) {
+            return;
+        }
+        
         compPtr->m_imageXport = new image_transport::ImageTransport(*n);
 
         char buf[512];

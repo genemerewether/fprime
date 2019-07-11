@@ -1086,7 +1086,6 @@ volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
-    ros::shutdown();
 }
 
 void dummy() {
@@ -1288,6 +1287,10 @@ int main(int argc, char* argv[]) {
 
         // stop tasks
         DEBUG_PRINT("Stopping tasks\n");
+        sdRosIface_ptr->disableRos();
+        mrCtrlIface_ptr->disableRos();
+        filterIface_ptr->disableRos();
+        rosSeq_ptr->disableRos();
         ros::shutdown();
     } // !isHiresChild && !isStereoChild
 

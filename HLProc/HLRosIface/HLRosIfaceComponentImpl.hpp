@@ -69,6 +69,8 @@ namespace HLProc {
                                         NATIVE_INT_TYPE stackSize,
                                         NATIVE_INT_TYPE cpuAffinity = -1);
 
+      void disableRos();
+
     PRIVATE:
 
       // ----------------------------------------------------------------------
@@ -143,7 +145,7 @@ namespace HLProc {
       // Member variables
       // ----------------------------------------------------------------------
 
-        bool m_rosInited;
+        volatile bool m_rosInited;
 
         TimeBase m_tbDes;
 

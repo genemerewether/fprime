@@ -100,6 +100,12 @@ namespace Gnc {
 
         return stat;
     }
+  
+    void MultirotorCtrlIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -230,6 +236,10 @@ namespace Gnc {
 	FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
+
+        if (ros::isShuttingDown()) {
+            return;
+        }
 
         BoolStampedHandler boolStampedHandler(compPtr, 0);
         boolStampedHandler.tbDes = compPtr->m_tbDes;

@@ -90,6 +90,12 @@ namespace Gnc {
 
         return stat;
     }
+
+    void GroundTruthIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -147,6 +153,10 @@ namespace Gnc {
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
+
+        if (ros::isShuttingDown()) {
+            return;
+        }
 
         OdometryHandler updateHandler(compPtr, 0);
         updateHandler.tbDes = compPtr->m_tbDes;

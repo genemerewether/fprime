@@ -101,6 +101,12 @@ namespace Gnc {
 
         return stat;
     }
+
+    void FilterIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -270,7 +276,11 @@ namespace Gnc {
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
-	compPtr->m_trBroad = new tf::TransformBroadcaster();
+        if (ros::isShuttingDown()) {
+            return;
+        }
+
+        compPtr->m_trBroad = new tf::TransformBroadcaster();
 
         char buf[32];
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {

@@ -68,6 +68,8 @@ namespace Gnc {
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,
                                         NATIVE_INT_TYPE cpuAffinity = -1);
+    
+      void disableRos();
 
     PRIVATE:
 
@@ -147,7 +149,7 @@ namespace Gnc {
       // Member variables
       // ----------------------------------------------------------------------
 
-        bool m_rosInited;
+        volatile bool m_rosInited;
 
         TimeBase m_tbDes;
 
