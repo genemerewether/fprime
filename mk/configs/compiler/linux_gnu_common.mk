@@ -36,6 +36,7 @@ LINUX_GNU_CFLAGS := $(LINUX_FLAGS_COMMON) \
 					#$(BUILD_32BIT) # Quantum framework won't build 32-bit
 
 LINUX_GNU_CXXFLAGS :=	$(LINUX_FLAGS_COMMON) \
+						-std=c++11 \
 						$(COMMON_DEFINES) \
 						$(GNU_CXXFLAGS_COMMON) \
 						#$(BUILD_32BIT)

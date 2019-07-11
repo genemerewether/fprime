@@ -108,6 +108,8 @@ Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr = 0;
 Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr = 0;
 Svc::BufferAccumulator* buffAccumStereoCamUnproc_ptr = 0;
 
+ewok::EwokComponentImpl* ewok_ptr = 0;
+
 void allocComps() {
     // Component instance pointers
     NATIVE_INT_TYPE rgDivs[] = {30, 1};
@@ -420,6 +422,12 @@ void allocComps() {
                         ("UDPRECV")
 #endif
 ;
+
+    ewok_ptr = new ewok::EwokComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("EWOK")
+#endif
+;
 }
 
 #if FW_OBJECT_REGISTRATION == 1
@@ -644,10 +652,12 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     hiresCam_ptr->init(60, 0);
     stereoCam_ptr->init(60, 0);
     hexRouter_ptr->init(60, 1000); // message size
+    
     sdRosIface_ptr->init(0);
     mrCtrlIface_ptr->init(0);
     filterIface_ptr->init(0);
     rosSeq_ptr->init(0);
+    ewok_ptr->init(0);
 
     serialTextConv_ptr->init(60,0);
     llRouter_ptr->init(60,SERIAL_BUFFER_SIZE,0);
@@ -663,7 +673,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     dspTimeSync_ptr->init(60, 0);
 
     udpReceiver_ptr->init(0);
-
+    
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
@@ -1207,6 +1217,7 @@ int main(int argc, char* argv[]) {
         mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
         filterIface_ptr->startIntTask(30, 5*1000*1024);
         rosSeq_ptr->startIntTask(30, 5*1000*1024);
+        ewok_ptr->startIntTask(30, 5*1000*1024);
 
         ros::console::shutdown();
 
