@@ -135,16 +135,16 @@ namespace R5 {
             break;
         }
 
-        port->bufferATailIdx++;
-        if (port->bufferATailIdx == port->bufferEntries) {
-            port->bufferATailIdx = 0;
-        }
-
         found++;
         // Read entries and push them to the Fifo
         ECTransformTime(port, HTUBufferPtr[port->bufferATailIdx], fifoEntry);
 
         HTUBufferPtr[port->bufferATailIdx] = 0;
+
+        port->bufferATailIdx++;
+        if (port->bufferATailIdx == port->bufferEntries) {
+            port->bufferATailIdx = 0;
+        }
 
         if (port->fifo.queue(&fifoEntry) != 0) {
             return false;
