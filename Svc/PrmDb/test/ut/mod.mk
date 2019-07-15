@@ -17,7 +17,7 @@ TEST_SRC = 	Handcode/TesterBase.cpp \
 			Handcode/GTestBase.cpp \
 			PrmDbTester.cpp \
 			PrmDbImplTester.cpp
-		
+
 TEST_MODS = Svc/PrmDb \
 			Svc/Ping \
 			Fw/Cmd \
@@ -32,6 +32,5 @@ TEST_MODS = Svc/PrmDb \
 			Os/Stubs \
 			Os \
 			gtest
-
 
 COMPARGS = -I$(CURDIR)/test/ut/Handcode

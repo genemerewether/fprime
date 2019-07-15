@@ -13,7 +13,7 @@
 
 # There are some standard files that are included for reference
 
-SRC = PrmDbComponentAi.xml PrmDbImpl.cpp
+SRC = PrmDbImpl.cpp
 
 HDR = PrmDbImpl.hpp PrmDbImplCfg.hpp
 

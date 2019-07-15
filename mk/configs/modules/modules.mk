@@ -125,7 +125,10 @@ SVC_MODULES := \
 	Svc/CameraFrame \
 	Svc/IPCRelay \
 	Svc/TimeSyncOffset \
-	Svc/TimeConvert
+	Svc/TimeConvert \
+	Svc/ActiveL1PrmDb \
+	Svc/ActiveL2PrmDb \
+	Svc/PassiveL2PrmDb
 
 DEMO_DRV_MODULES := \
 	Drv/DataTypes \
