@@ -361,10 +361,6 @@
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "16"/>
  	 <target component = "timeConvert" port = "SchedIn" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection53">
-	 <source component = "mvVislam" port = "ImageBufferReturn" type = "BufferSend" num = "0"/>
- 	 <target component = "mvCam" port = "GncBufferReturn" type = "BufferSend" num = "0"/>
-</connection>
 <connection name = "Connection54">
 	 <source component = "buffLogMVCamUnproc" port = "eventOutText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
@@ -464,10 +460,6 @@
 <connection name = "Connection78">
 	 <source component = "mvDFS" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection79">
-	 <source component = "mvVislam" port = "PointCloud" type = "PointCloud2" num = "0"/>
- 	 <target component = "sdRosIface" port = "PointCloud" type = "PointCloud2" num = "1"/>
 </connection>
 <connection name = "Connection80">
 	 <source component = "buffAccumHiresCamUnproc" port = "tlmOut" type = "Tlm" num = "0"/>
@@ -640,10 +632,6 @@
 <connection name = "Connection122">
 	 <source component = "buffAccumMVCamUnproc" port = "bufferSendOutReturn" type = "BufferSend" num = "0"/>
  	 <target component = "mvCam" port = "ImageBufferIn" type = "BufferSend" num = "0"/>
-</connection>
-<connection name = "Connection123">
-	 <source component = "mvCam" port = "GncBufferSend" type = "Image" num = "0"/>
- 	 <target component = "mvVislam" port = "ImageIn" type = "Image" num = "0"/>
 </connection>
 <connection name = "Connection124">
 	 <source component = "cmdSeq2" port = "timeCaller" type = "Time" num = "0"/>
@@ -960,10 +948,6 @@
 <connection name = "Connection202">
 	 <source component = "mvVislam" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
  	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
-</connection>
-<connection name = "Connection203">
-	 <source component = "mvDFS" port = "PointCloud" type = "PointCloud2" num = "0"/>
- 	 <target component = "sdRosIface" port = "PointCloud" type = "PointCloud2" num = "0"/>
 </connection>
 <connection name = "Connection204">
 	 <source component = "cmdSeq" port = "timeCaller" type = "Time" num = "0"/>

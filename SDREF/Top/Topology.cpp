@@ -444,7 +444,9 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(bool llRouterDevices) {
+void manualConstruct(bool llRouterDevices,
+                     bool gncCamConnect,
+                     bool gncCloudConnect) {
     if (!llRouterDevices) {
         // Sequence Com buffer and cmd response
         cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -573,8 +575,35 @@ void manualConstruct(bool llRouterDevices) {
     stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
     ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));
 
-    stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
-    ipcRelay_ptr->set_proc2Out_OutputPort(12, mvDFS_ptr->get_ImageIn_InputPort(0));
+    if (gncCamConnect) {
+        mvCam_ptr->set_GncBufferSend_OutputPort(0, mvVislam_ptr->get_ImageIn_InputPort(0));
+        mvVislam_ptr->set_ImageBufferReturn_OutputPort(0, mvCam_ptr->get_GncBufferReturn_InputPort(0));
+
+
+        stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
+        ipcRelay_ptr->set_proc2Out_OutputPort(12, mvDFS_ptr->get_ImageIn_InputPort(0));
+
+        mvDFS_ptr->set_ImageBufferReturn_OutputPort(0, stereoCam_ptr->get_GncBufferAsyncReturn_InputPort(0));
+    }
+    else {
+        mvCam_ptr->set_GncBufferSend_OutputPort(0, sdRosIface_ptr->get_ImageRecv_InputPort(0));
+        sdRosIface_ptr->set_ImageForward_OutputPort(0, mvCam_ptr->get_GncBufferReturn_InputPort(0));
+
+
+        stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
+        ipcRelay_ptr->set_proc2Out_OutputPort(12, sdRosIface_ptr->get_ImageRecv_InputPort(1));
+
+        sdRosIface_ptr->set_ImageForward_OutputPort(1, stereoCam_ptr->get_GncBufferAsyncReturn_InputPort(0));
+    }
+
+    if (gncCloudConnect) {
+        mvDFS_ptr->set_PointCloud_OutputPort(0, ewok_ptr->get_PointCloud_InputPort(0));
+        //mvVislam_ptr->set_PointCloud_OutputPort(0, ewok_ptr->get_PointCloud_InputPort(1));
+    }
+    else {
+        mvDFS_ptr->set_PointCloud_OutputPort(0, sdRosIface_ptr->get_PointCloud_InputPort(0));
+    }
+    mvVislam_ptr->set_PointCloud_OutputPort(0, sdRosIface_ptr->get_PointCloud_InputPort(1));
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
@@ -583,7 +612,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                   char* hostname,
                   unsigned int boot_count,
                   bool &isHiresChild, bool &isStereoChild,
-                  bool llRouterDevices,
+                  bool llRouterDevices, bool gncCamConnect, bool gncCloudConnect,
                   bool startSocketNow) {
     allocComps();
 
@@ -677,7 +706,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
-    manualConstruct(llRouterDevices);
+    manualConstruct(llRouterDevices, gncCamConnect, gncCloudConnect);
 
     const U32 tempPortNum[2] = {1, 0};
     const FwOpcodeType tempMinOpcode[2] = {0, 20000};
@@ -1071,6 +1100,8 @@ void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
                   "-p\tport_number\n"
                   "-d\trun on Snapdragon DSP\n"
+                  "-r\tnot present: connect all to GNC;"
+                  "0: connect all to ROS; 1: connect point cloud to ROS\n"
                   "-x\tll_port_number\n"
                   "-u\tUDP recv port string\n"
                   "-t\tUDP transmit port string\n"
@@ -1123,15 +1154,27 @@ int main(int argc, char* argv[]) {
     bool startSocketNow = false;
     U32 boot_count = 0;
     bool llRouterDevices = true;
+    I32 rosConnect = 0;
+    bool gncCamConnect = true;
+    bool gncCloudConnect = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "difhlsp:x:a:u:t:o:b:z:")) != -1){
+    while ((option = getopt(argc, argv, "r:difhlsp:x:a:u:t:o:b:z:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
                 return 0;
+                break;
+            case 'r':
+                gncCamConnect = false;
+                gncCloudConnect = false;
+                
+                rosConnect = atoi(optarg);
+                if (rosConnect >= 1) {
+                    gncCamConnect = true;
+                }
                 break;
             case 'd':
                 llRouterDevices = false;
@@ -1205,7 +1248,9 @@ int main(int argc, char* argv[]) {
     constructApp(port_number, ll_port_number,
                  udp_recv_string, udp_send_string, zmq_image_string,
                  hostname, boot_count,
-                 isHiresChild, isStereoChild, llRouterDevices,
+                 isHiresChild, isStereoChild,
+                 llRouterDevices,
+                 gncCamConnect, gncCloudConnect,
                  startSocketNow);
     //dumparch();
 
