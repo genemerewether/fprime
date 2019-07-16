@@ -163,152 +163,152 @@
  	 <target component = "i2c1Drv" port = "service" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection19">
-	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
- 	 <target component = "lidarLiteV3" port = "SchedIn" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection20">
 	 <source component = "mixer" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection21">
+<connection name = "Connection20">
 	 <source component = "cmdDisp" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection22">
+<connection name = "Connection21">
 	 <source component = "hlRouter" port = "SerReadPort" type = "SerialRead" num = "0"/>
  	 <target component = "hlUart" port = "serialRecv" type = "SerialRead" num = "0"/>
 </connection>
-<connection name = "Connection23">
+<connection name = "Connection22">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "2"/>
  	 <target component = "rgTlm" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection24">
+<connection name = "Connection23">
 	 <source component = "faultGpio" port = "setOut" type = "GpioSet" num = "0"/>
  	 <target component = "gpio" port = "set" type = "GpioSet" num = "0"/>
 </connection>
-<connection name = "Connection25">
+<connection name = "Connection24">
 	 <source component = "llDebug" port = "SerWritePort" type = "SerialWrite" num = "0"/>
  	 <target component = "debugUart" port = "serialSend" type = "SerialWrite" num = "0"/>
 </connection>
-<connection name = "Connection26">
+<connection name = "Connection25">
 	 <source component = "llCycle" port = "RateGroupOut" type = "Cycle" num = "0"/>
  	 <target component = "rgGncDrv" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection27">
+<connection name = "Connection26">
 	 <source component = "llDebug" port = "SwFault" type = "GpioWrite" num = "0"/>
  	 <target component = "faultGpio" port = "setIn" type = "GpioWrite" num = "0"/>
 </connection>
-<connection name = "Connection28">
+<connection name = "Connection27">
 	 <source component = "hlRouter" port = "SerWritePort" type = "SerialWrite" num = "0"/>
  	 <target component = "hlUart" port = "serialSend" type = "SerialWrite" num = "0"/>
 </connection>
-<connection name = "Connection29">
+<connection name = "Connection28">
 	 <source component = "stim300" port = "IMU" type = "ImuNoCov" num = "0"/>
  	 <target component = "imuInteg" port = "Imu" type = "ImuNoCov" num = "0"/>
 </connection>
-<connection name = "Connection30">
+<connection name = "Connection29">
 	 <source component = "mixer" port = "motor" type = "Actuators" num = "0"/>
  	 <target component = "actuatorAdapter" port = "motor" type = "Actuators" num = "0"/>
 </connection>
-<connection name = "Connection31">
+<connection name = "Connection30">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection32">
+<connection name = "Connection31">
 	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
  	 <target component = "leeCtrl" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection33">
+<connection name = "Connection32">
 	 <source component = "stim300" port = "packetTime" type = "Time" num = "0"/>
  	 <target component = "eventCapture" port = "time" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection34">
+<connection name = "Connection33">
 	 <source component = "hlRouter" port = "DebugOut" type = "DebugString" num = "0"/>
  	 <target component = "llDebug" port = "DebugStringIn" type = "DebugString" num = "0"/>
 </connection>
-<connection name = "Connection35">
+<connection name = "Connection34">
 	 <source component = "mpu9250" port = "SpiReadWrite" type = "SpiReadWrite" num = "0"/>
  	 <target component = "spiMaster" port = "spiSendRecv" type = "SpiReadWrite" num = "0"/>
 </connection>
-<connection name = "Connection36">
+<connection name = "Connection35">
 	 <source component = "actuatorAdapter" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection37">
+<connection name = "Connection36">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "9"/>
  	 <target component = "lidarLiteV3" port = "SchedIn" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection38">
+<connection name = "Connection37">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
  	 <target component = "hlRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection39">
+<connection name = "Connection38">
 	 <source component = "rgGncDrv" port = "CycleOut" type = "Cycle" num = "0"/>
  	 <target component = "rgPos" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
-<connection name = "Connection40">
+<connection name = "Connection39">
 	 <source component = "actuatorAdapter" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection41">
+<connection name = "Connection40">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
  	 <target component = "logQueue" port = "Run" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection42">
+<connection name = "Connection41">
 	 <source component = "stim300" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection43">
+<connection name = "Connection42">
 	 <source component = "sigGen" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection44">
+<connection name = "Connection43">
 	 <source component = "actuatorAdapter" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection45">
+<connection name = "Connection44">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
  	 <target component = "mpu9250" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection46">
+<connection name = "Connection45">
 	 <source component = "lidarLiteV3" port = "I2CWriteReadStatus" type = "I2CWriteReadStatus" num = "0"/>
  	 <target component = "i2c1Drv" port = "status" type = "I2CWriteReadStatus" num = "0"/>
 </connection>
-<connection name = "Connection47">
+<connection name = "Connection46">
 	 <source component = "rgAtt" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "imuInteg" port = "sched" type = "Sched" num = "0"/>
 </connection>
-<connection name = "Connection48">
+<connection name = "Connection47">
 	 <source component = "mpu9250" port = "Log" type = "Log" num = "0"/>
  	 <target component = "logQueue" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
-<connection name = "Connection49">
+<connection name = "Connection48">
 	 <source component = "sigGen" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection50">
+<connection name = "Connection49">
 	 <source component = "llCycle" port = "RtiWait" type = "GpioPoll" num = "0"/>
  	 <target component = "rtiWait" port = "wait" type = "GpioPoll" num = "0"/>
 </connection>
-<connection name = "Connection51">
+<connection name = "Connection50">
 	 <source component = "lidarLiteV3" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "tlmChan" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection52">
+<connection name = "Connection51">
 	 <source component = "sigGen" port = "controls" type = "TorqueThrust" num = "0"/>
  	 <target component = "mixer" port = "controls" type = "TorqueThrust" num = "0"/>
 </connection>
-<connection name = "Connection53">
+<connection name = "Connection52">
 	 <source component = "cmdDisp" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection54">
+<connection name = "Connection53">
 	 <source component = "lidarLiteV3" port = "Time" type = "Time" num = "0"/>
  	 <target component = "r5Time" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
-<connection name = "Connection55">
+<connection name = "Connection54">
 	 <source component = "sigGen" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
  	 <target component = "leeCtrl" port = "attRateThrust" type = "AttitudeRateThrust" num = "0"/>
+</connection>
+<connection name = "Connection55">
+	 <source component = "rgPos" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
+ 	 <target component = "lidarLiteV3" port = "SchedIn" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection56">
 	 <source component = "cmdDisp" port = "CmdStatus" type = "CmdResponse" num = "0"/>
