@@ -88,7 +88,7 @@ def main():
     print(args.uartSer)
     print(args.tovSer)
 
-    uartSerial = serial.Serial(args.uartSer, 115200)
+    uartSerial = serial.Serial(args.uartSer, 921600)
     tovSerial = serial.Serial(args.tovSer, 115200)
 
     count = 0

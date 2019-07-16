@@ -43,12 +43,11 @@ namespace R5 {
 
     // HTU Buffers
     U32* bufferA;
-    U32* bufferB;
     U32 bufferSize;
     U32 bufferEntries;
 
-    // Active HTU CP
-    HTUCP activeCP;
+    // CP A Buffer Tail
+    U32 bufferATailIdx;
 
     // RTI-HET Time sync
     RtiTime rtiTime;
@@ -122,73 +121,35 @@ namespace R5 {
     entry_out.useconds = rtiTemp.subseconds / R5_USEC_DIV;
   }
 
-  static bool ECSwitchBuffer(struct ECPort* port) {
-
-    U32 timeout = 0;
-
-    // Hold the VBUS until current transaction is done
-    htuREG1->GC |= HTU_GC_VBUSHOLD;
-
-    while (htuREG1->ACPE & HTU_ACPE_BUSBUSY) {
-        if (timeout > ECBusyCheckTimeout) {
-            htuREG1->GC &= ~(HTU_GC_VBUSHOLD);
-            return false;
-        }
-        timeout++;
-    }
-
-    if (port->activeCP == HTU_CP_A) {
-        // No longer busy. Switch to CP B
-        htuREG1->CPENA = HTU_CPENA_CPENA_ENB(port->config.DCP);
-        port->activeCP = HTU_CP_B;
-    } else {
-        // Switch to CB A
-        htuREG1->CPENA = HTU_CPENA_CPENA_ENA(port->config.DCP);
-        port->activeCP = HTU_CP_A;
-    }
-
-    // Stop holding the bus
-    htuREG1->GC &= ~(HTU_GC_VBUSHOLD);
-
-    return true;
-  }
-
   static bool ECReadInactiveBuffer(struct ECPort* port) {
-    //U32 bufferEntries;
+
     struct ECFifoEntry fifoEntry;
     U32 idx;
     U32* HTUBufferPtr;
 
-    FW_ASSERT(port->activeCP == HTU_CP_A ||
-              port->activeCP == HTU_CP_B, port->activeCP);
+    HTUBufferPtr = port->bufferA;
 
-    if (port->activeCP == HTU_CP_A) {
-        // Read number of frames transfered into B buffer
-        //bufferEntries = (htuCDCP1[port->config.DCP].CFCOUNT >> CDCP_CFCOUNT_CFTCTB_SHIFT) &
-                         //CDCP_CFCOUNT_CFTCTB_MASK;
-        HTUBufferPtr = port->bufferB;
-    } else {
-        // Read number of frames transfered into A buffer
-        //bufferEntries = (htuCDCP1[port->config.DCP].CFCOUNT >> CDCP_CFCOUNT_CFTCTA_SHIFT) &
-                         //CDCP_CFCOUNT_CFTCTA_MASK;
-        HTUBufferPtr = port->bufferA;
-    }
-
-    //FW_ASSERT(bufferEntries <= ECHTUBufferEntries, bufferEntries);
-
+    U8 found = 0;
     for (idx = 0; idx < port->bufferEntries; idx++) {
-        if (HTUBufferPtr[idx] == 0) {
+        if (HTUBufferPtr[port->bufferATailIdx] == 0) {
             break;
         }
+
+        found++;
         // Read entries and push them to the Fifo
-        ECTransformTime(port, HTUBufferPtr[idx], fifoEntry);
+        ECTransformTime(port, HTUBufferPtr[port->bufferATailIdx], fifoEntry);
+
+        HTUBufferPtr[port->bufferATailIdx] = 0;
+
+        port->bufferATailIdx++;
+        if (port->bufferATailIdx == port->bufferEntries) {
+            port->bufferATailIdx = 0;
+        }
 
         if (port->fifo.queue(&fifoEntry) != 0) {
             return false;
         }
     }
-
-    memset(HTUBufferPtr, 0, port->bufferSize);
 
     return true;
   }
@@ -214,12 +175,11 @@ namespace R5 {
     struct ECPort* port = &ECPorts[fpPort];
 
     port->bufferA = reinterpret_cast<U32*>(dmaMemoryA);
-    port->bufferB = reinterpret_cast<U32*>(dmaMemoryB);
     port->bufferSize = dmaMemorySize;
     port->bufferEntries = dmaMemorySize / sizeof(U32);
+    port->bufferATailIdx = 0;
 
     memset(port->bufferA, 0, dmaMemorySize);
-    memset(port->bufferB, 0, dmaMemorySize);
 
     port->fifo.reset();
 
@@ -228,17 +188,18 @@ namespace R5 {
 
     // Set HTU Buffer locations
     htuDCP1[port->config.DCP].IFADDRA = reinterpret_cast<uint32>(port->bufferA);
-    htuDCP1[port->config.DCP].IFADDRB = reinterpret_cast<uint32>(port->bufferB);
+    htuDCP1[port->config.DCP].IFADDRB = 0;
 
     // (Instruction 1 * 4 entries per Instruction) + Data field offset
-    htuDCP1[port->config.DCP].IHADDRCT = ((port->config.instruction*4) + 2) << DCP_IHADDRCT_IHADDR_SHIFT;
+    // CP A Circular buffer mode
+    htuDCP1[port->config.DCP].IHADDRCT = (((port->config.instruction*4) + 2) << DCP_IHADDRCT_IHADDR_SHIFT) |
+                                         DCP_IHADDRCT_TMBA_0;
 
     htuDCP1[port->config.DCP].ITCOUNT = (1 << DCP_ITCOUNT_IETCOUNT_SHIFT) | // 1 Element per Frame
                                         (port->bufferEntries << DCP_ITCOUNT_IFTCOUNT_SHIFT); // ECBufferLength Frames
 
     // Enable CP 0, buffer A
     htuREG1->CPENA = HTU_CPENA_CPENA_ENA(port->config.DCP);
-    port->activeCP = HTU_CP_A;
 
     // Enable the HTU
     htuREG1->GC = HTU_GC_HTUEN;
@@ -262,8 +223,6 @@ namespace R5 {
 
     if (fifo_stat != 0) {
         ECCalcTimeConversion(port);
-
-        ECSwitchBuffer(port);
 
         ECReadInactiveBuffer(port);
 

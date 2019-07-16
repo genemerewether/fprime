@@ -97,6 +97,7 @@ namespace LLProc {
         // null terminate
         this->m_debugText[sizeToSend-1] = 0;
         this->m_textBuffer.setsize(sizeToSend);
+        printf("%s", this->m_debugText);
         this->SerWritePort_out(0,this->m_textBuffer);
     }
     // copy assert text to serial port
