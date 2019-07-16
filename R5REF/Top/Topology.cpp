@@ -257,9 +257,6 @@ void manualConstruct() {
     tsForward.set_SendEventTime_OutputPort(0,hlRouter.get_LLPortsIn_InputPort(7));
     lidarLiteV3.set_AltimeterSend_OutputPort(0,hlRouter.get_LLPortsIn_InputPort(9));
 
-    // TODO(mereweth)
-    //eventGetter.set_Time_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(7));
-
     hlRouter.set_HLPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
     hlRouter.set_HLPortsOut_OutputPort(2, actuatorAdapter.get_motor_InputPort(1));
     // aux actuator command
@@ -267,8 +264,6 @@ void manualConstruct() {
     hlRouter.set_HLPortsOut_OutputPort(5, leeCtrl.get_flatOutput_InputPort(0));
     hlRouter.set_HLPortsOut_OutputPort(6, leeCtrl.get_attRateThrust_InputPort(0));
     hlRouter.set_HLPortsOut_OutputPort(7, leeCtrl.get_attRateThrust_InputPort(0));
-
-    llDebug.set_SerWritePort_OutputPort(0, debugUart.get_serialSend_InputPort(0));
 
     hlRouter.set_HLPortsOut_OutputPort(8, cmdDisp.get_seqCmdBuff_InputPort(1));
     cmdDisp.set_seqCmdStatus_OutputPort(1, hlRouter.get_LLPortsIn_InputPort(8));
