@@ -356,7 +356,8 @@ void constructApp() {
 
     /* Register commands */
     cmdDisp.regCommands();
-
+    llDebug.regCommands();
+    
     leeCtrl.regCommands();
     imuInteg.regCommands();
     mixer.regCommands();
