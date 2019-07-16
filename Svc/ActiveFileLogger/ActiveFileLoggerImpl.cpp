@@ -156,6 +156,8 @@ namespace Svc {
                 return "Ser";
             case AFL_HLROSIFACE_IMUNOCOV:
                 return "ImuNoCov";
+            case AFL_HLROSIFACE_RANGE:
+                return "Range";
             case AFL_FILTIFACE_ODOMNOCOV:
                 return "OdomNoCov";
             case AFL_MRCTRLIFACE_ACCEL_CMD:
@@ -166,10 +168,10 @@ namespace Svc {
                 return "MVCamCallback";
             case AFL_SCAM_CALLBACK:
                 return "StereoCamCallback";
-  	    case AFL_ATINETBOX_WRENCH:
-	        return "ATINetboxWrench";
-  	    case AFL_ATINETBOX_WRENCH_AA:
-	        return "ATINetboxWrenchAA";
+            case AFL_ATINETBOX_WRENCH:
+                return "ATINetboxWrench";
+            case AFL_ATINETBOX_WRENCH_AA:
+                return "ATINetboxWrenchAA";
             default:
                 return "Unknown";
         }

@@ -30,6 +30,8 @@
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
+#include "sensor_msgs/Imu.h"
+#include "sensor_msgs/Range.h"
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/fill_image.h>
@@ -177,6 +179,70 @@ namespace HLProc {
         m_imuPub[portNum].publish(msg);
     }
 
+
+    void HLRosIfaceComponentImpl ::
+      Range_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::sensor_msgs::Range &Range
+      )
+    {
+        ROS::std_msgs::Header header = Range.getheader();
+        Fw::Time stamp = header.getstamp();
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
+
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+
+        header.setstamp(convTime);
+        Range.setheader(header);
+        
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_RANGE);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Range.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+
+        if (!m_rosInited) {
+            return;
+        }
+
+        sensor_msgs::Range msg;
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
+
+        msg.header.seq = header.getseq();
+
+        // TODO(mereweth) - convert frame ID
+        U32 frame_id = header.getframe_id();
+        msg.header.frame_id = "llv3";
+
+        msg.radiation_type = Range.getradiation_type();
+        msg.field_of_view = Range.getfield_of_view();
+        msg.min_range = Range.getmin_range();
+        msg.max_range = Range.getmax_range();
+        msg.range = Range.getrange();
+        m_rangePub[portNum].publish(msg);
+    }
+  
     void HLRosIfaceComponentImpl ::
       sched_handler(
           const NATIVE_INT_TYPE portNum,
@@ -330,6 +396,11 @@ namespace HLProc {
         for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
             compPtr->m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
+        }
+        
+        for (int i = 0; i < NUM_RANGE_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "range_%d", i);
+            compPtr->m_rangePub[i] = n->advertise<sensor_msgs::Range>(buf, 100);
         }
 
         for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {

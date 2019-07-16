@@ -459,6 +459,7 @@ void manualConstruct(bool llRouterDevices,
         hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         // port 7 only used with LLRouter (timesync)
+        //hexRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
 
         rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
                                                       hexRouter_ptr->get_Sched_InputPort(0));
@@ -492,6 +493,7 @@ void manualConstruct(bool llRouterDevices,
         llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
 
         mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
         sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));

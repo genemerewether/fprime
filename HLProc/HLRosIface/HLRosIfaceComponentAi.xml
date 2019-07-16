@@ -14,6 +14,7 @@
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/RangePortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/PointCloud2PortAi.xml</import_port_type>
     
@@ -24,6 +25,9 @@
         </port>
 
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="Range" data_type="ROS::sensor_msgs::Range"  kind="sync_input"    max_number="1">
         </port>
 
         <!-- NOTE(mereweth) - other components, including MVDFS, assume this is sync -->
