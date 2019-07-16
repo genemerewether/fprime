@@ -7,7 +7,7 @@ Restart=always
 ExecStart=/system/bin/mm-qcamera-daemon
 CPUSchedulingPolicy=rr
 CPUSchedulingPriority=80
-CPUAffinity=1
+CPUAffinity=2
 
 [Install]
 WantedBy=multi-user.target
