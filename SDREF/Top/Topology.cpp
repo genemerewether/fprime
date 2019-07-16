@@ -10,8 +10,8 @@ enum {
     CORE_3 = 3,
 
     CORE_CDH = CORE_0,
-    CORE_GNC = CORE_2,
-    CORE_DEV = CORE_2,
+    CORE_GNC = CORE_1,
+    CORE_DEV = CORE_1,
     CORE_PRCP = CORE_3
 };
 
