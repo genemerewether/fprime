@@ -66,7 +66,7 @@ namespace Drv {
       //!
       void from_AltimeterSend_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Drv::Altimeter altimeterEuData /*!< Altimeter EU data*/
+          ROS::sensor_msgs::Range &altimeterEuData /*!< Altimeter EU data*/
       );
 
       //! Handler for from_I2CConfig
@@ -130,7 +130,7 @@ namespace Drv {
       Fw::Buffer* writeBuffer_ptr;
       Fw::Buffer* readBuffer_ptr;
 
-      Altimeter last_alt;
+      ROS::sensor_msgs::Range last_alt;
 
   };
 

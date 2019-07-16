@@ -818,13 +818,28 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     static const NATIVE_UINT_TYPE maxLogSize = 25U * 1000U * 1000U;
     buffLogMVCamUnproc_ptr->initLog("/img/mvcam_", ".upbin", maxLogSize, sizeof(U32),
                                     0, // 0 means unlimited number of buffers per file
-                                    Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                    Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogHiresCamUnproc_ptr->initLog("/img/hirescam_",".upbin", maxLogSize, sizeof(U32),
                                        0, // 0 means unlimited number of buffers
-                                       Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                       Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogStereoCamUnproc_ptr->initLog("/img/stereocam_",".upbin", maxLogSize, sizeof(U32),
                                         0, // 0 means unlimited number of buffers
-                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogMVCamUnproc_ptr->setBaseName("");
     buffLogHiresCamUnproc_ptr->setBaseName("");
     buffLogStereoCamUnproc_ptr->setBaseName("");

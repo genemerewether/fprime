@@ -113,7 +113,7 @@ namespace Drv {
       Fw::Buffer i2cWriteBuffer;
       Fw::Buffer i2cReadBuffer;
 
-      Drv::Altimeter altimeter_eu;
+      U32 seq;
     };
 
 } // end namespace Drv
