@@ -46,8 +46,7 @@ namespace Drv {
       init_registers_idx(0),
       i2c_state(LLV3_I2C_WAITING),
       i2cWriteBuffer(),
-      i2cReadBuffer(),
-      altimeter_eu()
+      i2cReadBuffer()
   {
 
   }
@@ -181,24 +180,29 @@ namespace Drv {
     send_measurement()
   {
     U32 measurement_dn;
-    U32 measurement_mm;
+    F32 measurement_m;
 
     measurement_dn = static_cast<U32>(i2cReadBufferArr[0]) << 8 |
                      static_cast<U32>(i2cReadBufferArr[1]);
 
+    // Convert cm to m
+    measurement_m = measurement_dn * 0.01;
 
-    // Convert cm to mm
-    measurement_mm = measurement_dn * 10;
+    {
+        using namespace ROS::sensor_msgs;
+        using namespace ROS::std_msgs;
 
-    altimeter_eu.setdistance(measurement_mm);
-    altimeter_eu.setstatus(0);
-    altimeter_eu.settime_secs(0);
-    altimeter_eu.settime_nsecs(0);
-
-    if (this->isConnected_AltimeterSend_OutputPort(0)) {
-        this->AltimeterSend_out(0, altimeter_eu);
+        Range r(Header(this->seq, this->getTime(), 0), // TODO(mereweth) - frame id
+                1, //INFRARED
+                0.008, // beam spread
+                0.1, // min distance
+                100.0, // max distance
+                measurement_m);
+        if (this->isConnected_AltimeterSend_OutputPort(0)) {
+            this->AltimeterSend_out(0, r);
+        }
     }
-    this->tlmWrite_LLV3_Distance(measurement_mm / 1000.);
+    this->tlmWrite_LLV3_Distance(measurement_m);
   }
 
   bool LIDARLiteV3ComponentImpl ::

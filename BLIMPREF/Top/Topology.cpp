@@ -787,7 +787,6 @@ volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
-    ros::shutdown();
 }
 
 void dummy() {
@@ -850,20 +849,12 @@ int main(int argc, char* argv[]) {
                  internalIMUProp,
                  externalIMU);
     //dumparch();
-    
-    ros::start();
 
     hlRosIface_ptr->startIntTask(30, 5*1000*1024);
     mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
     filterIface_ptr->startIntTask(30, 5*1000*1024);
     gtIface_ptr->startIntTask(30, 5*1000*1024);
     rosSeq_ptr->startIntTask(30, 5*1000*1024);
-
-    hlRosIface_ptr->startPub();
-    mrCtrlIface_ptr->startPub();
-    filterIface_ptr->startPub();
-    gtIface_ptr->startPub();
-    rosSeq_ptr->startPub();
 
     ros::console::shutdown();
 
@@ -904,6 +895,11 @@ int main(int argc, char* argv[]) {
     rgDecouple_ptr->setEnabled(false);
     
     DEBUG_PRINT("Stopping tasks\n");
+    hlRosIface_ptr->disableRos();
+    mrCtrlIface_ptr->disableRos();
+    filterIface_ptr->disableRos();
+    gtIface_ptr->disableRos();
+    rosSeq_ptr->disableRos();
     ros::shutdown();
     
     exitTasks();

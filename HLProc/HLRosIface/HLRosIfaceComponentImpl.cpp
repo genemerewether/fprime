@@ -30,6 +30,8 @@
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
+#include "sensor_msgs/Imu.h"
+#include "sensor_msgs/Range.h"
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/fill_image.h>
@@ -84,44 +86,11 @@ namespace HLProc {
         this->m_tbDes = tbDes;
     }
   
-    void HLRosIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice; free imageXport
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-        m_imageXport = new image_transport::ImageTransport(*n);
-
-        char buf[512];
-        for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
-        }
-
-        for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_%d", i);
-            m_imagePub[i] = m_imageXport->advertise(buf, 1);
-            
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_exposure_%d", i);
-            m_exposurePub[i] = n->advertise<std_msgs::Float32>(buf, 1);
-            
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_gain_%d", i);
-            m_gainPub[i] = n->advertise<std_msgs::Float32>(buf, 1);
-        }
-
-        for (int i = 0; i < NUM_POINTCLOUD_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "pointcloud_%d", i);
-            m_pointCloudPub[i] = n->advertise<sensor_msgs::PointCloud2>(buf, 1);
-        }
-
-        m_rosInited = true;
-    }
-
     Os::Task::TaskStatus HLRosIfaceComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("HLROSIFACE");
-        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, HLRosIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -131,6 +100,12 @@ namespace HLProc {
 
         return stat;
     }
+  
+    void HLRosIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -204,6 +179,70 @@ namespace HLProc {
         m_imuPub[portNum].publish(msg);
     }
 
+
+    void HLRosIfaceComponentImpl ::
+      Range_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::sensor_msgs::Range &Range
+      )
+    {
+        ROS::std_msgs::Header header = Range.getheader();
+        Fw::Time stamp = header.getstamp();
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
+
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+
+        header.setstamp(convTime);
+        Range.setheader(header);
+        
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_RANGE);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = Range.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+
+        if (!m_rosInited) {
+            return;
+        }
+
+        sensor_msgs::Range msg;
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
+
+        msg.header.seq = header.getseq();
+
+        // TODO(mereweth) - convert frame ID
+        U32 frame_id = header.getframe_id();
+        msg.header.frame_id = "llv3";
+
+        msg.radiation_type = Range.getradiation_type();
+        msg.field_of_view = Range.getfield_of_view();
+        msg.min_range = Range.getmin_range();
+        msg.max_range = Range.getmax_range();
+        msg.range = Range.getrange();
+        m_rangePub[portNum].publish(msg);
+    }
+  
     void HLRosIfaceComponentImpl ::
       sched_handler(
           const NATIVE_INT_TYPE portNum,
@@ -341,10 +380,44 @@ namespace HLProc {
         HLRosIfaceComponentImpl* compPtr = (HLRosIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
+
+        if (ros::isShuttingDown()) {
+            return;
+        }
+        
+        compPtr->m_imageXport = new image_transport::ImageTransport(*n);
+
+        char buf[512];
+        for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
+            compPtr->m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
+        }
+        
+        for (int i = 0; i < NUM_RANGE_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "range_%d", i);
+            compPtr->m_rangePub[i] = n->advertise<sensor_msgs::Range>(buf, 100);
+        }
+
+        for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_%d", i);
+            compPtr->m_imagePub[i] = compPtr->m_imageXport->advertise(buf, 1);
+            
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_exposure_%d", i);
+            compPtr->m_exposurePub[i] = n->advertise<std_msgs::Float32>(buf, 1);
+            
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_gain_%d", i);
+            compPtr->m_gainPub[i] = n->advertise<std_msgs::Float32>(buf, 1);
+        }
+
+        for (int i = 0; i < NUM_POINTCLOUD_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "pointcloud_%d", i);
+            compPtr->m_pointCloudPub[i] = n->advertise<sensor_msgs::PointCloud2>(buf, 1);
+        }
 
         ActuatorsHandler actuatorsHandler0(compPtr, 0);
         actuatorsHandler0.tbDes = compPtr->m_tbDes;
@@ -360,6 +433,8 @@ namespace HLProc {
                                             &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());
 
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));

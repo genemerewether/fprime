@@ -69,21 +69,11 @@ namespace SIMREF {
         }
     }
 
-    void GazeboManipIfComponentImpl ::
-      startPub() {
-        FW_ASSERT(m_nodeHandle);
-
-	// TODO(Mereweth) - start publishers here
-
-        m_rosInited = true;
-    }
-
     Os::Task::TaskStatus GazeboManipIfComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("GZMANIPIFROS");
-	this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, GazeboManipIfComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -383,6 +373,8 @@ namespace SIMREF {
         GazeboManipIfComponentImpl* compPtr = (GazeboManipIfComponentImpl*) ptr;
         compPtr->log_ACTIVITY_LO_GZMANIPIF_IntTaskStarted();
 
+	
+	compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
 	FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
@@ -391,6 +383,8 @@ namespace SIMREF {
         compPtr->m_client = new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>("arm_controller/follow_joint_trajectory");
         FW_ASSERT(compPtr->m_client);
 
+	compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));

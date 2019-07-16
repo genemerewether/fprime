@@ -59,12 +59,12 @@ namespace ROS {
       //!
       ~RosSeqComponentImpl(void);
 
-      void startPub();
-
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,
                                         NATIVE_INT_TYPE cpuAffinity = -1);
+
+      void disableRos();
 
     PRIVATE:
 
@@ -102,7 +102,7 @@ namespace ROS {
       void goalCB();
       void preemptCB();
 
-      bool m_rosInited;
+      volatile bool m_rosInited;
 
       //! Entry point for task serving action requests
       static void intTaskEntry(void * ptr);

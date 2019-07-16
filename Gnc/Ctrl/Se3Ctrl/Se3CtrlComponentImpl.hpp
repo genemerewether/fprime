@@ -75,7 +75,7 @@ namespace Gnc {
       //!
       void odometry_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::nav_msgs::Odometry &Odometry
+          ROS::nav_msgs::OdometryAccel &Odometry
       );
 
       //! Handler implementation for se3Cmd

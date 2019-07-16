@@ -144,10 +144,6 @@ LINUX_DRV_MODULES := \
 	Drv/SpiDriverPorts \
 	Drv/I2CDriverPorts
 
-DEV_DRV_MODULES := \
-	Drv/Altimeter/AltimeterPorts \
-	Drv/Altimeter/AltimeterTypes
-
 LLPROC_MODULES := \
 	LLProc/HLRouter \
 	Utils/Hash \
@@ -400,6 +396,7 @@ SDREF_MODULES := \
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
 	$(QUEST_GNC_ROSIFACE_MODULES) \
+	$(QUEST_EXTERNAL_MODULES) \
 	\
 	$(SNAPDRAGON_MODULES) \
 	\
@@ -450,6 +447,7 @@ SIMREF_GENERAL_MODULES := \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_ROSIFACE_MODULES) \
+	$(QUEST_EXTERNAL_MODULES) \
 	\
 	$(SVC_MODULES) \
 	\
@@ -615,8 +613,6 @@ R5REF_MODULES := \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
 	Drv/I2CDriverPorts \
-	Drv/Altimeter/AltimeterPorts \
-	Drv/Altimeter/AltimeterTypes \
 	\
 	Os \
 	\

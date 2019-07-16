@@ -59,6 +59,8 @@ void exitTasks(void);
 #include <Svc/TimeSyncOffset/TimeSyncOffsetComponentImpl.hpp>
 #include <SnapdragonFlight/DspOffset/DspOffsetComponentImpl.hpp>
 
+#include "Gnc/quest_external/traj/ewok/EwokComponentImpl.hpp"
+
 extern Drv::ATINetboxComponentImpl* atiNetbox_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
@@ -114,5 +116,7 @@ extern Svc::BufferLogger* buffLogStereoCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumStereoCamUnproc_ptr;
+
+extern ewok::EwokComponentImpl* ewok_ptr;
 
 #endif

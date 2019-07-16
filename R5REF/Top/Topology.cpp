@@ -265,6 +265,7 @@ void manualConstruct() {
     tlmChan.set_PktSend_OutputPort(0,hlRouter.get_LLPortsIn_InputPort(5));
     //actuatorAdapter.set_serialDat_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(6));
     tsForward.set_SendEventTime_OutputPort(0,hlRouter.get_LLPortsIn_InputPort(7));
+    lidarLiteV3.set_AltimeterSend_OutputPort(0,hlRouter.get_LLPortsIn_InputPort(9));
 
     // TODO(mereweth)
     //eventGetter.set_Time_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(7));

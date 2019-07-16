@@ -87,28 +87,11 @@ namespace Gnc {
         this->m_tbDes = tbDes;
     }
   
-    void FilterIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-        this->m_trBroad = new tf::TransformBroadcaster();
-
-        char buf[32];
-        for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = n->advertise<nav_msgs::Odometry>(buf, 5);
-        }
-
-        m_rosInited = true;
-    }
-
     Os::Task::TaskStatus FilterIfaceComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, FilterIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -118,6 +101,12 @@ namespace Gnc {
 
         return stat;
     }
+
+    void FilterIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -281,10 +270,23 @@ namespace Gnc {
         FilterIfaceComponentImpl* compPtr = (FilterIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
+
+        if (ros::isShuttingDown()) {
+            return;
+        }
+
+        compPtr->m_trBroad = new tf::TransformBroadcaster();
+
+        char buf[32];
+        for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
+            compPtr->m_odomPub[i] = n->advertise<nav_msgs::Odometry>(buf, 5);
+        }
 
         ImuStateUpdateHandler updateHandler(compPtr, 0);
         updateHandler.tbDes = compPtr->m_tbDes;
@@ -300,6 +302,9 @@ namespace Gnc {
                                               &ImuHandler::imuCallback,
                                               &imuHandler,
                                               ros::TransportHints().tcpNoDelay());
+	
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));

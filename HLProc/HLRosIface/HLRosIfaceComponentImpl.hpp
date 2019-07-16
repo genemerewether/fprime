@@ -23,7 +23,6 @@
 #include "HLProc/HLRosIface/HLRosIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
-#include "sensor_msgs/Imu.h"
 #include "mav_msgs/Actuators.h"
 #include <image_transport/image_transport.h>
 
@@ -63,13 +62,13 @@ namespace HLProc {
       ~HLRosIfaceComponentImpl(void);
 
       void setTBDes(TimeBase tbDes);
-    
-      void startPub();
 
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,
                                         NATIVE_INT_TYPE cpuAffinity = -1);
+
+      void disableRos();
 
     PRIVATE:
 
@@ -112,6 +111,13 @@ namespace HLProc {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::sensor_msgs::ImuNoCov &Imu
       );
+    
+      //! Handler implementation for Range
+      //!
+      void Range_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::sensor_msgs::Range &Range 
+      );    
 
       //! Handler implementation for PointCloud
       //!
@@ -145,13 +151,15 @@ namespace HLProc {
       // Member variables
       // ----------------------------------------------------------------------
 
-        bool m_rosInited;
+        volatile bool m_rosInited;
 
         TimeBase m_tbDes;
 
         //! Publishers for IMU data
         //!
         ros::Publisher m_imuPub[NUM_IMU_INPUT_PORTS];
+    
+        ros::Publisher m_rangePub[NUM_RANGE_INPUT_PORTS];
 
         ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;

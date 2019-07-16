@@ -108,6 +108,8 @@ Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr = 0;
 Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr = 0;
 Svc::BufferAccumulator* buffAccumStereoCamUnproc_ptr = 0;
 
+ewok::EwokComponentImpl* ewok_ptr = 0;
+
 void allocComps() {
     // Component instance pointers
     NATIVE_INT_TYPE rgDivs[] = {30, 1};
@@ -420,6 +422,12 @@ void allocComps() {
                         ("UDPRECV")
 #endif
 ;
+
+    ewok_ptr = new ewok::EwokComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("EWOK")
+#endif
+;
 }
 
 #if FW_OBJECT_REGISTRATION == 1
@@ -436,7 +444,9 @@ void dumpobj(const char* objName) {
 
 #endif
 
-void manualConstruct(bool llRouterDevices) {
+void manualConstruct(bool llRouterDevices,
+                     bool gncCamConnect,
+                     bool gncCloudConnect) {
     if (!llRouterDevices) {
         // Sequence Com buffer and cmd response
         cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -449,6 +459,7 @@ void manualConstruct(bool llRouterDevices) {
         hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         // port 7 only used with LLRouter (timesync)
+        //hexRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
 
         rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
                                                       hexRouter_ptr->get_Sched_InputPort(0));
@@ -482,6 +493,7 @@ void manualConstruct(bool llRouterDevices) {
         llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
 
         mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
         sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
@@ -565,8 +577,35 @@ void manualConstruct(bool llRouterDevices) {
     stereoCam_ptr->set_UnprocSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(11));
     ipcRelay_ptr->set_proc2Out_OutputPort(11, buffAccumStereoCamUnproc_ptr->get_bufferSendInFill_InputPort(0));
 
-    stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
-    ipcRelay_ptr->set_proc2Out_OutputPort(12, mvDFS_ptr->get_ImageIn_InputPort(0));
+    if (gncCamConnect) {
+        mvCam_ptr->set_GncBufferSend_OutputPort(0, mvVislam_ptr->get_ImageIn_InputPort(0));
+        mvVislam_ptr->set_ImageBufferReturn_OutputPort(0, mvCam_ptr->get_GncBufferReturn_InputPort(0));
+
+
+        stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
+        ipcRelay_ptr->set_proc2Out_OutputPort(12, mvDFS_ptr->get_ImageIn_InputPort(0));
+
+        mvDFS_ptr->set_ImageBufferReturn_OutputPort(0, stereoCam_ptr->get_GncBufferAsyncReturn_InputPort(0));
+    }
+    else {
+        mvCam_ptr->set_GncBufferSend_OutputPort(0, sdRosIface_ptr->get_ImageRecv_InputPort(0));
+        sdRosIface_ptr->set_ImageForward_OutputPort(0, mvCam_ptr->get_GncBufferReturn_InputPort(0));
+
+
+        stereoCam_ptr->set_GncBufferSend_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(12));
+        ipcRelay_ptr->set_proc2Out_OutputPort(12, sdRosIface_ptr->get_ImageRecv_InputPort(1));
+
+        sdRosIface_ptr->set_ImageForward_OutputPort(1, stereoCam_ptr->get_GncBufferAsyncReturn_InputPort(0));
+    }
+
+    if (gncCloudConnect) {
+        mvDFS_ptr->set_PointCloud_OutputPort(0, ewok_ptr->get_PointCloud_InputPort(0));
+        //mvVislam_ptr->set_PointCloud_OutputPort(0, ewok_ptr->get_PointCloud_InputPort(1));
+    }
+    else {
+        mvDFS_ptr->set_PointCloud_OutputPort(0, sdRosIface_ptr->get_PointCloud_InputPort(0));
+    }
+    mvVislam_ptr->set_PointCloud_OutputPort(0, sdRosIface_ptr->get_PointCloud_InputPort(1));
 }
 
 void constructApp(unsigned int port_number, unsigned int ll_port_number,
@@ -575,7 +614,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                   char* hostname,
                   unsigned int boot_count,
                   bool &isHiresChild, bool &isStereoChild,
-                  bool llRouterDevices,
+                  bool llRouterDevices, bool gncCamConnect, bool gncCloudConnect,
                   bool startSocketNow) {
     allocComps();
 
@@ -644,10 +683,12 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     hiresCam_ptr->init(60, 0);
     stereoCam_ptr->init(60, 0);
     hexRouter_ptr->init(60, 1000); // message size
+    
     sdRosIface_ptr->init(0);
     mrCtrlIface_ptr->init(0);
     filterIface_ptr->init(0);
     rosSeq_ptr->init(0);
+    ewok_ptr->init(0);
 
     serialTextConv_ptr->init(60,0);
     llRouter_ptr->init(60,SERIAL_BUFFER_SIZE,0);
@@ -663,11 +704,11 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     dspTimeSync_ptr->init(60, 0);
 
     udpReceiver_ptr->init(0);
-
+    
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
-    manualConstruct(llRouterDevices);
+    manualConstruct(llRouterDevices, gncCamConnect, gncCloudConnect);
 
     const U32 tempPortNum[2] = {1, 0};
     const FwOpcodeType tempMinOpcode[2] = {0, 20000};
@@ -779,13 +820,28 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     static const NATIVE_UINT_TYPE maxLogSize = 25U * 1000U * 1000U;
     buffLogMVCamUnproc_ptr->initLog("/img/mvcam_", ".upbin", maxLogSize, sizeof(U32),
                                     0, // 0 means unlimited number of buffers per file
-                                    Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                    Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogHiresCamUnproc_ptr->initLog("/img/hirescam_",".upbin", maxLogSize, sizeof(U32),
                                        0, // 0 means unlimited number of buffers
-                                       Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                       Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogStereoCamUnproc_ptr->initLog("/img/stereocam_",".upbin", maxLogSize, sizeof(U32),
                                         0, // 0 means unlimited number of buffers
-                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogMVCamUnproc_ptr->setBaseName("");
     buffLogHiresCamUnproc_ptr->setBaseName("");
     buffLogStereoCamUnproc_ptr->setBaseName("");
@@ -1061,6 +1117,8 @@ void print_usage() {
     (void) printf("Usage: ./SDREF [options]\n"
                   "-p\tport_number\n"
                   "-d\trun on Snapdragon DSP\n"
+                  "-r\tnot present: connect all to GNC;"
+                  "0: connect all to ROS; 1: connect point cloud to ROS\n"
                   "-x\tll_port_number\n"
                   "-u\tUDP recv port string\n"
                   "-t\tUDP transmit port string\n"
@@ -1086,7 +1144,6 @@ volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
-    ros::shutdown();
 }
 
 void dummy() {
@@ -1114,15 +1171,27 @@ int main(int argc, char* argv[]) {
     bool startSocketNow = false;
     U32 boot_count = 0;
     bool llRouterDevices = true;
+    I32 rosConnect = 0;
+    bool gncCamConnect = true;
+    bool gncCloudConnect = true;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "difhlsp:x:a:u:t:o:b:z:")) != -1){
+    while ((option = getopt(argc, argv, "r:difhlsp:x:a:u:t:o:b:z:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
                 return 0;
+                break;
+            case 'r':
+                gncCamConnect = false;
+                gncCloudConnect = false;
+                
+                rosConnect = atoi(optarg);
+                if (rosConnect >= 1) {
+                    gncCamConnect = true;
+                }
                 break;
             case 'd':
                 llRouterDevices = false;
@@ -1196,7 +1265,9 @@ int main(int argc, char* argv[]) {
     constructApp(port_number, ll_port_number,
                  udp_recv_string, udp_send_string, zmq_image_string,
                  hostname, boot_count,
-                 isHiresChild, isStereoChild, llRouterDevices,
+                 isHiresChild, isStereoChild,
+                 llRouterDevices,
+                 gncCamConnect, gncCloudConnect,
                  startSocketNow);
     //dumparch();
 
@@ -1204,17 +1275,11 @@ int main(int argc, char* argv[]) {
     Os::Task waiter;
 
     if (!isHiresChild && !isStereoChild) {
-        ros::start();
-
         sdRosIface_ptr->startIntTask(30, 5*1000*1024);
         mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
         filterIface_ptr->startIntTask(30, 5*1000*1024);
         rosSeq_ptr->startIntTask(30, 5*1000*1024);
-
-        sdRosIface_ptr->startPub();
-        mrCtrlIface_ptr->startPub();
-        filterIface_ptr->startPub();
-        rosSeq_ptr->startPub();
+        ewok_ptr->startIntTask(30, 5*1000*1024);
 
         ros::console::shutdown();
 
@@ -1295,6 +1360,10 @@ int main(int argc, char* argv[]) {
 
         // stop tasks
         DEBUG_PRINT("Stopping tasks\n");
+        sdRosIface_ptr->disableRos();
+        mrCtrlIface_ptr->disableRos();
+        filterIface_ptr->disableRos();
+        rosSeq_ptr->disableRos();
         ros::shutdown();
     } // !isHiresChild && !isStereoChild
 
