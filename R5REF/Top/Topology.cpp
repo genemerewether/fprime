@@ -31,11 +31,9 @@ static NATIVE_UINT_TYPE rgTlmContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = 
     Drv::MPU9250_SCHED_CONTEXT_TLM, // mpu9250
     Gnc::IMUINTEG_SCHED_CONTEXT_TLM, // imuInteg
     Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
-    0, // mixer
+    0,
     0, // logQueue
-    0, // chanTlm
-    LLProc::HLRTR_SCHED_UART_SEND,
-    Drv::LLV3_RG_MEASURE
+    0 // chanTlm
 };
 
 Svc::PassiveRateGroupImpl rgTlm(
@@ -76,11 +74,9 @@ Svc::PassiveRateGroupImpl rgAtt(
 static NATIVE_UINT_TYPE rgPosContext[Svc::PassiveRateGroupImpl::CONTEXT_SIZE] = {
     0, //TODO(mereweth) - actuatoradapter arm
     Gnc::LCTRL_SCHED_CONTEXT_POS, // leeCtrl
-    0,
+    Drv::LLV3_RG_MEASURE,
     0,
     0, //logQueue
-    LLProc::HLRTR_SCHED_UART_SEND,
-    LLProc::HLRTR_SCHED_UART_RECEIVE,
 };
 
 Svc::PassiveRateGroupImpl rgPos(
@@ -160,12 +156,6 @@ R5::R5TimeComponentImpl r5Time
 R5::R5A2DDriverComponentImpl a2dDrv
 #if FW_OBJECT_NAMES == 1
                         ("a2d")
-#endif
-;
-
-R5::R5PrmComponentImpl prm
-#if FW_OBJECT_NAMES == 1
-                        ("prm")
 #endif
 ;
 
@@ -321,7 +311,7 @@ void constructApp() {
                          alloc);
     
     hlUart.init(HL_UART_INSTANCE);
-    hlUart.initDriver(0,3000, // bytes - max we could send in one cycle
+    hlUart.initDriver(0,5000, // bytes - max we could send in one cycle
                       0,2000, // bytes - two cycles worth
                       alloc);
 
@@ -338,8 +328,6 @@ void constructApp() {
     DmaDrvInit();
 
     r5Time.init();
-
-    prm.init(0);
 
     logQueue.init(0);
 
@@ -376,9 +364,6 @@ void constructApp() {
     sigGen.regCommands();
 
     faultGpio.setMapping(R5::GPIO_SET_BANK_A, 0);
-
-    // load parameters from flash
-    //prm.load();
 }
 
 void cycleForever(void) {
