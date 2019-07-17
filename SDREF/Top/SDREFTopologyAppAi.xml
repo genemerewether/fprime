@@ -329,10 +329,6 @@
 	 <source component = "serialDriverDebug" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection45">
-	 <source component = "stereoCam" port = "ParamSet" type = "PrmSet" num = "0"/>
- 	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>
-</connection>
 <connection name = "Connection46">
 	 <source component = "mvVislam" port = "ParamSet" type = "PrmSet" num = "0"/>
  	 <target component = "prmDb" port = "setPrm" type = "PrmSet" num = "0"/>

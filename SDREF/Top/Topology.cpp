@@ -597,6 +597,9 @@ void manualConstruct(bool llRouterDevices,
 
         sdRosIface_ptr->set_ImageForward_OutputPort(1, stereoCam_ptr->get_GncBufferAsyncReturn_InputPort(0));
     }
+    
+    stereoCam_ptr->set_ParamSet_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(13));
+    ipcRelay_ptr->set_proc2Out_OutputPort(13, prmDb_ptr->get_setPrm_InputPort(0));
 
     if (gncCloudConnect) {
         mvDFS_ptr->set_PointCloud_OutputPort(0, ewok_ptr->get_PointCloud_InputPort(0));
