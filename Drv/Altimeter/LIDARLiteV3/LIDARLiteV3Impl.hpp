@@ -113,6 +113,7 @@ namespace Drv {
       U8 i2cReadBufferArr[LLV3_READ_BUFF_LEN];
 
       U8 statusByte;
+      U8 numTries;
 
       Fw::Buffer i2cWriteBuffer;
       Fw::Buffer i2cReadBuffer;

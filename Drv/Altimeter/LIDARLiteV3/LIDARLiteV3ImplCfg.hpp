@@ -53,6 +53,7 @@ namespace Drv {
     static const U8 LLV3_ACQ_CMD = 0x4;
   
     static const U8 LLV3_RESET_CMD = 0x0;
+    static const U8 LLV3_NUM_TRIES = 10;
 
     static const U8 LLV3_STATUS_ERR_MASK = LLV3_STATUS_PROC_ERR |
                                            LLV3_STATUS_HEALTH_OK |
