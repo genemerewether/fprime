@@ -45,8 +45,10 @@ namespace Drv {
       init_state(LLV3_INIT_CONFIG),
       init_registers_idx(0),
       i2c_state(LLV3_I2C_WAITING),
+      statusByte(0u),
       i2cWriteBuffer(),
-      i2cReadBuffer()
+      i2cReadBuffer(),
+      seq(0u)
   {
 
   }
@@ -193,7 +195,7 @@ namespace Drv {
         using namespace ROS::std_msgs;
 
         Range r(Header(this->seq, this->getTime(), 0), // TODO(mereweth) - frame id
-                1, //INFRARED
+                this->statusByte, //NOTE(Mereweth) - we co-opt this field to send status byte
                 0.008, // beam spread
                 0.1, // min distance
                 100.0, // max distance
@@ -208,10 +210,10 @@ namespace Drv {
   bool LIDARLiteV3ComponentImpl ::
     verify_status()
   {
-    U8 status = i2cReadBufferArr[0];
+    this->statusByte = i2cReadBufferArr[0];
     U8 exp_mask_val = LLV3_STATUS_HEALTH_OK;
 
-    return ((status & LLV3_STATUS_ERR_MASK) == exp_mask_val) ? true : false;
+    return ((this->statusByte & LLV3_STATUS_ERR_MASK) == exp_mask_val) ? true : false;
   }
 
   void LIDARLiteV3ComponentImpl ::
@@ -253,11 +255,11 @@ namespace Drv {
                         case I2C_STATUS_BUSY:
                             break;
                         case I2C_STATUS_OK:
-                            this->i2c_state = LLV3_I2C_STATUS_CMD;
+                            this->i2c_state = LLV3_I2C_WAITING;
                             break;
                         case I2C_STATUS_TX_NACK:
-                            // EVR
-                            this->i2c_state = LLV3_I2C_WAITING;
+                            // EVR - TODO(mereweth) - do another ACQ cmd?
+                            this->i2c_state = LLV3_I2C_ACQ_CMD;
                             break;
                         case I2C_STATUS_RX_NACK:
                             FW_ASSERT(false);
@@ -295,11 +297,14 @@ namespace Drv {
 
                                 if (this->i2cReadBufferArr[0] & LLV3_STATUS_BUSY) {
                                     // Still taking measurement. Wait
-                                    this->i2c_state = LLV3_I2C_STATUS_CMD;
+                                    this->i2c_state = LLV3_I2C_WAITING;
                                 } else {
                                     this->i2c_state = LLV3_I2C_MEASURE_CMD;
                                 }
-                            } else {
+                            } else if (0b10101010 == this->i2cReadBufferArr[0]) {
+                                this->i2c_state = LLV3_I2C_RESET_CMD;
+                            }
+                            else {
                                 // Invalid status
                                 // EVR
                                 this->i2c_state = LLV3_I2C_WAITING;
@@ -308,7 +313,7 @@ namespace Drv {
                         case I2C_STATUS_TX_NACK:
                         case I2C_STATUS_RX_NACK:
                             // EVR
-                            this->i2c_state = LLV3_I2C_WAITING;
+                            this->i2c_state = LLV3_I2C_STATUS_CMD;
                             break;
                         default:
                             FW_ASSERT(false);
@@ -339,13 +344,52 @@ namespace Drv {
                         case I2C_STATUS_BUSY:
                             break;
                         case I2C_STATUS_OK:
-                            this->i2c_state = LLV3_I2C_WAITING;
+                            this->i2c_state = LLV3_I2C_ACQ_CMD;
                             this->send_measurement();
                             break;
                         case I2C_STATUS_TX_NACK:
                         case I2C_STATUS_RX_NACK:
                             // EVR
+                            this->i2c_state = LLV3_I2C_MEASURE_CMD;
+                            break;
+                        default:
+                            FW_ASSERT(false);
+                            break;
+                    }
+
+                    break;
+                    
+                case LLV3_I2C_RESET_CMD:
+                    this->reset_i2c_buffers();
+                    I2CWriteSingleRegisterHelper(LLV3_ACQ_REG, LLV3_RESET_CMD,
+                                                 this->i2cWriteBuffer,
+                                                 this->i2cReadBuffer);
+
+                    this->I2CWriteRead_out(0,
+                                           this->i2cWriteBuffer,
+                                           this->i2cReadBuffer);
+
+                    this->i2c_state = LLV3_I2C_RESET_CMD_STATUS;
+                    break;
+
+                case LLV3_I2C_RESET_CMD_STATUS:
+                    
+                    i2cStatus = this->I2CWriteReadStatus_out(0, false);
+                    
+                    switch (i2cStatus)
+                    {
+                        case I2C_STATUS_BUSY:
+                            break;
+                        case I2C_STATUS_OK:
                             this->i2c_state = LLV3_I2C_WAITING;
+                            this->init_state = LLV3_INIT_CONFIG;
+                            break;
+                        case I2C_STATUS_TX_NACK:
+                            // EVR - TODO(mereweth) - do another RESET cmd?
+                            this->i2c_state = LLV3_I2C_RESET_CMD;
+                            break;
+                        case I2C_STATUS_RX_NACK:
+                            FW_ASSERT(false);
                             break;
                         default:
                             FW_ASSERT(false);
@@ -361,7 +405,7 @@ namespace Drv {
         if (this->init_state == LLV3_INIT_COMPLETE) {
             if (this->i2c_state == LLV3_I2C_WAITING) {
 
-                this->i2c_state = LLV3_I2C_ACQ_CMD;
+                this->i2c_state = LLV3_I2C_STATUS_CMD;
             } else {
                 // EVR here
             }
