@@ -932,6 +932,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #ifdef SOC_8096
                                25, // J7, pin 7, 3.3V level
 #else
+                               47, //TODO(Mereweth) - this is a placeholder; J12, pin 4, 3.3V level
 #endif
                                Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
 
@@ -940,6 +941,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #ifdef SOC_8096
                                      7, // tty 3, J10, SONAR_UART, BLSP7
 #else
+                                     3, //TODO(Mereweth) - this is a placeholder; J12, BLSP8
 #endif
                                      SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
                                      SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
@@ -949,6 +951,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #ifdef SOC_8096
                                         5, // tty 1, J12, ESC_UART, BLSP5
 #else
+                                        2, //TODO(Mereweth) - this is a placeholder; J13, BLSP6
 #endif
                                         SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
                                         SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
