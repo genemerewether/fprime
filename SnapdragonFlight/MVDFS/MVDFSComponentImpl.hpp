@@ -132,6 +132,8 @@ namespace SnapdragonFlight {
       bool m_activated;
 
       U32 m_imagesProcessed;
+    
+      U32 m_imagesProcessedLast;
 
     };
 

@@ -4,4 +4,9 @@
             MVDFS images processed
         </comment>
     </channel>
+    <channel id="1" name="MVDFS_ImageRate" data_type="U32" format_string="%dFPS">
+        <comment>
+            MVDFS images processed per second
+        </comment>
+    </channel>
 </telemetry>

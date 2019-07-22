@@ -277,7 +277,7 @@ namespace SnapdragonFlight {
             /*
              * \brief Temperature zone temperatures
              */
-            I32 temp_zone_temp[TEMP_FILE_TYPE_MAX - TEMP_FILE_TYPE_MIN + 1];
+            F32 temp_zone_temp[TEMP_FILE_TYPE_MAX - TEMP_FILE_TYPE_MIN + 1];
 
             GovernorType gov_setpoint[GOV_FILE_TYPE_MAX - GOV_FILE_TYPE_MIN + 1];
 

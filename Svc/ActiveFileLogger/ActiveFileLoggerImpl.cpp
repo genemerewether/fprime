@@ -160,6 +160,8 @@ namespace Svc {
                 return "Range";
             case AFL_FILTIFACE_ODOMNOCOV:
                 return "OdomNoCov";
+            case AFL_FILTIFACE_IMUSTATEUPDATENOCOV:
+                return "ImuStateUpdateNoCov";              
             case AFL_MRCTRLIFACE_ACCEL_CMD:
                 return "AccelCmd";
             case AFL_ACTADAP_ESC:

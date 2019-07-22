@@ -15,6 +15,7 @@
 |Channel Name|ID|Type|Description|
 |---|---|---|---|
 |MVDFS_ImageCount|0 (0x0)|U32|MVDFS images processed|
+|MVDFS_ImageRate|1 (0x1)|U32|MVDFS images processed per second|
 
 ## Event List
 

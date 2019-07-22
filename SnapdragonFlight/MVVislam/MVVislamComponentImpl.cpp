@@ -325,8 +325,10 @@ namespace SnapdragonFlight {
                           vio_pose.aBias[2])
               ); // end ImuStateUpdate constructor
 
-              if (isConnected_ImuStateUpdate_OutputPort(0)) {
-                  ImuStateUpdate_out(0, update);
+              for (int i = 0; i < NUM_IMUSTATEUPDATE_OUTPUT_PORTS; i++) {
+                  if (isConnected_ImuStateUpdate_OutputPort(i)) {
+                      ImuStateUpdate_out(i, update);
+                  }
               }
           } // if !errorCode
 

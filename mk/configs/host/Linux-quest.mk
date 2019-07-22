@@ -17,7 +17,7 @@ TURBOJPEG_INCLUDE := -I$(TURBOJPEG)/include
 TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
 
-ifneq ($(TARGET_8096),)
+ifeq ($(TARGET_8074),)
 HEXAGON_V_ARCH := v60
 TARGET_SOC := 8096
 TARGET_DSP := sdsp
@@ -60,7 +60,7 @@ FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
 
 MULTIARCH_TUPLE := arm-linux-gnueabihf
 
-RPATH_SYSROOT_CMD := -L$(HEXAGON_ARM_SYSROOT)/usr/lib/ -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -L$(INDIGO_ARM_SYSROOT)/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/
+RPATH_SYSROOT_CMD := -L$(HEXAGON_ARM_SYSROOT)/usr/lib/ -L$(INDIGO_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/lib/ -Wl,-rpath-link=$(HEXAGON_ARM_SYSROOT)/usr/lib/ -Wl,-rpath-link=$(INDIGO_ARM_SYSROOT)/usr/lib/
 # arbitrary convention - for use in inc.mk
 INCLUDE_ARM_SYSROOTS := $(INDIGO_ARM_SYSROOT)
 
