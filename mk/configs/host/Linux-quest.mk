@@ -16,6 +16,7 @@ TURBOJPEG_INCLUDE := -I$(TURBOJPEG)/include
 
 TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
+LINUX_FP_FLAGS := -mmmx -msse -msse2 -msse3 -mssse3
 
 ifeq ($(TARGET_8074),)
 HEXAGON_V_ARCH := v60
@@ -25,7 +26,7 @@ HEXAGON_SDK_ROOT := /opt/tools/quest/Qualcomm/Hexagon_SDK/3.1
 HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/aarch64-toolchain/sysroots/aarch64-oe-linux/
 INDIGO_ARM_SYSROOT := $(HEXAGON_ARM_SYSROOT)
 
-FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon-vfpv4 -mfloat-abi=softfp
+LINARO_FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon-vfpv4 -mfloat-abi=softfp
 
 MULTIARCH_TUPLE :=
 
@@ -56,7 +57,7 @@ HEXAGON_ARM_SYSROOT := /opt/tools/quest/Qualcomm/qrlinux_sysroot
 INDIGO_ARM_SYSROOT :=  /opt/tools/quest/Qualcomm/indigo_sysroot
 TURBOJPEG_LIB := $(TURBOJPEG)/lib/libturbojpeg.a
 
-FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
+LINARO_FP_FLAGS := -DARM_NEON -DENABLE_NEON -mfpu=neon -mfloat-abi=hard
 
 MULTIARCH_TUPLE := arm-linux-gnueabihf
 

@@ -1,7 +1,7 @@
 COMP ?= DEFAULT
 
 ifeq ($(COMP),DEFAULT)
- include $(BUILD_ROOT)/mk/configs/builds/linux-gcc-debug.mk
+ include $(BUILD_ROOT)/mk/configs/builds/linux-gcc-opt.mk
 endif
 
 ifeq ($(COMP),gcc-debug)
