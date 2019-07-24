@@ -65,7 +65,7 @@ Svc::TlmChanImpl* chanTlm_ptr = 0;
 Svc::CommandDispatcherImpl* cmdDisp_ptr = 0;
 Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
 Svc::CmdSequencerComponentImpl* cmdSeq2_ptr = 0;
-Svc::PrmDbImpl* prmDb_ptr = 0;
+Svc::ActiveL1PrmDbComponentImpl* prmDb_ptr = 0;
 Svc::SerialTextConverterComponentImpl* serialTextConv_ptr = 0;
 Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
@@ -205,7 +205,7 @@ void allocComps() {
 #endif
 ;
 
-    prmDb_ptr = new Svc::PrmDbImpl
+    prmDb_ptr = new Svc::ActiveL1PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("PRM",PRM_PATH)
 #else
@@ -484,6 +484,12 @@ void manualConstruct(bool llRouterDevices,
         // Sequence Com buffer and cmd response
         cmdSeq_ptr->set_comCmdOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
+
+        // L1 <-> L2 PrmDb
+        prmDb_ptr->set_sendPrm_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(10));
+        llRouter_ptr->set_LLPortsOut_OutputPort(10, prmDb_ptr->get_recvPrm_InputPort(0));
+        prmDb_ptr->set_recvPrmReady_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(11));
+        llRouter_ptr->set_LLPortsOut_OutputPort(11, prmDb_ptr->get_sendPrmReady_InputPort(0));
 
         llRouter_ptr->set_LLPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));

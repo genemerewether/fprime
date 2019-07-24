@@ -14,7 +14,7 @@ void exitTasks(void);
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Svc/TlmChan/TlmChanImpl.hpp>
-#include <Svc/PrmDb/PrmDbImpl.hpp>
+#include <Svc/ActiveL1PrmDb/ActiveL1PrmDbImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 #include <Svc/FileUplink/FileUplink.hpp>
 #include <Svc/FileDownlink/FileDownlink.hpp>
@@ -91,7 +91,7 @@ extern Svc::SerLoggerComponentImpl* serLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;
 extern Svc::CommandDispatcherImpl* cmdDisp_ptr;
-extern Svc::PrmDbImpl* prmDb_ptr;
+extern Svc::ActiveL1PrmDbComponentImpl* prmDb_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;

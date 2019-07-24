@@ -33,18 +33,6 @@
 | | | |error|I32||The error code|
 |PrmFileLoadComplete|7 (0x7)|Load of parameter file completed| | | | |
 | | | |records|U32||The number of records loaded|
-|PrmFileWriteError|4 (0x4)|Failed to write parameter file| | | | |
-| | | |stage|PrmWriteError||The write stage|
-| | | |record|I32||The record that had the failure|
-| | | |error|I32||The error code|
-|PrmFileSaveComplete|5 (0x5)|Save of parameter file completed| | | | |
-| | | |records|U32||The number of records saved|
-|PrmFileReadError|6 (0x6)|Failed to read parameter file| | | | |
-| | | |stage|PrmReadError||The write stage|
-| | | |record|I32||The record that had the failure|
-| | | |error|I32||The error code|
-|PrmFileLoadComplete|7 (0x7)|Load of parameter file completed| | | | |
-| | | |records|U32||The number of records loaded|
 |PrmSendTooLarge|8 (0x8)|Parameter too large to send to level 2 PrmDb| | | | |
 | | | |prmId|U32||Parameter that could not be sent|
 | | | |prmSize|U32||Size of serialized parameter|

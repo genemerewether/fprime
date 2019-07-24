@@ -1,9 +1,8 @@
 #
 #   Copyright 2004-2008, by the California Institute of Technology.
 #   ALL RIGHTS RESERVED. United States Government Sponsorship
-#   acknowledged.
-#
-#
+#   acknowledged. Any commercial use must be negotiated with the Office
+#   of Technology Transfer at the California Institute of Technology.
 
 # This is a template for the mod.mk file that goes in each module
 # and each module's subdirectories.
@@ -13,11 +12,9 @@
 
 # There are some standard files that are included for reference
 
-TEST_SRC = 	Handcode/TesterBase.cpp \
-			Handcode/GTestBase.cpp \
-			PrmDbTester.cpp \
+TEST_SRC = 	PrmDbTester.cpp \
 			PrmDbImplTester.cpp
-
+		
 TEST_MODS = Svc/PrmDb \
 			Svc/Ping \
 			Fw/Cmd \
@@ -32,5 +29,3 @@ TEST_MODS = Svc/PrmDb \
 			Os/Stubs \
 			Os \
 			gtest
-
-COMPARGS = -I$(CURDIR)/test/ut/Handcode

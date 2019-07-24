@@ -155,7 +155,6 @@ LLPROC_MODULES := \
 	LLProc/LLDebug \
 	LLProc/LLCycle \
 	LLProc/LLCmdDispatcher \
-	LLProc/LLPrmDb \
 	LLProc/LLTlmChan
 
 HLPROC_MODULES := \
@@ -507,7 +506,6 @@ HEXREF_GENERAL_MODULES := \
 	\
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
-	Svc/CmdSequencer \
 	Svc/Seq \
 	Svc/ActiveRateGroup \
 	Svc/PassiveRateGroup \
@@ -523,7 +521,7 @@ HEXREF_GENERAL_MODULES := \
 	Svc/Fatal \
 	Svc/PolyIf \
 	Svc/PolyDb \
-	Svc/PrmDb \
+	Svc/PassiveL2PrmDb \
 	Svc/Ping \
 	Svc/Health \
 	Svc/WatchDog \
