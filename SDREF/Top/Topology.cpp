@@ -780,10 +780,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     // read parameters
 
-    struct Svc::ActiveL1PrmDbComponentImpl::PrmDbRange activeL2Ranges[] = {
+    struct Svc::ActiveL1PrmDbComponentImpl::PrmDbRange L2Ranges[] = {
         {0, 0, 19999}
     };
-    prmDb_ptr->setPrmDbRanges(activeL2Ranges, FW_NUM_ARRAY_ELEMENTS(activeL2Ranges));
+    prmDb_ptr->setPrmDbRanges(L2Ranges, FW_NUM_ARRAY_ELEMENTS(L2Ranges));
     prmDb_ptr->readPrmFile();
 
     mvCam_ptr->loadParameters();
