@@ -147,10 +147,6 @@ LINUX_DRV_MODULES := \
 	Drv/SpiDriverPorts \
 	Drv/I2CDriverPorts
 
-DEV_DRV_MODULES := \
-	Drv/Altimeter/AltimeterPorts \
-	Drv/Altimeter/AltimeterTypes
-
 LLPROC_MODULES := \
 	LLProc/HLRouter \
 	Utils/Hash \
@@ -620,8 +616,6 @@ R5REF_MODULES := \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
 	Drv/I2CDriverPorts \
-	Drv/Altimeter/AltimeterPorts \
-	Drv/Altimeter/AltimeterTypes \
 	\
 	Os \
 	\

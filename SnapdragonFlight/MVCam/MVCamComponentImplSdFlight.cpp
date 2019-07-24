@@ -428,7 +428,7 @@ namespace SnapdragonFlight {
             + (F64) realtime_now.tv_sec - (F64) monotonic_now.tv_sec;
 
       DEBUG_PRINT("\ncorrection %.9f, timestamp_realtime (s) %.9f\n",
-                  0.0/*timestamp_ns*/, timestamp_realtime);
+                  timestamp_ns, timestamp_realtime);
 
 #ifdef DEBUG_MODE
       gettimeofday(&tv,NULL);

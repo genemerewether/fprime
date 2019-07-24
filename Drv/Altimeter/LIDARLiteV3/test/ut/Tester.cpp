@@ -87,7 +87,7 @@ namespace Drv {
 
     // Send a Config port message
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CConfig_SIZE(1);
@@ -96,7 +96,7 @@ namespace Drv {
 
     // Send a write to SIG_COUNT_VAL
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -112,7 +112,7 @@ namespace Drv {
     // Get the status of the SIG_COUNT_VAL write
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -120,7 +120,7 @@ namespace Drv {
 
     // Send a write to ACQ_CONFIG_REG
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -135,7 +135,7 @@ namespace Drv {
     // Get the status of the ACQ_CONFIG_REG busy
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_BUSY;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -144,7 +144,7 @@ namespace Drv {
     // Get the status of the ACQ_CONFIG_REG write
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -152,7 +152,7 @@ namespace Drv {
 
     // Confirm that a slow sched call doesn't interrupt initialization
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(0);
@@ -160,7 +160,7 @@ namespace Drv {
 
     // Send a write to THRESHOLD_BYPASS
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -175,7 +175,7 @@ namespace Drv {
     // Get the status of THRESHOLD_BYPASS
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_COMPLETE, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -183,14 +183,14 @@ namespace Drv {
 
     // Done with initialization. Confirm more FAST sched calls do nothing
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_COMPLETE, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(0);
     ASSERT_from_I2CWriteRead_SIZE(0);
 
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_COMPLETE, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(0);
@@ -200,13 +200,13 @@ namespace Drv {
     for (i = 0; i < 5; i++) {
         // Trigger a read with a MEASURE sched call
         this->clearHistory();
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+        this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
 
 
         // Start the I2C transaction. Send the ACQ Cmd
         this->clearHistory();
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteRead_SIZE(1);
@@ -222,7 +222,7 @@ namespace Drv {
         // Get ACQ Cmd Status. Not ready
         this->clearHistory();
         this->ret_i2c_status = I2C_STATUS_BUSY;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -231,7 +231,7 @@ namespace Drv {
         // Get ACQ Cmd Status. Ready
         this->clearHistory();
         this->ret_i2c_status = I2C_STATUS_OK;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -239,7 +239,7 @@ namespace Drv {
 
         // Send Status Cmd
         this->clearHistory();
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteRead_SIZE(1);
@@ -255,7 +255,7 @@ namespace Drv {
         // Get Status Cmd Status. Not ready
         this->clearHistory();
         this->ret_i2c_status = I2C_STATUS_BUSY;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -267,7 +267,7 @@ namespace Drv {
         i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
         i2c_read_data[0] = LLV3_STATUS_BUSY | LLV3_STATUS_HEALTH_OK;
         this->ret_i2c_status = I2C_STATUS_OK;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -276,7 +276,7 @@ namespace Drv {
 
         // Send Status cmd
         this->clearHistory();
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteRead_SIZE(1);
@@ -291,7 +291,7 @@ namespace Drv {
         // Get Status Cmd Status. Not ready
         this->clearHistory();
         this->ret_i2c_status = I2C_STATUS_BUSY;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -303,7 +303,7 @@ namespace Drv {
         i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
         i2c_read_data[0] = LLV3_STATUS_HEALTH_OK;
         this->ret_i2c_status = I2C_STATUS_OK;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -311,7 +311,7 @@ namespace Drv {
 
         // Send Measure Cmd
         this->clearHistory();
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteRead_SIZE(1);
@@ -326,7 +326,7 @@ namespace Drv {
         // Get Measure Cmd Status. Not Ready
         this->clearHistory();
         this->ret_i2c_status = I2C_STATUS_BUSY;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD_STATUS, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -341,7 +341,7 @@ namespace Drv {
         // Send 1316 cm, or 13.16m
         i2c_read_data[0] = 0x5;
         i2c_read_data[1] = 0x24;
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
 
         ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -349,14 +349,13 @@ namespace Drv {
 
         ASSERT_from_AltimeterSend_SIZE(1);
 
-        ASSERT_FLOAT_EQ(this->last_alt.getdistance(), 13.16);
-        ASSERT_EQ(this->last_alt.getstatus(), 0);
-        ASSERT_EQ(this->last_alt.gettime_secs(), 0);
-        ASSERT_EQ(this->last_alt.gettime_nsecs(), 0);
+        ASSERT_FLOAT_EQ(this->last_alt.getrange(), 13.16);
+        ASSERT_EQ(this->last_alt.getheader().getstamp().getSeconds(), 0);
+        ASSERT_EQ(this->last_alt.getheader().getstamp().getUSeconds(), 0);
 
         // Further Fast calls should be No-ops
         this->clearHistory();
-        this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+        this->invoke_to_SchedIn(0,LLV3_RG_FAST);
         ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
 
         ASSERT_from_AltimeterSend_SIZE(0);
@@ -376,13 +375,13 @@ namespace Drv {
 
     // Trigger a read with a MEASURE sched call
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
 
 
     // Start the I2C transaction. Send the ACQ Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -398,7 +397,7 @@ namespace Drv {
     // Get ACQ Cmd Status. Ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -406,7 +405,7 @@ namespace Drv {
 
     // Send Status Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -425,7 +424,7 @@ namespace Drv {
     i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
     i2c_read_data[0] = LLV3_STATUS_HEALTH_OK | LLV3_STATUS_PROC_ERR;
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -444,7 +443,7 @@ namespace Drv {
 
     // Send a Config port message
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CConfig_SIZE(1);
@@ -453,7 +452,7 @@ namespace Drv {
 
     // Send a write to SIG_COUNT_VAL
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -469,7 +468,7 @@ namespace Drv {
     // Get the status of the SIG_COUNT_VAL write
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -477,7 +476,7 @@ namespace Drv {
 
     // Send a write to ACQ_CONFIG_REG
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_STATUS, this->component.init_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -492,7 +491,7 @@ namespace Drv {
     // Get the status of the ACQ_CONFIG_REG busy
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_TX_NACK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_INIT_WRITE_REG, this->component.init_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -508,13 +507,13 @@ namespace Drv {
 
     // Trigger a read with a MEASURE sched call
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
 
 
     // Start the I2C transaction. Send the ACQ Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -530,7 +529,7 @@ namespace Drv {
     // Get ACQ Cmd Status. Not ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_TX_NACK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -543,13 +542,13 @@ namespace Drv {
 
     // Trigger a read with a MEASURE sched call
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
 
 
     // Start the I2C transaction. Send the ACQ Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -565,7 +564,7 @@ namespace Drv {
     // Get ACQ Cmd Status. Ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -573,7 +572,7 @@ namespace Drv {
 
     // Send Status Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -589,7 +588,7 @@ namespace Drv {
     // Get Status Cmd Status. Not ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_TX_NACK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -601,13 +600,13 @@ namespace Drv {
 
     // Trigger a read with a MEASURE sched call
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
 
 
     // Start the I2C transaction. Send the ACQ Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -623,7 +622,7 @@ namespace Drv {
     // Get ACQ Cmd Status. Ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -631,7 +630,7 @@ namespace Drv {
 
     // Send Status Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -647,7 +646,7 @@ namespace Drv {
     // Get Status Cmd Status. Not ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_BUSY;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -660,7 +659,7 @@ namespace Drv {
     i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
     i2c_read_data[0] = LLV3_STATUS_HEALTH_OK;
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -668,7 +667,7 @@ namespace Drv {
 
     // Send Measure Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -689,7 +688,7 @@ namespace Drv {
     // Send 1316 cm, or 13.16m
     i2c_read_data[0] = 0x5;
     i2c_read_data[1] = 0x24;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_WAITING, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -710,13 +709,13 @@ namespace Drv {
 
     // Trigger a read with a MEASURE sched call
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD, this->component.i2c_state);
 
 
     // Start the I2C transaction. Send the ACQ Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -732,7 +731,7 @@ namespace Drv {
     // Get ACQ Cmd Status. Not ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_BUSY;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_ACQ_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -741,7 +740,7 @@ namespace Drv {
     // Get ACQ Cmd Status. Ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -749,7 +748,7 @@ namespace Drv {
 
     // Send Status Cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -765,7 +764,7 @@ namespace Drv {
     // Get Status Cmd Status. Not ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_BUSY;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -777,7 +776,7 @@ namespace Drv {
     i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
     i2c_read_data[0] = LLV3_STATUS_BUSY | LLV3_STATUS_HEALTH_OK;
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -786,7 +785,7 @@ namespace Drv {
 
     // Send Status cmd
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteRead_SIZE(1);
@@ -801,7 +800,7 @@ namespace Drv {
     // Get Status Cmd Status. Not ready
     this->clearHistory();
     this->ret_i2c_status = I2C_STATUS_BUSY;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_STATUS_CMD_STATUS, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -813,7 +812,7 @@ namespace Drv {
     i2c_read_data = reinterpret_cast<U8*>(this->readBuffer_ptr->getdata());
     i2c_read_data[0] = LLV3_STATUS_HEALTH_OK;
     this->ret_i2c_status = I2C_STATUS_OK;
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_FAST);
+    this->invoke_to_SchedIn(0,LLV3_RG_FAST);
     ASSERT_EQ(LIDARLiteV3ComponentImpl::LLV3_I2C_MEASURE_CMD, this->component.i2c_state);
 
     ASSERT_from_I2CWriteReadStatus_SIZE(1);
@@ -821,7 +820,7 @@ namespace Drv {
 
     // Send a measurement sched call to trigger EVR
     this->clearHistory();
-    this->invoke_to_SchedIn(0,LIDARLiteV3ComponentImpl::LLV3_RG_MEASURE);
+    this->invoke_to_SchedIn(0,LLV3_RG_MEASURE);
 
     // TODO: Check for EVR
   }
@@ -833,7 +832,7 @@ namespace Drv {
   void Tester ::
     from_AltimeterSend_handler(
         const NATIVE_INT_TYPE portNum,
-        Drv::Altimeter altimeterEuData
+        ROS::sensor_msgs::Range &altimeterEuData
     )
   {
     this->pushFromPortEntry_AltimeterSend(altimeterEuData);

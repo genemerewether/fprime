@@ -138,6 +138,13 @@ namespace Gnc {
           ROS::nav_msgs::OdometryNoCov &Odometry
       );
 
+      //! Handler implementation for ImuStateUpdateReport
+      //!
+      void ImuStateUpdateReport_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::ImuStateUpdateNoCov &ImuStateUpdateNoCov 
+      );
+
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(
@@ -156,6 +163,8 @@ namespace Gnc {
         //! Publishers for Odometry data
         //!
         ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
+    
+        ros::Publisher m_imuStateUpdatePub[NUM_IMUSTATEUPDATEREPORT_INPUT_PORTS];
 
         ros::NodeHandle* m_nodeHandle;
 

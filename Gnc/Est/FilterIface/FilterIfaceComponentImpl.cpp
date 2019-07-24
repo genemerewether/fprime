@@ -246,6 +246,111 @@ namespace Gnc {
     }
 
     void FilterIfaceComponentImpl ::
+      ImuStateUpdateReport_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::mav_msgs::ImuStateUpdateNoCov &ImuStateUpdateNoCov
+      )
+    {
+        mav_msgs::ImuStateUpdate msg;
+
+        ROS::std_msgs::Header header = ImuStateUpdateNoCov.getheader();
+        Fw::Time stamp = header.getstamp();
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
+
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                DEBUG_PRINT("Failed to convert time in ImuStateUpdateReport handler\n");
+                return;
+            }
+        }
+
+        header.setstamp(convTime);
+        ImuStateUpdateNoCov.setheader(header);
+        
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_FILTIFACE_IMUSTATEUPDATENOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = ImuStateUpdateNoCov.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+
+        if (!m_rosInited) {
+            return;
+        }
+
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
+        
+        msg.header.seq = header.getseq();
+
+        // TODO(mereweth) - convert frame ID
+        U32 frame_id = header.getframe_id();
+        msg.header.frame_id = "world";
+
+        if (0 == portNum) {
+            msg.child_frame_id = "quest-base-link";
+        }
+        else {
+            msg.child_frame_id = "quest-unknown";
+        }
+
+        ROS::geometry_msgs::Point p = ImuStateUpdateNoCov.getpose().getposition();
+        msg.pose.pose.position.x = p.getx();
+        msg.pose.pose.position.y = p.gety();
+        msg.pose.pose.position.z = p.getz();
+        ROS::geometry_msgs::Quaternion q = ImuStateUpdateNoCov.getpose().getorientation();
+        msg.pose.pose.orientation.w = q.getw();
+        msg.pose.pose.orientation.x = q.getx();
+        msg.pose.pose.orientation.y = q.gety();
+        msg.pose.pose.orientation.z = q.getz();
+        ROS::geometry_msgs::Vector3 vec = ImuStateUpdateNoCov.gettwist().getlinear();
+        msg.twist.twist.linear.x = vec.getx();
+        msg.twist.twist.linear.y = vec.gety();
+        msg.twist.twist.linear.z = vec.getz();
+        vec = ImuStateUpdateNoCov.gettwist().getangular();
+        msg.twist.twist.angular.x = vec.getx();
+        msg.twist.twist.angular.y = vec.gety();
+        msg.twist.twist.angular.z = vec.getz();
+        vec = ImuStateUpdateNoCov.getangular_velocity_bias();
+        msg.angular_velocity_bias.x = vec.getx();
+        msg.angular_velocity_bias.y = vec.gety();
+        msg.angular_velocity_bias.z = vec.getz();
+        vec = ImuStateUpdateNoCov.getlinear_acceleration_bias();
+        msg.linear_acceleration_bias.x = vec.getx();
+        msg.linear_acceleration_bias.y = vec.gety();
+        msg.linear_acceleration_bias.z = vec.getz();
+
+        m_imuStateUpdatePub[portNum].publish(msg);
+
+        tf::Transform tfo;
+        tf::poseMsgToTF(msg.pose.pose, tfo);
+
+        tf::StampedTransform tfoStamp;
+        tfoStamp.stamp_ = msg.header.stamp;
+        tfoStamp.child_frame_id_ = "quest-base-link-update";
+        tfoStamp.frame_id_ = msg.header.frame_id;
+        tfoStamp.setData(tfo);
+
+        FW_ASSERT(this->m_trBroad);
+        this->m_trBroad->sendTransform(tfoStamp);
+    }
+  
+    void FilterIfaceComponentImpl ::
       pingIn_handler(
           const NATIVE_INT_TYPE portNum,
           U32 key
@@ -286,6 +391,11 @@ namespace Gnc {
         for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
             snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
             compPtr->m_odomPub[i] = n->advertise<nav_msgs::Odometry>(buf, 5);
+        }
+        
+        for (int i = 0; i < NUM_IMUSTATEUPDATEREPORT_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_state_update_out_%d", i);
+            compPtr->m_imuStateUpdatePub[i] = n->advertise<mav_msgs::ImuStateUpdate>(buf, 5);
         }
 
         ImuStateUpdateHandler updateHandler(compPtr, 0);

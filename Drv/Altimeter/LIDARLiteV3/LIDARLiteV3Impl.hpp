@@ -98,7 +98,9 @@ namespace Drv {
           LLV3_I2C_STATUS_CMD,
           LLV3_I2C_STATUS_CMD_STATUS,
           LLV3_I2C_MEASURE_CMD,
-          LLV3_I2C_MEASURE_CMD_STATUS
+          LLV3_I2C_MEASURE_CMD_STATUS,
+          LLV3_I2C_RESET_CMD,
+          LLV3_I2C_RESET_CMD_STATUS
       };
 
       static const LLV3InitReg init_registers[3];
@@ -110,10 +112,13 @@ namespace Drv {
       U8 i2cWriteBufferArr[LLV3_WRITE_BUFF_LEN];
       U8 i2cReadBufferArr[LLV3_READ_BUFF_LEN];
 
+      U8 statusByte;
+      U8 numTries;
+
       Fw::Buffer i2cWriteBuffer;
       Fw::Buffer i2cReadBuffer;
 
-      Drv::Altimeter altimeter_eu;
+      U32 seq;
     };
 
 } // end namespace Drv

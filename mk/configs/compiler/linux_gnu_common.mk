@@ -18,7 +18,7 @@ LIBRARY_TO :=
 POST_LINK_LIB := ranlib
 
 LINK_BIN := $(CXX)
-LINK_BIN_FLAGS := -z muldefs $(LIBS) #$(BUILD_32BIT)
+LINK_BIN_FLAGS := $(LINUX_FP_FLAGS) -z muldefs $(LIBS) #$(BUILD_32BIT)
 
 FILE_SIZE := $(LS) $(LS_SIZE)
 LOAD_SIZE := $(SIZE)
@@ -27,17 +27,19 @@ LOAD_SIZE := $(SIZE)
 
 LINK_LIBS := -ldl -lpthread -lm -lrt -lutil
 
-OPT_SPEED := -Os
+OPT_SPEED := -O3 -funroll-loops
 DEBUG := -g3
 
 LINUX_GNU_CFLAGS := $(LINUX_FLAGS_COMMON) \
 					$(COMMON_DEFINES) \
+					$(LINUX_FP_FLAGS) \
 					$(GNU_CFLAGS_COMMON) \
 					#$(BUILD_32BIT) # Quantum framework won't build 32-bit
 
 LINUX_GNU_CXXFLAGS :=	$(LINUX_FLAGS_COMMON) \
 						-std=c++11 \
 						$(COMMON_DEFINES) \
+						$(LINUX_FP_FLAGS) \
 						$(GNU_CXXFLAGS_COMMON) \
 						#$(BUILD_32BIT)
 

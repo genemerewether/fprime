@@ -52,7 +52,7 @@
         <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="output"    max_number="1">
         </port>
 
-        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">
+        <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="2">
         </port>
 
         <port name="pingIn" data_type="Svc::Ping"  kind="async_input"    max_number="1" full="drop">

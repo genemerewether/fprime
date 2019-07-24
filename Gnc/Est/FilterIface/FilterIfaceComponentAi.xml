@@ -49,6 +49,9 @@
         <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">
         </port>
 
+        <port name="ImuStateUpdateReport" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="sync_input"  max_number="1">
+        </port>
+
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="1">
         </port>
 

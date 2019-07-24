@@ -18,12 +18,12 @@ enum {
 #else
     BL_CHUNK_SIZE = 8192000,
 #endif
-    BL_MAX_DIRECT_CHUNK_SIZE = 1024,
+    BL_MAX_DIRECT_CHUNK_SIZE = 4096,
     BL_NUM_OLD_FDS = 20
 };
 
 enum BufferLoggerFileMode {
-    BL_DIRECT_WRITE, // requires block-aligned buffers (512 bytes on Snapdragon)
+    BL_DIRECT_WRITE, // requires block-aligned buffers (512 bytes on Snapdragon 801)
     BL_BULK_WRITE,
     BL_LOOPING_WRITE,
     BL_REGULAR_WRITE, // Doesn't wait for write to hit disk!

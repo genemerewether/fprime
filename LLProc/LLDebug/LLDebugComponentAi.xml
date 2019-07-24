@@ -23,5 +23,30 @@
            <comment>Port to enable/disable asserts</comment>
         </port>
     </ports>
+    
+    <commands>    
+        <command kind="sync" opcode="0" mnemonic="LLDBG_ENABLE_ASSERT" >
+            <comment>Enable/Disable asserts</comment>
+               <args>
+                    <arg name="enable" type="ENUM">
+                        <enum name="AssertEnable">
+                            <item name="ASSERT_ENABLE"/>
+                            <item name="ASSERT_DISABLE"/>
+                        </enum>
+                        <comment>Enable/Disable asserts</comment>
+                    </arg>   
+                </args>
+        </command>
+        <command kind="sync" opcode="1" mnemonic="LLDBG_STRING">
+            <comment>
+            No-op string command
+            </comment>
+            <args>
+                <arg name="arg1" type="string" size="40">
+                    <comment>The String command argument</comment>
+                </arg>
+            </args>
+        </command>
+    </commands>
 </component>
 

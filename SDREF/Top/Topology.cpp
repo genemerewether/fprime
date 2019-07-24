@@ -10,8 +10,8 @@ enum {
     CORE_3 = 3,
 
     CORE_CDH = CORE_0,
-    CORE_GNC = CORE_2,
-    CORE_DEV = CORE_2,
+    CORE_GNC = CORE_1,
+    CORE_DEV = CORE_1,
     CORE_PRCP = CORE_3
 };
 
@@ -459,11 +459,11 @@ void manualConstruct(bool llRouterDevices,
         hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         // port 7 only used with LLRouter (timesync)
+        //hexRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
 
         rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
                                                       hexRouter_ptr->get_Sched_InputPort(0));
 
-        mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
         sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
         sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
         sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
@@ -492,8 +492,8 @@ void manualConstruct(bool llRouterDevices,
         llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
+        llRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
 
-        mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
         sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
         sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
         sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
@@ -584,6 +584,13 @@ void manualConstruct(bool llRouterDevices,
         ipcRelay_ptr->set_proc2Out_OutputPort(12, mvDFS_ptr->get_ImageIn_InputPort(0));
 
         mvDFS_ptr->set_ImageBufferReturn_OutputPort(0, stereoCam_ptr->get_GncBufferAsyncReturn_InputPort(0));
+
+        mvVislam_ptr->set_ImuStateUpdate_OutputPort(1, filterIface_ptr->get_ImuStateUpdateReport_InputPort(0));
+        if (llRouterDevices) {
+            mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
+        } else {
+            mvVislam_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
+        }
     }
     else {
         mvCam_ptr->set_GncBufferSend_OutputPort(0, sdRosIface_ptr->get_ImageRecv_InputPort(0));
@@ -594,7 +601,16 @@ void manualConstruct(bool llRouterDevices,
         ipcRelay_ptr->set_proc2Out_OutputPort(12, sdRosIface_ptr->get_ImageRecv_InputPort(1));
 
         sdRosIface_ptr->set_ImageForward_OutputPort(1, stereoCam_ptr->get_GncBufferAsyncReturn_InputPort(0));
+
+        if (llRouterDevices) {
+            filterIface_ptr->set_ImuStateUpdate_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(1));
+        } else {
+            filterIface_ptr->set_ImuStateUpdate_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(1));
+        }
     }
+    
+    stereoCam_ptr->set_ParamSet_OutputPort(0, ipcRelay_ptr->get_proc1In_InputPort(13));
+    ipcRelay_ptr->set_proc2Out_OutputPort(13, prmDb_ptr->get_setPrm_InputPort(0));
 
     if (gncCloudConnect) {
         mvDFS_ptr->set_PointCloud_OutputPort(0, ewok_ptr->get_PointCloud_InputPort(0));
@@ -818,13 +834,28 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     static const NATIVE_UINT_TYPE maxLogSize = 25U * 1000U * 1000U;
     buffLogMVCamUnproc_ptr->initLog("/img/mvcam_", ".upbin", maxLogSize, sizeof(U32),
                                     0, // 0 means unlimited number of buffers per file
-                                    Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                    Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogHiresCamUnproc_ptr->initLog("/img/hirescam_",".upbin", maxLogSize, sizeof(U32),
                                        0, // 0 means unlimited number of buffers
-                                       Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                       Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogStereoCamUnproc_ptr->initLog("/img/stereocam_",".upbin", maxLogSize, sizeof(U32),
                                         0, // 0 means unlimited number of buffers
-                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC, 512);
+                                        Svc::BL_DIRECT_WRITE, Svc::BL_CLOSE_SYNC,
+#ifdef SOC_8096
+                                    4096);
+#else
+                                    512);
+#endif
     buffLogMVCamUnproc_ptr->setBaseName("");
     buffLogHiresCamUnproc_ptr->setBaseName("");
     buffLogStereoCamUnproc_ptr->setBaseName("");
@@ -912,6 +943,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #ifdef SOC_8096
                                25, // J7, pin 7, 3.3V level
 #else
+                               47, //TODO(Mereweth) - this is a placeholder; J12, pin 4, 3.3V level
 #endif
                                Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
 
@@ -920,6 +952,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #ifdef SOC_8096
                                      7, // tty 3, J10, SONAR_UART, BLSP7
 #else
+                                     3, //TODO(Mereweth) - this is a placeholder; J12, BLSP8
 #endif
                                      SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
                                      SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
@@ -929,6 +962,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 #ifdef SOC_8096
                                         5, // tty 1, J12, ESC_UART, BLSP5
 #else
+                                        2, //TODO(Mereweth) - this is a placeholder; J13, BLSP6
 #endif
                                         SnapdragonFlight::BlspSerialDriverComponentImpl::BAUD_921K,
                                         SnapdragonFlight::BlspSerialDriverComponentImpl::NO_FLOW,
@@ -1096,12 +1130,19 @@ void exitTasks(bool isHiresChild, bool isStereoChild,
     DEBUG_PRINT("After HexRouter quit\n");
 }
 
+extern "C" {
+    // Defined in version.c
+    extern const unsigned int FSW_HASH;
+    extern const char* FSW_BRANCH;
+}
+
 void print_usage() {
-    (void) printf("Usage: ./SDREF [options]\n"
+    (void) printf("Usage: ./SDREF hash 0x%x branch %s\n"
+                  "[options]\n"
                   "-p\tport_number\n"
                   "-d\trun on Snapdragon DSP\n"
-                  "-r\tnot present: connect all to GNC;"
-                  "0: connect all to ROS; 1: connect point cloud to ROS\n"
+                  "-r\tnot present: connect all to GNC;\n"
+                  "\t\t0: connect all to ROS; 1: connect point cloud to ROS\n"
                   "-x\tll_port_number\n"
                   "-u\tUDP recv port string\n"
                   "-t\tUDP transmit port string\n"
@@ -1112,7 +1153,8 @@ void print_usage() {
                   "-f\tto disable fini\n"
                   "-o\tto run # cycles instead of continuously\n"
                   "-b\tBoot count\n"
-                  "-s\tStart socket immediately\n");
+                  "-s\tStart socket immediately\n",
+                  FSW_HASH, FSW_BRANCH);
 }
 
 

@@ -23,7 +23,6 @@
 #include "HLProc/HLRosIface/HLRosIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
-#include "sensor_msgs/Imu.h"
 #include "mav_msgs/Actuators.h"
 #include <image_transport/image_transport.h>
 
@@ -112,6 +111,13 @@ namespace HLProc {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::sensor_msgs::ImuNoCov &Imu
       );
+    
+      //! Handler implementation for Range
+      //!
+      void Range_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::sensor_msgs::Range &Range 
+      );    
 
       //! Handler implementation for PointCloud
       //!
@@ -152,6 +158,8 @@ namespace HLProc {
         //! Publishers for IMU data
         //!
         ros::Publisher m_imuPub[NUM_IMU_INPUT_PORTS];
+    
+        ros::Publisher m_rangePub[NUM_RANGE_INPUT_PORTS];
 
         ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;

@@ -34,6 +34,8 @@ void exitTasks(void);
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 
+#include "Gnc/quest_external/traj/ewok/EwokComponentImpl.hpp"
+
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
@@ -61,5 +63,7 @@ extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;
 extern Gnc::SigGenComponentImpl sigGen;
 extern Gnc::AttFilterComponentImpl attFilter;
+
+extern ewok::EwokComponentImpl ewokComp;
 
 #endif

@@ -228,6 +228,11 @@ Svc::FatalHandlerComponentImpl fatalHandler
 #endif
 ;
 
+ewok::EwokComponentImpl ewokComp
+#if FW_OBJECT_NAMES == 1
+                        ("EWOK")
+#endif
+;
 
 #if FW_OBJECT_REGISTRATION == 1
 
@@ -295,6 +300,8 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     fatalAdapter.init(0);
     fatalHandler.init(0);
     udpReceiver.init(0);
+
+    ewokComp.init(0);
 
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
@@ -469,6 +476,8 @@ int main(int argc, char* argv[]) {
     stat = gzManipIf.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
     stat = rosSeq.startIntTask(70, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
+    stat = ewokComp.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     signal(SIGINT,sighandler);

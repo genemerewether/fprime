@@ -97,6 +97,7 @@ namespace LLProc {
         // null terminate
         this->m_debugText[sizeToSend-1] = 0;
         this->m_textBuffer.setsize(sizeToSend);
+        printf("%s", this->m_debugText);
         this->SerWritePort_out(0,this->m_textBuffer);
     }
     // copy assert text to serial port
@@ -123,6 +124,38 @@ namespace LLProc {
       )
     {
       this->m_disableAssert = (Common::DISABLED == enabled)?true:false;
+    }
+
+    // ----------------------------------------------------------------------
+    // Command handler implementations
+    // ----------------------------------------------------------------------
+
+    void LLDebugComponentImpl ::
+      LLDBG_ENABLE_ASSERT_cmdHandler(
+          const FwOpcodeType opCode,
+          const U32 cmdSeq,
+          AssertEnable enable
+      )
+    {      
+        this->m_disableAssert = (ASSERT_DISABLE == enable)?true:false;
+        this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
+    }
+
+    void LLDebugComponentImpl ::
+      LLDBG_STRING_cmdHandler(
+          const FwOpcodeType opCode,
+          const U32 cmdSeq,
+          const Fw::CmdStringArg& arg1
+      )
+    {
+        NATIVE_INT_TYPE sizeToSend = arg1.length() < LL_DEBUG_TEXT_SIZE?arg1.length():LL_DEBUG_TEXT_SIZE;
+        strncpy((char*)this->m_debugText, arg1.toChar(), LL_DEBUG_TEXT_SIZE);
+        // null terminate
+        this->m_debugText[LL_DEBUG_TEXT_SIZE-1] = 0;
+        this->m_textBuffer.setsize(sizeToSend);
+        this->SerWritePort_out(0,this->m_textBuffer);
+        
+        this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
     }
 
 } // end namespace LLProc
