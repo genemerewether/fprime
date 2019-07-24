@@ -75,6 +75,13 @@ namespace Svc {
     )
   {
     this->m_prmSendReadySize = maxSize;
+
+    FwPrmIdType dummy = 0;
+    for (NATIVE_INT_TYPE port = 0; port < NUM_PRMTRIGGER_OUTPUT_PORTS; port++) {
+        if (this->isConnected_prmTrigger_OutputPort(port)) {
+            this->prmTrigger_out(port, dummy);
+        }
+    }
   }
 
   void PassiveL2PrmDbComponentImpl ::

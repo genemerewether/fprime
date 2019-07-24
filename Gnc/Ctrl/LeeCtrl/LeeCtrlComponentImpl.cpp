@@ -272,6 +272,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void LeeCtrlComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void LeeCtrlComponentImpl ::
     odometry_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::nav_msgs::OdometryAccel &Odometry

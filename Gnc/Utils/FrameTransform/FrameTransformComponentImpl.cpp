@@ -108,6 +108,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void FrameTransformComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void FrameTransformComponentImpl ::
     odomInA_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::nav_msgs::OdometryAccel &Odometry

@@ -59,7 +59,7 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
-Svc::PassiveL2PrmDbComponentImpl* prmDb_ptr;
+Svc::ActiveL2PrmDbComponentImpl* prmDb_ptr;
 Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
 Gnc::ImuProcComponentImpl* imuProc_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
@@ -232,7 +232,7 @@ void allocComps() {
 #endif
 ;
 
-    prmDb_ptr = new Svc::PassiveL2PrmDbComponentImpl
+    prmDb_ptr = new Svc::ActiveL2PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("PRMDB", 64) //64 bytes max receive
 #endif
@@ -535,6 +535,8 @@ void constructApp() {
     actDecouple_ptr->start(0, 89, 20*1024);
 #endif
 
+    prmDb_ptr->start(0, 50, 20*1024);
+
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
@@ -587,6 +589,8 @@ void exitTasks(void) {
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif
+
+    prmDb_ptr->exit();
 }
 
 volatile bool terminate = false;

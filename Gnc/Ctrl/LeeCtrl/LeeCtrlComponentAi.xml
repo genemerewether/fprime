@@ -14,6 +14,7 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
+    <import_port_type>Fw/Prm/PrmTriggerPortAi.xml</import_port_type>
 
     <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
 
@@ -27,6 +28,9 @@
     <import_dictionary>Gnc/Ctrl/LeeCtrl/Events.xml</import_dictionary>
 
     <ports>
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        </port>
+
         <port name="odometry" data_type="ROS::nav_msgs::OdometryAccel"  kind="sync_input" max_number="1">
         </port>
         

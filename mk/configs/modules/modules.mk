@@ -522,7 +522,7 @@ HEXREF_GENERAL_MODULES := \
 	Svc/PolyIf \
 	Svc/PolyDb \
 	Svc/PrmDb \
-	Svc/PassiveL2PrmDb \
+	Svc/ActiveL2PrmDb \
 	Svc/Ping \
 	Svc/Health \
 	Svc/WatchDog \

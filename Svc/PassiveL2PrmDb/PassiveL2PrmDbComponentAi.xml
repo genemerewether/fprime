@@ -30,6 +30,9 @@
         <port name="recvPrmReady" data_type="Fw::PrmListReady"  kind="output"    max_number="1">
         </port>
 
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="output"    max_number="80">
+        </port>
+
         <port name="sendPrmReady" data_type="Fw::PrmListReady"  kind="sync_input"    max_number="1">
         </port>
 

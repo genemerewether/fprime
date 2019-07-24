@@ -7,7 +7,7 @@ void exitTasks(void);
 #include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
 #include <Svc/RateGroupDecoupler/RateGroupDecouplerComponentImpl.hpp>
-#include <Svc/PassiveL2PrmDb/PassiveL2PrmDbImpl.hpp>
+#include <Svc/ActiveL2PrmDb/ActiveL2PrmDbImpl.hpp>
 #include <Svc/PassiveConsoleTextLogger/ConsoleTextLoggerImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
@@ -50,7 +50,7 @@ extern Svc::ConsoleTextLoggerImpl* textLogger_ptr;
 extern LLProc::ShortLogQueueComponentImpl* logQueue_ptr;
 extern LLProc::LLCmdDispatcherImpl* cmdDisp_ptr;
 extern LLProc::LLTlmChanImpl* tlmChan_ptr;
-extern Svc::PassiveL2PrmDbComponentImpl* prmDb_ptr;
+extern Svc::ActiveL2PrmDbComponentImpl* prmDb_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
