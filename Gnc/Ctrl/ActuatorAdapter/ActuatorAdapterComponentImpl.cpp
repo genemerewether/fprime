@@ -551,6 +551,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void ActuatorAdapterComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void ActuatorAdapterComponentImpl ::
     flySafe_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::mav_msgs::BoolStamped &BoolStamped
