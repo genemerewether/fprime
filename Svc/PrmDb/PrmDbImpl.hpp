@@ -148,7 +148,7 @@ namespace Svc {
             class PrmDbIterator : public std::iterator<
                                                 std::input_iterator_tag,
                                                 const FwPrmIdType,
-                                                ptrdiff_t,
+                                                std::ptrdiff_t,
                                                 const FwPrmIdType*,
                                                 const FwPrmIdType> {
 
@@ -157,7 +157,7 @@ namespace Svc {
                 public:
 
                     PrmDbIterator() :
-                        db(nullptr),
+                        db(NULL),
                         entry(PRMDB_NUM_DB_ENTRIES) {
                     }
 
@@ -207,7 +207,7 @@ namespace Svc {
                     }
 
                     bool valid(void) {
-                        return this->db != nullptr &&
+                        return this->db != NULL &&
                                this->entry >= 0 &&
                                this->entry < PRMDB_NUM_DB_ENTRIES;
                     }

@@ -521,6 +521,7 @@ HEXREF_GENERAL_MODULES := \
 	Svc/Fatal \
 	Svc/PolyIf \
 	Svc/PolyDb \
+	Svc/PrmDb \
 	Svc/PassiveL2PrmDb \
 	Svc/Ping \
 	Svc/Health \

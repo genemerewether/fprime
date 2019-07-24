@@ -234,7 +234,7 @@ void allocComps() {
 
     prmDb_ptr = new Svc::PassiveL2PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("PRMDB")
+                        ("PRMDB", 64) //64 bytes max receive
 #endif
 ;
 

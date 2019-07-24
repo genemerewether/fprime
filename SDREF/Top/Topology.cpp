@@ -207,7 +207,7 @@ void allocComps() {
 
     prmDb_ptr = new Svc::ActiveL1PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("PRM",PRM_PATH)
+                        ("PRM",PRM_PATH, 128) // 128 bytes max recv size
 #else
                         (PRM_PATH)
 #endif
@@ -779,7 +779,13 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     }
 
     // read parameters
-    prmDb_ptr->readParamFile();
+
+    struct Svc::ActiveL1PrmDbComponentImpl::PrmDbRange activeL2Ranges[] = {
+        {0, 0, 19999}
+    };
+    prmDb_ptr->setPrmDbRanges(activeL2Ranges, FW_NUM_ARRAY_ELEMENTS(activeL2Ranges));
+    prmDb_ptr->readPrmFile();
+
     mvCam_ptr->loadParameters();
     mvVislam_ptr->loadParameters();
     mvDFS_ptr->loadParameters();
