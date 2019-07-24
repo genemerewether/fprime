@@ -35,7 +35,7 @@
 	<import_component_type>SnapdragonFlight/StereoCam/StereoCamComponentAi.xml</import_component_type>
 	<import_component_type>Svc/BufferAccumulator/BufferAccumulatorComponentAi.xml</import_component_type>
 	<import_component_type>Svc/CmdDispatcher/CommandDispatcherComponentAi.xml</import_component_type>
-	<import_component_type>Svc/PrmDb/PrmDbComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveL1PrmDb/ActiveL1PrmDbComponentAi.xml</import_component_type>
 	<import_component_type>Svc/CmdSequencer/CmdSequencerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/ActiveLogger/ActiveLoggerComponentAi.xml</import_component_type>
 	<import_component_type>Svc/AssertFatalAdapter/AssertFatalAdapterComponentAi.xml</import_component_type>
@@ -120,7 +120,7 @@
 
    <instance namespace="Svc" name="cmdDisp" type="CommandDispatcher" base_id="20150"  base_id_window="25" />
 
-   <instance namespace="Svc" name="prmDb" type="PrmDb" base_id="20175"  base_id_window="25" />
+   <instance namespace="Svc" name="prmDb" type="ActiveL1PrmDb" base_id="20175"  base_id_window="25" />
 
    <instance namespace="Svc" name="cmdSeq" type="CmdSequencer" base_id="25000"  base_id_window="100" />
 
@@ -170,20 +170,20 @@
  	 <target component = "buffAccumMVCamUnproc" port = "bufferSendInFill" type = "BufferSend" num = "0"/>
 </connection>
 <connection name = "Connection5">
-	 <source component = "cmdSeq" port = "cmdResponseOut" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection6">
 	 <source component = "blspSerialDriverLL" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
-<connection name = "Connection7">
-	 <source component = "llRouter" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+<connection name = "Connection6">
+	 <source component = "cmdSeq" port = "cmdResponseOut" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
-<connection name = "Connection8">
+<connection name = "Connection7">
 	 <source component = "serLogger" port = "LogOut" type = "ActiveFileLogPort" num = "0"/>
  	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
+</connection>
+<connection name = "Connection8">
+	 <source component = "llRouter" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection9">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "7"/>
@@ -202,16 +202,16 @@
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection13">
+	 <source component = "eventLoggerLL" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection14">
 	 <source component = "eventLogger" port = "FatalAnnounce" type = "FatalEvent" num = "0"/>
  	 <target component = "fatalHandler" port = "FatalReceive" type = "FatalEvent" num = "0"/>
 </connection>
-<connection name = "Connection14">
+<connection name = "Connection15">
 	 <source component = "fileLogger" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection15">
-	 <source component = "eventLoggerLL" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection16">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "10"/>
@@ -222,12 +222,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection18">
-	 <source component = "sdRosIface" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection19">
 	 <source component = "buffLogHiresCamUnproc" port = "bufferSendOut" type = "BufferSend" num = "0"/>
  	 <target component = "buffAccumHiresCamUnproc" port = "bufferSendInReturn" type = "BufferSend" num = "0"/>
+</connection>
+<connection name = "Connection19">
+	 <source component = "sdRosIface" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection20">
 	 <source component = "cmdSeq" port = "LogText" type = "LogText" num = "0"/>
@@ -242,12 +242,12 @@
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection23">
-	 <source component = "buffAccumHiresCamUnproc" port = "bufferSendOutReturn" type = "BufferSend" num = "0"/>
- 	 <target component = "hiresCam" port = "BufferReturn" type = "BufferSend" num = "0"/>
-</connection>
-<connection name = "Connection24">
 	 <source component = "buffAccumMVCamUnproc" port = "bufferSendOutDrain" type = "BufferSend" num = "0"/>
  	 <target component = "buffLogMVCamUnproc" port = "bufferSendIn" type = "BufferSend" num = "0"/>
+</connection>
+<connection name = "Connection24">
+	 <source component = "buffAccumHiresCamUnproc" port = "bufferSendOutReturn" type = "BufferSend" num = "0"/>
+ 	 <target component = "hiresCam" port = "BufferReturn" type = "BufferSend" num = "0"/>
 </connection>
 <connection name = "Connection25">
 	 <source component = "rgXfer" port = "RateGroupMemberOut" type = "Sched" num = "0"/>
@@ -390,12 +390,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection60">
-	 <source component = "prmDb" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection61">
 	 <source component = "rgXfer" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection61">
+	 <source component = "prmDb" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection62">
 	 <source component = "mvDFS" port = "ParamSet" type = "PrmSet" num = "0"/>
@@ -422,12 +422,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection68">
-	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "1"/>
- 	 <target component = "rgXfer" port = "CycleIn" type = "Cycle" num = "0"/>
-</connection>
-<connection name = "Connection69">
 	 <source component = "blspSerialDriverLL" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection69">
+	 <source component = "rgDrv" port = "CycleOut" type = "Cycle" num = "1"/>
+ 	 <target component = "rgXfer" port = "CycleIn" type = "Cycle" num = "0"/>
 </connection>
 <connection name = "Connection70">
 	 <source component = "buffAccumHiresCamUnproc" port = "eventOut" type = "Log" num = "0"/>
@@ -438,12 +438,12 @@
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection72">
-	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
- 	 <target component = "llRouter" port = "Sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection73">
 	 <source component = "mvVislam" port = "ImuFwd" type = "ImuNoCov" num = "0"/>
  	 <target component = "sdRosIface" port = "Imu" type = "ImuNoCov" num = "0"/>
+</connection>
+<connection name = "Connection73">
+	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
+ 	 <target component = "llRouter" port = "Sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection74">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "13"/>
@@ -470,12 +470,12 @@
  	 <target component = "buffAccumStereoCamUnproc" port = "bufferSendInReturn" type = "BufferSend" num = "0"/>
 </connection>
 <connection name = "Connection80">
-	 <source component = "snapHealth" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection81">
 	 <source component = "mrCtrlIface" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
  	 <target component = "fileLogger" port = "LogQueue" type = "ActiveFileLogPort" num = "0"/>
+</connection>
+<connection name = "Connection81">
+	 <source component = "snapHealth" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection82">
 	 <source component = "filterIface" port = "convertTime" type = "ConvertTime" num = "0"/>
@@ -506,12 +506,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection89">
-	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
- 	 <target component = "stereoCam" port = "Sched" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection90">
 	 <source component = "mvDFS" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection90">
+	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "1"/>
+ 	 <target component = "stereoCam" port = "Sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection91">
 	 <source component = "cmdSeq" port = "comCmdOut" type = "Com" num = "0"/>
@@ -550,12 +550,12 @@
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection100">
-	 <source component = "snapHealth" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection101">
 	 <source component = "buffLogMVCamUnproc" port = "timeCaller" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection101">
+	 <source component = "snapHealth" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection102">
 	 <source component = "mvDFS" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
@@ -574,12 +574,12 @@
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection106">
-	 <source component = "rgXfer" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection107">
 	 <source component = "buffAccumStereoCamUnproc" port = "bufferSendOutDrain" type = "BufferSend" num = "0"/>
  	 <target component = "buffLogStereoCamUnproc" port = "bufferSendIn" type = "BufferSend" num = "0"/>
+</connection>
+<connection name = "Connection107">
+	 <source component = "rgXfer" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection108">
 	 <source component = "mvCam" port = "FileLogger" type = "ActiveFileLogPort" num = "0"/>
@@ -622,12 +622,12 @@
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection118">
-	 <source component = "buffLogMVCamUnproc" port = "eventOut" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection119">
 	 <source component = "buffAccumMVCamUnproc" port = "bufferSendOutReturn" type = "BufferSend" num = "0"/>
  	 <target component = "mvCam" port = "ImageBufferIn" type = "BufferSend" num = "0"/>
+</connection>
+<connection name = "Connection119">
+	 <source component = "buffLogMVCamUnproc" port = "eventOut" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection120">
 	 <source component = "cmdSeq2" port = "timeCaller" type = "Time" num = "0"/>
@@ -690,12 +690,12 @@
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection135">
-	 <source component = "gpioTimeSync" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection136">
 	 <source component = "snapHealth" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
+</connection>
+<connection name = "Connection136">
+	 <source component = "gpioTimeSync" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection137">
 	 <source component = "gpioTimeSync" port = "Log" type = "Log" num = "0"/>
@@ -710,12 +710,12 @@
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection140">
-	 <source component = "eventLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
- 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
-</connection>
-<connection name = "Connection141">
 	 <source component = "cmdDisp" port = "seqCmdStatus" type = "CmdResponse" num = "1"/>
  	 <target component = "cmdSeq2" port = "cmdResponseIn" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection141">
+	 <source component = "eventLogger" port = "CmdStatus" type = "CmdResponse" num = "0"/>
+ 	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
 </connection>
 <connection name = "Connection142">
 	 <source component = "llTimeSync" port = "Tlm" type = "Tlm" num = "0"/>
@@ -742,12 +742,12 @@
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection148">
-	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection149">
 	 <source component = "serialDriverLL" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection149">
+	 <source component = "fatalAdapter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection150">
 	 <source component = "fatalAdapter" port = "Log" type = "Log" num = "0"/>
@@ -766,12 +766,12 @@
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection154">
-	 <source component = "blspSerialDriverDebug" port = "Tlm" type = "Tlm" num = "0"/>
- 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
-</connection>
-<connection name = "Connection155">
 	 <source component = "timeConvert" port = "Log" type = "Log" num = "0"/>
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
+</connection>
+<connection name = "Connection155">
+	 <source component = "blspSerialDriverDebug" port = "Tlm" type = "Tlm" num = "0"/>
+ 	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection156">
 	 <source component = "stereoCam" port = "Time" type = "Time" num = "0"/>
@@ -798,12 +798,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection162">
-	 <source component = "mvCam" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection163">
 	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "6"/>
  	 <target component = "mvCam" port = "Sched" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection163">
+	 <source component = "mvCam" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection164">
 	 <source component = "mvCam" port = "Log" type = "Log" num = "0"/>
@@ -846,12 +846,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection174">
-	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "14"/>
- 	 <target component = "buffAccumStereoCamUnproc" port = "schedIn" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection175">
 	 <source component = "sdRosIface" port = "convertTime" type = "ConvertTime" num = "0"/>
  	 <target component = "timeConvert" port = "ConvertTime" type = "ConvertTime" num = "0"/>
+</connection>
+<connection name = "Connection175">
+	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "14"/>
+ 	 <target component = "buffAccumStereoCamUnproc" port = "schedIn" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection176">
 	 <source component = "udpReceiver" port = "Log" type = "Log" num = "0"/>
@@ -906,24 +906,24 @@
  	 <target component = "mvDFS" port = "sched" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection189">
-	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "9"/>
- 	 <target component = "buffLogMVCamUnproc" port = "schedIn" type = "Sched" num = "0"/>
-</connection>
-<connection name = "Connection190">
 	 <source component = "hiresCam" port = "Time" type = "Time" num = "0"/>
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection190">
+	 <source component = "rgTlm" port = "RateGroupMemberOut" type = "Sched" num = "9"/>
+ 	 <target component = "buffLogMVCamUnproc" port = "schedIn" type = "Sched" num = "0"/>
 </connection>
 <connection name = "Connection191">
 	 <source component = "filterIface" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection192">
-	 <source component = "rgXfer" port = "Log" type = "Log" num = "0"/>
- 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
-</connection>
-<connection name = "Connection193">
 	 <source component = "fatalAdapter" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection193">
+	 <source component = "rgXfer" port = "Log" type = "Log" num = "0"/>
+ 	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection194">
 	 <source component = "atiNetbox" port = "ATINetboxLog" type = "ActiveFileLogPort" num = "0"/>
@@ -950,12 +950,12 @@
  	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection200">
-	 <source component = "sockGndIf" port = "LogText" type = "LogText" num = "0"/>
- 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
-</connection>
-<connection name = "Connection201">
 	 <source component = "rgXfer" port = "RateGroupMemberOut" type = "Sched" num = "2"/>
  	 <target component = "cmdSeq" port = "schedIn" type = "Sched" num = "0"/>
+</connection>
+<connection name = "Connection201">
+	 <source component = "sockGndIf" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
 </connection>
 <connection name = "Connection202">
 	 <source component = "serialDriverLL" port = "Time" type = "Time" num = "0"/>
@@ -990,12 +990,12 @@
  	 <target component = "eventLogger" port = "LogRecv" type = "Log" num = "0"/>
 </connection>
 <connection name = "Connection210">
-	 <source component = "llRouter" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection211">
 	 <source component = "mrCtrlIface" port = "convertTime" type = "ConvertTime" num = "0"/>
  	 <target component = "timeConvert" port = "ConvertTime" type = "ConvertTime" num = "0"/>
+</connection>
+<connection name = "Connection211">
+	 <source component = "llRouter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection212">
 	 <source component = "snapHealth" port = "Log" type = "Log" num = "0"/>
@@ -1098,12 +1098,12 @@
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
 <connection name = "Connection237">
-	 <source component = "llTimeSync" port = "Time" type = "Time" num = "0"/>
- 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
-</connection>
-<connection name = "Connection238">
 	 <source component = "mvVislam" port = "CmdStatus" type = "CmdResponse" num = "0"/>
  	 <target component = "cmdDisp" port = "compCmdStat" type = "CmdResponse" num = "0"/>
+</connection>
+<connection name = "Connection238">
+	 <source component = "llTimeSync" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
 </connection>
 <connection name = "Connection239">
 	 <source component = "rgXfer" port = "RateGroupMemberOut" type = "Sched" num = "4"/>
