@@ -16,7 +16,7 @@ TURBOJPEG_INCLUDE := -I$(TURBOJPEG)/include
 
 TI_CCS_DIR := /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
-LINUX_FP_FLAGS := -mmmx -msse -msse2 -msse3 -mssse3
+#LINUX_FP_FLAGS := -mmmx -msse -msse2 -msse3 -mssse3
 
 ifeq ($(TARGET_8074),)
 HEXAGON_V_ARCH := v60

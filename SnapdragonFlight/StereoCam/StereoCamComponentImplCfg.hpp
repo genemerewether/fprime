@@ -57,6 +57,8 @@ enum {
 
   SCAM_10BIT_CALLBACK_SIZE = SCAM_IMAGE_SIZE * 10 / 8,
   SCAM_8BIT_CALLBACK_SIZE = SCAM_IMAGE_SIZE,
+  
+  SCAM_DEFAULT_ROW_HALF_PERIOD_NS = 9667,
 };
 
 const float SCAM_DEFAULT_ROW_PERIOD_US = 19.3333; // This is used to compute the total exposure time.
