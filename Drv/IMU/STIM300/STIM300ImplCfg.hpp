@@ -22,6 +22,8 @@
 
 #include <Fw/Types/BasicTypes.hpp>
 
+#include <math.h>
+
 namespace Drv {
 
     const U32 STIM_MAX_EVENTS = 40;
@@ -36,7 +38,7 @@ namespace Drv {
     const U32 STIM_UART_BUFFER_SIZE = 1024;
 
     const U32 STIM_LATENCY_DN_TO_EU_US = 1; // TODO:
-    const F64 STIM_GYRO_DN_TO_EU_DEG_S_DIV = 16384; // 2^14
+    const F64 STIM_GYRO_DN_TO_EU_RAD_S_DIV = 16384 / 180.0 * M_PI; // 2^14 * pi / 180
     const F64 STIM_ACCEL_DN_TO_EU_M_S_DIV = (524288 / 9.81); //(2^19)/g
 }
 

@@ -51,9 +51,9 @@ namespace Drv {
 
         latency = stimPkt.latency[0] << 8 | stimPkt.latency[1];
 
-        gyro_x = imuU24ToF64(&stimPkt.gyro_x[0], STIM_GYRO_DN_TO_EU_DEG_S_DIV);
-        gyro_y = imuU24ToF64(&stimPkt.gyro_y[0], STIM_GYRO_DN_TO_EU_DEG_S_DIV);
-        gyro_z = imuU24ToF64(&stimPkt.gyro_z[0], STIM_GYRO_DN_TO_EU_DEG_S_DIV);
+        gyro_x = imuU24ToF64(&stimPkt.gyro_x[0], STIM_GYRO_DN_TO_EU_RAD_S_DIV);
+        gyro_y = imuU24ToF64(&stimPkt.gyro_y[0], STIM_GYRO_DN_TO_EU_RAD_S_DIV);
+        gyro_z = imuU24ToF64(&stimPkt.gyro_z[0], STIM_GYRO_DN_TO_EU_RAD_S_DIV);
 
         accel_x = imuU24ToF64(&stimPkt.accel_x[0], STIM_ACCEL_DN_TO_EU_M_S_DIV);
         accel_y = imuU24ToF64(&stimPkt.accel_y[0], STIM_ACCEL_DN_TO_EU_M_S_DIV);
