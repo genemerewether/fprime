@@ -544,7 +544,7 @@ R5REF_MODULES := \
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
 	Svc/PrmDb \
-	Svc/ActiveL2PrmDb \
+	Svc/PassiveL2PrmDb \
 	\
 	Svc/Sched \
 	Svc/Time \

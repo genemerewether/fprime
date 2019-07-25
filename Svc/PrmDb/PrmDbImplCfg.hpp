@@ -12,7 +12,11 @@
 namespace {
 
     enum {
-        PRMDB_NUM_DB_ENTRIES = 2000, // !< Number of entries in the parameter database
+#ifdef BUILD_TIR5
+        PRMDB_NUM_DB_ENTRIES = 200, // !< Number of entries in the parameter database
+#else
+        PRMDB_NUM_DB_ENTRIES = 1000, // !< Number of entries in the parameter database
+#endif
     };
 
 }
