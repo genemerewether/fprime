@@ -218,13 +218,6 @@ QUEST_GNC_HW_MODULES := \
 QUEST_EXTERNAL_MODULES := \
 	Gnc/quest_external/traj/ewok
 
-REF_MODULES := \
-	Ref/Top \
-	Ref/RecvBuffApp \
-	Ref/SendBuffApp \
-	Ref/SignalGen \
-	Ref/PingReceiver
-
 ROS_PORT_MODULES := \
 	ROS/Gen/std_msgs/Ports  \
 	ROS/Gen/geometry_msgs/Ports      \
@@ -283,67 +276,12 @@ ROS_MODULES := \
 	\
 	$(ROS_PORT_MODULES)
 
-Ref_MODULES := \
-	\
-	$(REF_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(DEMO_DRV_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
 BLIMPREF_DEPLOYMENT_MODULES := \
 	BLIMPREF/Top
 
 BLIMPREF_MODULES := \
 	\
 	$(BLIMPREF_DEPLOYMENT_MODULES) \
-	\
-	Drv/ForceTorque/ATINetbox \
-	Drv/IMU/MPU9250 \
-	\
-	$(ZMQ_MODULES) \
-	\
-	$(HLPROC_MODULES) \
-	$(HLPROC_ROS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	$(QUEST_GNC_ROSIFACE_MODULES) \
-	\
-	$(SNAPDRAGON_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(SVC_EXTRA_MODULES) \
-	\
-	$(LINUX_DRV_MODULES) \
-	\
-	$(ROS_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-CARREF_DEPLOYMENT_MODULES := \
-	CARREF/Top
-
-CARREF_MODULES := \
-	\
-	$(CARREF_DEPLOYMENT_MODULES) \
 	\
 	Drv/ForceTorque/ATINetbox \
 	Drv/IMU/MPU9250 \
@@ -767,26 +705,6 @@ ACDEVTEST_MODULES := \
 	Autocoders/Python/test/serial_passive \
     \
 	Autocoders/Python/templates
-	
-RPI_APP_MODULES := \
-	RPI/Top \
-	RPI/RpiDemo
-	
-RPI_MODULES := \
-	\
-	$(RPI_APP_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(LINUX_DRV_MODULES) \
-	\
-	$(CFDP_MODULES) \
-  	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-  	$(UTILS_MODULES)
 
 acdev_MODULES := \
 	$(FW_MODULES) \
@@ -806,5 +724,5 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF RPI
+DEPLOYMENTS := acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF
 

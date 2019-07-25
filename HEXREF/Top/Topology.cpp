@@ -467,7 +467,8 @@ void constructApp() {
 
     cmdDisp_ptr->init(0);
     tlmChan_ptr->init(0);
-    prmDb_ptr->init(0);
+    
+    prmDb_ptr->init(100, 0);
 
     kraitRouter_ptr->init(200, 1000);
 
@@ -479,6 +480,7 @@ void constructApp() {
     /* Register commands */
     cmdDisp_ptr->regCommands();
     fatalHandler_ptr->regCommands();
+    prmDb_ptr->regCommands();
 
     ctrlXest_ptr->regCommands();
     imuProc_ptr->regCommands();
