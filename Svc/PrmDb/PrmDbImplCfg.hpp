@@ -12,7 +12,7 @@
 namespace {
 
     enum {
-        PRMDB_NUM_DB_ENTRIES = 500, // !< Number of entries in the parameter database
+        PRMDB_NUM_DB_ENTRIES = 2000, // !< Number of entries in the parameter database
     };
 
 }

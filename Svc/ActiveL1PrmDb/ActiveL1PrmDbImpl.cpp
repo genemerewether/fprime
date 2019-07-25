@@ -24,6 +24,9 @@
 
 #include <Svc/PrmDb/PrmDbImpl.hpp>
 
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace Svc {
 
   // ----------------------------------------------------------------------
@@ -88,10 +91,13 @@ namespace Svc {
     FW_ASSERT(this->isConnected_sendPrm_OutputPort(portNum), portNum);
     FW_ASSERT(portNum < NUM_SENDPRM_OUTPUT_PORTS, portNum);
 
+    DEBUG_PRINT("L1PrmDb sendprmready handler\n");
+
     if (reload) {
         this->m_level2PrmDbs[portNum].iter = this->m_prmDb.begin();
     }
 
+    bool morePrms = false;
     if (this->m_level2PrmDbs[portNum].iter.valid() &&
         this->m_level2PrmDbs[portNum].iter != this->m_prmDb.end()) {
 
@@ -110,7 +116,8 @@ namespace Svc {
                 serStat = this->m_prmDb.serializePrmSize(prmId, serSize);
                 FW_ASSERT(serStat == PrmDbImpl::SERIALIZE_PRM_OK);
 
-                if ((serSize + buff.getBuffLength()) > maxSize) {
+                if (((serSize + buff.getBuffLength()) > maxSize) ||
+                    ((serSize + buff.getBuffLength()) > buff.getBuffCapacity())) {
 
                     if (buff.getBuffLength() == 0) {
                         // Not enough size to send parameter. EVR
@@ -128,21 +135,23 @@ namespace Svc {
                 }
 
                 serStat = this->m_prmDb.serializePrm(prmId, buff);
+                FW_ASSERT(serStat == PrmDbImpl::SERIALIZE_PRM_OK);
             }
 
             iter++;
         }
 
-        bool morePrms = iter != this->m_prmDb.end();
-
+        morePrms = iter != this->m_prmDb.end();
+        
         this->unLock();
 
         this->sendPrm_out(portNum, morePrms, buff);
-
-        if (!morePrms) {
-            // Signal that we are ready to receive parameter updates
-            this->recvPrmReady_out(portNum, this->m_maxRecvSize, false);
-        }
+    }
+            
+    if (!morePrms) {
+        DEBUG_PRINT("L1PrmDb ready to recv prms\n");
+        // Signal that we are ready to receive parameter updates
+        this->recvPrmReady_out(portNum, this->m_maxRecvSize, false);
     }
   }
 
@@ -186,6 +195,8 @@ namespace Svc {
     FwPrmIdType prmId;
     Fw::ParamBuffer prmBuff;
 
+    DEBUG_PRINT("L1PrmDb recvprm handler\n");
+    
     this->lock();
 
     while (val.getBuffLeft() > 0) {
@@ -195,12 +206,16 @@ namespace Svc {
 
         prmBuff.resetDeser();
         setStat = this->m_prmDb.setPrm(prmId, prmBuff);
-        this->log_WARNING_HI_PrmDbFull(prmId);
+        if (setStat == PrmDbImpl::SET_PRM_FULL) {
+            this->log_WARNING_HI_PrmDbFull(prmId);
+        }
     }
-
+    
     this->recvPrmReady_out(portNum, this->m_maxRecvSize, false);
 
     this->unLock();
+    
+    DEBUG_PRINT("L1PrmDb recvprm handler done\n");
   }
 
   void ActiveL1PrmDbComponentImpl ::

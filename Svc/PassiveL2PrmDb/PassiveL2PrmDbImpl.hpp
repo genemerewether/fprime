@@ -135,6 +135,8 @@ namespace Svc {
 
       bool m_firstSched;
 
+      bool m_prmTriggered;
+
     };
 
 } // end namespace Svc

@@ -234,7 +234,7 @@ void allocComps() {
 
     prmDb_ptr = new Svc::ActiveL2PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("PRMDB", 64) //64 bytes max receive
+                        ("PRMDB", 1024) //1024 max receive
 #endif
 ;
 
@@ -602,10 +602,7 @@ volatile bool preinit = true;
 
 int hexref_arm() {
     DEBUG_PRINT("hexref_arm\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_arm preinit - returning\n");
-        return -1;
-    }
+    terminate = true;
 
     return 0;
 }

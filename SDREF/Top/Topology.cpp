@@ -207,7 +207,7 @@ void allocComps() {
 
     prmDb_ptr = new Svc::ActiveL1PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("PRM",PRM_PATH, 128) // 128 bytes max recv size
+                        ("PRM",PRM_PATH, 1024) // 1024 max recv
 #else
                         (PRM_PATH)
 #endif
@@ -451,6 +451,12 @@ void manualConstruct(bool llRouterDevices,
         // Sequence Com buffer and cmd response
         cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(0, cmdSeq_ptr->get_cmdResponseIn_InputPort(1));
+
+        // L1 <-> L2 PrmDb
+        prmDb_ptr->set_sendPrm_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(10));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(10, prmDb_ptr->get_recvPrm_InputPort(0));
+        prmDb_ptr->set_recvPrmReady_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(11));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(11, prmDb_ptr->get_sendPrmReady_InputPort(0));
 
         hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
@@ -1181,6 +1187,10 @@ volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
+    if (SIGSEGV == signum) {
+        printf("segv; calling hexref_fini\n");
+        hexref_fini();
+    }
 }
 
 void dummy() {
@@ -1285,6 +1295,7 @@ int main(int argc, char* argv[]) {
     }
 
     signal(SIGINT,sighandler);
+    signal(SIGSEGV,sighandler);
     signal(SIGTERM,sighandler);
     signal(SIGKILL,sighandler);
     signal(SIGPIPE, SIG_IGN);

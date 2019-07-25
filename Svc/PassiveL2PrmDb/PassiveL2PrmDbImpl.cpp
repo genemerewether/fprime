@@ -43,8 +43,9 @@ namespace Svc {
       m_prmSendBufferIdx(),
       m_prmSendReadySize(0),
       m_sendListBuffer(),
-      m_updateMethod(PASSIVE_L2_NO_UPDATES),
-      m_firstSched(true)
+      m_updateMethod(PASSIVE_L2_PUSH_UPDATES),
+      m_firstSched(true),
+      m_prmTriggered(false)
   {
 
   }
@@ -75,12 +76,15 @@ namespace Svc {
     )
   {
     this->m_prmSendReadySize = maxSize;
-
-    FwPrmIdType dummy = 0;
-    for (NATIVE_INT_TYPE port = 0; port < NUM_PRMTRIGGER_OUTPUT_PORTS; port++) {
-        if (this->isConnected_prmTrigger_OutputPort(port)) {
-            this->prmTrigger_out(port, dummy);
+  
+    if (!this->m_prmTriggered) {
+        FwPrmIdType dummy = 0;
+        for (NATIVE_INT_TYPE port = 0; port < NUM_PRMTRIGGER_OUTPUT_PORTS; port++) {
+            if (this->isConnected_prmTrigger_OutputPort(port)) {
+                this->prmTrigger_out(port, dummy);
+            }
         }
+        this->m_prmTriggered = true;
     }
   }
 
@@ -251,7 +255,8 @@ namespace Svc {
             serStat = this->m_prmDb.serializePrmSize(prmId, serSize);
             FW_ASSERT(serStat == PrmDbImpl::SERIALIZE_PRM_OK);
 
-            if (this->m_sendListBuffer.getBuffLength() + serSize > this->m_prmSendReadySize) {
+            if ((this->m_sendListBuffer.getBuffLength() + serSize > this->m_prmSendReadySize)  ||
+                (this->m_sendListBuffer.getBuffLength() + serSize > this->m_sendListBuffer.getBuffCapacity())) {
 
                 if (nSent == 0) {
                     // Don't break if we can't send the first parameter.
@@ -264,7 +269,6 @@ namespace Svc {
 
             } else {
                 serStat = this->m_prmDb.serializePrm(prmId, this->m_sendListBuffer);
-
                 FW_ASSERT(serStat == PrmDbImpl::SERIALIZE_PRM_OK);
             }
 

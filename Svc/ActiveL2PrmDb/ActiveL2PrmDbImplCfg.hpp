@@ -12,7 +12,7 @@
 namespace {
 
     enum {
-        ACTIVE_L2_PRMDB_SEND_BUFFER_ENTRIES = 64, // !< Number of parameter entries to queue
+        ACTIVE_L2_PRMDB_SEND_BUFFER_ENTRIES = 1024, // !< Number of parameter entries to queue
     };
 
 }

@@ -21,6 +21,17 @@
 #include <Svc/ActiveL2PrmDb/ActiveL2PrmDbImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
+
 namespace Svc {
 
   // ----------------------------------------------------------------------
@@ -43,8 +54,9 @@ namespace Svc {
       m_prmSendBufferIdx(),
       m_prmSendReadySize(0),
       m_sendListBuffer(),
-      m_updateMethod(ACTIVE_L2_NO_UPDATES),
-      m_firstSched(true)
+      m_updateMethod(ACTIVE_L2_PUSH_UPDATES),
+      m_firstSched(true),
+      m_prmTriggered(false)
   {
 
   }
@@ -75,13 +87,17 @@ namespace Svc {
         bool resend
     )
   {
+    DEBUG_PRINT("L2PrmDb sendprmready handler\n");
     this->m_prmSendReadySize = maxSize;
 
-    FwPrmIdType dummy = 0;
-    for (NATIVE_INT_TYPE port = 0; port < NUM_PRMTRIGGER_OUTPUT_PORTS; port++) {
-        if (this->isConnected_prmTrigger_OutputPort(port)) {
-            this->prmTrigger_out(port, dummy);
+    if (!this->m_prmTriggered) {
+        FwPrmIdType dummy = 0;
+        for (NATIVE_INT_TYPE port = 0; port < NUM_PRMTRIGGER_OUTPUT_PORTS; port++) {
+            if (this->isConnected_prmTrigger_OutputPort(port)) {
+                this->prmTrigger_out(port, dummy);
+            }
         }
+        this->m_prmTriggered = true;
     }
   }
 
@@ -140,6 +156,8 @@ namespace Svc {
             prmBuff.resetDeser();
             setStat = this->m_prmDb.setPrm(prmId, prmBuff);
             FW_ASSERT(PrmDbImpl::SET_PRM_ADDED == setStat, setStat);
+
+            DEBUG_PRINT("Prm %x added\n", prmId);
         }
 
         this->unLock();
@@ -182,6 +200,7 @@ namespace Svc {
       NATIVE_UINT_TYPE context
     )
   {
+    DEBUG_PRINT("L2PrmDb sched handler\n");
     if (this->m_firstSched) {
         this->recvPrmReady_out(portNum, this->m_maxRecvSize, true);
         this->m_firstSched = false;
@@ -200,6 +219,7 @@ namespace Svc {
             this->m_prmSendBufferIdx -= nSent;
         }
     }
+    DEBUG_PRINT("L2PrmDb sched handler done\n");
   }
 
   //! Handler for command L2_PRM_PUSH_UPDATES
@@ -256,10 +276,13 @@ namespace Svc {
     U32 nSent = 0;
 
     if (this->m_prmSendReadySize > 0) {
+      DEBUG_PRINT("L2PrmDb prmSendReadySize %d\n",
+                  this->m_prmSendReadySize);
 
         this->m_sendListBuffer.resetSer();
 
         while (nSent < this->m_prmSendBufferIdx) {
+            DEBUG_PRINT("L2PrmDb sending prm %d in sendprms\n", nSent);
             FwPrmIdType prmId;
 
             prmId = this->m_prmSendBuffer[nSent];
@@ -268,7 +291,8 @@ namespace Svc {
             serStat = this->m_prmDb.serializePrmSize(prmId, serSize);
             FW_ASSERT(serStat == PrmDbImpl::SERIALIZE_PRM_OK);
 
-            if (this->m_sendListBuffer.getBuffLength() + serSize > this->m_prmSendReadySize) {
+            if ((this->m_sendListBuffer.getBuffLength() + serSize > this->m_prmSendReadySize) ||
+                (this->m_sendListBuffer.getBuffLength() + serSize > this->m_sendListBuffer.getBuffCapacity())) {
 
                 if (nSent == 0) {
                     // Don't break if we can't send the first parameter.
