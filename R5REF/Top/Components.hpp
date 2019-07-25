@@ -28,7 +28,7 @@ void exitTasks();
 #include <R5/R5EventCapture/R5EventCaptureImpl.hpp>
 #include <R5/R5TimeForward/R5TimeForwardComponentImpl.hpp>
 #include <R5/R5Rti/R5RtiComponentImpl.hpp>
-
+#include <Svc/PassiveL2PrmDb/PassiveL2PrmDbImpl.hpp>
 #include <R5/GpioAdapter/R5GpioAdapterComponentImpl.hpp>
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
@@ -42,7 +42,7 @@ extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::PassiveRateGroupImpl rgAtt;
 extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::PassiveRateGroupImpl rgTlm;
-
+extern Svc::PassiveL2PrmDbComponentImpl prmDb;
 extern Gnc::FrameTransformComponentImpl ctrlXest;
 extern Gnc::ImuProcComponentImpl imuProc;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;

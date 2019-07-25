@@ -86,6 +86,12 @@ Svc::PassiveRateGroupImpl rgPos(
                                 rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
 ;
 
+Svc::PassiveL2PrmDbComponentImpl prmDb
+#if FW_OBJECT_NAMES == 1
+                        ("PRMDB", 1024) //1024 max receive
+#endif
+;
+
 Gnc::FrameTransformComponentImpl ctrlXest
 #if FW_OBJECT_NAMES == 1
                         ("CTRLXEST")
@@ -260,6 +266,12 @@ void manualConstruct() {
     hlRouter.set_HLPortsOut_OutputPort(0, cmdDisp.get_seqCmdBuff_InputPort(0));
     cmdDisp.set_seqCmdStatus_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(0));
 
+    // L2 <-> L1 PrmDb
+    prmDb.set_sendPrm_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(10));
+    hlRouter.set_HLPortsOut_OutputPort(10, prmDb.get_recvPrm_InputPort(0));
+    prmDb.set_recvPrmReady_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(11));
+    hlRouter.set_HLPortsOut_OutputPort(11, prmDb.get_sendPrmReady_InputPort(0));
+
     stim300.set_IMU_OutputPort(1, hlRouter.get_LLPortsIn_InputPort(1));
     //imuInteg.set_odomNoCov_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(2));
     //leeCtrl.set_accelCommand_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(3));
@@ -293,6 +305,8 @@ void constructApp() {
     rgAtt.init(1);
     rgPos.init(0);
     rgTlm.init(2);
+
+    prmDb.init(0);
 
     // Initialize the GNC components
     leeCtrl.init(0);
@@ -369,6 +383,7 @@ void constructApp() {
     /* Register commands */
     cmdDisp.regCommands();
     llDebug.regCommands();
+    prmDb.regCommands();
 
     ctrlXest.regCommands();
     imuProc.regCommands();
