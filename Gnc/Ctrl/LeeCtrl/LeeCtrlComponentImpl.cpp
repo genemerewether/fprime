@@ -367,7 +367,7 @@ namespace Gnc {
                                                               this->j_w__des.getz()));
           }
 
-          if (this->leeControl.SetYawDes(this->yaw__des)) {
+          if (this->leeControl.SetYawDes(this->yaw__des, this->yawdot__des)) {
               DEBUG_PRINT("Failed setting yaw to %f\n", this->yaw__des);
           }
 
