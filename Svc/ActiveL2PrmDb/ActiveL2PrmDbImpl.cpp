@@ -224,6 +224,7 @@ namespace Svc {
           default:
               FW_ASSERT(false, updateMethod);
       }
+      this->cmdResponse_out(opCode,cmdSeq,Fw::COMMAND_OK);
   }
 
   void ActiveL2PrmDbComponentImpl ::
