@@ -95,6 +95,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
   
   void ImuIntegComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void ImuIntegComponentImpl ::
     Imu_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::sensor_msgs::ImuNoCov &ImuNoCov
