@@ -208,11 +208,11 @@ Svc::CmdSequencerComponentImpl cmdSeq
 #endif
 ;
 
-Svc::PrmDbImpl prmDb
+Svc::ActiveL1PrmDbComponentImpl prmDb
 #if FW_OBJECT_NAMES == 1
-                    ("PRM",PRM_PATH)
+                     ("PRM",PRM_PATH, 126)
 #else
-                    (PRM_PATH)
+                     (PRM_PATH, 126)
 #endif
 ;
 
@@ -330,7 +330,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     fileLogger.initLog("./log/");
     
     // read parameters
-    prmDb.readParamFile();
+    prmDb.readPrmFile();
     leeCtrl.loadParameters();
     attFilter.loadParameters();
     mixer.loadParameters();
