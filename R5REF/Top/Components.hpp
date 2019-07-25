@@ -11,6 +11,8 @@ void exitTasks();
 #include <Drv/IMU/STIM300/STIM300Impl.hpp>
 #include <Drv/Altimeter/LIDARLiteV3/LIDARLiteV3Impl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
+#include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
+#include <Gnc/Utils/ImuProc/ImuProcComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
@@ -41,6 +43,8 @@ extern Svc::PassiveRateGroupImpl rgAtt;
 extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::PassiveRateGroupImpl rgTlm;
 
+extern Gnc::FrameTransformComponentImpl ctrlXest;
+extern Gnc::ImuProcComponentImpl imuProc;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;
 extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;

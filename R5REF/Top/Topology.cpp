@@ -86,6 +86,18 @@ Svc::PassiveRateGroupImpl rgPos(
                                 rgPosContext,FW_NUM_ARRAY_ELEMENTS(rgPosContext));
 ;
 
+Gnc::FrameTransformComponentImpl ctrlXest
+#if FW_OBJECT_NAMES == 1
+                        ("CTRLXEST")
+#endif
+;
+
+Gnc::ImuProcComponentImpl imuProc
+#if FW_OBJECT_NAMES == 1
+                        ("IMUPROC")
+#endif
+;
+
 Gnc::LeeCtrlComponentImpl leeCtrl
 #if FW_OBJECT_NAMES == 1
                         ("LEECTRL")
@@ -269,6 +281,9 @@ void manualConstruct() {
     cmdDisp.set_seqCmdStatus_OutputPort(1, hlRouter.get_LLPortsIn_InputPort(8));
 
     hlRouter.set_HLPortsOut_OutputPort(9, actuatorAdapter.get_flySafe_InputPort(0));
+
+    // TODO(mereweth) - switch STIM vs MPU9520
+    stim300.set_IMU_OutputPort(0, imuProc.get_HighRateImu_InputPort(0));
 }
 
 void constructApp() {
@@ -281,6 +296,8 @@ void constructApp() {
 
     // Initialize the GNC components
     leeCtrl.init(0);
+    ctrlXest.init(0);
+    imuProc.init(0);
     mixer.init(0);
     actuatorAdapter.init(0);
     sigGen.init(0);
@@ -352,7 +369,9 @@ void constructApp() {
     /* Register commands */
     cmdDisp.regCommands();
     llDebug.regCommands();
-    
+
+    ctrlXest.regCommands();
+    imuProc.regCommands();
     leeCtrl.regCommands();
     imuInteg.regCommands();
     mixer.regCommands();
