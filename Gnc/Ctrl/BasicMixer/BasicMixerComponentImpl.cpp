@@ -160,6 +160,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void BasicMixerComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void BasicMixerComponentImpl ::
     controls_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::mav_msgs::TorqueThrust &TorqueThrust

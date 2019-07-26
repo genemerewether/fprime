@@ -89,6 +89,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void SigGenComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void SigGenComponentImpl ::
     sched_handler(
         const NATIVE_INT_TYPE portNum,
         NATIVE_UINT_TYPE context

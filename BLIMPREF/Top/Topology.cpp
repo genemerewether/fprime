@@ -42,7 +42,7 @@ Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
 Svc::ActiveTextLoggerComponentImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
-Svc::PrmDbImpl* prmDb_ptr = 0;
+Svc::ActiveL1PrmDbImpl* prmDb_ptr = 0;
 Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
@@ -84,6 +84,7 @@ SnapdragonFlight::BlspPwmDriverComponentImpl* escPwmSnap_ptr = 0;
 
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
 Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr = 0;
+Drv::LinuxI2CDriverComponentImpl* i2cDrv2_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr = 0;
 Drv::LinuxPwmDriverComponentImpl* escPwm_ptr = 0;
@@ -125,11 +126,11 @@ void allocComps() {
 #endif
 ;
 
-    prmDb_ptr = new Svc::PrmDbImpl
+    prmDb_ptr = new Svc::ActiveL1PrmDbImpl
 #if FW_OBJECT_NAMES == 1
-                        ("PRM",PRM_PATH)
+                        ("PRM",PRM_PATH, 128)
 #else
-                        (PRM_PATH)
+                        (PRM_PATH, 128)
 #endif
 ;
 
@@ -390,6 +391,12 @@ void allocComps() {
 #endif
 ;
 
+    i2cDrv2_ptr = new Drv::LinuxI2CDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                    ("I2C2DRV")
+#endif
+;
+
     imuDRInt_ptr = new Drv::LinuxGpioDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("IMUDRINT")
@@ -425,7 +432,36 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct(bool internalIMUProp,
-                     bool externalIMU) {  
+                     bool externalIMU) {
+#ifdef BUILD_SDFLIGHT
+    actuatorAdapter_ptr->set_outputEnable_OutputPort(0, hwEnablePinSnap_ptr->get_gpioRead_InputPort(0));
+
+    actuatorAdapter_ptr->set_escConfig_OutputPort(0, i2cDrvSnap_ptr->get_I2CConfig_InputPort(0));
+    actuatorAdapter_ptr->set_escConfig_OutputPort(1, i2cDrvSnap2_ptr->get_I2CConfig_InputPort(0));
+
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(0, i2cDrvSnap_ptr->get_I2CReadWrite_InputPort(0));
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(1, i2cDrvSnap2_ptr->get_I2CReadWrite_InputPort(0));
+
+    mpu9250_ptr->set_SpiReadWrite_OutputPort(0, spiDrvSnap_ptr->get_SpiReadWrite_InputPort(0));
+    mpu9250_ptr->set_SpiConfig_OutputPort(0, spiDrvSnap_ptr->get_SpiConfig_InputPort(0));
+
+    imuDRIntSnap_ptr->set_intOut_OutputPort(0, rgDcplDrv_ptr->get_CycleIn_InputPort(0));
+#else // BUILD_SDFLIGHT
+    actuatorAdapter_ptr->set_outputEnable_OutputPort(0, hwEnablePin_ptr->get_gpioRead_InputPort(0));
+
+    actuatorAdapter_ptr->set_escConfig_OutputPort(0, i2cDrv_ptr->get_I2CConfig_InputPort(0));
+    actuatorAdapter_ptr->set_escConfig_OutputPort(1, i2cDrv2_ptr->get_I2CConfig_InputPort(0));
+
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(0, i2cDrv_ptr->get_I2CReadWrite_InputPort(0));
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(1, i2cDrv2_ptr->get_I2CReadWrite_InputPort(0));
+
+    mpu9250_ptr->set_SpiReadWrite_OutputPort(0, spiDrv_ptr->get_SpiReadWrite_InputPort(0));
+    mpu9250_ptr->set_SpiConfig_OutputPort(0, spiDrv_ptr->get_SpiConfig_InputPort(0));
+
+    imuDRInt_ptr->set_intOut_OutputPort(0, rgDcplDrv_ptr->get_CycleIn_InputPort(0));
+#endif //BUILD_SDFLIGHT
+
+
     // switch based on command line options
     if (internalIMUProp) {
         attFilter_ptr->set_odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
@@ -589,6 +625,7 @@ void constructApp(unsigned int port_number,
 
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
+    i2cDrv2_ptr->init(0);
     hwEnablePin_ptr->init(1);
     imuDRInt_ptr->init(0);
     escPwm_ptr->init(0);

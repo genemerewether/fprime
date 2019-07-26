@@ -176,6 +176,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void WrenchMixerComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void WrenchMixerComponentImpl ::
     controls_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::geometry_msgs::WrenchStamped &WrenchStamped

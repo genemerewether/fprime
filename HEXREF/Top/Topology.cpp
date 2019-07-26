@@ -59,6 +59,7 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
+Svc::ActiveL2PrmDbComponentImpl* prmDb_ptr;
 Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
 Gnc::ImuProcComponentImpl* imuProc_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
@@ -231,6 +232,12 @@ void allocComps() {
 #endif
 ;
 
+    prmDb_ptr = new Svc::ActiveL2PrmDbComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("PRMDB", 1024) //1024 max receive
+#endif
+;
+
     ctrlXest_ptr = new Gnc::FrameTransformComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("CTRLXEST")
@@ -344,6 +351,12 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
+    // L2 <-> L1 PrmDb
+    prmDb_ptr->set_sendPrm_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(10));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(10, prmDb_ptr->get_recvPrm_InputPort(0));
+    prmDb_ptr->set_recvPrmReady_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(11));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(11, prmDb_ptr->get_sendPrmReady_InputPort(0));
+
     imuProc_ptr->set_DownsampledImu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
@@ -454,6 +467,8 @@ void constructApp() {
 
     cmdDisp_ptr->init(0);
     tlmChan_ptr->init(0);
+    
+    prmDb_ptr->init(100, 0);
 
     kraitRouter_ptr->init(200, 1000);
 
@@ -465,6 +480,7 @@ void constructApp() {
     /* Register commands */
     cmdDisp_ptr->regCommands();
     fatalHandler_ptr->regCommands();
+    prmDb_ptr->regCommands();
 
     ctrlXest_ptr->regCommands();
     imuProc_ptr->regCommands();
@@ -521,6 +537,8 @@ void constructApp() {
     actDecouple_ptr->start(0, 89, 20*1024);
 #endif
 
+    prmDb_ptr->start(0, 50, 20*1024);
+
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
@@ -573,6 +591,8 @@ void exitTasks(void) {
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif
+
+    prmDb_ptr->exit();
 }
 
 volatile bool terminate = false;
@@ -582,10 +602,7 @@ volatile bool preinit = true;
 
 int hexref_arm() {
     DEBUG_PRINT("hexref_arm\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_arm preinit - returning\n");
-        return -1;
-    }
+    terminate = true;
 
     return 0;
 }

@@ -109,7 +109,16 @@ namespace Gnc {
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
-  
+
+  void AttFilterComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
   void AttFilterComponentImpl ::
     Imu_handler(
         const NATIVE_INT_TYPE portNum,

@@ -1,0 +1,17 @@
+    <events>
+        <event id="8" name="PrmSendTooLarge" severity="WARNING_HI" format_string = "Parameter Id %d too large (%d bytes). Could not be sent">
+            <comment>
+                Parameter too large to send to level 1 PrmDb
+            </comment>
+            <args>
+                <arg name="prmId" type="U32">
+                    <comment>Parameter that could not be sent</comment>
+                </arg>
+                <arg name="prmSize" type="U32">
+                    <comment>Size of serialized parameter</comment>
+                </arg>
+            </args>
+        </event>
+        <event id="9" name="PrmSendBufferFull" severity="WARNING_HI" format_string = "Parameter send queue full. Will not send requested parameters back to L1 PrmDb" />
+    </events>    
+

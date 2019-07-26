@@ -11,6 +11,8 @@ void exitTasks();
 #include <Drv/IMU/STIM300/STIM300Impl.hpp>
 #include <Drv/Altimeter/LIDARLiteV3/LIDARLiteV3Impl.hpp>
 #include <Gnc/Ctrl/LeeCtrl/LeeCtrlComponentImpl.hpp>
+#include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
+#include <Gnc/Utils/ImuProc/ImuProcComponentImpl.hpp>
 #include <Gnc/Ctrl/BasicMixer/BasicMixerComponentImpl.hpp>
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Est/ImuInteg/ImuIntegComponentImpl.hpp>
@@ -26,7 +28,7 @@ void exitTasks();
 #include <R5/R5EventCapture/R5EventCaptureImpl.hpp>
 #include <R5/R5TimeForward/R5TimeForwardComponentImpl.hpp>
 #include <R5/R5Rti/R5RtiComponentImpl.hpp>
-
+#include <Svc/PassiveL2PrmDb/PassiveL2PrmDbImpl.hpp>
 #include <R5/GpioAdapter/R5GpioAdapterComponentImpl.hpp>
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
@@ -40,7 +42,9 @@ extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::PassiveRateGroupImpl rgAtt;
 extern Svc::PassiveRateGroupImpl rgPos;
 extern Svc::PassiveRateGroupImpl rgTlm;
-
+extern Svc::PassiveL2PrmDbComponentImpl prmDb;
+extern Gnc::FrameTransformComponentImpl ctrlXest;
+extern Gnc::ImuProcComponentImpl imuProc;
 extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;
 extern Gnc::ActuatorAdapterComponentImpl actuatorAdapter;

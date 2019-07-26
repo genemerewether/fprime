@@ -1,0 +1,91 @@
+    <events>
+        <event id="4" name="PrmFileWriteError" severity="WARNING_HI" format_string = "Parameter write failed in stage %d with record %d and error %d" >
+            <comment>
+            Failed to write parameter file
+            </comment>
+            <args>
+                <arg name="stage" type="ENUM">
+                    <enum name="PrmWriteError">
+                        <item name="PRM_WRITE_OPEN"/>
+                        <item name="PRM_WRITE_DELIMETER"/>
+                        <item name="PRM_WRITE_DELIMETER_SIZE"/>
+                        <item name="PRM_WRITE_RECORDSIZE"/>
+                        <item name="PRM_WRITE_RECORDSIZE_SIZE"/>
+                        <item name="PRM_WRITE_PARAMETER"/>
+                        <item name="PRM_WRITE_PARAMETER_SIZE"/>
+                    </enum>
+                    <comment>The write stage</comment>
+                </arg>
+                <arg name="record" type="I32">
+                    <comment>The record that had the failure</comment>
+                </arg>          
+                <arg name="error" type="I32">
+                    <comment>The error code</comment>
+                </arg>          
+            </args>
+        </event>
+        <event id="5" name="PrmFileSaveComplete" severity="ACTIVITY_HI" format_string = "Parameter file save completed. Wrote %d records." >
+            <comment>
+            Save of parameter file completed
+            </comment>
+            <args>
+                <arg name="records" type="U32">
+                    <comment>The number of records saved</comment>
+                </arg>          
+            </args>
+        </event>
+        <event id="6" name="PrmFileReadError" severity="WARNING_HI" format_string = "Parameter file read failed in stage %d with record %d and error %d" >
+            <comment>
+            Failed to read parameter file
+            </comment>
+            <args>
+                <arg name="stage" type="ENUM">
+                    <enum name="PrmReadError">
+                        <item name="PRM_READ_OPEN"/>
+                        <item name="PRM_READ_DELIMETER"/>
+                        <item name="PRM_READ_DELIMETER_SIZE"/>
+                        <item name="PRM_READ_DELIMETER_VALUE"/>
+                        <item name="PRM_READ_RECORD_SIZE"/>
+                        <item name="PRM_READ_RECORD_SIZE_SIZE"/>
+                        <item name="PRM_READ_RECORD_SIZE_VALUE"/>
+                        <item name="PRM_READ_PARAMETER"/>
+                        <item name="PRM_READ_PARAMETER_SIZE"/>
+                    </enum>
+                    <comment>The write stage</comment>
+                </arg>          
+                <arg name="record" type="I32">
+                    <comment>The record that had the failure</comment>
+                </arg>          
+                <arg name="error" type="I32">
+                    <comment>The error code</comment>
+                </arg>          
+            </args>
+        </event>
+        <event id="7" name="PrmFileLoadComplete" severity="ACTIVITY_HI" format_string = "Parameter file load completed. Read %d records." >
+            <comment>
+            Load of parameter file completed
+            </comment>
+            <args>
+                <arg name="records" type="U32">
+                    <comment>The number of records loaded</comment>
+                </arg>          
+            </args>
+        </event>
+        <event id="8" name="PrmSendTooLarge" severity="WARNING_HI" format_string = "Parameter Id %d too large (%d bytes). Could not be sent to port %d">
+            <comment>
+                Parameter too large to send to level 2 PrmDb
+            </comment>
+            <args>
+                <arg name="prmId" type="U32">
+                    <comment>Parameter that could not be sent</comment>
+                </arg>
+                <arg name="prmSize" type="U32">
+                    <comment>Size of serialized parameter</comment>
+                </arg>
+                <arg name="portNum" type="I32">
+                    <comment>Port Number of level 2 prmDb</comment>
+                </arg>
+            </args>
+        </event>
+    </events>    
+

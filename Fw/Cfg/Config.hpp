@@ -253,6 +253,11 @@
 #define FW_PARAM_BUFFER_MAX_SIZE             (FW_COM_BUFFER_MAX_SIZE - sizeof(FwPrmIdType) - sizeof(FwPacketDescriptorType))
 #endif
 
+// Specified the size of the buffer that contains a series of parameterized values
+#ifndef FW_PARAM_LIST_MAX_SIZE
+#define FW_PARAM_LIST_MAX_SIZE               (FW_COM_BUFFER_MAX_SIZE - sizeof(U32) - sizeof(FwPacketDescriptorType))
+#endif
+
 // Specifies the maximum size of a string in a parameter
 #ifndef FW_PARAM_STRING_MAX_SIZE
 #define FW_PARAM_STRING_MAX_SIZE           40  //!< Max size of parameter string type

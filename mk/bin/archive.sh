@@ -62,14 +62,3 @@ tar -czvf BLIMPREF.tar.gz \
     BLIMPREF/py_dict \
     BLIMPREF/*PrmDb*.dat \
     BLIMPREF/linux-linaro-cross-arm-opt-gnu-bin/BLIMPREF
-
-cd CARREF/Top
-make clean
-cd ..
-make
-make dict_install rosser
-cd ..
-tar -czvf CARREF.tar.gz \
-    CARREF/py_dict \
-    CARREF/*PrmDb*.dat \
-    CARREF/linux-linaro-cross-arm-opt-gnu-bin/CARREF

@@ -14,7 +14,7 @@ void exitTasks(void);
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <ROS/RosTime/RosTimeImpl.hpp>
 #include <Svc/TlmChan/TlmChanImpl.hpp>
-#include <Svc/PrmDb/PrmDbImpl.hpp>
+#include <Svc/ActiveL1PrmDb/ActiveL1PrmDbImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
@@ -49,7 +49,7 @@ extern Svc::ActiveFileLoggerImpl fileLogger;
 extern ROS::RosTimeImpl rosTime;
 extern Svc::TlmChanImpl chanTlm;
 extern Svc::CommandDispatcherImpl cmdDisp;
-extern Svc::PrmDbImpl prmDb;
+extern Svc::ActiveL1PrmDbComponentImpl prmDb;
 extern Svc::UdpReceiverComponentImpl udpReceiver;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;

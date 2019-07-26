@@ -84,7 +84,10 @@ namespace Gnc {
                                 paramGet_a_r_b__z(valid[6]));
 
       for (unsigned int i = 0; i < 7; i++) {
-          if (Fw::PARAM_VALID != valid[i]) {  return;  }
+          if (Fw::PARAM_VALID != valid[i]) {
+              this->log_WARNING_HI_FTFO_InitFailed(FTFO_PrmUnset);
+              return;
+          }
       }
 
       this->a_X_b = a_R_b * a_r_b; // translation after rotation
@@ -106,6 +109,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
+
+  void FrameTransformComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
 
   void FrameTransformComponentImpl ::
     odomInA_handler(
