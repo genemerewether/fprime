@@ -84,7 +84,7 @@ namespace Gnc {
   {
       this->paramsInited = false;
       Fw::ParamValid valid[3];
-      attFilter.SetTimeStep(paramGet_dt(valid[0]));
+      attFilter.SetTimeStep(paramGet_ATTFILTER_dt(valid[0]));
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
 
       attFilter.SetAccelGain(paramGet_accelGain(valid[0]));

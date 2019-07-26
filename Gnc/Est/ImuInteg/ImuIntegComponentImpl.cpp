@@ -84,7 +84,7 @@ namespace Gnc {
   {
       this->paramsInited = false;
       Fw::ParamValid valid[1];
-      imuInteg.SetTimeStep(paramGet_dt(valid[0]));
+      imuInteg.SetTimeStep(paramGet_IMUINTEG_dt(valid[0]));
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       
       this->paramsInited = true;

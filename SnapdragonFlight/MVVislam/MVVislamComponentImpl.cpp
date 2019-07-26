@@ -173,10 +173,7 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
 
   void MVVislamComponentImpl ::
-    Imu_handler(
-        const NATIVE_INT_TYPE portNum,
-        ROS::sensor_msgs::ImuNoCov &imu
-    )
+    addImuHelper(ROS::sensor_msgs::ImuNoCov &imu)
   {
       ROS::std_msgs::Header h = imu.getheader();
       Fw::Time stamp = h.getstamp();
@@ -209,9 +206,43 @@ namespace SnapdragonFlight {
                            imu.getangular_velocity().getz());
 #endif //BUILD_SDFLIGHT
       }
+  }
 
+  void MVVislamComponentImpl ::
+    Imu_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::sensor_msgs::ImuNoCov &imu
+    )
+  {
+      addImuHelper(imu);
       if (isConnected_ImuFwd_OutputPort(0)) {
           ImuFwd_out(0, imu);
+      }
+  }
+
+  void MVVislamComponentImpl ::
+    BatchImu_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::BatchImu &BatchImu
+    )
+  {
+      NATIVE_INT_TYPE size = 0;
+      ROS::sensor_msgs::ImuNoCov rwArray[20];
+      const ROS::sensor_msgs::ImuNoCov* imuArray = BatchImu.getsamples(size);
+      NATIVE_INT_TYPE setSize = FW_MIN(BatchImu.getsamples_count(), size);
+      if (setSize > FW_NUM_ARRAY_ELEMENTS(rwArray)) {
+          // TODO(mereweth) - EVR
+          return;
+      }
+      for (U32 ii = 0; ii < setSize; ii++) {
+          rwArray[ii] = imuArray[ii];
+          addImuHelper(rwArray[ii]);
+      }
+      
+      BatchImu.setsamples(rwArray, setSize);
+
+      if (isConnected_BatchImuFwd_OutputPort(0)) {
+          BatchImuFwd_out(0, BatchImu);
       }
   }
 

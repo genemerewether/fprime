@@ -2,6 +2,7 @@ SRC = \
 ActuatorsSerializableAi.xml \
 AttitudeRateThrustSerializableAi.xml \
 AttitudeThrustSerializableAi.xml \
+BatchImuSerializableAi.xml \
 BoolStampedSerializableAi.xml \
 FilteredSensorDataSerializableAi.xml \
 FlatOutputSerializableAi.xml \

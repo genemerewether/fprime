@@ -156,6 +156,8 @@ namespace Svc {
                 return "Ser";
             case AFL_HLROSIFACE_IMUNOCOV:
                 return "ImuNoCov";
+            case AFL_HLROSIFACE_BATCHIMU:
+                return "BatchImu";
             case AFL_HLROSIFACE_RANGE:
                 return "Range";
             case AFL_FILTIFACE_ODOMNOCOV:

@@ -68,6 +68,9 @@ namespace SnapdragonFlight {
       void preamble(void);
       //! Finalizer override
       void finalizer(void);
+
+      // add IMU packet to Vislam; converts time as side-effect
+      void addImuHelper(ROS::sensor_msgs::ImuNoCov &imu);
     
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -78,6 +81,13 @@ namespace SnapdragonFlight {
       void Imu_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::sensor_msgs::ImuNoCov &imu
+      );
+
+      //! Handler implementation for BatchImu
+      //!
+      void BatchImu_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::BatchImu &BatchImu 
       );
 
       //! Handler implementation for Image

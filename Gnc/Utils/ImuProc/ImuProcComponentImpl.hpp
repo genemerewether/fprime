@@ -89,6 +89,15 @@ namespace Gnc {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
+      // ----------------------------------------------------------------------
+      // Member variables
+      // ----------------------------------------------------------------------
+    
+      ROS::mav_msgs::BatchImu m_batchImu;
+
+      ROS::sensor_msgs::ImuNoCov m_imuArray[20];
+
+      NATIVE_INT_TYPE batchImuMax;
 
     };
 

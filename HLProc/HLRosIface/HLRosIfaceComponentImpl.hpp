@@ -105,13 +105,24 @@ namespace HLProc {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      void addImuHelper(ROS::sensor_msgs::ImuNoCov &Imu,
+                        U8 aflLog,
+                        sensor_msgs::Imu msg);
+
       //! Handler implementation for Imu
       //!
       void Imu_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::sensor_msgs::ImuNoCov &Imu
       );
-    
+
+      //! Handler implementation for BatchImu
+      //!
+      void BatchImu_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::BatchImu &BatchImu 
+      );
+
       //! Handler implementation for Range
       //!
       void Range_handler(
@@ -158,6 +169,7 @@ namespace HLProc {
         //! Publishers for IMU data
         //!
         ros::Publisher m_imuPub[NUM_IMU_INPUT_PORTS];
+        ros::Publisher m_batchImuPub[NUM_BATCHIMU_INPUT_PORTS];
     
         ros::Publisher m_rangePub[NUM_RANGE_INPUT_PORTS];
 

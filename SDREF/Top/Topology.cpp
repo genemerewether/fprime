@@ -458,7 +458,7 @@ void manualConstruct(bool llRouterDevices,
         prmDb_ptr->set_recvPrmReady_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(11));
         hexRouter_ptr->set_HexPortsOut_OutputPort(11, prmDb_ptr->get_sendPrmReady_InputPort(0));
 
-        hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
+        hexRouter_ptr->set_HexPortsOut_OutputPort(1, mvVislam_ptr->get_BatchImu_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
@@ -497,6 +497,7 @@ void manualConstruct(bool llRouterDevices,
         prmDb_ptr->set_recvPrmReady_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(11));
         llRouter_ptr->set_LLPortsOut_OutputPort(11, prmDb_ptr->get_sendPrmReady_InputPort(0));
 
+        // NOTE(mereweth) - change this line to use BatchImu with R5REF if that changes in future
         llRouter_ptr->set_LLPortsOut_OutputPort(1, mvVislam_ptr->get_Imu_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));

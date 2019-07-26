@@ -1,5 +1,5 @@
 <parameters>
-    <parameter id="0" set_opcode="20" save_opcode="21" name="dt" data_type="F64" >
+    <parameter id="0" set_opcode="20" save_opcode="21" name="IMUINTEG_dt" data_type="F64" >
       <comment>Nominal timestep</comment>
     </parameter>
 </parameters>
