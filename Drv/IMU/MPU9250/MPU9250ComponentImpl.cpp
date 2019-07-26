@@ -60,7 +60,8 @@ namespace Drv {
         m_gyroRawToRadS(0.0f),
         m_accelRawToMS2(0.0f),
         m_useMagnetometer(useMagnetometer),
-        m_cycleCount(0u)
+        m_cycleCount(0u),
+        m_sampleCount(0u)
     {
 
     }
@@ -191,7 +192,7 @@ namespace Drv {
                         ImuNoCov imu(
                           // TODO(mereweth) - add/use time port from GPIO interrupt
                           // TODO(mereweth) - convert frame name to U32 idx
-                          Header(m_cycleCount, ImuNow, 0/*Fw::EightyCharString("mpu9250")*/),
+                          Header(m_sampleCount++, ImuNow, 0/*Fw::EightyCharString("mpu9250")*/),
                           Quaternion(0, 0, 0, 1), // TODO(mereweth) - mag goes here
                           Vector3(gyroX, gyroY, gyroZ),
                           Vector3(accelX, accelY, accelZ)
@@ -272,6 +273,7 @@ namespace Drv {
                     else {
                         //DEBUG_PRINT("MPU9250 INIT_RESET cycle %d\n", m_cycleCount);
                         if (m_cycleCount > MPU9250_RESET_WAIT_CYCLES) {
+                            // TODO(mereweth) - use time here instead
                             m_cycleCount = 0;
                             m_initState = INIT_POWER_ON_1;
                             return;

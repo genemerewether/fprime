@@ -100,7 +100,7 @@ namespace Gnc {
       if ((samplesCount >= batchImuMax) ||
           (samplesCount >= FW_NUM_ARRAY_ELEMENTS(m_imuArray))) { // TODO(mereweth) - evr if greater?
           // NOTE(mereweth) - batchImu is full; send and reset
-          NATIVE_INT_TYPE size = 0;
+          NATIVE_INT_TYPE size = samplesCount;
           this->m_batchImu.setsamples(m_imuArray, size);
           for (int i = 0; i < NUM_BATCHIMU_OUTPUT_PORTS; i++) {
               if (this->isConnected_BatchImu_OutputPort(i)) {

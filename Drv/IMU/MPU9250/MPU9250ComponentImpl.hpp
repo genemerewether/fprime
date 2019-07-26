@@ -121,6 +121,8 @@ namespace Drv {
     bool m_useMagnetometer;
 
     NATIVE_UINT_TYPE m_cycleCount;
+    
+    NATIVE_UINT_TYPE m_sampleCount;
 
   };
 
