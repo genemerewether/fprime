@@ -86,7 +86,7 @@ extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
 extern Svc::ActiveTextLoggerComponentImpl* textLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;
-extern Svc::ActiveL1PrmDbImpl* prmDb_ptr;
+extern Svc::ActiveL1PrmDbComponentImpl* prmDb_ptr;
 extern Svc::SocketGndIfImpl* sockGndIf_ptr;
 extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
 extern Svc::TimeConvertComponentImpl* timeConvert_ptr;
