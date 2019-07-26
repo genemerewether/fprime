@@ -42,7 +42,7 @@ Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
 Svc::ActiveTextLoggerComponentImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
-Svc::ActiveL1PrmDbImpl* prmDb_ptr = 0;
+Svc::ActiveL1PrmDbComponentImpl* prmDb_ptr = 0;
 Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
 Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
@@ -126,7 +126,7 @@ void allocComps() {
 #endif
 ;
 
-    prmDb_ptr = new Svc::ActiveL1PrmDbImpl
+    prmDb_ptr = new Svc::ActiveL1PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("PRM",PRM_PATH, 128)
 #else
@@ -659,7 +659,7 @@ void constructApp(unsigned int port_number,
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
     
-    prmDb_ptr->readParamFile();
+    prmDb_ptr->readPrmFile();
 
     ctrlXest_ptr->loadParameters();
     imuProc_ptr->loadParameters();
