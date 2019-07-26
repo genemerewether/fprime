@@ -60,5 +60,4 @@ make dict_install rosser
 cd ..
 tar -czvf BLIMPREF.tar.gz \
     BLIMPREF/py_dict \
-    BLIMPREF/*PrmDb*.dat \
     BLIMPREF/linux-linaro-cross-arm-opt-gnu-bin/BLIMPREF

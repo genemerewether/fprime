@@ -114,7 +114,7 @@ namespace HLProc {
   void HLRosIfaceComponentImpl ::
     addImuHelper(ROS::sensor_msgs::ImuNoCov &imu,
                  U8 aflLog,
-                 sensor_msgs::Imu msg)
+                 sensor_msgs::Imu &msg)
   {
       ROS::std_msgs::Header h = imu.getheader();
       Fw::Time stamp = h.getstamp();
@@ -151,13 +151,13 @@ namespace HLProc {
           this->FileLogger_out(0,fileBuff);
       }
 
-      msg.header.stamp.sec = header.getstamp().getSeconds();
-      msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
+      msg.header.stamp.sec = h.getstamp().getSeconds();
+      msg.header.stamp.nsec = h.getstamp().getUSeconds() * 1000L;
 
-      msg.header.seq = header.getseq();
+      msg.header.seq = h.getseq();
 
       // TODO(mereweth) - convert frame ID
-      U32 frame_id = header.getframe_id();
+      U32 frame_id = h.getframe_id();
       msg.header.frame_id = "quest-imu";
 
       msg.orientation_covariance[0] = -1;
@@ -172,7 +172,7 @@ namespace HLProc {
       msg.angular_velocity.z = vec.getz();
   }
 
-    void MVVislamComponentImpl ::
+    void HLRosIfaceComponentImpl ::
       BatchImu_handler(
           const NATIVE_INT_TYPE portNum,
           ROS::mav_msgs::BatchImu &BatchImu
@@ -188,7 +188,7 @@ namespace HLProc {
             sensor_msgs::Imu data;
             addImuHelper(imu, AFL_HLROSIFACE_BATCHIMU, data);
 
-            msg.push_back(data);
+            msg.samples.push_back(data);
         }
 
         if (m_rosInited) {
@@ -202,10 +202,8 @@ namespace HLProc {
           ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
-        addImuHelper(Imu, AFL_HLROSIFACE_IMUNOCOV);
-        ROS::std_msgs::Header header = Imu.getheader();
-
         sensor_msgs::Imu msg;
+        addImuHelper(Imu, AFL_HLROSIFACE_IMUNOCOV, msg);
 
         if (m_rosInited) {
             m_imuPub[portNum].publish(msg);

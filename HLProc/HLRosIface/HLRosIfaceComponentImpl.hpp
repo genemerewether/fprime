@@ -23,6 +23,7 @@
 #include "HLProc/HLRosIface/HLRosIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
+#include "sensor_msgs/Imu.h"
 #include "mav_msgs/Actuators.h"
 #include <image_transport/image_transport.h>
 
@@ -107,7 +108,7 @@ namespace HLProc {
 
       void addImuHelper(ROS::sensor_msgs::ImuNoCov &Imu,
                         U8 aflLog,
-                        sensor_msgs::Imu msg);
+                        sensor_msgs::Imu &msg);
 
       //! Handler implementation for Imu
       //!

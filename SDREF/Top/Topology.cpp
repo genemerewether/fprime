@@ -709,7 +709,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     ipcRelay_ptr->init(60, IPC_RELAY_BUFFER_SIZE, 0);
     hiresCam_ptr->init(60, 0);
     stereoCam_ptr->init(60, 0);
-    hexRouter_ptr->init(60, 1000); // message size
+    hexRouter_ptr->init(60, 1600); // message size
     
     sdRosIface_ptr->init(0);
     mrCtrlIface_ptr->init(0);

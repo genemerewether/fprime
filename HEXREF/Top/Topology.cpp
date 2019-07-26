@@ -357,7 +357,7 @@ void manualConstruct(void) {
     prmDb_ptr->set_recvPrmReady_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(11));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(11, prmDb_ptr->get_sendPrmReady_InputPort(0));
 
-    imuProc_ptr->set_BatchImu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
+    imuProc_ptr->set_BatchImu_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
@@ -470,7 +470,7 @@ void constructApp() {
     
     prmDb_ptr->init(100, 0);
 
-    kraitRouter_ptr->init(200, 1000);
+    kraitRouter_ptr->init(200, 1600);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
