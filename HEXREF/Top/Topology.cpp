@@ -446,7 +446,7 @@ void constructApp() {
 
     //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
 
-    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ);
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_184HZ_GYRO_184HZ);
     
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
@@ -583,10 +583,13 @@ void exitTasks(void) {
     kraitRouter_ptr->quit();
 #ifdef DECOUPLE_RG
     rgDecouple_ptr->exit();
+    rgDecouple_ptr->join(NULL);
 #endif
     imuDecouple_ptr->exit();
+    imuDecouple_ptr->join(NULL);
 #ifdef DECOUPLE_ACTUATORS
     actDecouple_ptr->exit();
+    actDecouple_ptr->join(NULL);
 #endif
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();

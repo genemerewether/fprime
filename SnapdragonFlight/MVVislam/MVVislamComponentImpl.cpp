@@ -227,7 +227,7 @@ namespace SnapdragonFlight {
     )
   {
       NATIVE_INT_TYPE size = 0;
-      ROS::sensor_msgs::ImuNoCov rwArray[20];
+      ROS::sensor_msgs::ImuNoCov rwArray[100];
       const ROS::sensor_msgs::ImuNoCov* imuArray = BatchImu.getsamples(size);
       NATIVE_INT_TYPE setSize = FW_MIN(BatchImu.getsamples_count(), size);
       if (setSize > FW_NUM_ARRAY_ELEMENTS(rwArray)) {

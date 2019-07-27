@@ -95,7 +95,7 @@ namespace Gnc {
     
       ROS::mav_msgs::BatchImu m_batchImu;
 
-      ROS::sensor_msgs::ImuNoCov m_imuArray[20];
+      ROS::sensor_msgs::ImuNoCov m_imuArray[100];
 
       NATIVE_INT_TYPE batchImuMax;
 
