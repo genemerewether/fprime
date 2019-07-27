@@ -148,7 +148,7 @@ namespace Gnc {
 
       ROS::geometry_msgs::Point x_w = ImuStateUpdate.getpose().getposition();
       ROS::geometry_msgs::Quaternion w_q_b = ImuStateUpdate.getpose().getorientation();
-      ROS::geometry_msgs::Vector3 v_w = ImuStateUpdate.gettwist().getlinear();
+      ROS::geometry_msgs::Vector3 v_b = ImuStateUpdate.gettwist().getlinear();
       //this->omega_b = ImuStateUpdate.gettwist().getangular();
 
       ROS::geometry_msgs::Vector3 wBias = ImuStateUpdate.getangular_velocity_bias();
@@ -163,9 +163,9 @@ namespace Gnc {
                                                   w_q_b.getx(),
                                                   w_q_b.gety(),
                                                   w_q_b.getz()),
-                               Eigen::Vector3d(v_w.getx(),
-                                               v_w.gety(),
-                                               v_w.getz()),
+                               Eigen::Vector3d(v_b.getx(),
+                                               v_b.gety(),
+                                               v_b.getz()),
                                Eigen::Vector3d(wBias.getx(),
                                                wBias.gety(),
                                                wBias.getz()),

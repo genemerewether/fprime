@@ -94,9 +94,9 @@ namespace SnapdragonFlight {
       F32 ombc[] = { 0.0, 0.0, 1.57 };
 #else
       // NOTE(mereweth) - x,y,z, offsets in meters
-      F32 tbc[] = { -0.051, 0.015, 0.011 };
+      F32 tbc[] = { -0.0233, 0.0168, 0.0082 };
       // NOTE(mereweth) - axis-angle rep; 
-      F32 ombc[] = { 0.6149, -0.6149, -1.4817 };
+      F32 ombc[] = { 0.5709, -0.5676, -1.5285 };
 #endif
 
       F32 std0Tbc[] = { 0.005, 0.005, 0.005 };
@@ -110,16 +110,16 @@ namespace SnapdragonFlight {
       camCfg.pixelHeight = 480;
       camCfg.memoryStride = 640;
 
-      camCfg.principalPoint[0] = 320.0;
-      camCfg.principalPoint[1] = 240.0;
-      camCfg.focalLength[0] = 275.0;
-      camCfg.focalLength[1] = 275.0;
+      camCfg.principalPoint[0] = 327.986206;
+      camCfg.principalPoint[1] = 263.447510;
+      camCfg.focalLength[0] = 294.302726;
+      camCfg.focalLength[1] = 294.302826;
       camCfg.uvOffset = 0;
       camCfg.distortionModel = 10;
-      camCfg.distortion[0] = .003908;
-      camCfg.distortion[1] = -0.009574;
-      camCfg.distortion[2] = 0.010173;
-      camCfg.distortion[3] = -0.003329;
+      camCfg.distortion[0] = -0.017841;
+      camCfg.distortion[1] = 0.022006;
+      camCfg.distortion[2] = -0.014046;
+      camCfg.distortion[3] = 0.002722;
 
       this->m_mvVISLAMPtr = 
         mvVISLAM_Initialize(&camCfg,
@@ -149,7 +149,7 @@ namespace SnapdragonFlight {
                             "na", //staticMaskFilename
                             0.0f, //gpsImuTimeAlignment
                             tba,
-                            false //mapping
+                            true //mapping
       );
       if (NULL != m_mvVISLAMPtr) {
           m_initialized = true;
@@ -278,6 +278,20 @@ namespace SnapdragonFlight {
             - \b 15:  Sensor measurements with uninitialized time stamps or uninitialized uncertainty (set to 0)
           */
 
+          DEBUG_PRINT("tbc %0.4f, %0.4f, %0.4f\n", vio_pose.tbc[0], vio_pose.tbc[1], vio_pose.tbc[2]);
+          DEBUG_PRINT("Rbc\n[%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n]\n",
+                      vio_pose.Rbc[0][0], vio_pose.Rbc[0][1], vio_pose.Rbc[0][2],
+                      vio_pose.Rbc[1][0], vio_pose.Rbc[1][1], vio_pose.Rbc[1][2],
+                      vio_pose.Rbc[2][0], vio_pose.Rbc[2][1], vio_pose.Rbc[2][2]);
+          DEBUG_PRINT("aAccInv\n[%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n]\n",
+                      vio_pose.aAccInv[0][0], vio_pose.aAccInv[0][1], vio_pose.aAccInv[0][2],
+                      vio_pose.aAccInv[1][0], vio_pose.aAccInv[1][1], vio_pose.aAccInv[1][2],
+                      vio_pose.aAccInv[2][0], vio_pose.aAccInv[2][1], vio_pose.aAccInv[2][2]);
+          DEBUG_PRINT("aGyrInv\n[%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n]\n",
+                      vio_pose.aGyrInv[0][0], vio_pose.aGyrInv[0][1], vio_pose.aGyrInv[0][2],
+                      vio_pose.aGyrInv[1][0], vio_pose.aGyrInv[1][1], vio_pose.aGyrInv[1][2],
+                      vio_pose.aGyrInv[2][0], vio_pose.aGyrInv[2][1], vio_pose.aGyrInv[2][2]);
+
           //TODO(mereweth) - move these after transform
           this->x_b.setx(vio_pose.bodyPose.matrix[0][3]);
           this->x_b.sety(vio_pose.bodyPose.matrix[1][3]);
@@ -295,11 +309,6 @@ namespace SnapdragonFlight {
               Transform<float,3,Affine> odom_to_imu(AngleAxisf(3.14159, Vector3f::UnitY())
                                                     * AngleAxisf(acos(grav.dot(Vector3f::UnitZ())),
                                                                  grav.cross(Vector3f::UnitZ())));
-              // NOTE(Mereweth) - odom_to_imu is odom_to_imu-start (MV spatial) here,
-              // and velocity is expressed in MV spatial, so this is correct to get
-              // to odom frame
-              Vector3f vel(vio_pose.velocity[0], vio_pose.velocity[1], vio_pose.velocity[2]);
-              vel = odom_to_imu * vel;
               
               Transform<float,3,Affine> imu_start_to_imu;
               imu_start_to_imu.matrix() << vio_pose.bodyPose.matrix[0][0],
@@ -316,6 +325,11 @@ namespace SnapdragonFlight {
                 vio_pose.bodyPose.matrix[2][3],
                 0.0, 0.0, 0.0, 1.0;
               odom_to_imu = odom_to_imu * imu_start_to_imu;
+
+              // NOTE(Mereweth) - velocity is expressed in MV spatial, so this is correct to get
+              // to body
+              Vector3f vel(vio_pose.velocity[0], vio_pose.velocity[1], vio_pose.velocity[2]);
+              vel = imu_start_to_imu.rotation() * vel;
               
               const Quaternionf odom_to_imu_q(odom_to_imu.rotation());
               const Vector3f odom_to_imu_v(odom_to_imu.translation());
