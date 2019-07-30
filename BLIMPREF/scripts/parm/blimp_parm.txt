@@ -266,8 +266,8 @@ P1_CTRL_KP_PRM_SET, 50.0
 # output units max delta from open loop mapping
 P1_CTRL_MAXERR_PRM_SET, 2000.0
 
-# bluez esc I2C protocol
-P1_OUTPUTTYPE_PRM_SET, 2
+# bluez esc I2C short protocol
+P1_OUTPUTTYPE_PRM_SET, 4
 # take input from angular velocities
 P1_INPUTACTTYPE_PRM_SET, 2
 

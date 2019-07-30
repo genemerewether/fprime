@@ -1,6 +1,8 @@
 SRC = \
 OdometryNoCovSerializableAi.xml \
-OdometrySerializableAi.xml
+OdometrySerializableAi.xml \
+OdometryAccelNoCovSerializableAi.xml \
+OdometryAccelSerializableAi.xml
 
 # GetMapActionFeedbackSerializableAi.xml \
 # GetMapActionGoalSerializableAi.xml \

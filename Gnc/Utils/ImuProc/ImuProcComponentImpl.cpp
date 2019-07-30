@@ -42,12 +42,14 @@ namespace Gnc {
     ImuProcComponentImpl(
         const char *const compName
     ) :
-      ImuProcComponentBase(compName)
+      ImuProcComponentBase(compName),
 #else
-    ImuProcImpl(void)
+      ImuProcImpl(void),
 #endif
+      m_batchImu()
   {
-
+      m_batchImu.setsamples_count(0);
+      (void) m_batchImu.getsamples(batchImuMax);
   }
 
   void ImuProcComponentImpl ::
@@ -69,25 +71,51 @@ namespace Gnc {
   // ----------------------------------------------------------------------
 
   void ImuProcComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
+  void ImuProcComponentImpl ::
     HighRateImu_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::sensor_msgs::ImuNoCov &ImuNoCov
     )
   {
       // TODO (mereweth) - actually do processing and downsample
-      static unsigned int down = 0u;
-      /*      if (++down >= 8) {
-              down = 0u;*/
 
       for (int i = 0; i < NUM_DOWNSAMPLEDIMU_OUTPUT_PORTS; i++) {
           if (this->isConnected_DownsampledImu_OutputPort(i)) {
               this->DownsampledImu_out(i, ImuNoCov);
           }
           else {
-              DEBUG_PRINT("MPU9250 Imu out port %d not connected\n", i);
+              DEBUG_PRINT("ImuProc DownsampledImu out port %d not connected\n", i);
           }
       }
-      //}
+
+      U32 samplesCount = m_batchImu.getsamples_count();
+      if ((samplesCount >= batchImuMax) ||
+          (samplesCount >= FW_NUM_ARRAY_ELEMENTS(m_imuArray))) { // TODO(mereweth) - evr if greater?
+          // NOTE(mereweth) - batchImu is full; send and reset
+          NATIVE_INT_TYPE size = samplesCount;
+          this->m_batchImu.setsamples(m_imuArray, size);
+          for (int i = 0; i < NUM_BATCHIMU_OUTPUT_PORTS; i++) {
+              if (this->isConnected_BatchImu_OutputPort(i)) {
+                  this->BatchImu_out(i, this->m_batchImu);
+              }
+              else {
+                  DEBUG_PRINT("ImuProc BatchImu out port %d not connected\n", i);
+              }
+          }
+
+          samplesCount = 0;
+      }
+
+      m_imuArray[samplesCount++] = ImuNoCov; // post-increment
+      m_batchImu.setsamples_count(samplesCount);
   }
 
   // ----------------------------------------------------------------------

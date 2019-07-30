@@ -30,9 +30,13 @@
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
+#include "sensor_msgs/Imu.h"
+#include "mav_msgs/BatchImu.h"
+#include "sensor_msgs/Range.h"
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/fill_image.h>
+#include "std_msgs/Float32.h"
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -53,6 +57,7 @@ namespace HLProc {
     HLRosIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_imageXport(NULL),
     m_actuatorsSet() // zero-initialize instead of default-initializing
@@ -78,37 +83,15 @@ namespace HLProc {
     }
 
     void HLRosIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice; free imageXport
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-        m_imageXport = new image_transport::ImageTransport(*n);
-
-        char buf[32];
-        for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
-            m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 10000);
-        }
-
-        for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_%d", i);
-            m_imagePub[i] = m_imageXport->advertise(buf, 1);
-        }
-
-        for (int i = 0; i < NUM_POINTCLOUD_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "pointcloud_%d", i);
-            m_pointCloudPub[i] = n->advertise<sensor_msgs::PointCloud2>(buf, 1);
-        }
-
-        m_rosInited = true;
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
     }
-
+  
     Os::Task::TaskStatus HLRosIfaceComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("HLROSIFACE");
-        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, HLRosIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -118,9 +101,100 @@ namespace HLProc {
 
         return stat;
     }
+  
+    void HLRosIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
+
+  void HLRosIfaceComponentImpl ::
+    addImuHelper(ROS::sensor_msgs::ImuNoCov &imu,
+                 U8 aflLog,
+                 sensor_msgs::Imu &msg)
+  {
+      ROS::std_msgs::Header h = imu.getheader();
+      Fw::Time stamp = h.getstamp();
+
+      // if port is not connected, default to no conversion
+      Fw::Time convTime = stamp;
+
+      if (this->isConnected_convertTime_OutputPort(0)) {
+          bool success = false;
+          convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+          if (!success) {
+              // TODO(Mereweth) - EVR
+              return;
+          }
+      }
+      
+      h.setstamp(convTime);
+      imu.setheader(h);
+
+      if (this->isConnected_FileLogger_OutputPort(0)) {
+          Svc::ActiveFileLoggerPacket fileBuff;
+          Fw::SerializeStatus stat;
+          Fw::Time recvTime = this->getTime();
+          fileBuff.resetSer();
+          stat = fileBuff.serialize(aflLog);
+          FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+          stat = fileBuff.serialize(recvTime.getSeconds());
+          FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+          stat = fileBuff.serialize(recvTime.getUSeconds());
+          FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+          stat = imu.serialize(fileBuff);
+          FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+          this->FileLogger_out(0,fileBuff);
+      }
+
+      msg.header.stamp.sec = h.getstamp().getSeconds();
+      msg.header.stamp.nsec = h.getstamp().getUSeconds() * 1000L;
+
+      msg.header.seq = h.getseq();
+
+      // TODO(mereweth) - convert frame ID
+      U32 frame_id = h.getframe_id();
+      msg.header.frame_id = "quest-imu";
+
+      msg.orientation_covariance[0] = -1;
+
+      ROS::geometry_msgs::Vector3 vec = imu.getlinear_acceleration();
+      msg.linear_acceleration.x = vec.getx();
+      msg.linear_acceleration.y = vec.gety();
+      msg.linear_acceleration.z = vec.getz();
+      vec = imu.getangular_velocity();
+      msg.angular_velocity.x = vec.getx();
+      msg.angular_velocity.y = vec.gety();
+      msg.angular_velocity.z = vec.getz();
+  }
+
+    void HLRosIfaceComponentImpl ::
+      BatchImu_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::mav_msgs::BatchImu &BatchImu
+      )
+    {
+        NATIVE_INT_TYPE size = 0;
+        const ROS::sensor_msgs::ImuNoCov* imuArray = BatchImu.getsamples(size);
+        NATIVE_INT_TYPE setSize = FW_MIN(BatchImu.getsamples_count(), size);
+
+        mav_msgs::BatchImu msg;
+        for (U32 ii = 0; ii < setSize; ii++) {
+            ROS::sensor_msgs::ImuNoCov imu = imuArray[ii];
+            sensor_msgs::Imu data;
+            addImuHelper(imu, AFL_HLROSIFACE_BATCHIMU, data);
+
+            msg.samples.push_back(data);
+        }
+
+        if (m_rosInited) {
+            m_batchImuPub[portNum].publish(msg);
+        }
+    }
 
     void HLRosIfaceComponentImpl ::
       Imu_handler(
@@ -128,22 +202,51 @@ namespace HLProc {
           ROS::sensor_msgs::ImuNoCov &Imu
       )
     {
+        sensor_msgs::Imu msg;
+        addImuHelper(Imu, AFL_HLROSIFACE_IMUNOCOV, msg);
 
-        ROS::std_msgs::Header header = Imu.getheader();
+        if (m_rosInited) {
+            m_imuPub[portNum].publish(msg);
+        }
+    }
+
+
+    void HLRosIfaceComponentImpl ::
+      Range_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::sensor_msgs::Range &Range
+      )
+    {
+        ROS::std_msgs::Header header = Range.getheader();
         Fw::Time stamp = header.getstamp();
 
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
+
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+
+        header.setstamp(convTime);
+        Range.setheader(header);
+        
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
             Fw::Time recvTime = this->getTime();
             fileBuff.resetSer();
-            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_IMUNOCOV);
+            stat = fileBuff.serialize((U8)AFL_HLROSIFACE_RANGE);
             FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
             stat = fileBuff.serialize(recvTime.getSeconds());
             FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
             stat = fileBuff.serialize(recvTime.getUSeconds());
             FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
-            stat = Imu.serialize(fileBuff);
+            stat = Range.serialize(fileBuff);
             FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
 
             this->FileLogger_out(0,fileBuff);
@@ -153,7 +256,7 @@ namespace HLProc {
             return;
         }
 
-        sensor_msgs::Imu msg;
+        sensor_msgs::Range msg;
         msg.header.stamp.sec = header.getstamp().getSeconds();
         msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
 
@@ -161,21 +264,16 @@ namespace HLProc {
 
         // TODO(mereweth) - convert frame ID
         U32 frame_id = header.getframe_id();
-        msg.header.frame_id = "mpu9250";
+        msg.header.frame_id = "llv3";
 
-        msg.orientation_covariance[0] = -1;
-
-        ROS::geometry_msgs::Vector3 vec = Imu.getlinear_acceleration();
-        msg.linear_acceleration.x = vec.getx();
-        msg.linear_acceleration.y = vec.gety();
-        msg.linear_acceleration.z = vec.getz();
-        vec = Imu.getangular_velocity();
-        msg.angular_velocity.x = vec.getx();
-        msg.angular_velocity.y = vec.gety();
-        msg.angular_velocity.z = vec.getz();
-        m_imuPub[portNum].publish(msg);
+        msg.radiation_type = Range.getradiation_type();
+        msg.field_of_view = Range.getfield_of_view();
+        msg.min_range = Range.getmin_range();
+        msg.max_range = Range.getmax_range();
+        msg.range = Range.getrange();
+        m_rangePub[portNum].publish(msg);
     }
-
+  
     void HLRosIfaceComponentImpl ::
       sched_handler(
           const NATIVE_INT_TYPE portNum,
@@ -233,6 +331,13 @@ namespace HLProc {
             msg.header.stamp.sec = Image.getheader().getstamp().getSeconds();
             msg.header.stamp.nsec = Image.getheader().getstamp().getUSeconds() * 1000L;
             msg.is_bigendian = Image.getis_bigendian();
+            std_msgs::Float32 gain;
+            gain.data = Image.getgain();
+            m_gainPub[portNum].publish(gain);
+            std_msgs::Float32 exposure;
+            exposure.data = Image.getexposure();
+            m_exposurePub[portNum].publish(exposure);
+            
             m_imagePub[portNum].publish(msg);
         }
         Fw::Buffer temp = Image.getdata();
@@ -306,27 +411,76 @@ namespace HLProc {
         HLRosIfaceComponentImpl* compPtr = (HLRosIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
+        if (ros::isShuttingDown()) {
+            return;
+        }
+        
+        compPtr->m_imageXport = new image_transport::ImageTransport(*n);
+
+        char buf[512];
+        for (int i = 0; i < NUM_IMU_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_%d", i);
+            compPtr->m_imuPub[i] = n->advertise<sensor_msgs::Imu>(buf, 1000);
+        }
+
+        for (int i = 0; i < NUM_BATCHIMU_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "batchimu_%d", i);
+            compPtr->m_batchImuPub[i] = n->advertise<mav_msgs::BatchImu>(buf, 100);
+        }
+        
+        for (int i = 0; i < NUM_RANGE_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "range_%d", i);
+            compPtr->m_rangePub[i] = n->advertise<sensor_msgs::Range>(buf, 100);
+        }
+
+        for (int i = 0; i < NUM_IMAGERECV_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_%d", i);
+            compPtr->m_imagePub[i] = compPtr->m_imageXport->advertise(buf, 1);
+            
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_exposure_%d", i);
+            compPtr->m_exposurePub[i] = n->advertise<std_msgs::Float32>(buf, 1);
+            
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "image_gain_%d", i);
+            compPtr->m_gainPub[i] = n->advertise<std_msgs::Float32>(buf, 1);
+        }
+
+        for (int i = 0; i < NUM_POINTCLOUD_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "pointcloud_%d", i);
+            compPtr->m_pointCloudPub[i] = n->advertise<sensor_msgs::PointCloud2>(buf, 1);
+        }
+
         ActuatorsHandler actuatorsHandler0(compPtr, 0);
+        actuatorsHandler0.tbDes = compPtr->m_tbDes;
         ros::Subscriber actuatorsSub0 = n->subscribe("flight_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler0,
                                             ros::TransportHints().tcpNoDelay());
 
         ActuatorsHandler actuatorsHandler1(compPtr, 1);
+        actuatorsHandler1.tbDes = compPtr->m_tbDes;
         ros::Subscriber actuatorsSub1 = n->subscribe("aux_actuators_command", 10,
                                             &ActuatorsHandler::actuatorsCallback,
                                             &actuatorsHandler1,
                                             ros::TransportHints().tcpNoDelay());
 
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
+    }
+
+    HLRosIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
     }
 
     HLRosIfaceComponentImpl :: ActuatorsHandler ::
@@ -361,10 +515,25 @@ namespace HLProc {
                 //TODO(mereweth) - EVR
                 return;
             }
+
+            Fw::Time rosTime(TB_ROS_TIME, 0,
+                             msg->header.stamp.sec,
+                             msg->header.stamp.nsec / 1000);
+
+            // if port is not connected, default to no conversion
+            Fw::Time convTime = rosTime;
+
+            if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+                bool success = false;
+                convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+                if (!success) {
+                    // TODO(Mereweth) - EVR
+                    return;
+                }
+            }
+            
             Header head(msg->header.seq,
-                        Fw::Time(TB_ROS_TIME, 0,
-                                 msg->header.stamp.sec,
-                                 msg->header.stamp.nsec / 1000),
+                        convTime,
                         // TODO(mereweth) - convert frame id
                         0/*Fw::EightyCharString(msg->header.frame_id.data())*/);
 

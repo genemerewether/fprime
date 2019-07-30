@@ -53,8 +53,11 @@ namespace LLProc {
                                         // Works best when set to about twice the number of components producing telemetry
         TLMCHAN_HASH_MOD_VALUE = 99,    // !< The modulo value of the hashing function.
                                         // Should be set to a little below the ID gaps to spread the entries around
-
-        TLMCHAN_HASH_BUCKETS = 500       // !< Buckets assignable to a hash slot.
+#ifdef BUILD_TIR5
+        TLMCHAN_HASH_BUCKETS = 100       // !< Buckets assignable to a hash slot.
+#else
+        TLMCHAN_HASH_BUCKETS = 500
+#endif
                                          // Buckets must be >= number of telemetry channels in system
     };
 

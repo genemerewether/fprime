@@ -16,9 +16,14 @@
 SRC = \	
 	PrmGetPortAi.xml \
 	PrmSetPortAi.xml \
+	PrmListPortAi.xml \
+	PrmListReadyPortAi.xml \
+	PrmTriggerPortAi.xml \
 	PrmBuffer.cpp \
-	PrmString.cpp
+	PrmString.cpp \
+	PrmList.cpp
 	
 HDR = \
 	PrmBuffer.hpp \
-	PrmString.hpp
+	PrmString.hpp \
+	PrmList.hpp

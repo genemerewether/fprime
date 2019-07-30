@@ -70,24 +70,11 @@ namespace SIMREF {
 
     }
 
-    void RotorSDrvComponentImpl ::
-      startPub() {
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-	FW_ASSERT(n);
-
-        char buf[32];
-        m_motorPub = n->advertise<mav_msgs::Actuators>("command/motor_speed", 5);
-
-        m_rosInited = true;
-    }
-
     Os::Task::TaskStatus RotorSDrvComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("ROTORSDRVROS");
-	this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, RotorSDrvComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -176,10 +163,14 @@ namespace SIMREF {
         RotorSDrvComponentImpl* compPtr = (RotorSDrvComponentImpl*) ptr;
         compPtr->log_ACTIVITY_LO_RSDRV_IntTaskStarted();
 
+	compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
 	FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
+
+        char buf[32];
+        compPtr->m_motorPub = n->advertise<mav_msgs::Actuators>("command/motor_speed", 5);
 
         ImuHandler imuHandler(compPtr, 0);
         ros::Subscriber imuSub = n->subscribe("imu", 10,
@@ -187,6 +178,8 @@ namespace SIMREF {
                                               &imuHandler,
                                               ros::TransportHints().tcpNoDelay());
 
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));

@@ -14,7 +14,7 @@ void exitTasks(void);
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <Svc/LinuxTime/LinuxTimeImpl.hpp>
 #include <Svc/TlmChan/TlmChanImpl.hpp>
-#include <Svc/PrmDb/PrmDbImpl.hpp>
+#include <Svc/ActiveL1PrmDb/ActiveL1PrmDbImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 #include <Svc/FileUplink/FileUplink.hpp>
 #include <Svc/FileDownlink/FileDownlink.hpp>
@@ -50,14 +50,31 @@ void exitTasks(void);
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 
 #include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
+#include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspSerialDriver/BlspSerialDriverComponentImpl.hpp>
+#include <SnapdragonFlight/BlspGpioDriver/BlspGpioDriverComponentImpl.hpp>
 #include <Drv/ForceTorque/ATINetbox/ATINetboxComponentImpl.hpp>
+
+#include <Svc/TimeConvert/TimeConvertComponentImpl.hpp>
+#include <Svc/TimeSyncOffset/TimeSyncOffsetComponentImpl.hpp>
+#include <SnapdragonFlight/DspOffset/DspOffsetComponentImpl.hpp>
+
+#include "Gnc/quest_external/traj/ewok/EwokComponentImpl.hpp"
 
 extern Drv::ATINetboxComponentImpl* atiNetbox_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
+extern SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverLL_ptr;
+extern SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverDebug_ptr;
+extern Drv::LinuxGpioDriverComponentImpl* gpioTimeSync_ptr;
+extern SnapdragonFlight::BlspGpioDriverComponentImpl* blspGpioTimeSync_ptr;
 extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
 extern HLProc::LLRouterComponentImpl* llRouter_ptr;
 extern HLProc::EventExpanderComponentImpl* eventExp_ptr;
+
+extern Svc::TimeConvertComponentImpl* timeConvert_ptr;
+extern Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr;
+extern SnapdragonFlight::DspOffsetComponentImpl* dspTimeSync_ptr;
 
 extern Svc::RateGroupDriverImpl* rgDrv_ptr;
 extern Svc::ActiveRateGroupImpl* rgTlm_ptr;
@@ -74,7 +91,7 @@ extern Svc::SerLoggerComponentImpl* serLogger_ptr;
 extern Svc::LinuxTimeImpl* linuxTime_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;
 extern Svc::CommandDispatcherImpl* cmdDisp_ptr;
-extern Svc::PrmDbImpl* prmDb_ptr;
+extern Svc::ActiveL1PrmDbComponentImpl* prmDb_ptr;
 extern Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr;
 extern Svc::FatalHandlerComponentImpl* fatalHandler_ptr;
 extern SnapdragonFlight::MVCamComponentImpl* mvCam_ptr;
@@ -99,5 +116,7 @@ extern Svc::BufferLogger* buffLogStereoCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumMVCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumHiresCamUnproc_ptr;
 extern Svc::BufferAccumulator* buffAccumStereoCamUnproc_ptr;
+
+extern ewok::EwokComponentImpl* ewok_ptr;
 
 #endif

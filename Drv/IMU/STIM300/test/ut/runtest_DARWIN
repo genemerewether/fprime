@@ -1,0 +1,5 @@
+#!/bin/sh
+cd ${BUILD_ROOT}/Drv/IMU/STIM300/test/ut
+echo "Running ${BUILD_ROOT}/Drv/IMU/STIM300/test/ut/$1/test_ut"
+${BUILD_ROOT}/Drv/IMU/STIM300/test/ut/$1/test_ut
+

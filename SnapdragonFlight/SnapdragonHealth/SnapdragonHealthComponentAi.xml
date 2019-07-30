@@ -42,77 +42,77 @@
         <channel id="0" name="SnapTempZone0DspCpuStat" data_type="bool" >
             <comment>The status of temperature zone 0, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="1" name="SnapTempZone0DspCpuTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="1" name="SnapTempZone0DspCpuTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 0</comment>
         </channel>
 
         <channel id="2" name="SnapTempZone1DspModemStat" data_type="bool" >
             <comment>The status of temperature zone 1, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="3" name="SnapTempZone1DspModemTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="3" name="SnapTempZone1DspModemTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 1</comment>
         </channel>
 
         <channel id="4" name="SnapTempZone2ModemStat" data_type="bool" >
             <comment>The status of temperature zone 2, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="5" name="SnapTempZone2ModemTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="5" name="SnapTempZone2ModemTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 2</comment>
         </channel>
 
         <channel id="6" name="SnapTempZone3VideoStat" data_type="bool" >
             <comment>The status of temperature zone 3, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="7" name="SnapTempZone3VideoTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="7" name="SnapTempZone3VideoTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 3</comment>
         </channel>
 
         <channel id="8" name="SnapTempZone4WlanCpuStat" data_type="bool" >
             <comment>The status of temperature zone 4, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="9" name="SnapTempZone4WlanCpuTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="9" name="SnapTempZone4WlanCpuTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 4</comment>
         </channel>
 
         <channel id="10" name="SnapTempZone5Cpu0Stat" data_type="bool" >
             <comment>The status of temperature zone 5, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="11" name="SnapTempZone5Cpu0Temp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="11" name="SnapTempZone5Cpu0Temp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 5</comment>
         </channel>
 
         <channel id="12" name="SnapTempZone6Cpu1Stat" data_type="bool" >
             <comment>The status of temperature zone 6, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="13" name="SnapTempZone6Cpu1Temp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="13" name="SnapTempZone6Cpu1Temp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 6</comment>
         </channel>
 
         <channel id="14" name="SnapTempZone7Cpu2Stat" data_type="bool" >
             <comment>The status of temperature zone 7, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="15" name="SnapTempZone7Cpu2Temp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="15" name="SnapTempZone7Cpu2Temp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 7</comment>
         </channel>
 
         <channel id="16" name="SnapTempZone8Cpu3Stat" data_type="bool" >
             <comment>The status of temperature zone 8, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="17" name="SnapTempZone8Cpu3Temp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="17" name="SnapTempZone8Cpu3Temp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 8</comment>
         </channel>
 
         <channel id="18" name="SnapTempZone9GpuAStat" data_type="bool" >
             <comment>The status of temperature zone 9, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="19" name="SnapTempZone9GpuATemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="19" name="SnapTempZone9GpuATemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 9</comment>
         </channel>
 
         <channel id="20" name="SnapTempZone10GpuBStat" data_type="bool" >
             <comment>The status of temperature zone 10, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="21" name="SnapTempZone10GpuBTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="21" name="SnapTempZone10GpuBTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 10</comment>
         </channel>
 
@@ -187,28 +187,28 @@
         <!--channel id="37" name="SnapTempZone13PA0Stat" data_type="bool" >
             <comment>The status of temperature zone 13, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="38" name="SnapTempZone13PA0Temp" data_type="I16"  format_string="%3.2f" >
+        <channel id="38" name="SnapTempZone13PA0Temp" data_type="F32"  format_string="%3.2f" >
             <comment>The value of temperature zone 13</comment>
         </channel>
 
         <channel id="39" name="SnapTempZone14PA1Stat" data_type="bool" >
             <comment>The status of temperature zone 14, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="40" name="SnapTempZone14PA1Temp" data_type="I16"  format_string="%3.2f" >
+        <channel id="40" name="SnapTempZone14PA1Temp" data_type="F32"  format_string="%3.2f" >
             <comment>The value of temperature zone 14</comment>
         </channel-->
 
         <channel id="41" name="SnapTempZone15EmmcStat" data_type="bool" >
             <comment>The status of temperature zone 15, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="42" name="SnapTempZone15EmmcTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="42" name="SnapTempZone15EmmcTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 15</comment>
         </channel>
 
         <channel id="43" name="SnapTempZone16MsmStat" data_type="bool" >
             <comment>The status of temperature zone 16, enabled = 1, disabled = 0.</comment>
         </channel>
-        <channel id="44" name="SnapTempZone16MsmTemp" data_type="I16"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
+        <channel id="44" name="SnapTempZone16MsmTemp" data_type="F32"  format_string="%3.2fC" high_yellow="85.0" high_orange="90.0" high_red="95.0">
             <comment>The temperature of temperature zone 16</comment>
         </channel>
 

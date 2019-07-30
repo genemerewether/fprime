@@ -2,10 +2,10 @@
     <parameter id="0" set_opcode="20" save_opcode="21" name="numActuators" data_type="U32" >
       <comment>number of actuators</comment>
     </parameter>
-    <parameter id="1" set_opcode="22" save_opcode="23" name="flySafeCycles" data_type="U32" default="10000">
+    <parameter id="1" set_opcode="22" save_opcode="23" name="flySafeCycles" data_type="U32" default="1000">
       <comment>max number of cycles since last flysafe port call; 0 to disable check</comment>
     </parameter>
-    <parameter id="2" set_opcode="24" save_opcode="25" name="flySafeTime" data_type="F64" default="10.0">
+    <parameter id="2" set_opcode="24" save_opcode="25" name="flySafeTime" data_type="F64" default="1.0">
       <comment>max elapsed time (seconds) since last flysafe port call; negative to disable check</comment>
     </parameter>
 

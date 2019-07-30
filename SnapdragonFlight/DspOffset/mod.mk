@@ -1,5 +1,3 @@
-SRC = 
+SRC = DspOffsetComponentAi.xml DspOffsetComponentImpl.cpp
 
-SRC_DSPAL = 
-
-HDR = 
+HDR = DspOffsetComponentImpl.hpp

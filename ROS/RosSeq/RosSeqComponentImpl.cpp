@@ -61,21 +61,6 @@ namespace ROS {
 
   }
 
-    void RosSeqComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice; free ActionServer
-        FW_ASSERT(m_nodeHandle);
-        m_actionServer = new actionlib::SimpleActionServer<fprime_msgs::RunSeqAction>(*m_nodeHandle,
-                                                                                      "ROSSEQ",
-                                                                                      false);
-        m_actionServer->registerGoalCallback(boost::bind(&RosSeqComponentImpl::goalCB, this));
-        m_actionServer->registerPreemptCallback(boost::bind(&RosSeqComponentImpl::preemptCB, this));
-
-        m_actionServer->start();
-
-        m_rosInited = true;
-    }
-
     Os::Task::TaskStatus RosSeqComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
@@ -91,6 +76,11 @@ namespace ROS {
         return stat;
     }
 
+    void RosSeqComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -121,6 +111,9 @@ namespace ROS {
         Fw::CommandResponse response
       )
     {
+        if (!m_rosInited) {
+            return;
+        }
         FW_ASSERT(this->m_actionServer);
         if (Fw::COMMAND_OK == response) {
             this->m_actionServer->setSucceeded();
@@ -195,6 +188,17 @@ namespace ROS {
         ros::NodeHandle* const n = compPtr->m_nodeHandle;
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
+
+        if (ros::isShuttingDown()) {
+            return;
+        }
+
+        compPtr->m_actionServer = new actionlib::SimpleActionServer<fprime_msgs::RunSeqAction>(*n, "ROSSEQ", false);
+        compPtr->m_actionServer->registerGoalCallback(boost::bind(&RosSeqComponentImpl::goalCB, compPtr));
+        compPtr->m_actionServer->registerPreemptCallback(boost::bind(&RosSeqComponentImpl::preemptCB, compPtr));
+        compPtr->m_actionServer->start();
+
+        compPtr->m_rosInited = true;
 
         while (1) {
             // TODO(mereweth) - check for and respond to ping

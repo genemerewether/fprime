@@ -45,6 +45,9 @@ R5_MODULES := \
 	R5/SpiSlaveDrv \
 	R5/UartDrv \
 	R5/I2CDrv \
+	R5/R5EventCapture \
+	R5/R5TimeForward \
+	R5/R5Rti \
 	\
 	R5/TiHal \
 	R5/R5FlashApi
@@ -120,7 +123,12 @@ SVC_MODULES := \
 	Svc/UdpSender \
 	Svc/UdpReceiver \
 	Svc/CameraFrame \
-	Svc/IPCRelay
+	Svc/IPCRelay \
+	Svc/TimeSyncOffset \
+	Svc/TimeConvert \
+	Svc/ActiveL1PrmDb \
+	Svc/ActiveL2PrmDb \
+	Svc/PassiveL2PrmDb
 
 DEMO_DRV_MODULES := \
 	Drv/DataTypes \
@@ -139,10 +147,6 @@ LINUX_DRV_MODULES := \
 	Drv/SpiDriverPorts \
 	Drv/I2CDriverPorts
 
-DEV_DRV_MODULES := \
-	Drv/Altimeter/AltimeterPorts \
-	Drv/Altimeter/AltimeterTypes
-
 LLPROC_MODULES := \
 	LLProc/HLRouter \
 	Utils/Hash \
@@ -151,7 +155,6 @@ LLPROC_MODULES := \
 	LLProc/LLDebug \
 	LLProc/LLCycle \
 	LLProc/LLCmdDispatcher \
-	LLProc/LLPrmDb \
 	LLProc/LLTlmChan
 
 HLPROC_MODULES := \
@@ -165,6 +168,7 @@ HLPROC_ROS_MODULES := \
 SNAPDRAGON_MODULES := \
 	SnapdragonFlight/RpcCommon \
 	SnapdragonFlight/HexRouter \
+	SnapdragonFlight/DspOffset \
 	SnapdragonFlight/DspRpcAllocator \
 	SnapdragonFlight/DspRelay \
 	SnapdragonFlight/BlspSerialDriver \
@@ -211,12 +215,8 @@ QUEST_GNC_MODULES := \
 QUEST_GNC_HW_MODULES := \
 	Gnc/Ctrl/ActuatorAdapter
 
-REF_MODULES := \
-	Ref/Top \
-	Ref/RecvBuffApp \
-	Ref/SendBuffApp \
-	Ref/SignalGen \
-	Ref/PingReceiver
+QUEST_EXTERNAL_MODULES := \
+	Gnc/quest_external/traj/ewok
 
 ROS_PORT_MODULES := \
 	ROS/Gen/std_msgs/Ports  \
@@ -276,67 +276,12 @@ ROS_MODULES := \
 	\
 	$(ROS_PORT_MODULES)
 
-Ref_MODULES := \
-	\
-	$(REF_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(DEMO_DRV_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
 BLIMPREF_DEPLOYMENT_MODULES := \
 	BLIMPREF/Top
 
 BLIMPREF_MODULES := \
 	\
 	$(BLIMPREF_DEPLOYMENT_MODULES) \
-	\
-	Drv/ForceTorque/ATINetbox \
-	Drv/IMU/MPU9250 \
-	\
-	$(ZMQ_MODULES) \
-	\
-	$(HLPROC_MODULES) \
-	$(HLPROC_ROS_MODULES) \
-	\
-	$(COMMON_MODULES) \
-	\
-	$(QUEST_GNC_MODULES) \
-	$(QUEST_GNC_HW_MODULES) \
-	$(QUEST_GNC_ROSIFACE_MODULES) \
-	\
-	$(SNAPDRAGON_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(SVC_EXTRA_MODULES) \
-	\
-	$(LINUX_DRV_MODULES) \
-	\
-	$(ROS_MODULES) \
-	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-	$(CFDP_MODULES) \
-	\
-	$(UTILS_MODULES)
-
-CARREF_DEPLOYMENT_MODULES := \
-	CARREF/Top
-
-CARREF_MODULES := \
-	\
-	$(CARREF_DEPLOYMENT_MODULES) \
 	\
 	Drv/ForceTorque/ATINetbox \
 	Drv/IMU/MPU9250 \
@@ -391,6 +336,7 @@ SDREF_MODULES := \
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_HW_MODULES) \
 	$(QUEST_GNC_ROSIFACE_MODULES) \
+	$(QUEST_EXTERNAL_MODULES) \
 	\
 	$(SNAPDRAGON_MODULES) \
 	\
@@ -441,6 +387,7 @@ SIMREF_GENERAL_MODULES := \
 	\
 	$(QUEST_GNC_MODULES) \
 	$(QUEST_GNC_ROSIFACE_MODULES) \
+	$(QUEST_EXTERNAL_MODULES) \
 	\
 	$(SVC_MODULES) \
 	\
@@ -497,7 +444,6 @@ HEXREF_GENERAL_MODULES := \
 	\
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
-	Svc/CmdSequencer \
 	Svc/Seq \
 	Svc/ActiveRateGroup \
 	Svc/PassiveRateGroup \
@@ -514,6 +460,7 @@ HEXREF_GENERAL_MODULES := \
 	Svc/PolyIf \
 	Svc/PolyDb \
 	Svc/PrmDb \
+	Svc/ActiveL2PrmDb \
 	Svc/Ping \
 	Svc/Health \
 	Svc/WatchDog \
@@ -590,11 +537,14 @@ R5REF_MODULES := \
 	$(R5_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/IMU/STIM300 \
 	Drv/Mavlink/ActuatorControls \
 	Drv/Altimeter/LIDARLiteV3 \
 	\
 	Svc/PassiveRateGroup \
 	Svc/RateGroupDriver \
+	Svc/PrmDb \
+	Svc/PassiveL2PrmDb \
 	\
 	Svc/Sched \
 	Svc/Time \
@@ -605,8 +555,6 @@ R5REF_MODULES := \
 	Drv/SerialDriverPorts \
 	Drv/SpiDriverPorts \
 	Drv/I2CDriverPorts \
-	Drv/Altimeter/AltimeterPorts \
-	Drv/Altimeter/AltimeterTypes \
 	\
 	Os \
 	\
@@ -622,21 +570,16 @@ R5RELAY_MODULES := \
 	Svc/GndIf \
 	Svc/SocketGndIf \
 	\
-	Svc/Sched \
-	Svc/Cycle \
-	Svc/Ping \
-	Svc/PolyIf \
-	Svc/PolyDb \
-	Svc/Time \
-	Svc/LinuxTime \
-	Svc/ActiveLogger \
-	Svc/Fatal \
+	$(SVC_MODULES) \
 	\
 	HLProc/LLRouter \
 	HLProc/EventExpander \
 	\
 	Os \
 	\
+	$(ROS_TYPE_PORT_MODULES_ALL) \
+	\
+	R5RELAY/ImuSplitter \
 	R5RELAY/Top \
 	\
 	$(FW_MODULES) \
@@ -764,26 +707,6 @@ ACDEVTEST_MODULES := \
 	Autocoders/Python/test/serial_passive \
     \
 	Autocoders/Python/templates
-	
-RPI_APP_MODULES := \
-	RPI/Top \
-	RPI/RpiDemo
-	
-RPI_MODULES := \
-	\
-	$(RPI_APP_MODULES) \
-	\
-	$(SVC_MODULES) \
-	\
-	$(LINUX_DRV_MODULES) \
-	\
-	$(CFDP_MODULES) \
-  	\
-	$(FW_MODULES) \
-	\
-	$(OS_MODULES) \
-	\
-  	$(UTILS_MODULES)
 
 acdev_MODULES := \
 	$(FW_MODULES) \
@@ -803,5 +726,5 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := Ref acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF CARREF RPI
+DEPLOYMENTS := acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF
 

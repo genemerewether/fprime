@@ -131,8 +131,10 @@ namespace SnapdragonFlight {
           m_params.setFocusMode("manual");*/
         m_cameraPtr->sendFaceDetectCommand(false);
 
+#ifndef SOC_8096
         camera::ImageSize imageSize = camera::ImageSize(320, 240);
         m_params.setPreviewSize(imageSize);
+#endif
 
         stat = m_params.commit();
         if (stat) {
@@ -251,13 +253,19 @@ namespace SnapdragonFlight {
     }
 
     void HiresCamComponentImpl ::
+#ifdef SOC_8096 // TODO(mereweth) - figure out video for 8096
+      onPreviewFrame(camera::ICameraFrame *frame)
+#else
       onVideoFrame(camera::ICameraFrame *frame)
+#endif
     {
         if (!m_activated                                   ||
             !((m_currentMode == HIRES_WAIT_FIRST_VIDEO) ||
               (m_currentMode == HIRES_WAIT_LAST_VIDEO)  ||
               (m_currentMode == HIRES_GOT_LAST_VIDEO)))       {
+#ifndef SOC_8096
             this->log_WARNING_LO_HIRESCAM_ExtraCallbackError(HIRESCAM_EXTRA_VIDEO);
+#endif
             DEBUG_PRINT("\nonVideoFrame called while HiresCam (de)activating; mode %d\n",
                         m_currentMode);
             return;
@@ -654,7 +662,11 @@ namespace SnapdragonFlight {
     }
 
     void HiresCamComponentImpl ::
+#ifdef SOC_8096 // TODO(mereweth) - figure out video for 8096
+      onVideoFrame(camera::ICameraFrame *frame)
+#else
       onPreviewFrame(camera::ICameraFrame *frame)
+#endif
     {
 #ifdef DEBUG_MODE
         struct timeval tv;

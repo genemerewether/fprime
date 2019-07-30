@@ -44,3 +44,6 @@
 [submodule "ROS/fprime_ws/src/ackermann_msgs"]
 	path = ROS/fprime_ws/src/ackermann_msgs
 	url = https://github.com/ros-drivers/ackermann_msgs.git
+[submodule "Gnc/quest_external"]
+	path = Gnc/quest_external
+	url = ../quest_external.git

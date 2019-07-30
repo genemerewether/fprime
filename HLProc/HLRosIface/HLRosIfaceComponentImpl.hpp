@@ -62,12 +62,14 @@ namespace HLProc {
       //!
       ~HLRosIfaceComponentImpl(void);
 
-      void startPub();
+      void setTBDes(TimeBase tbDes);
 
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,
                                         NATIVE_INT_TYPE cpuAffinity = -1);
+
+      void disableRos();
 
     PRIVATE:
 
@@ -75,7 +77,14 @@ namespace HLProc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class ActuatorsHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+              TimeBase tbDes;
+        };
+    
+        class ActuatorsHandler : public TimeBaseHolder
         {
           public:
               ActuatorsHandler(HLRosIfaceComponentImpl* compPtr,
@@ -97,12 +106,30 @@ namespace HLProc {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      void addImuHelper(ROS::sensor_msgs::ImuNoCov &Imu,
+                        U8 aflLog,
+                        sensor_msgs::Imu &msg);
+
       //! Handler implementation for Imu
       //!
       void Imu_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::sensor_msgs::ImuNoCov &Imu
       );
+
+      //! Handler implementation for BatchImu
+      //!
+      void BatchImu_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::BatchImu &BatchImu 
+      );
+
+      //! Handler implementation for Range
+      //!
+      void Range_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::sensor_msgs::Range &Range 
+      );    
 
       //! Handler implementation for PointCloud
       //!
@@ -136,15 +163,22 @@ namespace HLProc {
       // Member variables
       // ----------------------------------------------------------------------
 
-        bool m_rosInited;
+        volatile bool m_rosInited;
+
+        TimeBase m_tbDes;
 
         //! Publishers for IMU data
         //!
         ros::Publisher m_imuPub[NUM_IMU_INPUT_PORTS];
+        ros::Publisher m_batchImuPub[NUM_BATCHIMU_INPUT_PORTS];
+    
+        ros::Publisher m_rangePub[NUM_RANGE_INPUT_PORTS];
 
         ros::NodeHandle* m_nodeHandle;
         image_transport::ImageTransport* m_imageXport;
         image_transport::Publisher m_imagePub[NUM_IMAGERECV_INPUT_PORTS];
+        ros::Publisher m_exposurePub[NUM_IMAGERECV_INPUT_PORTS];
+        ros::Publisher m_gainPub[NUM_IMAGERECV_INPUT_PORTS];
     
         ros::Publisher m_pointCloudPub[NUM_POINTCLOUD_INPUT_PORTS];
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/interface_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<interface name="PrmList" namespace="Fw">
+    <include_header>Fw/Prm/PrmList.hpp</include_header>
+    <comment>
+    Port Type interface arguments.
+    </comment>
+    <args>
+        <arg name="morePrms" type="bool" pass_by="value">
+        </arg>
+        <arg name="val" type="Fw::ParamList" pass_by="value">
+        </arg>
+    </args>
+</interface>

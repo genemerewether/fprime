@@ -11,7 +11,8 @@ CXXFLAGS := $(DEBUG) \
 			$(DARWIN_LLVM_CXXFLAGS) \
 			$(DARWIN_LLVM_INCLUDES) \
 			$(COVERAGE) \
-			$(UT_FLAGS)
+			$(UT_FLAGS) \
+			-std=c++11
 			
 LINK_BIN_FLAGS := $(LINK_BIN_FLAGS) $(COVERAGE)			
 

@@ -4,15 +4,18 @@
 <component name="HLRosIface" kind="passive" namespace="HLProc" modeler="true">
 
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/BatchImuPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Svc/Ping/PingPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/ConvertTimePortAi.xml</import_port_type>
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImagePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/RangePortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/sensor_msgs/Ports/PointCloud2PortAi.xml</import_port_type>
     
@@ -23,6 +26,12 @@
         </port>
 
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="BatchImu" data_type="ROS::mav_msgs::BatchImu"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="Range" data_type="ROS::sensor_msgs::Range"  kind="sync_input"    max_number="1">
         </port>
 
         <!-- NOTE(mereweth) - other components, including MVDFS, assume this is sync -->
@@ -36,6 +45,9 @@
 
         <port name="Time" data_type="Fw::Time"  kind="output"    max_number="1">
         </port-->
+
+        <port name="convertTime" data_type="Fw::ConvertTime"  kind="output"    max_number="1">
+        </port>
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>

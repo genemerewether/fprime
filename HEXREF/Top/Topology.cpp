@@ -59,6 +59,7 @@ Svc::AssertFatalAdapterComponentImpl* fatalAdapter_ptr = 0;
 Svc::FatalHandlerComponentImpl* fatalHandler_ptr = 0;
 LLProc::LLCmdDispatcherImpl* cmdDisp_ptr = 0;
 LLProc::LLTlmChanImpl* tlmChan_ptr = 0;
+Svc::ActiveL2PrmDbComponentImpl* prmDb_ptr;
 Gnc::FrameTransformComponentImpl* ctrlXest_ptr = 0;
 Gnc::ImuProcComponentImpl* imuProc_ptr = 0;
 Gnc::LeeCtrlComponentImpl* leeCtrl_ptr = 0;
@@ -231,6 +232,12 @@ void allocComps() {
 #endif
 ;
 
+    prmDb_ptr = new Svc::ActiveL2PrmDbComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("PRMDB", 1024) //1024 max receive
+#endif
+;
+
     ctrlXest_ptr = new Gnc::FrameTransformComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("CTRLXEST")
@@ -344,13 +351,21 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
-    imuProc_ptr->set_DownsampledImu_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
+    // L2 <-> L1 PrmDb
+    prmDb_ptr->set_sendPrm_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(10));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(10, prmDb_ptr->get_recvPrm_InputPort(0));
+    prmDb_ptr->set_recvPrmReady_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(11));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(11, prmDb_ptr->get_sendPrmReady_InputPort(0));
+
+    imuProc_ptr->set_BatchImu_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(1));
     attFilter_ptr->set_odomNoCov_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(2));
     leeCtrl_ptr->set_accelCommand_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(3));
     logQueue_ptr->set_LogSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(4));
     tlmChan_ptr->set_PktSend_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(5));
     // TODO(mereweth) - too much data?
     //actuatorAdapter_ptr->set_serialDat_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(6));
+
+    // NOTE(mereweth) - port 7 used for timesync with LL proc, so skip that HexPortsIn index
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(1, attFilter_ptr->get_ImuStateUpdate_InputPort(0));
 #ifdef DECOUPLE_ACTUATORS
@@ -431,7 +446,7 @@ void constructApp() {
 
     //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
 
-    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_460HZ_GYRO_184HZ);
+    mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_1KHZ_DLPF_ACCEL_184HZ_GYRO_184HZ);
     
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
@@ -452,8 +467,10 @@ void constructApp() {
 
     cmdDisp_ptr->init(0);
     tlmChan_ptr->init(0);
+    
+    prmDb_ptr->init(100, 0);
 
-    kraitRouter_ptr->init(200, 1000);
+    kraitRouter_ptr->init(200, 1600);
 
     // Connect rate groups to rate group driver
     constructHEXREFArchitecture();
@@ -463,6 +480,7 @@ void constructApp() {
     /* Register commands */
     cmdDisp_ptr->regCommands();
     fatalHandler_ptr->regCommands();
+    prmDb_ptr->regCommands();
 
     ctrlXest_ptr->regCommands();
     imuProc_ptr->regCommands();
@@ -519,6 +537,8 @@ void constructApp() {
     actDecouple_ptr->start(0, 89, 20*1024);
 #endif
 
+    prmDb_ptr->start(0, 50, 20*1024);
+
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->startIntTask(99); // NOTE(mereweth) - priority unused on DSPAL
 #endif
@@ -563,14 +583,19 @@ void exitTasks(void) {
     kraitRouter_ptr->quit();
 #ifdef DECOUPLE_RG
     rgDecouple_ptr->exit();
+    rgDecouple_ptr->join(NULL);
 #endif
     imuDecouple_ptr->exit();
+    imuDecouple_ptr->join(NULL);
 #ifdef DECOUPLE_ACTUATORS
     actDecouple_ptr->exit();
+    actDecouple_ptr->join(NULL);
 #endif
 #ifdef BUILD_DSPAL
     imuDRInt_ptr->exitThread();
 #endif
+
+    prmDb_ptr->exit();
 }
 
 volatile bool terminate = false;
@@ -580,10 +605,7 @@ volatile bool preinit = true;
 
 int hexref_arm() {
     DEBUG_PRINT("hexref_arm\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_arm preinit - returning\n");
-        return -1;
-    }
+    terminate = true;
 
     return 0;
 }

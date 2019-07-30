@@ -51,6 +51,7 @@ namespace SnapdragonFlight {
       ,m_initialized(false)
       ,m_activated(false)
       ,m_imagesProcessed(0u)
+      ,m_imagesProcessedLast(0u)
   {
 
   }
@@ -241,7 +242,10 @@ namespace SnapdragonFlight {
         NATIVE_UINT_TYPE context
     )
   {
+      NATIVE_UINT_TYPE imageCountDiff = m_imagesProcessed - m_imagesProcessedLast;
       this->tlmWrite_MVDFS_ImageCount(this->m_imagesProcessed);
+      this->tlmWrite_MVDFS_ImageRate(imageCountDiff);
+      m_imagesProcessedLast = m_imagesProcessed;
   }
 
   void MVDFSComponentImpl ::

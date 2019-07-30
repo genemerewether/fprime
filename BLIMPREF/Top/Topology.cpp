@@ -42,9 +42,10 @@ Svc::CmdSequencerComponentImpl* cmdSeq_ptr = 0;
 Svc::ActiveTextLoggerComponentImpl* textLogger_ptr = 0;
 Svc::ActiveLoggerImpl* eventLogger_ptr = 0;
 Svc::TlmChanImpl* chanTlm_ptr = 0;
-Svc::PrmDbImpl* prmDb_ptr = 0;
+Svc::ActiveL1PrmDbComponentImpl* prmDb_ptr = 0;
 Svc::SocketGndIfImpl* sockGndIf_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
+Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
 
 HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr = 0;
 Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr = 0;
@@ -83,6 +84,7 @@ SnapdragonFlight::BlspPwmDriverComponentImpl* escPwmSnap_ptr = 0;
 
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
 Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr = 0;
+Drv::LinuxI2CDriverComponentImpl* i2cDrv2_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr = 0;
 Drv::LinuxPwmDriverComponentImpl* escPwm_ptr = 0;
@@ -124,17 +126,23 @@ void allocComps() {
 #endif
 ;
 
-    prmDb_ptr = new Svc::PrmDbImpl
+    prmDb_ptr = new Svc::ActiveL1PrmDbComponentImpl
 #if FW_OBJECT_NAMES == 1
-                        ("PRM",PRM_PATH)
+                        ("PRM",PRM_PATH, 128)
 #else
-                        (PRM_PATH)
+                        (PRM_PATH, 128)
 #endif
 ;
 
     snapHealth_ptr = new SnapdragonFlight::SnapdragonHealthComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("SDHEALTH")
+#endif
+;
+
+    timeConvert_ptr = new Svc::TimeConvertComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("TIMECONV")
 #endif
 ;
 
@@ -383,6 +391,12 @@ void allocComps() {
 #endif
 ;
 
+    i2cDrv2_ptr = new Drv::LinuxI2CDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                    ("I2C2DRV")
+#endif
+;
+
     imuDRInt_ptr = new Drv::LinuxGpioDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("IMUDRINT")
@@ -418,7 +432,36 @@ void dumpobj(const char* objName) {
 #endif
 
 void manualConstruct(bool internalIMUProp,
-                     bool externalIMU) {  
+                     bool externalIMU) {
+#ifdef BUILD_SDFLIGHT
+    actuatorAdapter_ptr->set_outputEnable_OutputPort(0, hwEnablePinSnap_ptr->get_gpioRead_InputPort(0));
+
+    actuatorAdapter_ptr->set_escConfig_OutputPort(0, i2cDrvSnap_ptr->get_I2CConfig_InputPort(0));
+    actuatorAdapter_ptr->set_escConfig_OutputPort(1, i2cDrvSnap2_ptr->get_I2CConfig_InputPort(0));
+
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(0, i2cDrvSnap_ptr->get_I2CReadWrite_InputPort(0));
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(1, i2cDrvSnap2_ptr->get_I2CReadWrite_InputPort(0));
+
+    mpu9250_ptr->set_SpiReadWrite_OutputPort(0, spiDrvSnap_ptr->get_SpiReadWrite_InputPort(0));
+    mpu9250_ptr->set_SpiConfig_OutputPort(0, spiDrvSnap_ptr->get_SpiConfig_InputPort(0));
+
+    imuDRIntSnap_ptr->set_intOut_OutputPort(0, rgDcplDrv_ptr->get_CycleIn_InputPort(0));
+#else // BUILD_SDFLIGHT
+    actuatorAdapter_ptr->set_outputEnable_OutputPort(0, hwEnablePin_ptr->get_gpioRead_InputPort(0));
+
+    actuatorAdapter_ptr->set_escConfig_OutputPort(0, i2cDrv_ptr->get_I2CConfig_InputPort(0));
+    actuatorAdapter_ptr->set_escConfig_OutputPort(1, i2cDrv2_ptr->get_I2CConfig_InputPort(0));
+
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(0, i2cDrv_ptr->get_I2CReadWrite_InputPort(0));
+    actuatorAdapter_ptr->set_escReadWrite_OutputPort(1, i2cDrv2_ptr->get_I2CReadWrite_InputPort(0));
+
+    mpu9250_ptr->set_SpiReadWrite_OutputPort(0, spiDrv_ptr->get_SpiReadWrite_InputPort(0));
+    mpu9250_ptr->set_SpiConfig_OutputPort(0, spiDrv_ptr->get_SpiConfig_InputPort(0));
+
+    imuDRInt_ptr->set_intOut_OutputPort(0, rgDcplDrv_ptr->get_CycleIn_InputPort(0));
+#endif //BUILD_SDFLIGHT
+
+
     // switch based on command line options
     if (internalIMUProp) {
         attFilter_ptr->set_odometry_OutputPort(0, ctrlXest_ptr->get_odomInB_InputPort(0));
@@ -538,6 +581,7 @@ void constructApp(unsigned int port_number,
     snapHealth_ptr->setBootCount(boot_count);
     snapHealth_ptr->setInitPowerState(SnapdragonFlight::SH_SAVER_OFF);
     sockGndIf_ptr->init(0);
+    timeConvert_ptr->init();
 
     hlRosIface_ptr->init(0);
     mrCtrlIface_ptr->init(0);
@@ -581,6 +625,7 @@ void constructApp(unsigned int port_number,
 
     spiDrv_ptr->init(0);
     i2cDrv_ptr->init(0);
+    i2cDrv2_ptr->init(0);
     hwEnablePin_ptr->init(1);
     imuDRInt_ptr->init(0);
     escPwm_ptr->init(0);
@@ -614,7 +659,7 @@ void constructApp(unsigned int port_number,
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
     
-    prmDb_ptr->readParamFile();
+    prmDb_ptr->readPrmFile();
 
     ctrlXest_ptr->loadParameters();
     imuProc_ptr->loadParameters();
@@ -623,6 +668,22 @@ void constructApp(unsigned int port_number,
     mixer_ptr->loadParameters();
     actuatorAdapter_ptr->loadParameters();
     sigGen_ptr->loadParameters();
+
+    // NOTE(mereweth) - convert to TB_WORKSTATION_TIME for F' outputs of components with time conversion
+    mrCtrlIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    hlRosIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    filterIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    gtIface_ptr->setTBDes(TB_WORKSTATION_TIME);
+    
+    // set static time offset
+    // TODO(mereweth) - change this if we start timing out on correspondences
+    // TODO(mereweth) - check to make sure we are not using ROS sim time
+    {
+        Fw::InputTimePairPort* port = timeConvert_ptr->get_ClockTimes_InputPort(0);
+        Fw::Time t1(TB_ROS_TIME, 0, 0, 0);
+        Fw::Time t2(TB_WORKSTATION_TIME, 0, 0, 0);
+        port->invoke(t1, t2);
+    }
     
     char logFileName[256];
     snprintf(logFileName, sizeof(logFileName), "/eng/TextLog_%u.txt", boot_count % 10);
@@ -763,7 +824,6 @@ volatile sig_atomic_t terminate = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
-    ros::shutdown();
 }
 
 void dummy() {
@@ -782,7 +842,7 @@ int main(int argc, char* argv[]) {
     bool externalIMU = true;
 
     // Removes ROS cmdline args as a side-effect
-    ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
+    ros::init(argc,argv,"BLIMPREF", ros::init_options::NoSigintHandler);
 
     while ((option = getopt(argc, argv, "hisp:a:b:")) != -1){
         switch(option) {
@@ -826,20 +886,12 @@ int main(int argc, char* argv[]) {
                  internalIMUProp,
                  externalIMU);
     //dumparch();
-    
-    ros::start();
 
     hlRosIface_ptr->startIntTask(30, 5*1000*1024);
     mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
     filterIface_ptr->startIntTask(30, 5*1000*1024);
     gtIface_ptr->startIntTask(30, 5*1000*1024);
     rosSeq_ptr->startIntTask(30, 5*1000*1024);
-
-    hlRosIface_ptr->startPub();
-    mrCtrlIface_ptr->startPub();
-    filterIface_ptr->startPub();
-    gtIface_ptr->startPub();
-    rosSeq_ptr->startPub();
 
     ros::console::shutdown();
 
@@ -880,6 +932,11 @@ int main(int argc, char* argv[]) {
     rgDecouple_ptr->setEnabled(false);
     
     DEBUG_PRINT("Stopping tasks\n");
+    hlRosIface_ptr->disableRos();
+    mrCtrlIface_ptr->disableRos();
+    filterIface_ptr->disableRos();
+    gtIface_ptr->disableRos();
+    rosSeq_ptr->disableRos();
     ros::shutdown();
     
     exitTasks();

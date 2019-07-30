@@ -13,4 +13,5 @@
 
 |Event Name|ID|Description|Arg Name|Arg Type|Arg Size|Description
 |---|---|---|---|---|---|---|
-|FTFO_Dummy|0 (0x0)|dummy event| | | | |
+|FTFO_InitFailed|0 (0x0)|FTFO init failed for the following reason| | | | |
+| | | |error|FTFO_InitErrorType||The error code|

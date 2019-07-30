@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="R5TimeForward" kind="passive" namespace="R5" modeler="true">
+
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+
+    <ports>
+        <port name="Sched" data_type="Svc::Sched" kind="sync_input" max_number="1" />
+    
+        <port name="GetEventTime" data_type="Fw::Time"  kind="output" max_number="1" />
+
+        <port name="SendEventTime" data_type="Fw::Time" kind="output" max_number="1" />
+    </ports>
+
+</component>

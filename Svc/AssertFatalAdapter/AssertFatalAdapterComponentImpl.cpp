@@ -17,6 +17,10 @@
 #include <assert.h>
 #include <stdio.h>
 
+#ifdef BUILD_DSPAL
+#include <HAP_farf.h>
+#endif
+
 namespace Fw {
     void defaultReportAssert
             (
@@ -130,7 +134,11 @@ namespace Svc {
 
       I8 msg[FW_ASSERT_TEXT_SIZE];
       Fw::defaultReportAssert(file,lineNo,numArgs,arg1,arg2,arg3,arg4,arg5,arg6,msg,sizeof(msg));
+#ifdef BUILD_DSPAL
+      FARF(ALWAYS, "%s\n",(const char*)msg);
+#else
       fprintf(stderr, "%s\n",(const char*)msg);
+#endif
 
       switch (numArgs) {
           case 0:

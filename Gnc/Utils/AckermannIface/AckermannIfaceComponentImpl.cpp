@@ -50,6 +50,7 @@ namespace Gnc {
     AckermannIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_ackermannDriveStampedSet() // zero-initialize instead of default-initializing
   {
@@ -72,14 +73,10 @@ namespace Gnc {
     {
 
     }
-
+  
     void AckermannIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-
-        m_rosInited = true;
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
     }
 
     Os::Task::TaskStatus AckermannIfaceComponentImpl ::
@@ -87,7 +84,6 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, AckermannIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -97,6 +93,12 @@ namespace Gnc {
 
         return stat;
     }
+  
+    void AckermannIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -149,24 +151,38 @@ namespace Gnc {
         AckermannIfaceComponentImpl* compPtr = (AckermannIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
+        if (ros::isShuttingDown()) {
+            return;
+        }
+
         AckermannDriveStampedHandler updateHandler(compPtr, 0);
+        updateHandler.tbDes = compPtr->m_tbDes;
 
         ros::Subscriber updateSub = n->subscribe("ackermann_cmd", 10,
                                                 &AckermannDriveStampedHandler::ackermannDriveStampedCallback,
                                                 &updateHandler,
                                                 ros::TransportHints().tcpNoDelay());
 
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
     }
-
+  
+    AckermannIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
+    }
+  
     AckermannIfaceComponentImpl :: AckermannDriveStampedHandler ::
       AckermannDriveStampedHandler(AckermannIfaceComponentImpl* compPtr,
                       int portNum) :
@@ -205,15 +221,29 @@ namespace Gnc {
             return;
         }
 
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec / 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                DEBUG_PRINT("failed to convert time in ackermannDriveStamped\n");
+                return;
+            }
+        }
+        
         {
             using namespace ROS::std_msgs;
             using namespace ROS::ackermann_msgs;
 
             AckermannDriveStamped ackermannDriveStamped(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
               AckermannDrive(msg->drive.steering_angle,

@@ -4,16 +4,19 @@
 <component name="ImuProc" kind="passive" namespace="Gnc" modeler="true">
 
     <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/BatchImuPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Prm/PrmTriggerPortAi.xml</import_port_type>
     <import_dictionary>Gnc/Utils/ImuProc/Telemetry.xml</import_dictionary>
     <import_dictionary>Gnc/Utils/ImuProc/Events.xml</import_dictionary>
     <import_dictionary>Gnc/Utils/ImuProc/Commands.xml</import_dictionary>
     <import_dictionary>Gnc/Utils/ImuProc/Params.xml</import_dictionary>
     <ports>
-
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        </port>
 
         <port name="HighRateImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">
         </port>
@@ -23,7 +26,10 @@
 
         <port name="DownsampledImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="2">
         </port>
-	
+
+        <port name="BatchImu" data_type="ROS::mav_msgs::BatchImu"  kind="output"    max_number="1">
+        </port>
+
         <!--port name="Tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
         </port>
 

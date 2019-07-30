@@ -1,8 +1,8 @@
 #
 #   Copyright 2004-2008, by the California Institute of Technology.
 #   ALL RIGHTS RESERVED. United States Government Sponsorship
-#   acknowledged.
-#
+#   acknowledged. Any commercial use must be negotiated with the Office
+#   of Technology Transfer at the California Institute of Technology.
 #
 
 # This is a template for the mod.mk file that goes in each module
@@ -13,7 +13,7 @@
 
 # There are some standard files that are included for reference
 
-SRC = PrmDbComponentAi.xml PrmDbImpl.cpp
+SRC = PrmDbImpl.cpp
 
 HDR = PrmDbImpl.hpp PrmDbImplCfg.hpp
 

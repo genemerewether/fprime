@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="DspOffset" kind="active" namespace="SnapdragonFlight" modeler="true">
+
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePairPortAi.xml</import_port_type>
+    <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    
+    <import_dictionary>SnapdragonFlight/DspOffset/Telemetry.xml</import_dictionary>
+    <ports>
+    
+
+        <port name="SchedIn" data_type="Svc::Sched"  kind="async_input"    max_number="1">
+        </port>
+
+        <port name="ClockTimes" data_type="TimePair"  kind="output"    max_number="1">
+        </port>
+
+        <port name="Log" data_type="Fw::Log"  kind="output"    max_number="1">
+        </port>
+
+        <port name="LogText" data_type="Fw::LogText"  kind="output"    max_number="1">
+        </port>
+    </ports>
+
+</component>

@@ -49,6 +49,7 @@ test_harness/.autotools
 core
 
 *.swp4
+*.swp
 
 ./Gds/logs/*
 ./Gds/docs/doxy

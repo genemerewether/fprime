@@ -428,7 +428,7 @@ namespace SnapdragonFlight {
             + (F64) realtime_now.tv_sec - (F64) monotonic_now.tv_sec;
 
       DEBUG_PRINT("\ncorrection %.9f, timestamp_realtime (s) %.9f\n",
-                  0.0/*timestamp_ns*/, timestamp_realtime);
+                  timestamp_ns, timestamp_realtime);
 
 #ifdef DEBUG_MODE
       gettimeofday(&tv,NULL);
@@ -714,6 +714,8 @@ namespace SnapdragonFlight {
 #endif
                               image.setheader(ROS::std_msgs::Header(m_imagesAcquired,
                                                                     hwTime, 2/*"optic"*/));
+                              image.setexposure(m_exposureTargetTrunc);
+                              image.setgain(m_gainTargetTrunc);
                               GncBufferSend_out(0, image);
                           }
                               break;

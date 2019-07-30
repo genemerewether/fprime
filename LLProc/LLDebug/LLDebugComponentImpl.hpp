@@ -89,6 +89,28 @@ namespace LLProc {
           Common::EnableState enabled
       );
 
+    PRIVATE:
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations
+      // ----------------------------------------------------------------------
+
+      //! Implementation for LLDBG_ENABLE_ASSERT command handler
+      //! Enable/Disable asserts
+      void LLDBG_ENABLE_ASSERT_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          AssertEnable enable /*!< Enable/Disable asserts*/
+      );
+
+      //! Implementation for LLDBG_STRING command handler
+      //! No-op string command
+      void LLDBG_STRING_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq, /*!< The command sequence number*/
+          const Fw::CmdStringArg& arg1 /*!< The String command argument*/
+      );
+
       // debug string storage
       U8 m_debugText[LL_DEBUG_TEXT_SIZE];
       // container for serial data buffer

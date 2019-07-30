@@ -292,6 +292,21 @@ extern "C" {
                                + TEMP_FILE_TYPE_MIN > type,
                                static_cast<NATIVE_INT_TYPE>(type));
                      this->temp_zone_temp[type - TEMP_FILE_TYPE_MIN] = temp;
+
+                     // NOTE(mereweth) - unit test must reflect these transformations
+#ifdef SOC_8096 //TODO(mereweth) - confirm temperature sensor locations on 8096
+                     if (TEMP_0_FILE_TYPE == type) {
+                         this->temp_zone_temp[type - TEMP_FILE_TYPE_MIN] *= 0.001;
+                     }
+                     else {
+                         this->temp_zone_temp[type - TEMP_FILE_TYPE_MIN] *= 0.1;
+                     }
+#else // 8074
+                     if ((TEMP_11_FILE_TYPE == type) ||
+                         (TEMP_12_FILE_TYPE == type)) {
+                         this->temp_zone_temp[type - TEMP_FILE_TYPE_MIN] *= 0.001;
+                     }
+#endif
                 }
                 else if ((type >= TEMP_MODE_FILE_TYPE_MIN) &&
                          (type <= TEMP_MODE_FILE_TYPE_MAX)) {
@@ -637,8 +652,10 @@ extern "C" {
                 }
             }
 
+#ifndef SOC_8096 // TODO(mereweth) - find L2 cache power level file on 8096
             this->write_to_file(L2_POWER_FILE_TYPE,
                                 l2_power_string(this->l2_power_setpoint));
+#endif
         }
         else {
             this->tlmWrite_SnapdragonPowerSaver(SAVER_UNSET_TLM);
@@ -704,7 +721,6 @@ extern "C" {
         this->tlmWrite_SnapTempZone10GpuBStat(this->temp_zone_stat[10]);
         this->tlmWrite_SnapTempZone10GpuBTemp(this->temp_zone_temp[10]);
 
-        // NOTE(mereweth) - unit test must reflect these transformations
         this->tlmWrite_SnapTempZone11PM8841Stat(this->temp_zone_stat[11]);
         this->tlmWrite_SnapTempZone11PM8841Temp(0.001 *
                                                 this->temp_zone_temp[11]);

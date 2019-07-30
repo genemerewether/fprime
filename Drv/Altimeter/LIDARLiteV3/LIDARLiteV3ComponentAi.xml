@@ -11,7 +11,7 @@
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
     <import_port_type>Drv/I2CDriverPorts/I2CConfigPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
-    <import_port_type>Drv/Altimeter/AltimeterPorts/AltimeterPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/RangePortAi.xml</import_port_type>
 
     <import_dictionary>Drv/Altimeter/LIDARLiteV3/Events.xml</import_dictionary>
     <import_dictionary>Drv/Altimeter/LIDARLiteV3/Telemetry.xml</import_dictionary>
@@ -31,7 +31,7 @@
         <port name="I2CConfig" data_type="I2CConfig"  kind="output"    max_number="1">
         </port>
 
-        <port name="AltimeterSend" data_type="Altimeter"  kind="output"    max_number="1">
+        <port name="AltimeterSend" data_type="ROS::sensor_msgs::Range"  kind="output"    max_number="1">
         </port>
 
     </ports>

@@ -295,6 +295,15 @@ namespace Gnc {
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
+  
+  void Se3CtrlComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
 
   void Se3CtrlComponentImpl ::
     se3Cmd_handler(
@@ -314,7 +323,7 @@ namespace Gnc {
   void Se3CtrlComponentImpl ::
     odometry_handler(
         const NATIVE_INT_TYPE portNum,
-        ROS::nav_msgs::Odometry &Odometry
+        ROS::nav_msgs::OdometryAccel &Odometry
     )
   {
       ROS::std_msgs::Header h = Odometry.getheader();

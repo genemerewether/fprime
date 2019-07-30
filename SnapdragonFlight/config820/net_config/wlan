@@ -84,7 +84,7 @@ do_ctrl_cld_ll () {
                 echo "After bringing second interface up(wlan1)" > $DUMP_TO_KMSG
                 wpa_supplicant -Dnl80211 -iwlan1 -c /data/misc/wifi/wpa_supplicant.conf&
                 echo "After starting wpa on (wlan1)" > $DUMP_TO_KMSG
-                /usr/sbin/dhcpcd wlan1 -t 0 -o domain_name_servers --noipv4ll -h -b
+                timeout -t 20 /usr/sbin/dhcpcd wlan1 -t 0 -o domain_name_servers --noipv4ll -h -b
                 echo "After getting dhcp lease on (wlan1)" > $DUMP_TO_KMSG
             fi
         fi

@@ -26,12 +26,12 @@
 
 #include <Os/File.hpp>
 
+#include "nav_msgs/Odometry.h"
+
 #include <math.h>
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
-
-//#define DO_TIME_CONV
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -52,6 +52,7 @@ namespace Gnc {
     FilterIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_trBroad(NULL),
     m_imuStateUpdateSet(), // zero-initialize instead of default-initializing
@@ -82,27 +83,15 @@ namespace Gnc {
     }
 
     void FilterIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-        this->m_trBroad = new tf::TransformBroadcaster();
-
-        char buf[32];
-        for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
-            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
-            m_odomPub[i] = n->advertise<nav_msgs::Odometry>(buf, 5);
-        }
-
-        m_rosInited = true;
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
     }
-
+  
     Os::Task::TaskStatus FilterIfaceComponentImpl ::
       startIntTask(NATIVE_INT_TYPE priority,
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("FILTIFACE");
-        this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, FilterIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -112,6 +101,12 @@ namespace Gnc {
 
         return stat;
     }
+
+    void FilterIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -163,54 +158,23 @@ namespace Gnc {
 
         ROS::std_msgs::Header header = Odometry.getheader();
         Fw::Time stamp = header.getstamp();
-#ifdef DO_TIME_CONV
 
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
 
-        const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                DEBUG_PRINT("Failed to convert time in Odometry handler\n");
+                return;
+            }
         }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
-        if (-walltimeDspLeadUs > usecDsp) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
-                   walltimeDspLeadUs, usecDsp);
-            return;
-        }
-        const I64 usecRos = usecDsp + walltimeDspLeadUs;
-        msg.header.stamp.sec = (U32) (usecRos / 1000LL / 1000LL);
-        msg.header.stamp.nsec = (usecRos % (1000LL * 1000LL)) * 1000LU;
-
-        //TODO(mereweth) - END convert time instead using HLTimeConv
-
-        stamp.set((U32) (usecRos / 1000LL / 1000LL),
-                  (U32) (usecRos % (1000LL * 1000LL)));
-        header.setstamp(stamp);
+        header.setstamp(convTime);
         Odometry.setheader(header);
-#else
-        msg.header.stamp.sec = stamp.getSeconds();
-        msg.header.stamp.nsec = stamp.getUSeconds() * 1000LL;
-#endif // ifdef DO_TIME_CONV
-
+        
         if (this->isConnected_FileLogger_OutputPort(0)) {
             Svc::ActiveFileLoggerPacket fileBuff;
             Fw::SerializeStatus stat;
@@ -232,13 +196,21 @@ namespace Gnc {
             return;
         }
 
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
+        
         msg.header.seq = header.getseq();
 
         // TODO(mereweth) - convert frame ID
         U32 frame_id = header.getframe_id();
         msg.header.frame_id = "world";
 
-        msg.child_frame_id = "quest-base-link";
+        if (0 == portNum) {
+            msg.child_frame_id = "quest-base-link";
+        }
+        else {
+            msg.child_frame_id = "quest-unknown";
+        }
 
         ROS::geometry_msgs::Point p = Odometry.getpose().getposition();
         msg.pose.pose.position.x = p.getx();
@@ -274,6 +246,111 @@ namespace Gnc {
     }
 
     void FilterIfaceComponentImpl ::
+      ImuStateUpdateReport_handler(
+          const NATIVE_INT_TYPE portNum,
+          ROS::mav_msgs::ImuStateUpdateNoCov &ImuStateUpdateNoCov
+      )
+    {
+        mav_msgs::ImuStateUpdate msg;
+
+        ROS::std_msgs::Header header = ImuStateUpdateNoCov.getheader();
+        Fw::Time stamp = header.getstamp();
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
+
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                DEBUG_PRINT("Failed to convert time in ImuStateUpdateReport handler\n");
+                return;
+            }
+        }
+
+        header.setstamp(convTime);
+        ImuStateUpdateNoCov.setheader(header);
+        
+        if (this->isConnected_FileLogger_OutputPort(0)) {
+            Svc::ActiveFileLoggerPacket fileBuff;
+            Fw::SerializeStatus stat;
+            Fw::Time recvTime = this->getTime();
+            fileBuff.resetSer();
+            stat = fileBuff.serialize((U8)AFL_FILTIFACE_IMUSTATEUPDATENOCOV);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = fileBuff.serialize(recvTime.getUSeconds());
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+            stat = ImuStateUpdateNoCov.serialize(fileBuff);
+            FW_ASSERT(Fw::FW_SERIALIZE_OK == stat, stat);
+
+            this->FileLogger_out(0,fileBuff);
+        }
+
+        if (!m_rosInited) {
+            return;
+        }
+
+        msg.header.stamp.sec = header.getstamp().getSeconds();
+        msg.header.stamp.nsec = header.getstamp().getUSeconds() * 1000L;
+        
+        msg.header.seq = header.getseq();
+
+        // TODO(mereweth) - convert frame ID
+        U32 frame_id = header.getframe_id();
+        msg.header.frame_id = "world";
+
+        if (0 == portNum) {
+            msg.child_frame_id = "quest-base-link";
+        }
+        else {
+            msg.child_frame_id = "quest-unknown";
+        }
+
+        ROS::geometry_msgs::Point p = ImuStateUpdateNoCov.getpose().getposition();
+        msg.pose.pose.position.x = p.getx();
+        msg.pose.pose.position.y = p.gety();
+        msg.pose.pose.position.z = p.getz();
+        ROS::geometry_msgs::Quaternion q = ImuStateUpdateNoCov.getpose().getorientation();
+        msg.pose.pose.orientation.w = q.getw();
+        msg.pose.pose.orientation.x = q.getx();
+        msg.pose.pose.orientation.y = q.gety();
+        msg.pose.pose.orientation.z = q.getz();
+        ROS::geometry_msgs::Vector3 vec = ImuStateUpdateNoCov.gettwist().getlinear();
+        msg.twist.twist.linear.x = vec.getx();
+        msg.twist.twist.linear.y = vec.gety();
+        msg.twist.twist.linear.z = vec.getz();
+        vec = ImuStateUpdateNoCov.gettwist().getangular();
+        msg.twist.twist.angular.x = vec.getx();
+        msg.twist.twist.angular.y = vec.gety();
+        msg.twist.twist.angular.z = vec.getz();
+        vec = ImuStateUpdateNoCov.getangular_velocity_bias();
+        msg.angular_velocity_bias.x = vec.getx();
+        msg.angular_velocity_bias.y = vec.gety();
+        msg.angular_velocity_bias.z = vec.getz();
+        vec = ImuStateUpdateNoCov.getlinear_acceleration_bias();
+        msg.linear_acceleration_bias.x = vec.getx();
+        msg.linear_acceleration_bias.y = vec.gety();
+        msg.linear_acceleration_bias.z = vec.getz();
+
+        m_imuStateUpdatePub[portNum].publish(msg);
+
+        tf::Transform tfo;
+        tf::poseMsgToTF(msg.pose.pose, tfo);
+
+        tf::StampedTransform tfoStamp;
+        tfoStamp.stamp_ = msg.header.stamp;
+        tfoStamp.child_frame_id_ = "quest-base-link-update";
+        tfoStamp.frame_id_ = msg.header.frame_id;
+        tfoStamp.setData(tfo);
+
+        FW_ASSERT(this->m_trBroad);
+        this->m_trBroad->sendTransform(tfoStamp);
+    }
+  
+    void FilterIfaceComponentImpl ::
       pingIn_handler(
           const NATIVE_INT_TYPE portNum,
           U32 key
@@ -298,13 +375,33 @@ namespace Gnc {
         FilterIfaceComponentImpl* compPtr = (FilterIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
         FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
+        if (ros::isShuttingDown()) {
+            return;
+        }
+
+        compPtr->m_trBroad = new tf::TransformBroadcaster();
+
+        char buf[32];
+        for (int i = 0; i < NUM_ODOMETRY_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "odometry_%d", i);
+            compPtr->m_odomPub[i] = n->advertise<nav_msgs::Odometry>(buf, 5);
+        }
+        
+        for (int i = 0; i < NUM_IMUSTATEUPDATEREPORT_INPUT_PORTS; i++) {
+            snprintf(buf, FW_NUM_ARRAY_ELEMENTS(buf), "imu_state_update_out_%d", i);
+            compPtr->m_imuStateUpdatePub[i] = n->advertise<mav_msgs::ImuStateUpdate>(buf, 5);
+        }
+
         ImuStateUpdateHandler updateHandler(compPtr, 0);
+        updateHandler.tbDes = compPtr->m_tbDes;
         ImuHandler imuHandler(compPtr, 0);
+        imuHandler.tbDes = compPtr->m_tbDes;
 
         ros::Subscriber updateSub = n->subscribe("imu_state_update", 10,
                                                 &ImuStateUpdateHandler::imuStateUpdateCallback,
@@ -315,12 +412,21 @@ namespace Gnc {
                                               &ImuHandler::imuCallback,
                                               &imuHandler,
                                               ros::TransportHints().tcpNoDelay());
+	
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
     }
 
+    FilterIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
+    }
+  
     FilterIfaceComponentImpl :: ImuStateUpdateHandler ::
       ImuStateUpdateHandler(FilterIfaceComponentImpl* compPtr,
                       int portNum) :
@@ -350,52 +456,6 @@ namespace Gnc {
             return;
         }
 
-#ifdef DO_TIME_CONV
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-
-        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
-                      + (I64) msg->header.stamp.nsec / 1000LL;
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
-
-        if (walltimeDspLeadUs > usecRos) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld greater than message time %lu\n",
-                   walltimeDspLeadUs, usecRos);
-            return;
-        }
-        I64 usecDsp = usecRos - walltimeDspLeadUs;
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (usecDsp / 1000 / 1000),
-                          (U32) (usecDsp % (1000 * 1000)));
-#else
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (msg->header.stamp.sec),
-                          (U32) (msg->header.stamp.nsec / 1000));
-#endif //DO_TIME_CONV
-        //TODO(mereweth) - END convert time instead using HLTimeConv
-
         if (!std::isfinite(msg->pose.pose.position.x) ||
             !std::isfinite(msg->pose.pose.position.y) ||
             !std::isfinite(msg->pose.pose.position.z) ||
@@ -422,6 +482,23 @@ namespace Gnc {
             !std::isfinite(msg->linear_acceleration_bias.z)) {
             //TODO(mereweth) - EVR
             return;
+        }
+
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec / 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                DEBUG_PRINT("Failed to convert time in ImuStateUpdate handler\n");
+                // TODO(Mereweth) - EVR
+                return;
+            }
         }
 
         {
@@ -496,52 +573,6 @@ namespace Gnc {
             return;
         }
 
-#ifdef DO_TIME_CONV
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-
-        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
-                      + (I64) msg->header.stamp.nsec / 1000LL;
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
-
-        if (walltimeDspLeadUs > usecRos) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld greater than message time %lu\n",
-                   walltimeDspLeadUs, usecRos);
-            return;
-        }
-        I64 usecDsp = usecRos - walltimeDspLeadUs;
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (usecDsp / 1000 / 1000),
-                          (U32) (usecDsp % (1000 * 1000)));
-#else
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (msg->header.stamp.sec),
-                          (U32) (msg->header.stamp.nsec / 1000));
-#endif //DO_TIME_CONV
-        //TODO(mereweth) - END convert time instead using HLTimeConv
-
         if (!std::isfinite(msg->orientation.x) ||
             !std::isfinite(msg->orientation.y) ||
             !std::isfinite(msg->orientation.z) ||
@@ -556,6 +587,23 @@ namespace Gnc {
             !std::isfinite(msg->angular_velocity.z)) {
             //TODO(mereweth) - EVR
             return;
+        }
+        
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec / 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                DEBUG_PRINT("Failed to convert time in Imu handler\n");
+                // TODO(Mereweth) - EVR
+                return;
+            }
         }
 
         {

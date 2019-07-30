@@ -72,13 +72,13 @@
       <comment>Position feedback saturation</comment>
     </parameter>
 
-    <parameter id="23" set_opcode="66" save_opcode="67" name="sat_v__x" data_type="F64" default="100.0">
+    <parameter id="23" set_opcode="66" save_opcode="67" name="sat_v__x" data_type="F64" default="10.0">
       <comment>Velocity feedback saturation</comment>
     </parameter>
-    <parameter id="24" set_opcode="68" save_opcode="69" name="sat_v__y" data_type="F64" default="100.0">
+    <parameter id="24" set_opcode="68" save_opcode="69" name="sat_v__y" data_type="F64" default="10.0">
       <comment>Velocity feedback saturation</comment>
     </parameter>
-    <parameter id="25" set_opcode="70" save_opcode="71" name="sat_v__z" data_type="F64" default="100.0">
+    <parameter id="25" set_opcode="70" save_opcode="71" name="sat_v__z" data_type="F64" default="10.0">
       <comment>Velocity feedback saturation</comment>
     </parameter>
 
@@ -102,7 +102,7 @@
       <comment>Angular velocity feedback saturation</comment>
     </parameter>
     
-    <parameter id="32" set_opcode="84" save_opcode="85" name="sat_yaw" data_type="F64" default="1.7">
+    <parameter id="32" set_opcode="84" save_opcode="85" name="sat_yaw" data_type="F64" default="0.3">
       <comment>yaw feedback saturation</comment>
     </parameter>
 

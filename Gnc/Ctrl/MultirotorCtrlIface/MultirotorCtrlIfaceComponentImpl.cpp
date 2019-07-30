@@ -24,14 +24,9 @@
 #include <Svc/ActiveFileLogger/ActiveFileLoggerPacket.hpp>
 #include <Svc/ActiveFileLogger/ActiveFileLoggerStreams.hpp>
 
-#include <Os/File.hpp>
-
-#include <math.h>
 #include <stdio.h>
 
 #include <ros/callback_queue.h>
-
-#define DO_TIME_CONV
 
 //#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #define DEBUG_PRINT(x,...)
@@ -52,6 +47,7 @@ namespace Gnc {
     MultirotorCtrlIfaceImpl(void),
 #endif
     m_rosInited(false),
+    m_tbDes(TB_NONE),
     m_nodeHandle(NULL),
     m_boolStampedSet(), // zero-initialize instead of default-initializing
     m_flatOutSet(), // zero-initialize instead of default-initializing
@@ -86,12 +82,8 @@ namespace Gnc {
     }
 
     void MultirotorCtrlIfaceComponentImpl ::
-      startPub() {
-        // TODO(mereweth) - prevent calling twice
-        FW_ASSERT(m_nodeHandle);
-        ros::NodeHandle* n = this->m_nodeHandle;
-
-        m_rosInited = true;
+      setTBDes(TimeBase tbDes) {
+        this->m_tbDes = tbDes;
     }
 
     Os::Task::TaskStatus MultirotorCtrlIfaceComponentImpl ::
@@ -99,7 +91,6 @@ namespace Gnc {
                    NATIVE_INT_TYPE stackSize,
                    NATIVE_INT_TYPE cpuAffinity) {
         Os::TaskString name("MRCTRLIFACE");
-	this->m_nodeHandle = new ros::NodeHandle();
         Os::Task::TaskStatus stat = this->m_intTask.start(name, 0, priority,
           stackSize, MultirotorCtrlIfaceComponentImpl::intTaskEntry, this, cpuAffinity);
 
@@ -109,6 +100,12 @@ namespace Gnc {
 
         return stat;
     }
+  
+    void MultirotorCtrlIfaceComponentImpl ::
+      disableRos() {
+        this->m_rosInited = false;
+    }
+  
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
@@ -177,44 +174,19 @@ namespace Gnc {
         ROS::std_msgs::Header header = AccelStamped.getheader();
         Fw::Time stamp = header.getstamp();
 
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = stamp;
 
-        const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
+        if (this->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->convertTime_out(0, stamp, TB_ROS_TIME, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
         }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
-        if (-walltimeDspLeadUs > usecDsp) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld negative; greater than message time %lu\n",
-                   walltimeDspLeadUs, usecDsp);
-            return;
-        }
-        const I64 usecRos = usecDsp + walltimeDspLeadUs;
-
-        //TODO(mereweth) - END convert time instead using HLTimeConv
-
-        stamp.set((U32) (usecRos / 1000LL / 1000LL),
-                         (U32) (usecRos % (1000LL * 1000LL)));
-        header.setstamp(stamp);
+        header.setstamp(convTime);
         AccelStamped.setheader(header);
 
         if (this->isConnected_FileLogger_OutputPort(0)) {
@@ -259,14 +231,22 @@ namespace Gnc {
         MultirotorCtrlIfaceComponentImpl* compPtr = (MultirotorCtrlIfaceComponentImpl*) ptr;
         //compPtr->log_ACTIVITY_LO_HLROSIFACE_IntTaskStarted();
 
+        compPtr->m_nodeHandle = new ros::NodeHandle();
         ros::NodeHandle* n = compPtr->m_nodeHandle;
-          FW_ASSERT(n);
+	FW_ASSERT(n);
         ros::CallbackQueue localCallbacks;
         n->setCallbackQueue(&localCallbacks);
 
+        if (ros::isShuttingDown()) {
+            return;
+        }
+
         BoolStampedHandler boolStampedHandler(compPtr, 0);
+        boolStampedHandler.tbDes = compPtr->m_tbDes;
         FlatOutputHandler flatoutHandler(compPtr, 0);
+        flatoutHandler.tbDes = compPtr->m_tbDes;
         AttitudeRateThrustHandler attRateThrustHandler(compPtr, 0);
+        attRateThrustHandler.tbDes = compPtr->m_tbDes;
 
         ros::Subscriber flatoutSub = n->subscribe("flat_output_setpoint", 1,
                                                   &FlatOutputHandler::flatOutputCallback,
@@ -283,12 +263,20 @@ namespace Gnc {
                                                         &attRateThrustHandler,
                                                         ros::TransportHints().tcpNoDelay());
 
+        compPtr->m_rosInited = true;
+	
         while (1) {
             // TODO(mereweth) - check for and respond to ping
             localCallbacks.callAvailable(ros::WallDuration(0, 10 * 1000 * 1000));
         }
     }
 
+    MultirotorCtrlIfaceComponentImpl :: TimeBaseHolder ::
+      TimeBaseHolder() :
+      tbDes(TB_NONE)
+    {
+    }
+  
     // Bool stamped constructor/destructor/callback
     MultirotorCtrlIfaceComponentImpl :: BoolStampedHandler ::
       BoolStampedHandler(MultirotorCtrlIfaceComponentImpl* compPtr,
@@ -319,52 +307,21 @@ namespace Gnc {
             return;
         }
 
-#ifdef DO_TIME_CONV
-        //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec / 1000);
 
-        I64 usecRos = (I64) msg->header.stamp.sec * 1000LL * 1000LL
-                      + (I64) msg->header.stamp.nsec / 1000LL;
-        Os::File::Status stat = Os::File::OTHER_ERROR;
-        Os::File file;
-        stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-        if (stat != Os::File::OP_OK) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        char buff[255];
-        NATIVE_INT_TYPE size = sizeof(buff);
-        stat = file.read(buff, size, false);
-        file.close();
-        if ((stat != Os::File::OP_OK) ||
-            !size) {
-            // TODO(mereweth) - EVR
-            printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-            return;
-        }
-        // Make sure buffer is null-terminated:
-        buff[sizeof(buff)-1] = 0;
-        I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
 
-        if (walltimeDspLeadUs > usecRos) {
-            // TODO(mereweth) - EVR; can't have difference greater than time
-            printf("linux-dsp diff %lld greater than message time %lu\n",
-                   walltimeDspLeadUs, usecRos);
-            return;
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
         }
-        I64 usecDsp = usecRos - walltimeDspLeadUs;
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (usecDsp / 1000 / 1000),
-                          (U32) (usecDsp % (1000 * 1000)));
-#else
-        Fw::Time convTime(TB_WORKSTATION_TIME,
-                          0,
-                          (U32) (msg->header.stamp.sec),
-                          (U32) (msg->header.stamp.nsec / 1000));
-#endif //DO_TIME_CONV
-
-        //TODO(mereweth) - END convert time instead using HLTimeConv
 
         {
             using namespace ROS::std_msgs;
@@ -432,28 +389,52 @@ namespace Gnc {
             !std::isfinite(msg->acceleration.y) ||
             !std::isfinite(msg->acceleration.z) ||
 
-            !std::isfinite(msg->yaw)) {
+            !std::isfinite(msg->jerk.x) ||
+            !std::isfinite(msg->jerk.y) ||
+            !std::isfinite(msg->jerk.z) ||
+
+            !std::isfinite(msg->snap.x) ||
+            !std::isfinite(msg->snap.y) ||
+            !std::isfinite(msg->snap.z) ||
+
+            !std::isfinite(msg->yaw)    ||
+            !std::isfinite(msg->yawdot)) {
             //TODO(mereweth) - EVR
             return;
         }
 
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec / 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+        
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
             FlatOutput flatOutput(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
 
               Point(msg->position.x, msg->position.y, msg->position.z),
               Vector3(msg->velocity.x, msg->velocity.y, msg->velocity.z),
               Vector3(msg->acceleration.x, msg->acceleration.y, msg->acceleration.z),
-              F64(msg->yaw)
-
+              Vector3(msg->jerk.x, msg->jerk.y, msg->jerk.z),
+              Vector3(msg->snap.x, msg->snap.y, msg->snap.z),
+              F64(msg->yaw), F64(msg->yawdot)
             ); // end FlatOutput constructor
 
             this->compPtr->m_flatOutSet[this->portNum].mutex.lock();
@@ -517,15 +498,29 @@ namespace Gnc {
             return;
         }
 
+        Fw::Time rosTime(TB_ROS_TIME, 0,
+                         msg->header.stamp.sec,
+                         msg->header.stamp.nsec / 1000);
+
+        // if port is not connected, default to no conversion
+        Fw::Time convTime = rosTime;
+
+        if (this->compPtr->isConnected_convertTime_OutputPort(0)) {
+            bool success = false;
+            convTime = this->compPtr->convertTime_out(0, rosTime, this->tbDes, 0, success);
+            if (!success) {
+                // TODO(Mereweth) - EVR
+                return;
+            }
+        }
+        
         {
             using namespace ROS::std_msgs;
             using namespace ROS::mav_msgs;
             using namespace ROS::geometry_msgs;
             AttitudeRateThrust attRateThrust(
               Header(msg->header.seq,
-                     Fw::Time(TB_ROS_TIME, 0,
-                              msg->header.stamp.sec,
-                              msg->header.stamp.nsec / 1000),
+                     convTime,
                      // TODO(mereweth) - convert frame id
                      0/*Fw::EightyCharString(msg->header.frame_id.data())*/),
 

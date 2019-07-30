@@ -8,7 +8,7 @@ void exitTasks(void);
 #include <Svc/ActiveTextLogger/ActiveTextLoggerImpl.hpp>
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <Svc/TlmChan/TlmChanImpl.hpp>
-#include <Svc/PrmDb/PrmDbImpl.hpp>
+#include <Svc/ActiveL1PrmDb/ActiveL1PrmDbImpl.hpp>
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 #include <SnapdragonFlight/SnapdragonHealth/SnapdragonHealthComponentImpl.hpp>
 #include <Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentImpl.hpp>
@@ -16,7 +16,7 @@ void exitTasks(void);
 #include <Gnc/Est/GroundTruthIface/GroundTruthIfaceComponentImpl.hpp>
 #include <HLProc/HLRosIface/HLRosIfaceComponentImpl.hpp>
 #include <ROS/RosSeq/RosSeqComponentImpl.hpp>
-
+#include <Svc/TimeConvert/TimeConvertComponentImpl.hpp>
 #include <Svc/ActiveRateGroup/ActiveRateGroupImpl.hpp>
 #include <Svc/PassiveRateGroup/PassiveRateGroupImpl.hpp>
 #include <Svc/RateGroupDriver/RateGroupDriverImpl.hpp>
@@ -76,6 +76,7 @@ extern SnapdragonFlight::BlspPwmDriverComponentImpl* escPwmSnap_ptr;
 
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
 extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;
+extern Drv::LinuxI2CDriverComponentImpl* i2cDrv2_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr;
 extern Drv::LinuxPwmDriverComponentImpl* escPwm_ptr;
@@ -85,9 +86,10 @@ extern Svc::CmdSequencerComponentImpl* cmdSeq_ptr;
 extern Svc::ActiveTextLoggerComponentImpl* textLogger_ptr;
 extern Svc::ActiveLoggerImpl* eventLogger_ptr;
 extern Svc::TlmChanImpl* chanTlm_ptr;
-extern Svc::PrmDbImpl* prmDb_ptr;
+extern Svc::ActiveL1PrmDbComponentImpl* prmDb_ptr;
 extern Svc::SocketGndIfImpl* sockGndIf_ptr;
 extern SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr;
+extern Svc::TimeConvertComponentImpl* timeConvert_ptr;
 
 extern HLProc::HLRosIfaceComponentImpl* hlRosIface_ptr;
 extern Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr;

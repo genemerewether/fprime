@@ -1,0 +1,16 @@
+    <commands>
+        <command kind="sync" opcode="1" mnemonic="L2_PRM_PUSH_UPDATES" >
+            <comment>
+            Push parameter updates to the L1 Prm Db
+            </comment>
+            <args>
+                <arg name="updateMethod" type="ENUM">
+                    <enum name="UpdateMethod">
+                        <item name="PUSH_UPDATES"/>
+                        <item name="NO_UPDATES"/>
+                    </enum>
+                </arg>
+            </args>
+        </command>
+    </commands>
+

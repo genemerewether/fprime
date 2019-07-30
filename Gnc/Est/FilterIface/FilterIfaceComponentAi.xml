@@ -14,6 +14,7 @@
     <import_port_type>Svc/ActiveFileLogger/ActiveFileLoggerPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryNoCovPortAi.xml</import_port_type>
     <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/ConvertTimePortAi.xml</import_port_type>
 
     <import_dictionary>Gnc/Est/FilterIface/Telemetry.xml</import_dictionary>
     
@@ -27,6 +28,9 @@
         <port name="Time" data_type="Fw::Time"  kind="output"    max_number="1">
         </port-->
 
+        <port name="convertTime" data_type="Fw::ConvertTime"  kind="output"    max_number="1">
+        </port>
+
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>
 
@@ -39,10 +43,13 @@
         <port name="pingOut" data_type="Svc::Ping"  kind="output"    max_number="1">
         </port>
 
-        <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="1">
+        <port name="Odometry" data_type="ROS::nav_msgs::OdometryNoCov"  kind="sync_input"    max_number="2">
         </port>
 
         <port name="ImuStateUpdate" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="output"  max_number="1">
+        </port>
+
+        <port name="ImuStateUpdateReport" data_type="ROS::mav_msgs::ImuStateUpdateNoCov"  kind="sync_input"  max_number="1">
         </port>
 
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="output"    max_number="1">

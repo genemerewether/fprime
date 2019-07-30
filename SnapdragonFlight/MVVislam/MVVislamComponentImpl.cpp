@@ -52,6 +52,7 @@ namespace SnapdragonFlight {
       ,m_errorCode(0u)
       ,w_q_b(0.0, 0.0, 0.0, 1.0)
       ,x_b(0.0, 0.0, 0.0)
+      ,m_tbDes(TB_NONE)
   {
 
   }
@@ -72,6 +73,11 @@ namespace SnapdragonFlight {
   }
 
   void MVVislamComponentImpl ::
+    setTBDes(TimeBase tbDes) {
+      this->m_tbDes = tbDes;
+  }
+  
+  void MVVislamComponentImpl ::
     preamble(void)
   {
       initHelper();
@@ -88,9 +94,9 @@ namespace SnapdragonFlight {
       F32 ombc[] = { 0.0, 0.0, 1.57 };
 #else
       // NOTE(mereweth) - x,y,z, offsets in meters
-      F32 tbc[] = { -0.051, 0.015, 0.011 };
+      F32 tbc[] = { -0.0233, 0.0168, 0.0082 };
       // NOTE(mereweth) - axis-angle rep; 
-      F32 ombc[] = { 0.6149, -0.6149, -1.4817 };
+      F32 ombc[] = { 0.5709, -0.5676, -1.5285 };
 #endif
 
       F32 std0Tbc[] = { 0.005, 0.005, 0.005 };
@@ -104,16 +110,16 @@ namespace SnapdragonFlight {
       camCfg.pixelHeight = 480;
       camCfg.memoryStride = 640;
 
-      camCfg.principalPoint[0] = 320.0;
-      camCfg.principalPoint[1] = 240.0;
-      camCfg.focalLength[0] = 275.0;
-      camCfg.focalLength[1] = 275.0;
+      camCfg.principalPoint[0] = 327.986206;
+      camCfg.principalPoint[1] = 263.447510;
+      camCfg.focalLength[0] = 294.302726;
+      camCfg.focalLength[1] = 294.302826;
       camCfg.uvOffset = 0;
       camCfg.distortionModel = 10;
-      camCfg.distortion[0] = .003908;
-      camCfg.distortion[1] = -0.009574;
-      camCfg.distortion[2] = 0.010173;
-      camCfg.distortion[3] = -0.003329;
+      camCfg.distortion[0] = -0.017841;
+      camCfg.distortion[1] = 0.022006;
+      camCfg.distortion[2] = -0.014046;
+      camCfg.distortion[3] = 0.002722;
 
       this->m_mvVISLAMPtr = 
         mvVISLAM_Initialize(&camCfg,
@@ -143,7 +149,7 @@ namespace SnapdragonFlight {
                             "na", //staticMaskFilename
                             0.0f, //gpsImuTimeAlignment
                             tba,
-                            false //mapping
+                            true //mapping
       );
       if (NULL != m_mvVISLAMPtr) {
           m_initialized = true;
@@ -167,67 +173,76 @@ namespace SnapdragonFlight {
   // ----------------------------------------------------------------------
 
   void MVVislamComponentImpl ::
-    Imu_handler(
-        const NATIVE_INT_TYPE portNum,
-        ROS::sensor_msgs::ImuNoCov &imu
-    )
+    addImuHelper(ROS::sensor_msgs::ImuNoCov &imu)
   {
-      //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-
       ROS::std_msgs::Header h = imu.getheader();
       Fw::Time stamp = h.getstamp();
-      const I64 usecDsp = (I64) stamp.getSeconds() * 1000LL * 1000LL + (I64) stamp.getUSeconds();
-      Os::File::Status stat = Os::File::OTHER_ERROR;
-      Os::File file;
-      stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-      if (stat != Os::File::OP_OK) {
-          // TODO(mereweth) - EVR
-          printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-          return;
-      }
-      char buff[255];
-      NATIVE_INT_TYPE size = sizeof(buff);
-      stat = file.read(buff, size, false);
-      file.close();
-      if ((stat != Os::File::OP_OK) ||
-          !size) {
-          // TODO(mereweth) - EVR
-          printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-          return;
-      }
-      // Make sure buffer is null-terminated:
-      buff[sizeof(buff)-1] = 0;
-      const I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
 
-      if (-walltimeDspLeadUs > usecDsp) {
-          // TODO(mereweth) - EVR; can't have difference greater than time
-          printf("linux-dsp diff %lld negative; greater than message time %lu\n",
-                 walltimeDspLeadUs, usecDsp);
-          return;
+      // if port is not connected, default to no conversion
+      Fw::Time convTime = stamp;
+
+      if (this->isConnected_convertTime_OutputPort(0)) {
+          bool success = false;
+          convTime = this->convertTime_out(0, stamp, TB_WORKSTATION_TIME, 0, success);
+          if (!success) {
+              // TODO(Mereweth) - EVR
+              return;
+          }
       }
-      const I64 usecRos = usecDsp + walltimeDspLeadUs;
-      stamp.set((U32) (usecRos / 1000LL / 1000LL),
-                (U32) (usecRos % (1000LL * 1000LL)));
-      h.setstamp(stamp);
+      
+      h.setstamp(convTime);
       imu.setheader(h);
-
-      //TODO(mereweth) - END convert time instead using HLTimeConv
-    
+      
+      const I64 usecHLOS = (I64) convTime.getSeconds() * 1000LL * 1000LL + (I64) convTime.getUSeconds();
       if (m_initialized && m_activated) {
 #ifdef BUILD_SDFLIGHT
-          mvVISLAM_AddAccel(m_mvVISLAMPtr, usecRos * 1000LL,
+          mvVISLAM_AddAccel(m_mvVISLAMPtr, usecHLOS * 1000LL,
                             imu.getlinear_acceleration().getx(),
                             imu.getlinear_acceleration().gety(),
                             imu.getlinear_acceleration().getz());
-          mvVISLAM_AddGyro(m_mvVISLAMPtr, usecRos * 1000LL,
+          mvVISLAM_AddGyro(m_mvVISLAMPtr, usecHLOS * 1000LL,
                            imu.getangular_velocity().getx(),
                            imu.getangular_velocity().gety(),
                            imu.getangular_velocity().getz());
 #endif //BUILD_SDFLIGHT
       }
+  }
 
+  void MVVislamComponentImpl ::
+    Imu_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::sensor_msgs::ImuNoCov &imu
+    )
+  {
+      addImuHelper(imu);
       if (isConnected_ImuFwd_OutputPort(0)) {
           ImuFwd_out(0, imu);
+      }
+  }
+
+  void MVVislamComponentImpl ::
+    BatchImu_handler(
+        const NATIVE_INT_TYPE portNum,
+        ROS::mav_msgs::BatchImu &BatchImu
+    )
+  {
+      NATIVE_INT_TYPE size = 0;
+      ROS::sensor_msgs::ImuNoCov rwArray[100];
+      const ROS::sensor_msgs::ImuNoCov* imuArray = BatchImu.getsamples(size);
+      NATIVE_INT_TYPE setSize = FW_MIN(BatchImu.getsamples_count(), size);
+      if (setSize > FW_NUM_ARRAY_ELEMENTS(rwArray)) {
+          // TODO(mereweth) - EVR
+          return;
+      }
+      for (U32 ii = 0; ii < setSize; ii++) {
+          rwArray[ii] = imuArray[ii];
+          addImuHelper(rwArray[ii]);
+      }
+      
+      BatchImu.setsamples(rwArray, setSize);
+
+      if (isConnected_BatchImuFwd_OutputPort(0)) {
+          BatchImuFwd_out(0, BatchImu);
       }
   }
 
@@ -240,9 +255,9 @@ namespace SnapdragonFlight {
       Fw::Buffer data = Image.getdata();
       if (m_initialized && m_activated) {
 #ifdef BUILD_SDFLIGHT
-          Fw::Time t = Image.getheader().getstamp();
-          I64 usecRos = t.getSeconds() * 1000LL * 1000LL + t.getUSeconds();
-          mvVISLAM_AddImage(m_mvVISLAMPtr, usecRos * 1000LL, (U8*) (data.getdata()));
+          Fw::Time hlosTime = Image.getheader().getstamp();
+          I64 usecHLOS = hlosTime.getSeconds() * 1000LL * 1000LL + hlosTime.getUSeconds();
+          mvVISLAM_AddImage(m_mvVISLAMPtr, usecHLOS * 1000LL, (U8*) (data.getdata()));
           mvVISLAMPose vio_pose = mvVISLAM_GetPose(m_mvVISLAMPtr);
 	  
           /*
@@ -263,6 +278,20 @@ namespace SnapdragonFlight {
             - \b 15:  Sensor measurements with uninitialized time stamps or uninitialized uncertainty (set to 0)
           */
 
+          DEBUG_PRINT("tbc %0.4f, %0.4f, %0.4f\n", vio_pose.tbc[0], vio_pose.tbc[1], vio_pose.tbc[2]);
+          DEBUG_PRINT("Rbc\n[%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n]\n",
+                      vio_pose.Rbc[0][0], vio_pose.Rbc[0][1], vio_pose.Rbc[0][2],
+                      vio_pose.Rbc[1][0], vio_pose.Rbc[1][1], vio_pose.Rbc[1][2],
+                      vio_pose.Rbc[2][0], vio_pose.Rbc[2][1], vio_pose.Rbc[2][2]);
+          DEBUG_PRINT("aAccInv\n[%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n]\n",
+                      vio_pose.aAccInv[0][0], vio_pose.aAccInv[0][1], vio_pose.aAccInv[0][2],
+                      vio_pose.aAccInv[1][0], vio_pose.aAccInv[1][1], vio_pose.aAccInv[1][2],
+                      vio_pose.aAccInv[2][0], vio_pose.aAccInv[2][1], vio_pose.aAccInv[2][2]);
+          DEBUG_PRINT("aGyrInv\n[%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n%0.4f, %0.4f, %0.4f\n]\n",
+                      vio_pose.aGyrInv[0][0], vio_pose.aGyrInv[0][1], vio_pose.aGyrInv[0][2],
+                      vio_pose.aGyrInv[1][0], vio_pose.aGyrInv[1][1], vio_pose.aGyrInv[1][2],
+                      vio_pose.aGyrInv[2][0], vio_pose.aGyrInv[2][1], vio_pose.aGyrInv[2][2]);
+
           //TODO(mereweth) - move these after transform
           this->x_b.setx(vio_pose.bodyPose.matrix[0][3]);
           this->x_b.sety(vio_pose.bodyPose.matrix[1][3]);
@@ -280,11 +309,6 @@ namespace SnapdragonFlight {
               Transform<float,3,Affine> odom_to_imu(AngleAxisf(3.14159, Vector3f::UnitY())
                                                     * AngleAxisf(acos(grav.dot(Vector3f::UnitZ())),
                                                                  grav.cross(Vector3f::UnitZ())));
-              // NOTE(Mereweth) - odom_to_imu is odom_to_imu-start (MV spatial) here,
-              // and velocity is expressed in MV spatial, so this is correct to get
-              // to odom frame
-              Vector3f vel(vio_pose.velocity[0], vio_pose.velocity[1], vio_pose.velocity[2]);
-              vel = odom_to_imu * vel;
               
               Transform<float,3,Affine> imu_start_to_imu;
               imu_start_to_imu.matrix() << vio_pose.bodyPose.matrix[0][0],
@@ -301,52 +325,26 @@ namespace SnapdragonFlight {
                 vio_pose.bodyPose.matrix[2][3],
                 0.0, 0.0, 0.0, 1.0;
               odom_to_imu = odom_to_imu * imu_start_to_imu;
+
+              // NOTE(Mereweth) - velocity is expressed in MV spatial, so this is correct to get
+              // to body
+              Vector3f vel(vio_pose.velocity[0], vio_pose.velocity[1], vio_pose.velocity[2]);
+              vel = imu_start_to_imu.rotation() * vel;
               
               const Quaternionf odom_to_imu_q(odom_to_imu.rotation());
               const Vector3f odom_to_imu_v(odom_to_imu.translation());
 
-              //TODO(mereweth) - BEGIN convert time instead using HLTimeConv
-              Os::File::Status stat = Os::File::OTHER_ERROR;
-              Os::File file;
-              stat = file.open("/sys/kernel/dsp_offset/walltime_dsp_diff", Os::File::OPEN_READ);
-              if (stat != Os::File::OP_OK) {
-                  // TODO(mereweth) - EVR
-                  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-                  return;
-              }
-              char buff[255];
-              NATIVE_INT_TYPE size = sizeof(buff);
-              stat = file.read(buff, size, false);
-              file.close();
-              if ((stat != Os::File::OP_OK) ||
-                  !size) {
-                  // TODO(mereweth) - EVR
-                  printf("Unable to read DSP diff at /sys/kernel/dsp_offset/walltime_dsp_diff\n");
-                  return;
-              }
-              // Make sure buffer is null-terminated:
-              buff[sizeof(buff)-1] = 0;
-              I64 walltimeDspLeadUs = strtoll(buff, NULL, 10);
+              // if port is not connected, default to no conversion
+              Fw::Time convTime = hlosTime;
 
-              if (walltimeDspLeadUs > usecRos) {
-                  // TODO(mereweth) - EVR; can't have difference greater than time
-                  printf("linux-dsp diff %lld greater than message time %lu\n",
-                         walltimeDspLeadUs, usecRos);
-                  return;
+              if (this->isConnected_convertTime_OutputPort(0)) {
+                  bool success = false;
+                  convTime = this->convertTime_out(0, hlosTime, this->m_tbDes, 0, success);
+                  if (!success) {
+                      // TODO(Mereweth) - EVR
+                      return;
+                  }
               }
-              I64 usecDsp = usecRos - walltimeDspLeadUs;
-              Fw::Time convTime(TB_WORKSTATION_TIME,
-                                0,
-                                (U32) (usecDsp / 1000 / 1000),
-                                (U32) (usecDsp % (1000 * 1000)));
-
-              DEBUG_PRINT("usecRos %lld, lead %lld, convTime %u.%06u\n",
-                          usecRos,
-                          walltimeDspLeadUs,
-                          convTime.getSeconds(),
-                          convTime.getUSeconds());
-
-              //TODO(mereweth) - END convert time instead using HLTimeConv
 	      
               ImuStateUpdateNoCov update(
                   Header(Image.getheader().getseq(),
@@ -372,8 +370,10 @@ namespace SnapdragonFlight {
                           vio_pose.aBias[2])
               ); // end ImuStateUpdate constructor
 
-              if (isConnected_ImuStateUpdate_OutputPort(0)) {
-                  ImuStateUpdate_out(0, update);
+              for (int i = 0; i < NUM_IMUSTATEUPDATE_OUTPUT_PORTS; i++) {
+                  if (isConnected_ImuStateUpdate_OutputPort(i)) {
+                      ImuStateUpdate_out(i, update);
+                  }
               }
           } // if !errorCode
 

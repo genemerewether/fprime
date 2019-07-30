@@ -3,7 +3,9 @@ public:
     enum {
         SERIALIZED_SIZE =
 #for tname,type,size,format,comment,typeinfo in $members[0:-1]:
-#if $typeinfo == 'string' or $typeinfo == 'extern':
+#if $typeinfo == 'extern' and $size is not None:
+        ${type}::SERIALIZED_SIZE * $size +
+#else if $typeinfo == 'string' or $typeinfo == 'extern':
         ${type}::SERIALIZED_SIZE +
 #else if $typeinfo == 'enum':
         sizeof(FwEnumStoreType) +
@@ -14,7 +16,9 @@ public:
 #end if
 #end for
 #set ($tname,$type,$size,$format,$comment,$typeinfo) = $members[-1]
-#if $typeinfo == 'string' or $typeinfo == 'extern':
+#if $typeinfo == 'extern' and $size is not None:
+        ${type}::SERIALIZED_SIZE * $size
+#else if $typeinfo == 'string' or $typeinfo == 'extern':
         ${type}::SERIALIZED_SIZE
 #else if $typeinfo == 'enum':
         sizeof(FwEnumStoreType)
