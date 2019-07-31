@@ -60,8 +60,8 @@ namespace SnapdragonFlight {
     
       ,m_accelMeasRange(0.0)
       ,m_gyroMeasRange(0.0)
-      ,m_stdAccelMeasRange(0.0)
-      ,m_stdGyroMeasRange(0.0)
+      ,m_stdAccelMeasNoise(0.0)
+      ,m_stdGyroMeasNoise(0.0)
     
       ,m_stdCamNoise(0.0)
       ,m_minStdPixelNoise(0.0)
@@ -74,6 +74,7 @@ namespace SnapdragonFlight {
       ,m_limitedIMUbWtrigger(0.0)
       ,m_staticMaskFilename("na")
       ,m_gpsImuTimeAlignment(0.0)
+      ,m_mapping(false)
       ,m_initialized(false)
       ,m_activated(false)
       ,m_errorCode(0u)
@@ -110,73 +111,123 @@ namespace SnapdragonFlight {
       initHelper();
   }
 
+    void MVVislamComponentImpl ::
+      parameterUpdated(FwPrmIdType id)
+    {
+        DEBUG_PRINT("prm %d updated\n", id);
+        Fw::ParamValid valid;
+
+        switch (id) {
+            case PARAMID_MVVISLAM_INITWHENMOVING:
+            {
+                bool temp = paramGet_MVVISLAM_initWhenMoving(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_noInitWhenMoving = !temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_MAPPING:
+            {
+                bool temp = paramGet_MVVISLAM_mapping(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mapping = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STATICMASKFILENAME:
+            {
+                Fw::ParamString temp = paramGet_MVVISLAM_staticMaskFilename(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_staticMaskFilename = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_LOGDEPTHBOOTSTRAP:
+            {
+                F32 temp = paramGet_MVVISLAM_logDepthBootstrap(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_logDepthBootstrap = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_USELOGCAMERAHEIGHT:
+            {
+                U8 temp = paramGet_MVVISLAM_useLogCameraHeight(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_useLogCameraHeight = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+        }
+    }
+
+    void MVVislamComponentImpl ::
+      parametersLoaded()
+    {
+        for (U32 i = 0; i < __MAX_PARAMID; i++) {
+            parameterUpdated(i);
+        }
+    }
 
   void MVVislamComponentImpl ::
     initHelper(void)
   {
-#ifdef SOC_8074
-      // NOTE(mereweth) - x,y,z, offsets in meters
-      F32 tbc[] = { 0.005, 0.0150, 0.0 };
-      // NOTE(mereweth) - axis-angle rep; rotation of 90 deg about Z
-      F32 ombc[] = { 0.0, 0.0, 1.57 };
-#else
-      // NOTE(mereweth) - x,y,z, offsets in meters
-      F32 tbc[] = { -0.0233, 0.0168, 0.0082 };
-      // NOTE(mereweth) - axis-angle rep; 
-      F32 ombc[] = { 0.5709, -0.5676, -1.5285 };
-#endif
-
-      F32 std0Tbc[] = { 0.005, 0.005, 0.005 };
-      F32 std0Ombc[] = { 0.04, 0.04, 0.04 };
-
-      F32 tba[] = { 0.0, 0.0, 0.0 };
-    
 #ifdef BUILD_SDFLIGHT
-      mvCameraConfiguration camCfg;
-      camCfg.pixelWidth = 640;
-      camCfg.pixelHeight = 480;
-      camCfg.memoryStride = 640;
-
-      camCfg.principalPoint[0] = 327.986206;
-      camCfg.principalPoint[1] = 263.447510;
-      camCfg.focalLength[0] = 294.302726;
-      camCfg.focalLength[1] = 294.302826;
-      camCfg.uvOffset = 0;
-      camCfg.distortionModel = 10;
-      camCfg.distortion[0] = -0.017841;
-      camCfg.distortion[1] = 0.022006;
-      camCfg.distortion[2] = -0.014046;
-      camCfg.distortion[3] = 0.002722;
-
       this->m_mvVISLAMPtr = 
-        mvVISLAM_Initialize(&camCfg,
-                            0.0f, //readoutTime
-                            tbc,
-                            ombc,
-#ifdef SOC_8074
-                            -0.0068, //delta
-#else
-                            0.002f, //delta
-#endif
-                            std0Tbc,
-                            std0Ombc,
-                            0.001f, //std0Delta
-                            156.0f, //accelMeasRange
-                            34.0f, //gyroMeasRange
-                            0.316f, //stdAccelMeasNoise
-                            1e-2f, //stdGyroMeasNoise
-                            100.0f, //stdCamNoise
-                            0.5f, //minStdPixelNoise
-                            1.6651f, //failHighPixelNoiseScaleFactor
-                            0.0f, //logDepthBootstrap
-                            false, //useLogCameraHeight
-                            -3.22f, //logCameraHeightBootstrap
-                            false, //noInitWhenMoving
-                            200.0f, //limitedIMUbWtrigger
-                            "na", //staticMaskFilename
-                            0.0f, //gpsImuTimeAlignment
-                            tba,
-                            true //mapping
+        mvVISLAM_Initialize(&m_camCfg,
+                            m_readoutTime,
+                            m_tbc,
+                            m_ombc,
+                            m_camDelta,
+                            m_std0tbc,
+                            m_std0ombc,
+                            m_std0camDelta,
+                            m_accelMeasRange,
+                            m_gyroMeasRange,
+                            m_stdAccelMeasNoise,
+                            m_stdGyroMeasNoise,
+                            m_stdCamNoise,
+                            m_minStdPixelNoise,
+                            m_failHighPixelNoiseScaleFactor,
+                            m_logDepthBootstrap,
+                            m_useLogCameraHeight,
+                            m_logCameraHeightBootstrap,
+                            m_noInitWhenMoving,
+                            m_limitedIMUbWtrigger,
+                            m_staticMaskFilename.toChar(),
+                            m_gpsImuTimeAlignment,
+                            m_tba,
+                            m_mapping
       );
       if (NULL != m_mvVISLAMPtr) {
           m_initialized = true;
