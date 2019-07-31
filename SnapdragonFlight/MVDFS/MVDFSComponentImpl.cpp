@@ -38,6 +38,7 @@ namespace SnapdragonFlight {
       ,m_mvDFSPtr(NULL)
       ,m_depthCameraIntrinsics()
       ,m_camCfg()
+      ,m_dfsAlgorithm(MVDFS_MODE_ALG1_GPU)
 #endif
       ,m_invDepth(NULL)
       ,m_pointCloud(NULL)
@@ -56,6 +57,10 @@ namespace SnapdragonFlight {
     ) 
   {
     MVDFSComponentBase::init(queueDepth, instance);
+    
+#ifdef BUILD_SDFLIGHT
+    memset(&m_camCfg, 0, sizeof(m_camCfg)); // important!
+#endif
   }
 
   MVDFSComponentImpl ::
@@ -81,22 +86,11 @@ namespace SnapdragonFlight {
     initHelper(void)
   {
 #ifdef BUILD_SDFLIGHT
-      memset(&m_camCfg, 0, sizeof(m_camCfg)); // important!
-      m_camCfg.camera[0].pixelWidth = 640;
-      m_camCfg.camera[0].pixelHeight = 480;
-      // NOTE(mereweth) - saves the copy to separate joined rows
-      m_camCfg.camera[0].memoryStride = 1280;
-      m_camCfg.camera[1].pixelWidth = 640;
-      m_camCfg.camera[1].pixelHeight = 480;
-      // NOTE(mereweth) - saves the copy to separate joined rows
-      m_camCfg.camera[1].memoryStride = 1280;
-
       m_camCfg.camera[0].principalPoint[0] = 327.25028370506277;
       m_camCfg.camera[0].principalPoint[1] = 240.52747319394973;
       m_camCfg.camera[0].focalLength[0] = 434.0397908576731;
       m_camCfg.camera[0].focalLength[1] = 433.8185119766046;
-      m_camCfg.camera[0].uvOffset = 0;
-      m_camCfg.camera[0].distortionModel = 4;
+      
       m_camCfg.camera[0].distortion[0] = 0.010214217031416842;
       m_camCfg.camera[0].distortion[1] = -0.04651010371555157;
       m_camCfg.camera[0].distortion[2] = -0.0017014074768636185;
@@ -106,8 +100,7 @@ namespace SnapdragonFlight {
       m_camCfg.camera[1].principalPoint[1] = 244.4353351783047;
       m_camCfg.camera[1].focalLength[0] = 436.7596303746942;
       m_camCfg.camera[1].focalLength[1] = 436.4226057245768;
-      m_camCfg.camera[1].uvOffset = 0;
-      m_camCfg.camera[1].distortionModel = 4;
+      
       m_camCfg.camera[1].distortion[0] = 0.0014070626511820305;
       m_camCfg.camera[1].distortion[1] = -0.03208074310964145;
       m_camCfg.camera[1].distortion[2] = -0.0021471073082785313;
@@ -123,7 +116,7 @@ namespace SnapdragonFlight {
 
       this->m_mvDFSPtr = 
         mvDFS_Initialize(&m_camCfg,
-                         MVDFS_MODE_ALG1_GPU,
+                         m_dfsAlgorithm,
                          false); //using 10bit input
       if (NULL == m_mvDFSPtr) {
           // TODO(mereweth) - EVR
@@ -250,12 +243,6 @@ namespace SnapdragonFlight {
       this->pingOut_out(0, key);
   }
 
-
-
-
-  // TODO(kedelson) --- start2
-
-
   void MVDFSComponentImpl ::
       parameterUpdated(FwPrmIdType id)
     {
@@ -263,592 +250,476 @@ namespace SnapdragonFlight {
         Fw::ParamValid valid;
 
         switch (id) {
-
-            case PARAMID_DFSALGORITHM:
+            // default params
+          
+            case PARAMID_MVDFS_DFSALGORITHM:
             {
-                U8 temp = paramGet_dfsAlgorithm(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                U8 temp = paramGet_MVDFS_dfsAlgorithm(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                  m_dfsAlgorithm = (MVDFS_MODE) temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
                 }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
+            }
+                break;
+                
+            // defaults camera 0
+                
+            case PARAMID_MVDFS_CAM_0_PIXELWIDTH:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_pixelWidth(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].pixelWidth = temp;
+#endif
                 }
-                m_dfsAlgorithm = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_PIXELHEIGHT:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_pixelHeight(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].pixelHeight = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_MEMORYSTRIDE:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_memoryStride(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].memoryStride = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_UVOFFSET:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_uvOffset(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].uvOffset = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTIONMODEL:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_distortionModel(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortionModel = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
                 }
             }
                 break;
 
+            // defaults camera 1
 
-
-            case PARAMID_CAM_0_PIXWIDTH:
+            case PARAMID_MVDFS_CAM_1_PIXELWIDTH:
             {
-                U32 temp = paramGet_cam_0_pixWidth(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                U32 temp = paramGet_MVDFS_cam_1_pixelWidth(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].pixelWidth = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
                 }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_PIXELHEIGHT:
+            {
+                U32 temp = paramGet_MVDFS_cam_1_pixelHeight(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].pixelHeight = temp;
+#endif
                 }
-                m_cam_0_pixWidth = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_MEMORYSTRIDE:
+            {
+                U32 temp = paramGet_MVDFS_cam_1_memoryStride(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].memoryStride = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_UVOFFSET:
+            {
+                U32 temp = paramGet_MVDFS_cam_1_uvOffset(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].uvOffset = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTIONMODEL:
+            {
+                U8 temp = paramGet_MVDFS_cam_1_distortionModel(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortionModel = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
                 }
             }
                 break;
 
-            case PARAMID_CAM_0_PIXHEIGHT:
+            // intrinsics camera 0
+                
+            case PARAMID_MVDFS_CAM_0_PRINCIPALPOINT_U:
             {
-                U32 temp = paramGet_cam_0_pixHeight(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F64 temp = paramGet_MVDFS_cam_0_principalPoint_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].principalPoint[0] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
                 }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_PRINCIPALPOINT_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_principalPoint_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].principalPoint[1] = temp;
+#endif
                 }
-                m_cam_0_pixHeight = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_FOCALLENGTH_U:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_focalLength_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].focalLength[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_FOCALLENGTH_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_focalLength_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].focalLength[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+                
+            case PARAMID_MVDFS_CAM_0_DISTORTION_0:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_0(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTION_1:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_1(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTION_2:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_2(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTION_3:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_3(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[3] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
                 }
             }
                 break;
 
-            case PARAMID_CAM_0_MEMORYSTRIDE:
+            // intrinsics camera 1
+                
+            case PARAMID_MVDFS_CAM_1_PRINCIPALPOINT_U:
             {
-                U32 temp = paramGet_cam_0_memoryStride(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F64 temp = paramGet_MVDFS_cam_1_principalPoint_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].principalPoint[0] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
                 }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_PRINCIPALPOINT_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_principalPoint_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].principalPoint[1] = temp;
+#endif
                 }
-                m_cam_0_memoryStride = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_FOCALLENGTH_U:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_focalLength_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].focalLength[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_FOCALLENGTH_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_focalLength_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].focalLength[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+                
+            case PARAMID_MVDFS_CAM_1_DISTORTION_0:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_0(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTION_1:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_1(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTION_2:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_2(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTION_3:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_3(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[3] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
                 }
             }
                 break;
 
-            case PARAMID_CAM_0_PRINCIPALPOINT_0:
+            // extrinsics
+                
+            case PARAMID_MVDFS_TRANS_X:
             {
-                F32 temp = paramGet_cam_0_principalPoint_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F32 temp = paramGet_MVDFS_trans_x(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.translation[0] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_principalPoint_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
                 }
             }
                 break;
-
-            case PARAMID_CAM_0_PRINCIPALPOINT_1:
+            case PARAMID_MVDFS_TRANS_Y:
             {
-                F32 temp = paramGet_cam_0_principalPoint_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F32 temp = paramGet_MVDFS_trans_y(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.translation[1] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_principalPoint_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
                 }
             }
                 break;
-
-            case PARAMID_CAM_0_FOCALLENGTH_0:
+            case PARAMID_MVDFS_TRANS_Z:
             {
-                F32 temp = paramGet_cam_0_focalLength_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F32 temp = paramGet_MVDFS_trans_z(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.translation[2] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_focalLength_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
                 }
             }
                 break;
-
-            case PARAMID_CAM_0_FOCALLENGTH_1:
+            case PARAMID_MVDFS_ROT_X:
             {
-                F32 temp = paramGet_cam_0_focalLength_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F32 temp = paramGet_MVDFS_rot_x(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.rotation[0] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_focalLength_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
                 }
             }
                 break;
-
-            case PARAMID_CAM_0_UVOFFSET:
+            case PARAMID_MVDFS_ROT_Y:
             {
-                U8 temp = paramGet_cam_0_uvOffset(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F32 temp = paramGet_MVDFS_rot_y(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.rotation[1] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_uvOffset = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
                 }
             }
                 break;
-
-            case PARAMID_CAM_0_DISTORTIONMODEL:
+            case PARAMID_MVDFS_ROT_Z:
             {
-                U8 temp = paramGet_cam_0_distortionModel(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
+                F32 temp = paramGet_MVDFS_rot_z(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.rotation[2] = temp;
+#endif
+                }
+                else {
                     // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_distortionModel = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
                 }
             }
                 break;
+        }
+    }
 
-            case PARAMID_CAM_0_DISTORT_0:
-            {
-                F32 temp = paramGet_cam_0_distort_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_distort_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_0_DISTORT_1:
-            {
-                F32 temp = paramGet_cam_0_distort_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_distort_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_0_DISTORT_2:
-            {
-                F32 temp = paramGet_cam_0_distort_2(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_distort_2 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_0_DISTORT_3:
-            {
-                F32 temp = paramGet_cam_0_distort_3(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_0_distort_3 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            // CAMERA 1 -----------------------------------------
-
-            case PARAMID_CAM_1_PIXWIDTH:
-            {
-                U32 temp = paramGet_cam_1_pixWidth(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_pixWidth = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_PIXHEIGHT:
-            {
-                U32 temp = paramGet_cam_1_pixHeight(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_pixHeight = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_MEMORYSTRIDE:
-            {
-                U32 temp = paramGet_cam_1_memoryStride(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_memoryStride = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_PRINCIPALPOINT_0:
-            {
-                F32 temp = paramGet_cam_1_principalPoint_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_principalPoint_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_PRINCIPALPOINT_1:
-            {
-                F32 temp = paramGet_cam_1_principalPoint_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_principalPoint_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_FOCALLENGTH_0:
-            {
-                F32 temp = paramGet_cam_1_focalLength_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_focalLength_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_FOCALLENGTH_1:
-            {
-                F32 temp = paramGet_cam_1_focalLength_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_focalLength_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_UVOFFSET:
-            {
-                U8 temp = paramGet_cam_1_uvOffset(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_uvOffset = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_DISTORTIONMODEL:
-            {
-                U8 temp = paramGet_cam_1_distortionModel(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_distortionModel = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_DISTORT_0:
-            {
-                F32 temp = paramGet_cam_1_distort_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_distort_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_DISTORT_1:
-            {
-                F32 temp = paramGet_cam_1_distort_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_distort_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_DISTORT_2:
-            {
-                F32 temp = paramGet_cam_1_distort_2(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_distort_2 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_CAM_1_DISTORT_3:
-            {
-                F32 temp = paramGet_cam_1_distort_3(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_cam_1_distort_3 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-
-            case PARAMID_TRANS_0:
-            {
-                F32 temp = paramGet_trans_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_trans_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_TRANS_1:
-            {
-                F32 temp = paramGet_trans_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_trans_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_TRANS_2:
-            {
-                F32 temp = paramGet_trans_2(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_trans_2 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_ROT_0:
-            {
-                F32 temp = paramGet_rot_0(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_rot_0 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_ROT_1:
-            {
-                F32 temp = paramGet_rot_1(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_rot_1 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-            case PARAMID_ROT_2:
-            {
-                F32 temp = paramGet_rot_2(valid);
-                if ((Fw::PARAM_VALID != valid) && (Fw::PARAM_DEFAULT != valid)) {
-                    // TODO(mereweth) - issue EVR
-                    return;
-                }
-                if (m_initialized) {
-                    m_captureParamsLock.lock();
-                }
-                m_rot_2 = temp;
-                if (m_initialized) {
-                    m_captureParamsLock.unLock();
-                }
-            }
-                break;
-
-
-  
-    void MVCamComponentImpl ::
+    void MVDFSComponentImpl ::
       parametersLoaded()
     {
         for (U32 i = 0; i < __MAX_PARAMID; i++) {
             parameterUpdated(i);
         }
     }
-
-
-  // TODO(kedelson) --- end2
-
-
-
-
-
-
-
+    
   // ----------------------------------------------------------------------
   // Command handler implementations
   // ----------------------------------------------------------------------

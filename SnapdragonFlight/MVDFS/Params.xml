@@ -1,138 +1,106 @@
 <parameters>
-    <parameter id="0" set_opcode="20" save_opcode="21" name="dfsAlgorithm"
-               data_type="U8" default="2">
+    <parameter id="0" set_opcode="20" save_opcode="21" name="MVDFS_dfsAlgorithm" data_type="U8" default="2">
       <comment>which dfs algorithm to run - see mvDFS.h header</comment>
     </parameter>
-    <parameter id="1" set_opcode="22" save_opcode="23" name="cam_0_pixWidth"
-               data_type="U32">
+    
+    <parameter id="1" set_opcode="22" save_opcode="23" name="MVDFS_cam_0_pixelWidth" data_type="U32" default="640">
       <comment>camera 0 intrinsic - pixel width</comment>
     </parameter>
-    <parameter id="2" set_opcode="24" save_opcode="25" name="cam_0_pixHeight"
-               data_type="U32">
+    <parameter id="2" set_opcode="24" save_opcode="25" name="MVDFS_cam_0_pixelHeight" data_type="U32" default="480">
       <comment>camera 0 intrinsic - pixel height</comment>
     </parameter>
-    <parameter id="3" set_opcode="26" save_opcode="27" name="cam_0_memoryStride"
-               data_type="U32">
+    <parameter id="3" set_opcode="26" save_opcode="27" name="MVDFS_cam_0_memoryStride" data_type="U32" default="1280">
       <comment>camera 0 intrinsic - memory stride</comment>
     </parameter>
-    <parameter id="4" set_opcode="28" save_opcode="29" name="cam_0_principalPoint_0"
-               data_type="F32">
+    <parameter id="4" set_opcode="28" save_opcode="29" name="MVDFS_cam_0_principalPoint_u" data_type="F64">
       <comment>camera 0 intrinsic - principal point 0</comment>
     </parameter>
-    <parameter id="5" set_opcode="30" save_opcode="31" name="cam_0_principalPoint_1"
-               data_type="F32">
+    <parameter id="5" set_opcode="30" save_opcode="31" name="MVDFS_cam_0_principalPoint_v" data_type="F64">
       <comment>camera 0 intrinsic - principal point 1</comment>
     </parameter>
-    <parameter id="6" set_opcode="32" save_opcode="33" name="cam_0_focalLength_0"
-               data_type="F32">
+    <parameter id="6" set_opcode="32" save_opcode="33" name="MVDFS_cam_0_focalLength_u" data_type="F64">
       <comment>camera 0 intrinsic - focal length 0</comment>
     </parameter>
-    <parameter id="7" set_opcode="34" save_opcode="35" name="cam_0_focalLength_1"
-               data_type="F32">
+    <parameter id="7" set_opcode="34" save_opcode="35" name="MVDFS_cam_0_focalLength_v" data_type="F64">
       <comment>camera 0 intrinsic - focal length 1</comment>
     </parameter>
-    <parameter id="8" set_opcode="36" save_opcode="37" name="cam_0_uvOffset"
-               data_type="U8">
+    <parameter id="8" set_opcode="36" save_opcode="37" name="MVDFS_cam_0_uvOffset" data_type="U32" default="0">
       <comment>camera 0 intrinsic - uvOffset</comment>
     </parameter>
-    <parameter id="9" set_opcode="38" save_opcode="39" name="cam_0_distortionModel"
-               data_type="U8">
+    <parameter id="9" set_opcode="38" save_opcode="39" name="MVDFS_cam_0_distortionModel" data_type="U8" default="4">
       <comment>camera 0 intrinsic - distortion model</comment>
     </parameter>
-    <parameter id="10" set_opcode="40" save_opcode="41" name="cam_0_distort_0"
-               data_type="F32">
+    <parameter id="10" set_opcode="40" save_opcode="41" name="MVDFS_cam_0_distortion_0" data_type="F64">
       <comment>camera 0 intrinsic - distortion 0</comment>
     </parameter>
-    <parameter id="11" set_opcode="42" save_opcode="43" name="cam_0_distort_1"
-               data_type="F32">
+    <parameter id="11" set_opcode="42" save_opcode="43" name="MVDFS_cam_0_distortion_1" data_type="F64">
       <comment>camera 0 intrinsic - distortion 1</comment>
     </parameter>
-    <parameter id="12" set_opcode="44" save_opcode="45" name="cam_0_distort_2"
-               data_type="F32">
+    <parameter id="12" set_opcode="44" save_opcode="45" name="MVDFS_cam_0_distortion_2" data_type="F64">
       <comment>camera 0 intrinsic - distortion 2</comment>
     </parameter>
-    <parameter id="13" set_opcode="46" save_opcode="47" name="cam_0_distort_3"
-               data_type="F32">
+    <parameter id="13" set_opcode="46" save_opcode="47" name="MVDFS_cam_0_distortion_3" data_type="F64">
       <comment>camera 0 intrinsic - distortion 3</comment>
     </parameter>
 
 
-    <parameter id="14" set_opcode="48" save_opcode="49" name="cam_1_pixWidth"
-               data_type="U32">
+    <parameter id="14" set_opcode="48" save_opcode="49" name="MVDFS_cam_1_pixelWidth" data_type="U32" default="640">
       <comment>camera 1 intrinsic - pixel width</comment>
     </parameter>
-    <parameter id="15" set_opcode="50" save_opcode="51" name="cam_1_pixHeight"
-               data_type="U32">
+    <parameter id="15" set_opcode="50" save_opcode="51" name="MVDFS_cam_1_pixelHeight" data_type="U32" default="480">
       <comment>camera 1 intrinsic - pixel height</comment>
     </parameter>
-    <parameter id="16" set_opcode="52" save_opcode="53" name="cam_1_memoryStride"
-               data_type="U32">
+    <parameter id="16" set_opcode="52" save_opcode="53" name="MVDFS_cam_1_memoryStride" data_type="U32" default="1280">
       <comment>camera 1 intrinsic - memory stride</comment>
     </parameter>
-    <parameter id="17" set_opcode="54" save_opcode="55" name="cam_1_principalPoint_0"
-               data_type="F32">
+    <parameter id="17" set_opcode="54" save_opcode="55" name="MVDFS_cam_1_principalPoint_u" data_type="F64">
       <comment>camera 1 intrinsic - principal point 0</comment>
     </parameter>
-    <parameter id="18" set_opcode="56" save_opcode="57" name="cam_1_principalPoint_1"
-               data_type="F32">
+    <parameter id="18" set_opcode="56" save_opcode="57" name="MVDFS_cam_1_principalPoint_v" data_type="F64">
       <comment>camera 1 intrinsic - principal point 1</comment>
     </parameter>
-    <parameter id="19" set_opcode="58" save_opcode="59" name="cam_1_focalLength_0"
-               data_type="F32">
+    <parameter id="19" set_opcode="58" save_opcode="59" name="MVDFS_cam_1_focalLength_u" data_type="F64">
       <comment>camera 1 intrinsic - focal length 0</comment>
     </parameter>
-    <parameter id="20" set_opcode="60" save_opcode="61" name="cam_1_focalLength_1"
-               data_type="F32">
+    <parameter id="20" set_opcode="60" save_opcode="61" name="MVDFS_cam_1_focalLength_v" data_type="F64">
       <comment>camera 1 intrinsic - focal length 1</comment>
     </parameter>
-    <parameter id="21" set_opcode="62" save_opcode="63" name="cam_1_uvOffset"
-               data_type="U8">
+    <parameter id="21" set_opcode="62" save_opcode="63" name="MVDFS_cam_1_uvOffset" data_type="U32" default="0">
       <comment>camera 1 intrinsic - uvOffset</comment>
     </parameter>
-    <parameter id="22" set_opcode="64" save_opcode="65" name="cam_1_distortionModel"
-               data_type="U8">
+    <parameter id="22" set_opcode="64" save_opcode="65" name="MVDFS_cam_1_distortionModel" data_type="U8" default="4">
       <comment>camera 1 intrinsic - distortion model</comment>
     </parameter>
-    <parameter id="23" set_opcode="66" save_opcode="67" name="cam_1_distort_0"
-               data_type="F32">
+    <parameter id="23" set_opcode="66" save_opcode="67" name="MVDFS_cam_1_distortion_0" data_type="F64">
       <comment>camera 1 intrinsic - distortion 0</comment>
     </parameter>
-    <parameter id="24" set_opcode="68" save_opcode="69" name="cam_1_distort_1"
-               data_type="F32">
+    <parameter id="24" set_opcode="68" save_opcode="69" name="MVDFS_cam_1_distortion_1" data_type="F64">
       <comment>camera 1 intrinsic - distortion 1</comment>
     </parameter>
-    <parameter id="25" set_opcode="70" save_opcode="71" name="cam_1_distort_2"
-               data_type="F32">
+    <parameter id="25" set_opcode="70" save_opcode="71" name="MVDFS_cam_1_distortion_2" data_type="F64">
       <comment>camera 1 intrinsic - distortion 2</comment>
     </parameter>
-    <parameter id="26" set_opcode="72" save_opcode="73" name="cam_1_distort_3"
-               data_type="F32">
+    <parameter id="26" set_opcode="72" save_opcode="73" name="MVDFS_cam_1_distortion_3" data_type="F64">
       <comment>camera 1 intrinsic - distortion 3</comment>
     </parameter>
 
 
-    <parameter id="27" set_opcode="74" save_opcode="75" name="trans_0"
-               data_type="F32">
+    <parameter id="27" set_opcode="74" save_opcode="75" name="MVDFS_trans_x" data_type="F32">
       <comment>camera extrinsic - translation 0 - x</comment>
     </parameter>
-    <parameter id="28" set_opcode="76" save_opcode="77" name="trans_1"
-               data_type="F32">
+    <parameter id="28" set_opcode="76" save_opcode="77" name="MVDFS_trans_y" data_type="F32">
       <comment>camera extrinsic - translation 1 - y</comment>
     </parameter>
-    <parameter id="29" set_opcode="78" save_opcode="79" name="trans_2"
-               data_type="F32">
+    <parameter id="29" set_opcode="78" save_opcode="79" name="MVDFS_trans_z" data_type="F32">
       <comment>camera extrinsic - translation 2 - z</comment>
     </parameter>
-    <parameter id="30" set_opcode="80" save_opcode="81" name="rot_0"
-               data_type="F32">
+    <parameter id="30" set_opcode="80" save_opcode="81" name="MVDFS_rot_x" data_type="F32">
       <comment>camera extrinsic - rotation 0 - x</comment>
     </parameter>
-    <parameter id="31" set_opcode="82" save_opcode="83" name="rot_1"
-               data_type="F32">
+    <parameter id="31" set_opcode="82" save_opcode="83" name="MVDFS_rot_y" data_type="F32">
       <comment>camera extrinsic - rotation 1 - y</comment>
     </parameter>
-    <parameter id="32" set_opcode="84" save_opcode="85" name="rot_2"
-               data_type="F32">
+    <parameter id="32" set_opcode="84" save_opcode="85" name="MVDFS_rot_z" data_type="F32">
       <comment>camera extrinsic - rotation 2 - z</comment>
     </parameter>
 </parameters>

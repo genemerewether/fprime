@@ -54,6 +54,9 @@ namespace SnapdragonFlight {
       ~MVDFSComponentImpl(void);
 
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       //! Preamble override
       void preamble(void);
@@ -114,6 +117,8 @@ namespace SnapdragonFlight {
       mvCameraConfiguration m_depthCameraIntrinsics;
 
       mvStereoConfiguration m_camCfg;
+
+      MVDFS_MODE m_dfsAlgorithm;
 #endif
 
       float* m_invDepth;

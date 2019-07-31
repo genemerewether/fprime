@@ -220,7 +220,7 @@ namespace SnapdragonFlight {
                 break;
             case PARAMID_MVVISLAM_DISTORTIONMODEL:
             {
-                U32 temp = paramGet_MVVISLAM_distortionModel(valid);
+                U8 temp = paramGet_MVVISLAM_distortionModel(valid);
                 if ((Fw::PARAM_VALID == valid) ||
                     (Fw::PARAM_DEFAULT == valid)) {
 #ifdef BUILD_SDFLIGHT
