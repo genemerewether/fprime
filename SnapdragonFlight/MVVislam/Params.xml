@@ -63,10 +63,10 @@
       <comment>memory stride</comment>
     </parameter>
     
-    <parameter id="19" set_opcode="58" save_opcode="59" name="MVVISLAM_principalPoint_u" data_type="F32" >
+    <parameter id="19" set_opcode="58" save_opcode="59" name="MVVISLAM_principalPoint_u" data_type="F64" >
       <comment>principal point, u</comment>
     </parameter>
-    <parameter id="20" set_opcode="60" save_opcode="61" name="MVVISLAM_principalPoint_v" data_type="F32" >
+    <parameter id="20" set_opcode="60" save_opcode="61" name="MVVISLAM_principalPoint_v" data_type="F64" >
       <comment>principal point, v</comment>
     </parameter>
     
@@ -82,41 +82,41 @@
       <comment>distortion model - number of coefficients</comment>
     </parameter>
     
-    <parameter id="24" set_opcode="68" save_opcode="69" name="MVVISLAM_focalLength_u" data_type="F32" >
+    <parameter id="24" set_opcode="68" save_opcode="69" name="MVVISLAM_focalLength_u" data_type="F64" >
       <comment>focal length, u</comment>
     </parameter>
-    <parameter id="25" set_opcode="70" save_opcode="71" name="MVVISLAM_focalLength_v" data_type="F32" >
+    <parameter id="25" set_opcode="70" save_opcode="71" name="MVVISLAM_focalLength_v" data_type="F64" >
       <comment>focal length, v</comment>
     </parameter>
     
-    <parameter id="26" set_opcode="72" save_opcode="73" name="MVVISLAM_distortion_0" data_type="F32" >
+    <parameter id="26" set_opcode="72" save_opcode="73" name="MVVISLAM_distortion_0" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="27" set_opcode="74" save_opcode="75" name="MVVISLAM_distortion_1" data_type="F32" >
+    <parameter id="27" set_opcode="74" save_opcode="75" name="MVVISLAM_distortion_1" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="28" set_opcode="76" save_opcode="77" name="MVVISLAM_distortion_2" data_type="F32" >
+    <parameter id="28" set_opcode="76" save_opcode="77" name="MVVISLAM_distortion_2" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="29" set_opcode="78" save_opcode="79" name="MVVISLAM_distortion_3" data_type="F32" >
+    <parameter id="29" set_opcode="78" save_opcode="79" name="MVVISLAM_distortion_3" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="30" set_opcode="80" save_opcode="81" name="MVVISLAM_distortion_4" data_type="F32" >
+    <parameter id="30" set_opcode="80" save_opcode="81" name="MVVISLAM_distortion_4" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="31" set_opcode="82" save_opcode="83" name="MVVISLAM_distortion_5" data_type="F32" >
+    <parameter id="31" set_opcode="82" save_opcode="83" name="MVVISLAM_distortion_5" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="32" set_opcode="84" save_opcode="85" name="MVVISLAM_distortion_6" data_type="F32" >
+    <parameter id="32" set_opcode="84" save_opcode="85" name="MVVISLAM_distortion_6" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="33" set_opcode="86" save_opcode="87" name="MVVISLAM_distortion_7" data_type="F32" >
+    <parameter id="33" set_opcode="86" save_opcode="87" name="MVVISLAM_distortion_7" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="34" set_opcode="88" save_opcode="89" name="MVVISLAM_distortion_8" data_type="F32" >
+    <parameter id="34" set_opcode="88" save_opcode="89" name="MVVISLAM_distortion_8" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
-    <parameter id="35" set_opcode="90" save_opcode="91" name="MVVISLAM_distortion_9" data_type="F32" >
+    <parameter id="35" set_opcode="90" save_opcode="91" name="MVVISLAM_distortion_9" data_type="F64" >
       <comment>distortion parameter</comment>
     </parameter>
 
