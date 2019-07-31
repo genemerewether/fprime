@@ -46,7 +46,34 @@ namespace SnapdragonFlight {
 #endif
 #ifdef BUILD_SDFLIGHT
       ,m_mvVISLAMPtr(NULL)
+      ,m_camCfg()
 #endif
+      ,m_tbc()
+      ,m_ombc()
+      ,m_std0tbc()
+      ,m_std0ombc()
+      ,m_tba()
+
+      ,m_readoutTime(0.0)
+      ,m_camDelta(0.0)
+      ,m_std0camDelta(0.0)
+    
+      ,m_accelMeasRange(0.0)
+      ,m_gyroMeasRange(0.0)
+      ,m_stdAccelMeasRange(0.0)
+      ,m_stdGyroMeasRange(0.0)
+    
+      ,m_stdCamNoise(0.0)
+      ,m_minStdPixelNoise(0.0)
+    
+      ,m_failHighPixelNoiseScaleFactor(0.0)
+      ,m_logDepthBootstrap(0.0)
+      ,m_useLogCameraHeight(false)
+      ,m_logCameraHeightBootstrap(0.0)
+      ,m_noInitWhenMoving(false)
+      ,m_limitedIMUbWtrigger(0.0)
+      ,m_staticMaskFilename("na")
+      ,m_gpsImuTimeAlignment(0.0)
       ,m_initialized(false)
       ,m_activated(false)
       ,m_errorCode(0u)

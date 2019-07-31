@@ -3,4 +3,180 @@
                data_type="U8" default="2">
       <comment>which dfs algorithm to run - see mvDFS.h header</comment>
     </parameter>
+    <parameter id="1" set_opcode="22" save_opcode="23" name="cam_0_pixWidth"
+               data_type="U32">
+      <comment>camera 0 intrinsic - pixel width</comment>
+    </parameter>
+    <parameter id="2" set_opcode="24" save_opcode="25" name="cam_0_pixHeight"
+               data_type="U32">
+      <comment>camera 0 intrinsic - pixel height</comment>
+    </parameter>
+    <parameter id="3" set_opcode="26" save_opcode="27" name="cam_0_memoryStride"
+               data_type="U32">
+      <comment>camera 0 intrinsic - memory stride</comment>
+    </parameter>
+    <parameter id="4" set_opcode="28" save_opcode="29" name="cam_0_principalPoint_0"
+               data_type="F32">
+      <comment>camera 0 intrinsic - principal point 0</comment>
+    </parameter>
+    <parameter id="5" set_opcode="30" save_opcode="31" name="cam_0_principalPoint_1"
+               data_type="F32">
+      <comment>camera 0 intrinsic - principal point 1</comment>
+    </parameter>
+    <parameter id="6" set_opcode="32" save_opcode="33" name="cam_0_focalLength_0"
+               data_type="F32">
+      <comment>camera 0 intrinsic - focal length 0</comment>
+    </parameter>
+    <parameter id="7" set_opcode="34" save_opcode="35" name="cam_0_focalLength_1"
+               data_type="F32">
+      <comment>camera 0 intrinsic - focal length 1</comment>
+    </parameter>
+    <parameter id="8" set_opcode="36" save_opcode="37" name="cam_0_uvOffset"
+               data_type="U8">
+      <comment>camera 0 intrinsic - uvOffset</comment>
+    </parameter>
+    <parameter id="9" set_opcode="38" save_opcode="39" name="cam_0_distortionModel"
+               data_type="U8">
+      <comment>camera 0 intrinsic - distortion model</comment>
+    </parameter>
+    <parameter id="10" set_opcode="40" save_opcode="41" name="cam_0_distort_0"
+               data_type="F32">
+      <comment>camera 0 intrinsic - distortion 0</comment>
+    </parameter>
+    <parameter id="11" set_opcode="42" save_opcode="43" name="cam_0_distort_1"
+               data_type="F32">
+      <comment>camera 0 intrinsic - distortion 1</comment>
+    </parameter>
+    <parameter id="12" set_opcode="44" save_opcode="45" name="cam_0_distort_2"
+               data_type="F32">
+      <comment>camera 0 intrinsic - distortion 2</comment>
+    </parameter>
+    <parameter id="13" set_opcode="46" save_opcode="47" name="cam_0_distort_3"
+               data_type="F32">
+      <comment>camera 0 intrinsic - distortion 3</comment>
+    </parameter>
+
+
+    <parameter id="14" set_opcode="48" save_opcode="49" name="cam_1_pixWidth"
+               data_type="U32">
+      <comment>camera 1 intrinsic - pixel width</comment>
+    </parameter>
+    <parameter id="15" set_opcode="50" save_opcode="51" name="cam_1_pixHeight"
+               data_type="U32">
+      <comment>camera 1 intrinsic - pixel height</comment>
+    </parameter>
+    <parameter id="16" set_opcode="52" save_opcode="53" name="cam_1_memoryStride"
+               data_type="U32">
+      <comment>camera 1 intrinsic - memory stride</comment>
+    </parameter>
+    <parameter id="17" set_opcode="54" save_opcode="55" name="cam_1_principalPoint_0"
+               data_type="F32">
+      <comment>camera 1 intrinsic - principal point 0</comment>
+    </parameter>
+    <parameter id="18" set_opcode="56" save_opcode="57" name="cam_1_principalPoint_1"
+               data_type="F32">
+      <comment>camera 1 intrinsic - principal point 1</comment>
+    </parameter>
+    <parameter id="19" set_opcode="58" save_opcode="59" name="cam_1_focalLength_0"
+               data_type="F32">
+      <comment>camera 1 intrinsic - focal length 0</comment>
+    </parameter>
+    <parameter id="20" set_opcode="60" save_opcode="61" name="cam_1_focalLength_1"
+               data_type="F32">
+      <comment>camera 1 intrinsic - focal length 1</comment>
+    </parameter>
+    <parameter id="21" set_opcode="62" save_opcode="63" name="cam_1_uvOffset"
+               data_type="U8">
+      <comment>camera 1 intrinsic - uvOffset</comment>
+    </parameter>
+    <parameter id="22" set_opcode="64" save_opcode="65" name="cam_1_distortionModel"
+               data_type="U8">
+      <comment>camera 1 intrinsic - distortion model</comment>
+    </parameter>
+    <parameter id="23" set_opcode="66" save_opcode="67" name="cam_1_distort_0"
+               data_type="F32">
+      <comment>camera 1 intrinsic - distortion 0</comment>
+    </parameter>
+    <parameter id="24" set_opcode="68" save_opcode="69" name="cam_1_distort_1"
+               data_type="F32">
+      <comment>camera 1 intrinsic - distortion 1</comment>
+    </parameter>
+    <parameter id="25" set_opcode="70" save_opcode="71" name="cam_1_distort_2"
+               data_type="F32">
+      <comment>camera 1 intrinsic - distortion 2</comment>
+    </parameter>
+    <parameter id="26" set_opcode="72" save_opcode="73" name="cam_1_distort_3"
+               data_type="F32">
+      <comment>camera 1 intrinsic - distortion 3</comment>
+    </parameter>
+
+
+    <parameter id="27" set_opcode="74" save_opcode="75" name="trans_0"
+               data_type="F32">
+      <comment>camera extrinsic - translation 0 - x</comment>
+    </parameter>
+    <parameter id="28" set_opcode="76" save_opcode="77" name="trans_1"
+               data_type="F32">
+      <comment>camera extrinsic - translation 1 - y</comment>
+    </parameter>
+    <parameter id="29" set_opcode="78" save_opcode="79" name="trans_2"
+               data_type="F32">
+      <comment>camera extrinsic - translation 2 - z</comment>
+    </parameter>
+    <parameter id="30" set_opcode="80" save_opcode="81" name="rot_0"
+               data_type="F32">
+      <comment>camera extrinsic - rotation 0 - x</comment>
+    </parameter>
+    <parameter id="31" set_opcode="82" save_opcode="83" name="rot_1"
+               data_type="F32">
+      <comment>camera extrinsic - rotation 1 - y</comment>
+    </parameter>
+    <parameter id="32" set_opcode="84" save_opcode="85" name="rot_2"
+               data_type="F32">
+      <comment>camera extrinsic - rotation 2 - z</comment>
+    </parameter>
 </parameters>
+
+
+<!-- snapdragon 00041 extrinsic.txt -->
+<!-- set and save, no final save -->
+
+<!-- memset(&m_camCfg, 0, sizeof(m_camCfg)); // important!
+m_camCfg.camera[0].pixelWidth = 640;
+m_camCfg.camera[0].pixelHeight = 480;
+// NOTE(mereweth) - saves the copy to separate joined rows
+m_camCfg.camera[0].memoryStride = 1280;
+m_camCfg.camera[1].pixelWidth = 640;
+m_camCfg.camera[1].pixelHeight = 480;
+// NOTE(mereweth) - saves the copy to separate joined rows
+m_camCfg.camera[1].memoryStride = 1280;
+
+m_camCfg.camera[0].principalPoint[0] = 327.25028370506277;
+m_camCfg.camera[0].principalPoint[1] = 240.52747319394973;
+m_camCfg.camera[0].focalLength[0] = 434.0397908576731;
+m_camCfg.camera[0].focalLength[1] = 433.8185119766046;
+m_camCfg.camera[0].uvOffset = 0;
+m_camCfg.camera[0].distortionModel = 4;
+m_camCfg.camera[0].distortion[0] = 0.010214217031416842;
+m_camCfg.camera[0].distortion[1] = -0.04651010371555157;
+m_camCfg.camera[0].distortion[2] = -0.0017014074768636185;
+m_camCfg.camera[0].distortion[3] = 0.0013863895250307325;
+
+m_camCfg.camera[1].principalPoint[0] = 320.34588249858376;
+m_camCfg.camera[1].principalPoint[1] = 244.4353351783047;
+m_camCfg.camera[1].focalLength[0] = 436.7596303746942;
+m_camCfg.camera[1].focalLength[1] = 436.4226057245768;
+m_camCfg.camera[1].uvOffset = 0;
+m_camCfg.camera[1].distortionModel = 4;
+m_camCfg.camera[1].distortion[0] = 0.0014070626511820305;
+m_camCfg.camera[1].distortion[1] = -0.03208074310964145;
+m_camCfg.camera[1].distortion[2] = -0.0021471073082785313;
+m_camCfg.camera[1].distortion[3] = 0.0008696973644813725;
+
+m_camCfg.translation[0] = -0.08057393152744473;
+m_camCfg.translation[1] = 0.0028380369090344037;
+m_camCfg.translation[2] = -0.00025007902285991877;
+// scaled axis-angle
+m_camCfg.rotation[0] = -0.0022546;
+m_camCfg.rotation[1] = -0.0086814;
+m_camCfg.rotation[2] = -0.0749294; -->

@@ -143,7 +143,36 @@ namespace SnapdragonFlight {
 
 #ifdef BUILD_SDFLIGHT
       mvVISLAM* m_mvVISLAMPtr;
+    
+      mvCameraConfiguration m_camCfg;
 #endif
+
+      F32 m_tbc[3];
+      F32 m_ombc[3];
+      F32 m_std0tbc[3];
+      F32 m_std0ombc[3];
+      F32 m_tba[3];
+
+      F32 m_readoutTime;
+      F32 m_camDelta;
+      F32 m_std0camDelta;
+    
+      F32 m_accelMeasRange;
+      F32 m_gyroMeasRange;
+      F32 m_stdAccelMeasRange;
+      F32 m_stdGyroMeasRange;
+    
+      F32 m_stdCamNoise;
+      F32 m_minStdPixelNoise;
+    
+      F32 m_failHighPixelNoiseScaleFactor;
+      F32 m_logDepthBootstrap;
+      bool m_useLogCameraHeight;
+      F32 m_logCameraHeightBootstrap;
+      bool m_noInitWhenMoving;
+      F32 m_limitedIMUbWtrigger;
+      Fw::EightyCharString m_staticMaskFilename;
+      F32 m_gpsImuTimeAlignment;
 
       bool m_initialized;
       
