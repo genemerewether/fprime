@@ -1190,11 +1190,12 @@ volatile sig_atomic_t hexref_finid = 0;
 static void sighandler(int signum) {
     terminate = 1;
     if (SIGSEGV == signum) {
-        printf("segv; calling hexref_fini\n");
         if (!hexref_finid) {
+            printf("segv; calling hexref_fini\n");
             hexref_fini();
             hexref_finid = 1;
             kill(getpid(), signum);
+            exit(EXIT_FAILURE);
         }
     }
 }
