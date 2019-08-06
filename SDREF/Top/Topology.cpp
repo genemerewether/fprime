@@ -1311,6 +1311,8 @@ extern "C" {
 
 volatile sig_atomic_t terminate = 0;
 volatile sig_atomic_t hexref_finid = 0;
+volatile sig_atomic_t isHiresChildGbl = 0;
+volatile sig_atomic_t isStereoChildGbl = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
@@ -1318,7 +1320,9 @@ static void sighandler(int signum) {
         if (!hexref_finid) {
             printf("segv; calling hexref_fini\n");
 #ifdef BUILD_SDFLIGHT
-            hexref_fini();
+            if (!isHiresChildGbl && !isStereoChildGbl) {
+                hexref_fini();
+            }
 #endif
             hexref_finid = 1;
             kill(getpid(), signum);
@@ -1456,6 +1460,8 @@ int main(int argc, char* argv[]) {
                  gncCamConnect, gncCloudConnect,
                  groundRouter,
                  startSocketNow);
+    isHiresChildGbl = isHiresChild;
+    isStereoChildGbl = isStereoChild;
     //dumparch();
 
     Os::Task task;
