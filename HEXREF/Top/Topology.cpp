@@ -351,6 +351,9 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(0));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(0));
 
+    // from groundRouter on SDREF
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(12, cmdDisp_ptr->get_seqCmdBuff_InputPort(3));
+
     // L2 <-> L1 PrmDb
     prmDb_ptr->set_sendPrm_OutputPort(0, kraitRouter_ptr->get_HexPortsIn_InputPort(10));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(10, prmDb_ptr->get_recvPrm_InputPort(0));
@@ -371,6 +374,12 @@ void manualConstruct(void) {
 #ifdef DECOUPLE_ACTUATORS
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(9, actDecouple_ptr->get_DataIn_InputPort(2));
     actDecouple_ptr->set_DataOut_OutputPort(2, actuatorAdapter_ptr->get_flySafe_InputPort(0));
+
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(15, actDecouple_ptr->get_DataIn_InputPort(6));
+    actDecouple_ptr->set_DataOut_OutputPort(6, actuatorAdapter_ptr->get_flySafe_InputPort(0));
+
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(16, actDecouple_ptr->get_DataIn_InputPort(5));
+    actDecouple_ptr->set_DataOut_OutputPort(5, actuatorAdapter_ptr->get_flySafe_InputPort(0));
     
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actDecouple_ptr->get_DataIn_InputPort(3));
     actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
@@ -378,8 +387,7 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(9, actuatorAdapter_ptr->get_flySafe_InputPort(0));    
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
 #endif
-    // aux actuator command
-    //kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, );
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, leeCtrl_ptr->get_flatOutput_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(4, cmdDisp_ptr->get_seqCmdBuff_InputPort(2));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(5, leeCtrl_ptr->get_flatOutput_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(6, leeCtrl_ptr->get_attRateThrust_InputPort(0));
@@ -387,6 +395,9 @@ void manualConstruct(void) {
 
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(8, cmdDisp_ptr->get_seqCmdBuff_InputPort(1));
     cmdDisp_ptr->set_seqCmdStatus_OutputPort(1, kraitRouter_ptr->get_HexPortsIn_InputPort(8));
+
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(13, leeCtrl_ptr->get_attRateThrust_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(14, leeCtrl_ptr->get_flatOutput_InputPort(0));
 
     // other serial ports
     rgDcplDrv_ptr->set_CycleOut_OutputPort(0, imuDecouple_ptr->get_DataIn_InputPort(0));

@@ -266,6 +266,9 @@ void manualConstruct() {
     hlRouter.set_HLPortsOut_OutputPort(0, cmdDisp.get_seqCmdBuff_InputPort(0));
     cmdDisp.set_seqCmdStatus_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(0));
 
+    // from groundRouter on SDREF
+    hlRouter_ptr->set_HLPortsOut_OutputPort(12, cmdDisp_ptr->get_seqCmdBuff_InputPort(3));
+
     // L2 <-> L1 PrmDb
     prmDb.set_sendPrm_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(10));
     hlRouter.set_HLPortsOut_OutputPort(10, prmDb.get_recvPrm_InputPort(0));
@@ -283,7 +286,7 @@ void manualConstruct() {
 
     hlRouter.set_HLPortsOut_OutputPort(1, imuInteg.get_ImuStateUpdate_InputPort(0));
     hlRouter.set_HLPortsOut_OutputPort(2, actuatorAdapter.get_motor_InputPort(1));
-    // aux actuator command
+    hlRouter.set_HLPortsOut_OutputPort(3, leeCtrl.get_flatOutput_InputPort(0));
     hlRouter.set_HLPortsOut_OutputPort(4, cmdDisp.get_seqCmdBuff_InputPort(2));
     hlRouter.set_HLPortsOut_OutputPort(5, leeCtrl.get_flatOutput_InputPort(0));
     hlRouter.set_HLPortsOut_OutputPort(6, leeCtrl.get_attRateThrust_InputPort(0));
@@ -293,6 +296,11 @@ void manualConstruct() {
     cmdDisp.set_seqCmdStatus_OutputPort(1, hlRouter.get_LLPortsIn_InputPort(8));
 
     hlRouter.set_HLPortsOut_OutputPort(9, actuatorAdapter.get_flySafe_InputPort(0));
+
+    hlRouter.set_HLPortsOut_OutputPort(13, leeCtrl.get_attRateThrust_InputPort(0));
+    hlRouter.set_HLPortsOut_OutputPort(14, leeCtrl.get_flatOutput_InputPort(0));
+    hlRouter.set_HLPortsOut_OutputPort(15, actuatorAdapter.get_flySafe_InputPort(0));
+    hlRouter.set_HLPortsOut_OutputPort(16, actuatorAdapter.get_flySafe_InputPort(0));
 
     // TODO(mereweth) - switch STIM vs MPU9520
     stim300.set_IMU_OutputPort(0, imuProc.get_HighRateImu_InputPort(0));
