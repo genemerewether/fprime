@@ -1058,10 +1058,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     if (groundRouter) {
         serialDriverGround_ptr->open("/dev/quest-ground-uart",
-                                 Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
-                                 Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
-                                 Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
-                                 true);
+                                     Drv::LinuxSerialDriverComponentImpl::BAUD_57600,
+                                     Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                                     Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                                     true);
 
         /* ---------- Done opening devices, now start device threads ---------- */
         serialDriverGround_ptr->startReadThread(40, 20*1024);
@@ -1309,7 +1309,9 @@ static void sighandler(int signum) {
     if (SIGSEGV == signum) {
         if (!hexref_finid) {
             printf("segv; calling hexref_fini\n");
+#ifdef BUILD_SDFLIGHT
             hexref_fini();
+#endif
             hexref_finid = 1;
             kill(getpid(), signum);
             exit(EXIT_FAILURE);

@@ -487,10 +487,6 @@
 	 <source component = "buffAccumHiresCamUnproc" port = "tlmOut" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection83">
-	 <source component = "chanTlm" port = "PktSend" type = "Com" num = "0"/>
- 	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
-</connection>
 <connection name = "Connection84">
 	 <source component = "buffLogStereoCamUnproc" port = "bufferSendOut" type = "BufferSend" num = "0"/>
  	 <target component = "buffAccumStereoCamUnproc" port = "bufferSendInReturn" type = "BufferSend" num = "0"/>
@@ -547,10 +543,6 @@
 	 <source component = "cmdDisp" port = "Tlm" type = "Tlm" num = "0"/>
  	 <target component = "chanTlm" port = "TlmRecv" type = "Tlm" num = "0"/>
 </connection>
-<connection name = "Connection98">
-	 <source component = "eventLoggerLL" port = "PktSend" type = "Com" num = "0"/>
- 	 <target component = "sockGndIfLL" port = "downlinkPort" type = "Com" num = "0"/>
-</connection>
 <connection name = "Connection99">
 	 <source component = "rgTlm" port = "LogText" type = "LogText" num = "0"/>
  	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
@@ -562,10 +554,6 @@
 <connection name = "Connection101">
 	 <source component = "stereoCam" port = "ParamGet" type = "PrmGet" num = "0"/>
  	 <target component = "prmDb" port = "getPrm" type = "PrmGet" num = "0"/>
-</connection>
-<connection name = "Connection102">
-	 <source component = "eventLogger" port = "PktSend" type = "Com" num = "0"/>
- 	 <target component = "sockGndIf" port = "downlinkPort" type = "Com" num = "0"/>
 </connection>
 <connection name = "Connection103">
 	 <source component = "eventLogger" port = "LogText" type = "LogText" num = "0"/>
