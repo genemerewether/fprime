@@ -580,6 +580,8 @@ void manualConstruct(bool llRouterDevices,
     chanSplitter_ptr->set_DataOut_OutputPort(0, sockGndIf_ptr->get_downlinkPort_InputPort(0));
     chanLLSplitter_ptr->set_DataOut_OutputPort(0, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
 
+    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-2,
+                                                  groundRouter_ptr->get_SchedIn_InputPort(0));
     groundRouter_ptr->set_LLPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(Svc::CommandDispatcherImpl::NUM_CMDBUFF_PORTS - 1));
     if (!llRouterDevices) {
         // low-level seqCmdBuff
