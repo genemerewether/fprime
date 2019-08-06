@@ -823,7 +823,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     serialTextConv_ptr->init(60,0);
     llRouter_ptr->init(60,SERIAL_BUFFER_SIZE,0);
-    groundRouter_ptr->init(60,SERIAL_BUFFER_SIZE,0);
+    groundRouter_ptr->init(200,SERIAL_BUFFER_SIZE,0);
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
     serialDriverGround_ptr->init();
