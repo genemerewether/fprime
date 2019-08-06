@@ -17,7 +17,7 @@
         <port name="SchedIn" data_type="Svc::Sched"  kind="async_input"    max_number="1">
         </port>
 
-        <port name="ClockTimes" data_type="TimePair"  kind="output"    max_number="1">
+        <port name="ClockTimes" data_type="TimePair"  kind="output"    max_number="2">
         </port>
 
         <port name="Log" data_type="Fw::Log"  kind="output"    max_number="1">

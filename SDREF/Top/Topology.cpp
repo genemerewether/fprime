@@ -581,7 +581,7 @@ void manualConstruct(bool llRouterDevices,
     chanLLSplitter_ptr->set_DataOut_OutputPort(0, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
 
     rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-2,
-                                                  groundRouter_ptr->get_SchedIn_InputPort(0));
+                                                  groundRouter_ptr->get_Sched_InputPort(0));
     groundRouter_ptr->set_LLPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(Svc::CommandDispatcherImpl::NUM_CMDBUFF_PORTS - 1));
     if (!llRouterDevices) {
         // low-level seqCmdBuff
@@ -617,6 +617,12 @@ void manualConstruct(bool llRouterDevices,
         eventLLSplitter_ptr->set_DataOut_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(1));
         chanSplitter_ptr->set_DataOut_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(2));
         chanLLSplitter_ptr->set_DataOut_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(3));
+        if (!llRouterDevices) {
+            dspTimeSync_ptr->set_ClockTimes_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(4));
+        }
+        else {
+            llTimeSync_ptr->set_ClockTimes_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(4));
+        }
     }
 
 #ifdef BUILD_SDFLIGHT
@@ -1061,7 +1067,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     if (groundRouter) {
         serialDriverGround_ptr->open("/dev/quest-ground-uart",
                                      Drv::LinuxSerialDriverComponentImpl::BAUD_57600,
-                                     Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
+                                     Drv::LinuxSerialDriverComponentImpl::HW_FLOW,
                                      Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                                      true);
 
