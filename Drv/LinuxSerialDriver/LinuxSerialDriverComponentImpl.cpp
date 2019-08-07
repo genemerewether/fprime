@@ -28,10 +28,16 @@
 
 #ifdef BUILD_DSPAL
 #include <dev_fs_lib_serial.h>
+
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
-//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
-#define DEBUG_PRINT(x,...)
+//#undef DEBUG_PRINT
+//#define DEBUG_PRINT(x,...)
 
 namespace Drv {
 
@@ -88,6 +94,7 @@ namespace Drv {
 
       this->m_fd = fd;
 
+#ifndef BUILD_DSPAL
       // Configure blocking reads
       struct termios cfg;
 
@@ -128,7 +135,8 @@ namespace Drv {
       } else {
           DEBUG_PRINT("tcsetattr passed.\n");
       }
-
+#endif // BUILD_DSPAL
+      
       // Set flow control
       if (fc == HW_FLOW) {
 

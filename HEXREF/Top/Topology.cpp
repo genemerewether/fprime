@@ -67,11 +67,13 @@ Gnc::BasicMixerComponentImpl* mixer_ptr = 0;
 Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr = 0;
 Gnc::SigGenComponentImpl* sigGen_ptr = 0;
 Gnc::AttFilterComponentImpl* attFilter_ptr = 0;
+Drv::ActuatorControlsComponentImpl* actCtrl_ptr = 0;
 Drv::MPU9250ComponentImpl* mpu9250_ptr = 0;
 Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr = 0;
 Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr = 0;
 Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr = 0;
+Drv::LinuxSerialDriverComponentImpl* serialDrv_ptr = 0;
 Drv::LinuxPwmDriverComponentImpl* escPwm_ptr = 0;
 
 void allocComps() {
@@ -282,6 +284,12 @@ void allocComps() {
 #endif
 ;
 
+    actCtrl_ptr = new Drv::ActuatorControlsComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ACTCTRL")
+#endif
+;
+    
     mpu9250_ptr = new Drv::MPU9250ComponentImpl(
 #if FW_OBJECT_NAMES == 1
                         "MPU9250",
@@ -313,6 +321,12 @@ void allocComps() {
 #endif
 ;
 
+    serialDrv_ptr = new Drv::LinuxSerialDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SERDRV")
+#endif
+;
+    
     escPwm_ptr = new Drv::LinuxPwmDriverComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("ESCPWM")
@@ -455,6 +469,7 @@ void constructApp() {
     actuatorAdapter_ptr->init(0);
     sigGen_ptr->init(0);
     attFilter_ptr->init(0);
+    actCtrl_ptr->init(0);
     mpu9250_ptr->init(0);
 
     //mpu9250_ptr->setOutputMode(Drv::MPU9250ComponentImpl::OUTPUT_ACCEL_4KHZ_GYRO_8KHZ_DLPF_GYRO_3600KHZ);
@@ -465,6 +480,7 @@ void constructApp() {
     i2cDrv_ptr->init(0);
     hwEnablePin_ptr->init(1);
     imuDRInt_ptr->init(0);
+    serialDrv_ptr->init(0);
     escPwm_ptr->init(0);
 
 #if FW_ENABLE_TEXT_LOGGING
@@ -499,6 +515,7 @@ void constructApp() {
     imuProc_ptr->regCommands();
     leeCtrl_ptr->regCommands();
     attFilter_ptr->regCommands();
+    actCtrl_ptr->regCommands();
     mixer_ptr->regCommands();
     actuatorAdapter_ptr->regCommands();
     sigGen_ptr->regCommands();
@@ -517,6 +534,13 @@ void constructApp() {
     // J15, BLSP9
     i2cDrv_ptr->open(9, Drv::I2C_FREQUENCY_400KHZ);
 
+    //TODO(Mereweth) - this is a placeholder; J12, BLSP8
+    serialDrv_ptr->open("/dev/tty-3",
+                        Drv::LinuxSerialDriverComponentImpl::BAUD_57600,
+                        Drv::LinuxSerialDriverComponentImpl::HW_FLOW,
+                        Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                        true);
+
     // J15, BLSP9
     // TODO(mereweth) - Spektrum UART and binding GPIO
 
@@ -533,6 +557,13 @@ void constructApp() {
 
     // J10, SSC I2C 2, sonar pinout
     i2cDrv_ptr->open(2, Drv::I2C_FREQUENCY_400KHZ);
+
+    //TODO(Mereweth) - this is a placeholder; tty 3, J10, SONAR_UART, BLSP7
+    serialDrv_ptr->open("/dev/tty-7",
+                        Drv::LinuxSerialDriverComponentImpl::BAUD_57600,
+                        Drv::LinuxSerialDriverComponentImpl::HW_FLOW,
+                        Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                        true);
 
     // TODO(mereweth) - Spektrum UART and binding GPIO
     // TODO(mereweth) - PWM pins
