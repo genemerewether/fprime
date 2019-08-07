@@ -642,35 +642,6 @@ void exitTasks(void) {
     prmDb_ptr->exit();
 }
 
-volatile bool terminate = false;
-volatile bool preinit = true;
-
-#include <Fw/Cmd/CmdPacket.hpp>
-
-int hexref_arm() {
-    DEBUG_PRINT("hexref_arm\n");
-    terminate = true;
-
-    return 0;
-}
-
-int hexref_init(void) {
-    DEBUG_PRINT("Before constructing app\n");
-    constructApp();
-    DEBUG_PRINT("After constructing app\n");
-
-    //TODO(mereweth) - move to HexPower component
-#ifdef BUILD_DSPAL
-    HAP_power_request(100, 100, 1);
-#endif // BUILD_DSPAL
-
-    //dumparch();
-
-    preinit = false;
-
-    return 0;
-}
-
 void start_mpu9250() {
     int imuCycle = 0;
     while (!mpu9250_ptr->isReady()) {
@@ -693,25 +664,31 @@ void start_mpu9250() {
     }
 }
 
-int hexref_run(void) {
-    DEBUG_PRINT("hexref_run\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_run preinit - returning\n");
-        return -1;
-    }
+volatile bool terminate = false;
+
+int hexref_init(void) {
+    DEBUG_PRINT("Before constructing app\n");
+    constructApp();
+    DEBUG_PRINT("After constructing app\n");
+
+    //TODO(mereweth) - move to HexPower component
+#ifdef BUILD_DSPAL
+    HAP_power_request(100, 100, 1);
+#endif // BUILD_DSPAL
+
+    //dumparch();
     
     start_mpu9250();
 #ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(true);
 #endif
+
+    return 0;
+}
+
+int hexref_fini(void) {
+    DEBUG_PRINT("hexref_fini called...\n");
     
-    int backupCycle = 0;
-
-    while (!terminate) {
-        DEBUG_PRINT("running cycle %d\n", backupCycle++);
-        run1backupCycle();
-    }
-
     // stop tasks
 #ifdef DECOUPLE_RG
     rgDecouple_ptr->setEnabled(false);
@@ -722,45 +699,6 @@ int hexref_run(void) {
     Os::Task::delay(1000);
 
     DEBUG_PRINT("Exiting...\n");
-
-    return 0;
-}
-
-int hexref_cycle(unsigned int backupCycles) {
-    DEBUG_PRINT("hexref_cycle\n");
-    if (preinit) {
-        DEBUG_PRINT("hexref_cycle preinit - returning\n");
-        return -1;
-    }
-
-    start_mpu9250();
-#ifdef DECOUPLE_RG
-    rgDecouple_ptr->setEnabled(true);
-#endif
-    for (unsigned int i = 0; i < backupCycles; i++) {
-        if (terminate) break;
-        run1backupCycle();
-    }
-#ifdef DECOUPLE_RG
-    rgDecouple_ptr->setEnabled(false);
-#endif
-    DEBUG_PRINT("hexref_cycle returning\n");
-
-    return 0;
-}
-
-int hexref_wait() {
-    DEBUG_PRINT("hexref_wait\n");
-    while (!terminate) {
-        DEBUG_PRINT("hexref_wait loop; terminate: %d\n", terminate);
-        Os::Task::delay(1000);
-    }
-    return 0;
-}
-
-int hexref_fini(void) {
-    DEBUG_PRINT("hexref_fini called...\n");
-    terminate = true;
     DEBUG_PRINT("hexref_fini done...\n");
     return 0;
 }
@@ -775,7 +713,6 @@ extern "C" {
 };
 
 static void sighandler(int signum) {
-    terminate = 1;
 }
 
 int main(int argc, char* argv[]) {
@@ -784,8 +721,6 @@ int main(int argc, char* argv[]) {
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);
     signal(SIGHUP,sighandler);
-
-    preinit=false;
 
     for (int i = 0; i < 1000; i++) {
         // call interrupt to emulate a clock

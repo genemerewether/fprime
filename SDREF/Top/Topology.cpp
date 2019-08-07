@@ -1293,9 +1293,6 @@ void print_usage() {
                   "-z\tZMQ image send string\n"
                   "-a\thostname/IP address\n"
                   "-l\tFor time-based cycles\n"
-                  "-i\tto disable init\n"
-                  "-f\tto disable fini\n"
-                  "-o\tto run # cycles instead of continuously\n"
                   "-b\tBoot count\n"
                   "-s\tStart socket immediately\n",
                   FSW_HASH, FSW_BRANCH);
@@ -1338,11 +1335,6 @@ void dummy() {
 }
 
 int main(int argc, char* argv[]) {
-    bool noInit = false;
-    bool noFini = false;
-    bool kraitCycle = false;
-    bool hexCycle = true;
-    int numKraitCycles = 0;
     U32 port_number = 0;
     U32 ll_port_number = 0;
     I32 option = 0;
@@ -1364,7 +1356,7 @@ int main(int argc, char* argv[]) {
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "r:difhlgsp:x:a:u:t:o:b:z:")) != -1){
+    while ((option = getopt(argc, argv, "r:dhlgsp:x:a:u:t:b:z:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
@@ -1409,17 +1401,6 @@ int main(int argc, char* argv[]) {
             case 't':
                 udp_send_string = optarg;
                 break;
-            case 'i':
-                noInit = true;
-                break;
-            case 'f':
-                noFini = true;
-                break;
-            case 'o':
-                numKraitCycles = atoi(optarg);
-                kraitCycle = true;
-                hexCycle = false;
-                break;
             case 's':
                 startSocketNow = true;
                 break;
@@ -1431,11 +1412,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (kraitCycle && hexCycle) {
-        printf("o and c both specified - use one only\n");
-        return 1;
-    }
-
     signal(SIGINT,sighandler);
     signal(SIGSEGV,sighandler);
     signal(SIGTERM,sighandler);
@@ -1443,12 +1419,10 @@ int main(int argc, char* argv[]) {
     signal(SIGPIPE, SIG_IGN);
 
     (void) printf("Hit Ctrl-C to quit\n");
-
+    
     if (!llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-        if (!noInit) {
-            hexref_init();
-        }
+        hexref_init();
 #endif
     }
     
@@ -1464,9 +1438,6 @@ int main(int argc, char* argv[]) {
     isStereoChildGbl = isStereoChild;
     //dumparch();
 
-    Os::Task task;
-    Os::Task waiter;
-
     if (!isHiresChild && !isStereoChild) {
         sdRosIface_ptr->startIntTask(30, 5*1000*1024);
         mrCtrlIface_ptr->startIntTask(30, 5*1000*1024);
@@ -1475,50 +1446,6 @@ int main(int argc, char* argv[]) {
         ewok_ptr->startIntTask(30, 5*1000*1024);
 
         ros::console::shutdown();
-
-        Os::TaskString waiter_task_name("WAITER");
-        if (!llRouterDevices) {
-#ifdef BUILD_SDFLIGHT
-            // TODO(mereweth) - test that calling other functions before init has no effect
-            //hexref_rpc_relay_buff_allocate(10);
-            if (hexCycle) {
-                Os::TaskString task_name("HEXRPC");
-                DEBUG_PRINT("Starting cycler on hexagon\n");
-                if (Os::Task::TASK_OK !=
-                    task.start(task_name, 0, 10, 20*1024,
-                               (Os::Task::taskRoutine) hexref_run, NULL)) {
-                    DEBUG_PRINT("Error starting up DSP RUN task\n");
-                    terminate = 1;
-                }
-            }
-            if (Os::Task::TASK_OK !=
-                waiter.start(waiter_task_name, 0, 10, 20*1024,
-                             (Os::Task::taskRoutine) hexref_wait, NULL)) {
-                DEBUG_PRINT("Error starting up DSP WAIT task\n");
-                terminate = 1;
-            }
-#else
-            if (hexCycle) {
-                Os::TaskString task_name("DUMMY");
-                FW_ASSERT(Os::Task::TASK_OK ==
-                          task.start(task_name, 0, 10, 20*1024,
-                                     (Os::Task::taskRoutine) dummy, NULL));
-            }
-            FW_ASSERT(Os::Task::TASK_OK ==
-                      waiter.start(waiter_task_name, 0, 10, 20*1024,
-                                   (Os::Task::taskRoutine) dummy, NULL));
-#endif //BUILD_SDFLIGHT
-        } //not LLROUTER_DEVICES
-
-        if (!llRouterDevices) {
-#ifdef BUILD_SDFLIGHT
-            if (kraitCycle) {
-                DEBUG_PRINT("Cycling from Krait\n");
-                hexref_cycle(numKraitCycles);
-            }
-#endif //BUILD_SDFLIGHT
-        }
-
     } //!isHiresChild && !isStereoChild
 
     int cycle = 0;
@@ -1544,10 +1471,8 @@ int main(int argc, char* argv[]) {
     if (!isHiresChild && !isStereoChild) {
         if (!llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
-            if (!noFini) {
-                DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
-                hexref_fini();
-            }
+            DEBUG_PRINT("Calling exit function for SDFLIGHT\n");
+            hexref_fini();
 #endif //BUILD_SDFLIGHT
         }
 
@@ -1562,16 +1487,6 @@ int main(int argc, char* argv[]) {
 
     exitTasks(isHiresChild, isStereoChild, llRouterDevices, groundRouter);
     
-    if (!llRouterDevices && !isHiresChild && !isStereoChild) {
-        if (hexCycle) {
-            DEBUG_PRINT("Waiting for the runner to return\n");
-            FW_ASSERT(task.join(NULL) == Os::Task::TASK_OK);
-        }
-
-        DEBUG_PRINT("Waiting for the Hexagon code to be unloaded - prevents hanging the board\n");
-        FW_ASSERT(waiter.join(NULL) == Os::Task::TASK_OK);
-    } // !isHiresChild && !isStereoChild
-
     // Give time for threads to exit
 #if defined TGT_OS_TYPE_LINUX
     if (!isHiresChild && !isStereoChild) {
