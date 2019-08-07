@@ -22,6 +22,7 @@ void exitTasks(void);
 #include <Drv/IMU/MPU9250/MPU9250ComponentImpl.hpp>
 #include <Drv/LinuxSpiDriver/LinuxSpiDriverComponentImpl.hpp>
 #include <Drv/LinuxI2CDriver/LinuxI2CDriverComponentImpl.hpp>
+#include <Drv/LinuxSerialDriver/LinuxSerialDriverComponentImpl.hpp>
 #include <Drv/LinuxGpioDriver/LinuxGpioDriverComponentImpl.hpp>
 #include <Drv/LinuxPwmDriver/LinuxPwmDriverComponentImpl.hpp>
 #include <Gnc/Utils/FrameTransform/FrameTransformComponentImpl.hpp>
@@ -31,6 +32,7 @@ void exitTasks(void);
 #include <Gnc/Ctrl/ActuatorAdapter/ActuatorAdapterComponentImpl.hpp>
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
+#include <Drv/Mavlink/ActuatorControls/ActuatorControlsComponentImpl.hpp>
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
 #include <LLProc/LLCmdDispatcher/LLCmdDispatcherComponentImpl.hpp>
@@ -62,11 +64,13 @@ extern Gnc::BasicMixerComponentImpl* mixer_ptr;
 extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 extern Gnc::SigGenComponentImpl* sigGen_ptr;
 extern Gnc::AttFilterComponentImpl* attFilter_ptr;
+extern Drv::ActuatorControlsComponentImpl* actCtrl_ptr;
 extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
 extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr;
+extern Drv::LinuxSerialDriverComponentImpl* serialDrv_ptr;
 extern Drv::LinuxPwmDriverComponentImpl* escPwm_ptr;
 
 #endif

@@ -53,6 +53,13 @@ namespace Drv {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      //! Handler implementation for prmTrigger
+      //!
+      void prmTrigger_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          FwPrmIdType dummy 
+      );
+    
       //! Handler implementation for rateThrust
       //!
       void rateThrust_handler(

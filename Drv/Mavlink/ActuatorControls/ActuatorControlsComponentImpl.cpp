@@ -72,6 +72,15 @@ namespace Drv {
   // ----------------------------------------------------------------------
 
   void ActuatorControlsComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+ 
+  void ActuatorControlsComponentImpl ::
     rateThrust_handler(
         const NATIVE_INT_TYPE portNum,
         ROS::mav_msgs::RateThrust &RateThrust

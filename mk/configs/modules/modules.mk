@@ -442,6 +442,7 @@ HEXREF_GENERAL_MODULES := \
 	Drv/LinuxSpiDriver \
 	Drv/LinuxI2CDriver \
 	Drv/LinuxPwmDriver \
+	Drv/LinuxSerialDriver \
 	\
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
