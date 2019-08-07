@@ -267,7 +267,7 @@ void manualConstruct() {
     cmdDisp.set_seqCmdStatus_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(0));
 
     // from groundRouter on SDREF
-    hlRouter_ptr->set_HLPortsOut_OutputPort(12, cmdDisp_ptr->get_seqCmdBuff_InputPort(3));
+    hlRouter.set_HLPortsOut_OutputPort(12, cmdDisp.get_seqCmdBuff_InputPort(3));
 
     // L2 <-> L1 PrmDb
     prmDb.set_sendPrm_OutputPort(0, hlRouter.get_LLPortsIn_InputPort(10));
