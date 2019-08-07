@@ -130,6 +130,40 @@ namespace Drv {
     }
   }
 
+  void Tester::
+    inputFlatoutputTest(void)
+  {
+     printf("In Flatoutput Test\n");
+
+     this->init();
+
+     printf("First\n");
+
+     ROS::mav_msgs::InputFlatOutputPort flatNav_p;
+     ROS::mav_msgs::InputFlatOutputPort flatGuid_p;
+     
+     Fw::Time time__t;
+
+     printf("Second\n");
+     ROS::std_msgs::Header header(10,time__t, 0);
+     
+     printf("Third\n");
+     ROS::mav_msgs::FlatOutput flatNav_t(header,ROS::geometry_msgs::Point(0.0,0.0,0.0),
+                                              ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                              ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                              0.0*3.14159265359/180.0);
+     
+     ROS::mav_msgs::FlatOutput flatGuid_t(header,ROS::geometry_msgs::Point(6.0,6.0,0.0),
+                                               ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                               ROS::geometry_msgs::Vector3(0.0,0.0,0.0),
+                                               -45.0*3.14159265359/180.0);
+     
+     printf("Fourth\n");
+     this->invoke_to_Nav(0,flatNav_t);
+     this->invoke_to_Guid(0,flatGuid_t);
+
+  }
+
   // ----------------------------------------------------------------------
   // Handlers for typed from ports
   // ----------------------------------------------------------------------

@@ -1,0 +1,24 @@
+<commands>
+    <command kind="sync" opcode="0" mnemonic="AXSE3ADAP_InitParams">
+      <args>
+      </args>
+    </command>
+    <command kind="sync" opcode="1" mnemonic="LCTRL_FlatOutputSetpoint">
+      <args>
+         <arg name="x_w__x" type="F64">
+         </arg>
+         <arg name="x_w__y" type="F64">
+         </arg>
+         <arg name="x_w__z" type="F64">
+         </arg>
+         <arg name="v_w__x" type="F64">
+         </arg>
+         <arg name="v_w__y" type="F64">
+         </arg>
+         <arg name="v_w__z" type="F64">
+         </arg>
+         <arg name="yaw" type="F64">
+         </arg>
+         </args>
+    </command>
+</commands>

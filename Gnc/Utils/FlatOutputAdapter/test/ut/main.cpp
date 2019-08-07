@@ -8,8 +8,7 @@
 
 int main(int argc, char **argv) {
 
-    Drv::Tester tester;
+    Gnc::Tester tester;
 
-    //tester.uartConnTest();
-    tester.inputFlatoutputTest();
+    tester.inputFlatOutputTest();
 }

@@ -1,0 +1,18 @@
+<telemetry>
+    <channel id="0" name="Nav" data_type="ROS::mav_msgs::FlatOutput">
+        <comment>
+        </comment>
+    </channel>
+    <channel id="1" name="Guid" data_type="ROS::mav_msgs::FlatOutput">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="2" name="PX4" data_type="ROS::mav_msgs::FlatOutput">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="3" name="Des" data_type="ROS::mav_msgs::FlatOutput">
+      <comment>
+      </comment>
+    </channel>
+</telemetry>
