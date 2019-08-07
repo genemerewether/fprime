@@ -73,7 +73,10 @@ namespace Gnc {
                                            Se3FeedForward.getposition(),
                                            Se3FeedForward.getvelocity(),
                                            Se3FeedForward.getacceleration(),
-                                           euler(2));
+                                           ROS::geometry_msgs::Vector3(0.0, 0.0, 0.0), // jerk
+                                           ROS::geometry_msgs::Vector3(0.0, 0.0, 0.0), // snap
+                                           euler(2),
+                                           0.0); //yawdot
       this->flatOutput_out(0,flatoutput);
   }
 
