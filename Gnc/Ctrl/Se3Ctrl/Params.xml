@@ -76,13 +76,13 @@
       <comment>Position feedback saturation</comment>
     </parameter>
 
-    <parameter id="23" set_opcode="66" save_opcode="67" name="sat_v__x" data_type="F64" default="100.0">
+    <parameter id="23" set_opcode="66" save_opcode="67" name="sat_v__x" data_type="F64" default="1.5">
       <comment>Velocity feedback saturation</comment>
     </parameter>
-    <parameter id="24" set_opcode="68" save_opcode="69" name="sat_v__y" data_type="F64" default="100.0">
+    <parameter id="24" set_opcode="68" save_opcode="69" name="sat_v__y" data_type="F64" default="1.5">
       <comment>Velocity feedback saturation</comment>
     </parameter>
-    <parameter id="25" set_opcode="70" save_opcode="71" name="sat_v__z" data_type="F64" default="100.0">
+    <parameter id="25" set_opcode="70" save_opcode="71" name="sat_v__z" data_type="F64" default="1.5">
       <comment>Velocity feedback saturation</comment>
     </parameter>
 
@@ -96,13 +96,13 @@
       <comment>Rotation feedback saturation</comment>
     </parameter>
 
-    <parameter id="29" set_opcode="78" save_opcode="79" name="sat_omega__x" data_type="F64" default="9.0">
+    <parameter id="29" set_opcode="78" save_opcode="79" name="sat_omega__x" data_type="F64" default="3.0">
       <comment>Angular velocity feedback saturation</comment>
     </parameter>
-    <parameter id="30" set_opcode="80" save_opcode="81" name="sat_omega__y" data_type="F64" default="9.0">
+    <parameter id="30" set_opcode="80" save_opcode="81" name="sat_omega__y" data_type="F64" default="3.0">
       <comment>Angular velocity feedback saturation</comment>
     </parameter>
-    <parameter id="31" set_opcode="82" save_opcode="83" name="sat_omega__z" data_type="F64" default="9.0">
+    <parameter id="31" set_opcode="82" save_opcode="83" name="sat_omega__z" data_type="F64" default="3.0">
       <comment>Angular velocity feedback saturation</comment>
     </parameter>
 

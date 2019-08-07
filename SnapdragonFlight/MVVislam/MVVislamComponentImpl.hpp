@@ -22,6 +22,8 @@
 
 #include "SnapdragonFlight/MVVislam/MVVislamComponentAc.hpp"
 
+#include "Os/Mutex.hpp"
+
 #ifdef BUILD_SDFLIGHT
 #include "mv.h"
 #include "mvVISLAM.h"
@@ -63,6 +65,9 @@ namespace SnapdragonFlight {
       void setTBDes(TimeBase tbDes);
     
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       //! Preamble override
       void preamble(void);
@@ -143,7 +148,37 @@ namespace SnapdragonFlight {
 
 #ifdef BUILD_SDFLIGHT
       mvVISLAM* m_mvVISLAMPtr;
+    
+      mvCameraConfiguration m_camCfg;
 #endif
+
+      F32 m_tbc[3];
+      F32 m_ombc[3];
+      F32 m_std0tbc[3];
+      F32 m_std0ombc[3];
+      F32 m_tba[3];
+
+      F32 m_readoutTime;
+      F32 m_camDelta;
+      F32 m_std0camDelta;
+    
+      F32 m_accelMeasRange;
+      F32 m_gyroMeasRange;
+      F32 m_stdAccelMeasNoise;
+      F32 m_stdGyroMeasNoise;
+    
+      F32 m_stdCamNoise;
+      F32 m_minStdPixelNoise;
+    
+      F32 m_failHighPixelNoiseScaleFactor;
+      F32 m_logDepthBootstrap;
+      bool m_useLogCameraHeight;
+      F32 m_logCameraHeightBootstrap;
+      bool m_noInitWhenMoving;
+      F32 m_limitedIMUbWtrigger;
+      Fw::ParamString m_staticMaskFilename;
+      F32 m_gpsImuTimeAlignment;
+      bool m_mapping;
 
       bool m_initialized;
       

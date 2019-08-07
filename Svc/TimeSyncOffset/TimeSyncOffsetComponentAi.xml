@@ -31,7 +31,7 @@
             </comment>
         </port>
 
-        <port name="ClockTimes" data_type="Fw::TimePair" kind="output" max_number="1">
+        <port name="ClockTimes" data_type="Fw::TimePair" kind="output" max_number="2">
             <comment>
             output port to send high level and low level measured times
             </comment>

@@ -100,8 +100,14 @@ namespace SnapdragonFlight {
                        0,
                        (U32) (usecDsp / 1000 / 1000),
                        (U32) (usecDsp % (1000 * 1000)));
+      
+      NATIVE_INT_TYPE idx;
+      for (idx = 0; idx < this->getNum_ClockTimes_OutputPorts(); idx++) {
+          if (isConnected_ClockTimes_OutputPort(idx)) {
+              this->ClockTimes_out(0, hlosTime, dspTime);
+          }
+      }
 
-      this->ClockTimes_out(0, hlosTime, dspTime);
       this->tlmWrite_DSPOFF_HLOSLeadDsp((F64) walltimeDspLeadUs * 0.001 * 0.001);
   }
 

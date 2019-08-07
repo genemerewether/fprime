@@ -77,6 +77,7 @@ SnapdragonFlight::MVVislamComponentImpl* mvVislam_ptr = 0;
 SnapdragonFlight::MVDFSComponentImpl* mvDFS_ptr = 0;
 SnapdragonFlight::HiresCamComponentImpl* hiresCam_ptr = 0;
 SnapdragonFlight::SnapdragonHealthComponentImpl* snapHealth_ptr = 0;
+HLProc::LLRouterComponentImpl* groundRouter_ptr = 0;
 HLProc::LLRouterComponentImpl* llRouter_ptr = 0;
 HLProc::HLRosIfaceComponentImpl* sdRosIface_ptr = 0;
 Gnc::MultirotorCtrlIfaceComponentImpl* mrCtrlIface_ptr = 0;
@@ -87,6 +88,7 @@ Svc::UdpReceiverComponentImpl* udpReceiver_ptr = 0;
 
 Drv::ATINetboxComponentImpl* atiNetbox_ptr = 0;
 
+Drv::LinuxSerialDriverComponentImpl* serialDriverGround_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr = 0;
 Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr = 0;
 SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverLL_ptr = 0;
@@ -98,6 +100,11 @@ Svc::IPCRelayComponentImpl* ipcRelay_ptr = 0;
 Svc::TimeConvertComponentImpl* timeConvert_ptr = 0;
 Svc::TimeSyncOffsetComponentImpl* llTimeSync_ptr = 0;
 SnapdragonFlight::DspOffsetComponentImpl* dspTimeSync_ptr = 0;
+
+Svc::TeeComponentImpl* eventSplitter_ptr = 0;
+Svc::TeeComponentImpl* eventLLSplitter_ptr = 0;
+Svc::TeeComponentImpl* chanSplitter_ptr = 0;
+Svc::TeeComponentImpl* chanLLSplitter_ptr = 0;
 
 Svc::ImgTlmComponentImpl* imgTlm_ptr = 0;
 
@@ -249,6 +256,30 @@ void allocComps() {
 #endif
 ;
 
+    eventSplitter_ptr = new Svc::TeeComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ESPLIT")
+#endif
+;
+
+    eventLLSplitter_ptr = new Svc::TeeComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("ELLSPLIT")
+#endif
+;
+
+    chanSplitter_ptr = new Svc::TeeComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CSPLIT")
+#endif
+;
+
+    chanLLSplitter_ptr = new Svc::TeeComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("CLLSPLIT")
+#endif
+;
+
     hiresCam_ptr = new SnapdragonFlight::HiresCamComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("HIRESCAM")
@@ -309,9 +340,21 @@ void allocComps() {
 #endif
 ;
 
+    groundRouter_ptr = new HLProc::LLRouterComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("GROUTER")
+#endif
+;
+
     atiNetbox_ptr = new Drv::ATINetboxComponentImpl
 #if FW_OBJECT_NAMES == 1
                         ("ATINETBOX")
+#endif
+;
+
+    serialDriverGround_ptr = new Drv::LinuxSerialDriverComponentImpl
+#if FW_OBJECT_NAMES == 1
+                        ("SERIALDRVG")
 #endif
 ;
 
@@ -446,7 +489,8 @@ void dumpobj(const char* objName) {
 
 void manualConstruct(bool llRouterDevices,
                      bool gncCamConnect,
-                     bool gncCloudConnect) {
+                     bool gncCloudConnect,
+                     bool groundRouter) {
     if (!llRouterDevices) {
         // Sequence Com buffer and cmd response
         cmdSeq_ptr->set_comCmdOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(0));
@@ -462,7 +506,6 @@ void manualConstruct(bool llRouterDevices,
         hexRouter_ptr->set_HexPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
-        hexRouter_ptr->set_HexPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         hexRouter_ptr->set_HexPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         // port 7 only used with LLRouter (timesync)
         //hexRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
@@ -471,7 +514,7 @@ void manualConstruct(bool llRouterDevices,
                                                       hexRouter_ptr->get_Sched_InputPort(0));
 
         sdRosIface_ptr->set_ActuatorsData_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(2));
-        sdRosIface_ptr->set_ActuatorsData_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
+        udpReceiver_ptr->set_PortsOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(3));
         sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(4));
         mrCtrlIface_ptr->set_flatOutput_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(5));
         mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(6));
@@ -481,6 +524,7 @@ void manualConstruct(bool llRouterDevices,
         hexRouter_ptr->set_HexPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
         mrCtrlIface_ptr->set_boolStamped_OutputPort(0, hexRouter_ptr->get_KraitPortsIn_InputPort(9));
+        udpReceiver_ptr->set_PortsOut_OutputPort(2, hexRouter_ptr->get_KraitPortsIn_InputPort(16));
 
         rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
                                                      dspTimeSync_ptr->get_SchedIn_InputPort(0));
@@ -502,13 +546,12 @@ void manualConstruct(bool llRouterDevices,
         llRouter_ptr->set_LLPortsOut_OutputPort(2, filterIface_ptr->get_Odometry_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(3, mrCtrlIface_ptr->get_AccelCommand_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(4, eventExp_ptr->get_LogRecv_InputPort(0));
-        llRouter_ptr->set_LLPortsOut_OutputPort(5, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(6, serLogger_ptr->get_SerPortIn_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(7, llTimeSync_ptr->get_LLTime_InputPort(0));
         llRouter_ptr->set_LLPortsOut_OutputPort(9, sdRosIface_ptr->get_Range_InputPort(0));
 
         sdRosIface_ptr->set_ActuatorsData_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(2));
-        sdRosIface_ptr->set_ActuatorsData_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
+        udpReceiver_ptr->set_PortsOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(3));
         sockGndIfLL_ptr->set_uplinkPort_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(4));
         mrCtrlIface_ptr->set_flatOutput_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(5));
         mrCtrlIface_ptr->set_attRateThrust_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(6));
@@ -518,6 +561,7 @@ void manualConstruct(bool llRouterDevices,
         llRouter_ptr->set_LLPortsOut_OutputPort(8, cmdSeq2_ptr->get_cmdResponseIn_InputPort(1));
 
         mrCtrlIface_ptr->set_boolStamped_OutputPort(0, llRouter_ptr->get_HLPortsIn_InputPort(9));
+        udpReceiver_ptr->set_PortsOut_OutputPort(2, llRouter_ptr->get_HLPortsIn_InputPort(16));
 
         rgTlm_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-1,
                                                      llTimeSync_ptr->get_SchedIn_InputPort(0));
@@ -526,6 +570,60 @@ void manualConstruct(bool llRouterDevices,
         //llTimeSync_ptr->set_GPIOPulse_OutputPort(0, blspGpioTimeSync_ptr->get_gpioWrite_InputPort(0));
         llTimeSync_ptr->set_GPIOPulse_OutputPort(0, gpioTimeSync_ptr->get_gpioWrite_InputPort(0));
     }//LLROUTER_DEVICES
+
+    eventLogger_ptr->set_PktSend_OutputPort(0, eventSplitter_ptr->get_DataIn_InputPort(0));
+    eventLoggerLL_ptr->set_PktSend_OutputPort(0, eventLLSplitter_ptr->get_DataIn_InputPort(0));
+    chanTlm_ptr->set_PktSend_OutputPort(0, chanSplitter_ptr->get_DataIn_InputPort(0));
+
+    eventSplitter_ptr->set_DataOut_OutputPort(0, sockGndIf_ptr->get_downlinkPort_InputPort(0));
+    eventLLSplitter_ptr->set_DataOut_OutputPort(0, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
+    chanSplitter_ptr->set_DataOut_OutputPort(0, sockGndIf_ptr->get_downlinkPort_InputPort(0));
+    chanLLSplitter_ptr->set_DataOut_OutputPort(0, sockGndIfLL_ptr->get_downlinkPort_InputPort(0));
+
+    rgXfer_ptr->set_RateGroupMemberOut_OutputPort(Svc::ActiveRateGroupImpl::CONTEXT_SIZE-2,
+                                                  groundRouter_ptr->get_Sched_InputPort(0));
+    groundRouter_ptr->set_LLPortsOut_OutputPort(0, cmdDisp_ptr->get_seqCmdBuff_InputPort(Svc::CommandDispatcherImpl::NUM_CMDBUFF_PORTS - 1));
+    if (!llRouterDevices) {
+        // low-level seqCmdBuff
+        groundRouter_ptr->set_LLPortsOut_OutputPort(1, hexRouter_ptr->get_KraitPortsIn_InputPort(12));
+
+        // att rate thrust
+        groundRouter_ptr->set_LLPortsOut_OutputPort(2, hexRouter_ptr->get_KraitPortsIn_InputPort(13));
+        // flat output
+        groundRouter_ptr->set_LLPortsOut_OutputPort(3, hexRouter_ptr->get_KraitPortsIn_InputPort(14));
+        // safety message
+        groundRouter_ptr->set_LLPortsOut_OutputPort(4, hexRouter_ptr->get_KraitPortsIn_InputPort(15));
+
+        // low-level tlm
+        hexRouter_ptr->set_HexPortsOut_OutputPort(5, chanLLSplitter_ptr->get_DataIn_InputPort(0));
+    }
+    else {
+        // low-level seqCmdBuff
+        groundRouter_ptr->set_LLPortsOut_OutputPort(1, llRouter_ptr->get_HLPortsIn_InputPort(12));
+
+        // att rate thrust
+        groundRouter_ptr->set_LLPortsOut_OutputPort(2, llRouter_ptr->get_HLPortsIn_InputPort(13));
+        // flat output
+        groundRouter_ptr->set_LLPortsOut_OutputPort(3, llRouter_ptr->get_HLPortsIn_InputPort(14));
+        // safety message
+        groundRouter_ptr->set_LLPortsOut_OutputPort(4, llRouter_ptr->get_HLPortsIn_InputPort(15));
+
+        // low-level tlm
+        llRouter_ptr->set_LLPortsOut_OutputPort(5, chanLLSplitter_ptr->get_DataIn_InputPort(0));
+    }
+
+    if (groundRouter) {
+        eventSplitter_ptr->set_DataOut_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(0));
+        eventLLSplitter_ptr->set_DataOut_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(1));
+        chanSplitter_ptr->set_DataOut_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(2));
+        chanLLSplitter_ptr->set_DataOut_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(3));
+        if (!llRouterDevices) {
+            dspTimeSync_ptr->set_ClockTimes_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(4));
+        }
+        else {
+            llTimeSync_ptr->set_ClockTimes_OutputPort(1, groundRouter_ptr->get_HLPortsIn_InputPort(4));
+        }
+    }
 
 #ifdef BUILD_SDFLIGHT
     llRouter_ptr->set_SerialBufferSend_OutputPort(0, blspSerialDriverLL_ptr->get_readBufferSend_InputPort(0));
@@ -642,6 +740,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
                   unsigned int boot_count,
                   bool &isHiresChild, bool &isStereoChild,
                   bool llRouterDevices, bool gncCamConnect, bool gncCloudConnect,
+                  bool groundRouter,
                   bool startSocketNow) {
     allocComps();
 
@@ -711,6 +810,11 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     stereoCam_ptr->init(60, 0);
     hexRouter_ptr->init(60, 1600); // message size
     
+    eventSplitter_ptr->init(0);
+    eventLLSplitter_ptr->init(0);
+    chanSplitter_ptr->init(0);
+    chanLLSplitter_ptr->init(0);
+
     sdRosIface_ptr->init(0);
     mrCtrlIface_ptr->init(0);
     filterIface_ptr->init(0);
@@ -719,8 +823,10 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
 
     serialTextConv_ptr->init(60,0);
     llRouter_ptr->init(60,SERIAL_BUFFER_SIZE,0);
+    groundRouter_ptr->init(200,SERIAL_BUFFER_SIZE,0);
     serialDriverLL_ptr->init();
     serialDriverDebug_ptr->init();
+    serialDriverGround_ptr->init();
 
     blspSerialDriverLL_ptr->init();
     blspSerialDriverDebug_ptr->init();
@@ -735,7 +841,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     // Connect rate groups to rate group driver
     constructSDREFArchitecture();
 
-    manualConstruct(llRouterDevices, gncCamConnect, gncCloudConnect);
+    manualConstruct(llRouterDevices, gncCamConnect, gncCloudConnect, groundRouter);
 
     const U32 tempPortNum[2] = {1, 0};
     const FwOpcodeType tempMinOpcode[2] = {0, 20000};
@@ -776,6 +882,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     buffAccumStereoCamUnproc_ptr->regCommands();
 
     llRouter_ptr->regCommands();
+    groundRouter_ptr->regCommands();
     serialTextConv_ptr->regCommands();
 
     // initialize file logs
@@ -947,6 +1054,7 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     buffAccumStereoCamUnproc_ptr->start(0, 20, 20*1024);
 
     llRouter_ptr->start(0, 85, 20*1024);
+    groundRouter_ptr->start(0, 30, 20*1024);
     serialTextConv_ptr->start(0,79,20*1024);
 
     fileLogger_ptr->start(0,50,20*1024);
@@ -954,6 +1062,17 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
     if (!llRouterDevices) {
         hexRouter_ptr->startPortReadThread(90,20*1024, CORE_DEV);
         //hexRouter_ptr->startBuffReadThread(60,20*1024, CORE_DEV);
+    }
+
+    if (groundRouter) {
+        serialDriverGround_ptr->open("/dev/quest-ground-uart",
+                                     Drv::LinuxSerialDriverComponentImpl::BAUD_57600,
+                                     Drv::LinuxSerialDriverComponentImpl::HW_FLOW,
+                                     Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
+                                     true);
+
+        /* ---------- Done opening devices, now start device threads ---------- */
+        serialDriverGround_ptr->startReadThread(40, 20*1024);
     }
 
     if (llRouterDevices) {
@@ -995,13 +1114,13 @@ void constructApp(unsigned int port_number, unsigned int ll_port_number,
         //gpioTimeSync_ptr->open(TODO, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
         
         // Must start serial drivers after tasks that setup the buffers for the driver:
-        serialDriverLL_ptr->open("/dev/ttyUSB0",
+        serialDriverLL_ptr->open("/dev/quest-data-uart",
                                  Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
                                  Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                                  Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                                  true);
 
-        serialDriverDebug_ptr->open("/dev/ttyUSB1",
+        serialDriverDebug_ptr->open("/dev/quest-aux-uart",
                                     Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
                                     Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                                     Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
@@ -1067,7 +1186,7 @@ void runcycles(NATIVE_INT_TYPE cycles) {
 }
 
 void exitTasks(bool isHiresChild, bool isStereoChild,
-               bool llRouterDevices) {
+               bool llRouterDevices, bool groundRouter) {
 #if defined TGT_OS_TYPE_LINUX
     if (isHiresChild) {
 #endif
@@ -1110,6 +1229,10 @@ void exitTasks(bool isHiresChild, bool isStereoChild,
     buffAccumHiresCamUnproc_ptr->deallocateQueue(buffMallocator);
     buffAccumStereoCamUnproc_ptr->deallocateQueue(buffMallocator);
 
+    if (groundRouter) {
+        serialDriverGround_ptr->quitReadThread();
+    }
+
     if (llRouterDevices) {
 #ifdef BUILD_SDFLIGHT
         blspSerialDriverLL_ptr->quitReadThread();
@@ -1131,6 +1254,7 @@ void exitTasks(bool isHiresChild, bool isStereoChild,
     mvVislam_ptr->exit();
     mvDFS_ptr->exit();
     llRouter_ptr->exit();
+    groundRouter_ptr->exit();
     serialTextConv_ptr->exit();
 
     snapHealth_ptr->exit();
@@ -1160,6 +1284,7 @@ void print_usage() {
                   "[options]\n"
                   "-p\tport_number\n"
                   "-d\trun on Snapdragon DSP\n"
+                  "-g\tuse UART ground router\n"
                   "-r\tnot present: connect all to GNC;\n"
                   "\t\t0: connect all to ROS; 1: connect point cloud to ROS\n"
                   "-x\tll_port_number\n"
@@ -1186,15 +1311,22 @@ extern "C" {
 
 volatile sig_atomic_t terminate = 0;
 volatile sig_atomic_t hexref_finid = 0;
+volatile sig_atomic_t isHiresChildGbl = 0;
+volatile sig_atomic_t isStereoChildGbl = 0;
 
 static void sighandler(int signum) {
     terminate = 1;
     if (SIGSEGV == signum) {
-        printf("segv; calling hexref_fini\n");
         if (!hexref_finid) {
-            hexref_fini();
+            printf("segv; calling hexref_fini\n");
+#ifdef BUILD_SDFLIGHT
+            if (!isHiresChildGbl && !isStereoChildGbl) {
+                hexref_fini();
+            }
+#endif
             hexref_finid = 1;
             kill(getpid(), signum);
+            exit(EXIT_FAILURE);
         }
     }
 }
@@ -1227,15 +1359,19 @@ int main(int argc, char* argv[]) {
     I32 rosConnect = 0;
     bool gncCamConnect = true;
     bool gncCloudConnect = true;
+    bool groundRouter = false;
 
     // Removes ROS cmdline args as a side-effect
     ros::init(argc,argv,"SDREF", ros::init_options::NoSigintHandler);
 
-    while ((option = getopt(argc, argv, "r:difhlsp:x:a:u:t:o:b:z:")) != -1){
+    while ((option = getopt(argc, argv, "r:difhlgsp:x:a:u:t:o:b:z:")) != -1){
         switch(option) {
             case 'h':
                 print_usage();
                 return 0;
+                break;
+            case 'g':
+                groundRouter = true;
                 break;
             case 'r':
                 gncCamConnect = false;
@@ -1322,7 +1458,10 @@ int main(int argc, char* argv[]) {
                  isHiresChild, isStereoChild,
                  llRouterDevices,
                  gncCamConnect, gncCloudConnect,
+                 groundRouter,
                  startSocketNow);
+    isHiresChildGbl = isHiresChild;
+    isStereoChildGbl = isStereoChild;
     //dumparch();
 
     Os::Task task;
@@ -1421,7 +1560,7 @@ int main(int argc, char* argv[]) {
         ros::shutdown();
     } // !isHiresChild && !isStereoChild
 
-    exitTasks(isHiresChild, isStereoChild, llRouterDevices);
+    exitTasks(isHiresChild, isStereoChild, llRouterDevices, groundRouter);
     
     if (!llRouterDevices && !isHiresChild && !isStereoChild) {
         if (hexCycle) {

@@ -46,7 +46,35 @@ namespace SnapdragonFlight {
 #endif
 #ifdef BUILD_SDFLIGHT
       ,m_mvVISLAMPtr(NULL)
+      ,m_camCfg()
 #endif
+      ,m_tbc()
+      ,m_ombc()
+      ,m_std0tbc()
+      ,m_std0ombc()
+      ,m_tba()
+
+      ,m_readoutTime(0.0)
+      ,m_camDelta(0.0)
+      ,m_std0camDelta(0.0)
+    
+      ,m_accelMeasRange(0.0)
+      ,m_gyroMeasRange(0.0)
+      ,m_stdAccelMeasNoise(0.0)
+      ,m_stdGyroMeasNoise(0.0)
+    
+      ,m_stdCamNoise(0.0)
+      ,m_minStdPixelNoise(0.0)
+    
+      ,m_failHighPixelNoiseScaleFactor(0.0)
+      ,m_logDepthBootstrap(0.0)
+      ,m_useLogCameraHeight(false)
+      ,m_logCameraHeightBootstrap(0.0)
+      ,m_noInitWhenMoving(false)
+      ,m_limitedIMUbWtrigger(0.0)
+      ,m_staticMaskFilename("na")
+      ,m_gpsImuTimeAlignment(0.0)
+      ,m_mapping(false)
       ,m_initialized(false)
       ,m_activated(false)
       ,m_errorCode(0u)
@@ -83,73 +111,755 @@ namespace SnapdragonFlight {
       initHelper();
   }
 
+    void MVVislamComponentImpl ::
+      parameterUpdated(FwPrmIdType id)
+    {
+        DEBUG_PRINT("prm %d updated\n", id);
+        Fw::ParamValid valid;
+
+        switch (id) {
+            // default params
+          
+            case PARAMID_MVVISLAM_INITWHENMOVING:
+            {
+                bool temp = paramGet_MVVISLAM_initWhenMoving(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_noInitWhenMoving = !temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_MAPPING:
+            {
+                bool temp = paramGet_MVVISLAM_mapping(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_mapping = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STATICMASKFILENAME:
+            {
+                Fw::ParamString temp = paramGet_MVVISLAM_staticMaskFilename(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_staticMaskFilename = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_LOGDEPTHBOOTSTRAP:
+            {
+                F32 temp = paramGet_MVVISLAM_logDepthBootstrap(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_logDepthBootstrap = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_USELOGCAMERAHEIGHT:
+            {
+                U8 temp = paramGet_MVVISLAM_useLogCameraHeight(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_useLogCameraHeight = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_LOGCAMERAHEIGHTBOOTSTRAP:
+            {
+                F32 temp = paramGet_MVVISLAM_logCameraHeightBootstrap(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_logCameraHeightBootstrap = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_UVOFFSET:
+            {
+                U32 temp = paramGet_MVVISLAM_uvOffset(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.uvOffset = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTIONMODEL:
+            {
+                U8 temp = paramGet_MVVISLAM_distortionModel(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortionModel = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_READOUTTIME:
+            {
+                F32 temp = paramGet_MVVISLAM_readoutTime(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_readoutTime = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STD0_CAMDELTA:
+            {
+                F32 temp = paramGet_MVVISLAM_std0_camDelta(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_std0camDelta = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STD0_TBC_X:
+            {
+                F32 temp = paramGet_MVVISLAM_std0_tbc_x(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_std0tbc[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STD0_TBC_Y:
+            {
+                F32 temp = paramGet_MVVISLAM_std0_tbc_y(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_std0tbc[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STD0_TBC_Z:
+            {
+                F32 temp = paramGet_MVVISLAM_std0_tbc_z(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_std0tbc[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STD0_OMBC_X:
+            {
+                F32 temp = paramGet_MVVISLAM_std0_ombc_x(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_std0ombc[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STD0_OMBC_Y:
+            {
+                F32 temp = paramGet_MVVISLAM_std0_ombc_y(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_std0ombc[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STD0_OMBC_Z:
+            {
+                F32 temp = paramGet_MVVISLAM_std0_ombc_z(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_std0ombc[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_TBA_X:
+            {
+                F32 temp = paramGet_MVVISLAM_tba_x(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_tba[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_TBA_Y:
+            {
+                F32 temp = paramGet_MVVISLAM_tba_y(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_tba[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_TBA_Z:
+            {
+                F32 temp = paramGet_MVVISLAM_tba_z(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_tba[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_PIXELWIDTH:
+            {
+                U32 temp = paramGet_MVVISLAM_pixelWidth(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.pixelWidth = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_PIXELHEIGHT:
+            {
+                U32 temp = paramGet_MVVISLAM_pixelHeight(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.pixelHeight = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_MEMORYSTRIDE:
+            {
+                U32 temp = paramGet_MVVISLAM_memoryStride(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.memoryStride = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+ 
+            // imu <-> camera extrinsics and time alignment
+                
+            case PARAMID_MVVISLAM_CAMDELTA:
+            {
+                F32 temp = paramGet_MVVISLAM_camDelta(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camDelta = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_TBC_X:
+            {
+                F32 temp = paramGet_MVVISLAM_tbc_x(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_tbc[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_TBC_Y:
+            {
+                F32 temp = paramGet_MVVISLAM_tbc_y(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_tbc[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_TBC_Z:
+            {
+                F32 temp = paramGet_MVVISLAM_tbc_z(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_tbc[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_OMBC_X:
+            {
+                F32 temp = paramGet_MVVISLAM_ombc_x(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_ombc[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_OMBC_Y:
+            {
+                F32 temp = paramGet_MVVISLAM_ombc_y(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_ombc[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_OMBC_Z:
+            {
+                F32 temp = paramGet_MVVISLAM_ombc_z(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_ombc[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+
+            // intrinsics
+                
+            case PARAMID_MVVISLAM_PRINCIPALPOINT_U:
+            {
+                F64 temp = paramGet_MVVISLAM_principalPoint_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.principalPoint[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_PRINCIPALPOINT_V:
+            {
+                F64 temp = paramGet_MVVISLAM_principalPoint_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.principalPoint[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_FOCALLENGTH_U:
+            {
+                F64 temp = paramGet_MVVISLAM_focalLength_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.focalLength[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_FOCALLENGTH_V:
+            {
+                F64 temp = paramGet_MVVISLAM_focalLength_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.focalLength[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+                
+            case PARAMID_MVVISLAM_DISTORTION_0:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_0(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_1:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_1(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_2:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_2(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_3:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_3(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[3] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_4:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_4(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[4] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_5:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_5(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[5] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_6:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_6(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[6] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_7:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_7(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.distortion[7] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_8:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_8(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    // NOTE(Mereweth) - only 8 elements in array in header decl
+                    //m_camCfg.distortion[8] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_DISTORTION_9:
+            {
+                F64 temp = paramGet_MVVISLAM_distortion_9(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    // NOTE(Mereweth) - only 8 elements in array in header decl
+                    //m_camCfg.distortion[9] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+
+            // image sensor noise characteristics
+                
+            case PARAMID_MVVISLAM_STDCAMNOISE:
+            {
+                F32 temp = paramGet_MVVISLAM_stdCamNoise(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_stdCamNoise = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_MINSTDPIXELNOISE:
+            {
+                F32 temp = paramGet_MVVISLAM_minStdPixelNoise(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_minStdPixelNoise = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_FAILHIGHPIXELNOISESCALEFACTOR:
+            {
+                F32 temp = paramGet_MVVISLAM_failHighPixelNoiseScaleFactor(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_failHighPixelNoiseScaleFactor = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+
+            // imu characteristics
+                
+            case PARAMID_MVVISLAM_ACCELMEASRANGE:
+            {
+                F32 temp = paramGet_MVVISLAM_accelMeasRange(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_accelMeasRange = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_GYROMEASRANGE:
+            {
+                F32 temp = paramGet_MVVISLAM_gyroMeasRange(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_gyroMeasRange = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STDACCELMEASNOISE:
+            {
+                F32 temp = paramGet_MVVISLAM_stdAccelMeasNoise(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_stdAccelMeasNoise = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_STDGYROMEASNOISE:
+            {
+                F32 temp = paramGet_MVVISLAM_stdGyroMeasNoise(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_stdGyroMeasNoise = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVVISLAM_LIMITEDIMUBWTRIGGER:
+            {
+                F32 temp = paramGet_MVVISLAM_limitedIMUbWtrigger(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_limitedIMUbWtrigger = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+        }
+    }
+
+    void MVVislamComponentImpl ::
+      parametersLoaded()
+    {
+        for (U32 i = 0; i < __MAX_PARAMID; i++) {
+            parameterUpdated(i);
+        }
+    }
 
   void MVVislamComponentImpl ::
     initHelper(void)
   {
-#ifdef SOC_8074
-      // NOTE(mereweth) - x,y,z, offsets in meters
-      F32 tbc[] = { 0.005, 0.0150, 0.0 };
-      // NOTE(mereweth) - axis-angle rep; rotation of 90 deg about Z
-      F32 ombc[] = { 0.0, 0.0, 1.57 };
-#else
-      // NOTE(mereweth) - x,y,z, offsets in meters
-      F32 tbc[] = { -0.0233, 0.0168, 0.0082 };
-      // NOTE(mereweth) - axis-angle rep; 
-      F32 ombc[] = { 0.5709, -0.5676, -1.5285 };
-#endif
-
-      F32 std0Tbc[] = { 0.005, 0.005, 0.005 };
-      F32 std0Ombc[] = { 0.04, 0.04, 0.04 };
-
-      F32 tba[] = { 0.0, 0.0, 0.0 };
-    
 #ifdef BUILD_SDFLIGHT
-      mvCameraConfiguration camCfg;
-      camCfg.pixelWidth = 640;
-      camCfg.pixelHeight = 480;
-      camCfg.memoryStride = 640;
-
-      camCfg.principalPoint[0] = 327.986206;
-      camCfg.principalPoint[1] = 263.447510;
-      camCfg.focalLength[0] = 294.302726;
-      camCfg.focalLength[1] = 294.302826;
-      camCfg.uvOffset = 0;
-      camCfg.distortionModel = 10;
-      camCfg.distortion[0] = -0.017841;
-      camCfg.distortion[1] = 0.022006;
-      camCfg.distortion[2] = -0.014046;
-      camCfg.distortion[3] = 0.002722;
-
       this->m_mvVISLAMPtr = 
-        mvVISLAM_Initialize(&camCfg,
-                            0.0f, //readoutTime
-                            tbc,
-                            ombc,
-#ifdef SOC_8074
-                            -0.0068, //delta
-#else
-                            0.002f, //delta
-#endif
-                            std0Tbc,
-                            std0Ombc,
-                            0.001f, //std0Delta
-                            156.0f, //accelMeasRange
-                            34.0f, //gyroMeasRange
-                            0.316f, //stdAccelMeasNoise
-                            1e-2f, //stdGyroMeasNoise
-                            100.0f, //stdCamNoise
-                            0.5f, //minStdPixelNoise
-                            1.6651f, //failHighPixelNoiseScaleFactor
-                            0.0f, //logDepthBootstrap
-                            false, //useLogCameraHeight
-                            -3.22f, //logCameraHeightBootstrap
-                            false, //noInitWhenMoving
-                            200.0f, //limitedIMUbWtrigger
-                            "na", //staticMaskFilename
-                            0.0f, //gpsImuTimeAlignment
-                            tba,
-                            true //mapping
+        mvVISLAM_Initialize(&m_camCfg,
+                            m_readoutTime,
+                            m_tbc,
+                            m_ombc,
+                            m_camDelta,
+                            m_std0tbc,
+                            m_std0ombc,
+                            m_std0camDelta,
+                            m_accelMeasRange,
+                            m_gyroMeasRange,
+                            m_stdAccelMeasNoise,
+                            m_stdGyroMeasNoise,
+                            m_stdCamNoise,
+                            m_minStdPixelNoise,
+                            m_failHighPixelNoiseScaleFactor,
+                            m_logDepthBootstrap,
+                            m_useLogCameraHeight,
+                            m_logCameraHeightBootstrap,
+                            m_noInitWhenMoving,
+                            m_limitedIMUbWtrigger,
+                            m_staticMaskFilename.toChar(),
+                            m_gpsImuTimeAlignment,
+                            m_tba,
+                            m_mapping
       );
       if (NULL != m_mvVISLAMPtr) {
           m_initialized = true;

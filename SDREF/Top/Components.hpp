@@ -22,6 +22,7 @@ void exitTasks(void);
 #include <Svc/BufferAccumulator/BufferAccumulator.hpp>
 #include <Svc/BufferLogger/BufferLogger.hpp>
 #include <Svc/Health/HealthComponentImpl.hpp>
+#include <Svc/Tee/TeeComponentImpl.hpp>
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
 
@@ -62,6 +63,7 @@ void exitTasks(void);
 #include "Gnc/quest_external/traj/ewok/EwokComponentImpl.hpp"
 
 extern Drv::ATINetboxComponentImpl* atiNetbox_ptr;
+extern Drv::LinuxSerialDriverComponentImpl* serialDriverGround_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverLL_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDriverDebug_ptr;
 extern SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverLL_ptr;
@@ -69,6 +71,7 @@ extern SnapdragonFlight::BlspSerialDriverComponentImpl* blspSerialDriverDebug_pt
 extern Drv::LinuxGpioDriverComponentImpl* gpioTimeSync_ptr;
 extern SnapdragonFlight::BlspGpioDriverComponentImpl* blspGpioTimeSync_ptr;
 extern Svc::SerialTextConverterComponentImpl* serialTextConv_ptr;
+extern HLProc::LLRouterComponentImpl* groundRouter_ptr;
 extern HLProc::LLRouterComponentImpl* llRouter_ptr;
 extern HLProc::EventExpanderComponentImpl* eventExp_ptr;
 
@@ -107,6 +110,11 @@ extern Gnc::FilterIfaceComponentImpl* filterIface_ptr;
 extern ROS::RosSeqComponentImpl* rosSeq_ptr;
 extern Svc::UdpReceiverComponentImpl* udpReceiver_ptr;
 extern Svc::IPCRelayComponentImpl* ipcRelay_ptr;
+
+extern Svc::TeeComponentImpl* eventSplitter_ptr;
+extern Svc::TeeComponentImpl* eventLLSplitter_ptr;
+extern Svc::TeeComponentImpl* chanSplitter_ptr;
+extern Svc::TeeComponentImpl* chanLLSplitter_ptr;
 
 extern Svc::ImgTlmComponentImpl* imgTlm_ptr;
 

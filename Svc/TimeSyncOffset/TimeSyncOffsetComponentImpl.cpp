@@ -85,7 +85,13 @@ namespace Svc {
     // Fw::Time LLTime = time;
 
     // output HL and LL times
-    this->ClockTimes_out(0, LLTime, HLTime);
+    
+    NATIVE_INT_TYPE idx;
+    for (idx = 0; idx < this->getNum_ClockTimes_OutputPorts(); idx++) {
+        if (isConnected_ClockTimes_OutputPort(idx)) {
+            this->ClockTimes_out(0, LLTime, HLTime);
+        }
+    }
 
     // // compute times in F64 for tlm channels
     // U32 LLsec = LLTime.getSeconds();
