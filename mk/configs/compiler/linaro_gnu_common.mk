@@ -14,7 +14,7 @@ LIBRARY_TO :=
 POST_LINK_LIB := ranlib
 
 LINK_BIN := $(CXX)
-LINK_BIN_FLAGS := $(FP_FLAGS) -rdynamic -z muldefs $(LIBS)
+LINK_BIN_FLAGS := $(LINARO_FP_FLAGS) -rdynamic -z muldefs $(LIBS)
 
 FILE_SIZE := $(LS) $(LS_SIZE)
 LOAD_SIZE := $(SIZE)
@@ -34,14 +34,14 @@ LINARO_GNU_COMMON := -D SOC_$(TARGET_SOC)
 LINUX_GNU_CFLAGS := $(LINUX_FLAGS_COMMON) \
 			$(COMMON_DEFINES) \
 			$(GNU_CFLAGS_COMMON) \
-			$(FP_FLAGS) \
+			$(LINARO_FP_FLAGS) \
 	        $(LINARO_GNU_COMMON)
 
 LINUX_GNU_CXXFLAGS :=	$(LINUX_FLAGS_COMMON) \
 			-std=c++11 \
 			$(COMMON_DEFINES) \
 			$(GNU_CXXFLAGS_COMMON) \
-			$(FP_FLAGS) \
+			$(LINARO_FP_FLAGS) \
 	        $(LINARO_GNU_COMMON)
 
 COVERAGE := -fprofile-arcs -ftest-coverage

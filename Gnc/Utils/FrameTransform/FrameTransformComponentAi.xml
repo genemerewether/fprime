@@ -6,21 +6,25 @@
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
-    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/nav_msgs/Ports/OdometryAccelPortAi.xml</import_port_type>
+    <import_port_type>Fw/Prm/PrmTriggerPortAi.xml</import_port_type>
 
     <import_dictionary>Gnc/Utils/FrameTransform/Params.xml</import_dictionary>
     <import_dictionary>Gnc/Utils/FrameTransform/Commands.xml</import_dictionary>
     <import_dictionary>Gnc/Utils/FrameTransform/Events.xml</import_dictionary>
 
     <ports>
-        <port name="odomInA" data_type="ROS::nav_msgs::Odometry"  kind="sync_input" max_number="1">
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
         </port>
-	<port name="odomOutB" data_type="ROS::nav_msgs::Odometry"  kind="output" max_number="1">
+
+        <port name="odomInA" data_type="ROS::nav_msgs::OdometryAccel"  kind="sync_input" max_number="1">
+        </port>
+	    <port name="odomOutB" data_type="ROS::nav_msgs::OdometryAccel"  kind="output" max_number="1">
         </port>
 	
-        <port name="odomInB" data_type="ROS::nav_msgs::Odometry"  kind="sync_input" max_number="1">
+        <port name="odomInB" data_type="ROS::nav_msgs::OdometryAccel"  kind="sync_input" max_number="1">
         </port>
-	<port name="odomOutA" data_type="ROS::nav_msgs::Odometry"  kind="output" max_number="1">
+	    <port name="odomOutA" data_type="ROS::nav_msgs::OdometryAccel"  kind="output" max_number="1">
         </port>
 
         <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">

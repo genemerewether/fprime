@@ -1,7 +1,15 @@
 <events>
-    <event id="0" name="FTFO_Dummy" severity="ACTIVITY_LO" format_string = "dummy event" >
+    <event id="0" name="FTFO_InitFailed" severity="WARNING_HI" format_string = "Init failed due to %d" >
+        <args>
+            <arg name="error" type="ENUM">
+                <enum name="FTFO_InitErrorType">
+                    <item name="FTFO_PrmUnset" comment="One of the non-default parameters unset"/>
+                </enum>
+                <comment>The error code</comment>
+            </arg>
+        </args>
         <comment>
-             dummy event
+             FTFO init failed for the following reason
         </comment>
     </event>
 </events>

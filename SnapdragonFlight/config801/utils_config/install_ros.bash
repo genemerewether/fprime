@@ -3,7 +3,7 @@
 # from http://wiki.ros.org/indigo/Installation/UbuntuARM
 sudo update-locale LANG=C LANGUAGE=C LC_ALL=C LC_MESSAGES=POSIX
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
-sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
+sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 sudo apt-get update
 
 echo "installing chrony; if prompted about configuration files, use the currently existing version"
@@ -38,6 +38,7 @@ sudo apt-get install -y ros-indigo-ros-base python-rosdep \
     ros-indigo-cv-bridge ros-indigo-tf2-ros ros-indigo-tf2 \
     ros-indigo-diagnostic-updater ros-indigo-angles \
     ros-indigo-eigen-conversions ros-indigo-orocos-kdl \
+    ros-indigo-sophus libsuitesparse-dev \
     ros-indigo-urdf ros-indigo-tf libxslt1-dev ros-indigo-image-transport \
     ros-indigo-ros-comm ros-indigo-rosbash ros-indigo-dynamic-reconfigure \
     ros-indigo-camera-info-manager ros-indigo-camera-calibration \

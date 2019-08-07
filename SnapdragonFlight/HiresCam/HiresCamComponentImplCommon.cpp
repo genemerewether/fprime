@@ -235,7 +235,9 @@ namespace SnapdragonFlight {
                      * and transition to HIRES_WAIT_LAST_VIDEO
                      */
 #ifdef BUILD_SDFLIGHT
+#ifndef SOC_8096
                     stat = m_cameraPtr->startRecording();
+#endif
 #endif // BUILD_SDFLIGHT
                     if (stat == 0) {
                         m_callbackTimeout = static_cast<NATIVE_UINT_TYPE>(HIRESCAM_VID_WAIT_SEC);
@@ -571,7 +573,9 @@ namespace SnapdragonFlight {
 
                     m_params.setVideoSize(imageSize);
                     // TODO(mereweth) - go smaller?
+#ifndef SOC_8096
                     imageSize = camera::ImageSize(320, 240);
+#endif
                     m_params.setPreviewSize(imageSize);
 
                     stat = m_params.commit();
@@ -1037,7 +1041,9 @@ namespace SnapdragonFlight {
 
         m_params.setVideoSize(imageSize);
         // TODO(mereweth) - go smaller?
+#ifndef SOC_8096
         imageSize = camera::ImageSize(320, 240);
+#endif
         m_params.setPreviewSize(imageSize);
 
         stat = m_params.commit();
@@ -1073,7 +1079,9 @@ namespace SnapdragonFlight {
          }
 
 #ifdef BUILD_SDFLIGHT
+#ifndef SOC_8096
         stat = m_cameraPtr->startRecording();
+#endif
 #else
         stat = 0;
 #endif // BUILD_SDFLIGHT

@@ -179,6 +179,7 @@ namespace Svc {
         public:
 
             static const NATIVE_UINT_TYPE NUM_CMD_PORTS = NUM_COMPCMDSEND_OUTPUT_PORTS;
+            static const NATIVE_UINT_TYPE NUM_CMDBUFF_PORTS = NUM_SEQCMDBUFF_INPUT_PORTS;
 
     };
 }

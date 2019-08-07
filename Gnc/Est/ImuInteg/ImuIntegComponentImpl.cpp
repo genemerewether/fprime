@@ -84,7 +84,7 @@ namespace Gnc {
   {
       this->paramsInited = false;
       Fw::ParamValid valid[1];
-      imuInteg.SetTimeStep(paramGet_dt(valid[0]));
+      imuInteg.SetTimeStep(paramGet_IMUINTEG_dt(valid[0]));
       if (Fw::PARAM_VALID != valid[0]) {  return;  }
       
       this->paramsInited = true;
@@ -94,6 +94,15 @@ namespace Gnc {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
   
+  void ImuIntegComponentImpl ::
+    prmTrigger_handler(
+        const NATIVE_INT_TYPE portNum,
+        FwPrmIdType dummy
+    )
+  {
+      this->loadParameters();
+  }
+
   void ImuIntegComponentImpl ::
     Imu_handler(
         const NATIVE_INT_TYPE portNum,
@@ -139,7 +148,7 @@ namespace Gnc {
 
       ROS::geometry_msgs::Point x_w = ImuStateUpdate.getpose().getposition();
       ROS::geometry_msgs::Quaternion w_q_b = ImuStateUpdate.getpose().getorientation();
-      ROS::geometry_msgs::Vector3 v_w = ImuStateUpdate.gettwist().getlinear();
+      ROS::geometry_msgs::Vector3 v_b = ImuStateUpdate.gettwist().getlinear();
       //this->omega_b = ImuStateUpdate.gettwist().getangular();
 
       ROS::geometry_msgs::Vector3 wBias = ImuStateUpdate.getangular_velocity_bias();
@@ -154,9 +163,9 @@ namespace Gnc {
                                                   w_q_b.getx(),
                                                   w_q_b.gety(),
                                                   w_q_b.getz()),
-                               Eigen::Vector3d(v_w.getx(),
-                                               v_w.gety(),
-                                               v_w.getz()),
+                               Eigen::Vector3d(v_b.getx(),
+                                               v_b.gety(),
+                                               v_b.getz()),
                                Eigen::Vector3d(wBias.getx(),
                                                wBias.gety(),
                                                wBias.getz()),
@@ -180,22 +189,27 @@ namespace Gnc {
           Eigen::Quaterniond w_q_b(1, 0, 0, 0);
           Eigen::Vector3d v_b(0, 0, 0);
           Eigen::Vector3d omega_b(0, 0, 0);
+          Eigen::Vector3d a_b(0, 0, 0);
           this->imuInteg.GetState(&x_w,
                                   &w_q_b,
                                   &v_b,
-                                  &omega_b);
+                                  &omega_b,
+                                  &a_b);
 
           // TODO(mereweth) - convert frame name to U32 idx
           ROS::std_msgs::Header h(this->seq, this->getTime(), 0/*"odom"*/);
-          ROS::nav_msgs::Odometry odom(h, 0/*"body"*/,
+          ROS::nav_msgs::OdometryAccel odom(h, 0/*"body"*/,
               PoseWithCovariance(Pose(Point(x_w(0), x_w(1), x_w(2)),
                                       Quaternion(w_q_b.x(), w_q_b.y(),
                                                  w_q_b.z(), w_q_b.w())),
                                  NULL, 0), // don't use covariance estimates
               TwistWithCovariance(Twist(Vector3(v_b(0), v_b(1), v_b(2)),
                                         Vector3(omega_b(0), omega_b(1), omega_b(2))),
+                                  NULL, 0), // don't use covariance estimates
+              AccelWithCovariance(Accel(Vector3(a_b(0), a_b(1), a_b(2)),
+                                        Vector3(0, 0, 0)),
                                   NULL, 0) // don't use covariance estimates
-              );
+          );
           if (this->isConnected_odometry_OutputPort(0)) {
               this->odometry_out(0, odom);
           }

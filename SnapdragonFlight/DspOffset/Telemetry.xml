@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="DSPOFF_HLOSLeadDsp" data_type="F64">
+        <comment>
+            Number of floating point seconds that HLOS leads DSP
+        </comment>
+    </channel>
+</telemetry>

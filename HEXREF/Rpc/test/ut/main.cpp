@@ -39,7 +39,7 @@ void dummy() {
 }
 
 void print_usage() {
-    (void) printf("Usage: -i to disable init; -f to disable fini\n-o to run # cycles; -c to run continuously\n");
+    (void) printf("Usage: -a to shutdown; -i to disable init; -f to disable fini\n-o to run # cycles; -c to run continuously\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
     
 #ifdef BUILD_SDFLIGHT
     if (doArm) {
-        DEBUG_PRINT("Arming\n");
+        DEBUG_PRINT("Shutting down hung hexref\n");
         hexref_arm();
         return 0;
     }

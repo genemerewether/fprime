@@ -37,7 +37,7 @@ namespace R5 {
   {
       RtiTime rTime;
       rtiGetHighResTime(&rTime);
-      time.set(TB_WORKSTATION_TIME,rTime.seconds,rTime.subseconds/R5_USEC_DIV);
+      time.set(TB_PROC_TIME,rTime.seconds,rTime.subseconds/R5_USEC_DIV);
   }
 
   void R5TimeComponentImpl ::

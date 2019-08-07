@@ -13,7 +13,7 @@ namespace SnapdragonFlight {
   enum {
       // specifically for async processed cycling buffers
       HR_RECEIVE_BUFFER_POOL_SIZE = 4,
-      HR_RECEIVE_BUFFER_SIZE = 1024,
+      HR_RECEIVE_BUFFER_SIZE = 2048,
 
       HR_RPC_READ_SIZE = 4096
   };

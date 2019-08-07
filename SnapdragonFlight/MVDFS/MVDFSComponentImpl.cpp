@@ -6,16 +6,9 @@
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
-// acknowledged. Any commercial use must be negotiated with the Office
-// of Technology Transfer at the California Institute of Technology.
-// 
-// This software may be subject to U.S. export control laws and
-// regulations.  By accepting this document, the user agrees to comply
-// with all U.S. export laws and regulations.  User has the
-// responsibility to obtain export licenses, or other export authority
-// as may be required before exporting such information to foreign
-// countries or providing access to foreign persons.
-// ====================================================================== 
+// acknowledged.
+//
+// ======================================================================
 
 
 #include <SnapdragonFlight/MVDFS/MVDFSComponentImpl.hpp>
@@ -39,18 +32,20 @@ namespace SnapdragonFlight {
     ) :
       MVDFSComponentBase(compName)
 #else
-    MVDFSImpl(void)
+    MVDFSComponentImpl(void)
 #endif
 #ifdef BUILD_SDFLIGHT
       ,m_mvDFSPtr(NULL)
       ,m_depthCameraIntrinsics()
       ,m_camCfg()
+      ,m_dfsAlgorithm(MVDFS_MODE_ALG1_GPU)
 #endif
       ,m_invDepth(NULL)
       ,m_pointCloud(NULL)
       ,m_initialized(false)
       ,m_activated(false)
       ,m_imagesProcessed(0u)
+      ,m_imagesProcessedLast(0u)
   {
 
   }
@@ -62,6 +57,10 @@ namespace SnapdragonFlight {
     ) 
   {
     MVDFSComponentBase::init(queueDepth, instance);
+    
+#ifdef BUILD_SDFLIGHT
+    memset(&m_camCfg, 0, sizeof(m_camCfg)); // important!
+#endif
   }
 
   MVDFSComponentImpl ::
@@ -87,49 +86,9 @@ namespace SnapdragonFlight {
     initHelper(void)
   {
 #ifdef BUILD_SDFLIGHT
-      memset(&m_camCfg, 0, sizeof(m_camCfg)); // important!
-      m_camCfg.camera[0].pixelWidth = 640;
-      m_camCfg.camera[0].pixelHeight = 480;
-      // NOTE(mereweth) - saves the copy to separate joined rows
-      m_camCfg.camera[0].memoryStride = 1280;
-      m_camCfg.camera[1].pixelWidth = 640;
-      m_camCfg.camera[1].pixelHeight = 480;
-      // NOTE(mereweth) - saves the copy to separate joined rows
-      m_camCfg.camera[1].memoryStride = 1280;
-
-      m_camCfg.camera[0].principalPoint[0] = 320.0;
-      m_camCfg.camera[0].principalPoint[1] = 240.0;
-      m_camCfg.camera[0].focalLength[0] = 435.0;
-      m_camCfg.camera[0].focalLength[1] = 435.0;
-      m_camCfg.camera[0].uvOffset = 0;
-      m_camCfg.camera[0].distortionModel = 4;
-      m_camCfg.camera[0].distortion[0] = 0.045;
-      m_camCfg.camera[0].distortion[1] = -0.12;
-      m_camCfg.camera[0].distortion[2] = 0.001;
-      m_camCfg.camera[0].distortion[3] = 0.0;
-
-      m_camCfg.camera[1].principalPoint[0] = 320.0;
-      m_camCfg.camera[1].principalPoint[1] = 240.0;
-      m_camCfg.camera[1].focalLength[0] = 435.0;
-      m_camCfg.camera[1].focalLength[1] = 435.0;
-      m_camCfg.camera[1].uvOffset = 0;
-      m_camCfg.camera[1].distortionModel = 4;
-      m_camCfg.camera[1].distortion[0] = 0.045;
-      m_camCfg.camera[1].distortion[1] = -0.12;
-      m_camCfg.camera[1].distortion[2] = 0.001;
-      m_camCfg.camera[1].distortion[3] = 0.0;
-      
-      m_camCfg.translation[0] = -0.079395;
-      m_camCfg.translation[1] = 0.000653;
-      m_camCfg.translation[2] = -0.000398;
-      // scaled axis-angle
-      m_camCfg.rotation[0] = 0.008761;
-      m_camCfg.rotation[1] = -0.018536;
-      m_camCfg.rotation[2] = -0.026348;
-
       this->m_mvDFSPtr = 
         mvDFS_Initialize(&m_camCfg,
-                         MVDFS_MODE_ALG1_GPU,
+                         m_dfsAlgorithm,
                          false); //using 10bit input
       if (NULL == m_mvDFSPtr) {
           // TODO(mereweth) - EVR
@@ -241,7 +200,10 @@ namespace SnapdragonFlight {
         NATIVE_UINT_TYPE context
     )
   {
+      NATIVE_UINT_TYPE imageCountDiff = m_imagesProcessed - m_imagesProcessedLast;
       this->tlmWrite_MVDFS_ImageCount(this->m_imagesProcessed);
+      this->tlmWrite_MVDFS_ImageRate(imageCountDiff);
+      m_imagesProcessedLast = m_imagesProcessed;
   }
 
   void MVDFSComponentImpl ::
@@ -253,8 +215,485 @@ namespace SnapdragonFlight {
       this->pingOut_out(0, key);
   }
 
+  void MVDFSComponentImpl ::
+      parameterUpdated(FwPrmIdType id)
+    {
+        DEBUG_PRINT("prm %d updated\n", id);
+        Fw::ParamValid valid;
+
+        switch (id) {
+            // default params
+          
+            case PARAMID_MVDFS_DFSALGORITHM:
+            {
+                U8 temp = paramGet_MVDFS_dfsAlgorithm(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                  m_dfsAlgorithm = (MVDFS_MODE) temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+                
+            // defaults camera 0
+                
+            case PARAMID_MVDFS_CAM_0_PIXELWIDTH:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_pixelWidth(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].pixelWidth = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_PIXELHEIGHT:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_pixelHeight(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].pixelHeight = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_MEMORYSTRIDE:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_memoryStride(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].memoryStride = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_UVOFFSET:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_uvOffset(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].uvOffset = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTIONMODEL:
+            {
+                U32 temp = paramGet_MVDFS_cam_0_distortionModel(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortionModel = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+
+            // defaults camera 1
+
+            case PARAMID_MVDFS_CAM_1_PIXELWIDTH:
+            {
+                U32 temp = paramGet_MVDFS_cam_1_pixelWidth(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].pixelWidth = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_PIXELHEIGHT:
+            {
+                U32 temp = paramGet_MVDFS_cam_1_pixelHeight(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].pixelHeight = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_MEMORYSTRIDE:
+            {
+                U32 temp = paramGet_MVDFS_cam_1_memoryStride(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].memoryStride = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_UVOFFSET:
+            {
+                U32 temp = paramGet_MVDFS_cam_1_uvOffset(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].uvOffset = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTIONMODEL:
+            {
+                U8 temp = paramGet_MVDFS_cam_1_distortionModel(valid);
+                if ((Fw::PARAM_VALID == valid) ||
+                    (Fw::PARAM_DEFAULT == valid)) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortionModel = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+
+            // intrinsics camera 0
+                
+            case PARAMID_MVDFS_CAM_0_PRINCIPALPOINT_U:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_principalPoint_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].principalPoint[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_PRINCIPALPOINT_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_principalPoint_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].principalPoint[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_FOCALLENGTH_U:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_focalLength_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].focalLength[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_FOCALLENGTH_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_focalLength_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].focalLength[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+                
+            case PARAMID_MVDFS_CAM_0_DISTORTION_0:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_0(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTION_1:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_1(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTION_2:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_2(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_0_DISTORTION_3:
+            {
+                F64 temp = paramGet_MVDFS_cam_0_distortion_3(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[0].distortion[3] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+
+            // intrinsics camera 1
+                
+            case PARAMID_MVDFS_CAM_1_PRINCIPALPOINT_U:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_principalPoint_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].principalPoint[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_PRINCIPALPOINT_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_principalPoint_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].principalPoint[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_FOCALLENGTH_U:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_focalLength_u(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].focalLength[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_FOCALLENGTH_V:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_focalLength_v(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].focalLength[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+                
+            case PARAMID_MVDFS_CAM_1_DISTORTION_0:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_0(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTION_1:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_1(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTION_2:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_2(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_CAM_1_DISTORTION_3:
+            {
+                F64 temp = paramGet_MVDFS_cam_1_distortion_3(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.camera[1].distortion[3] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+
+            // extrinsics
+                
+            case PARAMID_MVDFS_TRANS_X:
+            {
+                F32 temp = paramGet_MVDFS_trans_x(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.translation[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_TRANS_Y:
+            {
+                F32 temp = paramGet_MVDFS_trans_y(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.translation[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_TRANS_Z:
+            {
+                F32 temp = paramGet_MVDFS_trans_z(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.translation[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_ROT_X:
+            {
+                F32 temp = paramGet_MVDFS_rot_x(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.rotation[0] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_ROT_Y:
+            {
+                F32 temp = paramGet_MVDFS_rot_y(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.rotation[1] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+            case PARAMID_MVDFS_ROT_Z:
+            {
+                F32 temp = paramGet_MVDFS_rot_z(valid);
+                if (Fw::PARAM_VALID == valid) {
+#ifdef BUILD_SDFLIGHT
+                    m_camCfg.rotation[2] = temp;
+#endif
+                }
+                else {
+                    // TODO(mereweth) - issue EVR
+                }
+            }
+                break;
+        }
+    }
+
+    void MVDFSComponentImpl ::
+      parametersLoaded()
+    {
+        for (U32 i = 0; i < __MAX_PARAMID; i++) {
+            parameterUpdated(i);
+        }
+    }
+    
   // ----------------------------------------------------------------------
-  // Command handler implementations 
+  // Command handler implementations
   // ----------------------------------------------------------------------
 
   void MVDFSComponentImpl ::

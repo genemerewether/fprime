@@ -42,7 +42,11 @@ extern "C" {
 
 #define UART_LOOPBACK 0
 
+#define FW_ASSERT(...) 
+
 namespace HLProc {
+
+  const char* BOOTLOADER_MAGIC_STRING = "LeoBoot!";
 
   //!< Shouldn't be more loop iterations than the number of bytes in the buffer,
   //!< and it can be higher than 5 b/c of off-nominal conditions
@@ -792,7 +796,7 @@ namespace HLProc {
 
                               this->m_magicStringBuffer[sizeof(BOOTLOADER_MAGIC_STRING) - 1] = data_ptr[i];
 
-                              if (memcmp(this->m_magicStringBuffer, BOOTLOADER_MAGIC_STRING, sizeof(BOOTLOADER_MAGIC_STRING)) == 0) {
+                              if (memcmp(this->m_magicStringBuffer, BOOTLOADER_MAGIC_STRING, strlen(BOOTLOADER_MAGIC_STRING)) == 0) {
                                   this->m_seenMagicString = true;
                                   DEBUG_PRINT("Received Magic String\n");
                                   runPatchFSM();

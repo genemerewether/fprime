@@ -67,18 +67,25 @@ namespace Gnc {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      //! Handler implementation for prmTrigger
+      //!
+      void prmTrigger_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          FwPrmIdType dummy 
+      );
+
       //! Handler implementation for odomInA
       //!
       void odomInA_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::nav_msgs::Odometry &Odometry
+          ROS::nav_msgs::OdometryAccel &Odometry
       );
 
       //! Handler implementation for odomInB
       //!
       void odomInB_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          ROS::nav_msgs::Odometry &Odometry
+          ROS::nav_msgs::OdometryAccel &Odometry
       );
 
     PRIVATE:

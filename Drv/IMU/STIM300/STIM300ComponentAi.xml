@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="STIM300" kind="passive" namespace="Drv" modeler="true">
+
+    <import_port_type>ROS/Gen/sensor_msgs/Ports/ImuNoCovPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+    <import_dictionary>Drv/IMU/STIM300/Telemetry.xml</import_dictionary>
+    <import_dictionary>Drv/IMU/STIM300/Events.xml</import_dictionary>
+
+    <import_serializable_type>ROS/Gen/sensor_msgs/Types/ImuNoCovSerializableAi.xml</import_serializable_type>
+
+    <ports>
+    
+
+        <port name="IMU" data_type="ImuNoCov"  kind="output"    max_number="2">
+        </port>
+
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="packetTime" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port>
+
+        <port name="serialRead" data_type="Drv::SerialRead"  kind="output"    max_number="1">
+        </port>
+    </ports>
+
+</component>

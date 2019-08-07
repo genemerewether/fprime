@@ -23,7 +23,6 @@
 #include "Gnc/Est/FilterIface/FilterIfaceComponentAc.hpp"
 
 #include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
 #include "mav_msgs/ImuStateUpdate.h"
 #include "sensor_msgs/Imu.h"
 #include "tf/transform_broadcaster.h"
@@ -62,13 +61,15 @@ namespace Gnc {
       //! Destroy object FilterIface
       //!
       ~FilterIfaceComponentImpl(void);
-
-      void startPub();
+    
+      void setTBDes(TimeBase tbDes);
 
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,
                                         NATIVE_INT_TYPE cpuAffinity = -1);
+    
+      void disableRos();
 
     PRIVATE:
 
@@ -76,7 +77,14 @@ namespace Gnc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class ImuStateUpdateHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+              TimeBase tbDes;
+        };
+    
+        class ImuStateUpdateHandler : public TimeBaseHolder
         {
           public:
               ImuStateUpdateHandler(FilterIfaceComponentImpl* compPtr,
@@ -94,7 +102,7 @@ namespace Gnc {
 
         }; // end class ImuStateUpdateHandler
 
-        class ImuHandler
+        class ImuHandler : public TimeBaseHolder
         {
           public:
               ImuHandler(FilterIfaceComponentImpl* compPtr,
@@ -130,6 +138,13 @@ namespace Gnc {
           ROS::nav_msgs::OdometryNoCov &Odometry
       );
 
+      //! Handler implementation for ImuStateUpdateReport
+      //!
+      void ImuStateUpdateReport_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::ImuStateUpdateNoCov &ImuStateUpdateNoCov 
+      );
+
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(
@@ -141,11 +156,15 @@ namespace Gnc {
       // Member variables
       // ----------------------------------------------------------------------
 
-        bool m_rosInited;
+        volatile bool m_rosInited;
+
+        TimeBase m_tbDes;
 
         //! Publishers for Odometry data
         //!
         ros::Publisher m_odomPub[NUM_ODOMETRY_INPUT_PORTS];
+    
+        ros::Publisher m_imuStateUpdatePub[NUM_IMUSTATEUPDATEREPORT_INPUT_PORTS];
 
         ros::NodeHandle* m_nodeHandle;
 

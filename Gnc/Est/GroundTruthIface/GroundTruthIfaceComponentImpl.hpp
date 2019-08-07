@@ -61,12 +61,14 @@ namespace Gnc {
       //!
       ~GroundTruthIfaceComponentImpl(void);
 
-      void startPub();
+      void setTBDes(TimeBase tbDes);
 
       //! Start interrupt task
       Os::Task::TaskStatus startIntTask(NATIVE_INT_TYPE priority,
                                         NATIVE_INT_TYPE stackSize,
                                         NATIVE_INT_TYPE cpuAffinity = -1);
+
+      void disableRos();
 
     PRIVATE:
 
@@ -74,7 +76,14 @@ namespace Gnc {
       // Utility classes for enumerating callbacks
       // ----------------------------------------------------------------------
 
-        class OdometryHandler
+        class TimeBaseHolder
+        {
+          public:
+              TimeBaseHolder();
+              TimeBase tbDes;
+        };
+    
+        class OdometryHandler : public TimeBaseHolder
         {
           public:
               OdometryHandler(GroundTruthIfaceComponentImpl* compPtr,
@@ -114,7 +123,9 @@ namespace Gnc {
       // Member variables
       // ----------------------------------------------------------------------
 
-        bool m_rosInited;
+        volatile bool m_rosInited;
+
+        TimeBase m_tbDes;
 
         ros::NodeHandle* m_nodeHandle;
 
@@ -127,7 +138,7 @@ namespace Gnc {
 
         struct OdometrySet {
             Os::Mutex mutex; //! Mutex lock to guard odometry object
-            ROS::nav_msgs::Odometry odometry; //! message object
+            ROS::nav_msgs::OdometryAccel odometry; //! message object
             bool fresh; //! Whether object has been updated
             NATIVE_UINT_TYPE overflows; //! Number of times port overwritten
         } m_odometrySet[NUM_ODOMETRY_OUTPUT_PORTS];

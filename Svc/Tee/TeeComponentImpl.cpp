@@ -21,6 +21,11 @@
 #include <Svc/Tee/TeeComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include <stdio.h>
+
+//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINT(x,...)
+
 namespace Svc {
 
   // ----------------------------------------------------------------------
@@ -64,10 +69,12 @@ namespace Svc {
         Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
     )
   {
+      DEBUG_PRINT("tee handling %d\n", portNum);
       NATIVE_INT_TYPE idx;
       for (idx = 0; idx < this->getNum_DataOut_OutputPorts(); idx++) {
           if (isConnected_DataOut_OutputPort(idx)) {
               this->DataOut_out(idx, Buffer);
+              DEBUG_PRINT("tee sending %d on %d\n", portNum, idx);
               Buffer.resetDeser();
           }
       }

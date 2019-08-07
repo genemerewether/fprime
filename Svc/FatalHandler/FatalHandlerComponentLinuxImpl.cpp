@@ -16,6 +16,10 @@
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#ifdef BUILD_DSPAL
+extern volatile bool terminate;
+#endif
+
 #ifndef BUILD_DSPAL
 #include <execinfo.h>
 #endif // BUILD_DSPAL
@@ -63,6 +67,9 @@ namespace Svc
         if (not this->m_disableAssert) {
             // for **nix, delay then exit with error code
             Os::Log::logMsg("FATAL %d handled.\n", (U32) Id, 0, 0, 0, 0, 0);
+#ifdef BUILD_DSPAL
+            terminate = true;
+#endif
             (void) Os::Task::delay(1000);
             //Os::Log::logMsg("Exiting.\n", 0, 0, 0, 0, 0, 0);
             //assert(0);

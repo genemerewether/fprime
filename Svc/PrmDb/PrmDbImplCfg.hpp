@@ -12,8 +12,11 @@
 namespace {
 
     enum {
-        PRMDB_NUM_DB_ENTRIES = 500, // !< Number of entries in the parameter database
-        PRMDB_ENTRY_DELIMETER = 0xA5 // !< Byte value that should precede each parameter in file; sanity check against file integrity. Should match ground system.
+#ifdef BUILD_TIR5
+        PRMDB_NUM_DB_ENTRIES = 200, // !< Number of entries in the parameter database
+#else
+        PRMDB_NUM_DB_ENTRIES = 1000, // !< Number of entries in the parameter database
+#endif
     };
 
 }

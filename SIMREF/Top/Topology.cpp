@@ -52,7 +52,7 @@ Svc::RateGroupDecouplerComponentImpl rgDecouple
 ;
 
 //NOTE(mereweth) - change this in sync with RosCycle timeDivMS
-static NATIVE_INT_TYPE rgGncDivs[] = {10, 1, 100};
+static NATIVE_INT_TYPE rgGncDivs[] = {1, 1, 100};
 Svc::RateGroupDriverImpl rgGncDrv(
 #if FW_OBJECT_NAMES == 1
                     "RGGNCDRV",
@@ -208,11 +208,11 @@ Svc::CmdSequencerComponentImpl cmdSeq
 #endif
 ;
 
-Svc::PrmDbImpl prmDb
+Svc::ActiveL1PrmDbComponentImpl prmDb
 #if FW_OBJECT_NAMES == 1
-                    ("PRM",PRM_PATH)
+                     ("PRM",PRM_PATH, 126)
 #else
-                    (PRM_PATH)
+                     (PRM_PATH, 126)
 #endif
 ;
 
@@ -228,6 +228,11 @@ Svc::FatalHandlerComponentImpl fatalHandler
 #endif
 ;
 
+ewok::EwokComponentImpl ewokComp
+#if FW_OBJECT_NAMES == 1
+                        ("EWOK")
+#endif
+;
 
 #if FW_OBJECT_REGISTRATION == 1
 
@@ -296,8 +301,13 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     fatalHandler.init(0);
     udpReceiver.init(0);
 
+    ewokComp.init(0);
+
     // Connect rate groups to rate group driver
     constructSIMREFArchitecture();
+
+    // TODO(mereweth) - put in MD model
+    leeCtrl.set_setpoint_OutputPort(0, filterIface.get_Odometry_InputPort(1));
     
     udpReceiver.set_PortsOut_OutputPort(0, leeCtrl.get_attRateThrust_InputPort(0));
 
@@ -320,7 +330,7 @@ void constructApp(int port_number, char* udp_string, char* hostname) {
     fileLogger.initLog("./log/");
     
     // read parameters
-    prmDb.readParamFile();
+    prmDb.readPrmFile();
     leeCtrl.loadParameters();
     attFilter.loadParameters();
     mixer.loadParameters();
@@ -467,12 +477,8 @@ int main(int argc, char* argv[]) {
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
     stat = rosSeq.startIntTask(70, 5*1000*1024);
     FW_ASSERT(Os::Task::TASK_OK == stat, stat);
-
-    rotorSDrv.startPub();
-    mrCtrlIface.startPub();
-    filterIface.startPub();
-    gzManipIf.startPub();
-    rosSeq.startPub();
+    stat = ewokComp.startIntTask(70, 5*1000*1024);
+    FW_ASSERT(Os::Task::TASK_OK == stat, stat);
 
     signal(SIGINT,sighandler);
     signal(SIGTERM,sighandler);

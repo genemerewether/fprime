@@ -2,10 +2,10 @@
     <parameter id="0" set_opcode="20" save_opcode="21" name="numActuators" data_type="U32" >
       <comment>number of actuators</comment>
     </parameter>
-    <parameter id="1" set_opcode="22" save_opcode="23" name="flySafeCycles" data_type="U32" default="10000">
+    <parameter id="1" set_opcode="22" save_opcode="23" name="flySafeCycles" data_type="U32" default="1000">
       <comment>max number of cycles since last flysafe port call; 0 to disable check</comment>
     </parameter>
-    <parameter id="2" set_opcode="24" save_opcode="25" name="flySafeTime" data_type="F64" default="10.0">
+    <parameter id="2" set_opcode="24" save_opcode="25" name="flySafeTime" data_type="F64" default="1.0">
       <comment>max elapsed time (seconds) since last flysafe port call; negative to disable check</comment>
     </parameter>
 
@@ -14,6 +14,9 @@
     </parameter>
     <parameter id="11" set_opcode="42" save_opcode="43" name="a1_inputActIdx" data_type="U8" >
       <comment>actuator 1 input index</comment>
+    </parameter>
+    <parameter id="12" set_opcode="44" save_opcode="45" name="a1_port" data_type="U8" default="0">
+      <comment>actuator 1 port</comment>
     </parameter>
     <parameter id="15" set_opcode="50" save_opcode="51" name="a1_reverse" data_type="bool" >
       <comment>actuator 1 reverse direction flag</comment>
@@ -28,6 +31,9 @@
     <parameter id="21" set_opcode="62" save_opcode="63" name="a2_inputActIdx" data_type="U8" >
       <comment>actuator 2 input index</comment>
     </parameter>
+    <parameter id="22" set_opcode="64" save_opcode="65" name="a2_port" data_type="U8" default="0">
+      <comment>actuator 2 port</comment>
+    </parameter>
     <parameter id="25" set_opcode="70" save_opcode="71" name="a2_reverse" data_type="bool" >
       <comment>actuator 2 reverse direction flag</comment>
     </parameter>
@@ -40,6 +46,9 @@
     </parameter>
     <parameter id="31" set_opcode="82" save_opcode="83" name="a3_inputActIdx" data_type="U8" >
       <comment>actuator 3 input index</comment>
+    </parameter>
+    <parameter id="32" set_opcode="84" save_opcode="85" name="a3_port" data_type="U8" default="0">
+      <comment>actuator 3 port</comment>
     </parameter>
     <parameter id="35" set_opcode="90" save_opcode="91" name="a3_reverse" data_type="bool" >
       <comment>actuator 3 reverse direction flag</comment>
@@ -54,6 +63,9 @@
     <parameter id="41" set_opcode="102" save_opcode="103" name="a4_inputActIdx" data_type="U8" >
       <comment>actuator 4 input index</comment>
     </parameter>
+    <parameter id="42" set_opcode="104" save_opcode="105" name="a4_port" data_type="U8" default="0">
+      <comment>actuator 4 port</comment>
+    </parameter>
     <parameter id="45" set_opcode="110" save_opcode="111" name="a4_reverse" data_type="bool" >
       <comment>actuator 4 reverse direction flag</comment>
     </parameter>
@@ -66,6 +78,9 @@
     </parameter>
     <parameter id="51" set_opcode="122" save_opcode="123" name="a5_inputActIdx" data_type="U8" >
       <comment>actuator 5 input index</comment>
+    </parameter>
+    <parameter id="52" set_opcode="124" save_opcode="125" name="a5_port" data_type="U8" default="0">
+      <comment>actuator 5 port</comment>
     </parameter>
     <parameter id="55" set_opcode="130" save_opcode="131" name="a5_reverse" data_type="bool" >
       <comment>actuator 5 reverse direction flag</comment>
@@ -80,6 +95,9 @@
     <parameter id="61" set_opcode="142" save_opcode="143" name="a6_inputActIdx" data_type="U8" >
       <comment>actuator 6 input index</comment>
     </parameter>
+    <parameter id="62" set_opcode="144" save_opcode="145" name="a6_port" data_type="U8" default="0">
+      <comment>actuator 6 port</comment>
+    </parameter>
     <parameter id="65" set_opcode="150" save_opcode="151" name="a6_reverse" data_type="bool" >
       <comment>actuator 6 reverse direction flag</comment>
     </parameter>
@@ -93,6 +111,9 @@
     <parameter id="71" set_opcode="162" save_opcode="163" name="a7_inputActIdx" data_type="U8" >
       <comment>actuator 7 input index</comment>
     </parameter>
+    <parameter id="72" set_opcode="164" save_opcode="165" name="a7_port" data_type="U8" default="0">
+      <comment>actuator 7 port</comment>
+    </parameter>
     <parameter id="75" set_opcode="170" save_opcode="171" name="a7_reverse" data_type="bool" >
       <comment>actuator 7 reverse direction flag</comment>
     </parameter>
@@ -105,6 +126,9 @@
     </parameter>
     <parameter id="81" set_opcode="182" save_opcode="183" name="a8_inputActIdx" data_type="U8" >
       <comment>actuator 8 input index</comment>
+    </parameter>
+    <parameter id="82" set_opcode="184" save_opcode="185" name="a8_port" data_type="U8" default="0">
+      <comment>actuator 8 port</comment>
     </parameter>
     <parameter id="85" set_opcode="190" save_opcode="191" name="a8_reverse" data_type="bool" >
       <comment>actuator 8 reverse direction flag</comment>

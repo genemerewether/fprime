@@ -109,10 +109,10 @@ void rtiInit(void)
     rtiREG1->CNT[1U].CPUCx = 74999999U;
 
     /** - Setup compare 0 value. This value is compared with selected free running counter. */
-    rtiREG1->CMP[0U].COMPx = 50000000U;
+    rtiREG1->CMP[0U].COMPx = 2000U;
 
     /** - Setup update compare 0 value. This value is added to the compare 0 value on each compare match. */
-    rtiREG1->CMP[0U].UDCPx = 50000000U;
+    rtiREG1->CMP[0U].UDCPx = 2000U;
 
     /** - Setup compare 1 value. This value is compared with selected free running counter. */
     rtiREG1->CMP[1U].COMPx = 5000U;

@@ -1,6 +1,176 @@
 <parameters>
-    <parameter id="0" set_opcode="20" save_opcode="21" name="initWhenMoving"
-               data_type="U8" default="1">
+    <parameter id="0" set_opcode="20" save_opcode="21" name="MVVISLAM_initWhenMoving" data_type="U8" default="1">
       <comment>whether to allow initialization when moving</comment>
+    </parameter>
+    
+    <parameter id="1" set_opcode="22" save_opcode="23" name="MVVISLAM_tbc_x" data_type="F32" >
+      <comment>imu-cam translation, x</comment>
+    </parameter>
+    <parameter id="2" set_opcode="24" save_opcode="25" name="MVVISLAM_tbc_y" data_type="F32" >
+      <comment>imu-cam translation, y</comment>
+    </parameter>
+    <parameter id="3" set_opcode="26" save_opcode="27" name="MVVISLAM_tbc_z" data_type="F32" >
+      <comment>imu-cam translation, z</comment>
+    </parameter>
+    
+    <parameter id="4" set_opcode="28" save_opcode="29" name="MVVISLAM_ombc_x" data_type="F32" >
+      <comment>imu-cam rotation, scaled axis-angle, x</comment>
+    </parameter>
+    <parameter id="5" set_opcode="30" save_opcode="31" name="MVVISLAM_ombc_y" data_type="F32" >
+      <comment>imu-cam rotation, scaled axis-angle, y</comment>
+    </parameter>
+    <parameter id="6" set_opcode="32" save_opcode="33" name="MVVISLAM_ombc_z" data_type="F32" >
+      <comment>imu-cam rotation, scaled axis-angle, z</comment>
+    </parameter>
+    
+    <parameter id="7" set_opcode="34" save_opcode="35" name="MVVISLAM_std0_tbc_x" data_type="F32" default="0.005" >
+      <comment>imu-cam translation, x</comment>
+    </parameter>
+    <parameter id="8" set_opcode="36" save_opcode="37" name="MVVISLAM_std0_tbc_y" data_type="F32" default="0.005" >
+      <comment>imu-cam translation, y</comment>
+    </parameter>
+    <parameter id="9" set_opcode="38" save_opcode="39" name="MVVISLAM_std0_tbc_z" data_type="F32" default="0.005" >
+      <comment>imu-cam translation, z</comment>
+    </parameter>
+   
+    <parameter id="10" set_opcode="40" save_opcode="41" name="MVVISLAM_std0_ombc_x" data_type="F32" default="0.04" >
+      <comment>imu-cam rotation, scaled axis-angle, x</comment>
+    </parameter>
+    <parameter id="11" set_opcode="42" save_opcode="43" name="MVVISLAM_std0_ombc_y" data_type="F32" default="0.04" >
+      <comment>imu-cam rotation, scaled axis-angle, y</comment>
+    </parameter>
+    <parameter id="12" set_opcode="44" save_opcode="45" name="MVVISLAM_std0_ombc_z" data_type="F32" default="0.04" >
+      <comment>imu-cam rotation, scaled axis-angle, z</comment>
+    </parameter>
+   
+    <parameter id="13" set_opcode="46" save_opcode="47" name="MVVISLAM_tba_x" data_type="F32" default="0.0" >
+      <comment>imu - GPS antenna translation, x</comment>
+    </parameter>
+    <parameter id="14" set_opcode="48" save_opcode="49" name="MVVISLAM_tba_y" data_type="F32" default="0.0" >
+      <comment>imu - GPS antenna translation, y</comment>
+    </parameter>
+    <parameter id="15" set_opcode="50" save_opcode="51" name="MVVISLAM_tba_z" data_type="F32" default="0.0" >
+      <comment>imu - GPS antenna translation, z</comment>
+    </parameter>
+    
+    <parameter id="16" set_opcode="52" save_opcode="53" name="MVVISLAM_pixelWidth" data_type="U32" default="640" >
+      <comment>pixel width</comment>
+    </parameter>
+    <parameter id="17" set_opcode="54" save_opcode="55" name="MVVISLAM_pixelHeight" data_type="U32" default="480" >
+      <comment>pixel height</comment>
+    </parameter>
+    <parameter id="18" set_opcode="56" save_opcode="57" name="MVVISLAM_memoryStride" data_type="U32" default="640" >
+      <comment>memory stride</comment>
+    </parameter>
+    
+    <parameter id="19" set_opcode="58" save_opcode="59" name="MVVISLAM_principalPoint_u" data_type="F64" >
+      <comment>principal point, u</comment>
+    </parameter>
+    <parameter id="20" set_opcode="60" save_opcode="61" name="MVVISLAM_principalPoint_v" data_type="F64" >
+      <comment>principal point, v</comment>
+    </parameter>
+    
+    <parameter id="21" set_opcode="62" save_opcode="63" name="MVVISLAM_mapping" data_type="U8" default="1">
+      <comment>whether to re-track points that move back into frame</comment>
+    </parameter>
+    
+    <parameter id="22" set_opcode="64" save_opcode="65" name="MVVISLAM_uvOffset" data_type="U32" default="0">
+      <comment>uv offset</comment>
+    </parameter>
+    
+    <parameter id="23" set_opcode="66" save_opcode="67" name="MVVISLAM_distortionModel" data_type="U8" default="10">
+      <comment>distortion model - number of coefficients</comment>
+    </parameter>
+    
+    <parameter id="24" set_opcode="68" save_opcode="69" name="MVVISLAM_focalLength_u" data_type="F64" >
+      <comment>focal length, u</comment>
+    </parameter>
+    <parameter id="25" set_opcode="70" save_opcode="71" name="MVVISLAM_focalLength_v" data_type="F64" >
+      <comment>focal length, v</comment>
+    </parameter>
+    
+    <parameter id="26" set_opcode="72" save_opcode="73" name="MVVISLAM_distortion_0" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="27" set_opcode="74" save_opcode="75" name="MVVISLAM_distortion_1" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="28" set_opcode="76" save_opcode="77" name="MVVISLAM_distortion_2" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="29" set_opcode="78" save_opcode="79" name="MVVISLAM_distortion_3" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="30" set_opcode="80" save_opcode="81" name="MVVISLAM_distortion_4" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="31" set_opcode="82" save_opcode="83" name="MVVISLAM_distortion_5" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="32" set_opcode="84" save_opcode="85" name="MVVISLAM_distortion_6" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="33" set_opcode="86" save_opcode="87" name="MVVISLAM_distortion_7" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="34" set_opcode="88" save_opcode="89" name="MVVISLAM_distortion_8" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+    <parameter id="35" set_opcode="90" save_opcode="91" name="MVVISLAM_distortion_9" data_type="F64" >
+      <comment>distortion parameter</comment>
+    </parameter>
+
+    <parameter id="36" set_opcode="92" save_opcode="93" name="MVVISLAM_readoutTime" data_type="F32" default="0.0">
+      <comment>readout time for rolling shutter cameras</comment>
+    </parameter>
+    <parameter id="37" set_opcode="94" save_opcode="95" name="MVVISLAM_camDelta" data_type="F32">
+      <comment>camera-imu timestamp delta</comment>
+    </parameter>
+    <parameter id="38" set_opcode="96" save_opcode="97" name="MVVISLAM_std0_camDelta" data_type="F32" default="0.001">
+      <comment>camera-imu timestamp delta stddev</comment>
+    </parameter>
+    
+    <parameter id="39" set_opcode="98" save_opcode="99" name="MVVISLAM_staticMaskFilename" data_type="string" size="80" default="na">
+      <comment>static mask filename</comment>
+    </parameter>
+    
+    <parameter id="40" set_opcode="100" save_opcode="101" name="MVVISLAM_accelMeasRange" data_type="F32" >
+      <comment>accelerometer measurement range</comment>
+    </parameter>
+    <parameter id="41" set_opcode="102" save_opcode="103" name="MVVISLAM_gyroMeasRange" data_type="F32" >
+      <comment>gyro measurement range</comment>
+    </parameter>
+    <parameter id="42" set_opcode="104" save_opcode="105" name="MVVISLAM_stdAccelMeasNoise" data_type="F32" >
+      <comment>accelerometer measurement std dev</comment>
+    </parameter>
+    <parameter id="43" set_opcode="106" save_opcode="107" name="MVVISLAM_stdGyroMeasNoise" data_type="F32" >
+      <comment>gyro measurement std dev</comment>
+    </parameter>
+
+    <parameter id="44" set_opcode="108" save_opcode="109" name="MVVISLAM_stdCamNoise" data_type="F32" >
+      <comment>camera noise std dev per pixel</comment>
+    </parameter>
+    <parameter id="45" set_opcode="110" save_opcode="111" name="MVVISLAM_minStdPixelNoise" data_type="F32" >
+      <comment>Minimum of standard deviation of feature measurement noise in pixels</comment>
+    </parameter>
+    <parameter id="46" set_opcode="112" save_opcode="113" name="MVVISLAM_failHighPixelNoiseScaleFactor" data_type="F32" >
+      <comment>Scales measurement noise and compares against search area (is search area large enough to reliably compute measurement noise covariance matrix).</comment>
+    </parameter>
+
+    <parameter id="47" set_opcode="114" save_opcode="115" name="MVVISLAM_logDepthBootstrap" data_type="F32" default="0.0">
+      <comment>Initial point depth [log(meters)], where log is the natural log.</comment>
+    </parameter>
+    <parameter id="48" set_opcode="116" save_opcode="117" name="MVVISLAM_useLogCameraHeight" data_type="U8" default="0">
+      <comment>Use logCameraHeightBootstrap instead of logDepthBootstrap.</comment>
+    </parameter>
+    <parameter id="49" set_opcode="118" save_opcode="119" name="MVVISLAM_logCameraHeightBootstrap" data_type="F32" default="-3.22">
+      <comment>camera height over ground (log(meters)), log is natural log</comment>
+    </parameter>
+
+    <parameter id="50" set_opcode="120" save_opcode="121" name="MVVISLAM_gpsImuTimeAlignment" data_type="F32" default="0.0">
+      <comment>GPS-inertial timestamp misalignment (seconds), negative if GPS time stamping is delayed relative to IMU time stamping</comment>
+    </parameter>
+    <parameter id="51" set_opcode="122" save_opcode="123" name="MVVISLAM_limitedIMUbWtrigger" data_type="F32" >
+      <comment>If sum of 3 consecutive accelerometer samples in any dimension divided by 4.3 exceed this threshold, IMU measurement noise is increased (and resets become more likely)</comment>
     </parameter>
 </parameters>

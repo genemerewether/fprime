@@ -62,6 +62,13 @@ namespace Gnc {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
+      //! Handler implementation for prmTrigger
+      //!
+      void prmTrigger_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          FwPrmIdType dummy 
+      );
+
       //! Handler implementation for HighRateImu
       //!
       void HighRateImu_handler(
@@ -82,6 +89,15 @@ namespace Gnc {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
+      // ----------------------------------------------------------------------
+      // Member variables
+      // ----------------------------------------------------------------------
+    
+      ROS::mav_msgs::BatchImu m_batchImu;
+
+      ROS::sensor_msgs::ImuNoCov m_imuArray[100];
+
+      NATIVE_INT_TYPE batchImuMax;
 
     };
 

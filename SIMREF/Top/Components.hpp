@@ -14,7 +14,7 @@ void exitTasks(void);
 #include <Svc/ActiveLogger/ActiveLoggerImpl.hpp>
 #include <ROS/RosTime/RosTimeImpl.hpp>
 #include <Svc/TlmChan/TlmChanImpl.hpp>
-#include <Svc/PrmDb/PrmDbImpl.hpp>
+#include <Svc/ActiveL1PrmDb/ActiveL1PrmDbImpl.hpp>
 #include <Fw/Obj/SimpleObjRegistry.hpp>
 
 #include <Svc/SocketGndIf/SvcSocketGndIfImpl.hpp>
@@ -34,6 +34,8 @@ void exitTasks(void);
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 
+#include "Gnc/quest_external/traj/ewok/EwokComponentImpl.hpp"
+
 extern Svc::RateGroupDecouplerComponentImpl rgDecouple;
 extern Svc::RateGroupDriverImpl rgGncDrv;
 extern Svc::ActiveRateGroupImpl rg;
@@ -47,7 +49,7 @@ extern Svc::ActiveFileLoggerImpl fileLogger;
 extern ROS::RosTimeImpl rosTime;
 extern Svc::TlmChanImpl chanTlm;
 extern Svc::CommandDispatcherImpl cmdDisp;
-extern Svc::PrmDbImpl prmDb;
+extern Svc::ActiveL1PrmDbComponentImpl prmDb;
 extern Svc::UdpReceiverComponentImpl udpReceiver;
 extern Svc::AssertFatalAdapterComponentImpl fatalAdapter;
 extern Svc::FatalHandlerComponentImpl fatalHandler;
@@ -61,5 +63,7 @@ extern Gnc::LeeCtrlComponentImpl leeCtrl;
 extern Gnc::BasicMixerComponentImpl mixer;
 extern Gnc::SigGenComponentImpl sigGen;
 extern Gnc::AttFilterComponentImpl attFilter;
+
+extern ewok::EwokComponentImpl ewokComp;
 
 #endif

@@ -22,6 +22,8 @@
 
 #include "SnapdragonFlight/MVVislam/MVVislamComponentAc.hpp"
 
+#include "Os/Mutex.hpp"
+
 #ifdef BUILD_SDFLIGHT
 #include "mv.h"
 #include "mvVISLAM.h"
@@ -60,12 +62,20 @@ namespace SnapdragonFlight {
       //!
       ~MVVislamComponentImpl(void);
 
+      void setTBDes(TimeBase tbDes);
+    
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       //! Preamble override
       void preamble(void);
       //! Finalizer override
       void finalizer(void);
+
+      // add IMU packet to Vislam; converts time as side-effect
+      void addImuHelper(ROS::sensor_msgs::ImuNoCov &imu);
     
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -76,6 +86,13 @@ namespace SnapdragonFlight {
       void Imu_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           ROS::sensor_msgs::ImuNoCov &imu
+      );
+
+      //! Handler implementation for BatchImu
+      //!
+      void BatchImu_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          ROS::mav_msgs::BatchImu &BatchImu 
       );
 
       //! Handler implementation for Image
@@ -131,7 +148,37 @@ namespace SnapdragonFlight {
 
 #ifdef BUILD_SDFLIGHT
       mvVISLAM* m_mvVISLAMPtr;
+    
+      mvCameraConfiguration m_camCfg;
 #endif
+
+      F32 m_tbc[3];
+      F32 m_ombc[3];
+      F32 m_std0tbc[3];
+      F32 m_std0ombc[3];
+      F32 m_tba[3];
+
+      F32 m_readoutTime;
+      F32 m_camDelta;
+      F32 m_std0camDelta;
+    
+      F32 m_accelMeasRange;
+      F32 m_gyroMeasRange;
+      F32 m_stdAccelMeasNoise;
+      F32 m_stdGyroMeasNoise;
+    
+      F32 m_stdCamNoise;
+      F32 m_minStdPixelNoise;
+    
+      F32 m_failHighPixelNoiseScaleFactor;
+      F32 m_logDepthBootstrap;
+      bool m_useLogCameraHeight;
+      F32 m_logCameraHeightBootstrap;
+      bool m_noInitWhenMoving;
+      F32 m_limitedIMUbWtrigger;
+      Fw::ParamString m_staticMaskFilename;
+      F32 m_gpsImuTimeAlignment;
+      bool m_mapping;
 
       bool m_initialized;
       
@@ -142,6 +189,8 @@ namespace SnapdragonFlight {
       ROS::geometry_msgs::Quaternion w_q_b;
     
       ROS::geometry_msgs::Vector3 x_b;
+
+      TimeBase m_tbDes;
 
     };
 

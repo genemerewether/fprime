@@ -59,7 +59,7 @@ class EnumType(type_base.BaseType):
 
     def _check_val(self, val):
       # make sure requested value is found in enum members
-      if val != "UNDEFINED" and self.__do_check:
+      if val != "UNDEFINED" and hasattr(self, '__do_check') and self.__do_check:
           if val not in list(self.__enum_dict.keys()):
               raise EnumMismatchException(self.__typename, val)
 
