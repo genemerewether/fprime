@@ -121,8 +121,10 @@ void allocComps() {
         Gnc::LCTRL_SCHED_CONTEXT_TLM, // leeCtrl
         0, // mixer
         Gnc::ACTADAP_SCHED_CONTEXT_TLM, // adapter
+        0, // actCtrl
         0, // logQueue
         0, // chanTlm
+        0, // prmDb
     };
 
     rgTlm_ptr = new Svc::PassiveRateGroupImpl(

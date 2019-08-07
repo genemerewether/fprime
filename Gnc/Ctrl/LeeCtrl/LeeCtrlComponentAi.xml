@@ -14,6 +14,7 @@
     <import_port_type>ROS/Gen/mav_msgs/Ports/TorqueThrustPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/FlatOutputPortAi.xml</import_port_type>
     <import_port_type>ROS/Gen/mav_msgs/Ports/AttitudeRateThrustPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/RateThrustPortAi.xml</import_port_type>
     <import_port_type>Fw/Prm/PrmTriggerPortAi.xml</import_port_type>
 
     <import_port_type>ROS/Gen/geometry_msgs/Ports/AccelStampedPortAi.xml</import_port_type>
@@ -41,6 +42,9 @@
         </port>
 
         <port name="attRateThrust" data_type="ROS::mav_msgs::AttitudeRateThrust"  kind="sync_input" max_number="1">
+        </port>
+
+        <port name="rateThrustOut" data_type="ROS::mav_msgs::RateThrust"  kind="output" max_number="1">
         </port>
 
         <port name="accelCommand" data_type="ROS::geometry_msgs::AccelStamped"  kind="output" max_number="1">

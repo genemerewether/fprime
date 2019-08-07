@@ -5,25 +5,30 @@
 
     <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
     <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
     <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
     <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
     <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
     <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
-    <import_port_type>Drv/PwmDriverPorts/PwmSetDutyCyclePortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/RateThrustPortAi.xml</import_port_type>
 
-    <!--import_dictionary>Gnc/Ctrl/ActuatorAdapter/Telemetry.xml</import_dictionary>
-    <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Events.xml</import_dictionary>
-    <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Commands.xml</import_dictionary-->
+    <import_dictionary>Drv/Mavlink/ActuatorControls/Telemetry.xml</import_dictionary>
+    <import_dictionary>Drv/Mavlink/ActuatorControls/Events.xml</import_dictionary>
+    <import_dictionary>Drv/Mavlink/ActuatorControls/Commands.xml</import_dictionary>
+    <import_dictionary>Drv/Mavlink/ActuatorControls/Params.xml</import_dictionary>
 
     <ports>
 
-        <port name="pwmSetDuty" data_type="Drv::PwmSetDutyCycleData"  kind="sync_input"    max_number="1">
-        </port>
+        <port name="rateThrust" data_type="ROS::mav_msgs::RateThrust"  kind="sync_input" max_number="1">
+        </port>      
 
         <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
         </port>
 
+        <port name="SerialBufferSend" data_type="Fw::BufferSend"  kind="output">
+           <comment>Port to send buffers for the serial driver to use</comment>
+        </port>
         <port name="SerReadPort" data_type="Drv::SerialRead" kind="sync_input" >
             <comment>
             Input port from serial driver to read accumulated data
