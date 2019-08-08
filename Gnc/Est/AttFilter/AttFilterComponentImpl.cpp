@@ -21,6 +21,8 @@
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 #include "Fw/Types/BasicTypes.hpp"
 
+#include "Os/IntervalTimer.hpp"
+
 #ifdef BUILD_DSPAL
 #include <HAP_farf.h>
 #define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
@@ -205,7 +207,14 @@ namespace Gnc {
     
       if (context == ATTFILTER_SCHED_CONTEXT_FILT) {
           using namespace ROS::geometry_msgs;
+          Os::IntervalTimer timer;
+          timer.start();
           this->attFilter.PropagateState();
+          timer.stop();
+          Fw::Time filtNow = this->getTime();
+          DEBUG_PRINT("prop done at %u.%06u, %u usec\n",
+                      filtNow.getSeconds(), filtNow.getUSeconds(), timer.getDiffUsec());
+          
           Eigen::Vector3d x_w(0, 0, 0);
           Eigen::Quaterniond w_q_b(1, 0, 0, 0);
           Eigen::Vector3d v_b(0, 0, 0);

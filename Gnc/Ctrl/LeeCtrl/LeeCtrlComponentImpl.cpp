@@ -465,14 +465,15 @@ namespace Gnc {
           }
 
           Eigen::Vector3d alpha_b__comm(0, 0, 0);
+          Eigen::Vector3d omega_b__comm(0, 0, 0);
           if (RPRATE_YAW_THRUST == this->ctrlMode) {
-              this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, false);
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, &omega_b__comm, true, false);
           }
           else if (RP_YAWRATE_THRUST == this->ctrlMode) {
-              this->leeControl.GetAngAccelCommand(&alpha_b__comm, false, true);
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, &omega_b__comm, false, true);
           }
           else if (ATTRATE_THRUST == this->ctrlMode) {
-              this->leeControl.GetAngAccelCommand(&alpha_b__comm, true, true);
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, &omega_b__comm, true, true);
           }
           else if (ROLL_ONLY == this->ctrlMode) {
               this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, 1<<0);
@@ -487,7 +488,7 @@ namespace Gnc {
               this->leeControl.GetAngAxisAlignedCommand(&alpha_b__comm, (1<<0) | (1<<1));
           }
           else {
-              this->leeControl.GetAngAccelCommand(&alpha_b__comm);
+              this->leeControl.GetAngAccelCommand(&alpha_b__comm, &omega_b__comm);
           }
 
           Eigen::Vector3d moment_b__comm = this->J_b * alpha_b__comm;
@@ -500,6 +501,20 @@ namespace Gnc {
           if (this->isConnected_controls_OutputPort(0) &&
               (CTRL_DISABLED != this->ctrlMode)) {
               this->controls_out(0, u_b__comm);
+          }
+          
+          ROS::mav_msgs::RateThrust omega_thrust_b__comm(h,
+            Vector3(moment_b__comm(0), moment_b__comm(1), moment_b__comm(2)),
+            Vector3(thrust_b__comm(0), thrust_b__comm(1), thrust_b__comm(2)));
+          if (this->isConnected_rateThrustOut_OutputPort(0) &&
+              ((RPRATE_YAW_THRUST == this->ctrlMode)      |
+               (RP_YAWRATE_THRUST == this->ctrlMode)      |
+               (ATTRATE_THRUST == this->ctrlMode)         |
+               (ATT_ATTRATE_THRUST == this->ctrlMode)     |
+               (LIN_VEL == this->ctrlMode)                |
+               (FLAT_OUTPUT_LIN_ACC_FF == this->ctrlMode) |
+               (FLAT_OUTPUT_ANG_ACC_FF == this->ctrlMode))) {
+              this->rateThrustOut_out(0, omega_thrust_b__comm);
           }
 
           ROS::geometry_msgs::AccelStamped accel__comm(h,

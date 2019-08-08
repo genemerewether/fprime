@@ -24,8 +24,19 @@
 #include <termios.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
-//#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#ifdef BUILD_DSPAL
+#include <dev_fs_lib_serial.h>
+
+#include <HAP_farf.h>
+#define DEBUG_PRINT(x,...) FARF(ALWAYS,x,##__VA_ARGS__);
+#else
+#include <stdio.h>
+#define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
+#endif
+
+#undef DEBUG_PRINT
 #define DEBUG_PRINT(x,...)
 
 namespace Drv {
@@ -65,8 +76,11 @@ namespace Drv {
 
        The O_NDELAY flag tells UNIX that this program doesn't care what state the DCD signal line is in - whether the other end of the port is up and running. If you do not specify this flag, your process will be put to sleep until the DCD signal line is the space voltage.
        */
+#ifdef BUILD_DSPAL
+      fd = ::open(device, O_RDWR | O_NONBLOCK | O_SYNC);
+#else
       fd = ::open(device, O_RDWR | O_NOCTTY); // | O_NDELAY);
-      //fd = open(device, O_RDWR | O_NONBLOCK | O_SYNC);
+#endif
 
       if (fd == -1) {
           DEBUG_PRINT("open UART device %s failed.\n", device);
@@ -80,6 +94,7 @@ namespace Drv {
 
       this->m_fd = fd;
 
+#ifndef BUILD_DSPAL
       // Configure blocking reads
       struct termios cfg;
 
@@ -120,7 +135,8 @@ namespace Drv {
       } else {
           DEBUG_PRINT("tcsetattr passed.\n");
       }
-
+#endif // BUILD_DSPAL
+      
       // Set flow control
       if (fc == HW_FLOW) {
 
@@ -228,6 +244,50 @@ namespace Drv {
       }
 
       // Set baud rate:
+#ifdef BUILD_DSPAL
+      DSPAL_SERIAL_BITRATES dspBitrate = DSPAL_SIO_BITRATE_ILLEGAL_1;
+      switch (baud) {
+          // TODO add more as needed
+          case BAUD_9600:
+              dspBitrate = DSPAL_SIO_BITRATE_9600;
+              break;
+          case BAUD_19200:
+              dspBitrate = DSPAL_SIO_BITRATE_19200;
+              break;
+          case BAUD_38400:
+              dspBitrate = DSPAL_SIO_BITRATE_38400;
+              break;
+          case BAUD_57600:
+              dspBitrate = DSPAL_SIO_BITRATE_57600;
+              break;
+          case BAUD_115K:
+              dspBitrate = DSPAL_SIO_BITRATE_115200;
+              break;
+          case BAUD_230K:
+              // TODO(mereweth) - does this work?
+              dspBitrate = DSPAL_SIO_BITRATE_230400;
+              break;
+          case BAUD_460K:
+              // TODO(mereweth) - does this work?
+              dspBitrate = DSPAL_SIO_BITRATE_460800;
+              break;
+          case BAUD_921K:
+              dspBitrate = DSPAL_SIO_BITRATE_921600;
+              break;
+          default:
+              FW_ASSERT(0,baud);
+              break;
+      }
+      struct dspal_serial_ioctl_data_rate rate = { .bit_rate = dspBitrate };
+
+      // configure UART data rate
+      if (ioctl(fd, SERIAL_IOCTL_SET_DATA_RATE, (void *) &rate) != 0) {
+          DEBUG_PRINT("ioctl UART fd %d failed", fd);
+          return false;
+      } else {
+          DEBUG_PRINT("UART fd %d successfully configured", fd);
+      }
+#else // BUILD_DSPAL
       stat = cfsetispeed(&newtio, relayRate);
       stat = cfsetospeed(&newtio, relayRate);
 
@@ -255,6 +315,8 @@ namespace Drv {
           return false;
       }
 
+#endif // BUILD_DSPAL
+      
       // All done!
       Fw::LogStringArg _arg = device;
       this->log_ACTIVITY_HI_DR_PortOpened(_arg);

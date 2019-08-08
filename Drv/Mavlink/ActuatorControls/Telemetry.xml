@@ -1,0 +1,7 @@
+<telemetry>
+    <channel id="0" name="ACTCTRL_ThrustComm" data_type="F32" format_string="%.5fN">
+        <comment>
+            Mavlink commanded body axis thrust
+        </comment>
+    </channel>
+</telemetry>

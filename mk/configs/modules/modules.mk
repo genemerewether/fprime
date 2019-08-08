@@ -442,6 +442,7 @@ HEXREF_GENERAL_MODULES := \
 	Drv/LinuxSpiDriver \
 	Drv/LinuxI2CDriver \
 	Drv/LinuxPwmDriver \
+	Drv/LinuxSerialDriver \
 	\
 	Svc/BufferManager \
 	Svc/CmdDispatcher \
@@ -560,32 +561,6 @@ R5REF_MODULES := \
 	Os \
 	\
 	$(FW_MODULES)
-
-R5RELAY_MODULES := \
-	$(COMMON_MODULES) \
-	\
-	Drv/LinuxSerialDriver \
-	Drv/SerialDriverPorts\
-	\
-	Svc/PassiveRateGroup \
-	Svc/GndIf \
-	Svc/SocketGndIf \
-	\
-	$(SVC_MODULES) \
-	\
-	HLProc/LLRouter \
-	HLProc/EventExpander \
-	\
-	Os \
-	\
-	$(ROS_TYPE_PORT_MODULES_ALL) \
-	\
-	R5RELAY/ImuSplitter \
-	R5RELAY/Top \
-	\
-	$(FW_MODULES) \
-	\
-	$(UTILS_MODULES)
 
 ACDEVTEST_MODULES := \
 	Autocoders/Python/test/active_tester \
@@ -727,5 +702,5 @@ OTHER_MODULES := \
 
 # List deployments
 
-DEPLOYMENTS := acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC R5RELAY BLIMPREF
+DEPLOYMENTS := acdev SDREF SIMREF HEXREF TESTRPC R5REF BASEREF DSPRELAY MINRPC BLIMPREF
 

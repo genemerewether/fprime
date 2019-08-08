@@ -1,0 +1,15 @@
+<events>
+    <event id="0" name="ACTCTRL_InitFailed" severity="WARNING_HI" format_string = "Init failed due to %d" >
+        <args>
+            <arg name="error" type="ENUM">
+                <enum name="ACTCTRL_InitErrorType">
+                    <item name="ACTCTRL_PrmUnset" comment="One of the non-default parameters unset"/>
+                </enum>
+                <comment>The error code</comment>
+            </arg>
+        </args>
+        <comment>
+             ACTCTRL init failed for the following reason
+        </comment>
+    </event>
+</events>

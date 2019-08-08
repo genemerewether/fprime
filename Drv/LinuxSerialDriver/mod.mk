@@ -7,6 +7,8 @@
 
 SRC = LinuxSerialDriverComponentAi.xml LinuxSerialDriverComponentImplCommon.cpp
 
+SRC_DSPAL = LinuxSerialDriverComponentImpl.cpp
+
 SRC_SDFLIGHT = LinuxSerialDriverComponentImpl.cpp
 
 SRC_LINUX = LinuxSerialDriverComponentImpl.cpp

@@ -1,21 +1,14 @@
-// ====================================================================== 
-// \title  ActuatorControlsImpl.hpp
+// ======================================================================
+// \title  ActuatorControlsComponentImpl.hpp
 // \author mereweth
 // \brief  hpp file for ActuatorControls component implementation class
 //
 // \copyright
 // Copyright 2009-2015, by the California Institute of Technology.
 // ALL RIGHTS RESERVED.  United States Government Sponsorship
-// acknowledged. Any commercial use must be negotiated with the Office
-// of Technology Transfer at the California Institute of Technology.
-// 
-// This software may be subject to U.S. export control laws and
-// regulations.  By accepting this document, the user agrees to comply
-// with all U.S. export laws and regulations.  User has the
-// responsibility to obtain export licenses, or other export authority
-// as may be required before exporting such information to foreign
-// countries or providing access to foreign persons.
-// ====================================================================== 
+// acknowledged.
+//
+// ======================================================================
 
 #ifndef ActuatorControls_HPP
 #define ActuatorControls_HPP
@@ -55,24 +48,26 @@ namespace Drv {
       ~ActuatorControlsComponentImpl(void);
 
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
-      //! Handler implementation for SerReadPort
+      //! Handler implementation for prmTrigger
       //!
-      void SerReadPort_handler(
+      void prmTrigger_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
-          SerialReadStatus &status /*!< Status of read*/
+          FwPrmIdType dummy 
       );
     
-      //! Handler implementation for pwmSetDuty
+      //! Handler implementation for rateThrust
       //!
-      void pwmSetDuty_handler(
+      void rateThrust_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          PwmSetDutyCycle pwmSetDutyCycle 
+          ROS::mav_msgs::RateThrust &RateThrust 
       );
 
       //! Handler implementation for sched
@@ -82,7 +77,34 @@ namespace Drv {
           NATIVE_UINT_TYPE context /*!< The call order*/
       );
 
+      //! Handler implementation for SerReadPort
+      //!
+      void SerReadPort_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &serBuffer, /*!< Buffer containing data*/
+          SerialReadStatus &status /*!< Status of read*/
+      );
 
+    PRIVATE:
+
+      // ----------------------------------------------------------------------
+      // Command handler implementations
+      // ----------------------------------------------------------------------
+
+      //! Implementation for ACTCTRL_InitParams command handler
+      //! 
+      void ACTCTRL_InitParams_cmdHandler(
+          const FwOpcodeType opCode, /*!< The opcode*/
+          const U32 cmdSeq /*!< The command sequence number*/
+      );
+
+      F32 minThrust;
+      F32 maxThrust;
+    
+      bool paramsInited;
+    
+      Fw::Buffer m_outputBufObj;
+      char m_outputBuf[512];
     };
 
 } // end namespace Drv
