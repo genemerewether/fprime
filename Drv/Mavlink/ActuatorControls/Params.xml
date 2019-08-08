@@ -1,5 +1,5 @@
 <parameters>
-    <parameter id="0" set_opcode="20" save_opcode="21" name="ACTCTRL_minThrust" data_type="F64" >
+    <parameter id="0" set_opcode="20" save_opcode="21" name="ACTCTRL_minThrust" data_type="F64" default="0.0" >
       <comment>min thrust (corresponding to 0 in mavlink message</comment>
     </parameter>
     <parameter id="1" set_opcode="22" save_opcode="23" name="ACTCTRL_maxThrust" data_type="F64" >

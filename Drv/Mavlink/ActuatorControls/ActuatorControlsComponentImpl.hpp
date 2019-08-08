@@ -48,6 +48,9 @@ namespace Drv {
       ~ActuatorControlsComponentImpl(void);
 
     PRIVATE:
+      void parameterUpdated(FwPrmIdType id /*!< The parameter ID*/);
+    
+      void parametersLoaded();
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -95,7 +98,13 @@ namespace Drv {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
-
+      F32 minThrust;
+      F32 maxThrust;
+    
+      bool paramsInited;
+    
+      Fw::Buffer m_outputBufObj;
+      char m_outputBuf[512];
     };
 
 } // end namespace Drv

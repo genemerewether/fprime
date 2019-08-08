@@ -36,8 +36,8 @@
 #define DEBUG_PRINT(x,...) printf(x,##__VA_ARGS__); fflush(stdout)
 #endif
 
-//#undef DEBUG_PRINT
-//#define DEBUG_PRINT(x,...)
+#undef DEBUG_PRINT
+#define DEBUG_PRINT(x,...)
 
 namespace Drv {
 
@@ -287,10 +287,9 @@ namespace Drv {
       } else {
           DEBUG_PRINT("UART fd %d successfully configured", fd);
       }
-#else
+#else // BUILD_DSPAL
       stat = cfsetispeed(&newtio, relayRate);
       stat = cfsetospeed(&newtio, relayRate);
-#endif
 
       // Raw output:
       newtio.c_oflag = 0;
@@ -302,10 +301,8 @@ namespace Drv {
       //options.c_iflag |=INPCK;
       newtio.c_iflag = INPCK;
 
-#ifndef BUILD_DSPAL
       // Flush old data:
       (void) tcflush(fd, TCIFLUSH);
-#endif
 
       // Set attributes:
       stat = tcsetattr(fd,TCSANOW,&newtio);
@@ -318,6 +315,8 @@ namespace Drv {
           return false;
       }
 
+#endif // BUILD_DSPAL
+      
       // All done!
       Fw::LogStringArg _arg = device;
       this->log_ACTIVITY_HI_DR_PortOpened(_arg);

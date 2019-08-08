@@ -400,7 +400,9 @@ void manualConstruct(void) {
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actDecouple_ptr->get_DataIn_InputPort(3));
     actDecouple_ptr->set_DataOut_OutputPort(3, actuatorAdapter_ptr->get_motor_InputPort(1));
 #else
-    kraitRouter_ptr->set_KraitPortsOut_OutputPort(9, actuatorAdapter_ptr->get_flySafe_InputPort(0));    
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(9, actuatorAdapter_ptr->get_flySafe_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(15, actuatorAdapter_ptr->get_flySafe_InputPort(0));
+    kraitRouter_ptr->set_KraitPortsOut_OutputPort(16, actuatorAdapter_ptr->get_flySafe_InputPort(0));
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(2, actuatorAdapter_ptr->get_motor_InputPort(1));
 #endif
     kraitRouter_ptr->set_KraitPortsOut_OutputPort(3, leeCtrl_ptr->get_flatOutput_InputPort(0));
@@ -536,8 +538,8 @@ void constructApp() {
 
     //TODO(Mereweth) - this is a placeholder; J12, BLSP8
     serialDrv_ptr->open("/dev/tty-3",
-                        Drv::LinuxSerialDriverComponentImpl::BAUD_57600,
-                        Drv::LinuxSerialDriverComponentImpl::HW_FLOW,
+                        Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                        Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                         Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                         true);
 
@@ -560,8 +562,8 @@ void constructApp() {
 
     //TODO(Mereweth) - this is a placeholder; tty 3, J10, SONAR_UART, BLSP7
     serialDrv_ptr->open("/dev/tty-7",
-                        Drv::LinuxSerialDriverComponentImpl::BAUD_57600,
-                        Drv::LinuxSerialDriverComponentImpl::HW_FLOW,
+                        Drv::LinuxSerialDriverComponentImpl::BAUD_921K,
+                        Drv::LinuxSerialDriverComponentImpl::NO_FLOW,
                         Drv::LinuxSerialDriverComponentImpl::PARITY_NONE,
                         true);
 
