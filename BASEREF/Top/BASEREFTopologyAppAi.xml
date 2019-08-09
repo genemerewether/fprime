@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/topology_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<assembly name = "BASEREF">
+	<import_component_type>Svc/Time/TimeComponentAi.xml</import_component_type>
+	<import_component_type>HLProc/LLRouter/LLRouterComponentAi.xml</import_component_type>
+	<import_component_type>Drv/LinuxSerialDriver/LinuxSerialDriverComponentAi.xml</import_component_type>
+	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
+	<import_component_type>Gnc/Ctrl/MultirotorCtrlIface/MultirotorCtrlIfaceComponentAi.xml</import_component_type>
+	<import_component_type>Svc/GndIf/GndIfComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveRateGroup/ActiveRateGroupComponentAi.xml</import_component_type>
+	<import_component_type>Svc/TimeConvert/TimeConvertComponentAi.xml</import_component_type>
+	<import_component_type>Svc/ActiveTextLogger/ActiveTextLoggerComponentAi.xml</import_component_type>
+
+   <instance namespace="Svc" name="linuxTime" type="Time" base_id="20525"  base_id_window="25" />
+
+   <instance namespace="HLProc" name="groundRouter" type="LLRouter" base_id="21050"  base_id_window="25" />
+
+   <instance namespace="Drv" name="serialDriverGround" type="LinuxSerialDriver" base_id="21025"  base_id_window="25" />
+
+   <instance namespace="Svc" name="sockGndIfLL" type="GndIf" base_id="20325"  base_id_window="25" />
+
+   <instance namespace="Gnc" name="mrCtrlIface" type="MultirotorCtrlIface" base_id="20650"  base_id_window="25" />
+
+   <instance namespace="Svc" name="sockGndIf" type="GndIf" base_id="20450"  base_id_window="25" />
+
+   <instance namespace="Svc" name="rgXfer" type="ActiveRateGroup" base_id="20350"  base_id_window="25" />
+
+   <instance namespace="Svc" name="timeConvert" type="TimeConvert" base_id="21000"  base_id_window="25" />
+
+   <instance namespace="Svc" name="textLogger" type="ActiveTextLogger"/>
+
+
+<connection name = "Connection1">
+	 <source component = "serialDriverGround" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection2">
+	 <source component = "sockGndIfLL" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection3">
+	 <source component = "serialDriverGround" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection4">
+	 <source component = "mrCtrlIface" port = "convertTime" type = "ConvertTime" num = "0"/>
+ 	 <target component = "timeConvert" port = "ConvertTime" type = "ConvertTime" num = "0"/>
+</connection>
+<connection name = "Connection5">
+	 <source component = "serialDriverGround" port = "serialRecv" type = "SerialRead" num = "0"/>
+ 	 <target component = "groundRouter" port = "SerReadPort" type = "SerialRead" num = "0"/>
+</connection>
+<connection name = "Connection6">
+	 <source component = "groundRouter" port = "SerWritePort" type = "SerialWrite" num = "0"/>
+ 	 <target component = "serialDriverGround" port = "serialSend" type = "SerialWrite" num = "0"/>
+</connection>
+<connection name = "Connection7">
+	 <source component = "groundRouter" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection8">
+	 <source component = "mrCtrlIface" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection9">
+	 <source component = "timeConvert" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection10">
+	 <source component = "groundRouter" port = "SerialBufferSend" type = "BufferSend" num = "0"/>
+ 	 <target component = "serialDriverGround" port = "readBufferSend" type = "BufferSend" num = "0"/>
+</connection>
+<connection name = "Connection11">
+	 <source component = "groundRouter" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection12">
+	 <source component = "timeConvert" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection13">
+	 <source component = "sockGndIf" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection14">
+	 <source component = "mrCtrlIface" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection15">
+	 <source component = "rgXfer" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection16">
+	 <source component = "sockGndIf" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+<connection name = "Connection17">
+	 <source component = "sockGndIfLL" port = "Time" type = "Time" num = "0"/>
+ 	 <target component = "linuxTime" port = "timeGetPort" type = "Time" num = "0"/>
+</connection>
+<connection name = "Connection18">
+	 <source component = "rgXfer" port = "LogText" type = "LogText" num = "0"/>
+ 	 <target component = "textLogger" port = "TextLogger" type = "LogText" num = "0"/>
+</connection>
+</assembly>
