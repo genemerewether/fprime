@@ -1,0 +1,11 @@
+<parameters>
+    <parameter id="0" set_opcode="20" save_opcode="21" name="QCESC_minRate" data_type="F64" >
+      <comment>min rad / sec</comment>
+    </parameter>
+    <parameter id="1" set_opcode="22" save_opcode="23" name="QCESC_maxRate" data_type="F64" >
+      <comment>max rad / sec</comment>
+    </parameter>
+    <parameter id="2" set_opcode="24" save_opcode="25" name="QCESC_numMotors" data_type="F64" >
+      <comment>max rad / sec</comment>
+    </parameter>
+</parameters>

@@ -1,0 +1,15 @@
+<events>
+    <event id="0" name="QCESC_InitFailed" severity="WARNING_HI" format_string = "Init failed due to %d" >
+        <args>
+            <arg name="error" type="ENUM">
+                <enum name="QCESC_InitErrorType">
+                    <item name="QCESC_PrmUnset" comment="One of the non-default parameters unset"/>
+                </enum>
+                <comment>The error code</comment>
+            </arg>
+        </args>
+        <comment>
+             QCESC init failed for the following reason
+        </comment>
+    </event>
+</events>

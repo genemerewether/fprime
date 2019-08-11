@@ -33,6 +33,7 @@ void exitTasks(void);
 #include <Gnc/Sysid/SigGen/SigGenComponentImpl.hpp>
 #include <Gnc/Est/AttFilter/AttFilterComponentImpl.hpp>
 #include <Drv/Mavlink/ActuatorControls/ActuatorControlsComponentImpl.hpp>
+#include <Drv/Actuator/QualcommESC/QualcommESCComponentImpl.hpp>
 
 #include <LLProc/ShortLogQueue/ShortLogQueueComponentImpl.hpp>
 #include <LLProc/LLCmdDispatcher/LLCmdDispatcherComponentImpl.hpp>
@@ -65,12 +66,14 @@ extern Gnc::ActuatorAdapterComponentImpl* actuatorAdapter_ptr;
 extern Gnc::SigGenComponentImpl* sigGen_ptr;
 extern Gnc::AttFilterComponentImpl* attFilter_ptr;
 extern Drv::ActuatorControlsComponentImpl* actCtrl_ptr;
+extern Drv::QualcommESCComponentImpl* qcEsc_ptr;
 extern Drv::MPU9250ComponentImpl* mpu9250_ptr;
 extern Drv::LinuxSpiDriverComponentImpl* spiDrv_ptr;
 extern Drv::LinuxI2CDriverComponentImpl* i2cDrv_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* imuDRInt_ptr;
 extern Drv::LinuxGpioDriverComponentImpl* hwEnablePin_ptr;
 extern Drv::LinuxSerialDriverComponentImpl* serialDrv_ptr;
+extern Drv::LinuxSerialDriverComponentImpl* escSerialDrv_ptr;
 extern Drv::LinuxPwmDriverComponentImpl* escPwm_ptr;
 
 #endif

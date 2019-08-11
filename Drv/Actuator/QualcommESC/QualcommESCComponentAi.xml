@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../Autocoders/schema/ISF/component_schema.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<component name="QualcommESC" kind="passive" namespace="Drv">
+
+    <import_port_type>Drv/SerialDriverPorts/SerialReadPortAi.xml</import_port_type>
+    <import_port_type>Drv/SerialDriverPorts/SerialWritePortAi.xml</import_port_type>
+    <import_port_type>Fw/Buffer/BufferSendPortAi.xml</import_port_type>
+    <import_port_type>Svc/Sched/SchedPortAi.xml</import_port_type>
+    <import_port_type>Fw/Tlm/TlmPortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogPortAi.xml</import_port_type>
+    <import_port_type>Fw/Time/TimePortAi.xml</import_port_type>
+    <import_port_type>Fw/Log/LogTextPortAi.xml</import_port_type>
+    <import_port_type>ROS/Gen/mav_msgs/Ports/ActuatorsPortAi.xml</import_port_type>
+
+    <import_dictionary>Drv/Actuator/QualcommESC/Telemetry.xml</import_dictionary>
+    <import_dictionary>Drv/Actuator/QualcommESC/Events.xml</import_dictionary>
+    <import_dictionary>Drv/Actuator/QualcommESC/Commands.xml</import_dictionary>
+    <import_dictionary>Drv/Actuator/QualcommESC/Params.xml</import_dictionary>
+    <import_port_type>Fw/Prm/PrmTriggerPortAi.xml</import_port_type>
+    
+    <ports>
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        </port>
+
+        <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="1">
+        </port>      
+
+        <port name="sched" data_type="Svc::Sched"  kind="sync_input"    max_number="1">
+        </port>
+
+        <port name="SerialBufferSend" data_type="Fw::BufferSend"  kind="output">
+           <comment>Port to send buffers for the serial driver to use</comment>
+        </port>
+        <port name="SerReadPort" data_type="Drv::SerialRead" kind="sync_input" >
+            <comment>
+            Input port from serial driver to read accumulated data
+            </comment>
+        </port>
+        <port name="SerWritePort" data_type="Drv::SerialWrite" kind="output" >
+            <comment>
+            Output port to serial driver to write data
+            </comment>
+        </port>
+
+        <!--port name="tlm" data_type="Fw::Tlm"  kind="output"    max_number="1">
+        </port>
+
+        <port name="log" data_type="Fw::Log"  kind="output"    max_number="1">
+        </port>
+
+        <port name="logText" data_type="Fw::LogText"  kind="output"    max_number="1">
+        </port>
+
+        <port name="time" data_type="Fw::Time"  kind="output"    max_number="1">
+        </port-->
+    </ports>
+
+</component>

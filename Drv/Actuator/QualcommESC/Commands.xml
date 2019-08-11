@@ -1,0 +1,12 @@
+<commands>
+    <command kind="sync" opcode="0" mnemonic="QCESC_InitParams">
+      <args>
+      </args>
+    </command>
+    <command kind="sync" opcode="1" mnemonic="QCESC_Arm">
+      <args>
+          <arg name="armState" type="bool">
+          </arg>
+      </args>
+    </command>
+</commands>

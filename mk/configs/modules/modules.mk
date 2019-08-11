@@ -432,6 +432,8 @@ HEXREF_GENERAL_MODULES := \
 	$(HEXAGON_MODULES) \
 	\
 	Drv/IMU/MPU9250 \
+	Drv/IMU/STIM300 \
+	Drv/Actuator/QualcommESC \
 	Drv/Mavlink/ActuatorControls \
 	Drv/PwmDriverPorts \
 	Drv/GpioDriverPorts \
@@ -541,6 +543,7 @@ R5REF_MODULES := \
 	Drv/IMU/MPU9250 \
 	Drv/IMU/STIM300 \
 	Drv/Mavlink/ActuatorControls \
+	Drv/Actuator/QualcommESC \
 	Drv/Altimeter/LIDARLiteV3 \
 	\
 	Svc/PassiveRateGroup \

@@ -1,0 +1,35 @@
+<telemetry>
+    <channel id="0" name="QCESC_Rot0" data_type="F32" format_string="%.3f rad">
+        <comment>
+        </comment>
+    </channel>
+    <channel id="1" name="QCESC_Rot1" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="2" name="QCESC_Rot2" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="3" name="QCESC_Rot3" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="4" name="QCESC_Rot4" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="5" name="QCESC_Rot5" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="6" name="QCESC_Rot6" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+    <channel id="7" name="QCESC_Rot7" data_type="F32" format_string="%.3f rad">
+      <comment>
+      </comment>
+    </channel>
+
+</telemetry>

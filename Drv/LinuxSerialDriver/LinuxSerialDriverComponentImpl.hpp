@@ -54,6 +54,7 @@ namespace Drv {
           BAUD_57600,
           BAUD_115K,
           BAUD_230K,
+          BAUD_250K,
           BAUD_460K,
           BAUD_921K
       } UartBaudRate ;

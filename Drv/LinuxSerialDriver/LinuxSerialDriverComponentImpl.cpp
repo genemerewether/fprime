@@ -187,6 +187,9 @@ namespace Drv {
           case BAUD_230K:
               relayRate = B230400;
               break;
+          case BAUD_250K:
+              relayRate = B250000;
+              break;
           case BAUD_460K:
               relayRate = B460800;
               break;
@@ -266,6 +269,9 @@ namespace Drv {
           case BAUD_230K:
               // TODO(mereweth) - does this work?
               dspBitrate = DSPAL_SIO_BITRATE_230400;
+              break;
+          case BAUD_250K:
+              dspBitrate = DSPAL_SIO_BITRATE_250000;
               break;
           case BAUD_460K:
               // TODO(mereweth) - does this work?
