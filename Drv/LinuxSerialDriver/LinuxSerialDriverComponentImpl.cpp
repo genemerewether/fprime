@@ -188,8 +188,12 @@ namespace Drv {
               relayRate = B230400;
               break;
           case BAUD_250K:
-              relayRate = B250000;
-              break;
+          {
+              Fw::LogStringArg _arg = device;
+              Fw::LogStringArg _err = "250000 Baud not supported on Linux\n";
+              this->log_WARNING_HI_DR_OpenError(_arg,fd,_err);
+          }
+              return false;
           case BAUD_460K:
               relayRate = B460800;
               break;
