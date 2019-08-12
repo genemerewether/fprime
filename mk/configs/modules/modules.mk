@@ -417,16 +417,26 @@ HEXREF_GENERAL_MODULES := \
 	ROS/Gen/nav_msgs/Ports           \
 	ROS/Gen/mav_msgs/Ports		 \
 	ROS/Gen/sensor_msgs/Ports	\
-	ROS/Gen/ackermann_msgs/Ports	\
 	\
 	ROS/Gen/std_msgs/Types  \
 	ROS/Gen/geometry_msgs/Types      \
 	ROS/Gen/nav_msgs/Types           \
 	ROS/Gen/mav_msgs/Types		 \
 	ROS/Gen/sensor_msgs/Types	\
-	ROS/Gen/ackermann_msgs/Types	\
 	\
-	$(QUEST_GNC_MODULES) \
+	Gnc/Ctrl/LeeCtrl \
+	Gnc/Ctrl/BasicMixer \
+	Gnc/Est/ImuInteg \
+	Gnc/Est/AttFilter \
+	Gnc/Sysid/SigGen \
+	Gnc/Utils/FrameTransform \
+	Gnc/Utils/ImuProc \
+	Gnc/quest_gnc/src/diffeo \
+	Gnc/quest_gnc/src/traj \
+	Gnc/quest_gnc/src/ctrl \
+	Gnc/quest_gnc/src/est \
+	Gnc/quest_gnc/src/mixer \
+	Gnc/quest_gnc/src/sysid \
 	$(QUEST_GNC_HW_MODULES) \
 	\
 	$(HEXAGON_MODULES) \
@@ -446,7 +456,6 @@ HEXREF_GENERAL_MODULES := \
 	Drv/LinuxPwmDriver \
 	Drv/LinuxSerialDriver \
 	\
-	Svc/BufferManager \
 	Svc/CmdDispatcher \
 	Svc/Seq \
 	Svc/ActiveRateGroup \
