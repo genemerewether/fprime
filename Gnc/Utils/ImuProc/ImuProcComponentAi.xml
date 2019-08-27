@@ -15,7 +15,7 @@
     <import_dictionary>Gnc/Utils/ImuProc/Commands.xml</import_dictionary>
     <import_dictionary>Gnc/Utils/ImuProc/Params.xml</import_dictionary>
     <ports>
-        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="HighRateImu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">

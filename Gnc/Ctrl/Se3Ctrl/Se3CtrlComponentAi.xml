@@ -26,7 +26,7 @@
     <import_dictionary>Gnc/Ctrl/Se3Ctrl/Events.xml</import_dictionary>
 
     <ports>
-        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="odometry" data_type="ROS::nav_msgs::OdometryAccel"  kind="sync_input" max_number="1">

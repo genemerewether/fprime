@@ -23,7 +23,7 @@
     <import_dictionary>Gnc/Ctrl/ActuatorAdapter/Params.xml</import_dictionary>
 
     <ports>
-        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="outputEnable" data_type="Drv::GpioRead"  kind="output"    max_number="1">

@@ -20,7 +20,7 @@
     <import_port_type>Fw/Prm/PrmTriggerPortAi.xml</import_port_type>
     
     <ports>
-        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="motor" data_type="ROS::mav_msgs::Actuators"  kind="sync_input" max_number="1">

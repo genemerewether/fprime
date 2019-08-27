@@ -19,7 +19,7 @@
     <import_dictionary>Gnc/Est/AttFilter/Params.xml</import_dictionary>
 
     <ports>
-        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="Imu" data_type="ROS::sensor_msgs::ImuNoCov"  kind="sync_input"    max_number="1">

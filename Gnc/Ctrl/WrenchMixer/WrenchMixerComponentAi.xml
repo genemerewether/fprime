@@ -21,7 +21,7 @@
     <import_dictionary>Gnc/Ctrl/WrenchMixer/Params.xml</import_dictionary>
 
     <ports>
-        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="80">
+        <port name="prmTrigger" data_type="Fw::PrmTrigger"  kind="sync_input"    max_number="1">
         </port>
 
         <port name="controls" data_type="ROS::geometry_msgs::WrenchStamped"  kind="sync_input" max_number="1">
