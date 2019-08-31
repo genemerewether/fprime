@@ -6,7 +6,7 @@
 
 SHELL = /bin/bash
 
-SEQ_TXT := $(shell find . -type f -name '*.seq')
+SEQ_TXT := $(shell find -L . -type f -name '*.seq')
 SEQ_BIN := $(SEQ_TXT:%.seq=%.bin)
 
 MKFILE_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -32,7 +32,3 @@ hash: $(SEQ_BIN)
 
 local: $(SEQ_BIN)
 	$(foreach SEQ,$(SEQ_BIN),cp $(SEQ) /seq/; md5sum $(SEQ); md5sum /seq/$(notdir $(SEQ));)
-
-load: $(SEQ_BIN)
-	$(foreach SEQ,$(SEQ_BIN),adb push $(SEQ) /seq/; md5sum $(SEQ); adb shell md5sum /seq/$(notdir $(SEQ));)
-	adb shell sync
