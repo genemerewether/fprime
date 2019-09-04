@@ -1,5 +1,5 @@
 [submodule "dspal"]
-	path = dspal
+	path = SnapdragonFlight/dspal
 	url = https://github.com/ATLFlight/dspal.git
 [submodule "Utils/nano-dm"]
 	path = Utils/nano-dm

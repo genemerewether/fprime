@@ -5,4 +5,5 @@ DSPAL_FLAGS_COMMON += -DTARGET_8096
 endif
 
 DSPAL_INCLUDES_COMMON := -I$(BUILD_ROOT)/Fw/Types/Dspal \
-			 -I$(BUILD_ROOT)/dspal/include
+			 -I$(BUILD_ROOT)/SnapdragonFlight/dspal/include \
+			 -I$(BUILD_ROOT)/SnapdragonFlight/
