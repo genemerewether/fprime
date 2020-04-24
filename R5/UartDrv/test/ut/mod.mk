@@ -12,4 +12,5 @@ TEST_MODS = R5/UartDrv R5/R5Mem R5/DmaDrv \
 
 
 TEST_MODS_TIR5 = R5/TiHal \
+	R5/R5EventCapture \
 			Drv/SerialDriverPorts
